@@ -39,7 +39,7 @@ body:
         请尽量清晰地描述你所期待的结果。
         Please be as clear and accurate as possible to describe the results you are looking for.
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: 截屏或者录屏演示 Screenshot or screen recording presentation
@@ -57,7 +57,7 @@ body:
         - Browser (if used):
       render: markdown
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: 日志文件 Log file
@@ -65,7 +65,7 @@ body:
         请提供内核日志 `工作空间/temp/siyuan.log`
         The program log file is located at `workspace/temp/siyuan.log`
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: 更多信息 More information
