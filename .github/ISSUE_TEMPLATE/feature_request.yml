@@ -17,7 +17,7 @@ body:
         请描述你能想到的最优解决方案。也有有些类似软件已经实现了该特性，请列出以供我们参考。
         Please try to describe the best solution. There may be similar software that implements this feature. Please also list it for our reference.
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: 描述候选的解决方案 Describe the candidate solution
