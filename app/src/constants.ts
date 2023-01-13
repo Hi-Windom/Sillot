@@ -20,10 +20,9 @@ export abstract class Constants {
     public static readonly SIYUAN_DROP_EDITOR: string = "application/siyuan-editor";
 
     // 渲染进程调主进程
-    public static readonly SIYUAN_CONFIG_THEME: string = "siyuan-config-theme";
-    public static readonly SIYUAN_CONFIG_CLOSE: string = "siyuan-config-close";
+    public static readonly SIYUAN_SHOW: string = "siyuan-show";
     public static readonly SIYUAN_CONFIG_TRAY: string = "siyuan-config-tray";
-    public static readonly SIYUAN_CONFIG_CLOSETRAY: string = "siyuan-config-closetray";
+    public static readonly SIYUAN_OPEN_WORKSPACE: string = "siyuan-open-workspace";
     public static readonly SIYUAN_QUIT: string = "siyuan-quit";
     public static readonly SIYUAN_HOTKEY: string = "siyuan-hotkey";
     public static readonly SIYUAN_INIT: string = "siyuan-init";
@@ -38,6 +37,7 @@ export abstract class Constants {
     public static readonly SIZE_UNDO = 64;
     public static readonly SIZE_TITLE = 512;
     public static readonly SIZE_EDITOR_WIDTH = 760;
+    public static readonly SIZE_ZOOM = [0.25, 0.33, 0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3];
 
     // ws callback
     public static readonly CB_MOUNT_HELP = "cb-mount-help";
@@ -58,12 +58,14 @@ export abstract class Constants {
     public static readonly CB_GET_HISTORY = "cb-get-history"; // 历史渲染
 
     // localstorage
+    public static readonly LOCAL_ZOOM = "local-zoom";
     public static readonly LOCAL_SEARCHEDATA = "local-searchedata";
-    public static readonly LOCAL_SEARCHEKEYS = "local-searchekeys"; // "keys", "col", "row", "replaceKeys", "layout"
+    public static readonly LOCAL_SEARCHEKEYS = "local-searchekeys";
     public static readonly LOCAL_DOCINFO = "local-docinfo"; // only mobile
-    public static readonly LOCAL_DAILYNOTEID = "local-dailynoteid";
-    public static readonly LOCAL_HISTORYNOTEID = "local-historynoteid";
-    public static readonly LOCAL_CODELANG = "local-codelang";
+    public static readonly LOCAL_SEARCHEKEY = "local-searchkey"; // only mobile
+    public static readonly LOCAL_DAILYNOTEID = "local-dailynoteid"; // string
+    public static readonly LOCAL_HISTORYNOTEID = "local-historynoteid"; // string
+    public static readonly LOCAL_CODELANG = "local-codelang"; // string
     public static readonly LOCAL_FONTSTYLES = "local-fontstyles";
     public static readonly LOCAL_EXPORTPDF = "local-exportpdf";
     public static readonly LOCAL_EXPORTWORD = "local-exportword";

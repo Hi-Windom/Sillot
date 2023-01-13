@@ -42,8 +42,22 @@ type BlockTree struct {
 	RootID   string // 根 ID
 	ParentID string // 父 ID
 	BoxID    string // 笔记本 ID
-	Path     string // 文档物理路径
-	HPath    string // 文档逻辑路径
+	Path     string // 文档数据路径
+	HPath    string // 文档可读路径
+	Updated  string // 更新时间
+}
+
+func GetRootUpdated() (ret map[string]string) {
+	blockTreesLock.Lock()
+	defer blockTreesLock.Unlock()
+
+	ret = map[string]string{}
+	for _, b := range blockTrees {
+		if b.RootID == b.ID {
+			ret[b.RootID] = b.Updated
+		}
+	}
+	return
 }
 
 func GetBlockTreeByPath(path string) *BlockTree {
@@ -102,6 +116,56 @@ func CeilBlockCount(count int) int {
 	return 10000*100 + 1
 }
 
+func GetRedundantPaths(boxID string, paths []string) (ret []string) {
+	pathsMap := map[string]bool{}
+	for _, path := range paths {
+		pathsMap[path] = true
+	}
+
+	tmp := blockTrees
+	btPathsMap := map[string]bool{}
+	for _, blockTree := range tmp {
+		if blockTree.BoxID != boxID {
+			continue
+		}
+
+		btPathsMap[blockTree.Path] = true
+	}
+
+	for p, _ := range btPathsMap {
+		if !pathsMap[p] {
+			ret = append(ret, p)
+		}
+	}
+	ret = gulu.Str.RemoveDuplicatedElem(ret)
+	return
+}
+
+func GetNotExistPaths(boxID string, paths []string) (ret []string) {
+	pathsMap := map[string]bool{}
+	for _, path := range paths {
+		pathsMap[path] = true
+	}
+
+	tmp := blockTrees
+	btPathsMap := map[string]bool{}
+	for _, blockTree := range tmp {
+		if blockTree.BoxID != boxID {
+			continue
+		}
+
+		btPathsMap[blockTree.Path] = true
+	}
+
+	for p, _ := range pathsMap {
+		if !btPathsMap[p] {
+			ret = append(ret, p)
+		}
+	}
+	ret = gulu.Str.RemoveDuplicatedElem(ret)
+	return
+}
+
 func GetBlockTreeRootByPath(boxID, path string) *BlockTree {
 	blockTreesLock.Lock()
 	defer blockTreesLock.Unlock()
@@ -142,7 +206,7 @@ func SetBlockTreePath(tree *parse.Tree) {
 
 	for _, b := range blockTrees {
 		if b.RootID == tree.ID {
-			b.BoxID, b.Path, b.HPath = tree.Box, tree.Path, tree.HPath
+			b.BoxID, b.Path, b.HPath, b.Updated = tree.Box, tree.Path, tree.HPath, tree.Root.IALAttr("updated")
 		}
 	}
 	blockTreesChanged = true
@@ -158,6 +222,24 @@ func RemoveBlockTreesByRootID(rootID string) {
 			ids = append(ids, b.RootID)
 		}
 	}
+	ids = gulu.Str.RemoveDuplicatedElem(ids)
+	for _, id := range ids {
+		delete(blockTrees, id)
+	}
+	blockTreesChanged = true
+}
+
+func RemoveBlockTreesByPath(path string) {
+	blockTreesLock.Lock()
+	defer blockTreesLock.Unlock()
+
+	var ids []string
+	for _, b := range blockTrees {
+		if b.Path == path {
+			ids = append(ids, b.ID)
+		}
+	}
+	ids = gulu.Str.RemoveDuplicatedElem(ids)
 	for _, id := range ids {
 		delete(blockTrees, id)
 	}
@@ -174,6 +256,7 @@ func RemoveBlockTreesByPathPrefix(pathPrefix string) {
 			ids = append(ids, b.ID)
 		}
 	}
+	ids = gulu.Str.RemoveDuplicatedElem(ids)
 	for _, id := range ids {
 		delete(blockTrees, id)
 	}
@@ -189,6 +272,7 @@ func RemoveBlockTreesByBoxID(boxID string) (ids []string) {
 			ids = append(ids, b.ID)
 		}
 	}
+	ids = gulu.Str.RemoveDuplicatedElem(ids)
 	for _, id := range ids {
 		delete(blockTrees, id)
 	}
@@ -214,6 +298,7 @@ func ReindexBlockTree(tree *parse.Tree) {
 			ids = append(ids, b.ID)
 		}
 	}
+	ids = gulu.Str.RemoveDuplicatedElem(ids)
 	for _, id := range ids {
 		delete(blockTrees, id)
 	}
@@ -229,7 +314,7 @@ func ReindexBlockTree(tree *parse.Tree) {
 		if "" == n.ID {
 			return ast.WalkContinue
 		}
-		blockTrees[n.ID] = &BlockTree{ID: n.ID, ParentID: parentID, RootID: tree.ID, BoxID: tree.Box, Path: tree.Path, HPath: tree.HPath}
+		blockTrees[n.ID] = &BlockTree{ID: n.ID, ParentID: parentID, RootID: tree.ID, BoxID: tree.Box, Path: tree.Path, HPath: tree.HPath, Updated: tree.Root.IALAttr("updated")}
 		return ast.WalkContinue
 	})
 	blockTreesChanged = true
@@ -250,7 +335,7 @@ func IndexBlockTree(tree *parse.Tree) {
 		if "" == n.ID {
 			return ast.WalkContinue
 		}
-		blockTrees[n.ID] = &BlockTree{ID: n.ID, ParentID: parentID, RootID: tree.ID, BoxID: tree.Box, Path: tree.Path, HPath: tree.HPath}
+		blockTrees[n.ID] = &BlockTree{ID: n.ID, ParentID: parentID, RootID: tree.ID, BoxID: tree.Box, Path: tree.Path, HPath: tree.HPath, Updated: tree.Root.IALAttr("updated")}
 		return ast.WalkContinue
 	})
 
@@ -259,7 +344,7 @@ func IndexBlockTree(tree *parse.Tree) {
 
 func AutoFlushBlockTree() {
 	for {
-		SaveBlockTree()
+		SaveBlockTree(false)
 		time.Sleep(7 * time.Second)
 	}
 }
@@ -307,8 +392,8 @@ func InitBlockTree(force bool) {
 	return
 }
 
-func SaveBlockTree() {
-	if !blockTreesChanged {
+func SaveBlockTree(force bool) {
+	if !force && !blockTreesChanged {
 		return
 	}
 

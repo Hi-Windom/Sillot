@@ -31,7 +31,6 @@ import (
 	"github.com/88250/gulu"
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
-	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/jinzhu/copier"
@@ -228,7 +227,7 @@ func FindReplace(keyword, replacement string, ids []string, method int) (err err
 				}
 			case ast.NodeTextMark:
 				if n.IsTextMarkType("code") {
-					escapedKey := html.EscapeString(keyword)
+					escapedKey := util.EscapeHTML(keyword)
 					if 0 == method {
 						if strings.Contains(n.TextMarkTextContent, escapedKey) {
 							n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, escapedKey, replacement)
@@ -604,7 +603,7 @@ func fullTextSearchByRegexp(exp, boxFilter, pathFilter, typeFilter, orderBy stri
 	exp = regexp.QuoteMeta(exp)
 
 	fieldFilter := fieldRegexp(exp)
-	stmt := "SELECT * FROM `blocks` WHERE (" + fieldFilter + ") AND type IN " + typeFilter
+	stmt := "SELECT * FROM `blocks` WHERE " + fieldFilter + " AND type IN " + typeFilter
 	stmt += boxFilter + pathFilter
 	stmt += " " + orderBy
 	stmt += " LIMIT " + strconv.Itoa(Conf.Search.Limit)
@@ -692,7 +691,7 @@ func markSearch(text string, keyword string, beforeLen int) (marked string, scor
 		marked = text
 
 		if strings.Contains(marked, search.SearchMarkLeft) { // 使用 FTS snippet() 处理过高亮片段，这里简单替换后就返回
-			marked = html.EscapeString(text)
+			marked = util.EscapeHTML(text)
 			marked = strings.ReplaceAll(marked, search.SearchMarkLeft, "<mark>")
 			marked = strings.ReplaceAll(marked, search.SearchMarkRight, "</mark>")
 			return
@@ -809,6 +808,7 @@ func maxContent(content string, maxLen int) string {
 
 func fieldRegexp(regexp string) string {
 	buf := bytes.Buffer{}
+	buf.WriteString("(")
 	buf.WriteString("content REGEXP '")
 	buf.WriteString(regexp)
 	buf.WriteString("'")
@@ -834,7 +834,7 @@ func fieldRegexp(regexp string) string {
 	}
 	buf.WriteString(" OR tag REGEXP '")
 	buf.WriteString(regexp)
-	buf.WriteString("'")
+	buf.WriteString("')")
 	return buf.String()
 }
 
@@ -878,7 +878,7 @@ func markReplaceSpan(n *ast.Node, unlinks *[]*ast.Node, keywords []string, markS
 	if ast.NodeText == n.Type {
 		text = search.EncloseHighlighting(text, keywords, getMarkSpanStart(markSpanDataType), getMarkSpanEnd(), Conf.Search.CaseSensitive)
 		n.Tokens = gulu.Str.ToBytes(text)
-		if bytes.Contains(n.Tokens, []byte("search-mark")) {
+		if bytes.Contains(n.Tokens, []byte(searchMarkDataType)) {
 			n.Tokens = lex.EscapeMarkers(n.Tokens)
 			linkTree := parse.Inline("", n.Tokens, luteEngine.ParseOptions)
 			var children []*ast.Node
@@ -892,8 +892,56 @@ func markReplaceSpan(n *ast.Node, unlinks *[]*ast.Node, keywords []string, markS
 			return true
 		}
 	} else if ast.NodeTextMark == n.Type {
-		// TODO 搜索结果高亮支持大部分行级元素 https://github.com/siyuan-note/siyuan/issues/6745
-		
+		// 搜索结果高亮支持大部分行级元素 https://github.com/siyuan-note/siyuan/issues/6745
+		if n.IsTextMarkType("inline-math") || n.IsTextMarkType("inline-memo") {
+			return false
+		}
+
+		startTag := getMarkSpanStart(markSpanDataType)
+		text = search.EncloseHighlighting(text, keywords, startTag, getMarkSpanEnd(), Conf.Search.CaseSensitive)
+		if strings.Contains(text, searchMarkDataType) {
+			dataType := getMarkSpanStart(n.TextMarkType + " " + searchMarkDataType)
+			text = strings.ReplaceAll(text, startTag, dataType)
+			tokens := gulu.Str.ToBytes(text)
+			linkTree := parse.Inline("", tokens, luteEngine.ParseOptions)
+			var children []*ast.Node
+			for c := linkTree.Root.FirstChild.FirstChild; nil != c; c = c.Next {
+				if ast.NodeText == c.Type {
+					c.Type = ast.NodeTextMark
+					c.TextMarkType = n.TextMarkType
+					c.TextMarkTextContent = string(c.Tokens)
+					if n.IsTextMarkType("a") {
+						c.TextMarkAHref, c.TextMarkATitle = n.TextMarkAHref, n.TextMarkATitle
+					} else if n.IsTextMarkType("block-ref") {
+						c.TextMarkBlockRefID = n.TextMarkBlockRefID
+						c.TextMarkBlockRefSubtype = n.TextMarkBlockRefSubtype
+					} else if n.IsTextMarkType("file-annotation-ref") {
+						c.TextMarkFileAnnotationRefID = n.TextMarkFileAnnotationRefID
+					}
+				} else if ast.NodeTextMark == c.Type {
+					if n.IsTextMarkType("a") {
+						c.TextMarkAHref, c.TextMarkATitle = n.TextMarkAHref, n.TextMarkATitle
+					} else if n.IsTextMarkType("block-ref") {
+						c.TextMarkBlockRefID = n.TextMarkBlockRefID
+						c.TextMarkBlockRefSubtype = n.TextMarkBlockRefSubtype
+					} else if n.IsTextMarkType("file-annotation-ref") {
+						c.TextMarkFileAnnotationRefID = n.TextMarkFileAnnotationRefID
+					}
+				}
+
+				children = append(children, c)
+				if nil != n.Next && ast.NodeKramdownSpanIAL == n.Next.Type {
+					c.KramdownIAL = n.KramdownIAL
+					ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: n.Next.Tokens}
+					children = append(children, ial)
+				}
+			}
+			for _, c := range children {
+				n.InsertBefore(c)
+			}
+			*unlinks = append(*unlinks, n)
+			return true
+		}
 	}
 	return false
 }

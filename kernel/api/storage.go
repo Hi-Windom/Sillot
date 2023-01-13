@@ -136,13 +136,18 @@ func removeLocalStorageVal(c *gin.Context) {
 	}
 
 	key := arg["key"].(string)
-
 	err := model.RemoveLocalStorageVal(key)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
 		return
 	}
+
+	app := arg["app"].(string)
+	evt := util.NewCmdResult("removeLocalStorageVal", 0, util.PushModeBroadcastMainExcludeSelfApp)
+	evt.AppId = app
+	evt.Data = map[string]interface{}{"key": key}
+	util.PushEvent(evt)
 }
 
 func setLocalStorageVal(c *gin.Context) {
@@ -156,13 +161,42 @@ func setLocalStorageVal(c *gin.Context) {
 
 	key := arg["key"].(string)
 	val := arg["val"].(interface{})
-
 	err := model.SetLocalStorageVal(key, val)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
 		return
 	}
+
+	app := arg["app"].(string)
+	evt := util.NewCmdResult("setLocalStorageVal", 0, util.PushModeBroadcastMainExcludeSelfApp)
+	evt.AppId = app
+	evt.Data = map[string]interface{}{"key": key, "val": val}
+	util.PushEvent(evt)
+}
+
+func setLocalStorage(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	val := arg["val"].(interface{})
+	err := model.SetLocalStorage(val)
+	if nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	app := arg["app"].(string)
+	evt := util.NewCmdResult("setLocalStorage", 0, util.PushModeBroadcastMainExcludeSelfApp)
+	evt.AppId = app
+	evt.Data = val
+	util.PushEvent(evt)
 }
 
 func getLocalStorage(c *gin.Context) {
@@ -176,23 +210,4 @@ func getLocalStorage(c *gin.Context) {
 		return
 	}
 	ret.Data = data
-}
-
-func setLocalStorage(c *gin.Context) {
-	ret := gulu.Ret.NewResult()
-	defer c.JSON(http.StatusOK, ret)
-
-	arg, ok := util.JsonArg(c, ret)
-	if !ok {
-		return
-	}
-
-	val := arg["val"].(interface{})
-
-	err := model.SetLocalStorage(val)
-	if nil != err {
-		ret.Code = -1
-		ret.Msg = err.Error()
-		return
-	}
 }

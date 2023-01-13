@@ -273,6 +273,9 @@ func InitConf() {
 	if 1024 < Conf.Editor.DynamicLoadBlocks {
 		Conf.Editor.DynamicLoadBlocks = 1024
 	}
+	if 0 > Conf.Editor.BacklinkExpandCount {
+		Conf.Editor.BacklinkExpandCount = 0
+	}
 
 	if nil == Conf.Search {
 		Conf.Search = conf.NewSearch()
@@ -424,7 +427,7 @@ func Close(force bool, execInstallPkg int) (exitCode int) {
 
 	Conf.Close()
 	sql.CloseDatabase()
-	treenode.SaveBlockTree()
+	treenode.SaveBlockTree(false)
 	clearWorkspaceTemp()
 	clearPortJSON()
 	util.UnlockWorkspace()
@@ -451,6 +454,7 @@ func NewLute() (ret *lute.Lute) {
 	ret.SetCodeSyntaxHighlightLineNum(Conf.Editor.CodeSyntaxHighlightLineNum)
 	ret.SetChineseParagraphBeginningSpace(Conf.Export.ParagraphBeginningSpace)
 	ret.SetProtyleMarkNetImg(Conf.Editor.DisplayNetImgMark)
+	ret.SetSpellcheck(Conf.Editor.Spellcheck)
 
 	customEmojiMap := map[string]string{}
 	CustomEmojis.Range(func(key, value interface{}) bool {
@@ -601,7 +605,7 @@ func InitBoxes() {
 	}
 
 	if !initialized {
-		treenode.SaveBlockTree()
+		treenode.SaveBlockTree(true)
 	}
 
 	var dbSize string
@@ -717,6 +721,11 @@ func clearWorkspaceTemp() {
 			logging.LogInfof("removed temp file [%s]", tmp)
 		}
 	}
+
+	// 老版本遗留文件清理
+	os.RemoveAll(filepath.Join(util.DataDir, "assets", ".siyuan", "assets.json"))
+	os.RemoveAll(filepath.Join(util.WorkspaceDir, "backup"))
+	os.RemoveAll(filepath.Join(util.WorkspaceDir, "sync"))
 
 	logging.LogInfof("cleared workspace temp")
 }

@@ -18,17 +18,18 @@ import {getIconByType} from "../editor/getIcon";
 import {unicode2Emoji} from "../emoji";
 import {Dialog} from "../dialog";
 import {hasClosestByClassName} from "../protyle/util/hasClosest";
+import {setStorageVal} from "../protyle/util/compatibility";
 
 const saveKeyList = (type: "keys" | "replaceKeys", value: string) => {
-    const searchKeys = JSON.parse(localStorage.getItem(Constants.LOCAL_SEARCHEKEYS) || "{}");
-    let list: string[] = searchKeys[type] || [];
+    let list: string[] = window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS][type];
     list.splice(0, 0, value);
     list = Array.from(new Set(list));
     if (list.length > window.siyuan.config.search.limit) {
         list.splice(window.siyuan.config.search.limit, list.length - window.siyuan.config.search.limit);
     }
-    searchKeys[type] = list;
-    localStorage.setItem(Constants.LOCAL_SEARCHEKEYS, JSON.stringify(searchKeys));
+    // new Set 后需重新赋值
+    window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS][type] = list;
+    setStorageVal(Constants.LOCAL_SEARCHEKEYS, window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS]);
 };
 
 export const openGlobalSearch = (text: string, replace: boolean) => {
@@ -52,33 +53,18 @@ export const openGlobalSearch = (text: string, replace: boolean) => {
         icon: "iconSearch",
         title: window.siyuan.languages.search,
         callback(tab) {
-            const localData = JSON.parse(localStorage.getItem(Constants.LOCAL_SEARCHEDATA) || "{}");
-            if (!localData.types) {
-                localData.types = {
-                    document: window.siyuan.config.search.document,
-                    heading: window.siyuan.config.search.heading,
-                    list: window.siyuan.config.search.list,
-                    listItem: window.siyuan.config.search.listItem,
-                    codeBlock: window.siyuan.config.search.codeBlock,
-                    htmlBlock: window.siyuan.config.search.htmlBlock,
-                    mathBlock: window.siyuan.config.search.mathBlock,
-                    table: window.siyuan.config.search.table,
-                    blockquote: window.siyuan.config.search.blockquote,
-                    superBlock: window.siyuan.config.search.superBlock,
-                    paragraph: window.siyuan.config.search.paragraph,
-                };
-            }
+            const localData = window.siyuan.storage[Constants.LOCAL_SEARCHEDATA];
             const asset = new Search({
                 tab,
                 config: {
                     k: text,
                     r: "",
                     hasReplace: false,
-                    method: localData.method || 0,
+                    method: localData.method,
                     hPath: "",
                     idPath: [],
-                    group: localData.group || 0,
-                    sort: localData.sort || 0,
+                    group: localData.group,
+                    sort: localData.sort,
                     types: localData.types
                 }
             });
@@ -89,7 +75,7 @@ export const openGlobalSearch = (text: string, replace: boolean) => {
     wnd.split("lr").addTab(tab);
     setPanelFocus(tab.panelElement);
 };
-
+// closeCB 不存在为页签搜索
 export const genSearch = (config: ISearchOption, element: Element, closeCB?: () => void) => {
     let methodText = window.siyuan.languages.keyword;
     if (config.method === 1) {
@@ -109,7 +95,7 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
             enableIncludeChild = true;
         }
     });
-    const data = JSON.parse(localStorage.getItem(Constants.LOCAL_SEARCHEKEYS) || "{}");
+    const data = window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS];
     element.innerHTML = `<div class="fn__flex-column" style="height: 100%;${closeCB ? "border-radius: 4px;overflow: hidden;" : ""}">
     <div class="b3-form__icon search__header">
         <span class="fn__a" id="searchHistoryBtn">
@@ -181,7 +167,7 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
             </span>
         </div>
     </div>
-    <div class="search__layout${data.layout === 1 ? " search__layout--row" : ""}">
+    <div class="search__layout${(closeCB ? data.layout === 1 : data.layoutTab === 1) ? " search__layout--row" : ""}">
         <div id="searchList" class="fn__flex-1 search__list b3-list b3-list--background"></div>
         <div class="search__drag"></div>
         <div id="searchPreview" class="fn__flex-1 search__preview"></div>
@@ -202,15 +188,29 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
             breadcrumbDocName: true
         },
     });
-    if (data.layout === 1) {
-        if (data.col) {
-            edit.protyle.element.style.width = data.col;
-            edit.protyle.element.classList.remove("fn__flex-1");
+    if (closeCB) {
+        if (data.layout === 1) {
+            if (data.col) {
+                edit.protyle.element.style.width = data.col;
+                edit.protyle.element.classList.remove("fn__flex-1");
+            }
+        } else {
+            if (data.row) {
+                edit.protyle.element.classList.remove("fn__flex-1");
+                edit.protyle.element.style.height = data.row;
+            }
         }
     } else {
-        if (data.row) {
-            edit.protyle.element.classList.remove("fn__flex-1");
-            edit.protyle.element.style.height = data.row;
+        if (data.layoutTab === 1) {
+            if (data.colTab) {
+                edit.protyle.element.style.width = data.colTab;
+                edit.protyle.element.classList.remove("fn__flex-1");
+            }
+        } else {
+            if (data.rowTab) {
+                edit.protyle.element.classList.remove("fn__flex-1");
+                edit.protyle.element.style.height = data.rowTab;
+            }
         }
     }
     let clickTimeout: number;
@@ -225,7 +225,7 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
         const documentSelf = document;
         const nextElement = dragElement.nextElementSibling as HTMLElement;
         const previousElement = dragElement.previousElementSibling as HTMLElement;
-        const direction = JSON.parse(localStorage.getItem(Constants.LOCAL_SEARCHEKEYS) || "{}").layout === 1 ? "lr" : "tb";
+        const direction = window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS][closeCB ? "layout" : "layoutTab"] === 1 ? "lr" : "tb";
         const x = event[direction === "lr" ? "clientX" : "clientY"];
         const previousSize = direction === "lr" ? previousElement.clientWidth : previousElement.clientHeight;
         const nextSize = direction === "lr" ? nextElement.clientWidth : nextElement.clientHeight;
@@ -250,9 +250,8 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
             documentSelf.ondragstart = null;
             documentSelf.onselectstart = null;
             documentSelf.onselect = null;
-            const json = JSON.parse(localStorage.getItem(Constants.LOCAL_SEARCHEKEYS) || "{}");
-            json[direction === "lr" ? "col" : "row"] = nextElement[direction === "lr" ? "clientWidth" : "clientHeight"] + "px";
-            localStorage.setItem(Constants.LOCAL_SEARCHEKEYS, JSON.stringify(json));
+            window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS][direction === "lr" ? (closeCB ? "col" : "colTab") : (closeCB ? "row" : "rowTab")] = nextElement[direction === "lr" ? "clientWidth" : "clientHeight"] + "px";
+            setStorageVal(Constants.LOCAL_SEARCHEKEYS, window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS]);
             if (direction === "lr") {
                 setPadding(edit.protyle);
             }
@@ -403,7 +402,7 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
                 event.preventDefault();
                 break;
             } else if (target.id === "searchHistoryBtn") {
-                const list = JSON.parse(localStorage.getItem(Constants.LOCAL_SEARCHEKEYS) || "{}");
+                const list = window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS];
                 if (!list.keys || list.keys.length === 0) {
                     return;
                 }
@@ -423,7 +422,7 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
                 event.preventDefault();
                 return;
             } else if (target.id === "replaceHistoryBtn") {
-                const list = JSON.parse(localStorage.getItem(Constants.LOCAL_SEARCHEKEYS) || "{}");
+                const list = window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS];
                 if (!list.replaceKeys || list.replaceKeys.length === 0) {
                     return;
                 }
@@ -667,7 +666,7 @@ const addConfigMoreMenu = async (config: ISearchOption, edit: Protyle, element: 
     }];
     if (config.group === 1) {
         sortMenu.push({
-            label: window.siyuan.languages.context,
+            label: window.siyuan.languages.sortByContent,
             current: config.sort === 5,
             click() {
                 config.sort = 5;
@@ -704,44 +703,50 @@ const addConfigMoreMenu = async (config: ISearchOption, edit: Protyle, element: 
             }
         }]
     }).element);
-    const localData = JSON.parse(localStorage.getItem(Constants.LOCAL_SEARCHEKEYS) || "{}");
-    if (typeof localData.layout === "undefined") {
-        localData.layout = 0;
-    }
+    const localData = window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS];
+    const isPopover = hasClosestByClassName(element, "b3-dialog__container");
     window.siyuan.menus.menu.append(new MenuItem({
         label: window.siyuan.languages.layout,
         type: "submenu",
         submenu: [{
             label: window.siyuan.languages.topBottomLayout,
-            current: localData.layout === 0,
+            current: isPopover ? localData.layout === 0 : localData.layoutTab === 0,
             click() {
                 element.querySelector(".search__layout").classList.remove("search__layout--row");
                 edit.protyle.element.style.width = "";
-                if (localData.row) {
-                    edit.protyle.element.style.height = localData.row;
+                if ((isPopover && localData.row) || (!isPopover && localData.rowTab)) {
+                    edit.protyle.element.style.height = isPopover ? localData.row : localData.rowTab;
                     edit.protyle.element.classList.remove("fn__flex-1");
                 } else {
                     edit.protyle.element.classList.add("fn__flex-1");
                 }
                 setPadding(edit.protyle);
-                localData.layout = 0;
-                localStorage.setItem(Constants.LOCAL_SEARCHEKEYS, JSON.stringify(localData));
+                if (isPopover) {
+                    localData.layout = 0;
+                } else {
+                    localData.layoutTab = 0;
+                }
+                setStorageVal(Constants.LOCAL_SEARCHEKEYS, window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS]);
             }
         }, {
             label: window.siyuan.languages.leftRightLayout,
-            current: localData.layout === 1,
+            current: isPopover ? localData.layout === 1 : localData.layoutTab === 1,
             click() {
                 element.querySelector(".search__layout").classList.add("search__layout--row");
                 edit.protyle.element.style.height = "";
-                if (localData.col) {
-                    edit.protyle.element.style.width = localData.col;
+                if ((isPopover && localData.col) || (!isPopover && localData.colTab)) {
+                    edit.protyle.element.style.width = isPopover ? localData.col : localData.colTab;
                     edit.protyle.element.classList.remove("fn__flex-1");
                 } else {
                     edit.protyle.element.classList.add("fn__flex-1");
                 }
                 setPadding(edit.protyle);
-                localData.layout = 1;
-                localStorage.setItem(Constants.LOCAL_SEARCHEKEYS, JSON.stringify(localData));
+                if (isPopover) {
+                    localData.layout = 1;
+                } else {
+                    localData.layoutTab = 1;
+                }
+                setStorageVal(Constants.LOCAL_SEARCHEKEYS, window.siyuan.storage[Constants.LOCAL_SEARCHEKEYS]);
             }
         }]
     }).element);
@@ -768,8 +773,15 @@ const addConfigMoreMenu = async (config: ISearchOption, edit: Protyle, element: 
                 saveDialog.destroy();
             });
             btnsElement[1].addEventListener("click", () => {
+                const value = saveDialog.element.querySelector("input").value;
+                if (!value) {
+                    showMessage(window.siyuan.languages["_kernel"]["142"]);
+                    return;
+                }
+                config.k = (element.querySelector("#searchInput") as HTMLInputElement).value;
+                config.r = (element.querySelector("#replaceInput") as HTMLInputElement).value;
                 const criterion = config;
-                criterion.name = saveDialog.element.querySelector("input").value;
+                criterion.name = value;
                 fetchPost("/api/storage/setCriterion", {criterion}, () => {
                     saveDialog.destroy();
                 });
@@ -891,8 +903,9 @@ const updateConfig = (element: Element, item: ISearchOption, config: ISearchOpti
     (element.querySelector("#searchInput") as HTMLInputElement).value = item.k;
     (element.querySelector("#replaceInput") as HTMLInputElement).value = item.r;
     Object.assign(config, item);
+    window.siyuan.storage[Constants.LOCAL_SEARCHEDATA] = Object.assign({}, config);
+    setStorageVal(Constants.LOCAL_SEARCHEDATA, window.siyuan.storage[Constants.LOCAL_SEARCHEDATA]);
     inputEvent(element, config, undefined, edit);
-    localStorage.setItem(Constants.LOCAL_SEARCHEDATA, JSON.stringify(config));
     window.siyuan.menus.menu.remove();
 };
 
@@ -1152,7 +1165,7 @@ const inputEvent = (element: Element, config: ISearchOption, inputTimeout: numbe
         loadingElement.classList.remove("fn__none");
         const inputValue = searchInputElement.value;
         element.querySelector("#searchList").scrollTo(0, 0);
-        if (inputValue === "") {
+        if (inputValue === "" && (!config.idPath || config.idPath.length === 0)) {
             fetchPost("/api/block/getRecentUpdatedBlocks", {}, (response) => {
                 onSearch(response.data, edit, element);
                 loadingElement.classList.add("fn__none");

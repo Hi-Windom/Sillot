@@ -34,6 +34,7 @@ import (
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
+	"github.com/dustin/go-humanize"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/httpclient"
@@ -280,45 +281,37 @@ func UploadAssets2Cloud(rootID string) (err error) {
 	}
 
 	sqlAssets := sql.QueryRootBlockAssets(rootID)
-	err = uploadCloud(sqlAssets)
+	err = uploadAssets2Cloud(sqlAssets, bizTypeUploadAssets)
 	return
 }
 
-func uploadCloud(sqlAssets []*sql.Asset) (err error) {
-	syncedAssets := readWorkspaceAssets()
-	var unSyncAssets []string
-	for _, sqlAsset := range sqlAssets {
-		if !gulu.Str.Contains(sqlAsset.Path, syncedAssets) && strings.Contains(sqlAsset.Path, "assets/") {
-			unSyncAssets = append(unSyncAssets, sqlAsset.Path)
-		}
-	}
+const (
+	bizTypeUploadAssets  = "upload-assets"
+	bizTypeExport2Liandi = "export-liandi"
+)
 
-	if 1 > len(unSyncAssets) {
-		return
-	}
-
+// uploadAssets2Cloud 将资源文件上传到云端图床。
+func uploadAssets2Cloud(sqlAssets []*sql.Asset, bizType string) (err error) {
 	var uploadAbsAssets []string
-	for _, asset := range unSyncAssets {
+	for _, asset := range sqlAssets {
 		var absPath string
-		absPath, err = GetAssetAbsPath(asset)
+		absPath, err = GetAssetAbsPath(asset.Path)
 		if nil != err {
 			logging.LogWarnf("get asset [%s] abs path failed: %s", asset, err)
 			return
 		}
 		if "" == absPath {
 			logging.LogErrorf("not found asset [%s]", asset)
-			err = errors.New(fmt.Sprintf(Conf.Language(12), asset))
-			return
+			continue
 		}
 
 		uploadAbsAssets = append(uploadAbsAssets, absPath)
 	}
 
+	uploadAbsAssets = gulu.Str.RemoveDuplicatedElem(uploadAbsAssets)
 	if 1 > len(uploadAbsAssets) {
 		return
 	}
-
-	uploadAbsAssets = gulu.Str.RemoveDuplicatedElem(uploadAbsAssets)
 
 	logging.LogInfof("uploading [%d] assets", len(uploadAbsAssets))
 	msgId := util.PushMsg(fmt.Sprintf(Conf.Language(27), len(uploadAbsAssets)), 3000)
@@ -327,13 +320,32 @@ func uploadCloud(sqlAssets []*sql.Asset) (err error) {
 		return
 	}
 
+	limitSize := uint64(3 * 1024 * 1024) // 3MB
+	if IsSubscriber() {
+		limitSize = 10 * 1024 * 1024 // 10MB
+	}
+
+	// metaType 为服务端 Filemeta.FILEMETA_TYPE，这里只有两个值：
+	//
+	//	5: SiYuan，表示为 SiYuan 上传图床
+	//	4: Client，表示作为客户端分享发布帖子时上传的文件
+	var metaType = "5"
+	if bizTypeUploadAssets == bizType {
+		metaType = "5"
+	} else if bizTypeExport2Liandi == bizType {
+		metaType = "4"
+	}
+
 	var completedUploadAssets []string
 	for _, absAsset := range uploadAbsAssets {
-		if fi, statErr := os.Stat(absAsset); nil != statErr {
+		fi, statErr := os.Stat(absAsset)
+		if nil != statErr {
 			logging.LogErrorf("stat file [%s] failed: %s", absAsset, statErr)
 			return statErr
-		} else if 10*1024*1024 <= fi.Size() {
-			logging.LogWarnf("file [%s] larger than 10MB, ignore uploading it", absAsset)
+		}
+
+		if limitSize < uint64(fi.Size()) {
+			logging.LogWarnf("file [%s] larger than limit size [%s], ignore uploading it", humanize.IBytes(limitSize), absAsset)
 			continue
 		}
 
@@ -347,6 +359,8 @@ func uploadCloud(sqlAssets []*sql.Asset) (err error) {
 			SetResult(requestResult).
 			SetFile("file[]", absAsset).
 			SetCookies(&http.Cookie{Name: "symphony", Value: uploadToken}).
+			SetHeader("meta-type", metaType).
+			SetHeader("biz-type", bizType).
 			Post(util.AliyunServer + "/apis/siyuan/upload?ver=" + util.Ver)
 		if nil != reqErr {
 			logging.LogErrorf("upload assets failed: %s", reqErr)
@@ -372,59 +386,9 @@ func uploadCloud(sqlAssets []*sql.Asset) (err error) {
 	util.PushClearMsg(msgId)
 
 	if 0 < len(completedUploadAssets) {
-		syncedAssets = readWorkspaceAssets()
 		logging.LogInfof("uploaded [%d] assets", len(completedUploadAssets))
-		for _, completedSyncAsset := range completedUploadAssets {
-			syncedAssets = append(syncedAssets, completedSyncAsset)
-		}
-		saveWorkspaceAssets(syncedAssets)
 	}
 	return
-}
-
-func readWorkspaceAssets() (ret []string) {
-	ret = []string{}
-	confDir := filepath.Join(util.DataDir, "assets", ".siyuan")
-	if err := os.MkdirAll(confDir, 0755); nil != err {
-		logging.LogErrorf("create assets conf dir [%s] failed: %s", confDir, err)
-		return
-	}
-	confPath := filepath.Join(confDir, "assets.json")
-	if !gulu.File.IsExist(confPath) {
-		return
-	}
-
-	data, err := os.ReadFile(confPath)
-	if nil != err {
-		logging.LogErrorf("read assets conf failed: %s", err)
-		return
-	}
-	if err = gulu.JSON.UnmarshalJSON(data, &ret); nil != err {
-		logging.LogErrorf("parse assets conf failed: %s, re-init it", err)
-		return
-	}
-	return
-}
-
-func saveWorkspaceAssets(assets []string) {
-	confDir := filepath.Join(util.DataDir, "assets", ".siyuan")
-	if err := os.MkdirAll(confDir, 0755); nil != err {
-		logging.LogErrorf("create assets conf dir [%s] failed: %s", confDir, err)
-		return
-	}
-	confPath := filepath.Join(confDir, "assets.json")
-
-	assets = gulu.Str.RemoveDuplicatedElem(assets)
-	sort.Strings(assets)
-	data, err := gulu.JSON.MarshalIndentJSON(assets, "", "  ")
-	if nil != err {
-		logging.LogErrorf("create assets conf failed: %s", err)
-		return
-	}
-	if err = filelock.WriteFile(confPath, data); nil != err {
-		logging.LogErrorf("write assets conf failed: %s", err)
-		return
-	}
 }
 
 func RemoveUnusedAssets() (ret []string) {

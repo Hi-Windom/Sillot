@@ -193,10 +193,13 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
             isHTML = true;
         } else if (textHTML.replace("<!--StartFragment--><!--EndFragment-->", "").trim() !== "") {
             textHTML = textHTML.replace("<!--StartFragment-->", "").replace("<!--EndFragment-->", "").trim();
-            // 浏览器上复制当个图片应拷贝到本地，excel 中的复制需粘贴
-            if (files && files.length === 1 && textHTML.indexOf("<img") > -1) {
+            if (files && files.length === 1 && (
+                textHTML.startsWith("<img") ||  // 浏览器上复制单个图片
+                (textHTML.startsWith("<table") && textHTML.indexOf("<img") > -1)  // Excel 或者浏览器中复制带有图片的表格
+            )) {
                 isHTML = false;
             } else {
+                // 需注意 Edge 中的画选不应识别为图片 https://github.com/siyuan-note/siyuan/issues/7021
                 isHTML = true;
             }
         }
@@ -237,7 +240,7 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
                     isBlock = false;
                 }
                 // 从历史中复制后粘贴
-                tempElement.querySelectorAll('[spellcheck="false"][contenteditable="false"]').forEach((e) => {
+                tempElement.querySelectorAll('[contenteditable="false"][spellcheck]').forEach((e) => {
                     e.setAttribute("contenteditable", "true");
                 });
                 const tempInnerHTML = tempElement.innerHTML;

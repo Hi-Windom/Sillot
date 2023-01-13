@@ -13,6 +13,7 @@ import {highlightRender} from "../markdown/highlightRender";
 import {Constants} from "../../constants";
 import {scrollCenter} from "../../util/highlightById";
 import {hideElements} from "../ui/hideElements";
+import {setStorageVal} from "../util/compatibility";
 
 const listEnter = (protyle: IProtyle, blockElement: HTMLElement, range: Range) => {
     const listItemElement = blockElement.parentElement;
@@ -233,7 +234,7 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
         trimStartText.indexOf("\n```") > -1 || trimStartText.indexOf("\n~~~") > -1 || trimStartText.indexOf("\n···") > -1) {
         if (trimStartText.indexOf("\n") === -1 && trimStartText.replace(/·|~/g, "`").replace(/^`{3,}/g, "").indexOf("`") > -1) {
             // ```test` 不处理，正常渲染为段落块
-        } else {
+        } else if (blockElement.classList.contains("p")) { // https://github.com/siyuan-note/siyuan/issues/6953
             const oldHTML = blockElement.outerHTML;
             let replaceInnerHTML = editableElement.innerHTML.replace(/^(~|·|`){3,}/g, "```").replace(/\n(~|·|`){3,}/g, "\n```").trim();
             if (!replaceInnerHTML.endsWith("\n```")) {
@@ -244,10 +245,11 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
             blockElement = protyle.wysiwyg.element.querySelector(`[data-node-id="${blockElement.getAttribute("data-node-id")}"]`);
             const languageElement = blockElement.querySelector(".protyle-action__language");
             if (languageElement) {
-                if (localStorage.getItem(Constants.LOCAL_CODELANG) && languageElement.textContent === "") {
-                    languageElement.textContent = localStorage.getItem(Constants.LOCAL_CODELANG);
+                if (window.siyuan.storage[Constants.LOCAL_CODELANG] && languageElement.textContent === "") {
+                    languageElement.textContent = window.siyuan.storage[Constants.LOCAL_CODELANG];
                 } else {
-                    localStorage.setItem(Constants.LOCAL_CODELANG, languageElement.textContent);
+                    window.siyuan.storage[Constants.LOCAL_CODELANG] = languageElement.textContent;
+                    setStorageVal(Constants.LOCAL_CODELANG, window.siyuan.storage[Constants.LOCAL_CODELANG]);
                 }
                 highlightRender(blockElement);
             } else {

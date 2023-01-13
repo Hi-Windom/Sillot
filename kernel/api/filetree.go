@@ -32,25 +32,6 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
-func reindexTree(c *gin.Context) {
-	ret := gulu.Ret.NewResult()
-	defer c.JSON(http.StatusOK, ret)
-
-	arg, ok := util.JsonArg(c, ret)
-	if !ok {
-		return
-	}
-
-	path := arg["path"].(string)
-	err := model.ReindexTree(path)
-	if nil != err {
-		ret.Code = -1
-		ret.Msg = err.Error()
-		ret.Data = map[string]interface{}{"closeTimeout": 5000}
-		return
-	}
-}
-
 func refreshFiletree(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -115,7 +96,7 @@ func heading2Doc(c *gin.Context) {
 	name := path.Base(targetPath)
 	box := model.Conf.Box(targetNotebook)
 	files, _, _ := model.ListDocTree(targetNotebook, path.Dir(targetPath), model.Conf.FileTree.Sort)
-	evt := util.NewCmdResult("heading2doc", 0, util.PushModeBroadcast, util.PushModeNone)
+	evt := util.NewCmdResult("heading2doc", 0, util.PushModeBroadcast)
 	evt.Data = map[string]interface{}{
 		"box":            box,
 		"path":           targetPath,
@@ -159,7 +140,7 @@ func li2Doc(c *gin.Context) {
 	name := path.Base(targetPath)
 	box := model.Conf.Box(targetNotebook)
 	files, _, _ := model.ListDocTree(targetNotebook, path.Dir(targetPath), model.Conf.FileTree.Sort)
-	evt := util.NewCmdResult("li2doc", 0, util.PushModeBroadcast, util.PushModeNone)
+	evt := util.NewCmdResult("li2doc", 0, util.PushModeBroadcast)
 	evt.Data = map[string]interface{}{
 		"box":            box,
 		"path":           targetPath,
@@ -465,7 +446,7 @@ func createDailyNote(c *gin.Context) {
 	if existed && "" != app {
 		pushMode = util.PushModeBroadcastApp
 	}
-	evt := util.NewCmdResult("createdailynote", 0, pushMode, util.PushModeNone)
+	evt := util.NewCmdResult("createdailynote", 0, pushMode)
 	evt.AppId = app
 
 	name := path.Base(p)
@@ -750,7 +731,7 @@ func getDoc(c *gin.Context) {
 }
 
 func pushCreate(box *model.Box, p, treeID string, arg map[string]interface{}) {
-	evt := util.NewCmdResult("create", 0, util.PushModeBroadcast, util.PushModeNone)
+	evt := util.NewCmdResult("create", 0, util.PushModeBroadcast)
 	name := path.Base(p)
 	files, _, _ := model.ListDocTree(box.ID, path.Dir(p), model.Conf.FileTree.Sort)
 	evt.Data = map[string]interface{}{

@@ -6,7 +6,7 @@
 		"icon": "2753",
 		"id": "20211226115227-r1rty9v",
 		"title": "常見問題",
-		"updated": "20221223222847"
+		"updated": "20230109113806"
 	},
 	"Children": [
 		{
@@ -237,30 +237,23 @@
 			"Type": "NodeParagraph",
 			"Properties": {
 				"id": "20211226115356-fcwiy36",
-				"updated": "20211228141251"
+				"updated": "20230109113806"
 			},
 			"Children": [
 				{
 					"Type": "NodeText",
-					"Data": "資料保存在工作空間文件夾下（預設位於用戶家目錄 Documents/SiYuan，可在 "
+					"Data": "資料保存在"
 				},
 				{
 					"Type": "NodeTextMark",
-					"TextMarkType": "kbd",
-					"TextMarkTextContent": "設置"
+					"TextMarkType": "block-ref",
+					"TextMarkBlockRefID": "20230106104645-o838uew",
+					"TextMarkBlockRefSubtype": "s",
+					"TextMarkTextContent": "工作空間"
 				},
 				{
 					"Type": "NodeText",
-					"Data": " - "
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "kbd",
-					"TextMarkTextContent": "關於"
-				},
-				{
-					"Type": "NodeText",
-					"Data": " 中進行修改），在工作空間 data 文件夾下："
+					"Data": "文件夾下（預設位於用戶家目錄/Documents/SiYuan），在工作空間/data/ 文件夾下："
 				}
 			]
 		},
@@ -270,7 +263,7 @@
 			"ListData": {},
 			"Properties": {
 				"id": "20211226115356-i1v42hf",
-				"updated": "20221223222847"
+				"updated": "20230103223819"
 			},
 			"Children": [
 				{
@@ -398,7 +391,7 @@
 					},
 					"Properties": {
 						"id": "20221202215226-ibnf53j",
-						"updated": "20221223222847"
+						"updated": "20230103223819"
 					},
 					"Children": [
 						{
@@ -406,7 +399,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20221202215226-n689p7u",
-								"updated": "20221223222847"
+								"updated": "20230103223819"
 							},
 							"Children": [
 								{
@@ -420,7 +413,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​ 用於保存瀏覽器 localStorage 以及"
+									"Data": "​ 用於保存命名查詢和"
 								},
 								{
 									"Type": "NodeTextMark",
@@ -1454,53 +1447,6 @@
 			]
 		},
 		{
-			"ID": "20220711123511-bzzrzif",
-			"Type": "NodeHeading",
-			"HeadingLevel": 2,
-			"Properties": {
-				"id": "20220711123511-bzzrzif",
-				"updated": "20220711123511"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "有的網絡圖片為什麼無法查看？"
-				}
-			]
-		},
-		{
-			"ID": "20220711123511-7kicy5w",
-			"Type": "NodeParagraph",
-			"Properties": {
-				"id": "20220711123511-7kicy5w",
-				"updated": "20220711123511"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "為了避免一些潛在的安全問題，思源在發起互聯網服務請求時不會繞過目標站點的安全標頭校驗（比如安全策略標頭和防盜鏈校驗）。可以試一下編輯器右上角 "
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "code",
-					"TextMarkTextContent": "..."
-				},
-				{
-					"Type": "NodeText",
-					"Data": " 中的 "
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "code",
-					"TextMarkTextContent": "網絡圖片轉換為本地圖片"
-				},
-				{
-					"Type": "NodeText",
-					"Data": " 功能將網絡圖片拉取到本地，這樣即使以後目標站點改變安全策略或者不可用本地圖片也不受影響。"
-				}
-			]
-		},
-		{
 			"ID": "20220615153430-zg69bjz",
 			"Type": "NodeHeading",
 			"HeadingLevel": 2,
@@ -1521,9 +1467,40 @@
 			"ListData": {},
 			"Properties": {
 				"id": "20220615153430-3fw6dhu",
-				"updated": "20220615153430"
+				"updated": "20230104152557"
 			},
 			"Children": [
+				{
+					"ID": "20230104152325-x1e0cld",
+					"Type": "NodeListItem",
+					"ListData": {
+						"BulletChar": 42,
+						"Marker": "Kg=="
+					},
+					"Properties": {
+						"id": "20230104152325-x1e0cld",
+						"updated": "20230104152557"
+					},
+					"Children": [
+						{
+							"ID": "20230104152325-2c2ub2s",
+							"Type": "NodeParagraph",
+							"Properties": {
+								"id": "20230104152325-2c2ub2s",
+								"updated": "20230104152557"
+							},
+							"Children": [
+								{
+									"Type": "NodeTextMark",
+									"TextMarkType": "block-ref",
+									"TextMarkBlockRefID": "20230104151953-48hwkwf",
+									"TextMarkBlockRefSubtype": "s",
+									"TextMarkTextContent": "分享文檔到鏈滴"
+								}
+							]
+						}
+					]
+				},
 				{
 					"ID": "20220615153430-jw52uvw",
 					"Type": "NodeListItem",
@@ -1555,7 +1532,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": " 數據包"
+									"Data": "​ 數據包"
 								}
 							]
 						}
@@ -1638,31 +1615,21 @@
 							},
 							"Children": [
 								{
+									"Type": "NodeText",
+									"Data": "​"
+								},
+								{
 									"Type": "NodeTextMark",
 									"TextMarkType": "kbd",
 									"TextMarkTextContent": "導出預覽"
 								},
 								{
 									"Type": "NodeText",
-									"Data": " 中復製到第三方在線服務"
+									"Data": "​ 中復製到第三方在線服務"
 								}
 							]
 						}
 					]
-				}
-			]
-		},
-		{
-			"ID": "20220615153430-15kn96y",
-			"Type": "NodeParagraph",
-			"Properties": {
-				"id": "20220615153430-15kn96y",
-				"updated": "20220615153430"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "前兩種方式可以保證數據原始語義。"
 				}
 			]
 		},

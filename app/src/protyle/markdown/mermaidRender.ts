@@ -18,7 +18,7 @@ export const mermaidRender = (element: Element, cdn = Constants.PROTYLE_CDN) => 
     if (mermaidElements.length === 0) {
         return;
     }
-    addScript(`${cdn}/js/mermaid/mermaid.min.js?v=9.1.7`, "protyleMermaidScript").then(() => {
+    addScript(`${cdn}/js/mermaid/mermaid.min.js?v=9.3.0`, "protyleMermaidScript").then(() => {
         const config: any = {
             securityLevel: "loose", // 升级后无 https://github.com/siyuan-note/siyuan/issues/3587，可使用该选项
             altFontFamily: "sans-serif",
@@ -32,7 +32,8 @@ export const mermaidRender = (element: Element, cdn = Constants.PROTYLE_CDN) => 
                 useMaxWidth: true,
                 diagramMarginX: 8,
                 diagramMarginY: 8,
-                boxMargin: 8
+                boxMargin: 8,
+                showSequenceNumbers: true // Mermaid 时序图增加序号 https://github.com/siyuan-note/siyuan/pull/6992 https://mermaid.js.org/syntax/sequenceDiagram.html#sequencenumbers
             },
             gantt: {
                 leftPadding: 75,

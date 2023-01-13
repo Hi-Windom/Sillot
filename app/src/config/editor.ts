@@ -12,14 +12,14 @@ export const editor = {
     setMode: (readOnly?: boolean) => {
         const target = document.querySelector("#barReadonly");
         if (typeof readOnly === "undefined") {
-            readOnly = target.getAttribute("aria-label") === `${window.siyuan.languages.use} ${window.siyuan.languages.editReadonly}`;
+            readOnly = target.getAttribute("aria-label") === `${window.siyuan.languages.use} ${window.siyuan.languages.editReadonly} ${updateHotkeyTip(window.siyuan.config.keymap.general.editMode.custom)}`;
         }
         window.siyuan.config.editor.readOnly = readOnly;
         if (readOnly) {
-            target.setAttribute("aria-label", `${window.siyuan.languages.use} ${window.siyuan.languages.editMode}`);
+            target.setAttribute("aria-label", `${window.siyuan.languages.use} ${window.siyuan.languages.editMode} ${updateHotkeyTip(window.siyuan.config.keymap.general.editMode.custom)}`);
             target.querySelector("use").setAttribute("xlink:href", "#iconPreview");
         } else {
-            target.setAttribute("aria-label", `${window.siyuan.languages.use} ${window.siyuan.languages.editReadonly}`);
+            target.setAttribute("aria-label", `${window.siyuan.languages.use} ${window.siyuan.languages.editReadonly} ${updateHotkeyTip(window.siyuan.config.keymap.general.editMode.custom)}`);
             target.querySelector("use").setAttribute("xlink:href", "#iconEdit");
         }
         fetchPost("/api/setting/setEditor", window.siyuan.config.editor, () => {
@@ -135,6 +135,14 @@ export const editor = {
 </label>
 <label class="fn__flex b3-label">
     <div class="fn__flex-1">
+        ${window.siyuan.languages.spellcheck}
+        <div class="b3-label__text">${window.siyuan.languages.spellcheckTip}</div>
+    </div>
+    <span class="fn__space"></span>
+    <input class="b3-switch fn__flex-center" id="spellcheck" type="checkbox"${window.siyuan.config.editor.spellcheck ? " checked" : ""}/>
+</label>
+<label class="fn__flex b3-label">
+    <div class="fn__flex-1">
         ${window.siyuan.languages.md31}
         <div class="b3-label__text">${window.siyuan.languages.md32}</div>
     </div>
@@ -165,7 +173,7 @@ export const editor = {
     <span class="fn__space"></span>
     <input class="b3-switch fn__flex-center" id="virtualBlockRef" type="checkbox"${window.siyuan.config.editor.virtualBlockRef ? " checked" : ""}/>
 </label>
-<label class="fn__flex b3-label">
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.md9}
         <div class="b3-label__text">${window.siyuan.languages.md36}</div>
@@ -173,7 +181,7 @@ export const editor = {
     <span class="fn__space"></span>
     <input class="b3-text-field fn__flex-center fn__size200" id="virtualBlockRefInclude" value="${window.siyuan.config.editor.virtualBlockRefInclude}" />
 </label>
-<label class="fn__flex b3-label">
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.md35}
         <div class="b3-label__text">${window.siyuan.languages.md36}</div>
@@ -182,7 +190,7 @@ export const editor = {
     <span class="fn__space"></span>
     <input class="b3-text-field fn__flex-center fn__size200" id="virtualBlockRefExclude" value="${window.siyuan.config.editor.virtualBlockRefExclude}" />
 </label>
-<label class="fn__flex b3-label">
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.md39}
         <div class="b3-label__text">${window.siyuan.languages.md40}</div>
@@ -190,7 +198,7 @@ export const editor = {
     <span class="fn__space"></span>
     <input class="b3-text-field fn__flex-center fn__size200" id="plantUMLServePath" value="${window.siyuan.config.editor.plantUMLServePath}"/>
 </label>
-<label class="fn__flex b3-label">
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.dynamicLoadBlocks}
         <div class="b3-label__text">${window.siyuan.languages.dynamicLoadBlocksTip}</div>
@@ -198,7 +206,7 @@ export const editor = {
     <span class="fn__space"></span>
     <input class="b3-text-field fn__flex-center fn__size200" id="dynamicLoadBlocks" type="number" min="48" max="1024" value="${window.siyuan.config.editor.dynamicLoadBlocks}"/>
 </label>
-<label class="fn__flex b3-label">
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.md37}
         <div class="b3-label__text">${window.siyuan.languages.md38}</div>
@@ -206,7 +214,15 @@ export const editor = {
     <span class="fn__space"></span>
     <input class="b3-text-field fn__flex-center fn__size200" id="blockRefDynamicAnchorTextMaxLen" type="number" min="1" max="5120" value="${window.siyuan.config.editor.blockRefDynamicAnchorTextMaxLen}"/>
 </label>
-<label class="fn__flex b3-label">
+<label class="fn__flex b3-label config__item">
+    <div class="fn__flex-1">
+        ${window.siyuan.languages.backlinkExpand}
+        <div class="b3-label__text">${window.siyuan.languages.backlinkExpandTip}</div>
+    </div>
+    <span class="fn__space"></span>
+    <input class="b3-text-field fn__flex-center fn__size200" id="backlinkExpandCount" type="number" min="0" max="512" value="${window.siyuan.config.editor.backlinkExpandCount}"/>
+</label>
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.generateHistory}
         <div class="b3-label__text">${window.siyuan.languages.generateHistoryInterval}</div>
@@ -214,7 +230,7 @@ export const editor = {
     <span class="fn__space"></span>
     <input class="b3-text-field fn__flex-center fn__size200" id="generateHistoryInterval" type="number" min="0" max="120" value="${window.siyuan.config.editor.generateHistoryInterval}"/>
 </label>
-<label class="fn__flex b3-label">
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.historyRetentionDays} 
         <a href="javascript:void(0)" id="clearHistory">${window.siyuan.languages.clearHistory}</a>
@@ -223,7 +239,7 @@ export const editor = {
     <span class="fn__space"></span>
     <input class="b3-text-field fn__flex-center fn__size200" id="historyRetentionDays" type="number" min="0" max="120" value="${window.siyuan.config.editor.historyRetentionDays}"/>
 </label>
-<label class="fn__flex b3-label">
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.font}
         <div class="b3-label__text">${window.siyuan.languages.font1}</div>
@@ -231,7 +247,7 @@ export const editor = {
     <span class="fn__space"></span>
     ${fontFamilyHTML}
 </label>
-<label class="fn__flex b3-label">
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.fontSize}
         <div class="b3-label__text">${window.siyuan.languages.fontSizeTip}</div>
@@ -241,7 +257,7 @@ export const editor = {
         <input class="b3-slider fn__size200" id="fontSize" max="72" min="9" step="1" type="range" value="${window.siyuan.config.editor.fontSize}">
     </div>
 </label>
-<label class="fn__flex b3-label">
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.md29}
         <div class="b3-label__text">${window.siyuan.languages.md30}</div>
@@ -298,6 +314,7 @@ export const editor = {
                 codeSyntaxHighlightLineNum: (editor.element.querySelector("#codeSyntaxHighlightLineNum") as HTMLInputElement).checked,
                 embedBlockBreadcrumb: (editor.element.querySelector("#embedBlockBreadcrumb") as HTMLInputElement).checked,
                 listLogicalOutdent: (editor.element.querySelector("#listLogicalOutdent") as HTMLInputElement).checked,
+                spellcheck: (editor.element.querySelector("#spellcheck") as HTMLInputElement).checked,
                 floatWindowMode: (editor.element.querySelector("#floatWindowMode") as HTMLInputElement).checked ? 0 : 1,
                 plantUMLServePath: (editor.element.querySelector("#plantUMLServePath") as HTMLInputElement).value,
                 katexMacros: (editor.element.querySelector("#katexMacros") as HTMLTextAreaElement).value,
@@ -306,6 +323,7 @@ export const editor = {
                 virtualBlockRefInclude: (editor.element.querySelector("#virtualBlockRefInclude") as HTMLInputElement).value,
                 virtualBlockRefExclude: (editor.element.querySelector("#virtualBlockRefExclude") as HTMLInputElement).value,
                 blockRefDynamicAnchorTextMaxLen: parseInt((editor.element.querySelector("#blockRefDynamicAnchorTextMaxLen") as HTMLInputElement).value),
+                backlinkExpandCount: parseInt((editor.element.querySelector("#backlinkExpandCount") as HTMLInputElement).value),
                 dynamicLoadBlocks: dynamicLoadBlocks,
                 codeLigatures: (editor.element.querySelector("#codeLigatures") as HTMLInputElement).checked,
                 codeTabSpaces: parseInt((editor.element.querySelector("#codeTabSpaces") as HTMLInputElement).value),

@@ -76,7 +76,7 @@ Cloud services require a paid subscription.
 ## 🗺️ Roadmap
 
 * [SiYuan development plan and progress](https://github.com/orgs/siyuan-note/projects/1)
-* [SiYuan Change logs](CHANGELOG.md)
+* [SiYuan changelog](CHANGELOG.md)
 
 ## 🛠️ Download Setup
 
@@ -170,7 +170,7 @@ The data is saved in the workspace folder (the default is in the user's home dir
 * `assets` is used to save all inserted assets
 * `emojis` is used to save emoji images
 * `snippets` is used to save code snippets
-* `storage` is used to save browser localStorage and flashcards, etc.
+* `storage` is used to save named criteria and flashcards, etc.
 * `templates` is used to save template snippets
 * `widgets` is used to save widgets
 * The rest of the folders are the notebook folders created by the user, files with the suffix of `.sy` in the notebook folder are used to save the document data, and the data format is JSON
@@ -196,11 +196,9 @@ In addition, you can also consider manually exporting and importing data to achi
 SiYuan is completely open source, and contributions are welcome:
 
 * [User Interface and Kernel](https://github.com/siyuan-note/siyuan)
-* [User Guide](https://github.com/siyuan-note/user-guide-en_US) and [Appearance](https://github.com/siyuan-note/appearance)
-* [Editor Engine](https://github.com/88250/lute)
-* [End-to-end encryption](https://github.com/siyuan-note/encryption) and [Data repo](https://github.com/siyuan-note/dejavu)
+* [Android](https://github.com/siyuan-note/siyuan-android)
+* [iOS](https://github.com/siyuan-note/siyuan-ios)
 * [Chrome Clipping Extension](https://github.com/siyuan-note/siyuan-chrome)
-* [Android](https://github.com/siyuan-note/siyuan-android) and [iOS](https://github.com/siyuan-note/siyuan-ios)
 
 For more details, please refer to [Development Guide](https://github.com/siyuan-note/siyuan/blob/master/.github/CONTRIBUTING.md).
 
@@ -222,38 +220,17 @@ After deletion, the doc will not appear in the operating system's recycle bin, b
 
 Please use <kbd>Shift+Enter</kbd>.
 
-### How to move the heading and blocks below it?
-
-Fold the heading and move it later. Please note that it is a move, not a cut, and a folded heading cut will not move the blocks below it.
-
-### How to select multiple blocks across pages?
-
-Click at the beginning, hold down <kbd>Shift</kbd> and click at the end after scrolling the page.
-
-### How to do find and replace?
-
-Press <kbd>Ctrl+R</kbd> after selecting the keyword in the editor.
-
-### How to insert the same inline element to the left of an existing inline element?
-
-Ambiguity may occur when using Markdown markers to insert, please refer to [here](https://github.com/siyuan-note/siyuan/issues/5372) for details. Please use `/` or the corresponding shortcut key for inline elements to insert.
-
 ### What if some blocks (such as paragraph blocks in list items) cannot find the block icon?
 
 The first sub-block under the list item is the block icon omitted. You can move the cursor into this block and trigger its block menu with <kbd>Ctrl+/</kbd> .
 
-### Why can't some online pictures be viewed?
-
-In order to avoid some potential security problems, SiYuan will not bypass the security header verification (such as security policy header and anti-leech verification) of the target site when initiating Internet service requests. You can try the `Convert network images to local images` function in the `...` in the upper right corner of the editor to pull the network image to the local, so that even if the target site changes the security policy or the local image is unavailable later, it will not be affected.
-
 ### How to share notes?
 
+* Share document to Liandi
 * Export and import `.sy.zip` package
 * Via network hosting
 * Export and import Markdown
 * <kbd>Export Preview</kbd> to copy to third-party online services
-
-The first two methods can guarantee the original semantics of the data.
 
 ### What should I do if the data repo key is lost?
 

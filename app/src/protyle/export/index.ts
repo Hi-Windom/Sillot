@@ -14,6 +14,7 @@ import {Dialog} from "../../dialog";
 import {lockFile} from "../../dialog/processSystem";
 import {pathPosix} from "../../util/pathName";
 import {replaceLocalPath} from "../../editor/rename";
+import {setStorageVal} from "../util/compatibility";
 
 export const saveExport = (option: { type: string, id: string }) => {
     /// #if !BROWSER
@@ -26,7 +27,7 @@ export const saveExport = (option: { type: string, id: string }) => {
             renderPDF(option.id);
         }
     } else if (option.type === "word") {
-        const localData = localStorage.getItem(Constants.LOCAL_EXPORTWORD);
+        const localData = window.siyuan.storage[Constants.LOCAL_EXPORTWORD];
         const wordDialog = new Dialog({
             title: "Word " + window.siyuan.languages.config,
             content: `<div class="b3-dialog__content">
@@ -35,14 +36,14 @@ export const saveExport = (option: { type: string, id: string }) => {
             ${window.siyuan.languages.exportPDF4}
         </div>
         <span class="fn__space"></span>
-        <input id="removeAssets" class="b3-switch" type="checkbox" ${localData === "true" ? "checked" : ""}>
+        <input id="removeAssets" class="b3-switch" type="checkbox" ${localData.removeAssets ? "checked" : ""}>
     </label>
     <label class="fn__flex b3-label">
         <div class="fn__flex-1">
             ${window.siyuan.languages.exportPDF6}
         </div>
         <span class="fn__space"></span>
-        <input id="mergeSubdocs" class="b3-switch" type="checkbox" ${localData === "true" ? "checked" : ""}>
+        <input id="mergeSubdocs" class="b3-switch" type="checkbox" ${localData.mergeSubdocs ? "checked" : ""}>
     </label>
 </div>
 <div class="b3-dialog__action">
@@ -58,7 +59,8 @@ export const saveExport = (option: { type: string, id: string }) => {
         btnsElement[1].addEventListener("click", () => {
             const removeAssets = (wordDialog.element.querySelector("#removeAssets") as HTMLInputElement).checked;
             const mergeSubdocs = (wordDialog.element.querySelector("#mergeSubdocs") as HTMLInputElement).checked;
-            localStorage.setItem(Constants.LOCAL_EXPORTWORD, JSON.stringify({removeAssets, mergeSubdocs}));
+            window.siyuan.storage[Constants.LOCAL_EXPORTWORD] = {removeAssets, mergeSubdocs};
+            setStorageVal(Constants.LOCAL_EXPORTWORD, window.siyuan.storage[Constants.LOCAL_EXPORTWORD]);
             getExportPath(option, removeAssets, mergeSubdocs);
             wordDialog.destroy();
         });
@@ -69,17 +71,8 @@ export const saveExport = (option: { type: string, id: string }) => {
 };
 
 /// #if !BROWSER
-let originalZoomFactor = 1;
 const renderPDF = (id: string) => {
-    const localData = JSON.parse(localStorage.getItem(Constants.LOCAL_EXPORTPDF) || JSON.stringify({
-        landscape: false,
-        marginType: "0",
-        scale: 1,
-        pageSize: "A4",
-        removeAssets: true,
-        keepFold: false,
-        mergeSubdocs: false,
-    }));
+    const localData = window.siyuan.storage[Constants.LOCAL_EXPORTPDF];
     const servePath = window.location.protocol + "//" + window.location.host;
     const isDefault = (window.siyuan.config.appearance.mode === 1 && window.siyuan.config.appearance.themeDark === "midnight") || (window.siyuan.config.appearance.mode === 0 && window.siyuan.config.appearance.themeLight === "daylight");
     let themeStyle = "";
@@ -420,13 +413,15 @@ const renderPDF = (id: string) => {
         actionElement.querySelector("#landscape").addEventListener('change', () => {
             setPadding();
         });
+        const currentWindowId = ${getCurrentWindow().id};
         actionElement.querySelector('.b3-button--cancel').addEventListener('click', () => {
             const {ipcRenderer}  = require("electron");
-            ipcRenderer.send("${Constants.SIYUAN_EXPORT_CLOSE}")
+            ipcRenderer.send("${Constants.SIYUAN_EXPORT_CLOSE}", currentWindowId)
         });
         actionElement.querySelector('.b3-button--text').addEventListener('click', () => {
             const {ipcRenderer}  = require("electron");
             ipcRenderer.send("${Constants.SIYUAN_EXPORT_PDF}", {
+              id: currentWindowId,
               pdfOptions:{
                 printBackground: true,
                 landscape: actionElement.querySelector("#landscape").checked,
@@ -457,7 +452,6 @@ const renderPDF = (id: string) => {
     });
 </script></body></html>`;
     const mainWindow = getCurrentWindow();
-    originalZoomFactor = mainWindow.webContents.zoomFactor;
     window.siyuan.printWin = new BrowserWindow({
         parent: mainWindow,
         modal: true,
@@ -476,18 +470,9 @@ const renderPDF = (id: string) => {
         },
     });
     window.siyuan.printWin.webContents.userAgent = `SiYuan/${app.getVersion()} https://b3log.org/siyuan Electron`;
-    window.siyuan.printWin.once("ready-to-show", () => {
-        // 导出 PDF 预览界面不受主界面缩放影响 https://github.com/siyuan-note/siyuan/issues/6262
-        window.siyuan.printWin.webContents.setZoomFactor(1);
-    });
     fetchPost("/api/export/exportTempContent", {content: html}, (response) => {
         window.siyuan.printWin.loadURL(response.data.url);
     });
-};
-
-export const destroyPrintWindow = () => {
-    getCurrentWindow().webContents.setZoomFactor(originalZoomFactor);
-    window.siyuan.printWin.destroy();
 };
 
 const getExportPath = (option: { type: string, id: string }, removeAssets?: boolean, mergeSubdocs?: boolean) => {

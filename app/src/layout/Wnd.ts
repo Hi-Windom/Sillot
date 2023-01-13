@@ -222,6 +222,13 @@ export class Wnd {
                 }
                 cloneTabElement.before(oldTab.headElement);
                 cloneTabElement.remove();
+                if (oldTab.model instanceof Asset) {
+                    // https://github.com/siyuan-note/siyuan/issues/6890
+                    const pdfViewerElement = oldTab.model.element.querySelector("#viewerContainer");
+                    if (pdfViewerElement) {
+                        pdfViewerElement.setAttribute("data-scrolltop", pdfViewerElement.scrollTop.toString());
+                    }
+                }
                 // 对象顺序
                 const newWnd = getInstanceById(it.parentElement.parentElement.getAttribute("data-id")) as Wnd;
                 newWnd.moveTab(oldTab, nextTabHeaderElement ? nextTabHeaderElement.getAttribute("data-id") : undefined);
@@ -363,18 +370,20 @@ export class Wnd {
                 }
             }
         });
-        const initData = currentTab.headElement.getAttribute("data-initdata");
-        if (initData) {
-            const json = JSON.parse(initData);
-            currentTab.addModel(new Editor({
-                tab: currentTab,
-                blockId: json.blockId,
-                mode: json.mode,
-                action: typeof json.action === "string" ? [json.action] : json.action,
-                scrollAttr: json.scrollAttr,
-            }));
-            currentTab.headElement.removeAttribute("data-initdata");
-            return;
+        if (currentTab) {
+            const initData = currentTab.headElement.getAttribute("data-initdata");
+            if (initData) {
+                const json = JSON.parse(initData);
+                currentTab.addModel(new Editor({
+                    tab: currentTab,
+                    blockId: json.blockId,
+                    mode: json.mode,
+                    action: typeof json.action === "string" ? [json.action] : json.action,
+                    scrollAttr: json.scrollAttr,
+                }));
+                currentTab.headElement.removeAttribute("data-initdata");
+                return;
+            }
         }
 
         if (currentTab && target === currentTab.headElement) {

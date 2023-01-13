@@ -1,4 +1,4 @@
-import {getEventName, updateHotkeyTip} from "../util/compatibility";
+import {getEventName, setStorageVal, updateHotkeyTip} from "../util/compatibility";
 import {ToolbarItem} from "./ToolbarItem";
 import {setPosition} from "../../util/setPosition";
 import {getSelectionPosition} from "../util/selection";
@@ -46,7 +46,7 @@ export const fontMenu = (protyle: IProtyle) => {
     const element = document.createElement("div");
     element.classList.add("protyle-font");
     let lastColorHTML = "";
-    const lastFonts = JSON.parse(localStorage.getItem(Constants.LOCAL_FONTSTYLES) || "[]");
+    const lastFonts = window.siyuan.storage[Constants.LOCAL_FONTSTYLES];
     if (lastFonts.length > 0) {
         lastColorHTML = `<div style="margin-bottom: 2px" class="fn__flex">
     ${window.siyuan.languages.lastUsed}<span class="fn__space"></span>
@@ -56,10 +56,10 @@ export const fontMenu = (protyle: IProtyle) => {
             const lastFontStatus = item.split(Constants.ZWSP);
             switch (lastFontStatus[0]) {
                 case "color":
-                    lastColorHTML += `<button class="b3-color__square" data-type="${lastFontStatus[0]}" style="background-color:${lastFontStatus[1]}"></button>`;
+                    lastColorHTML += `<button class="b3-color__square b3-tooltips b3-tooltips__s" aria-label="${window.siyuan.languages.colorFont}" data-type="${lastFontStatus[0]}" style="background-color:${lastFontStatus[1]}"></button>`;
                     break;
                 case "backgroundColor":
-                    lastColorHTML += `<button class="b3-color__square" data-type="${lastFontStatus[0]}" style="background-color:${lastFontStatus[1]}"></button>`;
+                    lastColorHTML += `<button class="b3-color__square b3-tooltips b3-tooltips__s" aria-label="${window.siyuan.languages["--b3-theme-background"]}" data-type="${lastFontStatus[0]}" style="background-color:${lastFontStatus[1]}"></button>`;
                     break;
                 case "style2":
                     lastColorHTML += `<button data-type="${lastFontStatus[0]}" class="protyle-font__style" style="-webkit-text-stroke: 0.2px var(--b3-theme-on-background);-webkit-text-fill-color : transparent;">${window.siyuan.languages.hollow}</button>`;
@@ -136,14 +136,15 @@ export const fontMenu = (protyle: IProtyle) => {
 };
 
 export const fontEvent = (protyle: IProtyle, type?: string, color?: string) => {
-    let localFontStyles = JSON.parse(localStorage.getItem(Constants.LOCAL_FONTSTYLES) || "[]");
+    let localFontStyles = window.siyuan.storage[Constants.LOCAL_FONTSTYLES];
     if (type) {
         localFontStyles.splice(0, 0, `${type}${Constants.ZWSP}${color}`);
         localFontStyles = [...new Set(localFontStyles)];
         if (localFontStyles.length > 8) {
             localFontStyles.splice(7, 1);
         }
-        localStorage.setItem(Constants.LOCAL_FONTSTYLES, JSON.stringify(localFontStyles));
+        window.siyuan.storage[Constants.LOCAL_FONTSTYLES] = localFontStyles;
+        setStorageVal(Constants.LOCAL_FONTSTYLES, window.siyuan.storage[Constants.LOCAL_FONTSTYLES]);
     } else {
         if (localFontStyles.length === 0) {
             type = "color";

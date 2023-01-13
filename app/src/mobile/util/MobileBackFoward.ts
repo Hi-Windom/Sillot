@@ -7,15 +7,17 @@ import {processRender} from "../../protyle/util/processCode";
 import {highlightRender} from "../../protyle/markdown/highlightRender";
 import {blockRender} from "../../protyle/markdown/blockRender";
 import {disabledForeverProtyle, disabledProtyle, enableProtyle} from "../../protyle/util/onGet";
+import {setStorageVal} from "../../protyle/util/compatibility";
 
 const forwardStack: IBackStack[] = [];
 
 const focusStack = (backStack: IBackStack) => {
     const protyle = window.siyuan.mobileEditor.protyle;
-    localStorage.setItem(Constants.LOCAL_DOCINFO, JSON.stringify({
+    window.siyuan.storage[Constants.LOCAL_DOCINFO] = {
         id: backStack.id,
         action: backStack.callback,
-    }));
+    };
+    setStorageVal(Constants.LOCAL_DOCINFO, window.siyuan.storage[Constants.LOCAL_DOCINFO]);
     hideElements(["toolbar", "hint", "util"], window.siyuan.mobileEditor.protyle);
     if (protyle.contentElement.classList.contains("fn__none")) {
         setEditMode(protyle, "wysiwyg");

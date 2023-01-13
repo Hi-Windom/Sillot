@@ -22,6 +22,7 @@
 @import "card";
 @import "menu";
 @import "color";
+@import "responsive";
 // un refactor
 @import "protyle";
 @import "typography";
@@ -213,6 +214,7 @@ progressLoading: 400
     align-self: center;
     background-color: transparent;
     border: 0;
+    line-height: 14px;
 
     &:not(.toolbar__item--disabled):not(.toolbar__item--close):hover,
     &--active {
@@ -223,6 +225,12 @@ progressLoading: 400
     svg {
       height: 14px;
       width: 14px;
+    }
+
+    svg.toolbar__svg {
+      width: 8px;
+      height: 14px;
+      margin-left: 4px;
     }
 
     &--disabled {
@@ -242,6 +250,14 @@ progressLoading: 400
         background-color: var(--b3-theme-error)
       }
     }
+  }
+
+  &__text {
+    max-width: 96px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    user-select: none;
   }
 }
 
@@ -285,6 +301,16 @@ progressLoading: 400
 }
 
 .config {
+  &__panel {
+    & > .b3-tab-bar {
+      user-select: none;
+      width: 180px;
+      overflow: auto;
+      padding: 8px 0;
+      box-sizing: border-box
+    }
+  }
+
   &-query {
     display: flex;
     flex-wrap: wrap;
@@ -335,6 +361,7 @@ progressLoading: 400
       margin-bottom: 82px;
       width: 100%;
       flex: 1;
+      min-height: 128px;
     }
 
     &__info {
@@ -378,6 +405,7 @@ progressLoading: 400
   &-about__logo {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 
     img {
       height: 24px;

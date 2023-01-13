@@ -115,7 +115,7 @@ func Unmount(boxID string) {
 	WaitForWritingFiles()
 
 	unmount0(boxID)
-	evt := util.NewCmdResult("unmount", 0, util.PushModeBroadcast, 0)
+	evt := util.NewCmdResult("unmount", 0, util.PushModeBroadcast)
 	evt.Data = map[string]interface{}{
 		"box": boxID,
 	}
@@ -199,7 +199,7 @@ func Mount(boxID string) (alreadyMount bool, err error) {
 	IndexRefs()
 	// 缓存根一级的文档树展开
 	ListDocTree(box.ID, "/", Conf.FileTree.Sort)
-	treenode.SaveBlockTree()
+	treenode.SaveBlockTree(false)
 	util.ClearPushProgress(100)
 	if reMountGuide {
 		return true, nil

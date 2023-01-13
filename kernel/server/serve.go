@@ -76,10 +76,6 @@ func Serve(fastMode bool) {
 	serveTemplates(ginServer)
 	api.ServeAPI(ginServer)
 
-	if !fastMode && "prod" == util.Mode && util.ContainerStd == util.Container {
-		killRunningKernel()
-	}
-
 	var host string
 	if model.Conf.System.NetworkServe || util.ContainerDocker == util.Container {
 		host = "0.0.0.0"
@@ -112,15 +108,20 @@ func Serve(fastMode bool) {
 		rewritePortJSON(pid, port)
 	}
 
-	logging.LogInfof("kernel [pid=%s] is booting [%s]", pid, "http://"+util.LocalHost+":"+port)
+	logging.LogInfof("kernel [pid=%s] http server [%s] is booting", pid, host+":"+port)
 	util.HttpServing = true
 
 	go func() {
+		time.Sleep(1 * time.Second)
 		if util.FixedPort != port {
+			if isPortOpen(util.FixedPort) {
+				return
+			}
+
 			// 启动一个 6806 端口的反向代理服务器，这样浏览器扩展才能直接使用 127.0.0.1:6806，不用配置端口
-			serverURL, _ := url.Parse("http://" + host + ":" + port)
+			serverURL, _ := url.Parse("http://127.0.0.1:" + port)
 			proxy := httputil.NewSingleHostReverseProxy(serverURL)
-			logging.LogInfof("reverse proxy server [%s] is booting", util.FixedPort)
+			logging.LogInfof("reverse proxy server [%s] is booting", host+":"+util.FixedPort)
 			if proxyErr := http.ListenAndServe(host+":"+util.FixedPort, proxy); nil != proxyErr {
 				logging.LogWarnf("boot reverse proxy server [%s] failed: %s", serverURL, proxyErr)
 			}
@@ -285,8 +286,11 @@ func serveCheckAuth(c *gin.Context) {
 		"l4":               model.Conf.Language(176),
 		"l5":               model.Conf.Language(177),
 		"l6":               model.Conf.Language(178),
+		"l7":               template.HTML(model.Conf.Language(184)),
 		"appearanceMode":   model.Conf.Appearance.Mode,
 		"appearanceModeOS": model.Conf.Appearance.ModeOS,
+		"workspace":        filepath.Base(util.WorkspaceDir),
+		"workspacePath":    util.WorkspaceDir,
 	}
 	buf := &bytes.Buffer{}
 	if err = tpl.Execute(buf, model); nil != err {
@@ -360,13 +364,14 @@ func serveWebSocket(ginServer *gin.Engine) {
 				if nil == val {
 					authOk = false
 				} else {
-					sess := map[string]interface{}{}
-					err = gulu.JSON.UnmarshalJSON([]byte(val.(string)), &sess)
+					sess := &util.SessionData{}
+					err = gulu.JSON.UnmarshalJSON([]byte(val.(string)), sess)
 					if nil != err {
 						authOk = false
 						logging.LogErrorf("unmarshal cookie failed: %s", err)
 					} else {
-						authOk = sess["AccessAuthCode"].(string) == model.Conf.AccessAuthCode
+						workspaceSess := util.GetWorkspaceSession(sess)
+						authOk = workspaceSess.AccessAuthCode == model.Conf.AccessAuthCode
 					}
 				}
 			}
@@ -474,6 +479,7 @@ func corsMiddleware() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Credentials", "true")
 		c.Header("Access-Control-Allow-Headers", "origin, Content-Length, Content-Type, Authorization")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS")
+		c.Header("Access-Control-Allow-Private-Network", "true")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)

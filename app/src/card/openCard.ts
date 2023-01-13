@@ -7,6 +7,15 @@ import {onGet} from "../protyle/util/onGet";
 import {hasClosestByClassName} from "../protyle/util/hasClosest";
 
 export const openCard = () => {
+    const exit = window.siyuan.dialogs.find(item => {
+        if (item.element.getAttribute("data-key") === window.siyuan.config.keymap.general.riffCard.custom) {
+            item.destroy();
+            return true;
+        }
+    });
+    if (exit) {
+        return;
+    }
     let decksHTML = '<option value="">All</option>';
     fetchPost("/api/riff/getRiffDecks", {}, (response) => {
         response.data.forEach((deck: { id: string, name: string }) => {
@@ -27,21 +36,36 @@ export const openCard = () => {
         <div style="margin-left: 8px" class="ft__on-surface ft__smaller fn__flex-center${blocks.length === 0 ? " fn__none" : ""}" data-type="count">${countHTML}</div>
     </div>
     <div class="fn__hr--b"><input style="opacity: 0;height: 1px;box-sizing: border-box"></div>
-    <div class="b3-dialog__cardblock b3-dialog__cardblock--show fn__flex-1${blocks.length === 0 ? " fn__none" : ""}" data-type="render"></div>
+    <div class="b3-dialog__cardblock b3-dialog__cardblock--hide fn__flex-1${blocks.length === 0 ? " fn__none" : ""}" data-type="render"></div>
     <div class="b3-dialog__cardempty${blocks.length === 0 ? "" : " fn__none"}" data-type="empty">${window.siyuan.languages.noDueCard}</div>
-    <div class="fn__flex b3-dialog__cardaction${blocks.length === 0 ? " fn__none" : ""}" style="flex-wrap: wrap" data-type="action">
-        <button data-type="-1" class="b3-button">Show (S)</button>
-        <span class="${isMobile() ? "fn__space" : "fn__flex-1"}"></span>
-        <button data-type="0" class="b3-button b3-button--error">Again (A)</button>
-        <span class="${isMobile() ? "fn__space" : "fn__flex-1"}"></span>
-        <button data-type="1" class="b3-button b3-button--warning">Hard (H)</button>
-        <span class="${isMobile() ? "fn__space" : "fn__flex-1"}"></span>
-        <button data-type="2" class="b3-button b3-button--info">Good (G)</button>
-        <span class="${isMobile() ? "fn__space" : "fn__flex-1"}"></span>
-        <button data-type="3" class="b3-button b3-button--success">Easy (E)</button>
+    <div class="fn__flex b3-dialog__cardaction${blocks.length === 0 ? " fn__none" : ""}">
+        <span class="fn__flex-1"></span>
+        <button data-type="-1" class="b3-button" style="margin-top: 16px">Show (S)</button>
+        <span class="fn__flex-1"></span>
+    </div>
+    <div class="fn__flex b3-dialog__cardaction fn__none">
+        <div>
+            <span></span>
+            <button data-type="0" class="b3-button b3-button--error">Again (A)</button>
+        </div>
+        <span class="fn__flex-1"></span>
+        <div>
+            <span></span>
+            <button data-type="1" class="b3-button b3-button--warning">Hard (H)</button>
+        </div>
+        <span class="fn__flex-1"></span>
+        <div>
+            <span></span>
+            <button data-type="2" class="b3-button b3-button--info">Good (G)</button>
+        </div>
+        <span class="fn__flex-1"></span>
+        <div>
+            <span></span>
+            <button data-type="3" class="b3-button b3-button--success">Easy (E)</button>
+        </div>
     </div>
 </div>`,
-                width: isMobile() ? "80vw" : "50vw",
+                width: isMobile() ? "96vw" : "50vw",
                 height: "70vh",
             });
             dialog.element.querySelector("input").focus();
@@ -51,7 +75,7 @@ export const openCard = () => {
                 render: {
                     background: false,
                     title: false,
-                    gutter: false,
+                    gutter: true,
                     breadcrumbDocName: true,
                 },
                 typewriterMode: false
@@ -68,18 +92,20 @@ export const openCard = () => {
             (dialog.element.firstElementChild as HTMLElement).style.zIndex = "200";
             dialog.element.setAttribute("data-key", window.siyuan.config.keymap.general.riffCard.custom);
             const countElement = dialog.element.querySelector('[data-type="count"]');
-            const actionElement = dialog.element.querySelector('[data-type="action"]');
+            const actionElements = dialog.element.querySelectorAll(".b3-dialog__cardaction");
             const selectElement = dialog.element.querySelector("select");
             selectElement.addEventListener("change", () => {
                 fetchPost("/api/riff/getRiffDueCards", {deckID: selectElement.value}, (cardsChangeResponse) => {
                     blocks = cardsChangeResponse.data;
                     index = 0;
+                    editor.protyle.element.classList.add("b3-dialog__cardblock--hide");
                     if (blocks.length > 0) {
                         countElement.innerHTML = `<span>1</span>/${blocks.length}`;
                         countElement.classList.remove("fn__none");
                         editor.protyle.element.classList.remove("fn__none");
                         editor.protyle.element.nextElementSibling.classList.add("fn__none");
-                        actionElement.classList.remove("fn__none");
+                        actionElements[0].classList.remove("fn__none");
+                        actionElements[1].classList.add("fn__none");
                         fetchPost("/api/filetree/getDoc", {
                             id: blocks[index].blockID,
                             mode: 0,
@@ -91,7 +117,8 @@ export const openCard = () => {
                         countElement.classList.add("fn__none");
                         editor.protyle.element.classList.add("fn__none");
                         editor.protyle.element.nextElementSibling.classList.remove("fn__none");
-                        actionElement.classList.add("fn__none");
+                        actionElements[0].classList.add("fn__none");
+                        actionElements[1].classList.add("fn__none");
                     }
                 });
             });
@@ -122,7 +149,12 @@ export const openCard = () => {
                 event.preventDefault();
                 event.stopPropagation();
                 if (type === "-1") {
-                    editor.protyle.element.classList.toggle("b3-dialog__cardblock--show");
+                    editor.protyle.element.classList.remove("b3-dialog__cardblock--hide");
+                    actionElements[0].classList.add("fn__none");
+                    actionElements[1].querySelectorAll(".b3-button").forEach((element, btnIndex) => {
+                        element.previousElementSibling.textContent = blocks[index].nextDues[btnIndex];
+                    });
+                    actionElements[1].classList.remove("fn__none");
                     return;
                 }
                 if (["0", "1", "2", "3"].includes(type)) {
@@ -132,13 +164,17 @@ export const openCard = () => {
                         rating: parseInt(type)
                     }, () => {
                         index++;
+                        editor.protyle.element.classList.add("b3-dialog__cardblock--hide");
                         if (index > blocks.length - 1) {
                             countElement.classList.add("fn__none");
                             editor.protyle.element.classList.add("fn__none");
                             editor.protyle.element.nextElementSibling.classList.remove("fn__none");
-                            actionElement.classList.add("fn__none");
+                            actionElements[0].classList.add("fn__none");
+                            actionElements[1].classList.add("fn__none");
                             return;
                         }
+                        actionElements[0].classList.remove("fn__none");
+                        actionElements[1].classList.add("fn__none");
                         countElement.firstElementChild.innerHTML = (index + 1).toString();
                         fetchPost("/api/filetree/getDoc", {
                             id: blocks[index].blockID,

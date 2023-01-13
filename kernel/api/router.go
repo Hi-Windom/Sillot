@@ -45,7 +45,9 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/system/setDownloadInstallPkg", model.CheckAuth, setDownloadInstallPkg)
 	ginServer.Handle("POST", "/api/system/setNetworkProxy", model.CheckAuth, setNetworkProxy)
 	ginServer.Handle("POST", "/api/system/setWorkspaceDir", model.CheckAuth, setWorkspaceDir)
-	ginServer.Handle("POST", "/api/system/listWorkspaceDirs", model.CheckAuth, listWorkspaceDirs)
+	ginServer.Handle("POST", "/api/system/getWorkspaces", model.CheckAuth, getWorkspaces)
+	ginServer.Handle("POST", "/api/system/createWorkspaceDir", model.CheckAuth, createWorkspaceDir)
+	ginServer.Handle("POST", "/api/system/removeWorkspaceDir", model.CheckAuth, removeWorkspaceDir)
 	ginServer.Handle("POST", "/api/system/setAppearanceMode", model.CheckAuth, setAppearanceMode)
 	ginServer.Handle("POST", "/api/system/getSysFonts", model.CheckAuth, getSysFonts)
 	ginServer.Handle("POST", "/api/system/exit", model.CheckAuth, exit)
@@ -104,7 +106,6 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/filetree/heading2Doc", model.CheckAuth, model.CheckReadonly, heading2Doc)
 	ginServer.Handle("POST", "/api/filetree/li2Doc", model.CheckAuth, model.CheckReadonly, li2Doc)
 	ginServer.Handle("POST", "/api/filetree/refreshFiletree", model.CheckAuth, model.CheckReadonly, refreshFiletree)
-	ginServer.Handle("POST", "/api/filetree/reindexTree", model.CheckAuth, model.CheckReadonly, reindexTree)
 
 	ginServer.Handle("POST", "/api/format/autoSpace", model.CheckAuth, model.CheckReadonly, autoSpace)
 	ginServer.Handle("POST", "/api/format/netImg2LocalAssets", model.CheckAuth, model.CheckReadonly, netImg2LocalAssets)
@@ -236,6 +237,7 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/export/exportData", model.CheckAuth, exportData)
 	ginServer.Handle("POST", "/api/export/exportDataInFolder", model.CheckAuth, exportDataInFolder)
 	ginServer.Handle("POST", "/api/export/exportTempContent", model.CheckAuth, exportTempContent)
+	ginServer.Handle("POST", "/api/export/export2Liandi", model.CheckAuth, export2Liandi)
 
 	ginServer.Handle("POST", "/api/import/importStdMd", model.CheckAuth, model.CheckReadonly, importStdMd)
 	ginServer.Handle("POST", "/api/import/importData", model.CheckAuth, model.CheckReadonly, importData)
@@ -307,8 +309,8 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/riff/addRiffCards", model.CheckAuth, addRiffCards)
 	ginServer.Handle("POST", "/api/riff/removeRiffCards", model.CheckAuth, removeRiffCards)
 	ginServer.Handle("POST", "/api/riff/getRiffDueCards", model.CheckAuth, getRiffDueCards)
-	ginServer.Handle("POST", "/api/riff/renderRiffCard", model.CheckAuth, renderRiffCard)
 	ginServer.Handle("POST", "/api/riff/reviewRiffCard", model.CheckAuth, reviewRiffCard)
+	ginServer.Handle("POST", "/api/riff/getRiffCards", model.CheckAuth, getRiffCards)
 
 	ginServer.Handle("POST", "/api/notification/pushMsg", model.CheckAuth, pushMsg)
 	ginServer.Handle("POST", "/api/notification/pushErrMsg", model.CheckAuth, pushErrMsg)

@@ -1,4 +1,4 @@
-import {isCtrl, isMac, updateHotkeyTip, writeText} from "../protyle/util/compatibility";
+import {isCtrl, isMac, setStorageVal, updateHotkeyTip, writeText} from "../protyle/util/compatibility";
 import {matchHotKey} from "../protyle/util/hotKey";
 import {openSearch} from "../search/spread";
 import {
@@ -42,6 +42,9 @@ import {getNextFileLi, getPreviousFileLi} from "../protyle/wysiwyg/getBlock";
 import {editor} from "../config/editor";
 import {hintMoveBlock} from "../protyle/hint/extend";
 import {Backlink} from "../layout/dock/Backlink";
+/// #if !BROWSER
+import {webFrame} from "electron";
+/// #endif
 import {openHistory} from "../history/history";
 import {openCard} from "../card/openCard";
 
@@ -339,7 +342,9 @@ export const globalShortcut = () => {
             return;
         }
 
-        if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey && ["s","a", "h", "g", "e"].includes(event.key.toLowerCase())) {
+        if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey &&
+            !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName) &&
+            ["s", "a", "h", "g", "e"].includes(event.key.toLowerCase())) {
             const openCardDialog = window.siyuan.dialogs.find(item => {
                 if (item.element.getAttribute("data-key") === window.siyuan.config.keymap.general.riffCard.custom) {
                     return true;
@@ -484,6 +489,39 @@ export const globalShortcut = () => {
             event.preventDefault();
             return;
         }
+        /// #if !BROWSER
+        if (matchHotKey("⌘=", event)) {
+            Constants.SIZE_ZOOM.find((item, index) => {
+                if (item === window.siyuan.storage[Constants.LOCAL_ZOOM]) {
+                    window.siyuan.storage[Constants.LOCAL_ZOOM] = Constants.SIZE_ZOOM[index + 1] || 3;
+                    webFrame.setZoomFactor(window.siyuan.storage[Constants.LOCAL_ZOOM]);
+                    setStorageVal(Constants.LOCAL_ZOOM, window.siyuan.storage[Constants.LOCAL_ZOOM]);
+                    return true;
+                }
+            });
+            event.preventDefault();
+            return;
+        }
+        if (matchHotKey("⌘0", event)) {
+            webFrame.setZoomFactor(1);
+            window.siyuan.storage[Constants.LOCAL_ZOOM] = 1;
+            setStorageVal(Constants.LOCAL_ZOOM, 1);
+            event.preventDefault();
+            return;
+        }
+        if (matchHotKey("⌘-", event)) {
+            Constants.SIZE_ZOOM.find((item, index) => {
+                if (item === window.siyuan.storage[Constants.LOCAL_ZOOM]) {
+                    window.siyuan.storage[Constants.LOCAL_ZOOM] = Constants.SIZE_ZOOM[index - 1] || 0.25;
+                    webFrame.setZoomFactor(window.siyuan.storage[Constants.LOCAL_ZOOM]);
+                    setStorageVal(Constants.LOCAL_ZOOM, window.siyuan.storage[Constants.LOCAL_ZOOM]);
+                    return true;
+                }
+            });
+            event.preventDefault();
+            return;
+        }
+        /// #endif
 
         if (matchHotKey(window.siyuan.config.keymap.general.syncNow.custom, event)) {
             event.preventDefault();
@@ -537,6 +575,7 @@ export const globalShortcut = () => {
         if (matchHotKey(window.siyuan.config.keymap.general.riffCard.custom, event)) {
             openCard();
             if (target.classList.contains("protyle-wysiwyg") ||
+                target.tagName === "TABLE" ||
                 target.classList.contains("protyle-title__input") ||
                 target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
                 target.blur();
@@ -547,6 +586,7 @@ export const globalShortcut = () => {
         if (matchHotKey(window.siyuan.config.keymap.general.dailyNote.custom, event)) {
             newDailyNote();
             if (target.classList.contains("protyle-wysiwyg") ||
+                target.tagName === "TABLE" ||
                 target.classList.contains("protyle-title__input") ||
                 target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
                 target.blur();

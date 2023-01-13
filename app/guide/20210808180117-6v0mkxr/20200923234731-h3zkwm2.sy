@@ -7,7 +7,7 @@
 		"id": "20200923234731-h3zkwm2",
 		"title": "FAQ",
 		"type": "doc",
-		"updated": "20221223222912"
+		"updated": "20230109113754"
 	},
 	"Children": [
 		{
@@ -242,30 +242,23 @@
 			"Type": "NodeParagraph",
 			"Properties": {
 				"id": "20210428222603-g1752n7",
-				"updated": "20210512152404"
+				"updated": "20230109113754"
 			},
 			"Children": [
 				{
 					"Type": "NodeText",
-					"Data": "The data is saved in the workspace folder (the default is in the user's home directory Documents/SiYuan, which can be modified in "
+					"Data": "The data is saved in the "
 				},
 				{
 					"Type": "NodeTextMark",
-					"TextMarkType": "kbd",
-					"TextMarkTextContent": "Settings"
+					"TextMarkType": "block-ref",
+					"TextMarkBlockRefID": "20230106104821-9nfphwm",
+					"TextMarkBlockRefSubtype": "s",
+					"TextMarkTextContent": "workspace"
 				},
 				{
 					"Type": "NodeText",
-					"Data": " - "
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "kbd",
-					"TextMarkTextContent": "About"
-				},
-				{
-					"Type": "NodeText",
-					"Data": "), in the workspace data folder:"
+					"Data": " folder (the default is in the user's home directory/Documents/SiYuan), in the workspace/data/ folder:"
 				}
 			]
 		},
@@ -275,7 +268,7 @@
 			"ListData": {},
 			"Properties": {
 				"id": "20210428222603-moih9fe",
-				"updated": "20221223222912"
+				"updated": "20230103223700"
 			},
 			"Children": [
 				{
@@ -405,7 +398,7 @@
 					},
 					"Properties": {
 						"id": "20221202214811-2s26txl",
-						"updated": "20221223222912"
+						"updated": "20230103223700"
 					},
 					"Children": [
 						{
@@ -413,7 +406,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20221202214811-p1eevpi",
-								"updated": "20221223222912"
+								"updated": "20230103223700"
 							},
 							"Children": [
 								{
@@ -427,7 +420,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​ is used to save browser localStorage and "
+									"Data": "​ is used to save named criteria and "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -1464,53 +1457,6 @@
 			]
 		},
 		{
-			"ID": "20220711123529-bjd0rvv",
-			"Type": "NodeHeading",
-			"HeadingLevel": 2,
-			"Properties": {
-				"id": "20220711123529-bjd0rvv",
-				"updated": "20220711123529"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "Why can't some online pictures be viewed?"
-				}
-			]
-		},
-		{
-			"ID": "20220711123529-xgrcde0",
-			"Type": "NodeParagraph",
-			"Properties": {
-				"id": "20220711123529-xgrcde0",
-				"updated": "20220711123705"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "In order to avoid some potential security problems, SiYuan will not bypass the security header verification (such as security policy header and anti-leech verification) of the target site when initiating Internet service requests. You can try the "
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "code",
-					"TextMarkTextContent": "Convert network images to local images"
-				},
-				{
-					"Type": "NodeText",
-					"Data": " function in the "
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "code",
-					"TextMarkTextContent": "..."
-				},
-				{
-					"Type": "NodeText",
-					"Data": " in the upper right corner of the editor to pull the network image to the local, so that even if the target site changes the security policy or the local image is unavailable later, it will not be affected."
-				}
-			]
-		},
-		{
 			"ID": "20220615153446-i8gpnt2",
 			"Type": "NodeHeading",
 			"HeadingLevel": 2,
@@ -1531,9 +1477,40 @@
 			"ListData": {},
 			"Properties": {
 				"id": "20220615153446-zufy5mm",
-				"updated": "20220615153525"
+				"updated": "20230104152515"
 			},
 			"Children": [
+				{
+					"ID": "20230104152308-nwfyw9q",
+					"Type": "NodeListItem",
+					"ListData": {
+						"BulletChar": 42,
+						"Marker": "Kg=="
+					},
+					"Properties": {
+						"id": "20230104152308-nwfyw9q",
+						"updated": "20230104152515"
+					},
+					"Children": [
+						{
+							"ID": "20230104152308-v9kzfgg",
+							"Type": "NodeParagraph",
+							"Properties": {
+								"id": "20230104152308-v9kzfgg",
+								"updated": "20230104152515"
+							},
+							"Children": [
+								{
+									"Type": "NodeTextMark",
+									"TextMarkType": "block-ref",
+									"TextMarkBlockRefID": "20230104152135-1iei0xa",
+									"TextMarkBlockRefSubtype": "s",
+									"TextMarkTextContent": "Share document to Liandi"
+								}
+							]
+						}
+					]
+				},
 				{
 					"ID": "20220615153446-j8izdpx",
 					"Type": "NodeListItem",
@@ -1565,7 +1542,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": " package"
+									"Data": "​ package"
 								}
 							]
 						}
@@ -1621,11 +1598,7 @@
 							"Children": [
 								{
 									"Type": "NodeText",
-									"Data": "Export and i"
-								},
-								{
-									"Type": "NodeText",
-									"Data": "mport Markdown"
+									"Data": "Export and import Markdown"
 								}
 							]
 						}
@@ -1652,31 +1625,21 @@
 							},
 							"Children": [
 								{
+									"Type": "NodeText",
+									"Data": "​"
+								},
+								{
 									"Type": "NodeTextMark",
 									"TextMarkType": "kbd",
 									"TextMarkTextContent": "Export Preview"
 								},
 								{
 									"Type": "NodeText",
-									"Data": " to copy to third-party online services"
+									"Data": "​​ to copy to third-party online services"
 								}
 							]
 						}
 					]
-				}
-			]
-		},
-		{
-			"ID": "20220615153446-qqqtcoj",
-			"Type": "NodeParagraph",
-			"Properties": {
-				"id": "20220615153446-qqqtcoj",
-				"updated": "20220615153446"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "The first two methods can guarantee the original semantics of the data."
 				}
 			]
 		},

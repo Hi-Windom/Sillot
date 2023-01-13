@@ -37,7 +37,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/facette/natsort"
 	"github.com/gin-gonic/gin"
-	jsoniter "github.com/json-iterator/go"
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/cache"
@@ -143,7 +142,7 @@ func (box *Box) docIAL(p string) (ret map[string]string) {
 		logging.LogErrorf("read file [%s] failed: %s", p, err)
 		return nil
 	}
-	ret = readDocIAL(data)
+	ret = filesys.ReadDocIAL(data)
 	if 1 > len(ret) {
 		logging.LogWarnf("tree [%s] is corrupted", filePath)
 		box.moveCorruptedData(filePath)
@@ -165,12 +164,6 @@ func (box *Box) moveCorruptedData(filePath string) {
 		return
 	}
 	logging.LogWarnf("moved corrupted data file [%s] to [%s]", filePath, to)
-}
-
-func readDocIAL(data []byte) (ret map[string]string) {
-	ret = map[string]string{}
-	jsoniter.Get(data, "Properties").ToVal(&ret)
-	return
 }
 
 func SearchDocsByKeyword(keyword string) (ret []map[string]string) {
@@ -1172,7 +1165,7 @@ func moveDoc(fromBox *Box, fromPath string, toBox *Box, toPath string) (newPath 
 		moveSorts(tree.ID, fromBox.ID, toBox.ID)
 	}
 
-	evt := util.NewCmdResult("moveDoc", 0, util.PushModeBroadcast, util.PushModeNone)
+	evt := util.NewCmdResult("moveDoc", 0, util.PushModeBroadcast)
 	evt.Data = map[string]interface{}{
 		"fromNotebook": fromBox.ID,
 		"fromPath":     fromPath,
@@ -1275,7 +1268,7 @@ func removeDoc(box *Box, p string) (err error) {
 
 	cache.RemoveDocIAL(p)
 
-	evt := util.NewCmdResult("removeDoc", 0, util.PushModeBroadcast, util.PushModeNone)
+	evt := util.NewCmdResult("removeDoc", 0, util.PushModeBroadcast)
 	evt.Data = map[string]interface{}{
 		"ids": removeIDs,
 	}
@@ -1321,7 +1314,7 @@ func RenameDoc(boxID, p, title string) (err error) {
 	}
 
 	refText := getNodeRefText(tree.Root)
-	evt := util.NewCmdResult("rename", 0, util.PushModeBroadcast, util.PushModeNone)
+	evt := util.NewCmdResult("rename", 0, util.PushModeBroadcast)
 	evt.Data = map[string]interface{}{
 		"box":     boxID,
 		"id":      tree.Root.ID,

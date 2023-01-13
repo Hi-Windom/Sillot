@@ -47,7 +47,6 @@
     * [Get boot progress](#Get-boot-progress)
     * [Get system version](#Get-system-version)
     * [Get the current time of the system](#Get-the-current-time-of-the-system)
-* [Webhook](#Webhook)
 
 ---
 

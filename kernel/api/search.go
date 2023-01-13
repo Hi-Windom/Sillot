@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"github.com/88250/gulu"
-	"github.com/88250/lute/html"
 	"github.com/gin-gonic/gin"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -182,7 +181,7 @@ func searchRefBlock(c *gin.Context) {
 	ret.Data = map[string]interface{}{
 		"blocks": blocks,
 		"newDoc": newDoc,
-		"k":      html.EscapeHTMLStr(keyword),
+		"k":      util.EscapeHTML(keyword),
 		"reqId":  arg["reqId"],
 	}
 }
@@ -202,10 +201,14 @@ func fullTextSearchBlock(c *gin.Context) {
 	if nil != pathsArg {
 		for _, p := range pathsArg.([]interface{}) {
 			path := p.(string)
-			box := strings.Split(path, "/")[0]
-			boxes = append(boxes, box)
-			path = strings.TrimPrefix(path, box)
-			paths = append(paths, path)
+			box := strings.TrimSpace(strings.Split(path, "/")[0])
+			if "" != box {
+				boxes = append(boxes, box)
+			}
+			path = strings.TrimSpace(strings.TrimPrefix(path, box))
+			if "" != path {
+				paths = append(paths, path)
+			}
 		}
 		paths = gulu.Str.RemoveDuplicatedElem(paths)
 		boxes = gulu.Str.RemoveDuplicatedElem(boxes)

@@ -51,12 +51,18 @@ interface Window {
     hideKeyboardToolbar(): void
 }
 
+interface IWorkspace {
+    path:string
+    closed:boolean
+}
+
 interface ICard {
     id: string
     updated: string
     name: string
     size: number
 }
+
 interface ISearchOption {
     name?: string
     sort: number,  //  0：按块类型（默认），1：按创建时间升序，2：按创建时间降序，3：按更新时间升序，4：按更新时间降序，5：按内容顺序（仅在按文档分组时），6：按相关度升序，7：按相关度降序
@@ -112,8 +118,9 @@ interface IPdfAnno {
     }[]
     index?: number,
     color: string,
-    type: string,
-    content: string,
+    type: string,   // border, text
+    content: string,    // rect, text
+    mode: string,
     id?: string,
     coords?: number[]
 }
@@ -149,6 +156,7 @@ interface INotebook {
 }
 
 interface ISiyuan {
+    storage?: { [key: string]: any },
     printWin?: import("electron").BrowserWindow
     transactionsTimeout?: number,
     transactions?: {
@@ -283,6 +291,7 @@ declare interface IEditor {
     rtl: boolean;
     readOnly: boolean;
     listLogicalOutdent: boolean;
+    spellcheck: boolean;
     katexMacros: string;
     fullWidth: boolean;
     floatWindowMode: number;
@@ -303,6 +312,7 @@ declare interface IEditor {
     virtualBlockRefExclude: string;
     virtualBlockRefInclude: string;
     blockRefDynamicAnchorTextMaxLen: number;
+    backlinkExpandCount: number;
 
     emoji: string[];
 }
