@@ -1,0 +1,39 @@
+body:not(.body--mobile) .protyle-wysiwyg.protyle-wysiwyg--attr>div.p {
+  text-indent: 0em;
+  line-height: 1.5em;
+  margin-top: 0em;
+  margin-bottom: 0em;
+  letter-spacing: 0px;
+}
+/* 宽度不足时显示更多文档文字 #223 */
+@container doc (max-width: 960px) {
+
+  p,
+  div.p,
+  tr {
+    line-height: 1.31em !important;
+    padding: 3px !important;
+    margin: 1px 0 !important;
+    letter-spacing: 0px;
+  }
+
+  .li>.protyle-action {
+    height: 30px;
+  }
+}
+
+@container doc (min-width: 960px) {
+
+  p,
+  div.p,
+  tr {
+    line-height: 1.58em !important;
+    padding: 4px !important;
+    margin: 4px 0 !important;
+    letter-spacing: 0.13px;
+  }
+
+  .li>.protyle-action {
+    height: 34px;
+  }
+}

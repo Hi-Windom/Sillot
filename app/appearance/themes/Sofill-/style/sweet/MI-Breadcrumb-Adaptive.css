@@ -1,0 +1,130 @@
+/* 设置面包屑中icon大小 */
+.protyle-breadcrumb__item svg {
+  height: 13px;
+  width: 13px;
+}
+
+.protyle-breadcrumb__item {
+  max-width: 98%;
+}
+
+.protyle-breadcrumb {
+  container-type: inline-size;
+  container-name: docBreadrumb;
+}
+
+@container docBreadrumb (max-width: 4000px) {
+  .protyle-breadcrumb__bar:has(.protyle-breadcrumb__item:nth-of-type(2)) .protyle-breadcrumb__text {
+    max-width: 50cqw;
+  }
+
+  .protyle-breadcrumb__bar:has(.protyle-breadcrumb__item:nth-of-type(3)) .protyle-breadcrumb__text {
+    max-width: 30cqw;
+  }
+
+  .protyle-breadcrumb__bar:has(.protyle-breadcrumb__item:nth-of-type(4)) .protyle-breadcrumb__text {
+    max-width: 23cqw;
+  }
+
+  .protyle-breadcrumb__bar:has(.protyle-breadcrumb__item:nth-of-type(5)) .protyle-breadcrumb__text {
+    max-width: 15cqw;
+  }
+
+  .protyle-breadcrumb__bar:has(.protyle-breadcrumb__item:nth-of-type(6)) .protyle-breadcrumb__text {
+    max-width: 10cqw;
+  }
+
+  .protyle-breadcrumb__bar:has(.protyle-breadcrumb__item:nth-of-type(7)) .protyle-breadcrumb__text {
+    max-width: 8cqw;
+  }
+}
+
+/* 将当前打开文档面包屑设置为毛玻璃效果 */
+/* 面包屑毛玻璃导致思源v2.4.6块滚动条无法跟随滚动 #154 */
+
+/* 聚焦模式不隐藏面包屑 */
+#layouts .layout__wnd--active .protyle-breadcrumb:not(:has(.protyle-breadcrumb__item:first-child:not(.protyle-breadcrumb__item--active))) {
+  /* position: var(--SCC-baseComponent-breadcrumb-position); */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  background-color: var(--b3-theme-background-light);
+  backdrop-filter: blur(15px);
+  z-index: 1;
+  font-size: 13px !important;
+  width: 100%;
+  margin-right: 0;
+  opacity: 0.58;
+  box-shadow: var(--SCC-baseComponent-breadcrumb-box-shadow);
+}
+
+#layouts .layout__wnd--active .protyle-breadcrumb:not(:has(.protyle-breadcrumb__item:first-child:not(.protyle-breadcrumb__item--active))):hover {
+  /* position: var(--SCC-baseComponent-breadcrumb-position); */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  background-color: var(--b3-theme-background-light);
+  backdrop-filter: blur(15px) brightness(0.9);
+  z-index: 10;
+  font-size: 13px !important;
+  width: 100%;
+  margin-right: 0;
+  opacity: 1;
+  box-shadow: var(--SCC-baseComponent-breadcrumb-box-shadow);
+  transition-delay: 0.31s;
+}
+
+#layouts .layout__wnd--active .protyle-breadcrumb .protyle-breadcrumb__bar .protyle-breadcrumb__item:not(:nth-of-type(1)) {
+  margin: 3px 0;
+  opacity: var(--SCC-baseProperty-Opacity-A);
+  color: var(--SCC-baseComponent-breadcrumb__bar-color);
+}
+
+#layouts .layout__wnd--active .protyle-breadcrumb .protyle-breadcrumb__bar .protyle-breadcrumb__item:nth-of-type(1) {
+  position: sticky;
+  left: 0px;
+  background-color: var(--b3-theme-secondary) !important;
+  opacity: 1 !important;
+  z-index: 2;
+}
+
+#layouts .layout__wnd--active .protyle-breadcrumb .protyle-breadcrumb__bar .protyle-breadcrumb__item:nth-of-type(1) svg {
+  color: var(--b3-theme-on-secondary);
+}
+
+/* 依次为 反链面板中【反向链接】、【提及】、嵌入块的面包屑 */
+.backlinkList .protyle-breadcrumb__bar,
+.backlinkMList .protyle-breadcrumb__bar,
+.protyle-wysiwyg__embed .protyle-breadcrumb__bar {
+  opacity: 0.77;
+  font-size: 88%;
+}
+
+/* 弹出面板的面包屑 */
+.block__popover .protyle-breadcrumb__bar {
+  opacity: 0.58;
+}
+
+.protyle-breadcrumb__bar:hover,
+.protyle-breadcrumb__item:hover,
+.protyle-breadcrumb:hover .protyle-breadcrumb__bar,
+.protyle-breadcrumb__bar:hover .protyle-breadcrumb__item {
+  opacity: 1 !important;
+}
+
+.protyle-breadcrumb__text {
+  width: fit-content;
+  max-width: clamp(5.8vw, 58cqw, 500px);
+}
+
+.backlinkList .protyle-breadcrumb__item:not(:nth-of-type(1)):not(:nth-last-of-type(1)) .protyle-breadcrumb__text,
+.backlinkMList .protyle-breadcrumb__item:not(:nth-of-type(1)):not(:nth-last-of-type(1)) .protyle-breadcrumb__text,
+.protyle-wysiwyg__embed .protyle-breadcrumb__item:not(:nth-of-type(1)):not(:nth-last-of-type(1)) .protyle-breadcrumb__text {
+  max-width: clamp(3rem, 13cqw, 8rem);
+}
+
+.protyle-breadcrumb__item--active,
+.protyle-breadcrumb__item--active>svg,
+.protyle-breadcrumb__item--active>svg.ft__primary+span {
+  color: var(--b3-theme-on-primary) !important;
+}

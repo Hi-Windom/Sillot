@@ -1,0 +1,35 @@
+/* 块过长时设置块内纵向滚动条 */
+.protyle-content [data-node-id][custom-render~=scroll] > .protyle-action,
+.protyle-content [data-node-id][custom-render~=scroll].table table>thead {
+  position: sticky;
+  top: 0px;
+}
+.protyle-content [data-node-id][custom-render~=scroll].table,
+.protyle-content [data-node-id][custom-render~=scroll]:not(.table) {
+  border-bottom: 2px dashed var(--b3-theme-surface-lighter);
+}
+
+.protyle-content [data-node-id][custom-render~=scroll]:not(.table) {
+  overflow-y: auto;
+}
+.protyle-content [data-node-id][custom-render~=scroll].table table {
+  display: inline-block;
+  overflow-y: auto;
+}
+
+.protyle-content [data-node-id][custom-render~=scroll31].table,
+.protyle-content [data-node-id][custom-render~=scroll31].table table,
+.protyle-content [data-node-id][custom-render~=scroll31]:not(.table) {
+  max-height: var(--custom-scroll-max-height, 31cqh);
+}
+.protyle-content [data-node-id][custom-render~=scroll58].table,
+.protyle-content [data-node-id][custom-render~=scroll58].table table,
+.protyle-content [data-node-id][custom-render~=scroll58]:not(.table) {
+  max-height: var(--custom-scroll-max-height, 58cqh);
+}
+/* 滚动条轨道样式 */
+/* .protyle-content [data-node-id][custom-render~=scroll].table::-webkit-scrollbar-track,
+.protyle-content [data-node-id][custom-render~=scroll]:not(.table)::-webkit-scrollbar-track {
+  background-color: var(--custom-scroll-track-background-color);
+  border-radius: var(--custom-border-radius);
+} */

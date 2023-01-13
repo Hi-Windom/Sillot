@@ -1,0 +1,167 @@
+:root {
+  /* 卡片 */
+  --b3-card-error-color: rgb(97, 26, 21);
+  --b3-card-error-background: #f5d1cfc5;
+  --b3-card-warning-color: rgb(102, 60, 0);
+  --b3-card-warning-background: #ffe8c8c5;
+  --b3-card-info-color: rgb(13, 60, 97);
+  --b3-card-info-background: #668899c5;
+  --b3-card-success-color: rgb(30, 70, 32);
+  --b3-card-success-background: #d7eed8c5;
+
+  /* 自定义颜色 */
+  --b3-font-color9: inherit;
+  --b3-font-color10: inherit;
+  --b3-font-color11: inherit;
+  --b3-font-color12: inherit;
+  --b3-font-color13: transparent;
+  --b3-font-background11: transparent;
+  --b3-font-background12: transparent;
+  --b3-font-background13: #000;
+
+  /* 动画效果 */
+  --b3-transition: all 0.31s cubic-bezier(0, 0, 0.2, 1) 0ms;
+  --b3-width-transition: width .2s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0ms;
+
+  /* 阴影 */
+  --b3-point-shadow: -2px 3px 3px -2px rgba(0, 0, 0, 0.13),
+    0px 58px 131px -10px var(--b3-theme-primary-lightest), 2px 3px 5px 0px rgba(0, 0, 0, 0.1);
+  --b3-dialog-shadow: 1px 13px 8px -1px rgba(0, 0, 0, 0.31),
+    0px 13px 131px -13px rgba(0, 0, 0, 0.07), 1px 1px 6px -2px rgba(0, 0, 0, 0.13);
+
+  /* 图表颜色 */
+  --b3-graph-p-point: #076f7e;
+  --b3-graph-heading-point: #660e7a;
+  --b3-graph-math-point: #80ffa5;
+  --b3-graph-code-point: #00ddff;
+  --b3-graph-table-point: #37a2ff;
+  --b3-graph-list-point: #ff0087;
+  --b3-graph-todo-point: #ffbf00;
+  --b3-graph-olist-point: #b3005f;
+  --b3-graph-listitem-point: #f65b00;
+  --b3-graph-bq-point: #8d48e3;
+  --b3-graph-super-point: #dd79ff;
+  --b3-graph-doc-point: #202124;
+  --b3-graph-tag-point: #dbf32f;
+  --b3-graph-asset-point: #05c091;
+  --b3-graph-line: #5f6368;
+  --b3-graph-ref-line: #d23f31;
+  --b3-graph-tag-line: #5f6b06;
+  --b3-graph-tag-tag-line: #dbf32f;
+  --b3-graph-asset-line: #037457;
+  --b3-graph-hl-point: #f3a92f;
+  --b3-graph-hl-line: #4285f4;
+
+  /* 编辑器搜索颜色 */
+  --b3-protyle-search-background: var(--SCC-Yellow-HellisePotter);
+  --b3-protyle-search-border-color: var(--SCC-Yellow-HellisePotter-light);
+  --b3-protyle-search-current-background: #a5d3fe;
+
+  /* 代码片段背景 */
+  --b3-protyle-code-background: rgba(37, 41, 55, 0.58);
+  --b3-protyle-code-linenumber-hl: transparent;
+
+  /* 所见即所得行内元素颜色 */
+  --b3-protyle-inline-strong-color: inherit;
+  --b3-protyle-inline-em-color: #bbbcbc;
+  /* 斜体字色 */
+  --b3-protyle-inline-s-color: #a8a2a1c5;
+  /* 删除线字色 */
+  --b3-protyle-inline-link-color: var(--SCC-Blue-Windom_2);
+  /* 超链接字色 */
+  --b3-protyle-inline-mark-background: #85858531;
+  --b3-protyle-inline-mark-color: var(--SCC-CNTC-茶白);
+  --b3-protyle-inline-tag-color: #5f6368;
+  --b3-protyle-inline-blockref-color: var(--b3-theme-primary);
+  /* 块引用字色 */
+
+  /* PDF */
+  --b3-pdf-selection: #d0e9c8;
+  --b3-pdf-sidebar-width: 200px;
+  --b3-pdf-offset: 0;
+  --b3-pdf-background1: var(--b3-theme-error);
+  --b3-pdf-background2: #f5822e;
+  --b3-pdf-background3: var(--b3-theme-secondary);
+  --b3-pdf-background4: #65b84d;
+  --b3-pdf-background5: #f5539e;
+  --b3-pdf-background6: var(--b3-theme-primary);
+  --b3-pdf-background7: #944194;
+}
+
+:root {
+  --SCC-baseComponent-Button-bg-color-TabBar: #a5a7a508;
+  --SCC-baseComponent-CodeBlock-ab-color: var(--SCC-White-lighter);
+  --SCC-baseComponent-selector-bg-color: #313233ee;
+  --SCC-baseComponent-text-color-1: #889999;
+  --SCC-baseComponent-text-color-2: var(--SCC-Gray-HellisePotter);
+  --SCC-baseComponent-Table-border-1: 0.25pt solid #58585858;
+  --SCC-baseComponent-Icon-arrow-color-1: var(--SCC-White);
+  --SCC-baseComponent-Switch-checked-ab-color: #999;
+  --SCC-baseComponent-breadcrumb__bar-color: #999999;
+  --SCC-baseComponent-breadcrumb-box-shadow: none;
+  --SCC-baseComponent-breadcrumb-position: unset;
+  --SCC-baseComponent-toolbar-drag-color: #eee;
+  --SCC-baseProperty-Opacity-A: 1;
+  --SCC-baseProperty-Opacity-B: .58;
+  --SCC-baseProperty-Opacity-C: 0.88;
+  --SCC-baseComponent-HintMenu-backdrop-filter: blur(99px);
+  --SCC-baseComponent-snackbar__content-color: #585858;
+  --SCC-baseComponent-file__tree-UL-border-image: linear-gradient(to right, #58585813 0%, #85858531 20%, #85858531 80%, #58585813 100%) 1;
+  --SCC-funs__baseComponent-list2map-line: 2px solid var(--b3-theme-primary-light);
+  --SCC-funs__baseComponent-list2table-border: 1px solid var(--b3-theme-primary-lightest);
+  --SCC-baseComponent-Dialog-520-box-shadow: 13px 31px 131px -58px rgb(0 0 0 / 50%), -30px 31px 119px 31px rgb(0 0 0 / 51%), 72px 51px 6px 1111px rgb(58 58 58 / 2%);
+  --SCC-baseComponent-Dialog-520-hover-box-shadow: 13px 31px 131px -58px rgb(0 0 0 / 8%), 6px 11px 19px 8px rgb(0 0 0 / 25%), -111px -111px 111px 1111px rgb(5 5 5 / 42%);
+  --SCC-baseComponent-Dialog-520-button-color: var(--SCC-CNTC-海松茶);
+  --SCC-baseComponent-Popup-Menu-shadow: 13px 31px 300px -58px rgb(0 0 0 / 51%), -30px 31px 300px 31px rgb(0 0 0 / 31%), 72px 51px 6px 1111px rgb(58 58 58 / 2%), 0px 0px 1px 1.31px rgb(131 131 131 / 28%);
+  --SCC-baseComponent-file-tree-hover-ul-outline: 1.3px ridge var(--b3-scroll-color);
+  /* 块引用波浪线动画图标 | The icon of wavy line animation */
+  --SCC-baseComponent-span-ref-animation-icon: url(/appearance/themes/Sofill-/src/icon/wavy-line.svg);
+}
+
+:root {
+  filter: var(--SCC-Variables-root-filter-dark, none) !important;
+}
+
+.b3-list--background .b3-list-item:hover:not(.b3-list-item--focus) {
+  background-color: #c1c2c308;
+}
+
+/* 背景色11、12改为标记色 #585 */
+[style*="background-color:var(--b3-font-background11)"],
+[style*="background-color: var(--b3-font-background11)"] {
+  background-image: linear-gradient(transparent, transparent 78%, var(--b3-theme-primary-lightest) 88%, var(--b3-theme-primary-lighter) 91%, var(--b3-theme-primary-light) 96%, var(--b3-theme-primary-lightest) 100%);
+  border-radius: 5.8%;
+  padding-bottom: 0.15em;
+  box-shadow: 1px 3px 3px var(--b3-theme-primary-lightest);
+}
+
+[style*="background-color:var(--b3-font-background12)"],
+[style*="background-color: var(--b3-font-background12)"] {
+  background-image: linear-gradient(transparent, transparent 31%, var(--b3-theme-primary-lightest) 58%, var(--b3-theme-secondary) 91%, var(--b3-theme-primary-lighter) 96%, var(--b3-theme-primary-lightest) 100%);
+  border-radius: 31%;
+  padding-bottom: 0.08em;
+}
+
+[style*="color:var(--b3-font-color9)"],
+[style*="color: var(--b3-font-color9)"] {
+  text-decoration: underline double var(--b3-font-color3);
+  text-underline-offset: 18%;
+}
+
+[style*="color:var(--b3-font-color10)"],
+[style*="color: var(--b3-font-color10)"] {
+  text-decoration: underline dashed var(--b3-font-color4);
+  text-underline-offset: 13%;
+}
+
+[style*="color:var(--b3-font-color11)"],
+[style*="color: var(--b3-font-color11)"] {
+  text-decoration: underline dotted var(--b3-font-color1);
+  text-underline-offset: 18%;
+}
+
+[style*="color:var(--b3-font-color12)"],
+[style*="color: var(--b3-font-color12)"] {
+  text-decoration: underline wavy var(--b3-font-color2);
+  text-underline-offset: 3.1%;
+}

@@ -1,0 +1,7 @@
+.b3-text-field:not([placeholder="搜索"]):not(.fn__size200):not(.fn__flex-1):not(.fn__flex-center):focus {
+  box-shadow: var(--SCC-baseComponent-Input-box-shadow-focus);
+}
+
+.search__header .b3-text-field--text:focus {
+  box-shadow: var(--SCC-baseComponent-search__header-input-box-shadow-focus);
+}

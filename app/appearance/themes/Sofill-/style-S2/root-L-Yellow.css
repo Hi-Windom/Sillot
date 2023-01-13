@@ -1,0 +1,116 @@
+:root {
+  /* 主色 */
+  --b3-theme-primary: #cc5831;
+  --b3-theme-primary-light: #cc5831c5;
+  --b3-theme-primary-lighter: #cc5831a5;
+  --b3-theme-primary-lightest: #cc583135;
+  --b3-theme-secondary: var(--SCC-CNTC-杏黄);
+  --b3-theme-background: #eed289;
+  --b3-theme-background-light: #eed28935;
+  --b3-theme-background-blur: #eed289e8;
+  --b3-theme-surface: #eed289;
+  --b3-theme-surface-light: #eed289c5;
+  --b3-theme-error: #d23f31;
+
+  /* 文字颜色 */
+  --b3-theme-on-primary: var(--SCC-SGTC-25A);
+  --b3-theme-on-secondary: #fff;
+  --b3-theme-on-background: #130103;
+  --b3-theme-on-surface: var(--SCColor);
+  /* 此色影响顶部栏图标颜色和不少界面区域中的文字颜色 */
+  --b3-theme-on-surface-light: var(--SCC-primary-light);
+  --b3-theme-on-error: #fff;
+
+  /* 顶部工具栏 */
+  --b3-toolbar-background: var(--SCC-primary-lightest);
+  --b3-toolbar-blur-background: #eed28935;
+  --b3-toolbar-color: var(--SCC-Red-WPS-light);
+
+  /* 自定义颜色 */
+  --b3-font-color1: var(--SCC-SGTC-32B);
+  --b3-font-color2: var(--SCC-CNTC-朱膘);
+  --b3-font-color3: var(--SCC-CNTC-金茶);
+  --b3-font-color4: var(--SCC-CNTC-黄金);
+  --b3-font-color5: var(--SCC-CNTC-枯茶);
+  --b3-font-color6: var(--SCC-CNTC-枯黄);
+  --b3-font-color7: var(--SCC-CNTC-嫣红);
+  --b3-font-color8: var(--SCC-CNTC-山鳩);
+  /* --b3-font-color9: var(--SCC-CNTC-殷红);
+  --b3-font-color10: var(--SCC-CNTC-宝蓝); */
+  --b3-font-background1: #bc002f13;
+  --b3-font-background2: #df33cc26;
+  --b3-font-background3: #9a58fd32;
+  --b3-font-background4: #58a8ff37;
+  --b3-font-background5: #c1ac7c66;
+  --b3-font-background6: #aaaaaa80;
+  --b3-font-background7: #9a747955;
+  --b3-font-background8: #33886633;
+  --b3-font-background9: #11991137;
+  --b3-font-background10: #00dece55;
+
+  /* 线条 */
+  --b3-border-color: #eed28935;
+
+  /* 滚动条 */
+  --b3-scroll-color: #d3b17dc5;
+
+  /* 列表 */
+  --b3-list-hover: #d3b17dc5;
+
+  /* 菜单 */
+  --b3-menu-background: #eed289;
+
+  /* 提示 */
+  --b3-tooltips-color: #6E5607c5;
+
+  /* 遮罩 */
+  --b3-mask-background: #020208a3;
+}
+
+/* --- */
+:root {
+  --SCC-Component-selector-border: 1px solid #cc5831c5;
+  --SCC-Component-button-text-color: #cc5831;
+  --SCC-Component-button-bg-color: var(--b3-theme-primary-lightest);
+  --SCC-Component-textarea-box-shadow: rgba(138, 88, 131, 0.1) 1px 1px 1px 1px inset,
+    rgba(255, 230, 80, 0.31) -3px -3px 58px 1px inset;
+  --SCC-Component-TabBar-item-hover-bg-color: #ffe389a5;
+  --SCC-Component-HR-LG1: linear-gradient(to right, #fff8cc13, #fff8ee58, #fff8cc13);
+  --SCC-Component-Inline-virtual-block-ref-border-bottom: 1px dotted var(--SCC-SGTC-32B);
+  --SCC-Component-Inline-virtual-block-ref-bg-color-hover: #ffffffc5;
+  --SCC-Component-EmbedBlock-bg-color: #eeb07113;
+  --SCC-Component-EmbedBlock-box-shadow: inset 9px 9px 29px #58583113, inset -9px -9px 29px #f4f0ff13;
+  --SCC-Component-Table-tr-bg-color-1: var(--SCC-White-light);
+  --SCC-Component-Table-tr-bg-color-2: var(--SCC-White-lighter);
+  --SCC-Component-CodeBlock-bg-color: #cca93a35;
+  --SCC-Component-CodeBlock-bg-color-hover: #cccca5;
+  --SCC-Component-Message-button-ok-border: 3px ridge var(--SCC-Cyan-186-lighter) !important;
+  --SCC-Component-Message-button-ok-bg-color: var(--SCC-CNTC-橘红);
+  --SCC-Component-meno-bg-color: var(--SCC-CNTC-白茶);
+  --SCC-Component-meno-border-bottom: 2px solid var(--b3-card-info-color);
+  --SCC-Component-Counter-bg-color: var(--SCC-CNTC-橘红);
+  --SCC-Component-Counter-border: 1.3px solid var(--SCC-CNTC-白茶);
+  --SCC-Component-TabBar-item__close-svg__hover-color: var(--SCC-CNTC-朱膘);
+  --SCC-sCt-Hfbs1-color1: rgba(38, 57, 77, 0.11);
+  --SCC-sCt-Hfbs1-color2: rgba(228, 197, 0, 0.17);
+  --SCC-sCt-Hfbs1-color3: rgba(228, 197, 0, 0.23);
+  --SCC-sCt-Hfbs1-color4: rgba(228, 197, 0, 0.29);
+  --SCC-sCt-Hfbs1-color5: rgba(228, 197, 0, 0.35);
+  --SCC-Component-Heading-folded-box-shadow-h5: var(--SCC-sCt-Hfbs1-color1) 7px 4px;
+  --SCC-Component-Heading-folded-box-shadow-h4: var(--SCC-sCt-Hfbs1-color2) 7px 4px, var(--SCC-sCt-Hfbs1-color1) 14px 8px;
+  --SCC-Component-Heading-folded-box-shadow-h3: var(--SCC-sCt-Hfbs1-color3) 7px 4px, var(--SCC-sCt-Hfbs1-color2) 14px 8px, var(--SCC-sCt-Hfbs1-color1) 21px 12px;
+  --SCC-Component-Heading-folded-box-shadow-h2: var(--SCC-sCt-Hfbs1-color4) 7px 4px, var(--SCC-sCt-Hfbs1-color3) 14px 8px, var(--SCC-sCt-Hfbs1-color2) 21px 12px, var(--SCC-sCt-Hfbs1-color1) 28px 16px;
+  --SCC-Component-Heading-folded-box-shadow-h1: var(--SCC-sCt-Hfbs1-color5) 7px 4px, var(--SCC-sCt-Hfbs1-color4) 14px 8px, var(--SCC-sCt-Hfbs1-color3) 21px 12px, var(--SCC-sCt-Hfbs1-color2) 28px 16px, var(--SCC-sCt-Hfbs1-color1) 35px 20px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h5: var(--SCC-sCt-Hfbs1-color1) 2px 4px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h4: var(--SCC-sCt-Hfbs1-color2) 2px 4px, var(--SCC-sCt-Hfbs1-color1) 4px 8px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h3: var(--SCC-sCt-Hfbs1-color3) 2px 4px, var(--SCC-sCt-Hfbs1-color2) 4px 8px, var(--SCC-sCt-Hfbs1-color1) 6px 12px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h2: var(--SCC-sCt-Hfbs1-color4) 2px 4px, var(--SCC-sCt-Hfbs1-color3) 4px 8px, var(--SCC-sCt-Hfbs1-color2) 6px 12px, var(--SCC-sCt-Hfbs1-color1) 8px 16px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h1: var(--SCC-sCt-Hfbs1-color5) 2px 4px, var(--SCC-sCt-Hfbs1-color4) 4px 8px, var(--SCC-sCt-Hfbs1-color3) 6px 12px, var(--SCC-sCt-Hfbs1-color2) 8px 16px, var(--SCC-sCt-Hfbs1-color1) 10px 20px;
+  --SCC-Component-HintMenu-bg-color: #8c645058;
+  --SCC-Component-HintMenu-border-bottom: 1.86px ridge rgba(244, 244, 0, 0.58);
+  --SCC-Component-HintMenu-column-rule: 1px solid var(--SCC-Cyan-186-lighter);
+  --SCC-Component-Inline-kbd-color: var(--SCC-SGTC-29A);
+  --SCC-Component-Inline-kbd-bg-color: var(--SCC-SGTC-29C);
+  --SCC-Component-Inline-kbd-box-shadow: rgba(254, 239, 234, 0.4) -1.5px 2px, rgba(40, 46, 85, 0.3) 2px 3px;
+  --SCC-Component-Inline-kbd-border-radius: 4px;
+}

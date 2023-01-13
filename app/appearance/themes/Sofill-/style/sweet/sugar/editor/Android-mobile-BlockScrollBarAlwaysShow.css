@@ -1,0 +1,6 @@
+body.body--mobile #editor>.protyle-scroll>.b3-tooltips.protyle-scroll__down,
+body.body--mobile #editor>.protyle-scroll>.b3-tooltips.protyle-scroll__up {
+  opacity: 1 !important;
+  color: var(--b3-theme-primary);
+  filter: brightness(0.95) drop-shadow(1px 2px 3px var(--b3-theme-on-surface));
+}

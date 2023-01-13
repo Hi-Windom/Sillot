@@ -1,0 +1,222 @@
+/* 文档树笔记本高度自适应 #288 */
+.file-tree.sy__file .fn__flex-1:has(>ul:nth-child(1))>ul {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-top: 1em;
+  padding-bottom: 1.31em;
+}
+
+.file-tree.sy__file .fn__flex-1:has(>ul:nth-child(6))>ul {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
+}
+
+.file-tree.sy__file .fn__flex-1:has(>ul:nth-child(9))>ul {
+  margin-top: 0.58em;
+  margin-bottom: 0.58em;
+  padding-top: 0.58em;
+  padding-bottom: 0.58em;
+}
+
+.file-tree.sy__file .fn__flex-1:has(>ul:nth-child(12))>ul {
+  margin-top: 0.58em;
+  margin-bottom: 0.58em;
+  padding-top: 0.31em;
+  padding-bottom: 0.31em;
+}
+
+.file-tree.sy__file .fn__flex-1:has(>ul:nth-child(16))>ul {
+  margin-top: 0.31em;
+  margin-bottom: 0.31em;
+  padding-top: 0.13em;
+  padding-bottom: 0.13em;
+}
+
+.file-tree.sy__file .fn__flex-1:has(>ul:nth-child(20))>ul {
+  margin-top: 0.13em;
+  margin-bottom: 0.13em;
+  padding-top: 0.13em;
+  padding-bottom: 0.13em;
+}
+
+/* 缓制文档树笔记本高度自适应副作用 */
+#layouts>div.fn__flex.fn__flex-1>div.fn__flex-column.fn__flex-shrink>div:nth-child(1)>div>div.layout-tab-container.fn__flex-1 .block__icons {
+  position: sticky;
+  top: 0px;
+  margin-bottom: 3px;
+  padding-bottom: 13px;
+}
+
+@container FileTree (max-width: 360px) {
+
+  /* 文档文字 */
+  .file-tree.sy__file ul>ul>li .b3-list-item__text {
+    font-weight: 400;
+    letter-spacing: -0.31px;
+  }
+
+  .file-tree.sy__file ul.b3-list.b3-list--background>ul>ul>ul>ul>ul li[data-type="navigation-file"] .counter.popover__block {
+    left: 0px;
+    position: absolute;
+    max-width: 25px;
+    margin-left: 1px;
+  }
+
+  .file-tree.sy__file ul.b3-list.b3-list--background:has(>ul>ul>ul>ul>ul)>ul>ul>ul>ul>ul li[data-type="navigation-file"] .b3-list-item__action[data-type="more-file"] {
+    height: 22px;
+    padding: 0 4px;
+    left: 43px;
+    position: absolute;
+    /* display: inline-flex; */
+    opacity: .58;
+  }
+
+  .file-tree.sy__file ul.b3-list.b3-list--background:has(>ul>ul>ul>ul>ul)>ul>ul>ul>ul>ul li[data-type="navigation-file"] .b3-list-item__action[data-type="new"] {
+    height: 22px;
+    padding: 0 4px;
+    left: 68px;
+    position: absolute;
+    /* display: inline-flex; */
+    opacity: .58;
+  }
+}
+
+body:not(.android) .file-tree.sy__file ul.b3-list.b3-list--background>li {
+  position: sticky;
+  top: 0px;
+  background-color: transparent;
+  z-index: 4;
+  /* 高于子容器就可以了，太高会显示在弹出层上面 */
+  padding-bottom: 1px;
+  transition: padding-bottom 0.2s ease-out;
+}
+
+/* 笔记本名文字 */
+.file-tree.sy__file ul.b3-list>li .b3-list-item__text {
+  font-size: clamp(14px, calc(13cqw*0.27), 18px) !important;
+  letter-spacing: calc(min(1cqw, 13px)*0.13) !important;
+  padding-left: calc(min(1.3cqw, 13px)*0.31) !important;
+}
+
+body.body--mobile [data-type="sidebar-file"] ul.b3-list>li .b3-list-item__text,
+body.body--desktop .file-tree.sy__file ul.b3-list>li .b3-list-item__text {
+  font-size: clamp(14px, 1.58vw, 18px) !important;
+  padding-left: min(0.7%, 13px) !important;
+}
+
+/* 文档名文字 */
+.file-tree.sy__file ul>ul>li .b3-list-item__text {
+  font-size: max(min(4.2cqw, 12pt), 9.5pt) !important;
+  letter-spacing: calc(min(1.3cqw, 13px)*0.13) !important;
+  padding-left: calc(min(1.3cqw, 13px)*0.58) !important;
+}
+
+body.body--mobile [data-type="sidebar-file"] ul>ul>li .b3-list-item__text,
+body.body--desktop .file-tree.sy__file ul>ul>li .b3-list-item__text {
+  font-size: clamp(11px, 1.31vw, 14px) !important;
+  padding-left: min(0.5%, 11px) !important;
+}
+
+
+/* 【已关闭的笔记本】融入文档树样式 #202 */
+#layouts .fn__flex-column.file-tree.sy__file>ul {
+  padding: 0px;
+  margin-top: 9px;
+  margin-left: 5px;
+  border: 1.3px ridge transparent;
+  opacity: 0;
+  transition: all .2s cubic-bezier(0.46, 0.03, 0.52, 0.96) 0s !important;
+  height: 10px;
+  max-height: 10px;
+}
+
+#layouts .fn__flex-column.file-tree.sy__file:hover>ul {
+  opacity: .9;
+  background-color: #65432103;
+  backdrop-filter: brightness(0.97);
+  margin-right: 7px;
+  max-height: unset;
+}
+
+#layouts .fn__flex-column.file-tree.sy__file>ul:hover {
+  height: 30px;
+}
+
+#layouts .fn__flex-column.file-tree.sy__file>ul:hover li {
+  opacity: 1;
+}
+
+#layouts .fn__flex-column.file-tree.sy__file>ul li {
+  opacity: 0;
+  transition-delay: .31s;
+}
+
+.file-tree.sy__file:hover ul.b3-list.b3-list--background {
+  outline: var(--SCC-baseComponent-file-tree-hover-ul-outline);
+  background-color: var(--b3-theme-surface);
+  filter: drop-shadow(-1px 1px 3px var(--b3-theme-primary-lightest));
+  transition: background-color .31s cubic-bezier(0.39, 0.58, 0.57, 1);
+}
+
+.file-tree.sy__file ul.b3-list.b3-list--background {
+  outline: none;
+}
+
+/* 更紧凑的布局 */
+.file-tree.sy__file ul.b3-list--background>li .b3-list-item__toggle--hl {
+  margin-left: -6px;
+}
+
+.file-tree.sy__file ul.b3-list--background>ul .b3-list-item__toggle--hl {
+  margin-left: -9px;
+}
+
+
+/* Android 手机端文档树功能区视觉效果调整 #58 */
+body.body--mobile #sidebar .b3-list-item {
+  margin: 0 3.1px 0 -5.8px !important;
+  padding: 1.3px 5.8px 1.3px 0px !important;
+}
+
+body.body--mobile #sidebar .b3-list-item__arrow {
+  scale: 1.31 !important;
+  opacity: 0.58 !important;
+}
+
+body.body--mobile #sidebar .b3-list-item__icon {
+  font-size: 0.88em !important;
+  opacity: 0.88 !important;
+  margin-right: 1.3px !important;
+  padding: 0 1.3px !important;
+}
+
+body.body--mobile #sidebar .b3-list-item__toggle {
+  min-height: 1.3em !important;
+}
+
+body.body--mobile #sidebar .b3-list-item__toggle:hover {
+  background-color: transparent !important;
+}
+
+body.body--mobile #sidebar .b3-list {
+  min-height: 40px !important;
+}
+
+body.body--mobile #sidebar [data-type="sidebar-file"] ul>li .b3-list-item__text {
+  font-size: 1.03em !important;
+}
+
+body.body--mobile #sidebar [data-type="sidebar-file"] ul>ul>li .b3-list-item__text {
+  font-size: 0.88em !important;
+}
+
+/* 优化安卓Pad端文档树自适应显示效果 #783 */
+body.body--desktop .file-tree.sy__file .fn__flex-1>ul>li {
+  height: 3em;
+}
+
+body.body--desktop .file-tree.sy__file .fn__flex-1>ul>ul>li {
+  height: 2em;
+}

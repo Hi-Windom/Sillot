@@ -1,0 +1,220 @@
+/* 标签页底部背景颜色,标签页数量较少时可以看到，颜色和标签页颜色保持一致 */
+ul.fn__flex.layout-tab-bar {
+  background-color: var(--b3-theme-background);
+  height: 100%;
+  padding-left: 3px;
+  animation: menu 0.2s ease-in-out;
+}
+
+ul.fn__flex.layout-tab-bar li {
+  z-index: 5;
+}
+
+body:not(.android) ul.fn__flex.layout-tab-bar li[data-type="tab-header"]:not(.item--pin) .item__close {
+  width: 0;
+  padding: 0;
+  transition: all 0.31s cubic-bezier(0.65, 0.05, 0.36, 1) 0.05s;
+}
+body:not(.android) ul.fn__flex.layout-tab-bar li[data-type="tab-header"]:not(.item--pin):hover .item__close {
+  width: 16px;
+  padding: 13px 8px 13px 0;
+  transition: all 0.31s cubic-bezier(0.65, 0.05, 0.36, 1) 0.05s;
+}
+
+/* 标签页鼠标悬浮时背景颜色 */
+ul.layout-tab-bar .item:not(.item--readonly):hover {
+  background-color: var(--SCC-Component-TabBar-item-hover-bg-color) !important;
+}
+
+/* 标签页中文字的相关设置 */
+ul.layout-tab-bar .item--pin .item__text {
+  margin-right: 13px; /* 预留位置给钉住图标 */
+  color: var(--SCC-baseComponent-text-color-1);
+  opacity: .58;
+}
+ul.layout-tab-bar .item:not(.item--pin) .item__text {
+  min-width: 1em;
+  margin-right: 1px;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  display: inline;
+  color: var(--SCC-baseComponent-text-color-1);
+  opacity: .58;
+}
+ul.layout-tab-bar .item:hover .item__text {
+  color: var(--SCC-baseComponent-text-color-1);
+  opacity: 1;
+}
+
+/* 标签页svg */
+ul.layout-tab-bar .item .item__close:hover svg {
+  color: var(--SCC-Component-TabBar-item__close-svg__hover-color);
+  scale: 1.1;
+}
+
+
+/* 样式优化 */
+.layout-tab-bar.fn__flex,
+ul.fn__flex.layout-tab-bar li {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px; /* 影响【设置】-【集市】标签页 */
+}
+
+body:not(.android) ul.layout-tab-bar.layout-tab-bar--readonly {
+  z-index: 1;
+}
+
+/* 右侧dock栏被遮挡 #208 */
+/* barHelp弹出位置调整 #245 */
+.dock#dockRight {
+  z-index: 1;
+}
+body.android ul.layout-tab-bar.layout-tab-bar--readonly {
+  z-index: 1;
+}
+
+body:not(.android) ul.layout-tab-bar.layout-tab-bar--readonly li.item--readonly:hover {
+  opacity: 1;
+}
+
+ul.layout-tab-bar li [title="更多"] {
+  margin-right: 12px;
+}
+body.android ul.layout-tab-bar li [title="新建文档"] span,
+body.android ul.layout-tab-bar li [title="更多"] span {
+  padding: 13px 8px 13px 0 !important;
+}
+body.android ul.layout-tab-bar li [title="新建文档"] svg,
+body.android ul.layout-tab-bar li [title="更多"] svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+body.android ul.layout-tab-bar li [title="新建文档"] svg,
+body.android ul.layout-tab-bar li [title="更多"] svg {
+  color: var(--SCColor) !important;
+  scale: 1.31 !important;
+}
+body:not(.android) ul.layout-tab-bar li [title="新建文档"] svg,
+body:not(.android) ul.layout-tab-bar li [title="更多"] svg {
+  color: var(--b3-theme-primary-light) !important;
+  scale: 1.58 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  /* opacity: 0; */
+}
+body:not(.android) ul.layout-tab-bar li [title="新建文档"] svg:hover,
+body:not(.android) ul.layout-tab-bar li [title="更多"] svg:hover {
+  color: var(--SCC-Red-Firole) !important;
+  opacity: 1;
+}
+
+#layouts
+  > div.fn__flex.fn__flex-1
+  > div.layout__center.fn__flex.fn__flex-1
+    div.layout-tab-container.fn__flex-1
+  > div.fn__flex-1.protyle
+  > div.protyle-breadcrumb
+  > button {
+  background-color: transparent !important;
+  margin-right: 9px;
+}
+
+/* 使用 li.item 而不是 .item ，避免修改影响【设置】-【集市】的标签页 */
+/* 非当前页签样式 */
+.layout-tab-bar li.item:not(:last-child).item:not(.item--focus),
+.layout-tab-bar li.item:last-child:not(.item--focus):not(.item--readonly) {
+  box-shadow: var(--SCC-Variables-TabBar-item-box-shadow) !important;
+  border-radius: 3px !important;
+  border: 0px ridge transparent !important;
+  /* margin-bottom: 0px !important; */
+  max-width: 131px !important;
+  min-width: 47px !important;
+  transition-duration: 0.58s;
+  transition-delay: 0.2s;
+  font-weight: 520 !important;
+  margin-right: 1px !important;
+  margin-left: 1px !important;
+  background-color: var(--SCC-baseComponent-Button-bg-color-TabBar);
+}
+/* 设置当前标签页样式 */
+.layout-tab-bar .item--focus:after {
+  height: 2px !important; /* 默认主题自带的 */
+  opacity: 0.31;
+}
+#layouts .layout-tab-bar .item--focus {
+  box-shadow: var(--SCC-Variables-TabBar-item__focus-box-shadow) !important;
+  border-radius: 3px !important;
+  border-bottom: var(--SCC-Variables-TabBar-border-bottom) !important;
+  background-color: var(--b3-theme-surface-lighter);
+  backdrop-filter: brightness(1.13);
+  margin-bottom: var(--SCC-Variables-TabBar-margin-bottom) !important;
+  max-width: 666px !important;
+  min-width: 47px !important;
+  transition-timing-function: cubic-bezier(1, 0, 0, 1);
+  transition-duration: 0.2s;
+  margin-right: 1px !important;
+  margin-left: 1px !important;
+}
+/* 钉住标签页*/
+.layout-tab-bar .item--pin .item__text {
+  max-width: 100px;
+}
+
+/*有图标的标签页内文档名钉住时非聚焦隐藏 */
+.layout-tab-bar .item--pin:not(.item--focus):has(.item__icon) .item__text {
+  display: none !important;
+}
+
+/* 为钉住的标签页右上角增加大头钉图标 */
+li.item.item--pin:not(.item--focus):after {
+  content: "";
+  content: url("../../src/icon/pin.svg");
+  position: absolute;
+  right: 5px;
+  top: 0px;
+  width: 11px;
+  height: 11px;
+  opacity: 0.8;
+  filter: grayscale(58%);
+}
+
+li.item.item--pin.item--focus:after {
+  content: "";
+  content: url("../../src/icon/pin.svg") !important;
+  position: absolute;
+  right: 5px;
+  top: 0px;
+  width: 11px;
+  height: 11px;
+  opacity: 1;
+  background-color: transparent !important;
+}
+
+
+/* 标签页上面的emoji */
+.layout-tab-bar .item:not(.item--pin) .item__icon {
+  opacity: 0.58;
+}
+.layout-tab-bar .item__icon:hover {
+  opacity: 1;
+}
+.layout-tab-bar .item--pin .item__graphic,
+.layout-tab-bar .item--pin .item__icon,
+.layout-tab-bar .item__icon {
+  padding: 4px 0 4px 8px;
+}
+
+/* 减小标签页上的emoji大小 */
+.layout-tab-bar .item__icon > img,
+.layout-tab-bar .item__icon > svg {
+  height: 13px;
+  width: 13px;
+}
+
+@media screen and (max-width: 500px) {
+  /* 宽度过小时隐藏 */
+  ul.layout-tab-bar:has([title="更多"]) {
+    display: none;
+  }
+}
+

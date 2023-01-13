@@ -36,3 +36,6 @@ lerna-debug.log*
 # package
 package-lock.json
 yarn.lock
+
+# Sillot extend
+/.history

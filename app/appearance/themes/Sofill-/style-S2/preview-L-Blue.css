@@ -1,0 +1,113 @@
+body:not(.fn__flex-column) #preview,
+body:not(.fn__flex-column) #action {
+  /* 主色 */
+  --b3-theme-primary: var(--SCC-Blue-WPS);
+  --b3-theme-primary-light: var(--SCC-Blue-WPS-light);
+  --b3-theme-primary-lighter: var(--SCC-Blue-WPS-lighter);
+  --b3-theme-primary-lightest: var(--SCC-Blue-WPS-lightest);
+  --b3-theme-secondary: var(--SCC-CNTC-花白);
+  --b3-theme-background: var(--SCC-White-WPS);
+  --b3-theme-background-light: var(--SCC-White-WPS-light);
+  --b3-theme-background-blur: #fafafae8;
+  --b3-theme-surface: var(--SCC-White-WPS);
+  --b3-theme-surface-light: var(--SCC-White-WPS-light);
+  --b3-theme-error: #d23f31;
+
+  /* 文字颜色 */
+  --b3-theme-on-primary: var(--SCC-SGTC-15D);
+  --b3-theme-on-secondary: #fff;
+  --b3-theme-on-background: #131131;
+  --b3-theme-on-surface: var(--SCColor);
+  /* 此色影响顶部栏图标颜色和不少界面区域中的文字颜色 */
+  --b3-theme-on-surface-light: var(--SCC-primary-light);
+  --b3-theme-on-error: #fff;
+
+  /* 自定义颜色 */
+  --b3-font-color1: var(--SCC-CNTC-利休白茶);
+  --b3-font-color2: var(--SCC-CNTC-宝蓝);
+  --b3-font-color3: var(--SCC-SGTC-13B);
+  --b3-font-color4: var(--SCC-SGTC-16A);
+  --b3-font-color5: var(--SCC-CNTC-淡藤);
+  --b3-font-color6: var(--SCC-SGTC-11B);
+  --b3-font-color7: var(--SCC-CNTC-嫣红);
+  --b3-font-color8: var(--SCC-CNTC-山鳩);
+  /* --b3-font-color9: var(--SCC-CNTC-殷红);
+  --b3-font-color10: var(--SCC-CNTC-宝蓝); */
+  --b3-font-background1: #bc002f13;
+  --b3-font-background2: #df33cc26;
+  --b3-font-background3: #9a58fd32;
+  --b3-font-background4: #58a8ff37;
+  --b3-font-background5: #c1ac7c66;
+  --b3-font-background6: #aaaaaa80;
+  --b3-font-background7: #9a747955;
+  --b3-font-background8: #33886633;
+  --b3-font-background9: #11991137;
+  --b3-font-background10: #00dece55;
+
+  /* 线条 */
+  --b3-border-color: var(--SCC-White-WPS-light);
+
+  /* 滚动条 */
+  --b3-scroll-color: var(--SCC-Blue-Windom-lighter);
+
+  /* 列表 */
+  --b3-list-hover: var(--SCC-Blue-Windom-lightest);
+
+  /* 菜单 */
+  --b3-menu-background: var(--SCC-White-WPS);
+
+  /* 提示 */
+  --b3-tooltips-color: #2A445Ac5;
+
+  /* 遮罩 */
+  --b3-mask-background: #030308a3;
+}
+
+/* --- */
+body:not(.fn__flex-column) #preview,
+body:not(.fn__flex-column) #action {
+  --SCC-Component-selector-border: 1px solid var(--SCC-Blue-WPS-light);
+  --SCC-Component-button-text-color: var(--SCC-Blue-WPS);
+  --SCC-Component-button-bg-color: var(--b3-theme-primary-lightest);
+  --SCC-Component-textarea-box-shadow: rgba(88, 101, 131, 0.31) 1px 1px 31px 0px inset,
+    rgba(255, 255, 255, 0.5) -3px -3px 66px 1px inset;
+  --SCC-Component-TabBar-item-hover-bg-color: var(--SCC-Blue-Windom_2-lighter);
+  --SCC-Component-HR-LG1: linear-gradient(to right, transparent, #58588858, transparent);
+  --SCC-Component-Inline-virtual-block-ref-border-bottom: 1px dotted #311358;
+  --SCC-Component-Inline-virtual-block-ref-bg-color-hover: #ffffffc5;
+  --SCC-Component-EmbedBlock-bg-color: #50588803;
+  --SCC-Component-EmbedBlock-box-shadow: inset 9px 9px 29px #38385813, inset -9px -9px 29px #f2f1f931;
+  --SCC-Component-Table-tr-bg-color-1: #fcfefa;
+  --SCC-Component-Table-tr-bg-color-2: #f7fcf013;
+  --SCC-Component-CodeBlock-bg-color: #fcfffca5;
+  --SCC-Component-CodeBlock-bg-color-hover: #fff;
+  --SCC-Component-Message-button-ok-border: 3px ridge var(--SCC-Cyan-186-lighter) !important;
+  --SCC-Component-Message-button-ok-bg-color: var(--SCC-CNTC-青褐);
+  --SCC-Component-meno-bg-color: var(--SCC-CNTC-淡藤);
+  --SCC-Component-meno-border-bottom: 2px solid var(--b3-card-info-color);
+  --SCC-Component-Counter-bg-color: var(--SCC-CNTC-青褐);
+  --SCC-Component-Counter-border: 1.3px solid var(--SCC-CNTC-淡藤);
+  --SCC-Component-TabBar-item__close-svg__hover-color: var(--SCC-CNTC-宝蓝);
+  --SCC-sCt-Hfbs1-color1: rgba(101, 117, 131, 0.11);
+  --SCC-sCt-Hfbs1-color2: rgba(101, 117, 131, 0.17);
+  --SCC-sCt-Hfbs1-color3: rgba(101, 117, 131, 0.23);
+  --SCC-sCt-Hfbs1-color4: rgba(101, 117, 131, 0.29);
+  --SCC-sCt-Hfbs1-color5: rgba(101, 117, 131, 0.35);
+  --SCC-Component-Heading-folded-box-shadow-h5: var(--SCC-sCt-Hfbs1-color1) 7px 4px;
+  --SCC-Component-Heading-folded-box-shadow-h4: var(--SCC-sCt-Hfbs1-color2) 7px 4px, var(--SCC-sCt-Hfbs1-color1) 14px 8px;
+  --SCC-Component-Heading-folded-box-shadow-h3: var(--SCC-sCt-Hfbs1-color3) 7px 4px, var(--SCC-sCt-Hfbs1-color2) 14px 8px, var(--SCC-sCt-Hfbs1-color1) 21px 12px;
+  --SCC-Component-Heading-folded-box-shadow-h2: var(--SCC-sCt-Hfbs1-color4) 7px 4px, var(--SCC-sCt-Hfbs1-color3) 14px 8px, var(--SCC-sCt-Hfbs1-color2) 21px 12px, var(--SCC-sCt-Hfbs1-color1) 28px 16px;
+  --SCC-Component-Heading-folded-box-shadow-h1: var(--SCC-sCt-Hfbs1-color5) 7px 4px, var(--SCC-sCt-Hfbs1-color4) 14px 8px, var(--SCC-sCt-Hfbs1-color3) 21px 12px, var(--SCC-sCt-Hfbs1-color2) 28px 16px, var(--SCC-sCt-Hfbs1-color1) 35px 20px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h5: var(--SCC-sCt-Hfbs1-color1) 2px 4px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h4: var(--SCC-sCt-Hfbs1-color2) 2px 4px, var(--SCC-sCt-Hfbs1-color1) 4px 8px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h3: var(--SCC-sCt-Hfbs1-color3) 2px 4px, var(--SCC-sCt-Hfbs1-color2) 4px 8px, var(--SCC-sCt-Hfbs1-color1) 6px 12px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h2: var(--SCC-sCt-Hfbs1-color4) 2px 4px, var(--SCC-sCt-Hfbs1-color3) 4px 8px, var(--SCC-sCt-Hfbs1-color2) 6px 12px, var(--SCC-sCt-Hfbs1-color1) 8px 16px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h1: var(--SCC-sCt-Hfbs1-color5) 2px 4px, var(--SCC-sCt-Hfbs1-color4) 4px 8px, var(--SCC-sCt-Hfbs1-color3) 6px 12px, var(--SCC-sCt-Hfbs1-color2) 8px 16px, var(--SCC-sCt-Hfbs1-color1) 10px 20px;
+  --SCC-Component-HintMenu-bg-color: rgba(0, 6, 85, 0.58);
+  --SCC-Component-HintMenu-border-bottom: 1.86px ridge rgba(244, 244, 0, 0.58);
+  --SCC-Component-HintMenu-column-rule: 1px solid var(--SCC-Cyan-186-lighter);
+  --SCC-Component-Inline-kbd-color: var(--SCC-CNTC-墨蓝);
+  --SCC-Component-Inline-kbd-bg-color: var(--SCC-SGTC-4B);
+  --SCC-Component-Inline-kbd-box-shadow: rgba(254, 239, 234, 0.8) -2px 2px, rgba(10, 16, 18, 0.18) 1px 3px;
+  --SCC-Component-Inline-kbd-border-radius: 4px;
+}

@@ -1,0 +1,195 @@
+#SC-CP .b3-dialog__container {
+  width: max(66vw, 333px);
+  height: 600px;
+}
+#SC-CP .sc-custom-container-p .sc-tab-container {
+  margin: 11px;
+  height: 580px;
+  width: -webkit-fill-available;
+  overflow: auto;
+  border-radius: 8px;
+}
+#SC-CP .sc-custom-nav {
+  user-select: none;
+  width: 180px;
+  height: 600px;
+  overflow: auto;
+  padding: 8px 0;
+  box-sizing: border-box;
+}
+#SC-CP .sc-custom-nav > li {
+  padding: 0;
+  margin: 2px !important;
+}
+#SC-CP .sc-custom-nav > li > label {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding-left: 22px;
+  letter-spacing: 0.58px;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 960px) {
+  #SC-CP .sc-custom-nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  #SC-CP .sc-custom-nav li.b3-list-item--big {
+    min-height: 31px;
+    min-width: 97%;
+  }
+}
+@media (max-width: 960px) {
+  #SC-CP .sc-custom-nav {
+    user-select: none;
+    width: 100%;
+    height: 3.9rem;
+    overflow: auto;
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    position: sticky;
+    top: 0px;
+    z-index: 6;
+    background-color: var(--b3-theme-background);
+  }
+  #SC-CP .sc-custom-nav > li {
+    height: 2.8rem;
+    display: contents;
+  }
+  #SC-CP .sc-custom-nav > li > label {
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    padding-left: 1.86vw;
+    padding-right: 1.31vw;
+  }
+  #SC-CP .sc-custom-nav > li > label > span {
+    display: none;
+  }
+}
+@media (max-width: 960px) {
+  #SC-CP .sc-tab-container label {
+    align-items: center;
+    flex-direction: column;
+  }
+  #SC-CP .b3-dialog__container {
+    width: 90vw;
+    height: 90vh;
+    overflow: scroll;
+  }
+  #SC-CP .sc-custom-container-p {
+    flex-direction: column;
+  }
+  #SC-CP .sc-custom-container-p .sc-tab-container {
+    overflow: hidden !important;
+    height: auto !important;
+  }
+}
+#SC-CP .config-query-4cols,
+#SC-CP .config-query-3cols,
+#SC-CP .config-query-2cols {
+  display: flex;
+  flex-wrap: wrap;
+}
+#SC-CP .config-query-4cols label {
+  max-width: 22%;
+  min-width: 20%;
+  margin: 7px 3% 1px 0px;
+}
+#SC-CP .config-query-3cols label {
+  max-width: 32%;
+  min-width: 29%;
+  margin: 7px 3% 1px 0px;
+}
+#SC-CP .config-query-2cols label {
+  max-width: 45%;
+  min-width: 44%;
+  margin: 7px 5% 1px 0px;
+}
+body:not(.body--mobile) #SC-CP .b3-dialog__container {
+  background-color: var(--b3-theme-surface-light);
+  backdrop-filter: blur(3px) brightness(2.6);
+}
+.Sofill-CDUI-btn,
+.Sofill-CDUI-btn__icon {
+  color: var(--b3-theme-primary);
+}
+.sc-custom-nav-bind-class,
+.sc-custom-nav-bind-class ~ div:not(#sc-custom-container-placehold),
+.sc-custom-nav-bind-class:checked ~ div {
+  display: none;
+}
+#sc-custom-nav-bind-id-editor:checked ~ #sc-custom-container-editor,
+#sc-custom-nav-bind-id-appearance:checked ~ #sc-custom-container-appearance,
+#sc-custom-nav-bind-id-assets:checked ~ #sc-custom-container-assets,
+#sc-custom-nav-bind-id-export:checked ~ #sc-custom-container-export,
+#sc-custom-nav-bind-id-search:checked ~ #sc-custom-container-search,
+#sc-custom-nav-bind-id-system:checked ~ #sc-custom-container-system,
+#sc-custom-nav-bind-id-custom:checked ~ #sc-custom-container-custom,
+#sc-custom-nav-bind-id-extension:checked ~ #sc-custom-container-extension,
+#sc-custom-nav-bind-id-filetree:checked ~ #sc-custom-container-filetree,
+#sc-custom-nav-bind-id-eHiWindom:checked ~ #sc-custom-container-eHiWindom,
+#sc-custom-nav-bind-id-about:checked ~ #sc-custom-container-about {
+  display: flow-root;
+  position: sticky;
+}
+#sc-custom-nav-bind-id-editor:checked ~ .sc-custom-nav > li[data-name="editor"],
+#sc-custom-nav-bind-id-appearance:checked ~ .sc-custom-nav > li[data-name="appearance"],
+#sc-custom-nav-bind-id-assets:checked ~ .sc-custom-nav > li[data-name="assets"],
+#sc-custom-nav-bind-id-editor:checked ~ .sc-custom-nav > li[data-name="editor"],
+#sc-custom-nav-bind-id-export:checked ~ .sc-custom-nav > li[data-name="export"],
+#sc-custom-nav-bind-id-search:checked ~ .sc-custom-nav > li[data-name="search"],
+#sc-custom-nav-bind-id-system:checked ~ .sc-custom-nav > li[data-name="system"],
+#sc-custom-nav-bind-id-custom:checked ~ .sc-custom-nav > li[data-name="custom"],
+#sc-custom-nav-bind-id-extension:checked ~ .sc-custom-nav > li[data-name="extension"],
+#sc-custom-nav-bind-id-filetree:checked ~ .sc-custom-nav > li[data-name="filetree"],
+#sc-custom-nav-bind-id-eHiWindom:checked ~ .sc-custom-nav > li[data-name="eHiWindom"],
+#sc-custom-nav-bind-id-about:checked ~ .sc-custom-nav > li[data-name="about"] {
+  background-color: var(--b3-list-hover);
+  color: var(--b3-theme-primary);
+}
+body.android .sc-custom-nav > li .b3-list-item__graphic {
+  margin-right: 4px;
+  height: 20px;
+  width: 20px;
+}
+.sc-custom-placeholder {
+  text-align: center;
+  padding-top: 10%;
+  font-size: 5.8rem;
+  font-family: 'SC Smiley';
+  color: var(--b3-theme-primary);
+}
+body:not(.body--mobile.android) .SC_ableOnlyC__Android_mobile,
+body:not(.body--app) .SC_ableOnlyC__App,
+body.body--mobile.android #sc-custom-container-custom > :not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.body--mobile.android #sc-custom-container-system > :not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.body--mobile.android #sc-custom-container-editor > :not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.body--mobile.android #sc-custom-container-filetree > :not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.body--mobile.android #sc-custom-container-appearance > :not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.body--mobile.android #sc-custom-container-export > :not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.android .SC_disableC__Android,
+body.body--mobile.android .SC_disableC__Android_mobile,
+body.body--desktop.android .SC_disableC__Android_desktop {
+  display: none !important;
+}
+/* 登录用户权益 */
+.SC_ableOnlyU__N {
+  color: var(--b3-theme-primary);
+  filter: drop-shadow(-3px 5px 13px var(--b3-theme-primary-lighter));
+}
+/* 订阅用户权益 */
+.SC_ableOnlyU__S {
+  color: var(--b3-theme-primary);
+  filter: drop-shadow(-3px 5px 13px var(--b3-theme-primary-lighter)) sepia(1);
+}
+/* 弹窗界面 */
+#SC-ConfirmDialog #CoverWarming {
+  filter: drop-shadow(1px 2px 13px #13131399);
+}

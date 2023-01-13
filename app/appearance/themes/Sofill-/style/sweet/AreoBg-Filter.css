@@ -1,0 +1,16 @@
+.protyle-title {
+  margin: 0 !important;
+  padding: 16px 96px 0px;
+  background-color: var(--b3-theme-background-blur);
+  backdrop-filter: blur(31px) brightness(1.31);
+}
+
+.protyle-wysiwyg {
+  background-color: var(--b3-theme-background-blur);
+  backdrop-filter: blur(50px) brightness(1.1);
+}
+
+.protyle-background {
+  position: sticky;
+  top: 0px;
+}

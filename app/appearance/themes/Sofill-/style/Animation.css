@@ -1,0 +1,265 @@
+@keyframes breath-iconRiffCard {
+  0% {
+    filter: none;
+    scale: 1;
+  }
+
+  100% {
+    filter: invert(1) brightness(1.03) blur(1.31px);
+    scale: 1.31;
+  }
+}
+
+@keyframes rotate-cycle {
+  0% {
+    rotate: 0deg;
+  }
+
+  50% {
+    rotate: 180deg;
+  }
+
+  100% {
+    rotate: 360deg;
+  }
+}
+
+@keyframes menu {
+  0% {
+    opacity: 0.13;
+  }
+
+  50% {
+    transform: scale(1.01);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes item-focus {
+  0% {
+    transform: scale(0.01);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes flex-column-x {
+  0% {
+    transform: scale(1, 0.86);
+    transform-origin: 0 0;
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1, 0.9);
+    transform-origin: 0 0;
+  }
+}
+
+@keyframes flex-column-y {
+  0% {
+    transform: scale(1.13, 1);
+    transform-origin: 0 0;
+  }
+
+  100% {
+    transform: scale(1, 1);
+    transform-origin: 0 0;
+  }
+}
+
+@keyframes flex-column-y-long {
+  0% {
+    transform: scale(1.16, 1);
+    transform-origin: 0 0;
+  }
+
+  100% {
+    transform: scale(1, 1);
+    transform-origin: 0 0;
+  }
+}
+
+@keyframes flex-column-y-longer {
+  0% {
+    transform: scale(1.19, 1);
+    transform-origin: 0 0;
+  }
+
+  100% {
+    transform: scale(1, 1);
+    transform-origin: 0 0;
+  }
+}
+
+@keyframes tree-list {
+  0% {
+    transform: scale(1, 1);
+    transform-origin: 0 0;
+    opacity: 0;
+  }
+
+  33% {
+    transform: scale(1, 1.01);
+    transform-origin: 0 0;
+    opacity: 0.58;
+  }
+
+  77% {
+    transform: scale(1, 1.01);
+    transform-origin: 0 0;
+    opacity: 0.85;
+  }
+
+  100% {
+    transform: scale(1, 1);
+    transform-origin: 0 0;
+  }
+}
+
+/* 动态波浪线 */
+@keyframes waveMove {
+  from {
+    background-position: -13px 100%;
+  }
+
+  to {
+    background-position: 0px 100%;
+  }
+}
+
+/* from http://web.chacuo.net/css3transition */
+@keyframes background-color-2 {
+  from {
+    background-color: #dee3f4;
+  }
+
+  to {
+    background-color: #dfe0f6;
+  }
+}
+
+@keyframes text-shadow {
+  from {
+    text-shadow: 0 0 0 white;
+  }
+
+  to {
+    text-shadow: 0 0 10px white;
+  }
+}
+
+@keyframes text-shadow-4 {
+  from {
+    text-shadow: 0 0 black;
+  }
+
+  to {
+    text-shadow: -3px -3px 30px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@keyframes letter-spacing-2 {
+  from {
+    letter-spacing: 0;
+  }
+
+  to {
+    letter-spacing: 100px;
+  }
+}
+
+@keyframes letter-spacing-head {
+  from {
+    letter-spacing: 0;
+  }
+
+  to {
+    letter-spacing: 1px;
+  }
+}
+
+@keyframes letter-spacing-more-list-1 {
+  from {
+    letter-spacing: 3px;
+    line-height: 30px;
+    opacity: 0.13;
+    margin-top: -7px;
+  }
+
+  to {
+    letter-spacing: 0.31px;
+    line-height: 31px;
+    opacity: 1;
+    margin-top: 0px;
+  }
+}
+
+@keyframes letter-spacing-more-list-2 {
+  from {
+    top: -58px;
+  }
+
+  to {
+    top: 58px;
+  }
+}
+
+.layout__wnd--active .layout-tab-bar .item--focus::after {
+  animation: item-focus 0.2s ease-in-out;
+}
+
+.protyle-util {
+  animation: menu 0.2s ease-in-out;
+}
+
+
+#layouts>.fn__flex>.fn__flex-column:has(span[data-type="focus"])>.fn__none:not(.layout__resize)>div[data-type=wnd] {
+  transition: all .24s cubic-bezier(0.645, 0.045, 0.355, 1) 0s;
+}
+
+/*侧栏（不包括文档树）展开动画*/
+#layouts div[data-type="wnd"]>.layout-tab-container>.fn__flex-column:not(:has(span[data-type="focus"])):has(li:nth-child(100)) ul:has(ul) {
+  animation: tree-list .2s ease-in;
+}
+
+@media screen and (min-width: 1300px) {
+  #layouts div[data-type="wnd"]>.layout-tab-container>.fn__flex-column:not(:has(span[data-type="focus"])):not(:has(li:nth-child(100))) {
+    animation: flex-column-y-longer 0.58s cubic-bezier(0.37, -0.02, 0.54, 1.09);
+    animation-delay: 0.1s;
+  }
+}
+
+@media screen and (min-width: 960px) and (max-width: 1300px) {
+  #layouts div[data-type="wnd"]>.layout-tab-container>.fn__flex-column:not(:has(span[data-type="focus"])):not(:has(li:nth-child(100))) {
+    animation: flex-column-y-long 0.35s cubic-bezier(0.37, -0.02, 0.54, 1.09);
+    animation-delay: 0.1s;
+  }
+}
+
+@media screen and (max-width: 960px) {
+  body:not(android) #layouts div[data-type="wnd"]>.layout-tab-container>.fn__flex-column:not(:has(span[data-type="focus"])):not(:has(li:nth-child(100))) {
+    animation: flex-column-y 0.13s cubic-bezier(0.37, -0.02, 0.54, 1.09);
+    animation-delay: 0.1s;
+  }
+}
+
+.b3-list-item--hide-action {
+  animation: tree-list 0.13s ease-in;
+}
+
+.protyle-gutters {
+  transition: all .2s ease-out;
+}
+
+/* hint--menu */
+.protyle-hint.b3-list.b3-list--background.hint--menu {
+  animation: menu 0.13s ease-in-out;
+}
