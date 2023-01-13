@@ -1,0 +1,568 @@
+/* 补丁形式注入,随版本更新随时可能更改或移动到其他CSS文件 */
+body:not(.user--null) .protyle-wysiwyg[contenteditable="false"]:active {
+  filter: sepia(1) opacity(.7);
+}
+
+body:not(.user--null) .protyle-title__input~.protyle-attr {
+  opacity: 1;
+  font-size: var(--SCC-Variables-protyle-attr-scale, 1);
+  letter-spacing: calc(var(--SCC-Variables-protyle-attr-scale, 1) * 1px);
+  transform: translateX(calc(var(--SCC-Variables-protyle-attr-scale, 1) * -5px));
+  transition: all .31s ease .13s;
+}
+
+body:not(.user--null) .protyle-title__input~.protyle-attr>div {
+  line-height: var(--SCC-Variables-protyle-attr-scale, 1);
+  display: flex !important;
+}
+
+body:not(.user--null) .protyle-title__input~.protyle-attr svg {
+  margin: auto calc(var(--SCC-Variables-protyle-attr-scale, 1) * 5px);
+  display: flex;
+  scale: var(--SCC-Variables-protyle-attr-scale, 1);
+  align-self: center;
+}
+
+#historyContainer>.history__repo li[data-type="repoitem"] {
+  border-radius: 13px;
+  border-top: 1px dashed #858585a5;
+  margin: 5.8px 10px 1.3px 22.5px;
+  padding: 3.1px 5.8px 1.3px 5.8px;
+}
+
+#historyContainer>.history__repo>ul>li>div>div:nth-child(2) {
+  display: flex;
+}
+
+#historyContainer>.history__repo>ul>li>div>div:nth-child(2)>.ft__smaller {
+  filter: brightness(1.31) sepia(1) opacity(0.88);
+}
+
+#historyContainer>.history__repo>ul>li>div>div:nth-child(2)>.b3-list-item__meta {
+  filter: brightness(1.31) opacity(0.38);
+}
+
+.b3-dialog__container.b3-dialog__container.b3-dialog__container.b3-dialog__container {
+  opacity: var(--SCC-Variables-KeynesOpacity, 1);
+}
+
+#menuCard>svg {
+  animation: breath-iconRiffCard .58s linear .13s infinite alternate;
+}
+
+#menuSyncNow>svg,
+/* 手机端还不支持 rotate 属性，暂时作为伺服手机界面的彩蛋保留 */
+#SC_winsay_cp_system__Refresh:hover>svg,
+#SC_winsay_cp__checkUpdateBtn:hover>svg,
+#checkUpdateBtn:hover>svg {
+  animation: rotate-cycle 5.86s cubic-bezier(0.68, -5, 0.31, 8) infinite;
+}
+
+.block__popover:has(>.block__icons>[data-type="close"]:hover) {
+  background-color: transparent !important;
+  backdrop-filter: blur(0.31px) brightness(.96);
+  transition: background-color 1.31s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.block__popover:has(>.block__icons>[data-type="close"]:hover)>.block__content,
+.block__popover:has(>.block__icons>[data-type="close"]:hover)>.block__content>div,
+.block__popover:has(>.block__icons>[data-type="close"]:hover)>.block__content>div>div {
+  opacity: 0;
+  transition: opacity 0.31s cubic-bezier(0.4, 0, 1, 1);
+}
+
+#Sofill-MobileBall {
+  width: 44px;
+  height: 44px;
+  position: absolute;
+  bottom: 131px;
+  right: 5.8px;
+  background-color: #fff0;
+  border-radius: 13px;
+  outline: none;
+  z-index: 119;
+}
+
+#Sofill-MobileBall>svg {
+  color: var(--b3-theme-secondary);
+}
+
+#addCodeSnippetCSS,
+#addCodeSnippetJS {
+  position: absolute;
+  bottom: 7px;
+  box-shadow: var(--b3-point-shadow);
+}
+
+.b3-menu__item:has(.b3-menu__submenu:empty),
+.b3-menu__submenu:empty {
+  display: none;
+}
+
+/* 添加 emoji 面板样式 #728 */
+body:not(body--mobile) .emojis {
+  height: clamp(200px, 58vh, 500px) !important;
+  max-height: unset !important;
+  width: clamp(200px, 58vw, 510px) !important;
+}
+
+body.body--mobile .emojis {
+  height: clamp(200px, 70vh, 500px) !important;
+  max-height: unset !important;
+  width: clamp(200px, 90vw, 500px) !important;
+}
+
+body.body--mobile .emojis .block__icon svg {
+  height: 18px;
+  width: 18px;
+}
+
+.emojis__panel .emojis__content button.emojis__item {
+  margin: 1.1px;
+  padding: 5.8px;
+  height: 35px;
+  width: 35px;
+  border-radius: 3.1px;
+}
+
+.emojis__panel .emojis__content button.emojis__item svg,
+.emojis .emojis__type svg {
+  scale: 1.15;
+}
+
+.emojis__panel+div {
+  margin-top: 3.8px;
+  margin-bottom: -5.8px;
+  border-radius: 5.8px;
+  border: 2px solid var(--b3-theme-surface-lighter);
+  backdrop-filter: brightness(0.98);
+}
+
+#barReadonly[aria-label^="使用 编辑模式"]>svg,
+#barReadonly[aria-label^="使用 編輯模式"]>svg,
+#barReadonly[aria-label^="Use Edit Mode"]>svg {
+  color: var(--b3-font-color1);
+  filter: saturate(5.8) brightness(0.58);
+}
+
+/* 主题设置界面支持自动翻译 #638 */
+#translate {
+  position: unset !important;
+  color: unset !important;
+  left: unset !important;
+  top: unset !important;
+  font-size: unset !important;
+  z-index: unset !important;
+}
+
+#translate select {
+  background-color: var(--SCC-baseComponent-selector-bg-color) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  width: 200px !important;
+  flex-shrink: 0 !important;
+  align-self: center !important;
+  border: 0;
+  border-radius: 4px;
+  padding: 4px 8px;
+  line-height: 20px;
+  box-sizing: border-box;
+  color: var(--b3-theme-on-background);
+  transition: box-shadow 120ms 0ms cubic-bezier(0, 0, 0.2, 1);
+  height: 28px;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+#sc_drawer::after {
+  content: attr(data-themeInfo);
+  font: -webkit-small-control;
+  font-size: 131%;
+  letter-spacing: 1px;
+  width: 58px;
+  text-align: left;
+  padding: 0 5.8px;
+  margin-top: 7px;
+  color: var(--b3-theme-secondary);
+}
+
+#sc_drawer:empty::after {
+  width: 200px;
+  text-align: center;
+}
+
+/* 搜索头统一层级，有遮挡的地方自行处理 */
+.search__header:focus {
+  z-index: 98;
+}
+
+@media screen and (min-width: 1000px) {
+  .search__header .b3-menu:not(:empty) {
+    column-count: 3;
+    column-width: 13vw !important;
+    column-gap: 0.13em;
+  }
+
+  .search__header .b3-menu .b3-list-item {
+    max-height: 6.2em;
+    min-height: 1em;
+    line-height: 1.2em;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .search__header .b3-menu:not(:empty) {
+    column-count: 2;
+    column-width: 22vw !important;
+    column-gap: 0.13em;
+  }
+
+  .search__header .b3-menu .b3-list-item {
+    max-height: 3.8em;
+    min-height: 1em;
+    line-height: 1.2em;
+  }
+}
+
+.search__header .b3-menu:not(:empty) {
+  max-height: 58vh !important;
+  column-rule: var(--SCC-Component-HintMenu-column-rule) !important;
+  border-bottom: var(--SCC-Component-HintMenu-border-bottom);
+  background-color: var(--b3-theme-surface-lighter) !important;
+  backdrop-filter: blur(13px) brightness(0.88);
+  filter: brightness(1.13) contrast(1.13);
+}
+
+.search__header .b3-menu:empty {
+  background-color: var(--b3-theme-surface-lighter) !important;
+  backdrop-filter: blur(3.1px) brightness(0.7);
+}
+
+.search__header .b3-menu:empty::before {
+  content: "~ no historical record ~";
+}
+
+.search__header .b3-menu .b3-list-item {
+  color: var(--b3-theme-primary);
+  filter: brightness(0.58) opacity(.88);
+  overflow: scroll;
+  letter-spacing: .05px;
+  align-items: flex-start;
+  padding: .58em .31em .31em .31em;
+}
+
+.search__header .b3-menu .b3-list-item:hover {
+  background-color: var(--b3-theme-surface-lighter);
+  backdrop-filter: contrast(0.31) brightness(13) opacity(.58);
+}
+
+.protyle-breadcrumb__bar--hide {
+  opacity: var(--SCC-Variables-breadcrumb--hide-opacity, 0) !important;
+}
+
+.fullscreen button[aria-label="更多"]>svg,
+.fullscreen button[aria-label="More"]>svg {
+  color: var(--b3-theme-primary);
+}
+
+.fullscreen>.protyle-breadcrumb {
+  height: 30px;
+  margin-bottom: 5.8px;
+}
+
+
+/* 搜索匹配列表分组辅助线（需开启搜索面板标号） #639 */
+#searchList>.b3-list-item+div:not([data-type=search-item]) {
+  box-shadow: none;
+}
+
+.protyle-util span.b3-list-item__action.b3-tooltips.b3-tooltips__w[aria-label="打开文件位置"],
+.protyle-util span.b3-list-item__action.b3-tooltips.b3-tooltips__w[aria-label="打開文件位置"],
+.protyle-util span.b3-list-item__action.b3-tooltips.b3-tooltips__w[aria-label="Show in Folder"] {
+  display: flex;
+  color: var(--b3-theme-on-surface);
+  opacity: .88;
+}
+
+/* 双击查看图片 */
+.viewer-canvas>img {
+  z-index: 9;
+}
+
+.viewer-player.viewer-show {
+  z-index: 100;
+}
+
+.viewer-navbar {
+  background-color: #00000013;
+  backdrop-filter: blur(3.1px);
+}
+
+.viewer-backdrop {
+  background-color: rgba(0, 0, 0, .13);
+  backdrop-filter: blur(31px) brightness(.58);
+}
+
+.viewer-toolbar>ul>li {
+  margin: 0 1.3px;
+  padding: 3.8px;
+  border-radius: 38%;
+}
+
+.viewer-title {
+  font-size: 14px;
+  letter-spacing: .13px;
+  backdrop-filter: blur(3.1px) brightness(.31);
+  padding: 5.8px;
+}
+
+.viewer-navbar,
+.viewer-list {
+  display: flex;
+}
+
+.viewer-list {
+  flex-basis: 100px;
+}
+
+body.body--mobile .viewer-title {
+  white-space: normal;
+  position: fixed;
+  top: 13px;
+  left: 0px;
+}
+
+body.body--mobile .viewer-toolbar>ul:not(:hover) {
+  margin-left: -60px;
+}
+
+body.body--mobile .viewer-toolbar:hover+.viewer-navbar {
+  margin-bottom: -50px;
+  transition: all .58s ease .31s;
+}
+
+body.body--mobile .viewer-toolbar>ul {
+  display: flex;
+  flex-direction: column-reverse;
+  width: 44px;
+  margin: 5.8px;
+  padding-right: 66px;
+  /* padding-bottom: 131px; */
+  transition: all .31s ease .03s;
+  align-items: center;
+  z-index: 99;
+  position: sticky;
+}
+
+body.body--mobile .viewer-toolbar>ul>li {
+  margin: 5px 3.1px;
+  padding: 8px;
+  border-radius: 31%;
+  backdrop-filter: blur(1.3px);
+}
+
+body.body--mobile .viewer-toolbar svg {
+  scale: 1.86;
+  max-width: 16px;
+  filter: drop-shadow(1px 2px 1px #131313a5);
+}
+
+
+.sy__backlink .b3-list--background .b3-list-item--focus:not(.dragover):not(.dragover__top):not(.dragover__bottom) {
+  background-color: var(--b3-list-hover);
+  backdrop-filter: blur(5.8px);
+  position: sticky;
+  top: 0px;
+  z-index: 2;
+}
+
+/* 13号色特殊显示 #320 */
+[style*="color: var(--b3-font-color13)"]:hover {
+  color: inherit !important;
+  transition: all .13s cubic-bezier(0, 0, 0.2, 1) .13s;
+}
+
+[style*="color: var(--b3-font-color13)"]:not(:hover) {
+  transition: all .31s cubic-bezier(0.4, 0, 0.2, 1) .31s;
+}
+
+[style*="background-color: var(--b3-font-background13)"]:hover {
+  background-color: transparent !important;
+  transition: all .13s cubic-bezier(0, 0, 0.2, 1) .31s;
+}
+
+[style*="background-color: var(--b3-font-background13)"]:not(:hover) {
+  transition: all .31s cubic-bezier(0.4, 0, 0.2, 1) .13s;
+  color: transparent !important;
+}
+
+/* https://ld246.com/article/1669468102342 */
+.b3-dialog__container>div:nth-child(3)>.fn__flex-column.b3-dialog--switch:has(.fn__hr):has(.dialog__path)>div.fn__flex {
+  overflow: auto;
+}
+
+.b3-dialog__container>div:nth-child(3)>.fn__flex-column.b3-dialog--switch:has(.fn__hr):has(.dialog__path)>div.fn__flex>ul {
+  padding: 3.1px;
+  margin: 5.8px 3.1px;
+}
+
+.b3-dialog__container>div:nth-child(3)>.fn__flex-column.b3-dialog--switch:has(.fn__hr):has(.dialog__path)>div.fn__flex>ul:nth-child(1) {
+  opacity: 0.58;
+}
+
+.b3-dialog__container>div:nth-child(3)>.fn__flex-column.b3-dialog--switch:has(.fn__hr):has(.dialog__path):has(li:nth-of-type(15)) {
+  width: clamp(31vw, 700px, 88vw);
+}
+
+.b3-dialog__container>div:nth-child(3)>.fn__flex-column.b3-dialog--switch:has(.fn__hr):has(.dialog__path)>div.fn__flex>ul:nth-child(2):has(li:nth-of-type(15)) {
+  column-count: 2;
+}
+
+.b3-dialog__container>div:nth-child(3)>.fn__flex-column.b3-dialog--switch:has(.fn__hr):has(.dialog__path)>div.fn__flex>ul:nth-child(2):has(li:nth-of-type(30)) {
+  column-count: 3;
+}
+
+.b3-dialog--switch .dialog__path {
+  min-height: 1.86em;
+}
+
+#barhelp>.b3-menu {
+  right: 13px !important;
+  padding: 3px 13px 13px !important;
+}
+
+div[data-name="bazaar"] .b3-card:hover {
+  transform: none;
+}
+
+#keymapList .b3-list-item.toggle {
+  margin: 6px 3px -2px !important;
+  font-size: 105%;
+  border: 1px solid var(--b3-theme-surface-lighter);
+  letter-spacing: .13px;
+}
+
+#keymapList .b3-list-item--hide-action:not(:hover) .b3-list-item__action {
+  display: flex;
+  opacity: .58;
+}
+
+#keymapList .b3-list--border .b3-list-item__text {
+  min-width: 8rem;
+  margin-right: 1rem;
+}
+
+.protyle-scroll:hover .protyle-scroll__up svg,
+.protyle-scroll:hover .protyle-scroll__down svg {
+  opacity: .31 !important;
+}
+
+/* Android 手机端model元素禁用过渡 #283
+适用于 2.4.9 及更老版本思源 */
+#editor:focus-within+div+div+div+div+div {
+  transition: height 0s;
+}
+
+#editor:not(:focus-within)+div+div+div+div+div {
+  transition: all 0s cubic-bezier(0.65, 0.05, 0.36, 1) 0s;
+  /* 如果存在过渡，编辑器呼出键盘时打开左右面板仍会出现，可通过增加过渡延时明显观察到 */
+}
+
+/* Android 手机端左右面板宽度调整 #284 */
+body.android #menu {
+  width: max-content;
+  overflow-y: scroll;
+}
+
+body.android #sidebar {
+  width: 90%;
+}
+
+/* 只读模式提示 #214 */
+/* 部分文档切换编辑/阅读模式卡死 #660 */
+/* .fn__flex-1.protyle:has(div[contenteditable="false"][data-doc-type="NodeDocument"]):hover,
+.fn__flex-1.protyle:has(div[contenteditable="false"][data-doc-type="NodeDocument"]):hover [data-doc-type="NodeDocument"] {
+  background-color: var(--SCC-Variables-docReadOnly-hover-bg-color) !important;
+} */
+
+/* 优化右上角窗口关闭按钮焦点样式，不适用于思源2.4.3 */
+#closeWindow:hover svg {
+  color: var(--SCC-Gray-HellisePotter) !important;
+}
+
+/* 【设置】-【账号】订阅按钮 */
+body>div.b3-dialog--open>div>div.b3-dialog__container>div:nth-child(3)>div>div.fn__flex-1.fn__flex>div:nth-child(10)>div>div.config-account__center.config-account__center--text>div.ft__center>a.b3-button.b3-button--outline {
+  background-color: var(--b3-theme-primary-lightest);
+  box-shadow: rgb(254 239 234 / 40%) 0px 3px, rgb(0 6 85 / 30%) 0px 5px,
+    rgb(72 69 80 / 10%) 0px 8px;
+}
+
+/* Android Pad 端拖拽页签异常问题 #120
+  Android Pad 端长按文档树列表项引发透明度异常问题 #141
+  屏蔽 Android 端拖拽  */
+body.android .b3-list-item,
+body.android .layout-tab-bar li {
+  -webkit-user-drag: none;
+}
+
+/* 文档树显示文档emoji图标异常 #119 */
+.b3-list-item__icon {
+  font-family: Segoe UI emoji;
+}
+
+/* Android Pad 端禁止在文档树修改图标 #139 */
+/* 支持通过主题设置界面禁用文档树修改图标 #684 */
+.b3-list-item__icon[aria-label="修改图标"],
+.b3-list-item__icon[aria-label="修改圖示"],
+.b3-list-item__icon[aria-label="Change icon"] {
+  pointer-events: var(--SCC-Variables-ChangeIconAvailability, all);
+}
+
+/* 右下角统计区适当增加右填充 #132 */
+#status .status__counter {
+  padding-right: 5.8px;
+}
+
+/* 集市主题详情页链接颜色与文档内链接颜色不一致 #97 */
+a:not([id="appearanceOpenTheme"]):not([id="appearanceOpenIcon"]):not([id="appearanceOpenEmoji"]):not([id="clearHistory"]):not(.fn__a):not(.b3-chip) {
+  color: var(--b3-protyle-inline-link-color);
+}
+
+#layouts .b3-typography img,
+#layouts .protyle-wysiwyg img {
+  background-color: var(--SCC-Variables-IMG-bg-color);
+}
+
+@media screen and (min-width: 960px) {
+
+  /* 部分颜色显示效果优化 */
+  [style="color: var(--b3-font-color8);"],
+  [style="color: var(--b3-font-color9);"] {
+    text-shadow: 1px 0.5px 1px #40051d31 !important;
+  }
+
+  [style="color: var(--b3-font-color10);"] {
+    text-shadow: 1px 0.5px 1px #7f04f558 !important;
+  }
+
+  [style="color: var(--b3-font-color11);"] {
+    text-shadow: 1px 0.5px 1px #0b0bff31 !important;
+  }
+}
+
+@media screen and (max-width: 960px) {
+
+  /* 部分颜色显示效果优化 */
+  [style="color: var(--b3-font-color8);"],
+  [style="color: var(--b3-font-color9);"] {
+    text-shadow: -0.5px 0.5px 0.5px #40051d58 !important;
+  }
+
+  [style="color: var(--b3-font-color10);"] {
+    text-shadow: -0.5px 0.5px 1px #7f04f531 !important;
+  }
+
+  [style="color: var(--b3-font-color11);"] {
+    text-shadow: -0.5px 0.5px 1px #0b0bff31 !important;
+  }
+}

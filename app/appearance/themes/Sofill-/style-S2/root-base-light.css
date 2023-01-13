@@ -1,0 +1,171 @@
+:root {
+  /* 卡片 */
+  --b3-card-error-color: rgb(97, 26, 21);
+  --b3-card-error-background: #f5d1cf;
+  --b3-card-warning-color: rgb(102, 60, 0);
+  --b3-card-warning-background: #ffe8c8;
+  --b3-card-info-color: rgb(13, 60, 97);
+  --b3-card-info-background: #d6eaf9;
+  --b3-card-success-color: rgb(30, 70, 32);
+  --b3-card-success-background: #d7eed8;
+
+  /* 自定义颜色 */
+  --b3-font-color9: inherit;
+  --b3-font-color10: inherit;
+  --b3-font-color11: inherit;
+  --b3-font-color12: inherit;
+  --b3-font-color13: transparent;
+  --b3-font-background11: transparent;
+  --b3-font-background12: transparent;
+  --b3-font-background13: #000;
+
+  /* 动画效果 */
+  --b3-transition: all 0.31s cubic-bezier(0, 0, 0.2, 1) 0ms;
+  --b3-width-transition: width .13s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0ms;
+
+  /* 阴影 */
+  --b3-point-shadow: -2px 3px 3px -2px rgba(0, 0, 0, 0.13),
+    0px 58px 131px -10px var(--b3-theme-primary-lightest), 2px 3px 5px 0px rgba(0, 0, 0, 0.1);
+  --b3-dialog-shadow: 1px 13px 8px -1px rgba(0, 0, 0, 0.31),
+    0px 13px 131px -13px rgba(0, 0, 0, 0.07), 1px 1px 6px -2px rgba(0, 0, 0, 0.13);
+
+  /* 图表颜色 */
+  --b3-graph-p-point: #076f7e;
+  --b3-graph-heading-point: #660e7a;
+  --b3-graph-math-point: #80ffa5;
+  --b3-graph-code-point: #00ddff;
+  --b3-graph-table-point: #37a2ff;
+  --b3-graph-list-point: #ff0087;
+  --b3-graph-todo-point: #ffbf00;
+  --b3-graph-olist-point: #b3005f;
+  --b3-graph-listitem-point: #f65b00;
+  --b3-graph-bq-point: #8d48e3;
+  --b3-graph-super-point: #dd79ff;
+  --b3-graph-doc-point: #202124;
+  --b3-graph-tag-point: #dbf32f;
+  --b3-graph-asset-point: #05c091;
+  --b3-graph-line: #5f6368;
+  --b3-graph-ref-line: #d23f31;
+  --b3-graph-tag-line: #5f6b06;
+  --b3-graph-tag-tag-line: #dbf32f;
+  --b3-graph-asset-line: #037457;
+  --b3-graph-hl-point: #f3a92f;
+  --b3-graph-hl-line: #4285f4;
+
+  /* 编辑器搜索颜色 */
+  --b3-protyle-search-background: var(--SCC-Yellow-HellisePotter);
+  --b3-protyle-search-border-color: var(--SCC-Yellow-HellisePotter-light);
+  --b3-protyle-search-current-background: #a5d3fe;
+
+  /* 代码片段背景 */
+  --b3-protyle-code-background: rgba(27, 31, 35, 0.05);
+  --b3-protyle-code-linenumber-hl: transparent;
+
+  /* 所见即所得行内元素颜色 */
+  --b3-protyle-inline-strong-color: inherit;
+  --b3-protyle-inline-em-color: inherit;
+  --b3-protyle-inline-s-color: #58585831;
+  --b3-protyle-inline-link-color: var(--SCC-Blue-Windom_2);
+  /* 超链接字色 */
+  --b3-protyle-inline-mark-background: #ffe955;
+  --b3-protyle-inline-mark-color: #202124;
+  --b3-protyle-inline-tag-color: #5f6368;
+  --b3-protyle-inline-blockref-color: var(--b3-theme-primary);
+  /* 块引用字色 */
+
+  /* PDF */
+  --b3-pdf-selection: #d0e9c8;
+  --b3-pdf-sidebar-width: 200px;
+  --b3-pdf-offset: 0;
+  --b3-pdf-background1: var(--b3-theme-error);
+  --b3-pdf-background2: #f5822e;
+  --b3-pdf-background3: var(--b3-theme-secondary);
+  --b3-pdf-background4: #65b84d;
+  --b3-pdf-background5: #f5539e;
+  --b3-pdf-background6: var(--b3-theme-primary);
+  --b3-pdf-background7: #944194;
+}
+
+:root {
+  --SCC-baseComponent-Button-bg-color-TabBar: transparent;
+  --SCC-baseComponent-CodeBlock-ab-color: var(--SCC-primary-lighter);
+  --SCC-baseComponent-selector-bg-color: var(--b3-theme-primary-lightest);
+  --SCC-baseComponent-text-color-1: var(--SCC-Brown-186);
+  --SCC-baseComponent-text-color-2: var(--SCC-Gray);
+  --SCC-baseComponent-Table-border-1: 0.25pt solid var(--b3-theme-primary-lightest);
+  --SCC-baseComponent-Icon-arrow-color-1: var(--SCC-Gray);
+  --SCC-baseComponent-Input-box-shadow-focus: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+  --SCC-baseComponent-search__header-input-box-shadow: none;
+  --SCC-baseComponent-search__header-input-box-shadow-focus: var(--SCC-baseComponent-Input-box-shadow-focus);
+  --SCC-baseComponent-Switch-checked-ab-color: #fff;
+  --SCC-baseComponent-breadcrumb__bar-color: var(--SCColor);
+  --SCC-baseComponent-breadcrumb-box-shadow: rgba(222, 227, 240, 0.13) 1px 0px 6px, rgba(222, 227, 240, 0.13) 0px 8px 5px 1px inset;
+  --SCC-baseComponent-breadcrumb-position: absolute;
+  --SCC-baseComponent-toolbar-drag-color: var(--SCColor);
+  --SCC-baseProperty-Opacity-A: 0.85;
+  --SCC-baseProperty-Opacity-B: 0.58;
+  --SCC-baseProperty-Opacity-C: 0.58;
+  --SCC-baseComponent-HintMenu-backdrop-filter: blur(13px);
+  --SCC-baseComponent-snackbar__content-color: #fff;
+  --SCC-baseComponent-file__tree-UL-border-image: linear-gradient(to right, #eeeeee13 0%, #58585813 20%, #58585813 80%, #eeeeee13 100%) 1;
+  --SCC-funs__baseComponent-list2map-line: 2px solid var(--b3-theme-primary-light);
+  --SCC-funs__baseComponent-list2table-border: 1px solid var(--b3-theme-primary-lightest);
+  --SCC-baseComponent-Dialog-520-box-shadow: 13px 31px 131px -58px rgb(0 0 0 / 50%), -30px 31px 29px -18px rgb(13 13 13 / 33%), 72px 51px 66px -92px rgb(255 255 255 / 79%);
+  --SCC-baseComponent-Dialog-520-hover-box-shadow: 13px 31px 131px -58px rgb(0 0 0 / 50%), 60px 111px 52px -8px rgb(0 0 0 / 13%), -262px -31px 777px -82px rgb(255 255 255 / 99%);
+  --SCC-baseComponent-Dialog-520-button-color: var(--SCC-CNTC-月白);
+  --SCC-baseComponent-Popup-Menu-shadow: rgb(0 0 0 / 31%) -20px 58px 111px -61px, rgb(131 131 131 / 3%) 10px -181px 666px 1111px, rgb(0 0 0 / 13%) 0px 3px 18px -12px inset;
+  --SCC-baseComponent-file-tree-hover-ul-outline: none;
+  /* 块引用波浪线动画图标 | The icon of wavy line animation */
+  --SCC-baseComponent-span-ref-animation-icon: url(/appearance/themes/Sofill-/src/icon/wavy-line-light.svg);
+}
+
+:root {
+  filter: var(--SCC-Variables-root-filter-light, none) !important;
+}
+
+/* 集市主题详情页 */
+.config-bazaar__readme,
+.config-bazaar__readme .item__side {
+  background-color: var(--b3-theme-background);
+  z-index: 99;
+}
+
+/* 背景色11、12改为标记色 #585 */
+[style*="background-color:var(--b3-font-background11)"],
+[style*="background-color: var(--b3-font-background11)"] {
+  background-image: linear-gradient(transparent, transparent 78%, var(--b3-theme-primary-lightest) 88%, var(--b3-theme-primary-lighter) 91%, var(--b3-theme-primary-light) 96%, var(--b3-theme-primary-lightest) 100%);
+  border-radius: 5.8%;
+  padding-bottom: 0.15em;
+  box-shadow: 1px 3px 3px var(--b3-theme-primary-lightest);
+}
+
+[style*="background-color:var(--b3-font-background12)"],
+[style*="background-color: var(--b3-font-background12)"] {
+  background-image: linear-gradient(transparent, transparent 31%, var(--b3-theme-primary-lightest) 58%, var(--b3-theme-secondary) 91%, var(--b3-theme-primary-lighter) 96%, var(--b3-theme-primary-lightest) 100%);
+  border-radius: 31%;
+  padding-bottom: 0.08em;
+}
+
+[style*="color:var(--b3-font-color9)"],
+[style*="color: var(--b3-font-color9)"] {
+  text-decoration: underline double var(--b3-font-color3);
+  text-underline-offset: 18%;
+}
+
+[style*="color:var(--b3-font-color10)"],
+[style*="color: var(--b3-font-color10)"] {
+  text-decoration: underline dashed var(--b3-font-color4);
+  text-underline-offset: 13%;
+}
+
+[style*="color:var(--b3-font-color11)"],
+[style*="color: var(--b3-font-color11)"] {
+  text-decoration: underline dotted var(--b3-font-color1);
+  text-underline-offset: 18%;
+}
+
+[style*="color:var(--b3-font-color12)"],
+[style*="color: var(--b3-font-color12)"] {
+  text-decoration: underline wavy var(--b3-font-color2);
+  text-underline-offset: 3.1%;
+}

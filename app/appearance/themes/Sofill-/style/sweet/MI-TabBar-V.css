@@ -1,0 +1,216 @@
+/* 纵向排列选项卡页签 */
+/* 后续优化方向：参考 edge 垂直标签栏 */
+.layout__center [data-type="wnd"][data-id] {
+  display: flex;
+  flex-direction: row;
+}
+
+.layout__center [data-type="wnd"][data-id]>.fn__flex:not(.layout-tab-container) {
+  flex-direction: column-reverse;
+}
+
+.layout__center [data-type="wnd"][data-id]:focus-within .layout-tab-bar:not(:hover) + .layout-tab-bar--readonly:not(:hover) {
+  display: none;
+}
+
+.layout__center [data-type="wnd"][data-id]:focus-within> :first-child {
+  justify-content: left;
+  width: var(--SCC-Variables-MI-TabBarV_Auto-width);
+  transition: width 0.03s cubic-bezier(0.46, 0.03, 0.52, 0.96) 0.31s;
+  z-index: 2;
+}
+
+.layout__center [data-type="wnd"][data-id]> :first-child,
+.layout__center [data-type="wnd"][data-id]:focus-within> :first-child:hover {
+  justify-content: left;
+  width: max(186px, 13vw);
+  transition: width 0.13s cubic-bezier(0.46, 0.03, 0.52, 0.96) 0.13s;
+  z-index: 2;
+}
+
+.layout-tab-bar .item--pin {
+  min-width: unset;
+}
+
+li.item.item--readonly .item__close[title="新建文档"]+span.fn__flex-1 {
+  display: none;
+}
+
+.layout__center [data-type="wnd"][data-id] .layout-tab-bar {
+  display: block;
+  flex: 1;
+}
+
+.layout__center [data-type="wnd"][data-id] .layout-tab-bar .item .fn__flex-1:first-child {
+  display: none;
+}
+
+.layout__center [data-type="wnd"][data-id] .layout-tab-bar .item .item__icon {
+  padding-left: 8px;
+}
+
+.layout__center [data-type="wnd"][data-id] .layout-tab-bar .item .item__text {
+  text-align: unset;
+  flex-grow: 1;
+}
+
+.layout__center [data-type="wnd"][data-id] .layout-tab-bar.layout-tab-bar--readonly {
+  flex: initial;
+}
+
+/* 标签页底部背景颜色,标签页数量较少时可以看到，颜色和标签页颜色保持一致 */
+ul.fn__flex.layout-tab-bar {
+  background-color: var(--b3-theme-background);
+  height: 100%;
+  padding-left: 3px;
+  animation: menu 0.2s ease-in-out;
+}
+
+ul.fn__flex.layout-tab-bar li {
+  z-index: 2;
+  max-width: max(186px, 13vw);
+  container-type: inline-size;
+  container-name: TabBarLi;
+}
+
+@container TabBarLi {
+  .item__text {
+    max-width: 90cqw;
+  }
+}
+
+body:not(.android) ul.fn__flex.layout-tab-bar li[data-type="tab-header"] .item__close {
+  width: 0;
+  padding: 5.8px;
+  transition: all 0.31s cubic-bezier(0.65, 0.05, 0.36, 1) 0.05s;
+}
+
+body:not(.android) ul.fn__flex.layout-tab-bar li[data-type="tab-header"]:hover .item__close {
+  width: 16px;
+  padding: 13px 13px 13px 0;
+  transition: all 0.31s cubic-bezier(0.65, 0.05, 0.36, 1) 0.05s;
+}
+
+/* 标签页鼠标悬浮时背景颜色 */
+ul.layout-tab-bar .item:not(.item--readonly):hover {
+  background-color: var(--SCC-Component-TabBar-item-hover-bg-color) !important;
+}
+
+/* 标签页svg */
+
+ul.layout-tab-bar li [title="新建文档"],
+ul.layout-tab-bar li [title="更多"] {
+  margin: 0px 3px 0px 3px;
+}
+
+body.android ul.layout-tab-bar li [title="新建文档"] span,
+body.android ul.layout-tab-bar li [title="更多"] span {
+  padding: 13px 8px 13px 0 !important;
+}
+
+ul.layout-tab-bar .item:not(.item--focus) .item__close:hover svg {
+  color: var(--b3-theme-primary);
+  scale: 1.1;
+}
+
+body.android ul.layout-tab-bar li [title="新建文档"] svg,
+body.android ul.layout-tab-bar li [title="更多"] svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+body.android ul.layout-tab-bar li [title="新建文档"] svg,
+body.android ul.layout-tab-bar li [title="更多"] svg {
+  color: var(--SCColor) !important;
+  scale: 1.31 !important;
+}
+
+body:not(.android) ul.layout-tab-bar li [title="新建文档"] svg,
+body:not(.android) ul.layout-tab-bar li [title="更多"] svg {
+  scale: 1.58 !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+body:not(.android) ul.layout-tab-bar li [title="新建文档"] svg:hover,
+body:not(.android) ul.layout-tab-bar li [title="更多"] svg:hover {
+  color: var(--b3-theme-primary) !important;
+  opacity: 1;
+}
+
+/* 样式优化 */
+.layout-tab-bar.fn__flex,
+ul.fn__flex.layout-tab-bar li {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+  /* 影响【设置】-【集市】标签页 */
+}
+
+.layout-tab-bar .item__close {
+  padding: 13px 5.8px 13px 0;
+  display: flex;
+  align-items: center;
+}
+
+/* 设置当前标签页样式 */
+.layout-tab-bar .item--focus:after {
+  height: 2px !important;
+  /* 默认主题自带的 */
+  opacity: 0.31;
+}
+
+/*有图标的标签页内文档名钉住时不隐藏 */
+.layout-tab-bar .item--pin:has(.item__icon) .item__text {
+  display: inline !important;
+}
+
+.layout-tab-bar .item--pin .item__graphic,
+.layout-tab-bar .item--pin .item__icon,
+.layout-tab-bar .item__icon {
+  padding: 4px 0 4px 8px;
+}
+
+/* 减小标签页上的emoji大小 */
+.layout-tab-bar .item__icon>img,
+.layout-tab-bar .item__icon>svg {
+  height: 13px;
+  width: 13px;
+}
+
+/* 使用 li.item 而不是 .item ，避免修改影响【设置】-【集市】的标签页 */
+/* 非当前页签样式 */
+.layout-tab-bar li.item:not(:last-child).item:not(.item--focus),
+.layout-tab-bar li.item:last-child:not(.item--focus):not(.item--readonly) {
+  box-shadow: var(--SCC-Variables-TabBar-V__item-box-shadow) !important;
+  border-radius: 3px !important;
+  border: 0px ridge transparent !important;
+  /* margin-bottom: 0px !important; */
+  transition-duration: 0.58s;
+  transition-delay: 0.2s;
+  font-weight: 520 !important;
+  margin-right: 1px !important;
+  margin-left: 1px !important;
+  background-color: var(--SCC-baseComponent-Button-bg-color-TabBar);
+}
+
+/* 设置当前标签页样式 */
+.layout-tab-bar .item--focus:after {
+  height: 2px !important;
+  /* 默认主题自带的 */
+  opacity: 0.31;
+}
+
+#layouts .layout-tab-bar .item--focus {
+  box-shadow: var(--SCC-Variables-TabBar-V__item-box-shadow) !important;
+  border-radius: 3px !important;
+  border-bottom: var(--SCC-Variables-TabBar-border-bottom) !important;
+  margin-bottom: 3px !important;
+  transition-timing-function: cubic-bezier(1, 0, 0, 1);
+  transition-duration: 0.2s;
+  margin-right: 1px !important;
+  margin-left: 1px !important;
+  background-color: var(--b3-theme-primary-lightest);
+}
+
+.layout-tab-bar .item--pin .item__text {
+  max-width: unset;
+}

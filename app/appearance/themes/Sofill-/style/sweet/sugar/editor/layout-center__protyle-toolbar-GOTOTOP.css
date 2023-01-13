@@ -1,0 +1,74 @@
+.layout__center .protyle:not(.search__preview) {
+  container-type: inline-size;
+  container-name: protyle;
+}
+
+@container (min-width: 88px) {
+  .layout__center .protyle>.protyle-toolbar {
+    display: flex !important;
+    border: none;
+    box-shadow: 0px 5px 10px 0px rgb(212 212 212 / 30%);
+    border-radius: 0%;
+    position: absolute;
+    top: 30px !important;
+    left: 1px !important;
+    right: 1px !important;
+    width: 74cqw !important;
+    padding-left: 13cqw !important;
+    padding-right: 13cqw !important;
+    flex-wrap: wrap;
+  }
+
+  .layout__center .protyle>.protyle-toolbar button.protyle-toolbar__item {
+    flex: 1;
+    min-width: 25px;
+  }
+
+  /* 设置字体弹窗位置紧靠字体选项 */
+  .layout__center .protyle-util:has(.protyle-font) {
+    top: 58px !important;
+    left: 18.6cqw !important;
+  }
+
+  /* 设置头图位置 */
+  .layout__center .protyle-background {
+    padding-top: 31px;
+  }
+
+  /* 位置修正 */
+  .layout__center .protyle-gutters {
+    margin-top: -55px;
+    left: 3px !important;
+  }
+
+}
+
+#editor .protyle-toolbar {
+  display: flex !important;
+  flex-wrap: wrap;
+  position: fixed !important;
+  min-width: 60px;
+  width: 31vw;
+  width: 100vw;
+  top: 64px !important;
+  left: 0 !important;
+  box-shadow: none;
+  box-shadow: 0px 5px 10px 0px rgb(212 212 212 / 30%);
+}
+
+#editor .protyle-toolbar .protyle-toolbar__divider {
+  display: none;
+}
+
+#editor .protyle-toolbar>button,
+#editor .protyle-toolbar__item svg {
+  display: flex;
+  flex-grow: 1;
+}
+
+#editor .protyle-toolbar>button {
+  align-items: center;
+  text-align: center;
+  flex-basis: 30px;
+  flex-shrink: 2;
+}

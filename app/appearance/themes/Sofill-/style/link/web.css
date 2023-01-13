@@ -1,0 +1,330 @@
+@layer {
+  .p[data-type="NodeParagraph"] a[href^="http://"]::before {
+    content: "";
+    background-image: url("protocal/http.png");
+  }
+  .p[data-type="NodeParagraph"] a[href^="https://"]::before {
+    content: "";
+    background-image: url("protocal/https.png");
+  }
+  .p[data-type="NodeParagraph"] a[href^="ftp://"]::before {
+    content: "";
+    background-image: url("protocal/ftp.png");
+  }
+  .p[data-type="NodeParagraph"] a[href^="thunder://"]::before {
+    content: "";
+    background-image: url("protocal/thunder.png");
+  }
+  .p[data-type="NodeParagraph"] a[href^="magnet:?"]::before {
+    content: "";
+    background-image: url("protocal/magnet.png");
+  }
+  span[data-type~=a][data-href^="http://"]:not(:empty)::before {
+    content: "";
+    background-image: url("protocal/http.png");
+  }
+  span[data-type~=a][data-href^="https://"]:not(:empty)::before {
+    content: "";
+    background-image: url("protocal/https.png");
+  }
+  span[data-type~=a][data-href^="ftp://"]:not(:empty)::before {
+    content: "";
+    background-image: url("protocal/ftp.png");
+  }
+  span[data-type~=a][data-href^="thunder://"]:not(:empty)::before {
+    content: "";
+    background-image: url("protocal/thunder.png");
+  }
+  span[data-type~=a][data-href^="magnet:?"]:not(:empty)::before {
+    content: "";
+    background-image: url("protocal/magnet.png");
+  }
+}
+a[href*="pypi.org/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/pypi.org.png");
+}
+span[data-type~=a][data-href*="pypi.org/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/pypi.org.png");
+}
+a[href*="bitbucket.org/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/bitbucket.org.png");
+}
+span[data-type~=a][data-href*="bitbucket.org/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/bitbucket.org.png");
+}
+a[href*="github.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/github.com.png");
+}
+span[data-type~=a][data-href*="github.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/github.com.png");
+}
+a[href*="gitee.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/gitee.com.png");
+}
+span[data-type~=a][data-href*="gitee.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/gitee.com.png");
+}
+a[href*="cn.bing.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/cn.bing.com.png");
+}
+span[data-type~=a][data-href*="cn.bing.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/cn.bing.com.png");
+}
+a[href*="www.weidown.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/www.weidown.com.png");
+}
+span[data-type~=a][data-href*="www.weidown.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/www.weidown.com.png");
+}
+a[href*="pc.qq.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/pc.qq.com.png");
+}
+span[data-type~=a][data-href*="pc.qq.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/pc.qq.com.png");
+}
+a[href*="pkgs.org/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/pkgs.org.png");
+}
+span[data-type~=a][data-href*="pkgs.org/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/pkgs.org.png");
+}
+a[href*="mp.weixin.qq.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/mp.weixin.qq.com.png");
+}
+span[data-type~=a][data-href*="mp.weixin.qq.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/mp.weixin.qq.com.png");
+}
+a[href*="www.cnblogs.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/www.cnblogs.com.png");
+}
+span[data-type~=a][data-href*="www.cnblogs.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/www.cnblogs.com.png");
+}
+a[href*="cloud.tencent.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/cloud.tencent.com.png");
+}
+span[data-type~=a][data-href*="cloud.tencent.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/cloud.tencent.com.png");
+}
+a[href*="developer.mozilla.org/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/developer.mozilla.org.png");
+}
+span[data-type~=a][data-href*="developer.mozilla.org/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/developer.mozilla.org.png");
+}
+a[href*="www.runoob.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/www.runoob.com.png");
+}
+span[data-type~=a][data-href*="www.runoob.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/www.runoob.com.png");
+}
+a[href*="www.w3school.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/www.w3school.com.png");
+}
+span[data-type~=a][data-href*="www.w3school.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/www.w3school.com.png");
+}
+a[href*="nodejs.cn/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/nodejs.cn.png");
+}
+span[data-type~=a][data-href*="nodejs.cn/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/nodejs.cn.png");
+}
+a[href*="ld246.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/ld246.com.png");
+}
+span[data-type~=a][data-href*="ld246.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/ld246.com.png");
+}
+a[href*="microsoft.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/microsoft.com.png");
+}
+span[data-type~=a][data-href*="microsoft.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/microsoft.com.png");
+}
+a[href*="stackoverflow.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/stackoverflow.com.png");
+}
+span[data-type~=a][data-href*="stackoverflow.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/stackoverflow.com.png");
+}
+a[href*="python.org/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/python.org.png");
+}
+span[data-type~=a][data-href*="python.org/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/python.org.png");
+}
+a[href*="www.yuque.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/www.yuque.com.png");
+}
+span[data-type~=a][data-href*="www.yuque.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/www.yuque.com.png");
+}
+a[href*="www.bilibili.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/www.bilibili.com.png");
+}
+span[data-type~=a][data-href*="www.bilibili.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/www.bilibili.com.png");
+}
+a[href*="gov.cn/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/gov.cn.png");
+}
+span[data-type~=a][data-href*="gov.cn/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/gov.cn.png");
+}
+a[href*="kdocs.cn/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/kdocs.cn.png");
+}
+span[data-type~=a][data-href*="kdocs.cn/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/kdocs.cn.png");
+}
+a[href*="flowus.cn/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/flowus.cn.png");
+}
+span[data-type~=a][data-href*="flowus.cn/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/flowus.cn.png");
+}
+a[href*="javtxt.org/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/javtxt.org.png");
+}
+span[data-type~=a][data-href*="javtxt.org/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/javtxt.org.png");
+}
+a[href*="www.ghxi.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/www.ghxi.com.png");
+}
+span[data-type~=a][data-href*="www.ghxi.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/www.ghxi.com.png");
+}
+a[href*="www.sozi.cn/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/www.sozi.cn.png");
+}
+span[data-type~=a][data-href*="www.sozi.cn/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/www.sozi.cn.png");
+}
+a[href*="chinaz.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/chinaz.com.png");
+}
+span[data-type~=a][data-href*="chinaz.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/chinaz.com.png");
+}
+a[href*="yandex.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/yandex.com.png");
+}
+span[data-type~=a][data-href*="yandex.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/yandex.com.png");
+}
+a[href*="www.zhangxinxu.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/www.zhangxinxu.com.png");
+}
+span[data-type~=a][data-href*="www.zhangxinxu.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/www.zhangxinxu.com.png");
+}
+a[href*="juejin.cn/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/juejin.cn.png");
+}
+span[data-type~=a][data-href*="juejin.cn/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/juejin.cn.png");
+}
+a[href*="zhihu.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/zhihu.com.png");
+}
+span[data-type~=a][data-href*="zhihu.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/zhihu.com.png");
+}
+a[href*="aliyun.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/aliyun.com.png");
+}
+span[data-type~=a][data-href*="aliyun.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/aliyun.com.png");
+}
+a[href*="airtable.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/airtable.com.png");
+}
+span[data-type~=a][data-href*="airtable.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/airtable.com.png");
+}
+a[href*="cnki.net/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/cnki.net.png");
+}
+span[data-type~=a][data-href*="cnki.net/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/cnki.net.png");
+}
+a[href*="wiki.mbalib.com/"]:not(:has(img))::before {
+  content: "";
+  background-image: url("web/wiki.mbalib.com.png");
+}
+span[data-type~=a][data-href*="wiki.mbalib.com/"]:not(:empty)::before {
+  content: "";
+  background-image: url("web/wiki.mbalib.com.png");
+}

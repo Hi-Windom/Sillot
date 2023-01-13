@@ -1,0 +1,37 @@
+.fn__flex-column:has(#searchList) {
+  height: 80vh !important;
+}
+
+.spread-search__preview {
+  margin-top: 13px;
+  border-top: none;
+}
+
+#searchList {
+  min-height: calc(58% - 69px) !important;
+  background-color: var(--b3-theme-surface);
+}
+
+#searchList div[data-type="search-item"]>.b3-list-item__text {
+  font-size: 87%;
+  text-align: left;
+  line-height: 1.31rem;
+}
+
+#searchList div[data-type="search-item"]>.b3-list-item__text svg {
+  margin: 3px 0 1px 0;
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column:has(#searchPreview.fullscreen) .search__header,
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column:has(#searchPreview.fullscreen) .search__header {
+  z-index: 1 !important;
+}
+
+#searchResult:not(:empty)::before {
+  content: "TB1 🎯" !important;
+  padding: 0 6px;
+}
+
+#searchResult:not(:empty) {
+  margin-left: -7px;
+}

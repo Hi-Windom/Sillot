@@ -465,6 +465,7 @@ const initWindow = () => {
     }
     const controlsElement = document.querySelector("#windowControls");
     document.body.classList.add("body--win32");
+    document.body.classList.add("branch--Sillot");
     controlsElement.innerHTML = `<div class="toolbar__item b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.min}" id="minWindow">
     <svg>
         <use xlink:href="#iconMin"></use>

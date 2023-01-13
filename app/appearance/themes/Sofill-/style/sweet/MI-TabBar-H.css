@@ -1,0 +1,250 @@
+/* 参考VS2022多行页签紧凑布局 */
+.layout__center [data-type="wnd"][data-id]>.fn__flex {
+  display: flex;
+  flex-direction: row;
+}
+
+#layouts .layout-tab-bar:not(.layout-tab-bar--readonly) {
+  background-color: transparent;
+  flex-wrap: wrap-reverse;
+  backdrop-filter: saturate(0.8);
+  max-height: 111px;
+  padding: 3px;
+  border-bottom: 3px outset #85858519;
+  border-right: 3px outset #cccccc09;
+  border-radius: 0px 0 6px 6px;
+}
+
+.layout-tab-bar:not(.layout-tab-bar--readonly) .item__close {
+  padding: 1px 3px 1px 0;
+  align-items: center;
+}
+
+#layouts .layout-tab-bar .item {
+  font-size: calc(var(--SCC-Variables-MI-TabBar-FontSize, 10) * 1pt - 1pt);
+  min-height: calc(var(--SCC-Variables-MI-TabBar-MinHeight, 30) * 1px - 3px);
+  height: calc(var(--SCC-Variables-MI-TabBar-MinHeight, 30) * 1px - 3px);
+  margin: -1px -1px -1px -2px !important;
+  border-left: 2px ridge #85858513 !important;
+  border-right: 0px ridge #85858508 !important;
+  border-radius: 4px !important;
+}
+
+/* 标签页鼠标悬浮时背景颜色 */
+ul.layout-tab-bar .item:not(.item--readonly):hover {
+  background-color: var(--SCC-Component-TabBar-item-hover-bg-color) !important;
+}
+
+/* 标签页中文字的相关设置 */
+ul.layout-tab-bar .item--pin .item__text {
+  margin-right: 15px;
+  /* 预留位置给钉住图标 */
+  color: var(--SCC-baseComponent-text-color-1);
+  opacity: .58;
+}
+
+ul.layout-tab-bar .item:not(.item--pin) .item__text {
+  min-width: 1em;
+  margin-right: 1px;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  display: inline;
+  color: var(--SCC-baseComponent-text-color-1);
+  opacity: .75;
+}
+
+ul.layout-tab-bar .item:hover .item__text {
+  color: var(--SCC-baseComponent-text-color-1);
+  opacity: 1;
+}
+
+/* 标签页svg */
+ul.layout-tab-bar .item .item__close svg {
+  opacity: .58;
+}
+
+ul.layout-tab-bar .item .item__close:hover svg {
+  color: var(--SCC-Component-TabBar-item__close-svg__hover-color);
+  scale: 1.1;
+}
+
+/* 样式优化 */
+.layout-tab-bar.fn__flex,
+ul.fn__flex.layout-tab-bar li {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+  /* 影响【设置】-【集市】标签页 */
+}
+
+.layout-tab-bar--readonly {
+  min-width: 31px;
+  width: 31px;
+  margin: 5px 5px 3px 5px;
+  height: auto;
+}
+
+.layout-tab-bar--readonly .item--readonly {
+  padding-left: 9px;
+  max-width: fit-content;
+  flex-direction: column;
+  justify-content: center;
+  height: 99%;
+}
+
+body.android ul.layout-tab-bar li [title="新建文档"] {
+  display: none !important;
+}
+
+ul.layout-tab-bar li [title="新建文档"],
+ul.layout-tab-bar li [title="更多"] {
+  margin: 0px 3px 1px 3px;
+  padding: 2px 5px 2px 3px;
+}
+
+body.android ul.layout-tab-bar li [title="新建文档"] span,
+body.android ul.layout-tab-bar li [title="更多"] span {
+  padding: 13px 8px 13px 0 !important;
+}
+
+body.android ul.layout-tab-bar li [title="新建文档"] svg,
+body.android ul.layout-tab-bar li [title="更多"] svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+body.android ul.layout-tab-bar li [title="新建文档"] svg,
+body.android ul.layout-tab-bar li [title="更多"] svg {
+  color: var(--SCColor) !important;
+  scale: 1.31 !important;
+}
+
+body:not(.android) ul.layout-tab-bar li [title="新建文档"] svg,
+body:not(.android) ul.layout-tab-bar li [title="更多"] svg {
+  scale: 1.31 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  opacity: .58;
+}
+
+body:not(.android) ul.layout-tab-bar li [title="新建文档"] svg:hover,
+body:not(.android) ul.layout-tab-bar li [title="更多"] svg:hover {
+  color: var(--b3-theme-primary) !important;
+  opacity: 1;
+}
+
+
+/* 使用 li.item 而不是 .item ，避免修改影响【设置】-【集市】的标签页 */
+/* 非当前页签样式 */
+#layouts .layout-tab-bar:not(.layout-tab-bar--readonly):has(li:nth-child(1)) li {
+  max-width: 90% !important;
+}
+
+#layouts .layout-tab-bar:not(.layout-tab-bar--readonly):has(li:nth-child(3)) li {
+  max-width: min(44%, 500px) !important;
+}
+
+#layouts .layout-tab-bar:not(.layout-tab-bar--readonly):has(li:nth-child(6)) li {
+  max-width: min(31%, 400px) !important;
+}
+
+#layouts .layout-tab-bar:not(.layout-tab-bar--readonly):has(li:nth-child(11)) li {
+  max-width: min(31%, 310px) !important;
+}
+
+#layouts .layout-tab-bar:not(.layout-tab-bar--readonly):has(li:nth-child(13)) li {
+  max-width: min(31%, 280px) !important;
+}
+
+#layouts .layout-tab-bar:not(.layout-tab-bar--readonly):has(li:nth-child(16)) li {
+  max-width: min(31%, 200px) !important;
+}
+
+#layouts .layout-tab-bar:not(.layout-tab-bar--readonly):has(li:nth-child(20)) li {
+  max-width: min(31%, 158px) !important;
+}
+
+#layouts .layout-tab-bar:not(.layout-tab-bar--readonly):has(li:nth-child(26)) li {
+  max-width: min(31%, 131px) !important;
+}
+
+#layouts .layout-tab-bar li.item:not(:last-child).item:not(.item--focus),
+#layouts .layout-tab-bar li.item:last-child:not(.item--focus):not(.item--readonly) {
+  min-width: 47px !important;
+  transition-duration: 0.2s;
+  transition-delay: 0.58s;
+  font-weight: 520 !important;
+  background-color: var(--SCC-baseComponent-Button-bg-color-TabBar);
+}
+
+/* 设置当前标签页样式 */
+#layouts .layout-tab-bar .item--focus:after {
+  height: 2px !important;
+  /* 默认主题自带的 */
+  opacity: .58;
+}
+
+#layouts .layout-tab-bar .item--focus {
+  max-width: min(500px, 96%) !important;
+  min-width: 47px !important;
+  transition-timing-function: cubic-bezier(0.92, -0.49, 0, 0.66);
+  transition-duration: .58s;
+  transition-delay: .31s;
+}
+
+/* 钉住标签页*/
+#layouts .layout-tab-bar .item--pin .item__text {
+  max-width: 100px;
+}
+
+/*有图标的标签页内文档名钉住时非聚焦隐藏 */
+#layouts .layout-tab-bar .item--pin:has(.item__icon) .item__text.fn__none {
+  display: none !important;
+}
+
+/* 为钉住的标签页右上角增加大头钉图标 */
+li.item.item--pin:not(.item--focus):after {
+  content: "";
+  content: url("../../src/icon/pin.svg");
+  position: absolute;
+  right: 5px;
+  top: 0px;
+  width: 11px;
+  height: 11px;
+  opacity: 0.8;
+  filter: grayscale(58%);
+}
+
+li.item.item--pin.item--focus:after {
+  content: "";
+  content: url("../../src/icon/pin.svg") !important;
+  position: absolute;
+  right: 5px;
+  top: 0px;
+  width: 11px;
+  height: 11px;
+  opacity: 1;
+  background-color: transparent !important;
+}
+
+
+/* 标签页上面的emoji */
+#layouts .layout-tab-bar .item:not(.item--pin) .item__icon {
+  opacity: 0.88;
+}
+
+#layouts .layout-tab-bar .item__icon:hover {
+  opacity: 1;
+}
+
+#layouts .layout-tab-bar .item--pin .item__graphic,
+#layouts .layout-tab-bar .item--pin .item__icon,
+#layouts .layout-tab-bar.item__icon {
+  padding: 4px 0 4px 8px;
+}
+
+/* 减小标签页上的emoji大小 */
+#layouts .layout-tab-bar .item__icon>img,
+#layouts .layout-tab-bar .item__icon>svg {
+  height: 13px;
+  width: 13px;
+}

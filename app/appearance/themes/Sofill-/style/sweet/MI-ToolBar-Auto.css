@@ -1,0 +1,168 @@
+:root {
+  /* 是否自动隐藏 */
+  /* 顶栏隐藏时子元素使用 visibility 控制而不是 opacity 这样比较简单，也不是 display 这样可以保留过渡效果同时不破坏布局 */
+  --SCC-Variables-MI-ToolBar-height-max: 11px;
+  --SCC-Variables-MI-ToolBar-child-visibility: hidden;
+  /* 不隐藏时高度相关 */
+  /* 当 ToolBar-height-max 大于 ToolBar-height 时即不隐藏 */
+  /* 隐藏时高度 11px，不隐藏时MAX高度为 unset，高度分为 26 31 37 三档，对应的 svg 宽高分为 14 16.5 19.5 三档  */
+  --SCC-Variables-MI-ToolBar-height: 26px;
+  --SCC-Variables-MI-ToolBar-svg-height: 0px;
+  --SCC-Variables-MI-ToolBar-svg-hover-height: 14px;
+  /* 不隐藏时是否隐藏控件 */
+  --SCC-Variables-MI-ToolBar-opacity-hover: .77;
+  --SCC-Variables-MI-ToolBar-docName-opacity: var(--SCC-Variables-MI-ToolBar-opacity-hover);
+  --SCC-Variables-MI-ToolBar-VIP-opacity: var(--SCC-Variables-MI-ToolBar-opacity-hover);
+  --SCC-Variables-MI-ToolBar-windowX-opacity: var(--SCC-Variables-MI-ToolBar-opacity-hover);
+  --SCC-Variables-MI-ToolBar-Other-opacity: var(--SCC-Variables-MI-ToolBar-opacity-hover);
+}
+
+body.darwin #toolbar:hover {
+  background-color: transparent !important;
+  height: 32px;
+  border-bottom: 0.5px solid var(--b3-border-color);
+  transition: all 0.31s ease-in-out;
+}
+
+body:not(.darwin) #toolbar {
+  height: var(--SCC-Variables-MI-ToolBar-height);
+  max-height: var(--SCC-Variables-MI-ToolBar-height-max);
+  border-bottom: 0px solid var(--b3-border-color);
+  transition: all 0.13s ease-in-out;
+}
+
+body:not(.darwin):not(.android) #toolbar:hover {
+  background-color: transparent !important;
+  height: var(--SCC-Variables-MI-ToolBar-height);
+  max-height: var(--SCC-Variables-MI-ToolBar-height);
+  border-bottom: 0.5px solid var(--b3-border-color);
+  transition: all 0.31s ease-in-out;
+}
+
+body:not(.darwin):not(.android) #toolbar svg {
+  height: var(--SCC-Variables-MI-ToolBar-svg-height, 14px);
+  width: var(--SCC-Variables-MI-ToolBar-svg-height, 14px);
+}
+
+body:not(.darwin):not(.android) #toolbar:hover svg {
+  height: var(--SCC-Variables-MI-ToolBar-svg-hover-height, 14px);
+  width: var(--SCC-Variables-MI-ToolBar-svg-hover-height, 14px);
+}
+
+body:not(.darwin):not(.android) #toolbar>button,
+body:not(.darwin):not(.android) #toolbar>div {
+  visibility: var(--SCC-Variables-MI-ToolBar-child-visibility);
+}
+
+body:not(.darwin):not(.android) #toolbar:hover>button,
+body:not(.darwin):not(.android) #toolbar:hover>div {
+  visibility: visible;
+}
+
+body:not(.darwin):not(.android) #toolbar .toolbar__item svg,
+body:not(.darwin):not(.android) #toolbar #drag {
+  transition: opacity .2s ease .13s;
+}
+
+body:not(.darwin):not(.android) #toolbar #drag {
+  opacity: var(--SCC-Variables-MI-ToolBar-docName-opacity);
+}
+
+body:not(.darwin):not(.android) #toolbar:not(:hover) #toolbarVIP svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barSync svg {
+  opacity: var(--SCC-Variables-MI-ToolBar-VIP-opacity);
+}
+
+body:not(.darwin):not(.android) #toolbar:not(:hover) #windowControls {
+  opacity: var(--SCC-Variables-MI-ToolBar-windowX-opacity);
+}
+
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barHistor svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barHistory svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barDailyNote svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barBack svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barForward svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #drag+button svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barSearch svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barReadonly svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barMode svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barSetting svg,
+body:not(.darwin):not(.android) #toolbar:not(:hover) #barTopHelp svg {
+  opacity: var(--SCC-Variables-MI-ToolBar-Other-opacity);
+}
+
+/* 通用 */
+body:not(.darwin):not(.android) #toolbar #drag {
+  color: var(--SCC-baseComponent-toolbar-drag-color);
+}
+
+body:not(.darwin):not(.android) #toolbar:hover svg {
+  opacity: var(--SCC-Variables-MI-ToolBar-opacity-hover);
+}
+
+body:not(.darwin):not(.android) #toolbar .toolbar__item:hover svg {
+  opacity: 1;
+  color: var(--b3-theme-primary);
+}
+
+.toolbar__item--disabled {
+  opacity: .31;
+  cursor: not-allowed;
+}
+
+/* 优化极端宽度环境下顶栏的布局和交互 #401 */
+@media screen and (max-width: 666px) {
+  #toolbar .toolbar__item {
+    display: none;
+  }
+
+  #toolbar {
+    align-self: flex-end;
+  }
+
+  #toolbar #drag {
+    letter-spacing: 1.3px;
+    margin-right: 3px;
+  }
+
+  #toolbar:hover .toolbar__item {
+    display: flex;
+  }
+
+  #toolbar:hover #drag {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 520px) {
+
+  #toolbar #toolbarVIP,
+  #toolbar #barHistory,
+  #toolbar #barDailyNote {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 370px) {
+
+  body:not(.android) #toolbar #barSetting,
+  #toolbar #barMod,
+  #toolbar button {
+    display: none !important;
+  }
+
+  #toolbar #drag {
+    letter-spacing: .3px;
+    margin-right: 1px;
+  }
+}
+
+@media screen and (max-width: 222px) {
+  body:not(.android) #toolbar *:not(#drag) {
+    display: none !important;
+  }
+
+  #toolbar #drag {
+    letter-spacing: .3px;
+  }
+}

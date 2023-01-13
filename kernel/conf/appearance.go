@@ -41,8 +41,8 @@ func NewAppearance() *Appearance {
 	return &Appearance{
 		Mode:                0,
 		ModeOS:              true,
-		ThemeDark:           "midnight",
-		ThemeLight:          "daylight",
+		ThemeDark:           "Sofill-",
+		ThemeLight:          "Sofill-",
 		Icon:                "material",
 		NativeEmoji:         true,
 		CodeBlockThemeLight: "github",

@@ -1,0 +1,236 @@
+@min960: ~"(min-width: 960px)";
+@max960: ~"(max-width: 960px)";
+@V-bind2: sc-custom-container;
+@V-bind3: sc-custom-nav;
+
+#SC-CP {
+  .b3-dialog__container {
+    width: max(66vw, 333px);
+    height: 600px;
+  }
+  .@{V-bind2}-p .sc-tab-container {
+    margin: 11px;
+    height: 580px;
+    width: -webkit-fill-available;
+    overflow: auto;
+    border-radius: 8px;
+  }
+
+  .@{V-bind3} {
+    user-select: none;
+    width: 180px;
+    height: 600px;
+    overflow: auto;
+    padding: 8px 0;
+    box-sizing: border-box;
+
+    >li {
+      padding: 0;
+      margin: 2px !important;
+
+      >label {
+        display: inline-flex;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        padding-left: 22px;
+        letter-spacing: .58px;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    // /* 不使用容器查询的方法 */
+    @media @min960 {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      // /* 水平均匀分布 */
+      align-items: center;
+
+      // /* 垂直居中 */
+      li.b3-list-item--big {
+        min-height: 31px;
+        min-width: 97%;
+      }
+    }
+
+    @media @max960 {
+      user-select: none;
+      width: 100%;
+      height: 3.9rem;
+      overflow: auto;
+      padding: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+      position: sticky;
+      top: 0px;
+      z-index: 6;
+      background-color: var(--b3-theme-background);
+
+      >li {
+        height: 2.8rem;
+        display: contents;
+
+        >label {
+          display: inline-flex;
+          align-items: center;
+          // /* justify-content: center; */
+          height: 100%;
+          width: 100%;
+          padding-left: 1.86vw;
+          padding-right: 1.31vw;
+
+          >span {
+            display: none;
+          }
+        }
+      }
+    }
+
+  }
+
+  @media @max960 {
+    .sc-tab-container label {
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .b3-dialog__container {
+      width: 90vw;
+      height: 90vh;
+      overflow: scroll;
+    }
+
+    .@{V-bind2}-p {
+      flex-direction: column;
+
+      .sc-tab-container {
+        overflow: hidden !important;
+        height: auto !important;
+      }
+    }
+
+  }
+
+  .config-query-4cols,
+  .config-query-3cols,
+  .config-query-2cols {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .config-query-4cols label {
+    max-width: 22%;
+    min-width: 20%;
+    margin: 7px 3% 1px 0px;
+  }
+
+  .config-query-3cols label {
+    max-width: 32%;
+    min-width: 29%;
+    margin: 7px 3% 1px 0px;
+  }
+
+  .config-query-2cols label {
+    max-width: 45%;
+    min-width: 44%;
+    margin: 7px 5% 1px 0px;
+  }
+}
+
+body:not(.body--mobile) #SC-CP .b3-dialog__container {
+  background-color: var(--b3-theme-surface-light);
+  backdrop-filter: blur(3px) brightness(2.6);
+}
+
+
+.Sofill-CDUI-btn,
+.Sofill-CDUI-btn__icon {
+  color: var(--b3-theme-primary);
+}
+
+.@{V-bind3}-bind-class,
+.@{V-bind3}-bind-class~div:not(#@{V-bind2}-placehold),
+.@{V-bind3}-bind-class:checked~div {
+  display: none;
+}
+
+#@{V-bind3}-bind-id-editor:checked~#@{V-bind2}-editor,
+#@{V-bind3}-bind-id-appearance:checked~#@{V-bind2}-appearance,
+#@{V-bind3}-bind-id-assets:checked~#@{V-bind2}-assets,
+#@{V-bind3}-bind-id-export:checked~#@{V-bind2}-export,
+#@{V-bind3}-bind-id-search:checked~#@{V-bind2}-search,
+#@{V-bind3}-bind-id-system:checked~#@{V-bind2}-system,
+#@{V-bind3}-bind-id-custom:checked~#@{V-bind2}-custom,
+#@{V-bind3}-bind-id-extension:checked~#@{V-bind2}-extension,
+#@{V-bind3}-bind-id-filetree:checked~#@{V-bind2}-filetree,
+#@{V-bind3}-bind-id-eHiWindom:checked~#@{V-bind2}-eHiWindom,
+#@{V-bind3}-bind-id-about:checked~#@{V-bind2}-about {
+  display: flow-root;
+  position: sticky;
+}
+
+#@{V-bind3}-bind-id-editor:checked~.@{V-bind3}>li[data-name="editor"],
+#@{V-bind3}-bind-id-appearance:checked~.@{V-bind3}>li[data-name="appearance"],
+#@{V-bind3}-bind-id-assets:checked~.@{V-bind3}>li[data-name="assets"],
+#@{V-bind3}-bind-id-editor:checked~.@{V-bind3}>li[data-name="editor"],
+#@{V-bind3}-bind-id-export:checked~.@{V-bind3}>li[data-name="export"],
+#@{V-bind3}-bind-id-search:checked~.@{V-bind3}>li[data-name="search"],
+#@{V-bind3}-bind-id-system:checked~.@{V-bind3}>li[data-name="system"],
+#@{V-bind3}-bind-id-custom:checked~.@{V-bind3}>li[data-name="custom"],
+#@{V-bind3}-bind-id-extension:checked~.@{V-bind3}>li[data-name="extension"],
+#@{V-bind3}-bind-id-filetree:checked~.@{V-bind3}>li[data-name="filetree"],
+#@{V-bind3}-bind-id-eHiWindom:checked~.@{V-bind3}>li[data-name="eHiWindom"],
+#@{V-bind3}-bind-id-about:checked~.@{V-bind3}>li[data-name="about"] {
+  background-color: var(--b3-list-hover);
+  color: var(--b3-theme-primary);
+}
+
+body.android .@{V-bind3}>li .b3-list-item__graphic {
+  margin-right: 4px;
+  height: 20px;
+  width: 20px;
+}
+
+.sc-custom-placeholder {
+  text-align: center;
+  padding-top: 10%;
+  font-size: 5.8rem;
+  font-family: 'SC Smiley';
+  color: var(--b3-theme-primary);
+}
+
+
+// /* 优化安卓端主题设置界面逻辑 #431 */
+// /* Android 端主题设置界面屏蔽项区分手机和平板 #552 */
+body:not(.body--mobile.android) .SC_ableOnlyC__Android_mobile,
+body:not(.body--app) .SC_ableOnlyC__App,
+body.body--mobile.android #@{V-bind2}-custom>:not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.body--mobile.android #@{V-bind2}-system>:not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.body--mobile.android #@{V-bind2}-editor>:not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.body--mobile.android #@{V-bind2}-filetree>:not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.body--mobile.android #@{V-bind2}-appearance>:not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.body--mobile.android #@{V-bind2}-export>:not(.SC_ableC__Android_mobile, .SC_ableOnlyC__Android_mobile),
+body.android .SC_disableC__Android,
+body.body--mobile.android .SC_disableC__Android_mobile,
+body.body--desktop.android .SC_disableC__Android_desktop {
+  display: none !important;
+}
+
+/* 登录用户权益 */
+.SC_ableOnlyU__N {
+  color: var(--b3-theme-primary);
+  filter: drop-shadow(-3px 5px 13px var(--b3-theme-primary-lighter));
+}
+
+/* 订阅用户权益 */
+.SC_ableOnlyU__S {
+  color: var(--b3-theme-primary);
+  filter: drop-shadow(-3px 5px 13px var(--b3-theme-primary-lighter)) sepia(1);
+}
+
+/* 弹窗界面 */
+#SC-ConfirmDialog #CoverWarming {
+  filter: drop-shadow(1px 2px 13px #13131399);
+}

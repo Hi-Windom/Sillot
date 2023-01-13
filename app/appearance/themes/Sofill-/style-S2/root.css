@@ -1,0 +1,116 @@
+:root {
+  /* 主色 */
+  --b3-theme-primary: var(--SCC-Purple-Soledar);
+  --b3-theme-primary-light: var(--SCC-Purple-Soledar-light);
+  --b3-theme-primary-lighter: var(--SCC-Purple-Soledar-lighter);
+  --b3-theme-primary-lightest: var(--SCC-Purple-Soledar-lightest);
+  --b3-theme-secondary: var(--SCC-CNTC-淡藤);
+  --b3-theme-background: var(--SCC-Gray-HellisePotter);
+  --b3-theme-background-light: var(--SCC-Gray-HellisePotter-light);
+  --b3-theme-background-blur: #dee3f4e8;
+  --b3-theme-surface: var(--SCC-Gray-HellisePotter);
+  --b3-theme-surface-light: var(--SCC-Gray-HellisePotter-light);
+  --b3-theme-error: #d23f31;
+
+  /* 文字颜色 */
+  --b3-theme-on-primary: var(--SCC-SGTC-15C);
+  --b3-theme-on-secondary: var(--SCC-CNTC-雪青);
+  --b3-theme-on-background: var(--SCC-Blue-Windom);
+  --b3-theme-on-surface: var(--SCColor);
+  /* 此色影响顶部栏图标颜色和不少界面区域中的文字颜色 */
+  --b3-theme-on-surface-light: var(--SCC-primary-light);
+  --b3-theme-on-error: #fff;
+
+  /* 顶部工具栏 */
+  --b3-toolbar-background: var(--SCC-primary-lightest);
+  --b3-toolbar-blur-background: var(--SCC-Gray-HellisePotter-light);
+  --b3-toolbar-color: var(--SCC-Blue-Windom-light);
+
+  /* 自定义颜色 */
+  --b3-font-color1: var(--SCC-Red-Firole);
+  --b3-font-color2: var(--SCC-Pink-Firole);
+  --b3-font-color3: var(--SCC-Purple-186);
+  --b3-font-color4: var(--SCC-Blue-186);
+  --b3-font-color5: var(--SCC-Black-186);
+  --b3-font-color6: var(--SCColor);
+  --b3-font-color7: var(--SCC-CNTC-赤褐);
+  --b3-font-color8: var(--SCC-CNTC-绛紫);
+  /* --b3-font-color9: var(--SCC-Cyan-186);
+  --b3-font-color10: var(--SCC-Green-186); */
+  --b3-font-background1: var(--SCC-Red-Firole-lighter);
+  --b3-font-background2: var(--SCC-Pink-Firole-lighter);
+  --b3-font-background3: var(--SCC-Purple-186-lighter);
+  --b3-font-background4: var(--SCC-Blue-Windom-lighter);
+  --b3-font-background5: var(--SCC-Brown-186-lighter);
+  --b3-font-background6: var(--SCC-Black-186-lighter);
+  --b3-font-background7: var(--SCC-Gray-186-lighter);
+  --b3-font-background8: var(--SCC-Cyan-186-lighter);
+  --b3-font-background9: var(--SCC-Blue-Windom_2-lighter);
+  --b3-font-background10: var(--SCC-Green-186-lighter);
+
+  /* 线条 */
+  --b3-border-color: var(--SCC-Gray-HellisePotter-light);
+
+  /* 滚动条 */
+  --b3-scroll-color: var(--SCC-Purple-186-lighter);
+
+  /* 列表 */
+  --b3-list-hover: var(--SCC-Purple-186-lightest);
+
+  /* 菜单 */
+  --b3-menu-background: var(--SCC-Gray-HellisePotter);
+
+  /* 提示 */
+  --b3-tooltips-color: #5A4D5Fc5;
+
+  /* 遮罩 */
+  --b3-mask-background: #070809a3;
+}
+
+/* --- */
+:root {
+  --SCC-Component-selector-border: 1px solid var(--SCC-Purple-186-lighter);
+  --SCC-Component-button-text-color: var(--SCC-Purple-Soledar);
+  --SCC-Component-button-bg-color: var(--b3-theme-primary-lightest);
+  --SCC-Component-textarea-box-shadow: rgba(128, 81, 231, 0.31) 3px 3px 6px 0px inset,
+    rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
+  --SCC-Component-TabBar-item-hover-bg-color: #dcd6f4a5;
+  --SCC-Component-HR-LG1: linear-gradient(to right, transparent, #58315858, transparent);
+  --SCC-Component-Inline-virtual-block-ref-border-bottom: 1px dotted #ce00ca;
+  --SCC-Component-Inline-virtual-block-ref-bg-color-hover: #ffffffc5;
+  --SCC-Component-EmbedBlock-bg-color: var(--SCC-Gray-HellisePotter);
+  --SCC-Component-EmbedBlock-box-shadow: inset 9px 9px 29px #cacfde, inset -9px -9px 29px #f2f7ff;
+  --SCC-Component-Table-tr-bg-color-1: var(--SCC-SGTC-9A);
+  --SCC-Component-Table-tr-bg-color-2: var(--SCC-SGTC-9B);
+  --SCC-Component-CodeBlock-bg-color: #f7f9fca5;
+  --SCC-Component-CodeBlock-bg-color-hover: #fff;
+  --SCC-Component-Message-button-ok-border: 3px ridge var(--SCC-Cyan-186-lighter) !important;
+  --SCC-Component-Message-button-ok-bg-color: var(--SCC-CNTC-绛紫);
+  --SCC-Component-meno-bg-color: var(--SCC-CNTC-雪青);
+  --SCC-Component-meno-border-bottom: 2px solid var(--b3-card-info-color);
+  --SCC-Component-Counter-bg-color: var(--SCC-CNTC-绛紫);
+  --SCC-Component-Counter-border: 1.3px solid var(--SCC-CNTC-雪青);
+  --SCC-Component-TabBar-item__close-svg__hover-color: var(--SCC-Purple-Soledar);
+  --SCC-sCt-Hfbs1-color1: rgba(144, 111, 137, 0.11);
+  --SCC-sCt-Hfbs1-color2: rgba(144, 111, 137, 0.17);
+  --SCC-sCt-Hfbs1-color3: rgba(144, 111, 137, 0.23);
+  --SCC-sCt-Hfbs1-color4: rgba(144, 111, 137, 0.29);
+  --SCC-sCt-Hfbs1-color5: rgba(144, 111, 137, 0.35);
+  --SCC-Component-Heading-folded-box-shadow-h5: var(--SCC-sCt-Hfbs1-color1) 7px 4px;
+  --SCC-Component-Heading-folded-box-shadow-h4: var(--SCC-sCt-Hfbs1-color2) 7px 4px, var(--SCC-sCt-Hfbs1-color1) 14px 8px;
+  --SCC-Component-Heading-folded-box-shadow-h3: var(--SCC-sCt-Hfbs1-color3) 7px 4px, var(--SCC-sCt-Hfbs1-color2) 14px 8px, var(--SCC-sCt-Hfbs1-color1) 21px 12px;
+  --SCC-Component-Heading-folded-box-shadow-h2: var(--SCC-sCt-Hfbs1-color4) 7px 4px, var(--SCC-sCt-Hfbs1-color3) 14px 8px, var(--SCC-sCt-Hfbs1-color2) 21px 12px, var(--SCC-sCt-Hfbs1-color1) 28px 16px;
+  --SCC-Component-Heading-folded-box-shadow-h1: var(--SCC-sCt-Hfbs1-color5) 7px 4px, var(--SCC-sCt-Hfbs1-color4) 14px 8px, var(--SCC-sCt-Hfbs1-color3) 21px 12px, var(--SCC-sCt-Hfbs1-color2) 28px 16px, var(--SCC-sCt-Hfbs1-color1) 35px 20px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h5: var(--SCC-sCt-Hfbs1-color1) 2px 4px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h4: var(--SCC-sCt-Hfbs1-color2) 2px 4px, var(--SCC-sCt-Hfbs1-color1) 4px 8px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h3: var(--SCC-sCt-Hfbs1-color3) 2px 4px, var(--SCC-sCt-Hfbs1-color2) 4px 8px, var(--SCC-sCt-Hfbs1-color1) 6px 12px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h2: var(--SCC-sCt-Hfbs1-color4) 2px 4px, var(--SCC-sCt-Hfbs1-color3) 4px 8px, var(--SCC-sCt-Hfbs1-color2) 6px 12px, var(--SCC-sCt-Hfbs1-color1) 8px 16px;
+  --SCC-Component__Phone-Heading-folded-box-shadow-h1: var(--SCC-sCt-Hfbs1-color5) 2px 4px, var(--SCC-sCt-Hfbs1-color4) 4px 8px, var(--SCC-sCt-Hfbs1-color3) 6px 12px, var(--SCC-sCt-Hfbs1-color2) 8px 16px, var(--SCC-sCt-Hfbs1-color1) 10px 20px;
+  --SCC-Component-HintMenu-bg-color: #867ba9ee;
+  --SCC-Component-HintMenu-border-bottom: 1.86px ridge rgba(244, 244, 0, 0.77);
+  --SCC-Component-HintMenu-column-rule: 1px solid var(--SCC-Cyan-186-lighter);
+  --SCC-Component-Inline-kbd-color: var(--SCC-Black-186);
+  --SCC-Component-Inline-kbd-bg-color: var(--SCC-White-light);
+  --SCC-Component-Inline-kbd-box-shadow: rgba(254, 239, 234, 0.4) 0px 3px, rgba(0, 6, 85, 0.3) 0px 5px;
+  --SCC-Component-Inline-kbd-border-radius: 6px;
+}

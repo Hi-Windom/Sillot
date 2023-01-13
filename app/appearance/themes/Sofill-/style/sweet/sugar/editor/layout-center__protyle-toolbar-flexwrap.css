@@ -1,0 +1,34 @@
+#editor .protyle-toolbar {
+  flex-wrap: wrap;
+  width: 160px;
+  margin-top: -58px;
+}
+
+.layout__center .protyle>.protyle-toolbar {
+  flex-wrap: wrap;
+  min-width: 60px;
+  width: 31vw;
+  max-width: 250px;
+  margin-top: 58px;
+}
+
+#editor .protyle-toolbar .protyle-toolbar__divider,
+.layout__center .protyle>.protyle-toolbar .protyle-toolbar__divider {
+  display: none;
+}
+
+#editor .protyle-toolbar>button,
+#editor .protyle-toolbar__item svg,
+.layout__center .protyle>.protyle-toolbar>button,
+.layout__center .protyle-toolbar__item svg {
+  display: flex;
+  flex-grow: 1;
+}
+
+#editor .protyle-toolbar>button,
+.layout__center .protyle>.protyle-toolbar>button {
+  align-items: center;
+  text-align: center;
+  flex-basis: 30px;
+  flex-shrink: 2;
+}

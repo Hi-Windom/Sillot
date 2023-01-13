@@ -1,0 +1,76 @@
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has([data-value^="((newFile"])>button:nth-of-type(2) .b3-list-item__first:after {
+  content: "🥇";
+  font-size: 150%;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has([data-value^="((newFile"])>button:nth-child(3) .b3-list-item__first:after {
+  content: "🥈";
+  font-size: 150%;
+  opacity: .9;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has([data-value^="((newFile"])>button:nth-child(4) .b3-list-item__first:after {
+  content: "🥉";
+  font-size: 150%;
+  opacity: .8;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has([data-value^="((newFile"])>button:not(:nth-child(-n+4)) .b3-list-item__first:after {
+  content: counter(hinthinthit) "th";
+  font-size: 78%;
+  margin-right: 5px;
+  opacity: .66;
+  box-shadow: 6px 4px 13px -2px #313131c5;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu)>button {
+  counter-increment: hinthinthit;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu) {
+  counter-reset: hinthinthit -1;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has(>button:nth-child(1)):before {
+  content: "🔕";
+  float: right;
+  opacity: 0;
+  font-size: 0%;
+  color: #fe4e;
+  transition: all .31s ease .31s;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has([data-value^="((newFile"]):has(>button:nth-child(2)):has(>button:nth-child(1):hover) {
+  background-color: transparent;
+  backdrop-filter: blur(0.58px) brightness(.98);
+  transition: background-color .13s cubic-bezier(0.43, -0.02, 0.15, 0.73) .13s;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has([data-value^="((newFile"]):has(>button:nth-child(2)):has(>button:nth-child(1):hover)>button:nth-child(1) {
+  background-color: rgba(72, 69, 80, .9);
+  opacity: 1 !important;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has([data-value^="((newFile"]):has(>button:nth-child(2)):has(>button:nth-child(1):hover):before,
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has([data-value^="((newFile"]):has(>button:nth-child(2)):has(>button:nth-child(1):hover)>button {
+  opacity: 0;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has(>button:nth-child(10)):before {
+  content: "9+ Hits";
+  opacity: 1;
+  font-size: 12pt;
+  letter-spacing: 2.2px;
+  padding: 3px 13px;
+  margin: 2px 0 13px 0;
+  border-radius: 9px;
+  box-shadow: -8px 7px 17px -7px #ffef3f31;
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has(>button:nth-child(50)):before {
+  content: "49+ Hits";
+}
+
+.protyle-hint.b3-list.b3-list--background:not(.hint--menu):has(>button:nth-child(100)):before {
+  content: "99+ Hits";
+}

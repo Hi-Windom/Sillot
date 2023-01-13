@@ -156,7 +156,7 @@ func InstalledThemes() (ret []*Theme) {
 }
 
 func isBuiltInTheme(dirName string) bool {
-	return "daylight" == dirName || "midnight" == dirName
+	return "daylight" == dirName || "midnight" == dirName || "Sofill-" == dirName
 }
 
 func InstallTheme(repoURL, repoHash, installPath string, systemID string) error {

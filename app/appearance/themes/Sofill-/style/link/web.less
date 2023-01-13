@@ -1,0 +1,122 @@
+@URL_protocal_ROOT: "./protocal/";
+@URL_web_ROOT: "./web/";
+// 代码托管专区
+@URL-V-1: "pypi.org";
+@URL-V-2: "bitbucket.org";
+@URL-V-3: "github.com";
+@URL-V-4: "gitee.com";
+// 第一批认证网站收录
+@URL-V-5: "cn.bing.com";
+@URL-V-6: "www.weidown.com";
+@URL-V-7: "pc.qq.com";
+@URL-V-8: "pkgs.org";
+@URL-V-9: "mp.weixin.qq.com";
+@URL-V-10: "www.cnblogs.com";
+@URL-V-11: "cloud.tencent.com";
+@URL-V-12: "developer.mozilla.org";
+@URL-V-13: "www.runoob.com";
+@URL-V-14: "www.w3school.com";
+@URL-V-15: "nodejs.cn";
+@URL-V-16: "ld246.com";
+@URL-V-17: "microsoft.com";
+@URL-V-18: "stackoverflow.com";
+@URL-V-19: "python.org";
+@URL-V-20: "www.yuque.com";
+@URL-V-21: "www.bilibili.com";
+@URL-V-22: "gov.cn";
+@URL-V-23: "kdocs.cn";
+@URL-V-24: "flowus.cn";
+// 第一批征集网站收录
+// 免责声明：以下站点均来自网友投稿，未经审核
+@URL-V-25: "javtxt.org";
+@URL-V-26: "www.ghxi.com";
+@URL-V-27: "www.sozi.cn";
+@URL-V-28: "chinaz.com";
+@URL-V-29: "yandex.com";
+@URL-V-30: "www.zhangxinxu.com";
+@URL-V-31: "juejin.cn";
+@URL-V-32: "zhihu.com";
+@URL-V-33: "aliyun.com";
+@URL-V-34: "airtable.com";
+@URL-V-35: "cnki.net";
+@URL-V-36: "wiki.mbalib.com";
+@URLS-COUNT-1: 36;
+
+@layer {
+
+  .p[data-type="NodeParagraph"] {
+    a[href^="http://"]::before {
+      content: "";
+      background-image: url("@{URL_protocal_ROOT}http.png");
+    }
+
+    a[href^="https://"]::before {
+      content: "";
+      background-image: url("@{URL_protocal_ROOT}https.png");
+    }
+
+    a[href^="ftp://"]::before {
+      content: "";
+      background-image: url("@{URL_protocal_ROOT}ftp.png");
+    }
+
+    a[href^="thunder://"]::before {
+      content: "";
+      background-image: url("@{URL_protocal_ROOT}thunder.png");
+    }
+
+    a[href^="magnet:?"]::before {
+      content: "";
+      background-image: url("@{URL_protocal_ROOT}magnet.png");
+    }
+  }
+
+  span[data-type~=a] {
+    &[data-href^="http://"]:not(:empty)::before {
+      content: "";
+      background-image: url("@{URL_protocal_ROOT}http.png");
+    }
+
+    &[data-href^="https://"]:not(:empty)::before {
+      content: "";
+      background-image: url("@{URL_protocal_ROOT}https.png");
+    }
+
+    &[data-href^="ftp://"]:not(:empty)::before {
+      content: "";
+      background-image: url("@{URL_protocal_ROOT}ftp.png");
+    }
+
+    &[data-href^="thunder://"]:not(:empty)::before {
+      content: "";
+      background-image: url("@{URL_protocal_ROOT}thunder.png");
+    }
+
+    &[data-href^="magnet:?"]:not(:empty)::before {
+      content: "";
+      background-image: url("@{URL_protocal_ROOT}magnet.png");
+    }
+  }
+}
+
+.loopa(@i) when(@i > 0) {
+  .loopa((@i - 1));
+  @id: 'URL-V-@{i}';
+  @value: @@id;
+
+  a {
+    &[href*="@{value}/"]:not(:has(img))::before {
+      content: "";
+      background-image: url("@{URL_web_ROOT}@{value}.png");
+    }
+  }
+
+  span[data-type~=a] {
+    &[data-href*="@{value}/"]:not(:empty)::before {
+      content: "";
+      background-image: url("@{URL_web_ROOT}@{value}.png");
+    }
+  }
+}
+
+.loopa(@URLS-COUNT-1);
