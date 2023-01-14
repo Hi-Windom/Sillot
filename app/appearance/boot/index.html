@@ -63,6 +63,7 @@
 </div>
 <script>
   const bgs = [
+    'linear-gradient(114deg, rgba(208,166,144,0.88) 0%, rgba(155,121,122,0.57) 19%, rgba(116,88,106,0.47) 33%, rgba(58,67,71,0.33) 51%, rgba(48,64,65,0.32) 54%, rgba(18,15,50,0.25) 71%, rgba(11,4,47,0.22) 75%, rgba(15,14,16,0) 100%)',
     'linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%)',
     'linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%)',
     'linear-gradient(120deg, #a6c0fe 0%, #f68084 100%)',
@@ -107,8 +108,10 @@
       window.location.replace(uri)
   }
   (async () => {
-    document.getElementById('bg').style.backgroundImage = bgs[(new Date()).getDate()]
-    document.getElementById('image').style.backgroundImage = `url(images/boot${(new Date()).getDate()}.svg)`
+    document.getElementById('bg').style.backgroundImage = bgs[0]
+    document.getElementById('image').style.backgroundImage = `url(images/boot.svg)`
+    // document.getElementById('bg').style.backgroundImage = bgs[(new Date()).getDate()]
+    // document.getElementById('image').style.backgroundImage = `url(images/boot${(new Date()).getDate()}.svg)`
     document.getElementById('details').textContent = 'Booting...'
     let progressing = false
     while (!progressing) {
