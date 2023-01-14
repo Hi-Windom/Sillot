@@ -10,9 +10,9 @@
 
         body {
             margin: 0;
-            color: #000;
-            text-shadow: 0 0 2px #fff;
-            font-size: 12px;
+            color: rgb(255, 255, 255);
+            text-shadow: 0 0 2px rgba(142, 70, 70, 0.31);
+            font-size: 13px;
             font-family: "Helvetica Neue", "Luxi Sans", "DejaVu Sans", "Hiragino Sans GB", "Microsoft Yahei", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", "EmojiSymbols";
         }
 
@@ -31,7 +31,7 @@
 <body>
 <div id="bg"
      style="opacity:0.68;background-image: linear-gradient(-225deg, #69EACB 0%, #EACCF8 48%, #6654F1 100%);height: 100%;position: fixed;width: 100%;box-sizing: border-box;"></div>
-<div id="image" style="background-image: url(images/boot1.svg)"></div>
+<div id="image" style="background-image: url(images/boot.svg)"></div>
 <div style="position: fixed;bottom: 34px;width: 100%;height: 2px;background-color: #3b3e43;">
     <div id="progress"
          style="position: absolute;height: 2px;background-color: #d23f31;transition: width 50ms cubic-bezier(0, 0, 0.2, 1);bottom: 0;"></div>
@@ -63,6 +63,7 @@
 </div>
 <script>
   const bgs = [
+    'linear-gradient(114deg, rgba(208,166,144,0.88) 0%, rgba(155,121,122,0.57) 19%, rgba(116,88,106,0.47) 33%, rgba(58,67,71,0.33) 51%, rgba(48,64,65,0.32) 54%, rgba(18,15,50,0.25) 71%, rgba(11,4,47,0.22) 75%, rgba(15,14,16,0) 100%)',
     'linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%)',
     'linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%)',
     'linear-gradient(120deg, #a6c0fe 0%, #f68084 100%)',
@@ -107,8 +108,10 @@
       window.location.replace(uri)
   }
   (async () => {
-    document.getElementById('bg').style.backgroundImage = bgs[(new Date()).getDate()]
-    document.getElementById('image').style.backgroundImage = `url(images/boot${(new Date()).getDate()}.svg)`
+    document.getElementById('bg').style.backgroundImage = bgs[0]
+    document.getElementById('image').style.backgroundImage = `url(images/boot.svg)`
+    // document.getElementById('bg').style.backgroundImage = bgs[(new Date()).getDate()]
+    // document.getElementById('image').style.backgroundImage = `url(images/boot${(new Date()).getDate()}.svg)`
     document.getElementById('details').textContent = 'Booting...'
     let progressing = false
     while (!progressing) {
