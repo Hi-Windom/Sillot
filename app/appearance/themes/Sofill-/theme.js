@@ -51,6 +51,11 @@ addUC();
 setInterval(() => {
   addUC();
 }, 3100);
+setTimeout(() => {
+  if (!document.body.classList.contains("branch--Sillot")) {
+    document.body.classList.add("branch--SiYuan");
+  }
+}, 500);
 
 var isAppMode = document
   .getElementsByTagName("body")[0]

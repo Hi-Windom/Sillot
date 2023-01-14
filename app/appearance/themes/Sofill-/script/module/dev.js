@@ -74,6 +74,4 @@ function ExtendProtyleToolbar() {
 }
 setTimeout(() => {
   ExtendProtyleToolbar();
-  // console.warn(API.LocalStorage.setItem("SC_winsay_cp_custom__test","okk"));
-  // console.warn(API.LocalStorage.getItem("SC_winsay_cp_custom__test"));
 }, 200);

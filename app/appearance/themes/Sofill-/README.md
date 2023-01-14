@@ -14,7 +14,7 @@
 
 ### 版本说明
 
-* 包含【SiYuan】标签的版本，建议更新思源至适配版本后再更新主题，否则可能存在适配问题；声明为【构建】标签的版本，**建议手动删除旧版本后再下载**（更新只会替换已有文件，不会删除不再引用的文件）
+* 包含【SiYuan】/【Sillot】标签的版本，建议更新思源/汐洛至适配版本后再更新主题，否则可能存在适配问题；声明为【构建】标签的版本，**建议手动删除旧版本后再下载**（更新只会替换已有文件，不会删除不再引用的文件）
 * [全部版本更新日志](https://gitee.com/soltus/Sofill/blob/main/CHANGELOG/winsay.md)  |  [All version change log](https://github.com/Hi-Windom/Sofill/blob/main/CHANGELOG/winsay.md)
 
 ### v1.5 聚合说明
@@ -22,9 +22,9 @@
 > 2023-01-?? released
 
 <p>
+<img src="https://img.shields.io/badge/Sillot-0.1-pink" alt="适配 Sillot v0.1" title="建议先更新汐洛版本" style="cursor:pointer;height: 38px;margin: 3px auto;"/>
 <img src="https://img.shields.io/badge/SiYuan-2.6.2-green" alt="适配 SiYuan v2.6.2" title="建议先更新思源版本" style="cursor:pointer;height: 38px;margin: 3px auto;"/>
-<img src="https://img.shields.io/badge/%E5%81%9C%E6%AD%A2%E9%80%82%E9%85%8D-2.6.1---red" alt="停止适配 SiYuan v2.6.1 及更早版本" title="只是后续不再主动适配，不代表主题无法在这些版本的思源中使用" style="cursor:pointer;height: 38px;margin: 3px;"/>
-<img src="https://img.shields.io/badge/-%E6%9E%84%E5%BB%BA-yellow" alt="这是一个构建版本" title="建议手动删除旧版本后再下载，而不是直接更新" style="cursor:pointer;height: 38px;margin: 3px;"/> <br>
+<img src="https://img.shields.io/badge/-%E6%9E%84%E5%BB%BA-yellow" alt="这是一个构建版本" title="建议手动删除旧版本后再下载，而不是直接更新" style="cursor:pointer;height: 38px;margin: 3px auto;"/> <br>
 <img src="https://img.shields.io/badge/Android-PASS-green?logo=Android" title="" style="margin: 3px auto;"/>
 <img src="https://img.shields.io/badge/Windows 11-PASS-green?logo=Windows 11" title="" style="margin: 3px auto;"/>
 <img src="https://img.shields.io/badge/Docker-PASS-green?logo=Docker" title="" style="margin: 3px auto;"/>
@@ -42,6 +42,9 @@
 4. [墨绿紫+青葱绿形态字色双忙测试验收通过 · Issue #849 · v1.5.6](https://github.com/Hi-Windom/winsay/issues/849)
 5. [适配Sofill#新字体接口 · Issue #898 · v1.5.7](https://github.com/Hi-Windom/winsay/issues/898)
 6. [优化安卓平板端退出思源功能 · Issue #903 · v1.5.9](https://github.com/Hi-Windom/winsay/issues/903)
+7. [body加入分支类名 · Issue #905 · v1.5.10](https://github.com/Hi-Windom/winsay/issues/905)
+8. [README不再显示停止适配的思源版本 · Issue #908 · v1.5.11](https://github.com/Hi-Windom/winsay/issues/908)
+9. [变更API · Issue #902 · v1.5.12](https://github.com/Hi-Windom/winsay/issues/902)
 
 修复缺陷：NULL
 
