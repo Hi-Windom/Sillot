@@ -7,7 +7,7 @@ if (API.isDesktopAppMode()) {
 }
 
 window.sofill.ekits.gites = {
-  UPath: `/appearance/themes/Sofill=/eHiWindom/gites/`
+  UPath: `/appearance/themes/Sofill=/eHiWindom/gites/`,
 };
 window.sofill.ekits.lnco = {};
 
@@ -223,27 +223,29 @@ if (urlParam1 && urlParam2) {
   }
 }
 
-fs
-  ? fs.access(oncePath, function (err) {
-      if (!err) {
-        setTimeout(() => {
-          window.sofill.funs.loadScript(
-            window.sofill.funs.addURLParam(
-              "/appearance/themes/Sofill-/script/module/AlertOnce.js"
-            ),
-            undefined,
-            true
-          );
+if (!document.body.classList.contains("branch--Sillot")) {
+  fs
+    ? fs.access(oncePath, function (err) {
+        if (!err) {
           setTimeout(() => {
-            fs.unlink(oncePath, function (err) {
-              if (err) {
-                throw err;
-              }
-              console.log("一次性通知已销毁");
-            });
-          }, 3000);
-          return;
-        }, 2000);
-      }
-    })
-  : null;
+            window.sofill.funs.loadScript(
+              window.sofill.funs.addURLParam(
+                "/appearance/themes/Sofill-/script/module/AlertOnce.js"
+              ),
+              undefined,
+              true
+            );
+            setTimeout(() => {
+              fs.unlink(oncePath, function (err) {
+                if (err) {
+                  throw err;
+                }
+                console.log("一次性通知已销毁");
+              });
+            }, 3000);
+            return;
+          }, 2000);
+        }
+      })
+    : null;
+}
