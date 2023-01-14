@@ -45,6 +45,7 @@
 7. [body加入分支类名 · Issue #905 · v1.5.10](https://github.com/Hi-Windom/winsay/issues/905)
 8. [README不再显示停止适配的思源版本 · Issue #908 · v1.5.11](https://github.com/Hi-Windom/winsay/issues/908)
 9. [变更API · Issue #902 · v1.5.12](https://github.com/Hi-Windom/winsay/issues/902)
+10. [Sillot分支禁用一次性通知 · Issue #911 · v1.5.13](https://github.com/Hi-Windom/winsay/issues/911)
 
 修复缺陷：NULL
 
