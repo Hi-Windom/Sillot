@@ -12,6 +12,8 @@
 
 ## 📜 集市更新版本日志
 
+很遗憾，Sofill-已**[结构性暂停](https://github.com/Hi-Windom/winsay/issues/914)**适配思源源分支更新。如果你使用的是思源源分支v2.6.3+桌面端，不推荐使用本主题（移动端仍是最佳主题）
+
 ### 版本说明
 
 * 包含【SiYuan】/【Sillot】标签的版本，建议更新思源/汐洛至适配版本后再更新主题，否则可能存在适配问题；声明为【构建】标签的版本，**建议手动删除旧版本后再下载**（更新只会替换已有文件，不会删除不再引用的文件）
@@ -46,6 +48,7 @@
 8. [README不再显示停止适配的思源版本 · Issue #908 · v1.5.11](https://github.com/Hi-Windom/winsay/issues/908)
 9. [变更API · Issue #902 · v1.5.12](https://github.com/Hi-Windom/winsay/issues/902)
 10. [Sillot分支禁用一次性通知 · Issue #911 · v1.5.13](https://github.com/Hi-Windom/winsay/issues/911)
+11. [结构性暂停适配思源源分支更新 · Issue #914 · v1.5.14](https://github.com/Hi-Windom/winsay/issues/914)
 
 修复缺陷：NULL
 
