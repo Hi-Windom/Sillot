@@ -11,7 +11,7 @@ import {
 import {newFile} from "./newFile";
 import {Constants} from "../constants";
 import {openSetting} from "../config";
-import {exportLayout, getDockByType, getInstanceById} from "../layout/util";
+import {getDockByType, getInstanceById} from "../layout/util";
 import {Tab} from "../layout/Tab";
 import {Editor} from "../editor";
 import {setEditMode} from "../protyle/util/setEditMode";
@@ -47,6 +47,7 @@ import {webFrame} from "electron";
 /// #endif
 import {openHistory} from "../history/history";
 import {openCard} from "../card/openCard";
+import {lockScreen} from "../dialog/processSystem";
 
 const getRightBlock = (element: HTMLElement, x: number, y: number) => {
     let index = 1;
@@ -534,11 +535,7 @@ export const globalShortcut = () => {
             return;
         }
         if (matchHotKey(window.siyuan.config.keymap.general.lockScreen.custom, event)) {
-            exportLayout(false, () => {
-                fetchPost("/api/system/logoutAuth", {}, () => {
-                    window.location.href = "/";
-                });
-            });
+            lockScreen();
             event.preventDefault();
             return;
         }

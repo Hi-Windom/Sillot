@@ -18,10 +18,11 @@ package treenode
 
 import (
 	"bytes"
-	"github.com/88250/gulu"
+	util2 "github.com/siyuan-note/siyuan/kernel/util"
 	"strings"
 	"sync"
 
+	"github.com/88250/gulu"
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/editor"
@@ -105,6 +106,32 @@ func NodeStaticContent(node *ast.Node, excludeTypes []string) string {
 		}
 
 		switch n.Type {
+		case ast.NodeImage:
+			linkDest := n.ChildByType(ast.NodeLinkDest)
+			var linkDestStr, ocrText string
+			if nil != linkDest {
+				linkDestStr = linkDest.TokensStr()
+				ocrText = util2.GetAssetText(linkDestStr)
+			}
+
+			linkText := n.ChildByType(ast.NodeLinkText)
+			if nil != linkText {
+				buf.Write(linkText.Tokens)
+				buf.WriteByte(' ')
+			}
+			if "" != ocrText {
+				buf.WriteString(ocrText)
+				buf.WriteByte(' ')
+			}
+			if nil != linkDest {
+				buf.Write(n.Tokens)
+				buf.WriteByte(' ')
+
+			}
+			if linkTitle := n.ChildByType(ast.NodeLinkTitle); nil != linkTitle {
+				buf.Write(linkTitle.Tokens)
+			}
+			return ast.WalkSkipChildren
 		case ast.NodeLinkText:
 			buf.Write(n.Tokens)
 			buf.WriteByte(' ')

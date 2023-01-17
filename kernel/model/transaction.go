@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -1233,7 +1234,17 @@ var autoFixLock = sync.Mutex{}
 func autoFixIndex() {
 	defer logging.Recover()
 
-	if util.IsMutexLocked(&autoFixLock) || isFullReindexing {
+	if isFullReindexing {
+		logging.LogInfof("skip check index caused by full reindexing")
+		return
+	}
+
+	if util.IsMutexLocked(&syncLock) {
+		logging.LogInfof("skip check index caused by sync lock")
+		return
+	}
+
+	if util.IsMutexLocked(&autoFixLock) {
 		return
 	}
 
@@ -1246,6 +1257,10 @@ func autoFixIndex() {
 		boxPath := filepath.Join(util.DataDir, box.ID)
 		var paths []string
 		filepath.Walk(boxPath, func(path string, info os.FileInfo, err error) error {
+			if isFullReindexing {
+				return io.EOF
+			}
+
 			if !info.IsDir() && filepath.Ext(path) == ".sy" {
 				p := path[len(boxPath):]
 				p = filepath.ToSlash(p)
@@ -1258,11 +1273,19 @@ func autoFixIndex() {
 
 		redundantPaths := treenode.GetRedundantPaths(box.ID, paths)
 		for _, p := range redundantPaths {
+			if isFullReindexing {
+				break
+			}
+
 			treenode.RemoveBlockTreesByPath(p)
 		}
 
 		missingPaths := treenode.GetNotExistPaths(box.ID, paths)
 		for i, p := range missingPaths {
+			if isFullReindexing {
+				break
+			}
+
 			reindexTreeByPath(box.ID, p, i, size)
 		}
 	}
@@ -1307,6 +1330,10 @@ func autoFixIndex() {
 	duplicatedRootIDs := sql.GetDuplicatedRootIDs()
 	size := len(duplicatedRootIDs)
 	for i, rootID := range duplicatedRootIDs {
+		if isFullReindexing {
+			break
+		}
+
 		root := sql.GetBlock(rootID)
 		if nil == root {
 			continue
@@ -1317,10 +1344,14 @@ func autoFixIndex() {
 		reindexTree(rootID, i, size)
 	}
 
-	util.PushStatusBar("")
+	util.PushStatusBar(Conf.Language(185))
 }
 
 func reindexTreeByPath(box, p string, i, size int) {
+	if isFullReindexing {
+		return
+	}
+
 	tree, err := LoadTree(box, p)
 	if nil != err {
 		return
@@ -1330,6 +1361,10 @@ func reindexTreeByPath(box, p string, i, size int) {
 }
 
 func reindexTree(rootID string, i, size int) {
+	if isFullReindexing {
+		return
+	}
+
 	root := treenode.GetBlockTree(rootID)
 	if nil == root {
 		logging.LogWarnf("root block not found", rootID)

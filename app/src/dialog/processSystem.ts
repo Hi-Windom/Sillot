@@ -10,7 +10,18 @@ import {Dialog} from "./index";
 import {isMobile} from "../util/functions";
 import {confirmDialog} from "./confirmDialog";
 import {getCurrentWindow} from "@electron/remote";
-import { getWorkspaceName } from "../menus/workspace";
+import {escapeHtml} from "../util/escape";
+import {getWorkspaceName} from "../util/noRelyPCFunction";
+
+export const lockScreen = () => {
+    /// #if BROWSER
+    fetchPost("/api/system/logoutAuth", {}, () => {
+        window.location.href = "/";
+    });
+    /// #else
+    ipcRenderer.send(Constants.SIYUAN_LOCK_SCREEN);
+    /// #endif
+};
 
 export const lockFile = (id: string) => {
     const html = `<div class="b3-dialog__scrim"></div>
@@ -267,13 +278,18 @@ export const setTitle = (title: string) => {
     if (title === window.siyuan.languages.siyuanNote) {
         const versionTitle = `${title} - ${workspaceName} - v${Constants.SIYUAN_VERSION}`;
         document.title = versionTitle;
-        dragElement.textContent = versionTitle;
-        dragElement.setAttribute("title", versionTitle);
+        if (dragElement) {
+            dragElement.textContent = versionTitle;
+            dragElement.setAttribute("title", versionTitle);
+        }
     } else {
         title = title || "Untitled";
-        document.title = `${title} - ${workspaceName}  - ${window.siyuan.languages.siyuanNote} v${Constants.SIYUAN_VERSION}`;
-        dragElement.textContent = title;
+        document.title = `${title} - ${workspaceName} - ${window.siyuan.languages.siyuanNote} v${Constants.SIYUAN_VERSION}`;
+        if (!dragElement) {
+            return;
+        }
         dragElement.setAttribute("title", title);
+        dragElement.innerHTML = escapeHtml(title);
     }
 };
 

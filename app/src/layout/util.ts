@@ -26,6 +26,8 @@ import {openSearch} from "../search/spread";
 import {saveScroll} from "../protyle/scroll/saveScroll";
 import {pdfResize} from "../asset/renderAssets";
 import {Backlink} from "./dock/Backlink";
+import {openFileById} from "../editor/util";
+import {getSearch} from "../util/functions";
 
 export const setPanelFocus = (element: Element) => {
     if (element.classList.contains("layout__tab--active") || element.classList.contains("layout__wnd--active")) {
@@ -157,11 +159,11 @@ export const exportLayout = (reload: boolean, cb?: () => void) => {
     };
     layoutToJSON(window.siyuan.layout.layout, layoutJSON.layout);
     fetchPost("/api/system/setUILayout", {layout: layoutJSON, exit: typeof cb !== "undefined"}, () => {
-            if (reload) {
-                window.location.reload();
-            } else if (cb) {
-                cb();
-            }
+        if (reload) {
+            window.location.reload();
+        } else if (cb) {
+            cb();
+        }
     });
 };
 
@@ -295,6 +297,18 @@ export const JSONToLayout = (isStart: boolean) => {
                 item.parent.removeTab(item.id);
             }
         });
+    }
+    // https://github.com/siyuan-note/siyuan/pull/7086
+    const openId = getSearch("id");
+    if (openId) {
+        // 启动时 layout 中有该文档，该文档还原会在此之后，因此需有延迟
+        setTimeout(() => {
+            openFileById({
+                id: openId,
+                action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
+                zoomIn: getSearch("focus") === "1"
+            });
+        }, Constants.TIMEOUT_BLOCKLOAD);
     }
 };
 
@@ -455,12 +469,20 @@ export const resizeTabs = () => {
                         }
                     });
                 }
+                // 保持光标位置不变 https://ld246.com/article/1673704873983/comment/1673765814595#comments
+                if (!item.element.classList.contains("fn__none") && item.editor.protyle.toolbar.range) {
+                    const protyleRect = item.editor.protyle.element.getBoundingClientRect();
+                    const rangeRect = item.editor.protyle.toolbar.range.getBoundingClientRect();
+                    if (protyleRect.top + 30 > rangeRect.top || protyleRect.bottom < rangeRect.bottom) {
+                        item.editor.protyle.toolbar.range.startContainer.parentElement.scrollIntoView(protyleRect.top > rangeRect.top);
+                    }
+                }
             }
         });
         // https://github.com/siyuan-note/siyuan/issues/6250
         models.backlink.forEach(item => {
             const mTreeElement = item.element.querySelector(".backlinkMList") as HTMLElement;
-            if (mTreeElement.style.height && mTreeElement.style.height !== "0px") {
+            if (mTreeElement.style.height && mTreeElement.style.height !== "0px" && item.element.clientHeight !== 0) {
                 mTreeElement.style.height = (item.element.clientHeight - mTreeElement.previousElementSibling.clientHeight * 2) + "px";
             }
             item.editors.forEach(editorItem => {

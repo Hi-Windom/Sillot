@@ -1,8 +1,9 @@
 {
+  "exitFocus": "Salir del enfoque",
+  "pointExchangeSize": "Intercambio de puntos",
+  "panel": "Panel",
   "copyPath": "Copiar ruta",
   "workspaceList": "Áreas de trabajo",
-  "openWorkspace": "Abrir espacio de trabajo",
-  "openedWorkspace": "Espacio de trabajo abierto",
   "removeWorkspaceTip": "Quitar de los espacios de trabajo",
   "new": "Nuevo",
   "share2LiandiConfirmTip": "¿Estás seguro de compartir este documento con Liandi?",
@@ -1057,6 +1058,7 @@
     "181": "El documento ha sido compartido con Liandi, <a href=\"%s\" target=\"_blank\">haga clic para ver</a>",
     "182": "Compartiendo documento, por favor espere...",
     "183": "Validando el árbol del documento de índice [%d/%d %s]",
-    "184": "Con la tecnología de <a href=\"https://b3log.org/siyuan\" target=\"_blank\">SiYuan</a>"
+    "184": "Con la tecnología de <a href=\"https://b3log.org/siyuan\" target=\"_blank\">SiYuan</a>",
+    "185": "Verificación de índice completada"
   }
 }

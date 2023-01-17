@@ -255,6 +255,14 @@ export class Toolbar {
         if (!nodeElement) {
             return;
         }
+        const endElement = hasClosestBlock(this.range.endContainer);
+        if (!endElement) {
+            return;
+        }
+        // 三击后还没有重新纠正 range 时使用快捷键标记会导致异常 https://github.com/siyuan-note/siyuan/issues/7068
+        if (!nodeElement.isSameNode(endElement)) {
+            this.range = setLastNodeRange(getContenteditableElement(nodeElement), this.range, false);
+        }
         const rangeTypes = this.getCurrentType(this.range);
         const selectText = this.range.toString();
         fixTableRange(this.range);
@@ -1289,7 +1297,7 @@ export class Toolbar {
     </div>
     <div class="b3-list fn__flex-1 b3-list--background" style="position: relative">${html}</div>
 </div>
-<div style="width: 520px;${isMobile() ? "display:none" : ""};overflow: auto;"></div>
+<div style="width: 520px;${isMobile() || window.outerWidth < window.outerWidth / 2 + 520 ? "display:none" : ""};overflow: auto;"></div>
 </div>`;
             const listElement = this.subElement.querySelector(".b3-list");
             const previewElement = this.subElement.firstElementChild.lastElementChild;
@@ -1469,7 +1477,7 @@ export class Toolbar {
     </div>
     <div class="b3-list fn__flex-1 b3-list--background" style="position: relative">${html}</div>
 </div>
-<div style="width: 260px;display: ${isMobile() ? "none" : "flex"};padding: 8px;overflow: auto;justify-content: center;align-items: center;"></div>
+<div style="width: 260px;display: ${isMobile() || window.outerWidth < window.outerWidth / 2 + 260 ? "none" : "flex"};padding: 8px;overflow: auto;justify-content: center;align-items: center;"></div>
 </div>`;
             const listElement = this.subElement.querySelector(".b3-list");
             listElement.addEventListener("mouseover", (event) => {

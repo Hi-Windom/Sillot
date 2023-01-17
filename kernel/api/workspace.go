@@ -17,18 +17,18 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
 
 	"github.com/88250/gulu"
+	"github.com/facette/natsort"
 	"github.com/gin-gonic/gin"
-	"github.com/gofrs/flock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -64,7 +64,7 @@ func createWorkspaceDir(c *gin.Context) {
 		return
 	}
 
-	workspacePaths, err := readWorkspacePaths()
+	workspacePaths, err := util.ReadWorkspacePaths()
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -73,7 +73,7 @@ func createWorkspaceDir(c *gin.Context) {
 
 	workspacePaths = append(workspacePaths, absPath)
 
-	if err = writeWorkspacePaths(workspacePaths); nil != err {
+	if err = util.WriteWorkspacePaths(workspacePaths); nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
 		return
@@ -91,7 +91,12 @@ func removeWorkspaceDir(c *gin.Context) {
 
 	path := arg["path"].(string)
 
-	workspacePaths, err := readWorkspacePaths()
+	if util.IsWorkspaceLocked(path) {
+		logging.LogWarnf("skip remove workspace [%s] because it is locked", path)
+		return
+	}
+
+	workspacePaths, err := util.ReadWorkspacePaths()
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -100,13 +105,13 @@ func removeWorkspaceDir(c *gin.Context) {
 
 	workspacePaths = gulu.Str.RemoveElem(workspacePaths, path)
 
-	if err = writeWorkspacePaths(workspacePaths); nil != err {
+	if err = util.WriteWorkspacePaths(workspacePaths); nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
 		return
 	}
 
-	if util.WorkspaceDir == path {
+	if util.WorkspaceDir == path && (util.ContainerIOS == util.Container || util.ContainerAndroid == util.Container) {
 		os.Exit(util.ExitCodeOk)
 	}
 }
@@ -120,25 +125,30 @@ func getWorkspaces(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
-	workspacePaths, err := readWorkspacePaths()
+	workspacePaths, err := util.ReadWorkspacePaths()
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
 		return
 	}
 
-	var workspaces []*Workspace
+	var workspaces, openedWorkspaces, closedWorkspaces []*Workspace
 	for _, p := range workspacePaths {
-		closed := false
-		f := flock.New(filepath.Join(p, ".lock"))
-		ok, _ := f.TryLock()
-		if ok {
-			closed = true
+		closed := !util.IsWorkspaceLocked(p)
+		if closed {
+			closedWorkspaces = append(closedWorkspaces, &Workspace{Path: p, Closed: closed})
+		} else {
+			openedWorkspaces = append(openedWorkspaces, &Workspace{Path: p, Closed: closed})
 		}
-		f.Unlock()
-
-		workspaces = append(workspaces, &Workspace{Path: p, Closed: closed})
 	}
+	sort.Slice(openedWorkspaces, func(i, j int) bool {
+		return natsort.Compare(util.RemoveEmoji(filepath.Base(openedWorkspaces[i].Path)), util.RemoveEmoji(filepath.Base(openedWorkspaces[j].Path)))
+	})
+	sort.Slice(closedWorkspaces, func(i, j int) bool {
+		return natsort.Compare(util.RemoveEmoji(filepath.Base(closedWorkspaces[i].Path)), util.RemoveEmoji(filepath.Base(closedWorkspaces[j].Path)))
+	})
+	workspaces = append(workspaces, openedWorkspaces...)
+	workspaces = append(workspaces, closedWorkspaces...)
 	ret.Data = workspaces
 }
 
@@ -169,7 +179,7 @@ func setWorkspaceDir(c *gin.Context) {
 		}
 	}
 
-	workspacePaths, err := readWorkspacePaths()
+	workspacePaths, err := util.ReadWorkspacePaths()
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -181,7 +191,7 @@ func setWorkspaceDir(c *gin.Context) {
 	workspacePaths = gulu.Str.RemoveElem(workspacePaths, path)
 	workspacePaths = append(workspacePaths, path) // 切换的工作空间固定放在最后一个
 
-	if err = writeWorkspacePaths(workspacePaths); nil != err {
+	if err = util.WriteWorkspacePaths(workspacePaths); nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
 		return
@@ -192,45 +202,6 @@ func setWorkspaceDir(c *gin.Context) {
 		time.Sleep(time.Second * 2)
 		model.Close(false, 1)
 	}
-}
-
-func readWorkspacePaths() (ret []string, err error) {
-	ret = []string{}
-	workspaceConf := filepath.Join(util.HomeDir, ".config", "siyuan", "workspace.json")
-	data, err := os.ReadFile(workspaceConf)
-	if nil != err {
-		msg := fmt.Sprintf("read workspace conf [%s] failed: %s", workspaceConf, err)
-		logging.LogErrorf(msg)
-		err = errors.New(msg)
-		return
-	}
-
-	if err = gulu.JSON.UnmarshalJSON(data, &ret); nil != err {
-		msg := fmt.Sprintf("unmarshal workspace conf [%s] failed: %s", workspaceConf, err)
-		logging.LogErrorf(msg)
-		err = errors.New(msg)
-		return
-	}
-	return
-}
-
-func writeWorkspacePaths(workspacePaths []string) (err error) {
-	workspaceConf := filepath.Join(util.HomeDir, ".config", "siyuan", "workspace.json")
-	data, err := gulu.JSON.MarshalJSON(workspacePaths)
-	if nil != err {
-		msg := fmt.Sprintf("marshal workspace conf [%s] failed: %s", workspaceConf, err)
-		logging.LogErrorf(msg)
-		err = errors.New(msg)
-		return
-	}
-
-	if err = os.WriteFile(workspaceConf, data, 0644); nil != err {
-		msg := fmt.Sprintf("write workspace conf [%s] failed: %s", workspaceConf, err)
-		logging.LogErrorf(msg)
-		err = errors.New(msg)
-		return
-	}
-	return
 }
 
 func isInvalidWorkspacePath(absPath string) bool {

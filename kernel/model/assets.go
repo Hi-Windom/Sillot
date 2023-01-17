@@ -197,7 +197,6 @@ func NetImg2LocalAssets(rootID string) (err error) {
 		if err = writeJSONQueue(tree); nil != err {
 			return
 		}
-		sql.WaitForWritingDatabase()
 		util.PushUpdateMsg(msgId, fmt.Sprintf(Conf.Language(120), files), 5000)
 	} else {
 		util.PushUpdateMsg(msgId, Conf.Language(121), 3000)
@@ -636,11 +635,18 @@ func UnusedAssets() (ret []string) {
 		}
 	}
 
-	// 排除文件注解和对应文件
 	var toRemoves []string
 	for asset, _ := range assetsPathMap {
 		if strings.HasSuffix(asset, ".sya") {
+			// 排除文件注解和对应文件
 			toRemoves = append(toRemoves, asset, strings.TrimSuffix(asset, ".sya"))
+			continue
+		}
+
+		if strings.HasSuffix(asset, "ocr-texts.json") {
+			// 排除 OCR 结果文本
+			toRemoves = append(toRemoves, asset)
+			continue
 		}
 	}
 	for _, toRemove := range toRemoves {

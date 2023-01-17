@@ -27,7 +27,8 @@ import {showMessage} from "../dialog/message";
 import {editor} from "../config/editor";
 import {goBack, goForward} from "./backForward";
 import {replaceLocalPath} from "../editor/rename";
-import {getWorkspaceName, workspaceMenu} from "../menus/workspace";
+import {workspaceMenu} from "../menus/workspace";
+import { getWorkspaceName } from "./noRelyPCFunction";
 
 const matchKeymap = (keymap: Record<string, IKeymapItem>, key1: "general" | "editor", key2?: "general" | "insert" | "heading" | "list" | "table") => {
     if (key1 === "general") {
@@ -179,7 +180,8 @@ export const onGetConfig = (isStart: boolean) => {
 };
 
 const initBar = () => {
-    document.querySelector(".toolbar").innerHTML = `
+    const toolbar = document.getElementById("toolbar");
+    toolbar.innerHTML = `
 <div id="barWorkspace" class="toolbar__item">
     <span class="toolbar__text">${getWorkspaceName()}</span>
     <svg class="toolbar__svg"><use xlink:href="#iconDown"></use></svg>
@@ -198,17 +200,14 @@ const initBar = () => {
 <div id="barSearch" class="toolbar__item b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.globalSearch} ${updateHotkeyTip(window.siyuan.config.keymap.general.globalSearch.custom)}">
     <svg><use xlink:href="#iconSearch"></use></svg>
 </div>
-<div id="barSetting" class="toolbar__item b3-tooltips b3-tooltips__sw${window.siyuan.config.readonly ? " fn__none" : ""}" aria-label="${window.siyuan.languages.config} ${updateHotkeyTip(window.siyuan.config.keymap.general.config.custom)}">
-    <svg><use xlink:href="#iconSettings"></use></svg>
-</div>
-<div id="barReadonly" class="toolbar__item b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.use} ${window.siyuan.config.editor.readOnly ? window.siyuan.languages.editMode : window.siyuan.languages.editReadonly} ${updateHotkeyTip(window.siyuan.config.keymap.general.editMode.custom)}">
+<div id="barReadonly" class="toolbar__item b3-tooltips b3-tooltips__sw${window.siyuan.config.editor.readOnly ? " toolbar__item--active" : ""}" aria-label="${window.siyuan.languages.use} ${window.siyuan.config.editor.readOnly ? window.siyuan.languages.editMode : window.siyuan.languages.editReadonly} ${updateHotkeyTip(window.siyuan.config.keymap.general.editMode.custom)}">
     <svg><use xlink:href="#icon${window.siyuan.config.editor.readOnly ? "Preview" : "Edit"}"></use></svg>
 </div>
 <div id="barMode" class="toolbar__item b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.appearanceMode}">
     <svg><use xlink:href="#icon${window.siyuan.config.appearance.modeOS ? "Mode" : (window.siyuan.config.appearance.mode === 0 ? "Light" : "Dark")}"></use></svg>
 </div>
 <div class="fn__flex" id="windowControls"></div>`;
-    document.querySelector(".toolbar").addEventListener("click", (event: MouseEvent) => {
+    toolbar.addEventListener("click", (event: MouseEvent) => {
         let target = event.target as HTMLElement;
         while (!target.classList.contains("toolbar")) {
             if (target.id === "barBack") {
@@ -232,7 +231,13 @@ const initBar = () => {
                 event.stopPropagation();
                 break;
             } else if (target.id === "barMode") {
+                if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
+                    window.siyuan.menus.menu.element.getAttribute("data-name") === "barmode") {
+                    window.siyuan.menus.menu.remove();
+                    return;
+                }
                 window.siyuan.menus.menu.remove();
+                window.siyuan.menus.menu.element.setAttribute("data-name", "barmode");
                 window.siyuan.menus.menu.append(new MenuItem({
                     label: window.siyuan.languages.themeLight,
                     icon: "iconLight",
@@ -258,11 +263,7 @@ const initBar = () => {
                     }
                 }).element);
                 const rect = target.getBoundingClientRect();
-                window.siyuan.menus.menu.popup({x: rect.left, y: rect.bottom});
-                event.stopPropagation();
-                break;
-            } else if (target.id === "barSetting") {
-                openSetting();
+                window.siyuan.menus.menu.popup({x: rect.right, y: rect.bottom}, true);
                 event.stopPropagation();
                 break;
             } else if (target.id === "toolbarVIP") {
@@ -344,6 +345,13 @@ const initWindow = () => {
                 });
                 ipcRenderer.send(Constants.SIYUAN_SHOW, getCurrentWindow().id);
             }
+        });
+    });
+    ipcRenderer.on(Constants.SIYUAN_LOCK_SCREEN, () => {
+        exportLayout(false, () => {
+            fetchPost("/api/system/logoutAuth", {}, () => {
+                window.location.reload();
+            });
         });
     });
     ipcRenderer.on(Constants.SIYUAN_SAVE_CLOSE, (event, close) => {
@@ -463,8 +471,18 @@ const initWindow = () => {
         }
         return;
     }
-    const controlsElement = document.querySelector("#windowControls");
     document.body.classList.add("body--win32");
+
+    //添加应用图标
+    const toolbar = document.getElementById("toolbar");
+    toolbar.insertAdjacentHTML("afterbegin", `<div class="toolbar__item" id="windowAppIcon">
+    <svg>
+        <use xlink:href="#iconSiYuan"></use>
+    </svg>
+</div>`);
+
+    //添加窗口控件
+    const controlsElement = document.getElementById("windowControls");
     controlsElement.innerHTML = `<div class="toolbar__item b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.min}" id="minWindow">
     <svg>
         <use xlink:href="#iconMin"></use>

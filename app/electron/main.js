@@ -52,10 +52,8 @@ try {
   }
 } catch (e) {
   console.error(e)
-  require('electron').
-    dialog.
-    showErrorBox('创建配置目录失败 Failed to create config directory',
-      '思源需要在用户家目录下创建配置文件夹（~/.config/siyuan），请确保该路径具有写入权限。\n\nSiYuan needs to create a configuration folder (~/.config/siyuan) in the user\'s home directory. Please make sure that the path has write permissions.')
+  require('electron').dialog.showErrorBox('创建配置目录失败 Failed to create config directory',
+    '思源需要在用户家目录下创建配置文件夹（~/.config/siyuan），请确保该路径具有写入权限。\n\nSiYuan needs to create a configuration folder (~/.config/siyuan) in the user\'s home directory. Please make sure that the path has write permissions.')
   app.exit()
 }
 
@@ -352,7 +350,21 @@ const boot = () => {
   })
 }
 
-const initKernel = (workspace, lang) => {
+const showWindow = (wnd) => {
+  if (!wnd || wnd.isDestroyed()) {
+    return
+  }
+
+  if (wnd.isMinimized()) {
+    wnd.restore()
+  }
+  if (!wnd.isVisible()) {
+    wnd.show()
+  }
+  wnd.focus()
+}
+
+const initKernel = (workspace, port, lang) => {
   return new Promise(async (resolve) => {
     bootWindow = new BrowserWindow({
       width: screen.getPrimaryDisplay().size.width / 2,
@@ -378,22 +390,26 @@ const initKernel = (workspace, lang) => {
     }
 
     if (!isDevEnv || workspaces.length > 0) {
-      const getAvailablePort = () => {
-        // https://gist.github.com/mikeal/1840641
-        return new Promise((portResolve, portReject) => {
-          const server = net.createServer()
-          server.on('error', error => {
-            writeLog(error)
-            kernelPort = ''
-            portReject()
+      if (port && "" !== port) {
+        kernelPort = port
+      } else {
+        const getAvailablePort = () => {
+          // https://gist.github.com/mikeal/1840641
+          return new Promise((portResolve, portReject) => {
+            const server = net.createServer()
+            server.on('error', error => {
+              writeLog(error)
+              kernelPort = ''
+              portReject()
+            })
+            server.listen(0, () => {
+              kernelPort = server.address().port
+              server.close(() => portResolve(kernelPort))
+            })
           })
-          server.listen(0, () => {
-            kernelPort = server.address().port
-            server.close(() => portResolve(kernelPort))
-          })
-        })
+        }
+        await getAvailablePort()
       }
-      await getAvailablePort()
     }
     writeLog('got kernel port [' + kernelPort + ']')
     if (!kernelPort) {
@@ -405,10 +421,13 @@ const initKernel = (workspace, lang) => {
     if (isDevEnv && workspaces.length === 0) {
       cmds.push('--mode', 'dev')
     }
-    if (workspace) {
+    if (workspace && "" !== workspace) {
       cmds.push('--workspace', workspace)
     }
-    if (lang) {
+    if (port && "" !== port) {
+      cmds.push('--port', port)
+    }
+    if (lang && "" !== lang) {
       cmds.push('--lang', lang)
     }
     let cmd = `ui version [${appVer}], booting kernel [${kernelPath} ${cmds.join(
@@ -428,8 +447,7 @@ const initKernel = (workspace, lang) => {
         kernelPort + ']')
 
       kernelProcess.on('close', (code) => {
-        writeLog(
-          `kernel [pid=${kernelProcessPid}] exited with code [${code}]`)
+        writeLog(`kernel [pid=${kernelProcessPid}] exited with code [${code}]`)
         if (0 !== code) {
           switch (code) {
             case 20:
@@ -454,7 +472,11 @@ const initKernel = (workspace, lang) => {
                 '⚠️ 无法读写块树文件 Failed to access blocktree file',
                 `<div>块树文件正在被其他程序锁定或者已经损坏，请删除 工作空间/temp/ 文件夹后重启</div><div>The block tree file is being locked by another program or is corrupted, please delete the workspace/temp/ folder and restart.</div>`)
               break
-            case 24:
+            case 24: // 工作空间已被锁定，尝试切换到第一个打开的工作空间
+              if (workspaces && 0 < workspaces.length) {
+                showWindow(workspaces[0].browserWindow)
+              }
+
               showErrorWindow(
                 '⚠️ 工作空间已被锁定 The workspace is locked',
                 `<div>该工作空间正在被使用。</div><div>The workspace is in use.</div>`)
@@ -567,7 +589,7 @@ app.whenReady().then(() => {
           ? lang.hideWindow
           : lang.showWindow,
         click: () => {
-          showHideWnd(tray, lang, mainWindow)
+          showHideWindow(tray, lang, mainWindow)
         },
       },
       {
@@ -617,7 +639,8 @@ app.whenReady().then(() => {
     const contextMenu = Menu.buildFromTemplate(trayMenuTemplate)
     tray.setContextMenu(contextMenu)
   }
-  const showHideWnd = (tray, lang, mainWindow) => {
+
+  const showHideWindow = (tray, lang, mainWindow) => {
     if (!mainWindow.isVisible()) {
       if (mainWindow.isMinimized()) {
         mainWindow.restore()
@@ -634,14 +657,7 @@ app.whenReady().then(() => {
     app.exit()
   })
   ipcMain.on('siyuan-show', (event, id) => {
-    const mainWindow = BrowserWindow.fromId(id)
-    if (mainWindow.isMinimized()) {
-      mainWindow.restore()
-    }
-    if (!mainWindow.isVisible()) {
-      mainWindow.show()
-    }
-    mainWindow.focus()
+    showWindow(BrowserWindow.fromId(id))
   })
   ipcMain.on('siyuan-config-tray', (event, data) => {
     workspaces.find(item => {
@@ -659,6 +675,17 @@ app.whenReady().then(() => {
   })
   ipcMain.on('siyuan-export-close', (event, id) => {
     BrowserWindow.fromId(id).webContents.send('siyuan-export-close', id)
+  })
+  ipcMain.on('siyuan-export-prevent', (event, id) => {
+    BrowserWindow.fromId(id).webContents.on('will-navigate', (event, url) => {
+      const currentURL = new URL(event.sender.getURL())
+      if (url.startsWith(getServer(currentURL.port))) {
+        return
+      }
+
+      event.preventDefault()
+      shell.openExternal(url)
+    })
   })
   ipcMain.on('siyuan-quit', (event, id) => {
     const mainWindow = BrowserWindow.fromId(id)
@@ -701,21 +728,14 @@ app.whenReady().then(() => {
     }
   })
   ipcMain.on('siyuan-open-workspace', (event, data) => {
-    const exitWorkspace = workspaces.find((item, index) => {
+    const foundWorkspace = workspaces.find((item, index) => {
       if (item.workspaceDir === data.workspace) {
-        const mainWindow = item.browserWindow
-        if (mainWindow.isMinimized()) {
-          mainWindow.restore()
-        }
-        if (!mainWindow.isVisible()) {
-          mainWindow.show()
-        }
-        mainWindow.focus()
+        showWindow(item.browserWindow)
         return true
       }
     })
-    if (!exitWorkspace) {
-      initKernel(data.workspace, data.lang).then((isSucc) => {
+    if (!foundWorkspace) {
+      initKernel(data.workspace, "", data.lang).then((isSucc) => {
         if (isSucc) {
           boot()
         }
@@ -739,7 +759,7 @@ app.whenReady().then(() => {
       const mainWindow = BrowserWindow.fromId(data.id)
       resetTrayMenu(tray, data.languages, mainWindow)
       tray.on('click', () => {
-        showHideWnd(tray, data.languages, mainWindow)
+        showHideWindow(tray, data.languages, mainWindow)
       })
     }
     workspaces.find(item => {
@@ -776,6 +796,12 @@ app.whenReady().then(() => {
           resetTrayMenu(item.tray, data.languages, mainWindow)
         }
       })
+    })
+  })
+
+  ipcMain.on('siyuan-lock-screen', () => {
+    workspaces.forEach(item => {
+      item.browserWindow.webContents.send('siyuan-lock-screen')
     })
   })
 
@@ -816,7 +842,7 @@ app.whenReady().then(() => {
     firstOpenWindow.show()
     // 初始化启动
     ipcMain.on('siyuan-first-init', (event, data) => {
-      initKernel(data.workspace, data.lang).then((isSucc) => {
+      initKernel(data.workspace, "", data.lang).then((isSucc) => {
         if (isSucc) {
           boot()
         }
@@ -826,8 +852,8 @@ app.whenReady().then(() => {
   } else {
     const getArg = (name) => {
       for (let i = 0; i < process.argv.length; i++) {
-        if (process.argv[i] === name) {
-          return process.argv[i + 1]
+        if (process.argv[i].startsWith(name)) {
+          return process.argv[i].split('=')[1]
         }
       }
     }
@@ -836,7 +862,11 @@ app.whenReady().then(() => {
     if (workspace) {
       writeLog('got arg [--workspace=' + workspace + ']')
     }
-    initKernel(workspace).then((isSucc) => {
+    const port = getArg('--port')
+    if (port) {
+      writeLog('got arg [--port=' + port + ']')
+    }
+    initKernel(workspace, port, "").then((isSucc) => {
       if (isSucc) {
         boot()
       }
@@ -854,13 +884,50 @@ app.on('open-url', (event, url) => { // for macOS
   }
 })
 
-app.on('second-instance', (event, commandLine) => {
-  workspaces.forEach(item => {
+app.on('second-instance', (event, argv) => {
+  writeLog('second-instance [' + argv + ']')
+  let workspace = argv.find((arg) => arg.startsWith('--workspace='))
+  if (workspace) {
+    workspace = workspace.split('=')[1]
+    writeLog('got second-instance arg [--workspace=' + workspace + ']')
+  }
+  let port = argv.find((arg) => arg.startsWith('--port='))
+  if (port) {
+    port = port.split('=')[1]
+    writeLog('got second-instance arg [--port=' + port + ']')
+  } else {
+    port = 0
+  }
+  const foundWorkspace = workspaces.find(item => {
     if (item.browserWindow && !item.browserWindow.isDestroyed()) {
-      item.browserWindow.webContents.send('siyuan-openurl',
-        commandLine.find((arg) => arg.startsWith('siyuan://')))
+      if (workspace && workspace === item.workspaceDir) {
+        showWindow(item.browserWindow)
+        return true
+      }
     }
   })
+  if (foundWorkspace) {
+    return
+  }
+  if (workspace) {
+    initKernel(workspace, port, "").then((isSucc) => {
+      if (isSucc) {
+        boot()
+      }
+    })
+    return
+  }
+
+  const siyuanURL = argv.find((arg) => arg.startsWith('siyuan://'))
+  workspaces.forEach(item => {
+    if (item.browserWindow && !item.browserWindow.isDestroyed() && siyuanURL) {
+      item.browserWindow.webContents.send('siyuan-openurl', siyuanURL)
+    }
+  })
+
+  if (!siyuanURL && 0 < workspaces.length) {
+    showWindow(workspaces[0].browserWindow)
+  }
 })
 
 app.on('activate', () => {

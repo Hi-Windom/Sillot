@@ -21,6 +21,7 @@ export abstract class Constants {
 
     // 渲染进程调主进程
     public static readonly SIYUAN_SHOW: string = "siyuan-show";
+    public static readonly SIYUAN_LOCK_SCREEN: string = "siyuan-lock-screen";
     public static readonly SIYUAN_CONFIG_TRAY: string = "siyuan-config-tray";
     public static readonly SIYUAN_OPEN_WORKSPACE: string = "siyuan-open-workspace";
     public static readonly SIYUAN_QUIT: string = "siyuan-quit";
@@ -30,6 +31,7 @@ export abstract class Constants {
     public static readonly SIYUAN_SAVE_CLOSE: string = "siyuan-save-close";
     public static readonly SIYUAN_EXPORT_PDF: string = "siyuan-export-pdf";
     public static readonly SIYUAN_EXPORT_CLOSE: string = "siyuan-export-close";
+    public static readonly SIYUAN_EXPORT_PREVENT: string = "siyuan-export-prevent";
 
     // size
     public static readonly SIZE_TOOLBAR_HEIGHT: number = 42;

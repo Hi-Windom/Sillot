@@ -22,7 +22,6 @@
 @import "card";
 @import "menu";
 @import "color";
-@import "responsive";
 // un refactor
 @import "protyle";
 @import "typography";
@@ -182,6 +181,18 @@ progressLoading: 400
     padding-left: 0;
   }
 
+  #windowAppIcon {
+    -webkit-app-region: drag;
+    width: 42px;
+    margin-left: 1px;
+    justify-content: center;
+    color: #fff;
+
+    &:hover {
+      color: var(--b3-theme-on-background);
+    }
+  }
+
   #windowControls {
     top: 0;
     z-index: 502;
@@ -214,7 +225,7 @@ progressLoading: 400
     align-self: center;
     background-color: transparent;
     border: 0;
-    line-height: 14px;
+    line-height: 13.5px;
 
     &:not(.toolbar__item--disabled):not(.toolbar__item--close):hover,
     &--active {
@@ -223,13 +234,13 @@ progressLoading: 400
     }
 
     svg {
-      height: 14px;
-      width: 14px;
+      height: 13.5px;
+      width: 13.5px;
     }
 
     svg.toolbar__svg {
       width: 8px;
-      height: 14px;
+      height: 13.5px;
       margin-left: 4px;
     }
 
@@ -253,6 +264,7 @@ progressLoading: 400
   }
 
   &__text {
+    font-size: 12px;
     max-width: 96px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -269,7 +281,6 @@ progressLoading: 400
   line-height: 32px;
   border-top: .5px solid var(--b3-border-color);
   padding: 0 5px;
-  font-size: 12px;
 
   .toolbar__item {
     color: var(--b3-theme-on-surface);
@@ -281,18 +292,17 @@ progressLoading: 400
     text-overflow: ellipsis;
     overflow: hidden;
     padding-left: 5px;
+    font-size: 12px;
   }
 
   &__counter {
     display: flex;
     flex-shrink: 0;
+    font-size: 12px;
   }
 
-  #barDock,
-  #barHelp {
-    .b3-menu__item:hover {
-      background-color: var(--b3-list-hover);
-    }
+  #barDock .b3-menu__item:hover {
+    background-color: var(--b3-list-hover);
   }
 
   .fn__space:last-child {
@@ -586,3 +596,6 @@ progressLoading: 400
     margin-top: 7px;
   }
 }
+
+// 需放置最后，否则 https://github.com/siyuan-note/siyuan/issues/7056
+@import "responsive";
