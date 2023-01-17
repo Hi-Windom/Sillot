@@ -1,0 +1,97 @@
+.search__layout {
+  flex-direction: row;
+  max-width: 100%;
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column,
+/* 固定搜索 */
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column {
+  flex-direction: row !important;
+  flex-wrap: wrap;
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column .search__header,
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column .b3-form__space--small,
+.b3-dialog__container[style*="80vw"] .search__header,
+.b3-dialog__container[style*="80vw"] .b3-form__space--small {
+  width: 100%;
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column .b3-form__space--small,
+.b3-dialog__container[style*="80vw"] .b3-form__space--small {
+  margin: 0;
+  padding: 13px 22px 13px 15px;
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column #searchList,
+.b3-dialog__container[style*="80vw"] #searchList {
+  float: left;
+  margin-right: 3px;
+  border-right: 2px ridge #58585813;
+  width: max(58%, 700px);
+}
+
+.spread-search__preview {
+  border-top: none;
+}
+
+/* CTRL + F 为空时保持高度 */
+/* .layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column #searchList,
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column #searchPreview:not(.fullscreen),
+.b3-dialog__container[style*="80vw"] #searchList,
+.b3-dialog__container[style*="80vw"] #searchPreview:not(.fullscreen) {
+  height: calc(100% - 50px - 53px) !important;
+} */
+
+.search__layout {
+  height: calc(100% - 80px);
+}
+
+#searchList div[data-type="search-item"]>.b3-list-item__text,
+#searchList div[data-type="search-item"] .b3-list-item__meta {
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: inherit;
+  padding: 0;
+  line-height: 1.31;
+  opacity: .88;
+  letter-spacing: 0.13px;
+}
+
+#searchList div[data-type="search-item"]>.b3-list-item__text {
+  font-size: 87%;
+  text-align: left;
+  margin: 5px 0 2px 0;
+}
+
+#searchList div[data-type="search-item"] .b3-list-item__meta {
+  text-align: right;
+}
+
+
+div[data-type="search-item"] .b3-list-item__meta {
+  font-size: .75rem;
+  /* direction: rtl; */
+  margin-left: 31px;
+  max-width: 58% !important;
+}
+
+#searchList div[data-type="search-item"]>.b3-list-item__text svg {
+  margin: 0;
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column:has(#searchPreview.fullscreen) .search__header,
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column:has(#searchPreview.fullscreen) .search__header {
+  z-index: 1 !important;
+}
+
+#searchResult:not(:empty)::before {
+  content: "LR1 🎯" !important;
+  padding: 0 6px;
+}
+
+#searchResult:not(:empty) {
+  margin-left: -7px;
+}

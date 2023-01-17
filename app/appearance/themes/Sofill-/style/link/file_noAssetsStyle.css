@@ -1,0 +1,32 @@
+.p a[href^="file://"][href$=".pdf"]:not(:empty)::before,
+span[data-type~=a][data-href^="file://"][data-href$=".pdf"]:not(:empty)::before {
+  content: "";
+  background-image: url("file_noAssetsStyle/pdf.png") !important;
+}
+.p a[href^="file://"][href$=".doc"]:not(:empty)::before,
+.p a[href^="file://"][href$=".docx"]:not(:empty)::before,
+span[data-type~=a][data-href^="file://"][data-href$=".doc"]:not(:empty)::before,
+span[data-type~=a][data-href^="file://"][data-href$=".docx"]:not(:empty)::before {
+  content: "";
+  background-image: url("file_noAssetsStyle/word.png") !important;
+}
+.p a[href^="file://"][href$=".xls"]:not(:empty)::before,
+.p a[href^="file://"][href$=".xlsx"]:not(:empty)::before,
+.p a[href^="file://"][href$=".xlsm"]:not(:empty)::before,
+.p a[href^="file://"][href$=".xlsb"]:not(:empty)::before,
+span[data-type~=a][data-href^="file://"][data-href$=".xls"]:not(:empty)::before,
+span[data-type~=a][data-href^="file://"][data-href$=".xlsx"]:not(:empty)::before,
+span[data-type~=a][data-href^="file://"][data-href$=".xlsm"]:not(:empty)::before,
+span[data-type~=a][data-href^="file://"][data-href$=".xlsb"]:not(:empty)::before {
+  content: "";
+  background-image: url("file_noAssetsStyle/excel.png") !important;
+}
+.p a[href^="file://"][href$=".ppt"]:not(:empty)::before,
+.p a[href^="file://"][href$=".pptx"]:not(:empty)::before,
+.p a[href^="file://"][href$=".pptm"]:not(:empty)::before,
+span[data-type~=a][data-href^="file://"][data-href$=".ppt"]:not(:empty)::before,
+span[data-type~=a][data-href^="file://"][data-href$=".pptx"]:not(:empty)::before,
+span[data-type~=a][data-href^="file://"][data-href$=".pptm"]:not(:empty)::before {
+  content: "";
+  background-image: url("file_noAssetsStyle/ppt.png") !important;
+}

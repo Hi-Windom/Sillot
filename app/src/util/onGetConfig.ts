@@ -472,6 +472,8 @@ const initWindow = () => {
         return;
     }
     document.body.classList.add("body--win32");
+    document.body.classList.add("branch--Sillot");
+
 
     //添加应用图标
     const toolbar = document.getElementById("toolbar");
@@ -483,6 +485,7 @@ const initWindow = () => {
 
     //添加窗口控件
     const controlsElement = document.getElementById("windowControls");
+
     controlsElement.innerHTML = `<div class="toolbar__item b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.min}" id="minWindow">
     <svg>
         <use xlink:href="#iconMin"></use>

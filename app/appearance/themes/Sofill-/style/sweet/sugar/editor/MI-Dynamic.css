@@ -1,0 +1,27 @@
+/* 文档页文档名下横线淡化 */
+#layouts>div.fn__flex.fn__flex-1 div.layout-tab-container.fn__flex-1 div.protyle-content>div.protyle-title.protyle-wysiwyg--attr #doc-underline {
+    transition-delay: 0.1s !important;
+    transition-duration: 1.31s !important;
+}
+
+#layouts>div.fn__flex.fn__flex-1 div.layout-tab-container.fn__flex-1 div.protyle-content>div.protyle-title.protyle-wysiwyg--attr:hover #doc-underline {
+    opacity: 1 !important;
+    transition-duration: .58s !important;
+}
+
+
+/* 文档页文档名输入框文本淡化 */
+#layouts>div.fn__flex.fn__flex-1 div.layout-tab-container.fn__flex-1 div.protyle-content>div.protyle-title.protyle-wysiwyg--attr>div.protyle-title__input {
+    opacity: 0.31;
+    transition-duration: 1.31s;
+}
+
+#layouts>div.fn__flex.fn__flex-1 div.layout-tab-container.fn__flex-1 div.protyle-content>div.protyle-title.protyle-wysiwyg--attr>div.protyle-title__input:hover {
+    opacity: 0.58;
+    transition-duration: 0.58s;
+}
+
+#layouts>div.fn__flex.fn__flex-1 div.layout-tab-container.fn__flex-1 div.protyle-content>div.protyle-title.protyle-wysiwyg--attr>div.protyle-title__input:focus {
+    opacity: 1;
+    transition-duration: 0.58s;
+}

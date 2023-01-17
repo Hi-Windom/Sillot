@@ -31,7 +31,10 @@ const fetch = require('electron-fetch').default
 process.noAsar = true
 const appDir = path.dirname(app.getAppPath())
 const isDevEnv = process.env.NODE_ENV === 'development'
-const appVer = app.getVersion()
+// const appVer = app.getVersion()
+const branchVer = app.getVersion()
+const pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString())
+const appVer = pkg["syv"]
 const confDir = path.join(app.getPath('home'), '.config', 'siyuan')
 const windowStatePath = path.join(confDir, 'windowState.json')
 let bootWindow

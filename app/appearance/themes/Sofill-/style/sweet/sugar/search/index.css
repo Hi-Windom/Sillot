@@ -1,0 +1,47 @@
+#searchList .b3-list-item__text:has(mark:nth-child(10)):before {
+  content: "9+";
+  font-size: 85%;
+  background-color: #58585831;
+  border-radius: 50%;
+  padding: 3px;
+  margin-right: 5px;
+}
+
+#searchList .b3-list-item__text:has(mark:nth-child(50)):before {
+  content: "49+";
+}
+
+#searchList .b3-list-item__text:has(mark:nth-child(100)):before {
+  content: "99+";
+}
+
+#searchList>.b3-list-item {
+  counter-increment: search-index;
+  counter-reset: search-index-2 0;
+}
+#searchList>div>.b3-list-item {
+  counter-increment: search-index-2;
+}
+
+#searchList>.b3-list-item:before {
+  content: counter(search-index);
+  font-size: 90%;
+  width: 26px;
+  opacity: .31;
+}
+#searchList>div>.b3-list-item:before {
+  content: "."counter(search-index-2);
+  font-size: 85%;
+  width: 36px;
+  opacity: .31;
+}
+
+#searchList {
+  counter-reset: search-index 0;
+  overflow-x: hidden;
+}
+
+/* 搜索匹配列表分组辅助线（需开启搜索面板标号） #639 */
+#searchList>.b3-list-item+div:not([data-type=search-item]) {
+  box-shadow: 57px 0 var(--b3-theme-background) inset,58px 0 var(--b3-theme-surface-lighter) inset !important;
+}

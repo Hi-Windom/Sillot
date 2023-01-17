@@ -1,0 +1,4 @@
+.sc-custom-nav>li[data-name="eHiWindom"],
+.sc-custom-nav>li[data-name="extension"] {
+  display: none !important;
+}

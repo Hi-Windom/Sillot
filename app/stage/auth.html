@@ -37,13 +37,15 @@
         }
 
         .b3-button {
-            margin: 16px 0;
-            width: 240px;
+            margin: 26px 0;
+            width: clamp(260px,58vw,380px);
             cursor: pointer;
             color: #fff;
             border-radius: 4px;
-            line-height: 20px;
-            padding: 4px 8px;
+            line-height: 1.86;
+            font-size: 1.13em;
+            letter-spacing: 0.31em;
+            padding: 5px 8px;
             white-space: nowrap;
             display: inline-flex;
             align-items: center;
@@ -91,12 +93,14 @@
          }
 
         .b3-text-filed {
-            width: 240px;
+            width: clamp(260px,58vw,380px);
             border: 0;
             border-radius: 4px;
-            box-shadow: inset 0 0 0 1px var(--b3-theme-on-surface);
-            padding: 4px 8px;
-            line-height: 20px;
+            box-shadow: inset 0 0 77px -58px var(--b3-theme-primary), 0 0 0 3px var(--b3-theme-primary-lightest);
+            padding: 0 13px;
+            line-height: 1.86;
+            letter-spacing: 0.2em;
+            font-size: 1.86em;
             box-sizing: border-box;
             color: var(--b3-theme-on-background);
             transition: box-shadow 120ms 0ms cubic-bezier(0, 0, 0.2, 1);
@@ -109,7 +113,7 @@
 
         .b3-text-filed:focus {
             outline: none;
-            box-shadow: inset 0 0 0 1px var(--b3-theme-primary), 0 0 0 3px var(--b3-theme-primary-lightest);
+            box-shadow: inset 0 0 77px -31px var(--b3-theme-primary), 0 0 0 7px var(--b3-theme-primary-lightest);
         }
 
         .b3-snackbar {

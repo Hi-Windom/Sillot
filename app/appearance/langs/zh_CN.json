@@ -287,7 +287,7 @@
   "changeIcon": "修改图标",
   "includeSubFile": "\n包含 x 个子文档",
   "untitled": "新文档",
-  "lockScreen": "锁屏",
+  "lockScreen": "锁定",
   "cloudIntro1": "端到端加密数据同步",
   "cloudIntro2": "加密和解密过程完全在本地设备上进行",
   "cloudIntro3": "加密算法为业界公认安全的 AES GCM",

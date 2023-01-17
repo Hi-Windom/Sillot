@@ -1,0 +1,42 @@
+@media screen and (min-width: 960px) {
+  #searchResult:not(:empty)::before {
+    content: "🎯";
+    opacity: .8;
+    padding: 0 3px;
+  }
+
+  .layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column:has(#searchList>.b3-list--empty):not(:has(#searchPathInput:empty), :has(>div>#searchPathInput>.search__rmpath.fn__none)) #searchResult:not(:empty)::after,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>div>.fn__flex-column:has(#searchList>.b3-list--empty):not(:has(#searchPathInput:empty), :has(>div>#searchPathInput>.search__rmpath.fn__none)) #searchResult:not(:empty)::after,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column:has(#searchList>.b3-list--empty):not(:has(#searchPathInput:empty), :has(>div>#searchPathInput>.search__rmpath.fn__none)) #searchResult:not(:empty)::after {
+    content: "|  💡指定路径是否正确？" !important;
+    opacity: .58;
+    padding: 0 6px 0 12px;
+  }
+
+  .layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column:has(#searchList>.b3-list--empty) #searchResult:not(:empty)::after,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>div>.fn__flex-column:has(#searchList>.b3-list--empty) #searchResult:not(:empty)::after,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column:has(#searchList>.b3-list--empty) #searchResult:not(:empty)::after {
+    content: "|  💡关键词是否正确？" !important;
+    opacity: .58;
+    padding: 0 6px 0 12px;
+  }
+
+  .layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column:not(:has(#searchPathInput:empty)):not(:has(>div>#searchPathInput>.search__rmpath.fn__none)):has(#searchList div:nth-child(99)) #searchResult:not(:empty)::after,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>div>.fn__flex-column:not(:has(#searchPathInput:empty)):not(:has(>div>#searchPathInput>.search__rmpath.fn__none)):has(#searchList div:nth-child(99)) #searchResult:not(:empty)::after,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column:not(:has(#searchPathInput:empty)):not(:has(>div>#searchPathInput>.search__rmpath.fn__none)):has(#searchList div:nth-child(99)) #searchResult:not(:empty)::after {
+    content: "|  💡试试更具体的搜索条件吧";
+    opacity: .58;
+    padding: 0 6px 0 12px;
+  }
+
+  .layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column:has(#searchPathInput:empty):has(#searchList div:nth-child(99)) #searchResult:not(:empty)::after,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>div>.fn__flex-column:has(#searchPathInput:empty):has(#searchList div:nth-child(99)) #searchResult:not(:empty)::after,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column:has(#searchPathInput:empty):has(#searchList div:nth-child(99)) #searchResult:not(:empty)::after,
+  .layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column:has(>div>#searchPathInput>.search__rmpath.fn__none):has(#searchList div:nth-child(99)) #searchResult:not(:empty)::after,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>div>.fn__flex-column:has(>div>#searchPathInput>.search__rmpath.fn__none):has(#searchList div:nth-child(99)) #searchResult:not(:empty)::after,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column:has(>div>#searchPathInput>.search__rmpath.fn__none):has(#searchList div:nth-child(99)) #searchResult:not(:empty)::after {
+    content: "|  💡试试指定路径吧";
+    opacity: .58;
+    padding: 0 6px 0 12px;
+  }
+}

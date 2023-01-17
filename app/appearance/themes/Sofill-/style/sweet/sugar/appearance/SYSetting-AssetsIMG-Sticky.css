@@ -1,0 +1,72 @@
+[data-name="image"]>.config-assets {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: scroll;
+  box-sizing: border-box;
+}
+
+[data-name="image"]>.config-assets>label:nth-of-type(1) {
+  position: sticky;
+  background-color: var(--b3-theme-background);
+  top: -26px;
+  padding: 13px;
+  z-index: 2;
+}
+
+[data-name="image"]>.config-assets>#assetsList {
+  overflow: auto;
+  flex: 1;
+  position: sticky;
+  top: -1000px;
+}
+
+[data-name="image"]>.config-assets>.config-assets__preview {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  flex: 1;
+  margin-top: 8px;
+  min-height: 58%;
+}
+
+[data-name="image"]>.config-assets>#assetsList>li {
+  border-radius: 13px;
+  border-left: 3px dotted var(--b3-theme-surface-lighter);
+  border-bottom: 1px dotted var(--b3-theme-surface-lighter);
+}
+
+@media (min-width: 1200px) {
+  [data-name="image"]>.config-assets>#assetsList {
+    column-count: 3;
+    min-height: 31%;
+  }
+
+  [data-name="image"]>.config-assets>.config-assets__preview {
+    min-height: 58%;
+  }
+}
+
+@media (min-width: 960px) and (max-width: 1200px) {
+  [data-name="image"]>.config-assets>#assetsList {
+    column-count: 2;
+    min-height: 38%;
+  }
+
+  [data-name="image"]>.config-assets>.config-assets__preview {
+    min-height: 58%;
+  }
+}
+
+@media (max-width: 960px) {
+  [data-name="image"]>.config-assets>#assetsList {
+    column-count: 1;
+    min-height: 58%;
+  }
+
+  [data-name="image"]>.config-assets>.config-assets__preview {
+    min-height: 31%;
+  }
+}

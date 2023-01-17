@@ -1,8 +1,9 @@
 {
-  "name": "SiYuan",
-  "version": "2.7.0",
+  "name": "Sillot",
+  "version": "0.1.8",
+  "syv": "2.7.0",
   "description": "Build Your Eternal Digital Garden",
-  "homepage": "https://b3log.org/siyuan",
+  "homepage": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
   "packageManager": "pnpm@7.18.1",
   "scripts": {
@@ -42,6 +43,11 @@
       "name": "Liyuan Li",
       "email": "84588990@qq.com",
       "url": "https://ld246.com/member/Vanessa"
+    },
+    {
+      "name": "Soltus",
+      "email": "694357845@qq.com",
+      "url": "https://ld246.com/member/soltus"
     }
   ],
   "devDependencies": {

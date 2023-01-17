@@ -1,0 +1,196 @@
+@media screen and (max-width: 1300px) {
+
+  .search__layout {
+    flex-direction: column;
+    max-width: 100%;
+  }
+
+  .fn__flex-column:has(#searchList) {
+    height: 88vh !important;
+  }
+
+  .spread-search__preview {
+    margin-top: 13px;
+    border-top: none;
+  }
+
+  body.android #searchList {
+    height: calc(58% - 69px) !important;
+  }
+
+  body:not(.android) #searchList {
+    height: calc(31% - 69px) !important;
+  }
+
+  #searchList:has(.b3-list-item:nth-of-type(6)) {
+    height: calc(58% - 69px) !important;
+  }
+
+  #searchList:has(.b3-list-item:nth-of-type(13)) {
+    height: calc(70% - 69px) !important;
+  }
+
+  #searchList>div[data-type="search-item"] {
+    min-height: 3.1rem;
+  }
+
+  #searchList div[data-type="search-item"]>.b3-list-item__text {
+    font-size: 87%;
+    text-align: left;
+    line-height: 1.68rem;
+  }
+
+  #searchList>div[data-type="search-item"]>.b3-list-item__text,
+  #searchList>div[data-type="search-item"]>.b3-list-item__graphic {
+    margin: -13px 0 1px 0;
+  }
+
+  #searchList [data-type=search-item].b3-list-item .b3-list-item__meta {
+    top: 2rem;
+    left: 24px;
+    line-height: 1rem;
+    max-width: 100%;
+    position: absolute;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: calc(100% - 16px);
+  }
+
+  #searchList .b3-list-item:before {
+    max-height: 3.1rem;
+  }
+}
+
+@media screen and (min-width: 1300px) {
+
+  .search__layout {
+    flex-direction: row;
+    max-width: 100%;
+  }
+
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+  }
+
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] .search__header,
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] .b3-form__space--small {
+    width: 100%;
+  }
+
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] .b3-form__space--small {
+    margin: 0;
+    padding: 13px 22px 13px 15px;
+  }
+
+  .b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] #searchList {
+    float: left;
+    margin-right: 3px;
+    border-right: 2px ridge #58585813;
+  }
+
+  body.android #searchList {
+    width: max(58%, 700px);
+  }
+
+  body:not(.android) .b3-dialog__container[style*="80vw"] #searchList {
+    width: max(31%, 580px);
+  }
+
+  .b3-dialog__container[style*="80vw"] #searchList:has(.b3-list-item:nth-of-type(13)) {
+    width: max(58%, 700px);
+  }
+
+  .spread-search__preview {
+    border-top: none;
+  }
+
+  /* CTRL + F 为空时保持高度 */
+  /* .b3-dialog__container[style*="80vw"] #searchList,
+  .b3-dialog__container[style*="80vw"] #searchPreview:not(.fullscreen) {
+    height: calc(100% - 50px - 53px) !important;
+  } */
+  .search__layout {
+    height: calc(100% - 80px);
+  }
+
+  .b3-dialog__container[style*="80vw"] #searchList div[data-type="search-item"]>.b3-list-item__text,
+  .b3-dialog__container[style*="80vw"] #searchList div[data-type="search-item"] .b3-list-item__meta {
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: inherit;
+    padding: 0;
+    line-height: 1.31;
+    opacity: .88;
+    letter-spacing: 0.13px;
+  }
+
+  .b3-dialog__container[style*="80vw"] #searchList div[data-type="search-item"]>.b3-list-item__text {
+    font-size: 87%;
+    text-align: left;
+    margin: 5px 0 2px 0;
+  }
+
+  .b3-dialog__container[style*="80vw"] #searchList div[data-type="search-item"] .b3-list-item__meta {
+    text-align: right;
+  }
+
+
+  div[data-type="search-item"] .b3-list-item__meta {
+    font-size: .75rem;
+    /* direction: rtl; */
+    margin-left: 31px;
+    max-width: 58% !important;
+  }
+
+  .b3-dialog__container[style*="80vw"] #searchList div[data-type="search-item"]>.b3-list-item__text svg {
+    margin: 0;
+  }
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column .search__header:has(#searchHistoryList:not(.fn__none))+.search__header,
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>div>.fn__flex-column .search__header:has(#searchHistoryList:not(.fn__none))+.search__header,
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column .search__header:has(#searchHistoryList:not(.fn__none))+.search__header {
+  z-index: 1 !important;
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column:has(#searchPreview.fullscreen):has(#searchHistoryList.fn__none) .search__header,
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>div>.fn__flex-column:has(#searchPreview.fullscreen):has(#searchHistoryList.fn__none) .search__header,
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column:has(#searchPreview.fullscreen):has(#searchHistoryList.fn__none) .search__header {
+  box-shadow: 3px 3px 3px -3px var(--b3-theme-secondary);
+  filter: brightness(1.08);
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column:has(#searchPreview.fullscreen) .search__header {
+  width: 40%;
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column:has(#searchPreview.fullscreen) .search__header .block__icons .block__icon:not(#searchReplace),
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>div>.fn__flex-column:has(#searchPreview.fullscreen) .search__header .block__icons .block__icon:not(#searchReplace),
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column:has(#searchPreview.fullscreen) .search__header .block__icons .block__icon:not(#searchReplace) {
+  pointer-events: none;
+  opacity: .13;
+}
+
+.layout__center .layout-tab-container>.fn__flex-1>.fn__flex-column>.search__header>.fn__a>.search__arrowdown,
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>div>.fn__flex-column>.search__header>.fn__a>.search__arrowdown,
+.b3-dialog--open[data-key] .b3-dialog__container[style*="80vw"] [style^="height"]:not(.b3-tab-container)>.fn__flex-column>.search__header>.fn__a>.search__arrowdown{
+  padding-left:1.3px;
+}
+
+#searchResult:not(:empty)::before {
+  content: "Auto 🎯" !important;
+  padding: 0 6px;
+}
+
+#searchResult:not(:empty) {
+  margin-left: -7px;
+}
+
+/* 不支持时隐藏，避免造成困惑 */
+#searchInclude:disabled {
+  display: none;
+}

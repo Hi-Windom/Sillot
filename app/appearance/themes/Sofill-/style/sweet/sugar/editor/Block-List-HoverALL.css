@@ -1,0 +1,4 @@
+/* 总控式 */
+.protyle-wysiwyg .list:hover [data-node-id].li:before {
+  border-left-color: var(--b3-scroll-color);
+}

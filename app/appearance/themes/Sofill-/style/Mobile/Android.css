@@ -1,0 +1,185 @@
+body.body--mobile #toolbarName {
+  width: 200px !important;
+}
+body.body--mobile #toolbarName:focus {
+  width: 217px !important;
+}
+body.body--mobile #toolbarName:focus + div {
+  display: none;
+}
+body.body--mobile.music-mode #toolbarName:not(:focus) {
+  opacity: 0.13;
+  filter: brightness(0.13) blur(22px);
+}
+body.body--mobile .toolbar.toolbar--border #toolbarMore {
+  margin-right: 8px;
+}
+body.android.client--siyuan svg {
+  min-height: 14px;
+  min-width: 14px;
+  scale: 1.5;
+}
+body.android div:not(.file-tree) .b3-list-item__action {
+  display: flex !important;
+}
+body.android .file-tree.sy__file ul.b3-list.b3-list--background > ul > ul li[data-type="navigation-file"] .counter.popover__block {
+  left: 0px;
+  position: absolute;
+  max-width: 25px;
+  margin-left: 1px;
+}
+body.android .file-tree.sy__file ul.b3-list.b3-list--background > ul > ul > ul > ul li[data-type="navigation-file"] .b3-list-item__action[data-type="more-file"] {
+  height: 22px;
+  padding: 0 4px;
+  left: 43px;
+  position: absolute;
+  display: inline-flex !important;
+  opacity: 0.58;
+}
+body.android .file-tree.sy__file ul.b3-list.b3-list--background > ul > ul > ul > ul > ul li[data-type="navigation-file"] .b3-list-item__action[data-type="new"] {
+  height: 22px;
+  padding: 0 4px;
+  left: 68px;
+  position: absolute;
+  display: inline-flex;
+  opacity: 0.58;
+}
+body.android .b3-menu__item {
+  margin: 3px;
+}
+@media (min-width: 960px) {
+  body.android.body--desktop .fn__size200 {
+    width: 150px;
+    min-width: 131px;
+  }
+}
+@media (max-width: 960px) {
+  body.android.body--desktop .fn__size200 {
+    width: 131px;
+    min-width: 131px;
+  }
+}
+body.android.body--desktop .fn__size200#copyKey {
+  letter-spacing: -0.5px;
+}
+body.android.body--desktop #keymapList > div.fn__flex > label:nth-child(3) > svg,
+body.android.body--desktop #searchByKey {
+  display: none;
+}
+body.android.body--desktop #barQuit:hover {
+  background-color: red;
+  color: var(--SCC-White);
+  border-radius: 31%;
+}
+body.body--mobile .b3-menu__icon,
+body.body--mobile .toolbar__icon,
+body.body--mobile .b3-list-item__graphic,
+body.body--mobile .protyle-breadcrumb__arrow,
+body.body--mobile .b3-list-item__arrow,
+body.body--mobile .b3-list-item__action > svg {
+  filter: drop-shadow(-2px 2px 2px #13131329);
+}
+body.body--mobile .side-panel {
+  background-color: var(--b3-theme-background-light);
+  opacity: var(--SCC-Variables-KeynesOpacity, 1);
+  backdrop-filter: blur(5.8px);
+}
+body.body--mobile #menu .b3-list-item--big {
+  padding: 13px;
+  margin: auto 13px !important;
+  font-size: 113%;
+  letter-spacing: 0.13px;
+}
+body.body--mobile #menu .b3-list-item--big .b3-list-item__graphic {
+  margin-right: 13px;
+  height: 20px;
+  width: 20px;
+}
+body.body--mobile #menu .b3-list-item--big .b3-list-item__graphic,
+body.body--mobile #menu .b3-list-item--big .b3-list-item__text {
+  align-self: center;
+  display: flex;
+}
+body.body--mobile #menu > #menuNewNotebook {
+  display: none;
+}
+body.body--mobile #menu > #menuHelp > svg,
+body.body--mobile #menu > #menuHelp > span {
+  color: var(--SCC-CNTC-墨灰);
+}
+body.body--mobile #menu > #menuAbout > svg,
+body.body--mobile #menu > #menuAbout > span {
+  color: var(--SCC-CNTC-宝蓝);
+}
+body.body--mobile #menu > #menuSafeQuit > svg,
+body.body--mobile #menu > #menuSafeQuit > span {
+  color: var(--SCC-CNTC-殷红);
+}
+body.body--mobile #historyContainer > .history__repo > .history__repoheader > select,
+body.body--mobile #historyContainer > .history__repo > .history__repoheader > div:nth-child(5),
+body.body--mobile #historyContainer > .history__repo > .history__repoheader > div:nth-child(5) > input {
+  width: 100%;
+}
+body.body--mobile #historyContainer > .history__repo > .history__repoheader > select,
+body.body--mobile #historyContainer > .history__repo > .history__repoheader > div:nth-child(5) {
+  margin: 5.8px;
+}
+body.body--mobile #searchPanel > .ft__smaller {
+  color: var(--b3-theme-primary);
+  filter: sepia(1);
+}
+body.body--mobile #searchPanel > .b3-list-item--two > .b3-list-item__first {
+  border-top: 1px dashed #858585a5;
+  margin-top: 1.3px;
+  padding-top: 3.1px;
+}
+body.body--mobile #searchPanel > .b3-list-item--two > .b3-list-item__first > .b3-list-item__graphic {
+  opacity: 0.58;
+}
+body.body--mobile #searchPanel > .b3-list-item--two > .b3-list-item__first > .b3-list-item__text {
+  -webkit-line-clamp: 3;
+  line-height: 1.6em;
+  letter-spacing: 0.31px;
+}
+body.body--mobile #searchPanel > .b3-list-item--two > .b3-list-item__first > .b3-list-item__text > mark {
+  font-size: 105%;
+  font-weight: 300;
+  padding: 1.3px 2px;
+  margin: 0 1.3px;
+  border-radius: 9px 13px 9px 13px;
+  filter: brightness(0.8);
+}
+body.body--mobile #searchPanel > .b3-list-item--two > .b3-list-item__meta {
+  line-height: 1.31em;
+  filter: brightness(0.58);
+  letter-spacing: 0.31px;
+  margin-left: 1.86em;
+}
+/* 代码块顶部添加风格元素 ，适配移动端 */
+body.body--mobile .code-block::after {
+  content: " ";
+  position: absolute;
+  background: #ff0000;
+  box-shadow: 13px 0 #0070c0, 26px 0 #ff3399, 39px 0 #912997;
+  border-radius: var(--b3-border-radius-round);
+  top: 10px;
+  left: 1px;
+  height: 3px;
+  width: 13px;
+  z-index: 1;
+}
+/* 代码块行号，适配移动端 */
+body.body--mobile .protyle-linenumber__rows {
+  padding: 22px 4px;
+  width: 1.3em;
+  margin-top: 16px;
+}
+body.body--mobile .protyle-linenumber {
+  margin-left: 1.3em;
+}
+body.body--mobile #sidebar .toolbar {
+  backdrop-filter: sepia(0.58) brightness(58);
+}
+body.body--mobile .custom-attr .fn__flex-center {
+  display: contents;
+}
