@@ -4,6 +4,31 @@ var fs = null;
 var oncePath = `${config.winsay_ROOT_ABS}/script/module/AlertOnce.js`;
 if (API.isDesktopAppMode()) {
   fs = require("fs");
+  new Promise(async function (response) {
+    if (document.body.classList.contains("branch--Sillot")) {
+      let testdata = {
+        f: "Sofill-CPuserData.json",
+      };
+      let rere = await API.getConfigesStore(testdata);
+      let y = await API.LocalStorage.init(
+        !API.isEmpty(rere),
+        rere.data.winsay,
+        "Sofill-CPuserData"
+      );
+      response(y);
+    }
+  }).then(function (response) {
+    console.log(response);
+    setTimeout(() => {
+      window.sofill.funs.loadScript(
+        window.sofill.funs.addURLParam(
+          "/appearance/themes/Sofill-/script/CP.js?r=" + Math.random()
+        ),
+        undefined,
+        true
+      );
+    }, 200);
+  });
 }
 
 window.sofill.ekits.gites = {
@@ -12,7 +37,7 @@ window.sofill.ekits.gites = {
 window.sofill.ekits.lnco = {};
 
 // 初始化获取用户配置
-let SC_winsay_cp_appearance__TabBarMode = localStorage.getItem(
+let SC_winsay_cp_appearance__TabBarMode = API.LocalStorage.getItem(
   "SC_winsay_cp_appearance__TabBarMode"
 );
 
@@ -119,7 +144,7 @@ switch (config.ThemeName) {
 var kernelVersion = window.siyuan.config.system.kernelVersion;
 var oldVersion = "2.6.1";
 var cv_result = API.compareVersion(oldVersion, kernelVersion);
-var AutoCheckSilently = localStorage.getItem(
+var AutoCheckSilently = API.LocalStorage.getItem(
   "SC_winsay_cp_search__about_AutoCheckSilently"
 );
 switch (cv_result) {
@@ -138,37 +163,59 @@ switch (cv_result) {
     break;
 }
 
-let inited = localStorage.getItem("SC_winsay_cp_inited");
+switch (API.compareVersion("2.7.0", kernelVersion)) {
+  case -1:
+  case 0:
+    window.sofill.funs.updateStyle(
+      "v2_7_0",
+      `/appearance/themes/Sofill-/VP/v2_7/v2_7_0.css`
+    );
+    window.sofill.funs.loadScript(
+      window.sofill.funs.addURLParam(
+        "/appearance/themes/Sofill-/VP/v2_7/v2_7_0.js"
+      ),
+      undefined,
+      true
+    );
+    break;
+  default:
+    break;
+}
+
+let inited = API.LocalStorage.getItem("SC_winsay_cp_inited");
 if (inited != "true") {
-  localStorage.setItem("SC_winsay_cp_system__SelfProtection", "true");
-  localStorage.setItem("SC_winsay_cp_editor__LH_Adaptive", "true");
-  localStorage.setItem("SC_winsay_cp_editor__ListAutoIndent", "true");
-  localStorage.setItem("SC_winsay_cp_editor__HintHint-index", "true");
-  localStorage.setItem("SC_winsay_cp_editor__BlockTable_FontSize", "92%");
-  localStorage.setItem(
+  API.LocalStorage.setItem("SC_winsay_cp_system__SelfProtection", "true");
+  API.LocalStorage.setItem("SC_winsay_cp_editor__LH_Adaptive", "true");
+  API.LocalStorage.setItem("SC_winsay_cp_editor__ListAutoIndent", "true");
+  API.LocalStorage.setItem("SC_winsay_cp_editor__HintHint-index", "true");
+  API.LocalStorage.setItem("SC_winsay_cp_editor__BlockTable_FontSize", "92%");
+  API.LocalStorage.setItem(
     "SC_winsay_cp_editor__Block-Inline-link__block-ref-content",
     "⁅⁅ ⁆⁆"
   );
-  localStorage.setItem(
+  API.LocalStorage.setItem(
     "SC_winsay_cp_editor__block__popover--open__PinSense",
     "1"
   );
-  localStorage.setItem(
+  API.LocalStorage.setItem(
     "SC_winsay_cp_appearance__ToolBarMode__NotFocus__bgColor",
     "var(--b3-theme-surface-lighter)"
   );
-  localStorage.setItem("SC_winsay_cp_appearance__ShowWebIcon", "true");
-  localStorage.setItem("SC_winsay_cp_appearance__ShowFileIcon", "true");
-  localStorage.setItem("SC_winsay_cp_appearance__status_msg_opacity", "0.9");
-  localStorage.setItem(
+  API.LocalStorage.setItem("SC_winsay_cp_appearance__ShowWebIcon", "true");
+  API.LocalStorage.setItem("SC_winsay_cp_appearance__ShowFileIcon", "true");
+  API.LocalStorage.setItem(
+    "SC_winsay_cp_appearance__status_msg_opacity",
+    "0.9"
+  );
+  API.LocalStorage.setItem(
     "SC_winsay_cp_appearance__strengthen_backlinkList_panel_border",
     "true"
   );
-  localStorage.setItem("SC_winsay_cp_filetree__Adaptive_display", "true");
-  localStorage.setItem("SC_winsay_cp_search__index", "true");
-  localStorage.setItem("SC_winsay_cp_search__layout", "layout-Auto.css");
+  API.LocalStorage.setItem("SC_winsay_cp_filetree__Adaptive_display", "true");
+  API.LocalStorage.setItem("SC_winsay_cp_search__index", "true");
+  API.LocalStorage.setItem("SC_winsay_cp_search__layout", "layout-Auto.css");
   //初始化完成
-  localStorage.setItem("SC_winsay_cp_inited", "true");
+  API.LocalStorage.setItem("SC_winsay_cp_inited", "true");
 }
 
 if (config.clientMode == "body--mobile") {

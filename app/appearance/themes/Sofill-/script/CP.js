@@ -5,6 +5,7 @@ import * as config from "./config.js";
 import { iterLC, iterDC } from "./module/SSS.js";
 var fs = null;
 var path = null;
+var CP_dialog = null;
 if (API.isDesktopAppMode()) {
   fs = require("fs");
   path = require("path");
@@ -22,7 +23,7 @@ var It_SelfProtector = null;
 var It_filterTimer = null;
 
 function switchlocalVersion() {
-  if (localStorage.getItem("SC_winsay_cp_about__checkAPI") == "Bazaar") {
+  if (API.LocalStorage.getItem("SC_winsay_cp_about__checkAPI") == "Bazaar") {
     return window.sofill.localVersion.useBazaar; // 简单省事,但是本地覆盖版本号不会生效
   } else {
     return window.sofill.localVersion.useGithub;
@@ -64,6 +65,33 @@ function getlocalVersion() {
   });
 }
 
+if (document.getElementById("SC-CP") == null) {
+  CP_dialog = new CPDialog({
+    isCancel: true,
+    dragable: false, //貌似可拖拽会有问题
+    maskable: true,
+  });
+}
+
+export function insertCPintro(dom, way, inID, classList) {
+  if (document.getElementById(inID) == null) {
+    const CDUI_1 = document.createElement("button");
+    CDUI_1.id = inID;
+    CDUI_1.className = classList;
+    CDUI_1.ariaLabel = "主题设置（实验性）";
+    CDUI_1.style.paddingRight = "0";
+    CDUI_1.innerHTML = `<svg class="b3-menu__icon Sofill-CDUI-btn__icon" "=""><use xlink:href="#iconSettings"></use></svg><span class="b3-menu__label">主题设置</span>`;
+    dom.insertAdjacentElement(way, CDUI_1);
+    document.getElementById(inID).onclick = function () {
+      CP_dialog.open();
+      getlocalVersion();
+      document
+        .getElementById("sofill_preview")
+        .setAttribute("src", `${config.THEME_ROOT}preview.png`);
+    };
+  }
+}
+
 if (config.clientMode == "body--mobile") {
   const leftPanel = document.getElementById("sidebar");
   const menu = document.getElementById("menu");
@@ -80,15 +108,10 @@ if (config.clientMode == "body--mobile") {
     CDUI_2.className = "Sofill-CDUI-btn b3-list-item b3-list-item--big";
     CDUI_2.innerHTML = `<span class="b3-list-item__icon b3-list-item__graphic">🏳️&zwj;🌈</span><span class="b3-list-item__text">主题设置</span>`;
     leftPanel.children[0].insertAdjacentElement("beforeend", CDUI_1);
-    let dialog = new CPDialog({
-      isCancel: true,
-      dragable: false, //貌似可拖拽会有问题
-      maskable: true,
-    });
     document
       .querySelector("#Sofill-CDUI-1")
       .addEventListener("click", (event) => {
-        dialog.open();
+        CP_dialog.open();
         getlocalVersion();
         event.stopPropagation();
       });
@@ -98,7 +121,7 @@ if (config.clientMode == "body--mobile") {
         document
           .querySelector("#Sofill-CDUI-2")
           .addEventListener("click", (event) => {
-            dialog.open();
+            CP_dialog.open();
             getlocalVersion();
             // event.stopPropagation();
           });
@@ -107,45 +130,64 @@ if (config.clientMode == "body--mobile") {
   }
 } else {
   var barhelp = document.querySelector("#barHelp");
-  barhelp.addEventListener(
-    "click",
-    (event) => {
-      if (
-        event.target.parentNode.parentNode.id == "toolbarVIP" ||
-        event.target.parentNode.parentNode.parentNode.id == "toolbarVIP"
-      ) {
-        document.querySelector("#toolbar #barSetting").click();
-        document
-          .querySelector(
-            '.b3-tab-bar:not(.sc-custom-nav) [data-name="account"]'
-          )
-          .click();
-        event.stopPropagation();
-      } else if (
-        event.target.parentNode.id == "barMode" ||
-        event.target.parentNode.parentNode.id == "barMode"
-      ) {
-        document.querySelector("#toolbar #barMode").click();
-        event.stopPropagation();
-      } else if (
-        event.target.parentNode.classList.contains("b3-menu__item") ||
-        event.target.parentNode.parentNode.classList.contains("b3-menu__item")
-      ) {
-        console.log(event.target.innerHTML);
-      } else if (
-        event.target.id == "barTopHelp" ||
-        event.target.parentNode.id == "barTopHelp"
-      ) {
-        event.target.id = "barHelp";
-      } else {
-        event.stopPropagation();
-      }
-    },
-    true
-  );
-  barhelp.setAttribute("class", "toolbar__item");
-  barhelp.children[0].innerHTML = `<use xlink:href="#iconMore"></use>`;
-  if (document.getElementById("sc_drawer") == null) {
+  if (barhelp) {
+    barhelp.addEventListener(
+      "click",
+      (event) => {
+        if (
+          event.target.parentNode.parentNode.id == "toolbarVIP" ||
+          event.target.parentNode.parentNode.parentNode.id == "toolbarVIP"
+        ) {
+          document.querySelector("#toolbar #barSetting").click();
+          document
+            .querySelector(
+              '.b3-tab-bar:not(.sc-custom-nav) [data-name="account"]'
+            )
+            .click();
+          event.stopPropagation();
+        } else if (
+          event.target.parentNode.id == "barMode" ||
+          event.target.parentNode.parentNode.id == "barMode"
+        ) {
+          document.querySelector("#toolbar #barMode").click();
+          event.stopPropagation();
+        } else if (
+          event.target.parentNode.classList.contains("b3-menu__item") ||
+          event.target.parentNode.parentNode.classList.contains("b3-menu__item")
+        ) {
+          console.log(event.target.innerHTML);
+        } else if (
+          event.target.id == "barTopHelp" ||
+          event.target.parentNode.id == "barTopHelp"
+        ) {
+          event.target.id = "barHelp";
+        } else {
+          event.stopPropagation();
+        }
+      },
+      true
+    );
+
+    barhelp.setAttribute("class", "toolbar__item");
+    barhelp.children[0].innerHTML = `<use xlink:href="#iconMore"></use>`;
+    insertCPintro(
+      barhelp.children[1],
+      "beforeend",
+      "Sofill-CDUI-1",
+      "Sofill-CDUI-btn b3-menu__item"
+    );
+  } else {
+    setTimeout(() => {
+      let inDom1 = document.querySelector("#barDock > .b3-menu");
+      insertCPintro(
+        inDom1.children[0],
+        "beforebegin",
+        "Sofill-CDUI-2",
+        "Sofill-CDUI-btn b3-menu__item"
+      );
+    }, 100);
+  }
+  if (barhelp && document.getElementById("sc_drawer") == null) {
     var drawer = document.createElement("div");
     drawer.id = "sc_drawer";
     drawer.style.display = "flex";
@@ -158,29 +200,8 @@ if (config.clientMode == "body--mobile") {
     barhelp.children[1].insertAdjacentElement("afterbegin", drawer);
   }
 
-  if (document.getElementById("Sofill-CDUI-1") == null) {
-    const CDUI_1 = document.createElement("button");
-    CDUI_1.id = "Sofill-CDUI-1";
-    CDUI_1.className = "Sofill-CDUI-btn b3-menu__item";
-    CDUI_1.ariaLabel = "主题设置（实验性）";
-    CDUI_1.style.paddingRight = "0";
-    CDUI_1.innerHTML = `<svg class="b3-menu__icon Sofill-CDUI-btn__icon" "=""><use xlink:href="#iconSettings"></use></svg><span class="b3-menu__label">主题设置</span>`;
-    barhelp.children[1].insertAdjacentElement("beforeend", CDUI_1);
-    let dialog = new CPDialog({
-      isCancel: true,
-      dragable: false, //貌似可拖拽会有问题
-      maskable: true,
-    });
-    document.querySelector("#Sofill-CDUI-1").onclick = function () {
-      dialog.open();
-      getlocalVersion();
-      document
-        .getElementById("sofill_preview")
-        .setAttribute("src", `${config.THEME_ROOT}preview.png`);
-    };
-  }
-
   if (document.querySelector("body.android.body--desktop")) {
+    // 为安卓pad端的主界面添加一个退出应用按钮 #758
     let icon = `<svg><use xlink:href="#iconQuit"></use></svg>`;
     let t = document.querySelector("#toolbar");
     let div = document.createElement("div");
@@ -225,7 +246,9 @@ async function checkUpdateViaGithub(v, q) {
   }).then(async function (response) {
     // console.log(response);
     let version = response["tag_name"];
-    let SVN = localStorage.getItem("SC_winsay_cp_about__AutoCheckIgnoreSVN");
+    let SVN = API.LocalStorage.getItem(
+      "SC_winsay_cp_about__AutoCheckIgnoreSVN"
+    );
     if (SVN == "true") {
       let x = v.split(".");
       x.splice(-1);
@@ -266,7 +289,7 @@ async function checkUpdateViaGithub(v, q) {
           "CoverWarming"
         ).innerHTML = `下载链接能否访问取决于你的网络`;
       });
-      localStorage.setItem("SC_winsay_latest_checked_version", version);
+      API.LocalStorage.setItem("SC_winsay_latest_checked_version", version);
     } else {
       if (q == false) {
         API.通知(`真棒👍，主题已是最新版本`, 800);
@@ -286,7 +309,10 @@ async function checkUpdateViaBazaar(v, q) {
   });
   if (API.compareVersion(mytheme.version, v) == 1) {
     console.warn("集市有新版本发布");
-    localStorage.setItem("SC_winsay_latest_checked_version", mytheme.version);
+    API.LocalStorage.setItem(
+      "SC_winsay_latest_checked_version",
+      mytheme.version
+    );
     API.通知(`集市有新版本发布：<br>${v} => ${mytheme.version}<br> `);
     updateTheme("Sofill-");
   } else {
@@ -302,7 +328,8 @@ function updateTheme(themeName) {
     !document.body.classList.contains("client--browser")
   ) {
     setTimeout(() => {
-      localStorage.getItem("SC_winsay_cp_about__AutoToUpdateMobile") == "true"
+      API.LocalStorage.getItem("SC_winsay_cp_about__AutoToUpdateMobile") ==
+      "true"
         ? window.open(
             `http://0.0.0.0:6806/stage/build/desktop/?action=next&name=update-winsay&args=${encodeURIComponent(
               window.siyuan.config.localIPs[0] + ":6806"
@@ -327,7 +354,7 @@ function updateTheme(themeName) {
 }
 
 async function checkUpdate(q = false) {
-  let mode = localStorage.getItem("SC_winsay_cp_about__checkAPI");
+  let mode = API.LocalStorage.getItem("SC_winsay_cp_about__checkAPI");
   let v = switchlocalVersion();
   switch (mode) {
     case "Github":
@@ -357,7 +384,7 @@ checkboxList.forEach(function (value) {
   API.checkedInit(value);
 });
 // 支持记忆主题设置界面 #499
-let navLatest = localStorage.getItem("SC_winsay_cp_custom-nav-bind-id");
+let navLatest = API.LocalStorage.getItem("SC_winsay_cp_custom-nav-bind-id");
 if (!API.isEmpty(navLatest)) {
   document.getElementById(navLatest).checked = "true";
 }
@@ -368,7 +395,7 @@ navList.forEach(function (value) {
   API.checkedChange(
     value,
     () => {
-      localStorage.setItem("SC_winsay_cp_custom-nav-bind-id", value.id);
+      API.LocalStorage.setItem("SC_winsay_cp_custom-nav-bind-id", value.id);
     },
     () => {}
   );
@@ -385,19 +412,19 @@ document
       success() {
         console.log("点击了确定");
         var counter = 0;
-        for (var i = 0; i < localStorage.length; i++) {
-          var key = localStorage.key(i);
+        for (var i = 0; i < API.LocalStorage.length; i++) {
+          var key = API.LocalStorage.key(i);
           if (key.startsWith("winsay_") || key.startsWith("SC_winsay_")) {
-            localStorage.removeItem(key);
+            API.LocalStorage.removeItem(key);
             console.log(`${key} removed`);
             counter++;
           }
         }
         // 简单粗暴的执行两次
-        for (var i = 0; i < localStorage.length; i++) {
-          var key = localStorage.key(i);
+        for (var i = 0; i < API.LocalStorage.length; i++) {
+          var key = API.LocalStorage.key(i);
           if (key.startsWith("winsay_") || key.startsWith("SC_winsay_")) {
-            localStorage.removeItem(key);
+            API.LocalStorage.removeItem(key);
             console.log(`${key} removed`);
             counter++;
           }
@@ -426,19 +453,19 @@ document
       success() {
         console.log("点击了确定");
         var counter = 0;
-        for (var i = 0; i < localStorage.length; i++) {
-          var key = localStorage.key(i);
+        for (var i = 0; i < API.LocalStorage.length; i++) {
+          var key = API.LocalStorage.key(i);
           if (key.startsWith("SC_winsay_cp")) {
-            localStorage.removeItem(key);
+            API.LocalStorage.removeItem(key);
             console.log(`${key} removed`);
             counter++;
           }
         }
         // 简单粗暴的执行两次
-        for (var i = 0; i < localStorage.length; i++) {
-          var key = localStorage.key(i);
+        for (var i = 0; i < API.LocalStorage.length; i++) {
+          var key = API.LocalStorage.key(i);
           if (key.startsWith("SC_winsay_cp")) {
-            localStorage.removeItem(key);
+            API.LocalStorage.removeItem(key);
             console.log(`${key} removed`);
             counter++;
           }
@@ -520,11 +547,11 @@ document
     jsonData.winsay = {};
     jsonData.sy_editor = {};
     jsonData.sy_keymap = {};
-    for (var i = 0; i < localStorage.length; i++) {
-      var key = localStorage.key(i);
+    for (var i = 0; i < API.LocalStorage.length; i++) {
+      var key = API.LocalStorage.key(i);
       if (key.startsWith("winsay_") || key.startsWith("SC_winsay_")) {
         try {
-          jsonData.winsay[key] = localStorage.getItem(key);
+          jsonData.winsay[key] = API.LocalStorage.getItem(key);
           ok++;
         } catch (e) {
           console.error(`${key} is not a valid value for ${e}`);
@@ -534,19 +561,21 @@ document
         }
       }
     }
-    let sy_editor = localStorage.getItem(
+    let sy_editor = API.LocalStorage.getItem(
       "SC_winsay_cp__exportData__EXT_sy_editor"
     );
     sy_editor == "true"
       ? (jsonData.sy_editor = window.siyuan.config.editor)
       : (jsonData.sy_editor = "禁用了附加这部分数据");
-    let sy_keymap = localStorage.getItem(
+    let sy_keymap = API.LocalStorage.getItem(
       "SC_winsay_cp__exportData__EXT_sy_keymap"
     );
     sy_keymap == "true"
       ? (jsonData.sy_keymap = window.siyuan.config.keymap)
       : (jsonData.sy_keymap = "禁用了附加这部分数据");
-    let sy_sync = localStorage.getItem("SC_winsay_cp__exportData__EXT_sy_sync");
+    let sy_sync = API.LocalStorage.getItem(
+      "SC_winsay_cp__exportData__EXT_sy_sync"
+    );
     sy_sync == "true"
       ? (() => {
           jsonData.sy_sync = window.siyuan.config.sync;
@@ -627,9 +656,9 @@ document
           if (name == "winsay") {
             for (var val in jsonStr[name]) {
               counter = counter + 1;
-              if (jsonStr[name][val] != localStorage.getItem(val)) {
+              if (jsonStr[name][val] != API.LocalStorage.getItem(val)) {
                 diff = diff + 1;
-                diffDetail[name][val] = `${localStorage.getItem(val)} => ${
+                diffDetail[name][val] = `${API.LocalStorage.getItem(val)} => ${
                   jsonStr[name][val]
                 }`;
               }
@@ -655,7 +684,7 @@ document
               if (name == "winsay") {
                 for (var val in jsonStr[name]) {
                   try {
-                    localStorage.setItem(val, jsonStr[name][val]);
+                    API.LocalStorage.setItem(val, jsonStr[name][val]);
                     ok = ok + 1;
                     console.warn(`${val} updated`);
                   } catch (e) {
@@ -705,7 +734,7 @@ document
     "SC_winsay_cp_editor__Block-Inline-link__block-ref-content_AsyncToSY"
   )
   .addEventListener("click", function () {
-    var i = localStorage.getItem(
+    var i = API.LocalStorage.getItem(
       "SC_winsay_cp_editor__Block-Inline-link__block-ref-content"
     );
     if (!API.isEmpty(i)) {
@@ -780,7 +809,7 @@ async function CP_EditorMonitor() {
   API.propChange(
     "SC_winsay_cp_editor__block__popover--open__PinSense",
     function () {
-      var i = localStorage.getItem(
+      var i = API.LocalStorage.getItem(
         "SC_winsay_cp_editor__block__popover--open__PinSense"
       );
       if (!API.isEmpty(i)) {
@@ -819,7 +848,9 @@ async function CP_EditorMonitor() {
     }
   );
   API.propChange("SC_winsay_cp_editor__BlockTable_MinWidth", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__BlockTable_MinWidth");
+    var i = API.LocalStorage.getItem(
+      "SC_winsay_cp_editor__BlockTable_MinWidth"
+    );
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-BlockTable-minWidth",
@@ -833,7 +864,9 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__BlockTable_MaxWidth", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__BlockTable_MaxWidth");
+    var i = API.LocalStorage.getItem(
+      "SC_winsay_cp_editor__BlockTable_MaxWidth"
+    );
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-BlockTable-maxWidth",
@@ -847,7 +880,9 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__BlockTable_FontSize", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__BlockTable_FontSize");
+    var i = API.LocalStorage.getItem(
+      "SC_winsay_cp_editor__BlockTable_FontSize"
+    );
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-BlockTable-fontSize",
@@ -861,7 +896,9 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__BlockTable_TextAlign", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__BlockTable_TextAlign");
+    var i = API.LocalStorage.getItem(
+      "SC_winsay_cp_editor__BlockTable_TextAlign"
+    );
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-BlockTable-text_align",
@@ -892,7 +929,7 @@ async function CP_EditorMonitor() {
   API.propChange(
     "SC_winsay_cp_editor__Block-List-LightUpLineMode",
     function () {
-      var i = localStorage.getItem(
+      var i = API.LocalStorage.getItem(
         "SC_winsay_cp_editor__Block-List-LightUpLineMode"
       );
       if (!API.isEmpty(i)) {
@@ -939,7 +976,7 @@ async function CP_EditorMonitor() {
   API.propChange(
     "SC_winsay_cp_editor__layout-center_protyle-toolbar_position",
     function () {
-      var i = localStorage.getItem(
+      var i = API.LocalStorage.getItem(
         "SC_winsay_cp_editor__layout-center_protyle-toolbar_position"
       );
       var j = API.isEmpty(i) ? "" : i;
@@ -950,7 +987,7 @@ async function CP_EditorMonitor() {
     }
   );
   API.propChange("SC_winsay_cp_editor__protyle-attr-scale", function () {
-    var h = localStorage.getItem("SC_winsay_cp_editor__protyle-attr-scale");
+    var h = API.LocalStorage.getItem("SC_winsay_cp_editor__protyle-attr-scale");
     if (!API.isEmpty(h)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-protyle-attr-scale",
@@ -960,7 +997,7 @@ async function CP_EditorMonitor() {
   });
   var SC_winsay_cp_editor__DocWidthMode__previousValue = "null";
   API.propChange("SC_winsay_cp_editor__DocWidthMode", function () {
-    var w = localStorage.getItem("SC_winsay_cp_editor__DocWidthMode");
+    var w = API.LocalStorage.getItem("SC_winsay_cp_editor__DocWidthMode");
     clearInterval(It_DocWidthMode);
     if (!API.isEmpty(w)) {
       SC_winsay_cp_editor__DocWidthMode__previousValue = w;
@@ -999,7 +1036,7 @@ async function CP_EditorMonitor() {
   });
   var t2 = null; // 声明计时器
   API.propChange("SC_winsay_cp_editor__Doc_bgColor", function () {
-    var w = localStorage.getItem("SC_winsay_cp_editor__Doc_bgColor");
+    var w = API.LocalStorage.getItem("SC_winsay_cp_editor__Doc_bgColor");
     clearInterval(t2);
     if (!API.isEmpty(w)) {
       t2 = setInterval(function () {
@@ -1018,7 +1055,7 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__ListAutoIndent_mode", function () {
-    var value = localStorage.getItem(
+    var value = API.LocalStorage.getItem(
       "SC_winsay_cp_editor__ListAutoIndent_mode"
     );
     if (!API.isEmpty(value) && value == "2") {
@@ -1051,10 +1088,10 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__img-bg-color", function () {
-    var value = localStorage.getItem("SC_winsay_cp_editor__img-bg-color");
+    var value = API.LocalStorage.getItem("SC_winsay_cp_editor__img-bg-color");
     if (!API.isEmpty(value)) {
       switch (
-        localStorage.getItem("SC_winsay_cp_editor__img-bg-color_always")
+        API.LocalStorage.getItem("SC_winsay_cp_editor__img-bg-color_always")
       ) {
         case "true":
           document.documentElement.style.setProperty(
@@ -1081,7 +1118,7 @@ async function CP_EditorMonitor() {
   API.checkedChange(
     document.getElementById("SC_winsay_cp_editor__img-bg-color_always"),
     () => {
-      var value = localStorage.getItem("SC_winsay_cp_editor__img-bg-color");
+      var value = API.LocalStorage.getItem("SC_winsay_cp_editor__img-bg-color");
       document.documentElement.style.setProperty(
         "--SCC-Variables-IMG-bg-color_hover",
         value
@@ -1092,7 +1129,7 @@ async function CP_EditorMonitor() {
       );
     },
     () => {
-      var value = localStorage.getItem("SC_winsay_cp_editor__img-bg-color");
+      var value = API.LocalStorage.getItem("SC_winsay_cp_editor__img-bg-color");
       document.documentElement.style.setProperty(
         "--SCC-Variables-IMG-bg-color_hover",
         value
@@ -1170,7 +1207,9 @@ async function CP_EditorMonitor() {
     }
   );
   API.propChange("SC_winsay_cp_editor__LH_Adaptive__pIndent", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__LH_Adaptive__pIndent");
+    var i = API.LocalStorage.getItem(
+      "SC_winsay_cp_editor__LH_Adaptive__pIndent"
+    );
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-MI-Doc-pIndent",
@@ -1182,7 +1221,7 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__dynamicLoadBlocks", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__dynamicLoadBlocks");
+    var i = API.LocalStorage.getItem("SC_winsay_cp_editor__dynamicLoadBlocks");
     if (!API.isEmpty(i)) {
       window.siyuan.config.editor.dynamicLoadBlocks = API.RangeLimitedInt(
         48,
@@ -1194,7 +1233,7 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__LH_Adaptive__LH", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__LH_Adaptive__LH");
+    var i = API.LocalStorage.getItem("SC_winsay_cp_editor__LH_Adaptive__LH");
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-MI-Doc-LH",
@@ -1203,7 +1242,10 @@ async function CP_EditorMonitor() {
       document
         .getElementById("SC_winsay_cp_editor__LH_Adaptive__LH__label")
         .setAttribute("aria-label", `${i}`);
-      localStorage.setItem("SC_winsay_cp_editor__LH_Adaptive__LH__label", i);
+      API.LocalStorage.setItem(
+        "SC_winsay_cp_editor__LH_Adaptive__LH__label",
+        i
+      );
       if (
         config.clientMode == "body--mobile" &&
         document.querySelector("#SC-CP").style.display != "none"
@@ -1213,7 +1255,9 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__LH_Adaptive__marginTop", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__LH_Adaptive__marginTop");
+    var i = API.LocalStorage.getItem(
+      "SC_winsay_cp_editor__LH_Adaptive__marginTop"
+    );
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-MI-Doc-marginTop",
@@ -1225,7 +1269,7 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__LH_Adaptive__marginBottom", function () {
-    var i = localStorage.getItem(
+    var i = API.LocalStorage.getItem(
       "SC_winsay_cp_editor__LH_Adaptive__marginBottom"
     );
     if (!API.isEmpty(i)) {
@@ -1239,7 +1283,9 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__LH_Adaptive__lSpacing", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__LH_Adaptive__lSpacing");
+    var i = API.LocalStorage.getItem(
+      "SC_winsay_cp_editor__LH_Adaptive__lSpacing"
+    );
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-MI-Doc-lSpacing",
@@ -1248,7 +1294,7 @@ async function CP_EditorMonitor() {
       document
         .getElementById("SC_winsay_cp_editor__LH_Adaptive__lSpacing__label")
         .setAttribute("aria-label", `${i}`);
-      localStorage.setItem(
+      API.LocalStorage.setItem(
         "SC_winsay_cp_editor__LH_Adaptive__lSpacing__label",
         i
       );
@@ -1261,7 +1307,9 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__BlockScrollBar-opacity", function () {
-    var o = localStorage.getItem("SC_winsay_cp_editor__BlockScrollBar-opacity");
+    var o = API.LocalStorage.getItem(
+      "SC_winsay_cp_editor__BlockScrollBar-opacity"
+    );
     if (!API.isEmpty(o)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-MI-BlockScrollBar-opacity-hover",
@@ -1315,7 +1363,7 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__BlockScrollBar_Hposition", function () {
-    var p = localStorage.getItem(
+    var p = API.LocalStorage.getItem(
       "SC_winsay_cp_editor__BlockScrollBar_Hposition"
     );
     if (!API.isEmpty(p)) {
@@ -1383,7 +1431,7 @@ async function CP_EditorMonitor() {
   API.propChange(
     "SC_winsay_cp_editor__Block-Inline-link__block-ref-content",
     function () {
-      var i = localStorage.getItem(
+      var i = API.LocalStorage.getItem(
         "SC_winsay_cp_editor__Block-Inline-link__block-ref-content"
       );
       if (!API.isEmpty(i)) {
@@ -1412,7 +1460,7 @@ async function CP_EditorMonitor() {
   API.propChange(
     "SC_winsay_cp_editor__Block-List-Task__item-done__text-color",
     function () {
-      var i = localStorage.getItem(
+      var i = API.LocalStorage.getItem(
         "SC_winsay_cp_editor__Block-List-Task__item-done__text-color"
       );
       if (!API.isEmpty(i) && i == "auto") {
@@ -1592,7 +1640,7 @@ async function CP_EditorMonitor() {
     }
   );
   API.propChange("SC_winsay_cp_editor__HintHintMaxWidth", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__HintHintMaxWidth");
+    var i = API.LocalStorage.getItem("SC_winsay_cp_editor__HintHintMaxWidth");
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-HintHint-MaxWidth",
@@ -1601,7 +1649,7 @@ async function CP_EditorMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_editor__HintHintMaxHeight", function () {
-    var i = localStorage.getItem("SC_winsay_cp_editor__HintHintMaxHeight");
+    var i = API.LocalStorage.getItem("SC_winsay_cp_editor__HintHintMaxHeight");
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-HintHint-MaxHeight",
@@ -1616,7 +1664,11 @@ async function CP_AppearanceMonitor() {
     API.checkedChange(
       document.getElementById("SC_winsay_cp_appearance__CoolToolBar"),
       () => {
-        if (!document.body.classList.contains("user--Sub")) return;
+        if (
+          !document.body.classList.contains("user--Sub") ||
+          document.getElementById("v2_7_0")
+        )
+          return;
         API.MoveDOM("#barTopHelp", "#sc_drawer");
         API.MoveDOM("#toolbarVIP", "#sc_drawer");
         API.CopyDOM("#barMode", "#sc_drawer");
@@ -1624,6 +1676,7 @@ async function CP_AppearanceMonitor() {
         document.querySelector("#toolbar #barMode").style.padding = "0";
       },
       () => {
+        if (document.getElementById("v2_7_0")) return;
         document
           .querySelector("#barSetting")
           .insertAdjacentElement(
@@ -1716,7 +1769,7 @@ async function CP_AppearanceMonitor() {
     );
   }
   API.propChange("SC_winsay_cp_appearance__KeynesOpacity", function () {
-    var i = localStorage.getItem("SC_winsay_cp_appearance__KeynesOpacity");
+    var i = API.LocalStorage.getItem("SC_winsay_cp_appearance__KeynesOpacity");
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-KeynesOpacity",
@@ -1725,7 +1778,7 @@ async function CP_AppearanceMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_appearance__TabBarSize", function () {
-    var i = localStorage.getItem("SC_winsay_cp_appearance__TabBarSize");
+    var i = API.LocalStorage.getItem("SC_winsay_cp_appearance__TabBarSize");
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-MI-TabBar-FontSize",
@@ -1738,7 +1791,9 @@ async function CP_AppearanceMonitor() {
     }
   });
   API.propChange("SC_winsay_cp_appearance__TabBarStyleFeel", function () {
-    var i = localStorage.getItem("SC_winsay_cp_appearance__TabBarStyleFeel");
+    var i = API.LocalStorage.getItem(
+      "SC_winsay_cp_appearance__TabBarStyleFeel"
+    );
     if (!API.isEmpty(i)) {
       switch (i) {
         case "3":
@@ -1819,7 +1874,7 @@ async function CP_AppearanceMonitor() {
   API.propChange(
     "SC_winsay_cp_appearance__TabBar_item__textShadow",
     function () {
-      var i = localStorage.getItem(
+      var i = API.LocalStorage.getItem(
         "SC_winsay_cp_appearance__TabBar_item__textShadow"
       );
       if (!API.isEmpty(i)) {
@@ -1842,7 +1897,7 @@ async function CP_AppearanceMonitor() {
     }
   );
   API.propChange("SC_winsay_cp_appearance__TabBarMode", function () {
-    var i = localStorage.getItem("SC_winsay_cp_appearance__TabBarMode");
+    var i = API.LocalStorage.getItem("SC_winsay_cp_appearance__TabBarMode");
     var j = API.isEmpty(i) ? "MI-TabBar-D.css" : i;
     window.sofill.funs.updateStyle(
       "TabBar",
@@ -1897,7 +1952,7 @@ async function CP_AppearanceMonitor() {
         "--SCC-Variables-MI-ToolBar-child-visibility",
         "visible"
       );
-      var h = localStorage.getItem(
+      var h = API.LocalStorage.getItem(
         "SC_winsay_cp_appearance__ToolBarMode__height"
       );
       if (!API.isEmpty(h)) {
@@ -1934,7 +1989,7 @@ async function CP_AppearanceMonitor() {
     }
   );
   API.propChange("SC_winsay_cp_appearance__ToolBarMode__height", function () {
-    var h = localStorage.getItem(
+    var h = API.LocalStorage.getItem(
       "SC_winsay_cp_appearance__ToolBarMode__height"
     );
     if (!API.isEmpty(h)) {
@@ -1955,7 +2010,7 @@ async function CP_AppearanceMonitor() {
   API.propChange(
     "SC_winsay_cp_appearance__ToolBarMode__NotFocus__bgColor",
     function () {
-      var h = localStorage.getItem(
+      var h = API.LocalStorage.getItem(
         "SC_winsay_cp_appearance__ToolBarMode__NotFocus__bgColor"
       );
       if (!API.isEmpty(h)) {
@@ -2059,7 +2114,9 @@ async function CP_AppearanceMonitor() {
     }
   );
   API.propChange("SC_winsay_cp_appearance__status_msg_opacity", function () {
-    var i = localStorage.getItem("SC_winsay_cp_appearance__status_msg_opacity");
+    var i = API.LocalStorage.getItem(
+      "SC_winsay_cp_appearance__status_msg_opacity"
+    );
     if (!API.isEmpty(i)) {
       document.documentElement.style.setProperty(
         "--SCC-Variables-MI-status__msg_opacity",
@@ -2126,14 +2183,14 @@ setTimeout(async () => {
 });
 
 API.propChange("SC_winsay_cp_about__checkTime", function () {
-  var i = localStorage.getItem("SC_winsay_cp_about__checkTime");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_about__checkTime");
   if (!API.isEmpty(i)) {
     switch (i) {
       case "Once":
         getlocalVersion();
         if (
           document.querySelector("#SC-CP").style.display == "none" &&
-          localStorage.getItem("SC_winsay_cp_about__AutoCheckSilently") ==
+          API.LocalStorage.getItem("SC_winsay_cp_about__AutoCheckSilently") ==
             "true"
         ) {
           setTimeout(() => {
@@ -2151,32 +2208,32 @@ API.propChange("SC_winsay_cp_about__checkTime", function () {
   }
 });
 API.propChange("SC_winsay_cp_custom__EXTmaxOpenTabCount", function () {
-  var i = localStorage.getItem("SC_winsay_cp_custom__EXTmaxOpenTabCount");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_custom__EXTmaxOpenTabCount");
   if (!API.isEmpty(i)) {
-    let o = localStorage.getItem(
+    let o = API.LocalStorage.getItem(
       "SC_winsay_cp_custom__EXTmaxOpenTabCount__origin"
     );
     if (API.isEmpty(o)) {
-      localStorage.setItem(
+      API.LocalStorage.setItem(
         "SC_winsay_cp_custom__EXTmaxOpenTabCount__origin",
         window.siyuan.config.fileTree.maxOpenTabCount
       );
     }
     window.siyuan.config.fileTree.maxOpenTabCount = parseInt(i);
   } else {
-    let o = localStorage.getItem(
+    let o = API.LocalStorage.getItem(
       "SC_winsay_cp_custom__EXTmaxOpenTabCount__origin"
     );
     if (!API.isEmpty(o)) {
       window.siyuan.config.fileTree.maxOpenTabCount = parseInt(o);
-      localStorage.removeItem(
+      API.LocalStorage.removeItem(
         "SC_winsay_cp_custom__EXTmaxOpenTabCount__origin"
       );
     }
   }
 });
 API.propChange("SC_winsay_cp_custom__root_filter_light", function () {
-  var i = localStorage.getItem("SC_winsay_cp_custom__root_filter_light");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_custom__root_filter_light");
   if (!API.isEmpty(i)) {
     switch (i) {
       case "5":
@@ -2220,7 +2277,7 @@ API.propChange("SC_winsay_cp_custom__root_filter_light", function () {
   }
 });
 API.propChange("SC_winsay_cp_custom__root_filter_dark", function () {
-  var i = localStorage.getItem("SC_winsay_cp_custom__root_filter_dark");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_custom__root_filter_dark");
   if (!API.isEmpty(i)) {
     switch (i) {
       case "5":
@@ -2275,21 +2332,21 @@ API.checkedChange(
         let Dfilter = document.documentElement.style.getPropertyValue(
           "--SCC-Variables-root-filter-dark"
         );
-        localStorage.setItem(
+        API.LocalStorage.setItem(
           "SC_winsay_cp_custom__root_Lfilter_daily",
           Lfilter
         );
-        localStorage.setItem(
+        API.LocalStorage.setItem(
           "SC_winsay_cp_custom__root_Dfilter_daily",
           Dfilter
         );
         document.documentElement.style.setProperty(
           "--SCC-Variables-root-filter-light",
-          localStorage.getItem("SC_winsay_cp_custom__root_Lfilter_daily")
+          API.LocalStorage.getItem("SC_winsay_cp_custom__root_Lfilter_daily")
         );
         document.documentElement.style.setProperty(
           "--SCC-Variables-root-filter-dark",
-          localStorage.getItem("SC_winsay_cp_custom__root_Dfilter_daily")
+          API.LocalStorage.getItem("SC_winsay_cp_custom__root_Dfilter_daily")
         );
       } else {
         document.documentElement.style.setProperty(
@@ -2327,9 +2384,9 @@ API.checkedChange(
 );
 
 API.propChange("SC_winsay_cp_custom__defaultS", function () {
-  var i = localStorage.getItem("SC_winsay_cp_custom__defaultS");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_custom__defaultS");
   if (!API.isEmpty(i)) {
-    localStorage.removeItem("SC_winsay_cp_custom__defaultS_auto");
+    API.LocalStorage.removeItem("SC_winsay_cp_custom__defaultS_auto");
     if (window.sofill.funs.getThemeMode) {
       let writeData = `@import url("preview-base-light.css"); @import url("${i}?r=${Math.random()}");`;
       fs
@@ -2348,10 +2405,11 @@ API.propChange("SC_winsay_cp_custom__defaultS", function () {
         : console.log("platform not supported");
     }
   } else {
-    localStorage.setItem("SC_winsay_cp_custom__defaultS_auto", "true");
-    let writeData = `@import url("preview-base-light.css"); @import url("${localStorage
-      .getItem("SC_winsay_cp_custom__LS")
-      .replace("root", "preview")}?r=${Math.random()}");`;
+    API.LocalStorage.setItem("SC_winsay_cp_custom__defaultS_auto", "true");
+    let i = API.LocalStorage.getItem("SC_winsay_cp_custom__LS");
+    let writeData = `@import url("preview-base-light.css"); @import url("${
+      i ? i.replace("root", "preview") : ""
+    }?r=${Math.random()}");`;
     fs
       ? fs.writeFile(
           `${config.S2_BASE_ABS}defaultS.css`,
@@ -2369,16 +2427,15 @@ API.propChange("SC_winsay_cp_custom__defaultS", function () {
   }
 });
 API.propChange("SC_winsay_cp_custom__LS", function () {
-  var i = localStorage.getItem("SC_winsay_cp_custom__LS");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_custom__LS");
   if (!API.isEmpty(i)) {
     if (window.sofill.funs.getThemeMode == "light") {
-      localStorage.setItem(config.latest_LC_ID, i);
+      API.LocalStorage.setItem(config.latest_LC_ID, i);
       iterLC();
-    } else if (localStorage.getItem("SC_winsay_cp_custom__defaultS_auto")) {
-      let writeData = `@import url("preview-base-light.css"); @import url("${i.replace(
-        "root",
-        "preview"
-      )}?r=${Math.random()}");`;
+    } else if (API.LocalStorage.getItem("SC_winsay_cp_custom__defaultS_auto")) {
+      let writeData = `@import url("preview-base-light.css"); @import url("${
+        i ? i.replace("root", "preview") : ""
+      }?r=${Math.random()}");`;
       fs
         ? fs.writeFile(
             `${config.S2_BASE_ABS}defaultS.css`,
@@ -2397,15 +2454,15 @@ API.propChange("SC_winsay_cp_custom__LS", function () {
   }
 });
 API.propChange("SC_winsay_cp_custom__DS", function () {
-  var i = localStorage.getItem("SC_winsay_cp_custom__DS");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_custom__DS");
   if (window.sofill.funs.getThemeMode == "dark" && !API.isEmpty(i)) {
-    localStorage.setItem(config.latest_DC_ID, i);
+    API.LocalStorage.setItem(config.latest_DC_ID, i);
     iterDC();
   }
 });
 
 API.propChange("SC_winsay_cp_search__layout", function () {
-  var i = localStorage.getItem("SC_winsay_cp_search__layout");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_search__layout");
   if (API.isEmpty(i) && document.getElementById("search__layout")) {
     document.getElementById("search__layout").remove();
   } else {
@@ -2417,7 +2474,7 @@ API.propChange("SC_winsay_cp_search__layout", function () {
 });
 
 API.propChange("SC_winsay_cp_assets__PCards", function () {
-  var i = localStorage.getItem("SC_winsay_cp_assets__PCards");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_assets__PCards");
   if (API.isEmpty(i) && document.getElementById("assets__PCards")) {
     document.getElementById("assets__PCards").remove();
   } else {
@@ -2558,7 +2615,7 @@ API.checkedChange(
 );
 
 API.propChange("SC_winsay_cp_filetree__docFontsize", function () {
-  var i = localStorage.getItem("SC_winsay_cp_filetree__docFontsize");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_filetree__docFontsize");
   if (!API.isEmpty(i)) {
     document.documentElement.style.setProperty(
       "--SCC-Variables-MI-DocTree-docFontsize",
@@ -2567,11 +2624,11 @@ API.propChange("SC_winsay_cp_filetree__docFontsize", function () {
     document
       .getElementById("SC_winsay_cp_filetree__docFontsize__label")
       .setAttribute("aria-label", `${i}`);
-    localStorage.setItem("SC_winsay_cp_filetree__docFontsize__label", i);
+    API.LocalStorage.setItem("SC_winsay_cp_filetree__docFontsize__label", i);
   }
 });
 API.propChange("SC_winsay_cp_filetree__nbFontsize", function () {
-  var i = localStorage.getItem("SC_winsay_cp_filetree__nbFontsize");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_filetree__nbFontsize");
   if (!API.isEmpty(i)) {
     document.documentElement.style.setProperty(
       "--SCC-Variables-MI-DocTree-nbFontsize",
@@ -2580,11 +2637,11 @@ API.propChange("SC_winsay_cp_filetree__nbFontsize", function () {
     document
       .getElementById("SC_winsay_cp_filetree__nbFontsize__label")
       .setAttribute("aria-label", `${i}`);
-    localStorage.setItem("SC_winsay_cp_filetree__nbFontsize__label", i);
+    API.LocalStorage.setItem("SC_winsay_cp_filetree__nbFontsize__label", i);
   }
 });
 API.propChange("SC_winsay_cp_filetree__nbMargin", function () {
-  var i = localStorage.getItem("SC_winsay_cp_filetree__nbMargin");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_filetree__nbMargin");
   if (!API.isEmpty(i)) {
     document.documentElement.style.setProperty(
       "--SCC-Variables-MI-DocTree-nbMargin",
@@ -2593,7 +2650,7 @@ API.propChange("SC_winsay_cp_filetree__nbMargin", function () {
     document
       .getElementById("SC_winsay_cp_filetree__nbMargin__label")
       .setAttribute("aria-label", `${i}`);
-    localStorage.setItem("SC_winsay_cp_filetree__nbMargin__label", i);
+    API.LocalStorage.setItem("SC_winsay_cp_filetree__nbMargin__label", i);
   }
 });
 
@@ -2683,7 +2740,7 @@ API.checkedChange(
   }
 );
 API.propChange("SC_winsay_cp_about__checkAPI", function () {
-  var i = localStorage.getItem("SC_winsay_cp_about__checkAPI");
+  var i = API.LocalStorage.getItem("SC_winsay_cp_about__checkAPI");
   if (!API.isEmpty(i)) {
     let vv = switchlocalVersion();
     vv

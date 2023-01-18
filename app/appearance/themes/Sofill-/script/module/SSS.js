@@ -43,8 +43,8 @@ function AndroidChangeColor() {
     const latest_color_href = window.sofill.iter.next().value;
     switch (window.sofill.funs.getThemeMode) {
       case "dark":
-        localStorage.setItem(config.latest_DC_ID, latest_color_href);
-        localStorage.setItem("SC_winsay_cp_custom__DS", latest_color_href);
+        API.LocalStorage.setItem(config.latest_DC_ID, latest_color_href);
+        API.LocalStorage.setItem("SC_winsay_cp_custom__DS", latest_color_href);
         var snode = document.getElementById("SC_winsay_cp_custom__DS");
         if (snode) {
           snode.value = latest_color_href;
@@ -52,13 +52,13 @@ function AndroidChangeColor() {
         break;
       case "light":
       default:
-        localStorage.setItem(config.latest_LC_ID, latest_color_href);
-        localStorage.setItem("SC_winsay_cp_custom__LS", latest_color_href);
+        API.LocalStorage.setItem(config.latest_LC_ID, latest_color_href);
+        API.LocalStorage.setItem("SC_winsay_cp_custom__LS", latest_color_href);
         var snode = document.getElementById("SC_winsay_cp_custom__LS");
         if (snode) {
           snode.value = latest_color_href;
         }
-        if (localStorage.getItem("SC_winsay_cp_custom__defaultS_auto")) {
+        if (API.LocalStorage.getItem("SC_winsay_cp_custom__defaultS_auto")) {
           console.log(latest_color_href);
           let writeData = `@import url("preview-base-light.css"); @import url("${latest_color_href.replace("root", "preview")}?r=${Math.random()}");`;
           fs
@@ -87,7 +87,7 @@ function AndroidChangeColor() {
 function iterLC() {
   let colors_href = [];
   let colorList = [];
-  let latest_color_href = localStorage.getItem(config.latest_LC_ID);
+  let latest_color_href = API.LocalStorage.getItem(config.latest_LC_ID);
   window.sofill.iter = config.Iterator(colors_href);
   if (latest_color_href) {
     colorList = config.colors;
@@ -124,7 +124,7 @@ function iterLC() {
       colorList = config.colors;
       colorList.forEach((color) => colors_href.push(`${color}`));
       window.sofill.iter = config.Iterator(colors_href);
-      localStorage.setItem(config.latest_LC_ID, response.color.light);
+      API.LocalStorage.setItem(config.latest_LC_ID, response.color.light);
       window.sofill.funs.updateStyle(
         config.IDs.STYLE_COLOR,
         `${config.S2_BASE}${response.color.light}`
@@ -139,7 +139,7 @@ function iterLC() {
 function iterDC() {
   let colors_href = [];
   let colorList = [];
-  let latest_color_href = localStorage.getItem(config.latest_DC_ID);
+  let latest_color_href = API.LocalStorage.getItem(config.latest_DC_ID);
   window.sofill.iter = config.Iterator2(colors_href);
   if (latest_color_href) {
     colorList = config.colors2;
@@ -176,7 +176,7 @@ function iterDC() {
       colorList = config.colors2;
       colorList.forEach((color) => colors_href.push(`${color}`));
       window.sofill.iter = config.Iterator2(colors_href);
-      localStorage.setItem(config.latest_DC_ID, response.color.dark);
+      API.LocalStorage.setItem(config.latest_DC_ID, response.color.dark);
       window.sofill.funs.updateStyle(
         config.IDs.STYLE_COLOR,
         `${config.S2_BASE}${response.color.dark}`
@@ -200,8 +200,8 @@ function DesktopChangeColor() {
       const latest_color_href = window.sofill.iter.next().value;
       switch (window.sofill.funs.getThemeMode) {
         case "dark":
-          localStorage.setItem(config.latest_DC_ID, latest_color_href);
-          localStorage.setItem("SC_winsay_cp_custom__DS", latest_color_href);
+          API.LocalStorage.setItem(config.latest_DC_ID, latest_color_href);
+          API.LocalStorage.setItem("SC_winsay_cp_custom__DS", latest_color_href);
           var snode = document.getElementById("SC_winsay_cp_custom__DS");
           if (snode) {
             snode.value = latest_color_href;
@@ -209,13 +209,13 @@ function DesktopChangeColor() {
           break;
         case "light":
         default:
-          localStorage.setItem(config.latest_LC_ID, latest_color_href);
-          localStorage.setItem("SC_winsay_cp_custom__LS", latest_color_href);
+          API.LocalStorage.setItem(config.latest_LC_ID, latest_color_href);
+          API.LocalStorage.setItem("SC_winsay_cp_custom__LS", latest_color_href);
           var snode = document.getElementById("SC_winsay_cp_custom__LS");
           if (snode) {
             snode.value = latest_color_href;
           }
-          if (localStorage.getItem("SC_winsay_cp_custom__defaultS_auto")) {
+          if (API.LocalStorage.getItem("SC_winsay_cp_custom__defaultS_auto")) {
             console.log(latest_color_href);
             let writeData = `@import url("preview-base-light.css"); @import url("${latest_color_href.replace("root", "preview")}?r=${Math.random()}");`;
             fs
