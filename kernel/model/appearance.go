@@ -47,11 +47,11 @@ func InitAppearance() {
 
 	if !gulu.Str.Contains(Conf.Appearance.ThemeDark, Conf.Appearance.DarkThemes) {
 		Conf.Appearance.ThemeDark = "Sofill-"
-		Conf.Appearance.ThemeJS = false
+		Conf.Appearance.ThemeJS = true
 	}
 	if !gulu.Str.Contains(Conf.Appearance.ThemeLight, Conf.Appearance.LightThemes) {
 		Conf.Appearance.ThemeLight = "Sofill-"
-		Conf.Appearance.ThemeJS = false
+		Conf.Appearance.ThemeJS = true
 	}
 
 	loadIcons()

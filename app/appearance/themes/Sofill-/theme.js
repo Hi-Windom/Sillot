@@ -149,51 +149,6 @@ window.sofill.funs.addURLParam = function (
   }
 };
 
-var SelfProtection = localStorage.getItem(
-  "SC_winsay_cp_system__SelfProtection"
-);
-var P = [];
-var bP = "";
-path
-  ? (bP = path.join(
-      window.siyuan.config.system.confDir,
-      "appearance",
-      "themes",
-      "Sofill-"
-    ))
-  : null;
-fs
-  ? fs.access(bP, (e) => {
-      if (e) {
-        console.error(e);
-        alert(
-          `主题根目录未正确命名或不存在：【致命错误】${bP} 文件夹不存在。修正错误后，需重启思源并重新选择主题。`
-        );
-      }
-    })
-  : null;
-if (SelfProtection && SelfProtection === "true") {
-  try {
-    path ? P.push(path.join(bP, "script", "utils", "api.min.js")) : null;
-    path ? P.push(path.join(bP, "script", "CP.js")) : null;
-    path ? P.push(path.join(bP, "script", "config.js")) : null;
-    path ? P.push(path.join(bP, "style", "Init.min.css")) : null;
-    path ? P.push(path.join(bP, "style", "Block.css")) : null;
-    P.forEach((i) => {
-      fs
-        ? fs.readFile(i, "utf-8", (e, data) => {
-            if (e) {
-              console.error(e);
-              alert(`主题自我保护检测到异常：【致命错误】${i} 文件不存在`);
-            }
-          })
-        : null;
-    });
-  } catch (e) {
-    console.error(e);
-  }
-}
-
 window.sofill.funs.loadScript(
   window.sofill.funs.addURLParam(
     "/appearance/themes/Sofill-/script/module/CustomBoot.js"
@@ -220,15 +175,6 @@ setTimeout(() => {
 setTimeout(() => {
   window.sofill.funs.loadScript(
     window.sofill.funs.addURLParam(
-      "/appearance/themes/Sofill-/script/CP.js?r=" + Math.random()
-    ),
-    undefined,
-    true
-  );
-}, 200);
-setTimeout(() => {
-  window.sofill.funs.loadScript(
-    window.sofill.funs.addURLParam(
       "/appearance/themes/Sofill-/script/module/DTL.js"
     ),
     undefined,
@@ -249,3 +195,50 @@ setTimeout(() => {
     true
   );
 }, 500);
+
+setTimeout(() => {
+  var SelfProtection = localStorage.getItem(
+    "SC_winsay_cp_system__SelfProtection"
+  );
+  var P = [];
+  var bP = "";
+  path
+    ? (bP = path.join(
+        window.siyuan.config.system.confDir,
+        "appearance",
+        "themes",
+        "Sofill-"
+      ))
+    : null;
+  fs
+    ? fs.access(bP, (e) => {
+        if (e) {
+          console.error(e);
+          alert(
+            `主题根目录未正确命名或不存在：【致命错误】${bP} 文件夹不存在。修正错误后，需重启思源并重新选择主题。`
+          );
+        }
+      })
+    : null;
+  if (SelfProtection && SelfProtection === "true") {
+    try {
+      path ? P.push(path.join(bP, "script", "utils", "api.min.js")) : null;
+      path ? P.push(path.join(bP, "script", "CP.js")) : null;
+      path ? P.push(path.join(bP, "script", "config.js")) : null;
+      path ? P.push(path.join(bP, "style", "Init.min.css")) : null;
+      path ? P.push(path.join(bP, "style", "Block.css")) : null;
+      P.forEach((i) => {
+        fs
+          ? fs.readFile(i, "utf-8", (e, data) => {
+              if (e) {
+                console.error(e);
+                alert(`主题自我保护检测到异常：【致命错误】${i} 文件不存在`);
+              }
+            })
+          : null;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}, 1000);

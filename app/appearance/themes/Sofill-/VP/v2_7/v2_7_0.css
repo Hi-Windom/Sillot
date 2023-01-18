@@ -1,0 +1,7 @@
+#barDock > .b3-menu {
+  margin-bottom: -3px;
+}
+
+#sc-custom-container-appearance > label:has(#SC_winsay_cp_appearance__CoolToolBar) {
+  display: none !important;
+}

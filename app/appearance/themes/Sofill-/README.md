@@ -49,6 +49,7 @@
 9. [变更API · Issue #902 · v1.5.12](https://github.com/Hi-Windom/winsay/issues/902)
 10. [Sillot分支禁用一次性通知 · Issue #911 · v1.5.13](https://github.com/Hi-Windom/winsay/issues/911)
 11. [结构性暂停适配思源源分支更新 · Issue #914 · v1.5.14](https://github.com/Hi-Windom/winsay/issues/914)
+12. [左下角增加一个主题设置入口 · Issue #916 · v1.5.15](https://github.com/Hi-Windom/winsay/issues/916)
 
 修复缺陷：NULL
 

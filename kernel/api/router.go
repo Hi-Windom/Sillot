@@ -319,4 +319,10 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/snippet/setSnippet", model.CheckAuth, setSnippet)
 	ginServer.Handle("POST", "/api/snippet/removeSnippet", model.CheckAuth, removeSnippet)
 	ginServer.Handle("GET", "/snippets/*filepath", serveSnippets)
+
+	// 汐洛扩展
+	ginServer.Handle("GET", "/api/sillot/getAppConfigesStore", getAppConfigesStore)
+	ginServer.Handle("POST", "/api/sillot/getConfigesStore", getConfigesStore)
+	ginServer.Handle("POST", "/api/sillot/hookConfigesStore", hookConfigesStore)
+	ginServer.Handle("POST", "/api/sillot/dishookConfigesStore", dishookConfigesStore)
 }
