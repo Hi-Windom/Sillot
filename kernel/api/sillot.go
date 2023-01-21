@@ -35,30 +35,14 @@ func getConfigesStore(c *gin.Context) {
 	}
 }
 
-func hookConfigesStore(c *gin.Context) {
+func setConfigesStore(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
-
-	arg, ok := util.JsonArg(c, ret)
-	if !ok {
-		return
-	}
-	repoURL := arg["repoURL"].(string)
+	f := c.PostForm("f")
+	data := c.PostForm("data")
+	model.SetStoredConfiges(f, data)
 	ret.Data = map[string]interface{}{
-		"packages": repoURL,
-	}
-}
-
-func dishookConfigesStore(c *gin.Context) {
-	ret := gulu.Ret.NewResult()
-	defer c.JSON(http.StatusOK, ret)
-
-	arg, ok := util.JsonArg(c, ret)
-	if !ok {
-		return
-	}
-	repoURL := arg["repoURL"].(string)
-	ret.Data = map[string]interface{}{
-		"packages": repoURL,
+		"dir":  model.GetSillotAppDataDir(),
+		"data": data,
 	}
 }

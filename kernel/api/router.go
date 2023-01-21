@@ -323,6 +323,5 @@ func ServeAPI(ginServer *gin.Engine) {
 	// 汐洛扩展
 	ginServer.Handle("GET", "/api/sillot/getAppConfigesStore", getAppConfigesStore)
 	ginServer.Handle("POST", "/api/sillot/getConfigesStore", getConfigesStore)
-	ginServer.Handle("POST", "/api/sillot/hookConfigesStore", hookConfigesStore)
-	ginServer.Handle("POST", "/api/sillot/dishookConfigesStore", dishookConfigesStore)
+	ginServer.Handle("POST", "/api/sillot/setConfigesStore", setConfigesStore)
 }
