@@ -1,15 +1,15 @@
-import {Constants} from "./constants";
-import {Menus} from "./menus";
-import {Model} from "./layout/Model";
-import {onGetConfig} from "./util/onGetConfig";
+import { Constants } from "./constants";
+import { Menus } from "./menus";
+import { Model } from "./layout/Model";
+import { onGetConfig } from "./util/onGetConfig";
 import "./assets/scss/base.scss";
-import {initBlockPopover} from "./block/popover";
-import {account} from "./config/account";
-import {addScript, addScriptSync} from "./protyle/util/addScript";
-import {genUUID} from "./util/genID";
-import {fetchGet, fetchPost} from "./util/fetch";
-import {addBaseURL, setNoteBook} from "./util/pathName";
-import {openFileById} from "./editor/util";
+import { initBlockPopover } from "./block/popover";
+import { account } from "./config/account";
+import { addScript, addScriptSync } from "./protyle/util/addScript";
+import { genUUID } from "./util/genID";
+import { fetchGet, fetchPost } from "./util/fetch";
+import { addBaseURL, setNoteBook } from "./util/pathName";
+import { openFileById } from "./editor/util";
 import {
     bootSync,
     downloadProgress,
@@ -18,11 +18,13 @@ import {
     setTitle,
     transactionError
 } from "./dialog/processSystem";
-import {promiseTransactions} from "./protyle/wysiwyg/transaction";
-import {initMessage} from "./dialog/message";
-import {resizeDrag} from "./layout/util";
-import {getAllTabs} from "./layout/getAll";
-import {getLocalStorage} from "./protyle/util/compatibility";
+import { promiseTransactions } from "./protyle/wysiwyg/transaction";
+import { initMessage } from "./dialog/message";
+import { resizeDrag } from "./layout/util";
+import { getAllTabs } from "./layout/getAll";
+import { getLocalStorage } from "./protyle/util/compatibility";
+import { importIDB } from './util/sillot-idb-backup-and-restore'
+import * as path from "path";
 
 class App {
     constructor() {
@@ -44,10 +46,10 @@ class App {
                 msgCallback: (data) => {
                     if (data) {
                         switch (data.cmd) {
-                            case"progress":
+                            case "progress":
                                 progressLoading(data);
                                 break;
-                            case"setLocalStorageVal":
+                            case "setLocalStorageVal":
                                 window.siyuan.storage[data.data.key] = data.data.val;
                                 break;
                             case "rename":
@@ -89,16 +91,16 @@ class App {
                                     }
                                 });
                                 break;
-                            case"statusbar":
+                            case "statusbar":
                                 progressStatus(data);
                                 break;
-                            case"downloadProgress":
+                            case "downloadProgress":
                                 downloadProgress(data.data);
                                 break;
-                            case"txerr":
+                            case "txerr":
                                 transactionError(data);
                                 break;
-                            case"syncing":
+                            case "syncing":
                                 if (data.code === 0) {
                                     document.querySelector("#barSync").classList.add("toolbar__item--active");
                                 } else {
@@ -117,7 +119,7 @@ class App {
                                 }
                                 break;
                             case "createdailynote":
-                                openFileById({id: data.data.id, action: [Constants.CB_GET_FOCUS]});
+                                openFileById({ id: data.data.id, action: [Constants.CB_GET_FOCUS] });
                                 break;
                         }
                     }
@@ -141,10 +143,17 @@ class App {
                     });
                 });
             });
+            let workspaceName: string = path.basename(window.siyuan.config.system.workspaceDir)
+            fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, response => {
+                let result = response.data;
+                console.log(result);
+                importIDB(result).then(() => {
+                    setNoteBook();
+                    initBlockPopover();
+                    promiseTransactions();
+                });
+            });
         });
-        setNoteBook();
-        initBlockPopover();
-        promiseTransactions();
     }
 }
 

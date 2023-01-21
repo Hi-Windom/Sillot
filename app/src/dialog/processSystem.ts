@@ -12,6 +12,7 @@ import {confirmDialog} from "./confirmDialog";
 import {getCurrentWindow} from "@electron/remote";
 import {escapeHtml} from "../util/escape";
 import {getWorkspaceName} from "../util/noRelyPCFunction";
+import { exportIDB } from '../util/sillot-idb-backup-and-restore'
 
 export const lockScreen = () => {
     /// #if BROWSER
@@ -97,6 +98,7 @@ export const kernelError = () => {
 };
 
 export const exitSiYuan = () => {
+    exportIDB().then(() => {
     fetchPost("/api/system/exit", {force: false}, (response) => {
         if (response.code === 1) { // 同步执行失败
             const msgId = showMessage(response.msg, response.data.closeTimeout, "error");
@@ -153,6 +155,7 @@ export const exitSiYuan = () => {
             /// #endif
         }
     });
+    })
 };
 
 export const transactionError = (data: { code: number, data: string }) => {
