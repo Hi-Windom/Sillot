@@ -4,21 +4,21 @@ const sleep = (ms: number) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-export async function exportToJson(idbDatabase: IDBRequest) {
+async function exportToJson(idbDatabase: IDBRequest) {
   return new Promise((resolve, reject) => {
     var exportObject: any = {}
     if (idbDatabase.result.objectStoreNames.length === 0) {
       resolve(JSON.stringify(exportObject))
     } else {
-      const transaction = idbDatabase.result.transaction(
-        idbDatabase.result.objectStoreNames,
-        'readonly'
-      )
-
-      transaction.addEventListener('error', reject)
-
-      for (const storeName of idbDatabase.result.objectStoreNames) {
+      let snList: Array<string> = Object.values(idbDatabase.result.objectStoreNames);
+      snList.forEach((storeName: any) => {
         const allObjects: any[] = []
+        const transaction = idbDatabase.result.transaction(
+          storeName,
+          'readonly'
+        )
+
+        transaction.addEventListener('error', reject)
         transaction
           .objectStore(storeName)
           .openCursor()
@@ -43,17 +43,16 @@ export async function exportToJson(idbDatabase: IDBRequest) {
               }
             }
           })
-      }
+      })
     }
   })
 }
 
 
-export async function importFromJson(idbDatabase: IDBRequest, json: string) {
+function importFromJson(idbDatabase: IDBRequest, importObject: any) {
   return new Promise<void>((resolve, reject) => {
-
-    var importObject = JSON.parse(json)
-    for (const storeName of idbDatabase.result.objectStoreNames) {
+    let snList: Array<string> = Object.values(idbDatabase.result.objectStoreNames);
+    snList.forEach((storeName: any) => {
       if (importObject[storeName].length > 0) {
         let transaction = idbDatabase.result.transaction(
           storeName,
@@ -61,10 +60,11 @@ export async function importFromJson(idbDatabase: IDBRequest, json: string) {
         )
         // transaction.addEventListener('error', reject)
         transaction.onerror = function (event: any) {
-          console.log('transaction error: ' + transaction.error);
+          console.error('transaction error: ' + transaction.error);
         };
         let count = 0
-        for (const toAdd of importObject[storeName]) {
+        let kList: Array<string> = Object.values(importObject[storeName]);
+        importObject[storeName].forEach((toAdd: any) => {
           let value: any = Object.values(toAdd)[0];
           let key: any = Object.keys(toAdd)[0];
           if (!value || Object.keys(value).length == 0) {
@@ -82,14 +82,15 @@ export async function importFromJson(idbDatabase: IDBRequest, json: string) {
               }
             }
           })
-        }
+        })
+      } else {
+        delete importObject[storeName]
       }
-    }
+    })
   })
 }
 
-
-export function clearDatabase(idbDatabase: { transaction: (arg0: any, arg1: string) => any; objectStoreNames: string | any[]; }) {
+function clearDatabase(idbDatabase: { transaction: (arg0: any, arg1: string) => any; objectStoreNames: any[]; }) {
   return new Promise<void>((resolve, reject) => {
     const transaction = idbDatabase.transaction(
       idbDatabase.objectStoreNames,
@@ -98,7 +99,7 @@ export function clearDatabase(idbDatabase: { transaction: (arg0: any, arg1: stri
     transaction.addEventListener('error', reject)
 
     let count = 0
-    for (const storeName of idbDatabase.objectStoreNames) {
+    idbDatabase.objectStoreNames.forEach((storeName: any) => {
       transaction
         .objectStore(storeName)
         .clear()
@@ -109,34 +110,48 @@ export function clearDatabase(idbDatabase: { transaction: (arg0: any, arg1: stri
             resolve()
           }
         })
-    }
+    })
   })
 }
 
 export async function importIDB(result: any) {
   let importObject: any = result.data
   let dbList: Array<string> = Object.keys(importObject);
-  for (var dbName in dbList) {
-
-    let DBOpenRequest: IDBOpenDBRequest = window?.indexedDB?.open(dbName);
-    DBOpenRequest.onupgradeneeded = function (event) {
-      // 数据库创建或升级时触发
-      let db = DBOpenRequest.result
-      for (var key in importObject[dbName]) {
-        if (!db.objectStoreNames.contains(key)) {
-          db.createObjectStore(key);
-        }
+  let resolved: number = 0;
+  return new Promise<number>(async (resolve, reject) => {
+    dbList.forEach(dbName => {
+      let DBOpenRequest: IDBOpenDBRequest = window.indexedDB.open(dbName);
+      DBOpenRequest.onupgradeneeded = function (event) {
+        // 数据库创建或升级时触发
+        let db = DBOpenRequest.result
+        let kList: Array<string> = Object.keys(importObject[dbName]);
+        kList.forEach((key: any) => {
+          if (!db.objectStoreNames.contains(key)) {
+            db.createObjectStore(key);
+            console.warn(key)
+          }
+        })
+      }
+      DBOpenRequest.onsuccess = function (event) {
+        // 第一次打开数据库时，会先触发upgradeneeded事件，然后触发success事件
+        importFromJson(DBOpenRequest, importObject[dbName]).then(() => { resolved += 1; }).catch((e) => {
+          console.error(e)
+          resolved += 1;
+        })
+      }
+      // 失败时触发
+      DBOpenRequest.onerror = (event) => {
+        console.error(event);
+        reject(event);
+      };
+    })
+    while (true) {
+      if (resolved == dbList.length) { break; } else {
+        await sleep(100);
       }
     }
-    DBOpenRequest.onsuccess = function (event) {
-      // 第一次打开数据库时，会先触发upgradeneeded事件，然后触发success事件
-      importFromJson(DBOpenRequest, JSON.stringify(importObject)).then((re) => { console.log('ok'); return (re); }).catch(console.error)
-    }
-    // 失败时触发
-    DBOpenRequest.onerror = (event) => {
-      console.log(event);
-    };
-  }
+    resolve(resolved)
+  })
 }
 
 export async function exportIDB() {
@@ -154,7 +169,7 @@ export async function exportIDB() {
       }
       // 失败时触发
       DBOpenRequest.onerror = (event) => {
-        console.log(event);
+        console.error(event);
       };
     });
     while (true) {
