@@ -112,7 +112,7 @@ class App {
                                 if (!window.siyuan.config.appearance.customCSS && data.data.theme.indexOf("custom.css") > -1) {
                                     return;
                                 }
-                                if ((window.siyuan.config.appearance.mode === 1 && window.siyuan.config.appearance.themeDark !== "midnight") || (window.siyuan.config.appearance.mode === 0 && window.siyuan.config.appearance.themeLight !== "daylight")) {
+                                if ((window.siyuan.config.appearance.mode === 1 && window.siyuan.config.appearance.themeDark !== "默认主题 midnight") || (window.siyuan.config.appearance.mode === 0 && window.siyuan.config.appearance.themeLight !== "默认主题 daylight")) {
                                     (document.getElementById("themeStyle") as HTMLLinkElement).href = data.data.theme;
                                 } else {
                                     (document.getElementById("themeDefaultStyle") as HTMLLinkElement).href = data.data.theme;
@@ -129,25 +129,25 @@ class App {
         };
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
-            getLocalStorage(() => {
-                fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
-                    window.siyuan.languages = lauguages;
-                    bootSync();
-                    fetchPost("/api/setting/getCloudUser", {}, userResponse => {
-                        window.siyuan.user = userResponse.data;
-                        onGetConfig(response.data.start);
-                        account.onSetaccount();
-                        resizeDrag();
-                        setTitle(window.siyuan.languages.siyuanNote);
-                        initMessage();
-                    });
-                });
-            });
             let workspaceName: string = path.basename(window.siyuan.config.system.workspaceDir)
-            fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, response => {
+            fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, async (response) => {
                 let result = response.data;
                 console.log(result);
-                importIDB(result).then(() => {
+                await importIDB(result).then(() => {
+                    getLocalStorage(() => {
+                        fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
+                            window.siyuan.languages = lauguages;
+                            bootSync();
+                            fetchPost("/api/setting/getCloudUser", {}, userResponse => {
+                                window.siyuan.user = userResponse.data;
+                                onGetConfig(response.data.start);
+                                account.onSetaccount();
+                                resizeDrag();
+                                setTitle(window.siyuan.languages.siyuanNote);
+                                initMessage();
+                            });
+                        });
+                    });
                     setNoteBook();
                     initBlockPopover();
                     promiseTransactions();
