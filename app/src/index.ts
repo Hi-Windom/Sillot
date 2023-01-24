@@ -130,11 +130,11 @@ class App {
         window.Sillot = { IDBloaded: false }
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
-            let workspaceName: string = path.basename(window.siyuan.config.system.workspaceDir)
-            fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, async (response) => {
-                let result = response.data;
-                console.log(result);
-                await importIDB(result).then(() => {
+            let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").pop()
+            // console.log(workspaceName)
+            fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, async (r) => {
+                // console.log(r);
+                await importIDB(r.data).then(() => {
                     window.Sillot.IDBloaded = true;
                     getLocalStorage(() => {
                         fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
