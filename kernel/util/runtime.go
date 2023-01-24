@@ -42,6 +42,9 @@ const (
 	ExitCodeFatal                 = 1  // 致命错误
 )
 
+// IsExiting 是否正在退出程序。
+var IsExiting = false
+
 func logBootInfo() {
 	logging.LogInfof("kernel is booting:\n"+
 		"    * ver [%s]\n"+
@@ -100,4 +103,10 @@ const (
 
 	// SQLFlushInterval 为数据库事务队列写入间隔。
 	SQLFlushInterval = 3000 * time.Millisecond
+)
+
+var (
+	Langs           = map[string]map[int]string{}
+	TimeLangs       = map[string]map[string]interface{}{}
+	TaskActionLangs = map[string]map[string]interface{}{}
 )

@@ -23,6 +23,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"math"
 	"net/http"
 	"os"
@@ -501,14 +502,21 @@ func InitRepoKey() (err error) {
 	return
 }
 
-func CheckoutRepo(id string) (err error) {
+func CheckoutRepo(id string) {
+	task.PrependTask(task.RepoCheckout, checkoutRepo, id)
+}
+
+func checkoutRepo(id string) {
+	var err error
 	if 1 > len(Conf.Repo.Key) {
-		err = errors.New(Conf.Language(26))
+		util.PushErrMsg(Conf.Language(26), 7000)
 		return
 	}
 
 	repo, err := newRepository()
 	if nil != err {
+		logging.LogErrorf("new repository failed: %s", err)
+		util.PushErrMsg(Conf.Language(141), 7000)
 		return
 	}
 
@@ -525,11 +533,14 @@ func CheckoutRepo(id string) (err error) {
 
 	_, _, err = repo.Checkout(id, map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBarAndProgress})
 	if nil != err {
+		logging.LogErrorf("checkout repository failed: %s", err)
 		util.PushClearProgress()
+		util.PushErrMsg(Conf.Language(141), 7000)
 		return
 	}
 
 	FullReindex()
+
 	if syncEnabled {
 		func() {
 			time.Sleep(5 * time.Second)
@@ -977,11 +988,15 @@ func syncRepo(exit, byHand bool) (err error) {
 	// 有数据变更，需要重建索引
 	var upserts, removes []string
 	var upsertTrees int
-	var needReloadFlashcard bool
+	var needReloadFlashcard, needReloadOcrTexts bool
 	for _, file := range mergeResult.Upserts {
 		upserts = append(upserts, file.Path)
 		if strings.HasPrefix(file.Path, "/storage/riff/") {
 			needReloadFlashcard = true
+		}
+
+		if strings.HasPrefix(file.Path, "/data/assets/ocr-texts.json") {
+			needReloadOcrTexts = true
 		}
 
 		if strings.HasSuffix(file.Path, ".sy") {
@@ -993,10 +1008,18 @@ func syncRepo(exit, byHand bool) (err error) {
 		if strings.HasPrefix(file.Path, "/storage/riff/") {
 			needReloadFlashcard = true
 		}
+
+		if strings.HasPrefix(file.Path, "/data/assets/ocr-texts.json") {
+			needReloadOcrTexts = true
+		}
 	}
 
 	if needReloadFlashcard {
-		InitFlashcards()
+		LoadFlashcards()
+	}
+
+	if needReloadOcrTexts {
+		LoadAssetsTexts()
 	}
 
 	cache.ClearDocsIAL()              // 同步后文档树文档图标没有更新 https://github.com/siyuan-note/siyuan/issues/4939

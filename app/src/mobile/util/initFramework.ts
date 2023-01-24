@@ -19,6 +19,7 @@ import {MobileBookmarks} from "./MobileBookmarks";
 import {MobileTags} from "./MobileTags";
 import {hideKeyboardToolbar, initKeyboardToolbar} from "./showKeyboardToolbar";
 import {getSearch} from "../../util/functions";
+import {syncGuide} from "../../sync/syncGuide";
 
 export const initFramework = () => {
     setInlineStyle();
@@ -72,7 +73,7 @@ export const initFramework = () => {
             }
         });
     });
-    new MobileFiles();
+    window.siyuan.mobile.files = new MobileFiles();
     document.getElementById("toolbarFile").addEventListener("click", () => {
         sidebarElement.style.left = "0";
         document.querySelector(".scrim").classList.remove("fn__none");
@@ -109,11 +110,11 @@ export const initFramework = () => {
         window.siyuan.config.editor.readOnly = isReadonly;
         fetchPost("/api/setting/setEditor", window.siyuan.config.editor, () => {
             if (!isReadonly) {
-                enableProtyle(window.siyuan.mobileEditor.protyle);
+                enableProtyle(window.siyuan.mobile.editor.protyle);
                 inputElement.readOnly = false;
                 editIconElement.setAttribute("xlink:href", "#iconEdit");
             } else {
-                disabledProtyle(window.siyuan.mobileEditor.protyle);
+                disabledProtyle(window.siyuan.mobile.editor.protyle);
                 inputElement.readOnly = true;
                 editIconElement.setAttribute("xlink:href", "#iconPreview");
             }
@@ -127,33 +128,43 @@ export const initFramework = () => {
         closePanel();
     });
     initEditorName();
+    if (window.siyuan.config.newbie) {
+        mountHelp();
+    }
+    const transactionTipElement = document.getElementById("transactionTip");
+    transactionTipElement.innerHTML = `${window.siyuan.languages.waitSync} <button class="b3-button">${window.siyuan.languages.syncNow}</button>`;
+    transactionTipElement.querySelector(".b3-button").addEventListener(getEventName(), () => {
+        syncGuide();
+    });
     if (getOpenNotebookCount() > 0) {
+        if (window.JSAndroid) {
+           if (window.openFileByURL(window.JSAndroid.getBlockURL())) {
+               return;
+            }
+        }
         const openId = getSearch("id");
         if (openId) {
             openMobileFileById(openId,
                 getSearch("focus") === "1" ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]);
-        } else {
-            const localDoc = window.siyuan.storage[Constants.LOCAL_DOCINFO];
-            fetchPost("/api/block/checkBlockExist", {id: localDoc.id}, existResponse => {
-                if (existResponse.data) {
-                    openMobileFileById(localDoc.id, localDoc.action);
-                } else {
-                    fetchPost("/api/block/getRecentUpdatedBlocks", {}, (response) => {
-                        if (response.data.length !== 0) {
-                            openMobileFileById(response.data[0].id, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
-                        } else {
-                            setEmpty();
-                        }
-                    });
-                }
-            });
+            return;
         }
-    } else {
-        setEmpty();
+        const localDoc = window.siyuan.storage[Constants.LOCAL_DOCINFO];
+        fetchPost("/api/block/checkBlockExist", {id: localDoc.id}, existResponse => {
+            if (existResponse.data) {
+                openMobileFileById(localDoc.id, localDoc.action);
+            } else {
+                fetchPost("/api/block/getRecentUpdatedBlocks", {}, (response) => {
+                    if (response.data.length !== 0) {
+                        openMobileFileById(response.data[0].id, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
+                    } else {
+                        setEmpty();
+                    }
+                });
+            }
+        });
+        return;
     }
-    if (window.siyuan.config.newbie) {
-        mountHelp();
-    }
+    setEmpty();
 };
 
 const initEditorName = () => {
@@ -163,7 +174,7 @@ const initEditorName = () => {
         hideKeyboardToolbar();
     });
     inputElement.addEventListener("blur", () => {
-        if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly || window.siyuan.mobileEditor.protyle.disabled) {
+        if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly || window.siyuan.mobile.editor.protyle.disabled) {
             return;
         }
         if (!validateName(inputElement.value)) {
@@ -172,8 +183,8 @@ const initEditorName = () => {
         }
 
         fetchPost("/api/filetree/renameDoc", {
-            notebook: window.siyuan.mobileEditor.protyle.notebookId,
-            path: window.siyuan.mobileEditor.protyle.path,
+            notebook: window.siyuan.mobile.editor.protyle.notebookId,
+            path: window.siyuan.mobile.editor.protyle.path,
             title: inputElement.value,
         });
     });

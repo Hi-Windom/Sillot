@@ -846,6 +846,7 @@ const addConfigMoreMenu = async (config: ISearchOption, edit: Protyle, element: 
                     blockquote: window.siyuan.config.search.blockquote,
                     superBlock: window.siyuan.config.search.superBlock,
                     paragraph: window.siyuan.config.search.paragraph,
+                    embedBlock: window.siyuan.config.search.embedBlock,
                 }
             }, config, edit);
         }
@@ -990,6 +991,13 @@ const addConfigFilterMenu = (config: ISearchOption, edit: Protyle, element: Elem
         <span class="fn__space"></span>
         <input id="removeAssets" class="b3-switch fn__flex-center" data-type="htmlBlock" type="checkbox"${config.types.htmlBlock ? " checked" : ""}>
     </label>
+    <label class="fn__flex b3-label">
+        <div class="fn__flex-1 fn__flex-center">
+            ${window.siyuan.languages.embedBlock}
+        </div>
+        <span class="fn__space"></span>
+        <input id="removeAssets" class="b3-switch fn__flex-center" data-type="embedBlock" type="checkbox"${config.types.embedBlock ? " checked" : ""}>
+    </label>
 </div>
 <div class="b3-dialog__action">
     <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
@@ -1075,7 +1083,8 @@ const getArticle = (options: {
             onGet(getResponse, options.edit.protyle, foldResponse.data ? [Constants.CB_GET_ALL, Constants.CB_GET_HTML] : [Constants.CB_GET_HL, Constants.CB_GET_HTML]);
             const matchElement = options.edit.protyle.wysiwyg.element.querySelector(`div[data-node-id="${options.id}"] span[data-type="search-mark"]`);
             if (matchElement) {
-                matchElement.scrollIntoView();
+                const contentRect = options.edit.protyle.contentElement.getBoundingClientRect();
+                options.edit.protyle.contentElement.scrollTop = options.edit.protyle.contentElement.scrollTop + matchElement.getBoundingClientRect().top - contentRect.top - contentRect.height / 2;
             }
         });
     });

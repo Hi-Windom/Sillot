@@ -43,6 +43,7 @@ interface Window {
         writeClipboard(text: string): void
         writeImageClipboard(uri: string): void
         readClipboard(): string
+        getBlockURL(): string
     }
 
     goBack(): void
@@ -50,11 +51,13 @@ interface Window {
     showKeyboardToolbar(bottom?: number): void
 
     hideKeyboardToolbar(): void
+
+    openFileByURL(URL: string): boolean
 }
 
 interface IWorkspace {
-    path:string
-    closed:boolean
+    path: string
+    closed: boolean
 }
 
 interface ICard {
@@ -86,6 +89,7 @@ interface ISearchOption {
         listItem: boolean
         codeBlock: boolean
         htmlBlock: boolean
+        embedBlock: boolean
     }
 }
 
@@ -171,7 +175,10 @@ interface ISiyuan {
     notebooks?: INotebook[],
     emojis?: IEmoji[],
     backStack?: IBackStack[],
-    mobileEditor?: import("../protyle").Protyle, // mobile
+    mobile?: {
+        editor?: import("../protyle").Protyle
+        files?: import("../mobile/util/MobileFiles").MobileFiles
+    },
     user?: {
         userId: string
         userName: string
@@ -447,6 +454,7 @@ declare interface IConfig {
         sort: number
     }
     search: {
+        embedBlock: boolean
         htmlBlock: boolean
         document: boolean
         heading: boolean

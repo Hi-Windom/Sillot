@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"io/ioutil"
 	"os"
 	"path"
@@ -105,7 +106,7 @@ func ListNotebooks() (ret []*Box, err error) {
 			continue
 		}
 
-		if !util.IsIDPattern(dir.Name()) {
+		if !ast.IsNodeIDPattern(dir.Name()) {
 			continue
 		}
 
@@ -113,31 +114,18 @@ func ListNotebooks() (ret []*Box, err error) {
 		boxDirPath := filepath.Join(util.DataDir, dir.Name())
 		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json")
 		if !gulu.File.IsExist(boxConfPath) {
-			if IsUserGuide(dir.Name()) {
-				filelock.Remove(boxDirPath)
-				continue
-			}
-			to := filepath.Join(util.WorkspaceDir, "corrupted", time.Now().Format("2006-01-02-150405"), dir.Name())
-			if copyErr := filelock.Copy(boxDirPath, to); nil != copyErr {
-				logging.LogErrorf("copy corrupted box [%s] failed: %s", boxDirPath, copyErr)
-				continue
-			}
-			if removeErr := filelock.Remove(boxDirPath); nil != removeErr {
-				logging.LogErrorf("remove corrupted box [%s] failed: %s", boxDirPath, removeErr)
-				continue
-			}
-			logging.LogWarnf("moved corrupted box [%s] to [%s]", boxDirPath, to)
+			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
 			continue
-		} else {
-			data, readErr := filelock.ReadFile(boxConfPath)
-			if nil != readErr {
-				logging.LogErrorf("read box conf [%s] failed: %s", boxConfPath, readErr)
-				continue
-			}
-			if readErr = gulu.JSON.UnmarshalJSON(data, boxConf); nil != readErr {
-				logging.LogErrorf("parse box conf [%s] failed: %s", boxConfPath, readErr)
-				continue
-			}
+		}
+
+		data, readErr := filelock.ReadFile(boxConfPath)
+		if nil != readErr {
+			logging.LogErrorf("read box conf [%s] failed: %s", boxConfPath, readErr)
+			continue
+		}
+		if readErr = gulu.JSON.UnmarshalJSON(data, boxConf); nil != readErr {
+			logging.LogErrorf("parse box conf [%s] failed: %s", boxConfPath, readErr)
+			continue
 		}
 
 		id := dir.Name()
@@ -329,7 +317,7 @@ func (box *Box) Move(oldPath, newPath string) error {
 		return errors.New(msg)
 	}
 
-	if oldDir := path.Dir(oldPath); util.IsIDPattern(path.Base(oldDir)) {
+	if oldDir := path.Dir(oldPath); ast.IsNodeIDPattern(path.Base(oldDir)) {
 		fromDir := filepath.Join(boxLocalPath, oldDir)
 		if util.IsEmptyDir(fromDir) {
 			filelock.Remove(fromDir)
@@ -349,18 +337,6 @@ func (box *Box) Remove(path string) error {
 	}
 	IncSync()
 	return nil
-}
-
-func (box *Box) Unindex() {
-	tx, err := sql.BeginTx()
-	if nil != err {
-		return
-	}
-	sql.RemoveBoxHash(tx, box.ID)
-	sql.DeleteByBoxTx(tx, box.ID)
-	sql.CommitTx(tx)
-	ids := treenode.RemoveBlockTreesByBoxID(box.ID)
-	RemoveRecentDoc(ids)
 }
 
 func (box *Box) ListFiles(path string) (ret []*FileInfo) {
@@ -491,6 +467,23 @@ func genTreeID(tree *parse.Tree) {
 			n.ID = n.IALAttr("id")
 		}
 
+		if ast.NodeHTMLBlock == n.Type {
+			tokens := bytes.TrimSpace(n.Tokens)
+			if !bytes.HasPrefix(tokens, []byte("<div>")) {
+				tokens = []byte("<div>\n" + string(tokens))
+			}
+			if !bytes.HasSuffix(tokens, []byte("</div>")) {
+				tokens = append(tokens, []byte("\n</div>")...)
+			}
+			n.Tokens = tokens
+			return ast.WalkContinue
+		}
+
+		if ast.NodeInlineHTML == n.Type {
+			n.Type = ast.NodeText
+			return ast.WalkContinue
+		}
+
 		if ast.NodeParagraph == n.Type && nil != n.FirstChild && ast.NodeTaskListItemMarker == n.FirstChild.Type {
 			// 踢掉任务列表的第一个子节点左侧空格
 			n.FirstChild.Next.Tokens = bytes.TrimLeft(n.FirstChild.Next.Tokens, " ")
@@ -504,11 +497,13 @@ func genTreeID(tree *parse.Tree) {
 	return
 }
 
-var isFullReindexing = false
-
 func FullReindex() {
-	isFullReindexing = true
-	util.PushEndlessProgress(Conf.Language(35))
+	task.PrependTask(task.DatabaseIndexFull, fullReindex)
+	task.AppendTask(task.DatabaseIndexRef, IndexRefs)
+}
+
+func fullReindex() {
+	util.PushMsg(Conf.Language(35), 60*1000*10)
 	WaitForWritingFiles()
 
 	if err := sql.InitDatabase(true); nil != err {
@@ -519,14 +514,12 @@ func FullReindex() {
 
 	openedBoxes := Conf.GetOpenedBoxes()
 	for _, openedBox := range openedBoxes {
-		openedBox.Index(true)
+		index(openedBox.ID)
 	}
-	IndexRefs()
 	treenode.SaveBlockTree(true)
-	InitFlashcards()
+	LoadFlashcards()
 
-	util.PushEndlessProgress(Conf.Language(58))
-	isFullReindexing = false
+	util.PushMsg(Conf.Language(58), 7000)
 	go func() {
 		time.Sleep(1 * time.Second)
 		util.ReloadUI()

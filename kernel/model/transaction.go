@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"os"
 	"path"
 	"path/filepath"
@@ -31,6 +31,7 @@ import (
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/editor"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/emirpasic/gods/sets/hashset"
@@ -106,12 +107,7 @@ func AutoFlushTx() {
 	}
 }
 
-var txLock = sync.Mutex{}
-
 func flushTx() {
-	txLock.Lock()
-	defer txLock.Unlock()
-
 	defer logging.Recover()
 
 	currentTx = mergeTx()
@@ -1221,10 +1217,53 @@ func updateRefText(refNode *ast.Node, changedDefNodes map[string]*ast.Node) (cha
 	return
 }
 
+// AutoIndexEmbedBlock 嵌入块支持搜索 https://github.com/siyuan-note/siyuan/issues/7112
+func AutoIndexEmbedBlock() {
+	for {
+		embedBlocks := sql.QueryEmptyContentEmbedBlocks()
+		task.AppendTask(task.DatabaseIndexEmbedBlock, autoIndexEmbedBlock, embedBlocks)
+		time.Sleep(10 * time.Minute)
+	}
+}
+
+func autoIndexEmbedBlock(embedBlocks []*sql.Block) {
+	for i, embedBlock := range embedBlocks {
+		stmt := strings.TrimPrefix(embedBlock.Markdown, "{{")
+		stmt = strings.TrimSuffix(stmt, "}}")
+		queryResultBlocks := sql.SelectBlocksRawStmtNoParse(stmt, 102400)
+		for _, block := range queryResultBlocks {
+			embedBlock.Content += block.Content
+		}
+		if "" == embedBlock.Content {
+			embedBlock.Content = "no query result"
+		}
+		sql.UpdateBlockContent(embedBlock)
+
+		if 63 <= i { // 一次任务中最多处理 64 个嵌入块，防止卡顿
+			break
+		}
+	}
+}
+
+func updateEmbedBlockContent(embedBlockID string, queryResultBlocks []*EmbedBlock) {
+	embedBlock := sql.GetBlock(embedBlockID)
+	if nil == embedBlock {
+		return
+	}
+
+	for _, block := range queryResultBlocks {
+		embedBlock.Content += block.Block.Markdown
+	}
+	if "" == embedBlock.Content {
+		embedBlock.Content = "no query result"
+	}
+	sql.UpdateBlockContent(embedBlock)
+}
+
 // AutoFixIndex 自动校验数据库索引 https://github.com/siyuan-note/siyuan/issues/7016
 func AutoFixIndex() {
 	for {
-		autoFixIndex()
+		task.AppendTask(task.DatabaseIndexFix, autoFixIndex)
 		time.Sleep(10 * time.Minute)
 	}
 }
@@ -1234,33 +1273,12 @@ var autoFixLock = sync.Mutex{}
 func autoFixIndex() {
 	defer logging.Recover()
 
-	if isFullReindexing {
-		logging.LogInfof("skip check index caused by full reindexing")
-		return
-	}
-
-	if util.IsMutexLocked(&syncLock) {
-		logging.LogInfof("skip check index caused by sync lock")
-		return
-	}
-
-	if util.IsMutexLocked(&autoFixLock) {
-		return
-	}
-
-	autoFixLock.Lock()
-	defer autoFixLock.Unlock()
-
 	// 根据文件系统补全块树
 	boxes := Conf.GetOpenedBoxes()
 	for _, box := range boxes {
 		boxPath := filepath.Join(util.DataDir, box.ID)
 		var paths []string
 		filepath.Walk(boxPath, func(path string, info os.FileInfo, err error) error {
-			if isFullReindexing {
-				return io.EOF
-			}
-
 			if !info.IsDir() && filepath.Ext(path) == ".sy" {
 				p := path[len(boxPath):]
 				p = filepath.ToSlash(p)
@@ -1273,67 +1291,61 @@ func autoFixIndex() {
 
 		redundantPaths := treenode.GetRedundantPaths(box.ID, paths)
 		for _, p := range redundantPaths {
-			if isFullReindexing {
-				break
-			}
-
 			treenode.RemoveBlockTreesByPath(p)
 		}
 
 		missingPaths := treenode.GetNotExistPaths(box.ID, paths)
 		for i, p := range missingPaths {
-			if isFullReindexing {
-				break
+			id := path.Base(p)
+			id = strings.TrimSuffix(id, ".sy")
+			if !ast.IsNodeIDPattern(id) {
+				continue
 			}
 
 			reindexTreeByPath(box.ID, p, i, size)
+			if util.IsExiting {
+				break
+			}
 		}
+
+		if util.IsExiting {
+			break
+		}
+	}
+
+	// 清理已关闭的笔记本块树
+	boxes = Conf.GetClosedBoxes()
+	for _, box := range boxes {
+		treenode.RemoveBlockTreesByBoxID(box.ID)
 	}
 
 	// 对比块树和数据库并订正数据库
 	rootUpdatedMap := treenode.GetRootUpdated()
-	dbRootUpdatedMap, err := sql.GetRootUpdated()
+	dbRootUpdatedMap, err := sql.GetRootUpdated("blocks")
 	if nil == err {
-		i := -1
-		size := len(rootUpdatedMap)
-		for rootID, updated := range rootUpdatedMap {
-			if isFullReindexing {
-				break
-			}
-
-			i++
-
-			rootUpdated := dbRootUpdatedMap[rootID]
-			if "" == rootUpdated {
-				logging.LogWarnf("not found tree [%s] in database, reindex it", rootID)
-				reindexTree(rootID, i, size)
-				continue
-			}
-
-			if "" == updated {
-				// BlockTree 迁移，v2.6.3 之前没有 updated 字段
-				reindexTree(rootID, i, size)
-				continue
-			}
-
-			btUpdated, _ := time.Parse("20060102150405", updated)
-			dbUpdated, _ := time.Parse("20060102150405", rootUpdated)
-			if dbUpdated.Before(btUpdated.Add(-10 * time.Minute)) {
-				logging.LogWarnf("tree [%s] is not up to date, reindex it", rootID)
-				reindexTree(rootID, i, size)
-				continue
-			}
+		reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap, "blocks")
+	}
+	dbFtsRootUpdatedMap, err := sql.GetRootUpdated("blocks_fts")
+	if nil == err {
+		reindexTreeByUpdated(rootUpdatedMap, dbFtsRootUpdatedMap, "blocks_fts")
+	}
+	if !Conf.Search.CaseSensitive {
+		dbFtsRootUpdatedMap, err = sql.GetRootUpdated("blocks_fts_case_insensitive")
+		if nil == err {
+			reindexTreeByUpdated(rootUpdatedMap, dbFtsRootUpdatedMap, "blocks_fts_case_insensitive")
 		}
 	}
 
 	// 去除重复的数据库块记录
-	duplicatedRootIDs := sql.GetDuplicatedRootIDs()
+	duplicatedRootIDs := sql.GetDuplicatedRootIDs("blocks")
+	if 1 > len(duplicatedRootIDs) {
+		duplicatedRootIDs = sql.GetDuplicatedRootIDs("blocks_fts")
+		if 1 > len(duplicatedRootIDs) && !Conf.Search.CaseSensitive {
+			duplicatedRootIDs = sql.GetDuplicatedRootIDs("blocks_fts_case_insensitive")
+		}
+	}
 	size := len(duplicatedRootIDs)
 	for i, rootID := range duplicatedRootIDs {
-		if isFullReindexing {
-			break
-		}
-
 		root := sql.GetBlock(rootID)
 		if nil == root {
 			continue
@@ -1342,16 +1354,64 @@ func autoFixIndex() {
 		logging.LogWarnf("exist more than one tree [%s], reindex it", rootID)
 		sql.RemoveTreeQueue(root.Box, rootID)
 		reindexTree(rootID, i, size)
+
+		if util.IsExiting {
+			break
+		}
 	}
 
 	util.PushStatusBar(Conf.Language(185))
 }
 
-func reindexTreeByPath(box, p string, i, size int) {
-	if isFullReindexing {
-		return
+func reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap map[string]string, blocksTable string) {
+	i := -1
+	size := len(rootUpdatedMap)
+	for rootID, updated := range rootUpdatedMap {
+		i++
+
+		if util.IsExiting {
+			break
+		}
+
+		rootUpdated := dbRootUpdatedMap[rootID]
+		if "" == rootUpdated {
+			logging.LogWarnf("not found tree [%s] in database, reindex it", rootID)
+			reindexTree(rootID, i, size)
+			continue
+		}
+
+		if "" == updated {
+			// BlockTree 迁移，v2.6.3 之前没有 updated 字段
+			reindexTree(rootID, i, size)
+			continue
+		}
+
+		btUpdated, _ := time.Parse("20060102150405", updated)
+		dbUpdated, _ := time.Parse("20060102150405", rootUpdated)
+		if dbUpdated.Before(btUpdated.Add(-10 * time.Minute)) {
+			logging.LogWarnf("tree [%s] is not up to date, reindex it", rootID)
+			reindexTree(rootID, i, size)
+			continue
+		}
+
+		if util.IsExiting {
+			break
+		}
 	}
 
+	for rootID, _ := range dbRootUpdatedMap {
+		if _, ok := rootUpdatedMap[rootID]; !ok {
+			logging.LogWarnf("tree [%s] is not in block tree, remove it from [%s]", rootID, blocksTable)
+			sql.DeleteTree(blocksTable, rootID)
+		}
+
+		if util.IsExiting {
+			break
+		}
+	}
+}
+
+func reindexTreeByPath(box, p string, i, size int) {
 	tree, err := LoadTree(box, p)
 	if nil != err {
 		return
@@ -1361,10 +1421,6 @@ func reindexTreeByPath(box, p string, i, size int) {
 }
 
 func reindexTree(rootID string, i, size int) {
-	if isFullReindexing {
-		return
-	}
-
 	root := treenode.GetBlockTree(rootID)
 	if nil == root {
 		logging.LogWarnf("root block not found", rootID)
@@ -1393,5 +1449,5 @@ func reindexTree0(tree *parse.Tree, i, size int) {
 		treenode.ReindexBlockTree(tree)
 		sql.UpsertTreeQueue(tree)
 	}
-	util.PushStatusBar(fmt.Sprintf(Conf.Language(183), i, size, path.Base(tree.HPath)))
+	util.PushStatusBar(fmt.Sprintf(Conf.Language(183), i, size, html.EscapeHTMLStr(path.Base(tree.HPath))))
 }

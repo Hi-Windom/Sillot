@@ -23,7 +23,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -33,6 +32,7 @@ import (
 )
 
 var (
+	TesseractBin       = "tesseract"
 	TesseractEnabled   bool
 	AssetsTexts        = map[string]string{}
 	AssetsTextsLock    = sync.Mutex{}
@@ -59,8 +59,17 @@ func GetAssetText(asset string) string {
 	return ret
 }
 
+func IsTesseractExtractable(p string) bool {
+	lowerName := strings.ToLower(p)
+	return strings.HasSuffix(lowerName, ".png") || strings.HasSuffix(lowerName, ".jpg") || strings.HasSuffix(lowerName, ".jpeg")
+}
+
 func Tesseract(imgAbsPath string) string {
 	if ContainerStd != Container || !TesseractEnabled {
+		return ""
+	}
+
+	if !IsTesseractExtractable(imgAbsPath) {
 		return ""
 	}
 
@@ -74,7 +83,7 @@ func Tesseract(imgAbsPath string) string {
 	ctx, cancel := context.WithTimeout(context.Background(), 7*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "tesseract", "-c", "debug_file=/dev/null", imgAbsPath, "stdout", "-l", strings.Join(TesseractLangs, "+"))
+	cmd := exec.CommandContext(ctx, TesseractBin, "-c", "debug_file=/dev/null", imgAbsPath, "stdout", "-l", strings.Join(TesseractLangs, "+"))
 	gulu.CmdAttr(cmd)
 	output, err := cmd.CombinedOutput()
 	if ctx.Err() == context.DeadlineExceeded {
@@ -88,11 +97,8 @@ func Tesseract(imgAbsPath string) string {
 	}
 
 	ret := string(output)
-	ret = strings.ReplaceAll(ret, "\r", "")
-	ret = strings.ReplaceAll(ret, "\n", "")
-	ret = strings.ReplaceAll(ret, "\t", " ")
-	reg := regexp.MustCompile("\\s{2,}")
-	ret = reg.ReplaceAllString(ret, " ")
+	ret = gulu.Str.RemoveInvisible(ret)
+	ret = RemoveRedundantSpace(ret)
 	msg := fmt.Sprintf("OCR [%s] [%s]", info.Name(), ret)
 	PushStatusBar(msg)
 	return ret
@@ -110,27 +116,9 @@ func initTesseract() {
 		TesseractEnabled = false
 		return
 	}
-	if !gulu.Str.Contains("eng", langs) {
-		logging.LogWarnf("no eng tesseract lang found")
-		return
-	}
-
-	foundChi := false
-	for _, lang := range langs {
-		if strings.Contains(lang, "chi") {
-			foundChi = true
-			break
-		}
-	}
-	if !foundChi {
-		logging.LogWarnf("no chi_* tesseract lang found")
-		return
-	}
 
 	for _, lang := range langs {
-		if "eng" == lang || strings.HasPrefix(lang, "chi") {
-			TesseractLangs = append(TesseractLangs, lang)
-		}
+		TesseractLangs = append(TesseractLangs, lang)
 	}
 	logging.LogInfof("tesseract-ocr enabled [ver=%s, langs=%s]", ver, strings.Join(TesseractLangs, "+"))
 }
@@ -140,10 +128,23 @@ func getTesseractVer() (ret string) {
 		return
 	}
 
-	cmd := exec.Command("tesseract", "--version")
+	cmd := exec.Command(TesseractBin, "--version")
 	gulu.CmdAttr(cmd)
 	data, err := cmd.CombinedOutput()
-	if nil == err && strings.HasPrefix(string(data), "tesseract ") {
+	if nil != err {
+		if strings.Contains(err.Error(), "executable file not found") {
+			// macOS 端 Tesseract OCR 安装后不识别 https://github.com/siyuan-note/siyuan/issues/7107
+			TesseractBin = "/usr/local/bin/tesseract"
+			cmd = exec.Command(TesseractBin, "--version")
+			gulu.CmdAttr(cmd)
+			data, err = cmd.CombinedOutput()
+		}
+	}
+	if nil != err {
+		return
+	}
+
+	if strings.HasPrefix(string(data), "tesseract ") {
 		parts := bytes.Split(data, []byte("\n"))
 		if 0 < len(parts) {
 			ret = strings.TrimPrefix(string(parts[0]), "tesseract ")
@@ -160,7 +161,7 @@ func getTesseractLangs() (ret []string) {
 		return nil
 	}
 
-	cmd := exec.Command("tesseract", "--list-langs")
+	cmd := exec.Command(TesseractBin, "--list-langs")
 	gulu.CmdAttr(cmd)
 	data, err := cmd.CombinedOutput()
 	if nil != err {

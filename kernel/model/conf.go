@@ -19,6 +19,7 @@ package model
 import (
 	"bytes"
 	"fmt"
+	"github.com/88250/lute/ast"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -104,7 +105,7 @@ func InitConf() {
 
 			if userLang, err := locale.Detect(); nil == err {
 				var supportLangs []language.Tag
-				for lang := range langs {
+				for lang := range util.Langs {
 					if tag, err := language.Parse(lang); nil == err {
 						supportLangs = append(supportLangs, tag)
 					} else {
@@ -124,6 +125,7 @@ func InitConf() {
 				Conf.Lang = util.Lang
 			}
 		}
+		util.Lang = Conf.Lang
 	}
 
 	Conf.Langs = loadLangs()
@@ -139,6 +141,7 @@ func InitConf() {
 	}
 	if !langOK {
 		Conf.Lang = "en_US"
+		util.Lang = Conf.Lang
 	}
 	Conf.Appearance.Lang = Conf.Lang
 	if nil == Conf.UILayout {
@@ -320,9 +323,6 @@ func InitConf() {
 	util.SetNetworkProxy(Conf.System.NetworkProxy.String())
 }
 
-var langs = map[string]map[int]string{}
-var timeLangs = map[string]map[string]interface{}{}
-
 func initLang() {
 	p := filepath.Join(util.WorkingDir, "appearance", "langs")
 	dir, err := os.Open(p)
@@ -362,14 +362,15 @@ func initLang() {
 		}
 		kernelMap[-1] = label
 		name := langName[:strings.LastIndex(langName, ".")]
-		langs[name] = kernelMap
+		util.Langs[name] = kernelMap
 
-		timeLangs[name] = langMap["_time"].(map[string]interface{})
+		util.TimeLangs[name] = langMap["_time"].(map[string]interface{})
+		util.TaskActionLangs[name] = langMap["_taskAction"].(map[string]interface{})
 	}
 }
 
 func loadLangs() (ret []*conf.Lang) {
-	for name, langMap := range langs {
+	for name, langMap := range util.Langs {
 		lang := &conf.Lang{Label: langMap[-1], Name: name}
 		ret = append(ret, lang)
 	}
@@ -391,24 +392,19 @@ var exitLock = sync.Mutex{}
 func Close(force bool, execInstallPkg int) (exitCode int) {
 	exitLock.Lock()
 	defer exitLock.Unlock()
+	util.IsExiting = true
 
 	logging.LogInfof("exiting kernel [force=%v, execInstallPkg=%d]", force, execInstallPkg)
 	util.PushMsg(Conf.Language(95), 10000*60)
 	WaitForWritingFiles()
 
 	if !force {
-		SyncData(false, true, false)
+		syncData(false, true, false)
 		if 0 != ExitSyncSucc {
 			exitCode = 1
 			return
 		}
 	}
-
-	//util.UIProcessIDs.Range(func(key, _ interface{}) bool {
-	//	pid := key.(string)
-	//	util.Kill(pid)
-	//	return true
-	//})
 
 	waitSecondForExecInstallPkg := false
 	if !skipNewVerInstallPkg() {
@@ -430,6 +426,7 @@ func Close(force bool, execInstallPkg int) (exitCode int) {
 	treenode.SaveBlockTree(false)
 	SaveAssetsTexts()
 	clearWorkspaceTemp()
+	clearCorruptedNotebooks()
 	clearPortJSON()
 	util.UnlockWorkspace()
 
@@ -570,11 +567,11 @@ func (conf *AppConf) GetClosedBoxes() (ret []*Box) {
 }
 
 func (conf *AppConf) Language(num int) (ret string) {
-	ret = langs[conf.Lang][num]
+	ret = util.Langs[conf.Lang][num]
 	if "" != ret {
 		return
 	}
-	ret = langs["en_US"][num]
+	ret = util.Langs["en_US"][num]
 	return
 }
 
@@ -601,7 +598,7 @@ func InitBoxes() {
 		box.UpdateHistoryGenerated() // 初始化历史生成时间为当前时间
 
 		if !initialized {
-			box.Index(true)
+			index(box.ID)
 		}
 	}
 
@@ -669,6 +666,49 @@ func clearPortJSON() {
 	} else {
 		if err = os.WriteFile(portJSON, data, 0644); nil != err {
 			logging.LogWarnf("write port.json failed: %s", err)
+		}
+	}
+}
+
+func clearCorruptedNotebooks() {
+	// 数据同步时展开文档树操作可能导致数据丢失 https://github.com/siyuan-note/siyuan/issues/7129
+
+	dirs, err := os.ReadDir(util.DataDir)
+	if nil != err {
+		logging.LogErrorf("read dir [%s] failed: %s", util.DataDir, err)
+		return
+	}
+	for _, dir := range dirs {
+		if util.IsReservedFilename(dir.Name()) {
+			continue
+		}
+
+		if !dir.IsDir() {
+			continue
+		}
+
+		if !ast.IsNodeIDPattern(dir.Name()) {
+			continue
+		}
+
+		boxDirPath := filepath.Join(util.DataDir, dir.Name())
+		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json")
+		if !gulu.File.IsExist(boxConfPath) {
+			if IsUserGuide(dir.Name()) {
+				filelock.Remove(boxDirPath)
+				continue
+			}
+			to := filepath.Join(util.WorkspaceDir, "corrupted", time.Now().Format("2006-01-02-150405"), dir.Name())
+			if copyErr := filelock.Copy(boxDirPath, to); nil != copyErr {
+				logging.LogErrorf("copy corrupted box [%s] failed: %s", boxDirPath, copyErr)
+				continue
+			}
+			if removeErr := filelock.Remove(boxDirPath); nil != removeErr {
+				logging.LogErrorf("remove corrupted box [%s] failed: %s", boxDirPath, removeErr)
+				continue
+			}
+			logging.LogWarnf("moved corrupted box [%s] to [%s]", boxDirPath, to)
+			continue
 		}
 	}
 }

@@ -31,6 +31,22 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
+func QueryEmptyContentEmbedBlocks() (ret []*Block) {
+	stmt := "SELECT * FROM blocks WHERE type = 'query_embed' AND content = ''"
+	rows, err := query(stmt)
+	if nil != err {
+		logging.LogErrorf("sql query [%s] failed: %s", stmt, err)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if block := scanBlockRows(rows); nil != block {
+			ret = append(ret, block)
+		}
+	}
+	return
+}
+
 func queryBlockHashes(rootID string) (ret map[string]string) {
 	stmt := "SELECT id, hash FROM blocks WHERE root_id = ?"
 	rows, err := query(stmt, rootID)
@@ -581,8 +597,8 @@ func GetBlock(id string) (ret *Block) {
 	return
 }
 
-func GetRootUpdated() (ret map[string]string, err error) {
-	rows, err := query("SELECT root_id, updated FROM blocks WHERE type = 'd'")
+func GetRootUpdated(blocksTable string) (ret map[string]string, err error) {
+	rows, err := query("SELECT root_id, updated FROM `" + blocksTable + "` WHERE type = 'd'")
 	if nil != err {
 		logging.LogErrorf("sql query failed: %s", err)
 		return
@@ -598,8 +614,8 @@ func GetRootUpdated() (ret map[string]string, err error) {
 	return
 }
 
-func GetDuplicatedRootIDs() (ret []string) {
-	rows, err := query("SELECT DISTINCT root_id FROM blocks GROUP BY id HAVING COUNT(*) > 1")
+func GetDuplicatedRootIDs(blocksTable string) (ret []string) {
+	rows, err := query("SELECT DISTINCT root_id FROM `" + blocksTable + "` GROUP BY id HAVING COUNT(*) > 1")
 	if nil != err {
 		logging.LogErrorf("sql query failed: %s", err)
 		return

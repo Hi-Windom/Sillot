@@ -13,6 +13,7 @@ import { openFileById } from "./editor/util";
 import {
     bootSync,
     downloadProgress,
+    processSync, progressBackgroundTask,
     progressLoading,
     progressStatus,
     setTitle,
@@ -101,12 +102,10 @@ class App {
                                 transactionError(data);
                                 break;
                             case "syncing":
-                                if (data.code === 0) {
-                                    document.querySelector("#barSync").classList.add("toolbar__item--active");
-                                } else {
-                                    document.querySelector("#barSync").classList.remove("toolbar__item--active");
-                                }
-                                document.querySelector("#barSync").setAttribute("aria-label", data.msg);
+                                processSync(data);
+                                break;
+                            case "backgroundtask":
+                                progressBackgroundTask(data.data.tasks);
                                 break;
                             case "refreshtheme":
                                 if (!window.siyuan.config.appearance.customCSS && data.data.theme.indexOf("custom.css") > -1) {
@@ -120,6 +119,9 @@ class App {
                                 break;
                             case "createdailynote":
                                 openFileById({ id: data.data.id, action: [Constants.CB_GET_FOCUS] });
+                                break;
+                            case "openFileById":
+                                openFileById({id: data.data.id, action: [Constants.CB_GET_FOCUS]});
                                 break;
                         }
                     }

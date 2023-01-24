@@ -19,6 +19,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"math"
 	"os"
 	"path"
@@ -96,7 +97,7 @@ func (box *Box) docFromFileInfo(fileInfo *FileInfo, ial map[string]string) (ret 
 }
 
 func HumanizeTime(then time.Time) string {
-	labels := timeLangs[Conf.Lang]
+	labels := util.TimeLangs[Conf.Lang]
 
 	defaultMagnitudes := []humanize.RelTimeMagnitude{
 		{time.Second, labels["now"].(string), time.Second},
@@ -248,7 +249,7 @@ func ListDocTree(boxID, path string, sortMode int) (ret []*File, totals int, err
 	var docs []*File
 	for _, file := range files {
 		if file.isdir {
-			if !util.IsIDPattern(file.name) {
+			if !ast.IsNodeIDPattern(file.name) {
 				continue
 			}
 
@@ -903,7 +904,7 @@ func DuplicateDoc(rootID string) (ret *parse.Tree, err error) {
 
 	resetTree(ret, "Duplicated")
 	createTreeTx(ret)
-	sql.WaitForWritingDatabase()
+	WaitForWritingFiles()
 	return
 }
 
@@ -911,15 +912,7 @@ func createTreeTx(tree *parse.Tree) {
 	transaction := &Transaction{DoOperations: []*Operation{{Action: "create", Data: tree}}}
 	err := PerformTransactions(&[]*Transaction{transaction})
 	if nil != err {
-		tx, txErr := sql.BeginTx()
-		if nil != txErr {
-			logging.LogFatalf("transaction failed: %s", txErr)
-			return
-		}
-		sql.ClearBoxHash(tx)
-		sql.CommitTx(tx)
 		logging.LogFatalf("transaction failed: %s", err)
-		return
 	}
 }
 
@@ -1177,23 +1170,19 @@ func moveDoc(fromBox *Box, fromPath string, toBox *Box, toPath string) (newPath 
 	return
 }
 
-func RemoveDoc(boxID, p string) (err error) {
+func RemoveDoc(boxID, p string) {
 	box := Conf.Box(boxID)
 	if nil == box {
-		err = errors.New(Conf.Language(0))
 		return
 	}
 
 	WaitForWritingFiles()
-	err = removeDoc(box, p)
-	if nil != err {
-		return
-	}
+	removeDoc(box, p)
 	IncSync()
 	return
 }
 
-func RemoveDocs(paths []string) (err error) {
+func RemoveDocs(paths []string) {
 	util.PushEndlessProgress(Conf.Language(116))
 	defer util.PushClearProgress()
 
@@ -1201,17 +1190,14 @@ func RemoveDocs(paths []string) (err error) {
 	pathsBoxes := getBoxesByPaths(paths)
 	WaitForWritingFiles()
 	for p, box := range pathsBoxes {
-		err = removeDoc(box, p)
-		if nil != err {
-			return
-		}
+		removeDoc(box, p)
 	}
 	return
 }
 
-func removeDoc(box *Box, p string) (err error) {
-	tree, err := LoadTree(box.ID, p)
-	if nil != err {
+func removeDoc(box *Box, p string) {
+	tree, _ := LoadTree(box.ID, p)
+	if nil == tree {
 		return
 	}
 
@@ -1224,15 +1210,13 @@ func removeDoc(box *Box, p string) (err error) {
 	historyPath := filepath.Join(historyDir, box.ID, p)
 	absPath := filepath.Join(util.DataDir, box.ID, p)
 	if err = filelock.Copy(absPath, historyPath); nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(70), box.Name, absPath, err))
+		logging.LogErrorf("backup [path=%s] to history [%s] failed: %s", absPath, historyPath, err)
+		return
 	}
 
 	copyDocAssetsToDataAssets(box.ID, p)
 
-	var removeIDs []string
-	ids := treenode.RootChildIDs(tree.ID)
-	removeIDs = append(removeIDs, ids...)
-
+	removeIDs := treenode.RootChildIDs(tree.ID)
 	dir := path.Dir(p)
 	childrenDir := path.Join(dir, tree.ID)
 	existChildren := box.Exist(childrenDir)
@@ -1240,6 +1224,7 @@ func removeDoc(box *Box, p string) (err error) {
 		absChildrenDir := filepath.Join(util.DataDir, tree.Box, childrenDir)
 		historyPath = filepath.Join(historyDir, tree.Box, childrenDir)
 		if err = filelock.Copy(absChildrenDir, historyPath); nil != err {
+			logging.LogErrorf("backup [path=%s] to history [%s] failed: %s", absChildrenDir, historyPath, err)
 			return
 		}
 	}
@@ -1254,11 +1239,7 @@ func removeDoc(box *Box, p string) (err error) {
 		return
 	}
 	box.removeSort(removeIDs)
-
-	treenode.RemoveBlockTreesByPathPrefix(childrenDir)
-	sql.RemoveTreePathQueue(box.ID, childrenDir)
 	RemoveRecentDoc(removeIDs)
-
 	if "/" != dir {
 		others, err := os.ReadDir(filepath.Join(util.DataDir, box.ID, dir))
 		if nil == err && 1 > len(others) {
@@ -1266,13 +1247,19 @@ func removeDoc(box *Box, p string) (err error) {
 		}
 	}
 
-	cache.RemoveDocIAL(p)
-
 	evt := util.NewCmdResult("removeDoc", 0, util.PushModeBroadcast)
 	evt.Data = map[string]interface{}{
 		"ids": removeIDs,
 	}
 	util.PushEvent(evt)
+
+	task.PrependTask(task.DatabaseIndex, removeDoc0, box, p, childrenDir)
+}
+
+func removeDoc0(box *Box, p, childrenDir string) {
+	treenode.RemoveBlockTreesByPathPrefix(childrenDir)
+	sql.RemoveTreePathQueue(box.ID, childrenDir)
+	cache.RemoveDocIAL(p)
 	return
 }
 
@@ -1472,13 +1459,6 @@ func createDoc(boxID, p, title, dom string) (err error) {
 	transaction := &Transaction{DoOperations: []*Operation{{Action: "create", Data: tree}}}
 	err = PerformTransactions(&[]*Transaction{transaction})
 	if nil != err {
-		tx, txErr := sql.BeginTx()
-		if nil != txErr {
-			logging.LogFatalf("transaction failed: %s", txErr)
-			return
-		}
-		sql.ClearBoxHash(tx)
-		sql.CommitTx(tx)
 		logging.LogFatalf("transaction failed: %s", err)
 		return
 	}

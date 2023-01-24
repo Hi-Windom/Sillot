@@ -1,5 +1,6 @@
 import {openMobileFileById} from "../editor";
-import {progressLoading, progressStatus, transactionError} from "../../dialog/processSystem";
+import {processSync, progressLoading, progressStatus, transactionError} from "../../dialog/processSystem";
+import {Constants} from "../../constants";
 
 export const onMessage = (data: IWebSocketData) => {
     if (data) {
@@ -8,17 +9,17 @@ export const onMessage = (data: IWebSocketData) => {
                 progressLoading(data);
                 break;
             case"syncing":
-                if (document.querySelector("#menuSyncNow")) {
-                    if (data.code === 0) {
-                        document.querySelector("#menuSyncNow svg").classList.add("fn__rotate");
-                    } else {
-                        document.querySelector("#menuSyncNow svg").classList.remove("fn__rotate");
-                    }
+                processSync(data);
+                if (data.code !== 0) {
+                    document.getElementById("transactionTip").classList.add("fn__none");
                 }
                 break;
             case "create":
             case "createdailynote":
                 openMobileFileById(data.data.id);
+                break;
+            case "openFileById":
+                openMobileFileById(data.data.id, [Constants.CB_GET_FOCUS]);
                 break;
             case"txerr":
                 transactionError(data);
