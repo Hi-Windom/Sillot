@@ -192,11 +192,11 @@ func serveAppearance(ginServer *gin.Engine) {
 
 		ua := user_agent.New(userAgentHeader)
 		if ua.Mobile() {
-			c.Redirect(302, "/stage/build/mobile/?r="+gulu.Rand.String(7))
+			c.Redirect(302, "/stage/build/mobile/?b=Sillot&r="+gulu.Rand.String(7))
 			return
 		}
 
-		c.Redirect(302, "/stage/build/desktop/?r="+gulu.Rand.String(7))
+		c.Redirect(302, "/stage/build/desktop/?b=Sillot&r="+gulu.Rand.String(7))
 	})
 
 	appearancePath := util.AppearancePath
