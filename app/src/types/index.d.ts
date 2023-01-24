@@ -33,6 +33,7 @@ interface Window {
     __localStorage__setItem: (key: string, value: string) => void
     dataLayer: any[]
     siyuan: ISiyuan
+    Sillot: ISillot
     webkit: any
     html2canvas: (element: Element) => Promise<any>;
     JSAndroid: {
@@ -207,6 +208,10 @@ interface ISiyuan {
     bookmarkLabel?: string[]
     blockPanels: import("../block/Panel").BlockPanel[],
     dialogs: import("../dialog").Dialog[],
+}
+
+interface ISillot {
+    IDBloaded: boolean
 }
 
 interface IScrollAttr {

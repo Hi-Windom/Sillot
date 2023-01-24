@@ -127,6 +127,7 @@ class App {
             }),
             menus: new Menus()
         };
+        window.Sillot = { IDBloaded: false }
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
             let workspaceName: string = path.basename(window.siyuan.config.system.workspaceDir)
@@ -134,6 +135,7 @@ class App {
                 let result = response.data;
                 console.log(result);
                 await importIDB(result).then(() => {
+                    window.Sillot.IDBloaded = true;
                     getLocalStorage(() => {
                         fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
                             window.siyuan.languages = lauguages;
