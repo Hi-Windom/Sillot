@@ -99,8 +99,8 @@ export class MobileFiles extends Model {
                     event.preventDefault();
                     break;
                 } else if (type === "focus") {
-                    if (window.siyuan.mobileEditor) {
-                        this.selectItem(window.siyuan.mobileEditor.protyle.notebookId, window.siyuan.mobileEditor.protyle.path);
+                    if (window.siyuan.mobile.editor) {
+                        this.selectItem(window.siyuan.mobile.editor.protyle.notebookId, window.siyuan.mobile.editor.protyle.path);
                     }
                     event.preventDefault();
                     break;
@@ -569,9 +569,6 @@ export class MobileFiles extends Model {
                     this.element.insertAdjacentHTML("afterbegin", html);
                 }
             }
-            if (data.callback === Constants.CB_MOUNT_HELP) {
-                openMobileFileById(Constants.HELP_START_PATH[window.siyuan.config.appearance.lang as "zh_CN" | "en_US"]);
-            }
         });
 
     }
@@ -649,7 +646,7 @@ export class MobileFiles extends Model {
         }
     }
 
-    private getLeaf(liElement: Element, notebookId: string) {
+    public getLeaf(liElement: Element, notebookId: string) {
         const toggleElement = liElement.querySelector(".b3-list-item__arrow");
         if (toggleElement.classList.contains("b3-list-item__arrow--open")) {
             toggleElement.classList.remove("b3-list-item__arrow--open");

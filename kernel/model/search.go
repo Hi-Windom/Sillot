@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"path"
 	"regexp"
 	"sort"
@@ -58,6 +59,11 @@ func searchEmbedBlock(embedBlockID, stmt string, excludeIDs []string, headingMod
 	sqlBlocks := sql.SelectBlocksRawStmtNoParse(stmt, Conf.Search.Limit)
 	var tmp []*sql.Block
 	for _, b := range sqlBlocks {
+		if "query_embed" == b.Type { // 嵌入块不再嵌入
+			// 嵌入块支持搜索 https://github.com/siyuan-note/siyuan/issues/7112
+			// 这里会导致上面的 limit 限制不准确，导致结果变少，暂时没有解决方案，只能靠用户自己调整 SQL，加上 type != 'query_embed' 的条件
+			continue
+		}
 		if !gulu.Str.Contains(b.ID, excludeIDs) {
 			tmp = append(tmp, b)
 		}
@@ -91,6 +97,9 @@ func searchEmbedBlock(embedBlockID, stmt string, excludeIDs []string, headingMod
 			BlockPaths: blockPaths,
 		})
 	}
+
+	// 嵌入块支持搜索 https://github.com/siyuan-note/siyuan/issues/7112
+	task.AppendTask(task.DatabaseIndexEmbedBlock, updateEmbedBlockContent, embedBlockID, ret)
 
 	// 添加笔记本名称
 	var boxIDs []string
@@ -494,6 +503,7 @@ func buildTypeFilter(types map[string]bool) string {
 		s.SuperBlock = types["superBlock"]
 		s.Paragraph = types["paragraph"]
 		s.HTMLBlock = types["htmlBlock"]
+		s.EmbedBlock = types["embedBlock"]
 	} else {
 		s.Document = Conf.Search.Document
 		s.Heading = Conf.Search.Heading
@@ -506,6 +516,7 @@ func buildTypeFilter(types map[string]bool) string {
 		s.SuperBlock = Conf.Search.SuperBlock
 		s.Paragraph = Conf.Search.Paragraph
 		s.HTMLBlock = Conf.Search.HTMLBlock
+		s.EmbedBlock = Conf.Search.EmbedBlock
 	}
 	return s.TypeFilter()
 }
@@ -534,7 +545,7 @@ func searchBySQL(stmt string, beforeLen int) (ret []*Block, matchedBlockCount, m
 func fullTextSearchRefBlock(keyword string, beforeLen int) (ret []*Block) {
 	keyword = gulu.Str.RemoveInvisible(keyword)
 
-	if util.IsIDPattern(keyword) {
+	if ast.IsNodeIDPattern(keyword) {
 		ret, _, _ = searchBySQL("SELECT * FROM `blocks` WHERE `id` = '"+keyword+"'", 36)
 		return
 	}
@@ -581,7 +592,7 @@ func fullTextSearchRefBlock(keyword string, beforeLen int) (ret []*Block) {
 
 func fullTextSearchByQuerySyntax(query, boxFilter, pathFilter, typeFilter, orderBy string, beforeLen int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
 	query = gulu.Str.RemoveInvisible(query)
-	if util.IsIDPattern(query) {
+	if ast.IsNodeIDPattern(query) {
 		ret, matchedBlockCount, matchedRootCount = searchBySQL("SELECT * FROM `blocks` WHERE `id` = '"+query+"'", beforeLen)
 		return
 	}
@@ -590,7 +601,7 @@ func fullTextSearchByQuerySyntax(query, boxFilter, pathFilter, typeFilter, order
 
 func fullTextSearchByKeyword(query, boxFilter, pathFilter, typeFilter string, orderBy string, beforeLen int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
 	query = gulu.Str.RemoveInvisible(query)
-	if util.IsIDPattern(query) {
+	if ast.IsNodeIDPattern(query) {
 		ret, matchedBlockCount, matchedRootCount = searchBySQL("SELECT * FROM `blocks` WHERE `id` = '"+query+"'", beforeLen)
 		return
 	}
@@ -660,7 +671,7 @@ func fullTextSearchByFTS(query, boxFilter, pathFilter, typeFilter, orderBy strin
 
 func fullTextSearchCount(query, boxFilter, pathFilter, typeFilter string) (matchedBlockCount, matchedRootCount int) {
 	query = gulu.Str.RemoveInvisible(query)
-	if util.IsIDPattern(query) {
+	if ast.IsNodeIDPattern(query) {
 		ret, _ := sql.Query("SELECT COUNT(id) AS `matches`, COUNT(DISTINCT(root_id)) AS `docs` FROM `blocks` WHERE `id` = '" + query + "'")
 		if 1 > len(ret) {
 			return

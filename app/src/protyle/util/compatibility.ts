@@ -171,6 +171,9 @@ export const getLocalStorage = (cb:()=>void) => {
             keepFold: false,
             mergeSubdocs: false,
         };
+        defaultStorage[Constants.LOCAL_EXPORTIMG] = {
+            keepFold: false,
+        };
         defaultStorage[Constants.LOCAL_DOCINFO] = {
             id: "",
             action: []
@@ -197,11 +200,12 @@ export const getLocalStorage = (cb:()=>void) => {
                 blockquote: window.siyuan.config.search.blockquote,
                 superBlock: window.siyuan.config.search.superBlock,
                 paragraph: window.siyuan.config.search.paragraph,
+                embedBlock: window.siyuan.config.search.embedBlock,
             }
         };
         defaultStorage[Constants.LOCAL_ZOOM] = 1;
 
-        [Constants.LOCAL_SEARCHEKEYS, Constants.LOCAL_PDFTHEME, Constants.LOCAL_BAZAAR, Constants.LOCAL_EXPORTWORD,
+        [Constants.LOCAL_EXPORTIMG, Constants.LOCAL_SEARCHEKEYS, Constants.LOCAL_PDFTHEME, Constants.LOCAL_BAZAAR, Constants.LOCAL_EXPORTWORD,
             Constants.LOCAL_EXPORTPDF, Constants.LOCAL_DOCINFO, Constants.LOCAL_FONTSTYLES, Constants.LOCAL_SEARCHEDATA,
             Constants.LOCAL_ZOOM,].forEach((key) => {
             if (typeof response.data[key] === "string") {

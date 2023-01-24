@@ -58,9 +58,7 @@ func AutoSync() {
 func BootSyncData() {
 	defer logging.Recover()
 
-	if util.IsMutexLocked(&syncLock) {
-		logging.LogWarnf("sync is in progress")
-		planSyncAfter(30 * time.Second)
+	if !checkSync(true, false, false) {
 		return
 	}
 
@@ -69,27 +67,10 @@ func BootSyncData() {
 
 	util.IncBootProgress(3, "Syncing data from the cloud...")
 	BootSyncSucc = 0
-
-	if !Conf.Sync.Enabled || !cloud.IsValidCloudDirName(Conf.Sync.CloudName) {
-		return
-	}
-
-	if !IsSubscriber() && conf.ProviderSiYuan == Conf.Sync.Provider {
-		return
-	}
-
 	logging.LogInfof("sync before boot")
-
-	if 7 < syncDownloadErrCount {
-		logging.LogErrorf("sync download error too many times, cancel auto sync, try to sync by hand")
-		util.PushErrMsg(Conf.Language(125), 1000*60*60)
-		planSyncAfter(64 * time.Minute)
-		return
-	}
 
 	now := util.CurrentTimeMillis()
 	Conf.Sync.Synced = now
-
 	util.BroadcastByType("main", "syncing", 0, Conf.Language(81), nil)
 	err := bootSyncRepo()
 	synced := util.Millisecond2Time(Conf.Sync.Synced).Format("2006-01-02 15:04:05") + "\n\n"
@@ -101,20 +82,23 @@ func BootSyncData() {
 	msg := fmt.Sprintf(Conf.Language(82), synced)
 	Conf.Sync.Stat = msg
 	Conf.Save()
-	util.BroadcastByType("main", "syncing", 1, msg, nil)
+	code := 1
+	if nil != err {
+		code = 2
+	}
+	util.BroadcastByType("main", "syncing", code, msg, nil)
 	return
 }
 
 func SyncData(boot, exit, byHand bool) {
+	util.BroadcastByType("main", "syncing", 0, Conf.Language(81), nil)
+	syncData(boot, exit, byHand)
+}
+
+func syncData(boot, exit, byHand bool) {
 	defer logging.Recover()
 
-	if !boot && !exit && 2 == Conf.Sync.Mode && !byHand {
-		return
-	}
-
-	if util.IsMutexLocked(&syncLock) {
-		logging.LogWarnf("sync is in progress")
-		planSyncAfter(30 * time.Second)
+	if !checkSync(boot, exit, byHand) {
 		return
 	}
 
@@ -124,46 +108,12 @@ func SyncData(boot, exit, byHand bool) {
 	if boot {
 		util.IncBootProgress(3, "Syncing data from the cloud...")
 		BootSyncSucc = 0
-	}
-	if exit {
-		ExitSyncSucc = 0
-	}
-
-	if !Conf.Sync.Enabled {
-		if byHand {
-			util.PushMsg(Conf.Language(124), 5000)
-		}
-		return
-	}
-
-	if !cloud.IsValidCloudDirName(Conf.Sync.CloudName) {
-		if byHand {
-			util.PushMsg(Conf.Language(123), 5000)
-		}
-		return
-	}
-
-	if !IsSubscriber() && conf.ProviderSiYuan == Conf.Sync.Provider {
-		return
-	}
-
-	if !cloud.IsValidCloudDirName(Conf.Sync.CloudName) {
-		return
-	}
-
-	if boot {
 		logging.LogInfof("sync before boot")
 	}
 	if exit {
+		ExitSyncSucc = 0
 		logging.LogInfof("sync before exit")
 		util.PushMsg(Conf.Language(81), 1000*60*15)
-	}
-
-	if 7 < syncDownloadErrCount && !byHand {
-		logging.LogErrorf("sync download error too many times, cancel auto sync, try to sync by hand")
-		util.PushErrMsg(Conf.Language(125), 1000*60*60)
-		planSyncAfter(64 * time.Minute)
-		return
 	}
 
 	now := util.CurrentTimeMillis()
@@ -180,8 +130,59 @@ func SyncData(boot, exit, byHand bool) {
 	msg := fmt.Sprintf(Conf.Language(82), synced)
 	Conf.Sync.Stat = msg
 	Conf.Save()
-	util.BroadcastByType("main", "syncing", 1, msg, nil)
+	code := 1
+	if nil != err {
+		code = 2
+	}
+	util.BroadcastByType("main", "syncing", code, msg, nil)
 	return
+}
+
+func checkSync(boot, exit, byHand bool) bool {
+	if !boot && !exit && 2 == Conf.Sync.Mode && !byHand {
+		return false
+	}
+
+	if !Conf.Sync.Enabled {
+		if byHand {
+			util.PushMsg(Conf.Language(124), 5000)
+		}
+		return false
+	}
+
+	if !cloud.IsValidCloudDirName(Conf.Sync.CloudName) {
+		if byHand {
+			util.PushMsg(Conf.Language(123), 5000)
+		}
+		return false
+	}
+
+	if !IsSubscriber() && conf.ProviderSiYuan == Conf.Sync.Provider {
+		return false
+	}
+
+	if !cloud.IsValidCloudDirName(Conf.Sync.CloudName) {
+		return false
+	}
+
+	if util.IsMutexLocked(&syncLock) {
+		logging.LogWarnf("sync is in progress")
+		planSyncAfter(30 * time.Second)
+		return false
+	}
+
+	if 7 < syncDownloadErrCount && !byHand {
+		logging.LogErrorf("sync download error too many times, cancel auto sync, try to sync by hand")
+		util.PushErrMsg(Conf.Language(125), 1000*60*60)
+		planSyncAfter(64 * time.Minute)
+		return false
+	}
+
+	if !util.IsOnline() {
+		util.BroadcastByType("main", "syncing", 2, Conf.Language(28), nil)
+		return false
+	}
+	return true
 }
 
 // incReindex 增量重建索引。
@@ -267,53 +268,35 @@ func SetCloudSyncDir(name string) {
 		return
 	}
 
-	syncLock.Lock()
-	defer syncLock.Unlock()
-
 	Conf.Sync.CloudName = name
 	Conf.Save()
 }
 
 func SetSyncGenerateConflictDoc(b bool) {
-	syncLock.Lock()
-	defer syncLock.Unlock()
-
 	Conf.Sync.GenerateConflictDoc = b
 	Conf.Save()
 	return
 }
 
-func SetSyncEnable(b bool) (err error) {
-	syncLock.Lock()
-	defer syncLock.Unlock()
-
+func SetSyncEnable(b bool) {
 	Conf.Sync.Enabled = b
 	Conf.Save()
 	return
 }
 
 func SetSyncMode(mode int) (err error) {
-	syncLock.Lock()
-	defer syncLock.Unlock()
-
 	Conf.Sync.Mode = mode
 	Conf.Save()
 	return
 }
 
 func SetSyncProvider(provider int) (err error) {
-	syncLock.Lock()
-	defer syncLock.Unlock()
-
 	Conf.Sync.Provider = provider
 	Conf.Save()
 	return
 }
 
 func SetSyncProviderS3(s3 *conf.S3) (err error) {
-	syncLock.Lock()
-	defer syncLock.Unlock()
-
 	s3.Endpoint = strings.TrimSpace(s3.Endpoint)
 	s3.Endpoint = util.NormalizeEndpoint(s3.Endpoint)
 	s3.AccessKey = strings.TrimSpace(s3.AccessKey)
@@ -328,9 +311,6 @@ func SetSyncProviderS3(s3 *conf.S3) (err error) {
 }
 
 func SetSyncProviderWebDAV(webdav *conf.WebDAV) (err error) {
-	syncLock.Lock()
-	defer syncLock.Unlock()
-
 	webdav.Endpoint = strings.TrimSpace(webdav.Endpoint)
 	webdav.Endpoint = util.NormalizeEndpoint(webdav.Endpoint)
 	webdav.Username = strings.TrimSpace(webdav.Username)
@@ -349,9 +329,6 @@ func CreateCloudSyncDir(name string) (err error) {
 		err = errors.New(Conf.Language(131))
 		return
 	}
-
-	syncLock.Lock()
-	defer syncLock.Unlock()
 
 	name = strings.TrimSpace(name)
 	name = gulu.Str.RemoveInvisible(name)
@@ -379,9 +356,6 @@ func RemoveCloudSyncDir(name string) (err error) {
 	}
 
 	msgId := util.PushMsg(Conf.Language(116), 15000)
-
-	syncLock.Lock()
-	defer syncLock.Unlock()
 
 	if "" == name {
 		return

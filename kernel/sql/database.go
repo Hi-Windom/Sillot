@@ -206,34 +206,6 @@ func initHistoryDBTables() {
 	}
 }
 
-func IndexMode() {
-	if nil != db {
-		db.Close()
-	}
-	dsn := util.DBPath + "?_journal_mode=OFF" +
-		"&_synchronous=OFF" +
-		"&_secure_delete=OFF" +
-		"&_cache_size=-20480" +
-		"&_page_size=8192" +
-		"&_busy_timeout=7000" +
-		"&_ignore_check_constraints=ON" +
-		"&_temp_store=MEMORY" +
-		"&_case_sensitive_like=OFF" +
-		"&_locking_mode=EXCLUSIVE"
-	var err error
-	db, err = sql.Open("sqlite3_extended", dsn)
-	if nil != err {
-		logging.LogFatalf("create database failed: %s", err)
-	}
-	db.SetMaxIdleConns(1)
-	db.SetMaxOpenConns(1)
-	db.SetConnMaxLifetime(365 * 24 * time.Hour)
-}
-
-func NormalMode() {
-	initDBConnection()
-}
-
 func initDBConnection() {
 	if nil != db {
 		db.Close()
@@ -277,7 +249,7 @@ func refsFromTree(tree *parse.Tree) (refs []*Ref, fileAnnotationRefs []*FileAnno
 		if treenode.IsBlockRef(n) {
 			ref := buildRef(tree, n)
 			refs = append(refs, ref)
-		} else if ast.NodeTextMark == n.Type && n.IsTextMarkType("file-annotation-ref") {
+		} else if treenode.IsFileAnnotationRef(n) {
 			pathID := n.TextMarkFileAnnotationRefID
 			idx := strings.LastIndex(pathID, "/")
 			if -1 == idx {
@@ -305,6 +277,9 @@ func refsFromTree(tree *parse.Tree) (refs []*Ref, fileAnnotationRefs []*FileAnno
 				Type:         treenode.TypeAbbr(n.Type.String()),
 			}
 			fileAnnotationRefs = append(fileAnnotationRefs, ref)
+		} else if treenode.IsEmbedBlockRef(n) {
+			ref := buildEmbedRef(tree, n)
+			refs = append(refs, ref)
 		}
 		return ast.WalkContinue
 	})
@@ -336,6 +311,37 @@ func buildRef(tree *parse.Tree, refNode *ast.Node) *Ref {
 		Markdown:         markdown,
 		Type:             treenode.TypeAbbr(refNode.Type.String()),
 	}
+}
+
+func buildEmbedRef(tree *parse.Tree, embedNode *ast.Node) *Ref {
+	defBlockID := getEmbedRef(embedNode)
+	var defBlockParentID, defBlockRootID, defBlockPath string
+	defBlock := treenode.GetBlockTree(defBlockID)
+	if nil != defBlock {
+		defBlockParentID = defBlock.ParentID
+		defBlockRootID = defBlock.RootID
+		defBlockPath = defBlock.Path
+	}
+
+	return &Ref{
+		ID:               ast.NewNodeID(),
+		DefBlockID:       defBlockID,
+		DefBlockParentID: defBlockParentID,
+		DefBlockRootID:   defBlockRootID,
+		DefBlockPath:     defBlockPath,
+		BlockID:          embedNode.ID,
+		RootID:           tree.ID,
+		Box:              tree.Box,
+		Path:             tree.Path,
+		Content:          "", // 通过嵌入块构建引用时定义块可能还没有入库，所以这里统一不填充内容
+		Markdown:         "",
+		Type:             treenode.TypeAbbr(embedNode.Type.String()),
+	}
+}
+
+func getEmbedRef(embedNode *ast.Node) (queryBlockID string) {
+	queryBlockID = treenode.GetEmbedBlockRef(embedNode)
+	return
 }
 
 func fromTree(node *ast.Node, tree *parse.Tree) (blocks []*Block, spans []*Span, assets []*Asset, attributes []*Attribute) {

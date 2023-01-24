@@ -36,6 +36,7 @@ type Search struct {
 	SuperBlock bool `json:"superBlock"`
 	Paragraph  bool `json:"paragraph"`
 	HTMLBlock  bool `json:"htmlBlock"`
+	EmbedBlock bool `json:"embedBlock"`
 
 	Limit         int  `json:"limit"`
 	CaseSensitive bool `json:"caseSensitive"`
@@ -71,6 +72,7 @@ func NewSearch() *Search {
 		SuperBlock: true,
 		Paragraph:  true,
 		HTMLBlock:  true,
+		EmbedBlock: false,
 
 		Limit:         64,
 		CaseSensitive: true,
@@ -180,8 +182,14 @@ func (s *Search) TypeFilter() string {
 		buf.WriteByte('\'')
 		buf.WriteString(",")
 	}
+	if s.EmbedBlock {
+		buf.WriteByte('\'')
+		buf.WriteString(treenode.TypeAbbr(ast.NodeBlockQueryEmbed.String()))
+		buf.WriteByte('\'')
+		buf.WriteString(",")
+	}
 	// 无法搜索到 iframe 块、视频块和音频块 https://github.com/siyuan-note/siyuan/issues/3604
-	buf.WriteString("'iframe','query_embed','video','audio',")
+	buf.WriteString("'iframe','video','audio',")
 	// 挂件块支持内置属性搜索 https://github.com/siyuan-note/siyuan/issues/4497
 	buf.WriteString("'widget',")
 

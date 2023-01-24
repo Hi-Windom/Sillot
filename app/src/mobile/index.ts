@@ -17,6 +17,8 @@ import {initMessage} from "../dialog/message";
 import {goBack} from "./util/MobileBackFoward";
 import {hideKeyboardToolbar, showKeyboardToolbar} from "./util/showKeyboardToolbar";
 import {getLocalStorage} from "../protyle/util/compatibility";
+import {openMobileFileById} from "./editor";
+import {getSearch} from "../util/functions";
 
 class App {
     constructor() {
@@ -29,6 +31,7 @@ class App {
             backStack: [],
             dialogs: [],
             blockPanels: [],
+            mobile: {},
             menus: new Menus(),
             ws: new Model({
                 id: genUUID(),
@@ -55,9 +58,12 @@ class App {
                     loadAssets(confResponse.data.conf.appearance);
                     initMessage();
                     initAssets();
-                    fetchPost("/api/system/getEmojiConf", {}, emojiResponse => {
-                        window.siyuan.emojis = emojiResponse.data as IEmoji[];
-                        initFramework();
+                    fetchPost("/api/setting/getCloudUser", {}, userResponse => {
+                        window.siyuan.user = userResponse.data;
+                        fetchPost("/api/system/getEmojiConf", {}, emojiResponse => {
+                            window.siyuan.emojis = emojiResponse.data as IEmoji[];
+                            initFramework();
+                        });
                     });
                     addGA();
                 });
@@ -78,3 +84,11 @@ new App();
 window.goBack = goBack;
 window.showKeyboardToolbar = showKeyboardToolbar;
 window.hideKeyboardToolbar = hideKeyboardToolbar;
+window.openFileByURL = (openURL) => {
+    if (openURL && /^siyuan:\/\/blocks\/\d{14}-\w{7}/.test(openURL)) {
+        openMobileFileById(openURL.substr(16, 22),
+            getSearch("focus", openURL) === "1" ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]);
+        return true;
+    }
+    return false;
+};

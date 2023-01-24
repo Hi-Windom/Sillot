@@ -35,7 +35,7 @@ export class Breadcrumb {
     constructor(protyle: IProtyle) {
         const element = document.createElement("div");
         element.className = "protyle-breadcrumb";
-        const isFocus = protyle.options.action.includes(Constants.CB_GET_ALL);
+        const isFocus = protyle.options.action.includes(Constants.CB_GET_ALL) && !isMobile();
         let html = `<div class="protyle-breadcrumb__bar"></div>
 <span class="protyle-breadcrumb__space"></span>
 <button class="block__icon block__icon--show ft__smaller fn__flex-center${isFocus ? "" : " fn__none"}" style="line-height: 14px" data-type="exit-focus">${window.siyuan.languages.exitFocus}</button>
@@ -280,7 +280,7 @@ export class Breadcrumb {
                 }).element);
                 window.siyuan.menus.menu.append(new MenuItem({
                     label: window.siyuan.languages.uploadAssets2CDN,
-                    icon: "iconCloud",
+                    icon: "iconCloudSucc",
                     click() {
                         if (!needSubscribe()) {
                             confirmDialog("📦 " + window.siyuan.languages.uploadAssets2CDN, window.siyuan.languages.uploadAssets2CDNConfirmTip, () => {

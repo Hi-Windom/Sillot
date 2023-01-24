@@ -176,8 +176,8 @@ func NetImg2LocalAssets(rootID string) (err error) {
 					}
 				}
 				name = strings.TrimSuffix(name, ext)
-				name = gulu.Str.SubStr(name, 64)
 				name = util.FilterFileName(name)
+				name = util.TruncateLenFileName(name)
 				name = "net-img-" + name + "-" + ast.NewNodeID() + ext
 				writePath := filepath.Join(assetsDirPath, name)
 				if err = filelock.WriteFile(writePath, data); nil != err {
@@ -502,8 +502,10 @@ func RenameAsset(oldPath, newName string) (err error) {
 	if nil != err {
 		return
 	}
+
 	for _, notebook := range notebooks {
 		pages := pagedPaths(filepath.Join(util.DataDir, notebook.ID), 32)
+
 		for _, paths := range pages {
 			for _, treeAbsPath := range paths {
 				data, readErr := filelock.ReadFile(treeAbsPath)
@@ -513,6 +515,7 @@ func RenameAsset(oldPath, newName string) (err error) {
 					return
 				}
 
+				util.PushEndlessProgress(fmt.Sprintf(Conf.Language(70), filepath.Base(treeAbsPath)))
 				if !bytes.Contains(data, []byte(oldName)) {
 					continue
 				}
@@ -541,9 +544,6 @@ func RenameAsset(oldPath, newName string) (err error) {
 	}
 
 	IncSync()
-
-	util.PushEndlessProgress(Conf.Language(113))
-	sql.WaitForWritingDatabase()
 	util.ReloadUI()
 	return
 }

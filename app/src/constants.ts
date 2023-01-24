@@ -34,7 +34,7 @@ export abstract class Constants {
     public static readonly SIYUAN_EXPORT_PREVENT: string = "siyuan-export-prevent";
 
     // size
-    public static readonly SIZE_TOOLBAR_HEIGHT: number = 42;
+    public static readonly SIZE_TOOLBAR_HEIGHT: number = 32;
     public static readonly SIZE_GET_MAX = 102400;
     public static readonly SIZE_UNDO = 64;
     public static readonly SIZE_TITLE = 512;
@@ -71,6 +71,7 @@ export abstract class Constants {
     public static readonly LOCAL_FONTSTYLES = "local-fontstyles";
     public static readonly LOCAL_EXPORTPDF = "local-exportpdf";
     public static readonly LOCAL_EXPORTWORD = "local-exportword";
+    public static readonly LOCAL_EXPORTIMG = "local-exportimg";
     public static readonly LOCAL_BAZAAR = "local-bazaar";
     public static readonly LOCAL_PDFTHEME = "local-pdftheme";
 
@@ -87,12 +88,6 @@ export abstract class Constants {
         zh_CHT: "20211226090932-5lcq56f",
         en_US: "20210808180117-6v0mkxr",
         fr_FR: "20210808180117-6v0mkxr",
-    };
-    public static readonly HELP_START_PATH = {
-        zh_CN: "20200812220555-lj3enxa",
-        zh_CHT: "20211226115423-d5z1joq",
-        en_US: "20200923234011-ieuun1p",
-        fr_FR: "20200923234011-ieuun1p",
     };
 
     public static readonly KEYCODE: { [key: string]: string[] } = {
