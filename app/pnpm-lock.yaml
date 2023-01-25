@@ -28,7 +28,7 @@ specifiers:
   ifdef-loader: ^2.3.2
   mini-css-extract-plugin: 2.3.0
   path-browserify: ^1.0.1
-  pnpm: 7.9.3
+  pnpm: 7.26.0
   safer-buffer: ^2.1.2
   sass: ^1.53.0
   sass-loader: ^12.6.0
@@ -43,7 +43,7 @@ dependencies:
   '@electron/remote': 2.0.8_electron@23.0.0-beta.4
   electron-fetch: 1.7.4
   electron-store: registry.npmmirror.com/electron-store/8.1.0
-  pnpm: 7.9.3
+  pnpm: registry.npmmirror.com/pnpm/7.26.0
 
 devDependencies:
   '@babel/core': 7.18.6
@@ -4031,12 +4031,6 @@ packages:
       xmlbuilder: 9.0.7
     dev: true
 
-  /pnpm/7.9.3:
-    resolution: {integrity: sha512-0hpAD1vtILw0i9gTN4ffagnScWMW9/avfZIKllBUd++fAvCss+hVgPPDd0HS9XcOT675gid4H9esGkbLdaFy+w==}
-    engines: {node: '>=14.6'}
-    hasBin: true
-    dev: false
-
   /postcss-modules-extract-imports/3.0.0_postcss@8.4.14:
     resolution: {integrity: sha512-bdHleFnP3kZ4NYDhuGlVK+CMrQ/pqUm8bx/oGL93K6gVwiclvX5x0n76fYMKuIGKzlABOy13zsvqjb0f92TEXw==}
     engines: {node: ^10 || ^12 || >= 14}
@@ -5886,6 +5880,14 @@ packages:
       xmlbuilder: registry.npmmirror.com/xmlbuilder/9.0.7
     dev: true
     optional: true
+
+  registry.npmmirror.com/pnpm/7.26.0:
+    resolution: {integrity: sha512-ASNhFsTa9YpJoalnGa28IKMimZk/oBOt19oxvB6+iP2EVr1h+PYcsTty4mrgSE/LegWQPy4yphZinshKjxycOA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/pnpm/-/pnpm-7.26.0.tgz}
+    name: pnpm
+    version: 7.26.0
+    engines: {node: '>=14.6'}
+    hasBin: true
+    dev: false
 
   registry.npmmirror.com/progress/2.0.3:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/progress/-/progress-2.0.3.tgz}
