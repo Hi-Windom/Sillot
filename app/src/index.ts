@@ -132,7 +132,7 @@ class App {
         window.Sillot = { IDBloaded: false, disableDocSetPadding: false }
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
-            let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").pop()
+            let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1)
             // console.log(workspaceName)
             fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, async (r) => {
                 // console.log(r);
