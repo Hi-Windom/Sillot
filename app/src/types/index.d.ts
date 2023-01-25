@@ -218,7 +218,8 @@ interface ISiyuan {
 }
 
 interface ISillot {
-    IDBloaded: boolean
+    IDBloaded: boolean,
+    disableDocSetPadding: boolean,
 }
 
 interface IScrollAttr {
