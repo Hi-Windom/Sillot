@@ -27,7 +27,7 @@ export const openSetting = () => {
         content: `<div class="fn__flex-column" style="border-radius: 4px;overflow: hidden;position: relative">
 <div class="b3-form__icon search__header"><svg style="left: 14px;" class="b3-form__icon-icon"><use xlink:href="#iconSearch"></use></svg><input class="b3-text-field b3-text-field--text fn__block b3-form__icon-input"></div>
 <div class="fn__flex-1 fn__flex config__panel">
-  <ul class="b3-tab-bar b3-list b3-list--background" style="height:${height}px;">
+  <ul class="b3-tab-bar b3-list b3-list--background" style="height:88vh;">
     <li data-name="editor" class="b3-list-item--focus b3-list-item b3-list-item--big"><svg class="b3-list-item__graphic"><use xlink:href="#iconEdit"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.editor}</span></li>
     <li data-name="filetree" class="b3-list-item b3-list-item--big"><svg class="b3-list-item__graphic"><use xlink:href="#iconFiles"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.fileTree}</span></li>
     <li data-name="image" class="b3-list-item b3-list-item--big"><svg class="b3-list-item__graphic"><use xlink:href="#iconImage"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.assets}</span></li>
@@ -40,17 +40,17 @@ export const openSetting = () => {
     <li data-name="repos" class="b3-list-item b3-list-item--big"><svg class="b3-list-item__graphic"><use xlink:href="#iconCloud"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.cloud}</span></li>
     <li data-name="about" class="b3-list-item b3-list-item--big"><svg class="b3-list-item__graphic"><use xlink:href="#iconInfo"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.about}</span></li>
   </ul>
-  <div class="b3-tab-container" style="height:${height}px" data-name="editor">${editor.genHTML()}</div>
-  <div class="b3-tab-container fn__none" style="height:${height}px" data-name="filetree"></div>
-  <div class="b3-tab-container fn__none" style="height:${height}px" data-name="image"></div>
-  <div class="b3-tab-container fn__none" style="height:${height}px" data-name="export"></div>
-  <div class="b3-tab-container fn__none" style="height:${height}px" data-name="appearance"></div>
-  <div class="b3-tab-container fn__none" style="height:${height}px" data-name="bazaar"></div>
-  <div class="b3-tab-container fn__none" style="height:${height}px" data-name="search"></div>
-  <div class="b3-tab-container fn__none" style="height:${height}px;overflow: scroll" data-name="keymap"></div>
-  <div class="b3-tab-container fn__none" style="height:${height}px" data-name="account"></div>
-  <div class="b3-tab-container fn__none" style="height:${height}px" data-name="repos"></div>
-  <div class="b3-tab-container fn__none" style="height:${height}px" data-name="about"></div>
+  <div class="b3-tab-container" style="height:88vh" data-name="editor">${editor.genHTML()}</div>
+  <div class="b3-tab-container fn__none" style="height:88vh" data-name="filetree"></div>
+  <div class="b3-tab-container fn__none" style="height:88vh" data-name="image"></div>
+  <div class="b3-tab-container fn__none" style="height:88vh" data-name="export"></div>
+  <div class="b3-tab-container fn__none" style="height:88vh" data-name="appearance"></div>
+  <div class="b3-tab-container fn__none" style="height:88vh" data-name="bazaar"></div>
+  <div class="b3-tab-container fn__none" style="height:88vh" data-name="search"></div>
+  <div class="b3-tab-container fn__none" style="height:88vh;overflow: scroll" data-name="keymap"></div>
+  <div class="b3-tab-container fn__none" style="height:88vh" data-name="account"></div>
+  <div class="b3-tab-container fn__none" style="height:88vh" data-name="repos"></div>
+  <div class="b3-tab-container fn__none" style="height:88vh" data-name="about"></div>
 </div>
 </div>`,
         width: "90vw",
