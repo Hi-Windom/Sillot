@@ -70,8 +70,16 @@ function importFromJson(idbDatabase: IDBRequest, importObject: any) {
           if (!value || Object.keys(value).length == 0) {
             value = "";
           }
-          const request = transaction.objectStore(storeName).add(value, key)
-          request.addEventListener('success', () => {
+          const request = transaction.objectStore(storeName)
+          var req = request.openCursor(key);
+          req.onsuccess = function (e: any) {
+            var cursor = e.target.result;
+            if (cursor) { // key already exist
+              // cursor.update(value);
+              // 重载时不覆写IndexedDB #60
+            } else { // key not exist
+              request.add(value, key)
+            }
             count++
             if (count === importObject[storeName].length) {
               // Added all objects for this store
@@ -81,7 +89,7 @@ function importFromJson(idbDatabase: IDBRequest, importObject: any) {
                 resolve()
               }
             }
-          })
+          };
         })
       } else {
         delete importObject[storeName]
