@@ -84,7 +84,7 @@ export const removeLoading = (protyle: IProtyle) => {
 };
 
 export const setPadding = (protyle: IProtyle) => {
-    if (protyle.options.action.includes(Constants.CB_GET_HISTORY)) {
+    if (protyle.options.action.includes(Constants.CB_GET_HISTORY) || window.Sillot.disableDocSetPadding) {
         return;
     }
     let min16 = 16;

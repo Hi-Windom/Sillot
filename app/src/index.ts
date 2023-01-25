@@ -129,7 +129,7 @@ class App {
             }),
             menus: new Menus()
         };
-        window.Sillot = { IDBloaded: false }
+        window.Sillot = { IDBloaded: false, disableDocSetPadding: false }
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
             let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").pop()
