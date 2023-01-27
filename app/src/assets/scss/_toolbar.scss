@@ -7,6 +7,7 @@
     border-radius: 4px;
     display: flex;
     transition: top .15s cubic-bezier(0, 0, .2, 1) 0ms;
+    border: 1px solid var(--b3-theme-surface-lighter);
 
     &__item {
       color: var(--b3-theme-on-surface);
@@ -49,6 +50,7 @@
     position: fixed;
     border-radius: 4px;
     box-shadow: var(--b3-dialog-shadow);
+    border: 1px solid var(--b3-theme-surface-lighter);
     background-color: var(--b3-menu-background);
     z-index: 201;
     overflow: auto;
@@ -61,10 +63,11 @@
     position: fixed;
     border-radius: 4px;
     box-shadow: var(--b3-dialog-shadow);
+    border: 1px solid var(--b3-theme-surface-lighter);
     background-color: var(--b3-menu-background);
     padding: 8px;
     max-height: 80vh;
-    z-index: 200;
+    z-index: 4;
   }
 
   &-font {
