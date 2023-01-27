@@ -1,10 +1,12 @@
 declare const SIYUAN_VERSION: string;
 declare const NODE_ENV: string;
-
+declare const SIYUAN_ORIGIN_VERSION: string;
+const _SIYUAN_ORIGIN_VERSION = SIYUAN_ORIGIN_VERSION
 const _SIYUAN_VERSION = SIYUAN_VERSION;
 const _NODE_ENV = NODE_ENV;
 
 export abstract class Constants {
+    public static readonly SIYUAN_ORIGIN_VERSION: string = _SIYUAN_ORIGIN_VERSION;
     public static readonly SIYUAN_VERSION: string = _SIYUAN_VERSION;
     public static readonly NODE_ENV: string = _NODE_ENV;
     public static readonly SIYUAN_APPID: string = Math.random().toString(36).substring(8);
