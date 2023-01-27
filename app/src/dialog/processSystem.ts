@@ -23,6 +23,7 @@ export const lockScreen = () => {
     /// #else
     ipcRenderer.send(Constants.SIYUAN_LOCK_SCREEN);
     /// #endif
+    exportIDB()
 };
 
 export const lockFile = (id: string) => {
