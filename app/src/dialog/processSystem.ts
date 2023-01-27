@@ -190,6 +190,7 @@ export const transactionError = (data: { code: number, data: string }) => {
     });
     btnsElement[1].addEventListener("click", () => {
         fetchPost("/api/filetree/refreshFiletree", {});
+        dialog.destroy();
     });
 };
 
@@ -344,12 +345,11 @@ export const processSync = (data?: IWebSocketData) => {
     }
     const useElement = iconElement.querySelector("use");
     if (!data) {
+        iconElement.classList.remove("toolbar__item--active");
         if (!window.siyuan.config.sync.enabled || (0 === window.siyuan.config.sync.provider && needSubscribe(""))) {
-            iconElement.classList.add("toolbar__item--active");
             iconElement.setAttribute("aria-label", window.siyuan.languages["_kernel"]["53"]);
             useElement.setAttribute("xlink:href", "#iconCloudOff");
         } else {
-            iconElement.classList.remove("toolbar__item--active");
             useElement.setAttribute("xlink:href", "#iconCloudSucc");
         }
         return;

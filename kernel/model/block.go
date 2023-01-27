@@ -19,11 +19,13 @@ package model
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/siyuan-note/siyuan/kernel/sql"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -197,12 +199,12 @@ func SwapBlockRef(refID, defID string, includeChildren bool) (err error) {
 	}
 	refPivot.Unlink()
 
-	treenode.ReindexBlockTree(refTree)
+	treenode.IndexBlockTree(refTree)
 	if err = writeJSONQueue(refTree); nil != err {
 		return
 	}
 	if !sameTree {
-		treenode.ReindexBlockTree(defTree)
+		treenode.IndexBlockTree(defTree)
 		if err = writeJSONQueue(defTree); nil != err {
 			return
 		}
@@ -391,11 +393,18 @@ func getBlock(id string) (ret *Block, err error) {
 		return
 	}
 
-	waitForIndexing()
-
 	tree, err := loadTreeByBlockID(id)
 	if nil != err {
-		return
+		if task.ContainIndexTask() {
+			err = ErrIndexing
+			return
+		}
+
+		time.Sleep(1 * time.Second)
+		tree, err = loadTreeByBlockID(id)
+		if nil != err {
+			return
+		}
 	}
 
 	node := treenode.GetNodeInTree(tree, id)

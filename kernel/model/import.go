@@ -31,7 +31,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime/debug"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -393,7 +393,7 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 			continue
 		}
 
-		treenode.ReindexBlockTree(tree)
+		treenode.IndexBlockTree(tree)
 		sql.UpsertTreeQueue(tree)
 	}
 
@@ -441,6 +441,7 @@ func ImportData(zipPath string) (err error) {
 
 	IncSync()
 	FullReindex()
+	ReloadUI()
 	return
 }
 
@@ -706,16 +707,10 @@ func ImportFromLocalPath(boxID, localPath string, toPath string) (err error) {
 			return
 		}
 		IncSync()
-		sql.WaitForWritingDatabase()
-
-		util.PushEndlessProgress(Conf.Language(58))
-		go func() {
-			time.Sleep(2 * time.Second)
-			util.ReloadUI()
-		}()
 	}
-	debug.FreeOSMemory()
+
 	IncSync()
+	runtime.GC()
 	return
 }
 

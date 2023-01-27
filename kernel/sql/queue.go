@@ -17,7 +17,11 @@
 package sql
 
 import (
+	"database/sql"
+	"errors"
+	"fmt"
 	"path"
+	"runtime"
 	"sync"
 	"time"
 
@@ -37,21 +41,20 @@ var (
 
 type dbQueueOperation struct {
 	inQueueTime time.Time
-	action      string // upsert/delete/delete_id/rename/delete_box/delete_box_refs/insert_refs
+	action      string // upsert/delete/delete_id/rename/delete_box/delete_box_refs/insert_refs/index/delete_ids
 
+	indexPath                     string      // index
 	upsertTree                    *parse.Tree // upsert/insert_refs
 	removeTreeBox, removeTreePath string      // delete
 	removeTreeIDBox, removeTreeID string      // delete_id
-	box                           string      // delete_box/delete_box_refs
+	removeTreeIDs                 []string    // delete_ids
+	box                           string      // delete_box/delete_box_refs/index
 	renameTree                    *parse.Tree // rename
 	renameTreeOldHPath            string      // rename
 }
 
-func AutoFlushTx() {
-	for {
-		time.Sleep(util.SQLFlushInterval)
-		task.PrependTask(task.DatabaseIndex, FlushQueue)
-	}
+func FlushTxJob() {
+	task.AppendTask(task.DatabaseIndexCommit, FlushQueue)
 }
 
 func WaitForWritingDatabase() {
@@ -97,47 +100,78 @@ func FlushQueue() {
 	txLock.Lock()
 	defer txLock.Unlock()
 	start := time.Now()
-	tx, err := BeginTx()
-	if nil != err {
-		return
-	}
 
 	context := map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBar}
-	for _, op := range ops {
+	total := len(ops)
+	for i, op := range ops {
 		if util.IsExiting {
-			break
+			return
 		}
 
-		switch op.action {
-		case "upsert":
-			tree := op.upsertTree
-			if err = upsertTree(tx, tree, context); nil != err {
-				logging.LogErrorf("upsert tree [%s] into database failed: %s", tree.Box+tree.Path, err)
-			}
-		case "delete":
-			batchDeleteByPathPrefix(tx, op.removeTreeBox, op.removeTreePath)
-		case "delete_id":
-			DeleteByRootID(tx, op.removeTreeID)
-		case "rename":
-			batchUpdateHPath(tx, op.renameTree.Box, op.renameTree.ID, op.renameTreeOldHPath, op.renameTree.HPath)
-			updateRootContent(tx, path.Base(op.renameTree.HPath), op.renameTree.Root.IALAttr("updated"), op.renameTree.ID)
-		case "delete_box":
-			DeleteByBoxTx(tx, op.box)
-		case "delete_box_refs":
-			DeleteRefsByBoxTx(tx, op.box)
-		case "insert_refs":
-			InsertRefs(tx, op.upsertTree)
-		case "update_refs":
-			UpsertRefs(tx, op.upsertTree)
-		default:
-			logging.LogErrorf("unknown operation [%s]", op.action)
+		tx, err := beginTx()
+		if nil != err {
+			return
+		}
+
+		context["current"] = i
+		context["total"] = total
+		if err = execOp(op, tx, context); nil != err {
+			logging.LogErrorf("queue operation failed: %s", err)
+			return
+		}
+
+		if err = commitTx(tx); nil != err {
+			logging.LogErrorf("commit tx failed: %s", err)
+			return
+		}
+
+		if 16 < i && 0 == i%128 {
+			runtime.GC()
 		}
 	}
-	CommitTx(tx)
+
+	if 128 < len(ops) {
+		runtime.GC()
+	}
+
 	elapsed := time.Now().Sub(start).Milliseconds()
 	if 5000 < elapsed {
 		logging.LogInfof("op tx [%dms]", elapsed)
 	}
+}
+
+func execOp(op *dbQueueOperation, tx *sql.Tx, context map[string]interface{}) (err error) {
+	switch op.action {
+	case "index":
+		err = indexTree(tx, op.box, op.indexPath, context)
+	case "upsert":
+		err = upsertTree(tx, op.upsertTree, context)
+	case "delete":
+		err = batchDeleteByPathPrefix(tx, op.removeTreeBox, op.removeTreePath)
+	case "delete_id":
+		err = deleteByRootID(tx, op.removeTreeID, context)
+	case "delete_ids":
+		err = batchDeleteByRootIDs(tx, op.removeTreeIDs, context)
+	case "rename":
+		err = batchUpdateHPath(tx, op.renameTree.Box, op.renameTree.ID, op.renameTreeOldHPath, op.renameTree.HPath)
+		if nil != err {
+			break
+		}
+		err = updateRootContent(tx, path.Base(op.renameTree.HPath), op.renameTree.Root.IALAttr("updated"), op.renameTree.ID)
+	case "delete_box":
+		err = deleteByBoxTx(tx, op.box)
+	case "delete_box_refs":
+		err = deleteRefsByBoxTx(tx, op.box)
+	case "insert_refs":
+		err = insertRefs(tx, op.upsertTree)
+	case "update_refs":
+		err = upsertRefs(tx, op.upsertTree)
+	default:
+		msg := fmt.Sprintf("unknown operation [%s]", op.action)
+		logging.LogErrorf(msg)
+		err = errors.New(msg)
+	}
+	return
 }
 
 func mergeUpsertTrees() (ops []*dbQueueOperation) {
@@ -205,6 +239,20 @@ func DeleteBoxQueue(boxID string) {
 	operationQueue = append(operationQueue, newOp)
 }
 
+func IndexTreeQueue(box, p string) {
+	dbQueueLock.Lock()
+	defer dbQueueLock.Unlock()
+
+	newOp := &dbQueueOperation{indexPath: p, box: box, inQueueTime: time.Now(), action: "index"}
+	for i, op := range operationQueue {
+		if "index" == op.action && op.indexPath == p && op.box == box { // 相同树则覆盖
+			operationQueue[i] = newOp
+			return
+		}
+	}
+	operationQueue = append(operationQueue, newOp)
+}
+
 func UpsertTreeQueue(tree *parse.Tree) {
 	dbQueueLock.Lock()
 	defer dbQueueLock.Unlock()
@@ -241,16 +289,21 @@ func RemoveTreeQueue(box, rootID string) {
 	dbQueueLock.Lock()
 	defer dbQueueLock.Unlock()
 
-	var tmp []*dbQueueOperation
-	// 将已有的 upsert 操作去重
-	for _, op := range operationQueue {
-		if "upsert" == op.action && op.upsertTree.ID != rootID {
-			tmp = append(tmp, op)
+	newOp := &dbQueueOperation{removeTreeIDBox: box, removeTreeID: rootID, inQueueTime: time.Now(), action: "delete_id"}
+	for i, op := range operationQueue {
+		if "delete_id" == op.action && op.removeTreeIDBox == box && op.removeTreeID == rootID {
+			operationQueue[i] = newOp
+			return
 		}
 	}
-	operationQueue = tmp
+	operationQueue = append(operationQueue, newOp)
+}
 
-	newOp := &dbQueueOperation{removeTreeIDBox: box, removeTreeID: rootID, inQueueTime: time.Now(), action: "delete_id"}
+func BatchRemoveTreeQueue(rootIDs []string) {
+	dbQueueLock.Lock()
+	defer dbQueueLock.Unlock()
+
+	newOp := &dbQueueOperation{removeTreeIDs: rootIDs, inQueueTime: time.Now(), action: "delete_ids"}
 	operationQueue = append(operationQueue, newOp)
 }
 
@@ -258,15 +311,12 @@ func RemoveTreePathQueue(treeBox, treePathPrefix string) {
 	dbQueueLock.Lock()
 	defer dbQueueLock.Unlock()
 
-	var tmp []*dbQueueOperation
-	// 将已有的 upsert 操作去重
-	for _, op := range operationQueue {
-		if "upsert" == op.action && (op.removeTreeBox != treeBox || op.upsertTree.Path != treePathPrefix) {
-			tmp = append(tmp, op)
+	newOp := &dbQueueOperation{removeTreeBox: treeBox, removeTreePath: treePathPrefix, inQueueTime: time.Now(), action: "delete"}
+	for i, op := range operationQueue {
+		if "delete" == op.action && (op.removeTreeBox == treeBox && op.removeTreePath == treePathPrefix) {
+			operationQueue[i] = newOp
+			return
 		}
 	}
-	operationQueue = tmp
-
-	newOp := &dbQueueOperation{removeTreeBox: treeBox, removeTreePath: treePathPrefix, inQueueTime: time.Now(), action: "delete"}
 	operationQueue = append(operationQueue, newOp)
 }

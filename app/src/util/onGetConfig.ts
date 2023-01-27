@@ -20,7 +20,7 @@ import {openFileById} from "../editor/util";
 import {focusByRange} from "../protyle/util/selection";
 import {exitSiYuan, processSync} from "../dialog/processSystem";
 import {openSetting} from "../config";
-import {getSearch} from "./functions";
+import {getSearch, isWindow} from "./functions";
 import {initStatus} from "../layout/status";
 import {syncGuide} from "../sync/syncGuide";
 import {showMessage} from "../dialog/message";
@@ -29,6 +29,7 @@ import {goBack, goForward} from "./backForward";
 import {replaceLocalPath} from "../editor/rename";
 import {workspaceMenu} from "../menus/workspace";
 import {getWorkspaceName} from "./noRelyPCFunction";
+import {setTabPosition} from "../window/setHeader";
 
 const matchKeymap = (keymap: Record<string, IKeymapItem>, key1: "general" | "editor", key2?: "general" | "insert" | "heading" | "list" | "table") => {
     if (key1 === "general") {
@@ -118,8 +119,9 @@ export const onGetConfig = (isStart: boolean) => {
     const hasKeymap4 = hasKeymap(Constants.SIYUAN_KEYMAP.editor.heading, "editor", "heading");
     const hasKeymap5 = hasKeymap(Constants.SIYUAN_KEYMAP.editor.list, "editor", "list");
     const hasKeymap6 = hasKeymap(Constants.SIYUAN_KEYMAP.editor.table, "editor", "table");
-    if (!window.siyuan.config.readonly && (!matchKeymap1 || !matchKeymap2 || !matchKeymap3 || !matchKeymap4 || !matchKeymap5 || !matchKeymap6) &&
-        (!hasKeymap1 || !hasKeymap2 || !hasKeymap3 || !hasKeymap4 || !hasKeymap5 || !hasKeymap6)) {
+    if (!window.siyuan.config.readonly &&
+        (!matchKeymap1 || !matchKeymap2 || !matchKeymap3 || !matchKeymap4 || !matchKeymap5 || !matchKeymap6 ||
+            !hasKeymap1 || !hasKeymap2 || !hasKeymap3 || !hasKeymap4 || !hasKeymap5 || !hasKeymap6)) {
         fetchPost("/api/setting/setKeymap", {
             data: window.siyuan.config.keymap
         }, () => {
@@ -179,7 +181,7 @@ export const onGetConfig = (isStart: boolean) => {
     addGA();
 };
 
-const initBar = () => {
+export const initBar = () => {
     const toolbar = document.getElementById("toolbar");
     toolbar.innerHTML = `
 <div id="barWorkspace" class="toolbar__item">
@@ -325,38 +327,40 @@ const winOnClose = (currentWindow: Electron.BrowserWindow, close = false) => {
     /// #endif
 };
 
-const initWindow = () => {
+export const initWindow = () => {
     /// #if !BROWSER
     const currentWindow = getCurrentWindow();
     currentWindow.on("focus", winOnFocus);
     currentWindow.on("blur", () => {
         document.body.classList.add("body--blur");
     });
-    ipcRenderer.on(Constants.SIYUAN_OPENURL, (event, url) => {
-        if (!/^siyuan:\/\/blocks\/\d{14}-\w{7}/.test(url)) {
-            return;
-        }
-        const id = url.substr(16, 22);
-        fetchPost("/api/block/checkBlockExist", {id}, existResponse => {
-            if (existResponse.data) {
-                openFileById({
-                    id,
-                    action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
-                    zoomIn: getSearch("focus", url) === "1"
-                });
-                ipcRenderer.send(Constants.SIYUAN_SHOW, getCurrentWindow().id);
+    if (!isWindow()) {
+        ipcRenderer.on(Constants.SIYUAN_OPENURL, (event, url) => {
+            if (!/^siyuan:\/\/blocks\/\d{14}-\w{7}/.test(url)) {
+                return;
             }
+            const id = url.substr(16, 22);
+            fetchPost("/api/block/checkBlockExist", {id}, existResponse => {
+                if (existResponse.data) {
+                    openFileById({
+                        id,
+                        action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
+                        zoomIn: getSearch("focus", url) === "1"
+                    });
+                    ipcRenderer.send(Constants.SIYUAN_SHOW, getCurrentWindow().id);
+                }
+            });
         });
-    });
+        ipcRenderer.on(Constants.SIYUAN_SAVE_CLOSE, (event, close) => {
+            winOnClose(currentWindow, close);
+        });
+    }
     ipcRenderer.on(Constants.SIYUAN_LOCK_SCREEN, () => {
         exportLayout(false, () => {
             fetchPost("/api/system/logoutAuth", {}, () => {
                 window.location.reload();
             });
         });
-    });
-    ipcRenderer.on(Constants.SIYUAN_SAVE_CLOSE, (event, close) => {
-        winOnClose(currentWindow, close);
     });
     ipcRenderer.on(Constants.SIYUAN_EXPORT_CLOSE, () => {
         window.siyuan.printWin.destroy();
@@ -451,8 +455,8 @@ const initWindow = () => {
     window.addEventListener("beforeunload", () => {
         currentWindow.off("focus", winOnFocus);
     }, false);
-    if ("windows" !== window.siyuan.config.system.os && "linux" !== window.siyuan.config.system.os) {
-        document.getElementById("drag").addEventListener("dblclick", () => {
+    if ("darwin" === window.siyuan.config.system.os) {
+        document.getElementById("drag")?.addEventListener("dblclick", () => {
             if (currentWindow.isMaximized()) {
                 currentWindow.unmaximize();
             } else {
@@ -461,13 +465,21 @@ const initWindow = () => {
         });
         const toolbarElement = document.getElementById("toolbar");
         currentWindow.on("enter-full-screen", () => {
-            toolbarElement.style.paddingLeft = "0";
+            if (isWindow()) {
+                setTabPosition();
+            } else {
+                toolbarElement.style.paddingLeft = "0";
+            }
         });
         currentWindow.on("leave-full-screen", () => {
-            toolbarElement.setAttribute("style", "");
+            if (isWindow()) {
+                setTabPosition();
+            } else {
+                toolbarElement.setAttribute("style", "");
+            }
         });
 
-        if (currentWindow.isFullScreen()) {
+        if (currentWindow.isFullScreen() && !isWindow()) {
             toolbarElement.style.paddingLeft = "0";
         }
         return;
@@ -476,18 +488,19 @@ const initWindow = () => {
     document.body.classList.add("branch--Sillot");
 
 
-    //添加应用图标
-    const toolbar = document.getElementById("toolbar");
-    toolbar.insertAdjacentHTML("afterbegin", `<div class="toolbar__item" id="windowAppIcon">
+    // 添加应用图标
+    if (!isWindow()) {
+        const toolbarElement = document.getElementById("toolbar");
+        toolbarElement.insertAdjacentHTML("afterbegin", `<div class="toolbar__item" id="windowAppIcon">
     <svg>
         <use xlink:href="#iconSiYuan"></use>
     </svg>
 </div>`);
+    }
 
-    //添加窗口控件
-    const controlsElement = document.getElementById("windowControls");
 
-    controlsElement.innerHTML = `<div class="toolbar__item b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.min}" id="minWindow">
+    // 添加窗口控件
+    const controlsHTML = `<div class="toolbar__item b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.min}" id="minWindow">
     <svg>
         <use xlink:href="#iconMin"></use>
     </svg>
@@ -507,6 +520,11 @@ const initWindow = () => {
         <use xlink:href="#iconClose"></use>
     </svg>
 </div>`;
+    if (isWindow()) {
+        document.body.insertAdjacentHTML("beforeend", `<div class="toolbar__window">${controlsHTML}</div>`);
+    } else {
+        document.getElementById("windowControls").innerHTML = controlsHTML;
+    }
     const maxBtnElement = document.getElementById("maxWindow");
     const restoreBtnElement = document.getElementById("restoreWindow");
 
@@ -547,15 +565,21 @@ const initWindow = () => {
         currentWindow.minimize();
     });
     closeBtnElement.addEventListener("click", () => {
-        winOnClose(currentWindow);
+        if (isWindow()) {
+            currentWindow.destroy();
+        } else {
+            winOnClose(currentWindow);
+        }
     });
     /// #else
-    document.querySelector(".toolbar").classList.add("toolbar--browser");
-    window.addEventListener("beforeunload", () => {
-        exportLayout(false);
-    }, false);
-    window.addEventListener("pagehide", () => {
-        exportLayout(false);
-    }, false);
+    if (!isWindow()) {
+        document.querySelector(".toolbar").classList.add("toolbar--browser");
+        window.addEventListener("beforeunload", () => {
+            exportLayout(false);
+        }, false);
+        window.addEventListener("pagehide", () => {
+            exportLayout(false);
+        }, false);
+    }
     /// #endif
 };

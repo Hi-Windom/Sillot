@@ -17,6 +17,7 @@ import {Constants} from "../constants";
 /// #if !BROWSER
 import {webFrame} from "electron";
 import {getCurrentWindow} from "@electron/remote";
+import {setTabPosition} from "../window/setHeader";
 /// #endif
 import {Search} from "../search";
 import {showMessage} from "../dialog/message";
@@ -29,6 +30,7 @@ import {Asset} from "../asset";
 import {newFile} from "../util/newFile";
 import {MenuItem} from "../menus/Menu";
 import {escapeHtml} from "../util/escape";
+import {isWindow} from "../util/functions";
 
 export class Wnd {
     public id: string;
@@ -99,16 +101,25 @@ export class Wnd {
                 target = target.parentElement;
             }
         });
-        this.headersElement.addEventListener("dblclick", (event) => {
-            if (window.siyuan.config.fileTree.openFilesUseCurrentTab) {
-                let target = event.target as HTMLElement;
-                while (target && !target.isEqualNode(this.headersElement)) {
-                    if (target.tagName === "LI") {
-                        target.classList.remove("item--unupdate");
-                        break;
+        this.headersElement.parentElement.addEventListener("dblclick", (event) => {
+            let target = event.target as HTMLElement;
+            while (target && !target.isEqualNode(this.headersElement)) {
+                if (window.siyuan.config.fileTree.openFilesUseCurrentTab && target.getAttribute("data-type") === "tab-header") {
+                    target.classList.remove("item--unupdate");
+                    break;
+                } else if (target.tagName === "SPAN" && target.className === "fn__flex-1" &&
+                    isWindow() && this.headersElement.getBoundingClientRect().top <= 0) {
+                    /// #if !BROWSER
+                    const currentWindow = getCurrentWindow();
+                    if (currentWindow.isMaximized()) {
+                        currentWindow.unmaximize();
+                    } else {
+                        currentWindow.maximize();
                     }
-                    target = target.parentElement;
+                    /// #endif
+                    break;
                 }
+                target = target.parentElement;
             }
         });
         const dragElement = this.element.querySelector(".layout-tab-container__drag") as HTMLElement;
@@ -287,7 +298,7 @@ export class Wnd {
             const targetWnd = getInstanceById(targetWndElement.getAttribute("data-id")) as Wnd;
             const tabId = event.dataTransfer.getData(Constants.SIYUAN_DROP_TAB);
             const oldTab = getInstanceById(tabId) as Tab;
-            if (oldTab.model instanceof  Asset) {
+            if (oldTab.model instanceof Asset) {
                 // https://github.com/siyuan-note/siyuan/issues/6890
                 const pdfViewerElement = oldTab.model.element.querySelector("#viewerContainer");
                 if (pdfViewerElement) {
@@ -319,9 +330,11 @@ export class Wnd {
                         switchWnd(newWnd, targetWnd);
                     }
                 }
+                /// #if !BROWSER
+                setTabPosition();
+                /// #endif
                 return;
             }
-
 
             if (targetWndElement.contains(document.querySelector(`[data-id="${tabId}"]`))) {
                 return;
@@ -370,7 +383,7 @@ export class Wnd {
                 }
             }
         });
-        if (currentTab) {
+        if (currentTab && currentTab.headElement) {
             const initData = currentTab.headElement.getAttribute("data-initdata");
             if (initData) {
                 const json = JSON.parse(initData);
@@ -495,6 +508,9 @@ export class Wnd {
         } else if (this.children.length > window.siyuan.config.fileTree.maxOpenTabCount) {
             this.removeOverCounter(oldFocusIndex);
         }
+        /// #if !BROWSER
+        setTabPosition();
+        /// #endif
     }
 
     private renderTabList(event: MouseEvent) {
@@ -652,6 +668,12 @@ export class Wnd {
         if (window.siyuan.layout.centerLayout) {
             const wnd = getWndByLayout(window.siyuan.layout.centerLayout);
             if (!wnd) {
+                /// #if !BROWSER
+                if (isWindow()) {
+                    getCurrentWindow().destroy();
+                    return;
+                }
+                /// #endif
                 const wnd = new Wnd();
                 window.siyuan.layout.centerLayout.addWnd(wnd);
                 wnd.addTab(newCenterEmptyTab());

@@ -25,6 +25,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -55,17 +56,9 @@ type Box struct {
 	historyGenerated int64 // 最近一次历史生成时间
 }
 
-func AutoStat() {
-	time.Sleep(time.Minute)
-	autoStat()
-	for range time.Tick(2 * time.Hour) {
-		autoStat()
-	}
-}
-
 var statLock = sync.Mutex{}
 
-func autoStat() {
+func StatJob() {
 	statLock.Lock()
 	defer statLock.Unlock()
 
@@ -497,13 +490,17 @@ func genTreeID(tree *parse.Tree) {
 	return
 }
 
+func ReloadUI() {
+	task.AppendTask(task.ReloadUI, util.ReloadUI)
+}
+
 func FullReindex() {
 	task.PrependTask(task.DatabaseIndexFull, fullReindex)
 	task.AppendTask(task.DatabaseIndexRef, IndexRefs)
 }
 
 func fullReindex() {
-	util.PushMsg(Conf.Language(35), 60*1000*10)
+	util.PushMsg(Conf.Language(35), 7*1000)
 	WaitForWritingFiles()
 
 	if err := sql.InitDatabase(true); nil != err {
@@ -512,18 +509,15 @@ func fullReindex() {
 	}
 	treenode.InitBlockTree(true)
 
+	sql.DisableCache()
 	openedBoxes := Conf.GetOpenedBoxes()
 	for _, openedBox := range openedBoxes {
 		index(openedBox.ID)
 	}
+	sql.EnableCache()
 	treenode.SaveBlockTree(true)
 	LoadFlashcards()
-
-	util.PushMsg(Conf.Language(58), 7000)
-	go func() {
-		time.Sleep(1 * time.Second)
-		util.ReloadUI()
-	}()
+	runtime.GC()
 }
 
 func ChangeBoxSort(boxIDs []string) {

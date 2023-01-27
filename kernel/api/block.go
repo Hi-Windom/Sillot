@@ -174,6 +174,11 @@ func checkBlockExist(c *gin.Context) {
 		ret.Data = id
 		return
 	}
+	if errors.Is(err, model.ErrIndexing) {
+		ret.Code = 0
+		ret.Data = false
+		return
+	}
 	ret.Data = nil != b
 }
 
@@ -377,6 +382,11 @@ func getBlockInfo(c *gin.Context) {
 		ret.Data = id
 		return
 	}
+	if errors.Is(err, model.ErrIndexing) {
+		ret.Code = 3
+		ret.Msg = model.Conf.Language(56)
+		return
+	}
 	if nil == block {
 		ret.Code = -1
 		ret.Msg = fmt.Sprintf(model.Conf.Language(15), id)
@@ -401,6 +411,11 @@ func getBlockInfo(c *gin.Context) {
 	if errors.Is(err, filelock.ErrUnableAccessFile) {
 		ret.Code = 2
 		ret.Data = id
+		return
+	}
+	if errors.Is(err, model.ErrIndexing) {
+		ret.Code = 3
+		ret.Data = model.Conf.Language(56)
 		return
 	}
 	rootTitle := root.IAL["title"]

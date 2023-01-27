@@ -46,12 +46,9 @@ var (
 	ExitSyncSucc = -1
 )
 
-func AutoSync() {
-	for {
-		time.Sleep(5 * time.Second)
-		if time.Now().After(syncPlanTime) {
-			SyncData(false, false, false)
-		}
+func SyncDataJob() {
+	if time.Now().After(syncPlanTime) {
+		SyncData(false, false, false)
 	}
 }
 
@@ -91,7 +88,6 @@ func BootSyncData() {
 }
 
 func SyncData(boot, exit, byHand bool) {
-	util.BroadcastByType("main", "syncing", 0, Conf.Language(81), nil)
 	syncData(boot, exit, byHand)
 }
 
@@ -158,10 +154,6 @@ func checkSync(boot, exit, byHand bool) bool {
 	}
 
 	if !IsSubscriber() && conf.ProviderSiYuan == Conf.Sync.Provider {
-		return false
-	}
-
-	if !cloud.IsValidCloudDirName(Conf.Sync.CloudName) {
 		return false
 	}
 
@@ -253,13 +245,8 @@ func incReindex(upserts, removes []string) {
 		if nil != err0 {
 			continue
 		}
-		treenode.ReindexBlockTree(tree)
+		treenode.IndexBlockTree(tree)
 		sql.UpsertTreeQueue(tree)
-	}
-
-	util.PushStatusBar(Conf.Language(58))
-	if needPushRemoveProgress || needPushUpsertProgress {
-		util.PushEndlessProgress(Conf.Language(58))
 	}
 }
 
