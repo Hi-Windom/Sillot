@@ -27,6 +27,7 @@ require (
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.8.2
+	github.com/go-co-op/gocron v1.18.0
 	github.com/gofrs/flock v0.8.1
 	github.com/imroc/req/v3 v3.30.0
 	github.com/jinzhu/copier v0.3.5
@@ -41,7 +42,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.22.12
 	github.com/siyuan-note/dejavu v0.0.0-20230117131301-821aa3adc1e7
 	github.com/siyuan-note/encryption v0.0.0-20220713091850-5ecd92177b75
-	github.com/siyuan-note/eventbus v0.0.0-20220916025349-3ac6e75522da
+	github.com/siyuan-note/eventbus v0.0.0-20230126092943-c6bf51e65ae2
 	github.com/siyuan-note/filelock v0.0.0-20221117095924-e1947438a35e
 	github.com/siyuan-note/httpclient v0.0.0-20230116125720-ee36ddf6f223
 	github.com/siyuan-note/logging v0.0.0-20221031125421-9b7234d79d8a
@@ -112,6 +113,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
 	github.com/qiniu/go-sdk/v7 v7.14.0 // indirect
 	github.com/restic/chunker v0.4.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cast v1.5.0 // indirect

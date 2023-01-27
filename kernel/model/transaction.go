@@ -20,9 +20,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/siyuan-note/siyuan/kernel/task"
-	"os"
-	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -31,7 +28,6 @@ import (
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/editor"
-	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/emirpasic/gods/sets/hashset"
@@ -70,7 +66,6 @@ const txFixDelay = 10
 var (
 	txQueue     []*Transaction
 	txQueueLock = sync.Mutex{}
-	txDelay     = txFixDelay
 
 	currentTx *Transaction
 )
@@ -92,19 +87,15 @@ func WaitForWritingFiles() {
 }
 
 func isWritingFiles() bool {
-	time.Sleep(time.Duration(txDelay+5) * time.Millisecond)
+	time.Sleep(time.Duration(txFixDelay+10) * time.Millisecond)
 	if 0 < len(txQueue) || util.IsMutexLocked(&txQueueLock) {
 		return true
 	}
 	return nil != currentTx
 }
 
-func AutoFlushTx() {
-	go autoFlushUpdateRefTextRenameDoc()
-	for {
-		flushTx()
-		time.Sleep(time.Duration(txDelay) * time.Millisecond)
-	}
+func FlushTxJob() {
+	flushTx()
 }
 
 func flushTx() {
@@ -127,7 +118,7 @@ func flushTx() {
 	elapsed := time.Now().Sub(start).Milliseconds()
 	if 0 < len(currentTx.DoOperations) {
 		if 2000 < elapsed {
-			logging.LogWarnf("tx [%dms]", elapsed)
+			logging.LogWarnf("op tx [%dms]", elapsed)
 		}
 	}
 	currentTx = nil
@@ -182,12 +173,6 @@ type TxErr struct {
 
 func performTx(tx *Transaction) (ret *TxErr) {
 	if 1 > len(tx.DoOperations) {
-		txDelay -= 1000
-		if 100*txFixDelay < txDelay {
-			txDelay = txDelay / 2
-		} else if 0 > txDelay {
-			txDelay = txFixDelay
-		}
 		return
 	}
 
@@ -206,7 +191,6 @@ func performTx(tx *Transaction) (ret *TxErr) {
 		return
 	}
 
-	start := time.Now()
 	for _, op := range tx.DoOperations {
 		switch op.Action {
 		case "create":
@@ -246,11 +230,6 @@ func performTx(tx *Transaction) (ret *TxErr) {
 
 		logging.LogErrorf("commit tx failed: %s", cr)
 		return &TxErr{msg: cr.Error()}
-	}
-	elapsed := int(time.Now().Sub(start).Milliseconds())
-	txDelay = 10 + elapsed
-	if 1000*10 < txDelay {
-		txDelay = 1000 * 10
 	}
 	return
 }
@@ -310,6 +289,11 @@ func (tx *Transaction) doMove(operation *Operation) (ret *TxErr) {
 				targetNode = targetChildren[l-1]
 			}
 		}
+
+		if isMovingFoldHeadingIntoSelf(targetNode, headingChildren) {
+			return
+		}
+
 		for i := len(headingChildren) - 1; -1 < i; i-- {
 			c := headingChildren[i]
 			targetNode.InsertAfter(c)
@@ -350,6 +334,10 @@ func (tx *Transaction) doMove(operation *Operation) (ret *TxErr) {
 	if nil == targetNode {
 		logging.LogErrorf("get node [%s] in tree [%s] failed", targetParentID, targetTree.Root.ID)
 		return &TxErr{code: TxErrCodeBlockNotFound, id: targetParentID}
+	}
+
+	if isMovingFoldHeadingIntoSelf(targetNode, headingChildren) {
+		return
 	}
 
 	processed := false
@@ -404,6 +392,16 @@ func (tx *Transaction) doMove(operation *Operation) (ret *TxErr) {
 		}
 	}
 	return
+}
+
+func isMovingFoldHeadingIntoSelf(targetNode *ast.Node, headingChildren []*ast.Node) bool {
+	for _, headingChild := range headingChildren {
+		if headingChild.ID == targetNode.ID {
+			// 不能将折叠标题移动到自己下方节点的前或后 https://github.com/siyuan-note/siyuan/issues/7163
+			return true
+		}
+	}
+	return false
 }
 
 func (tx *Transaction) doPrependInsert(operation *Operation) (ret *TxErr) {
@@ -1093,7 +1091,7 @@ func (tx *Transaction) loadTree(id string) (ret *parse.Tree, err error) {
 
 func (tx *Transaction) writeTree(tree *parse.Tree) (err error) {
 	tx.trees[tree.ID] = tree
-	treenode.ReindexBlockTree(tree)
+	treenode.IndexBlockTree(tree)
 	return
 }
 
@@ -1171,11 +1169,9 @@ func updateRefTextRenameDoc(renamedTree *parse.Tree) {
 	updateRefTextRenameDocLock.Unlock()
 }
 
-func autoFlushUpdateRefTextRenameDoc() {
-	for {
-		sql.WaitForWritingDatabase()
-		flushUpdateRefTextRenameDoc()
-	}
+func FlushUpdateRefTextRenameDocJob() {
+	sql.WaitForWritingDatabase()
+	flushUpdateRefTextRenameDoc()
 }
 
 func flushUpdateRefTextRenameDoc() {
@@ -1215,239 +1211,4 @@ func updateRefText(refNode *ast.Node, changedDefNodes map[string]*ast.Node) (cha
 		return ast.WalkContinue
 	})
 	return
-}
-
-// AutoIndexEmbedBlock 嵌入块支持搜索 https://github.com/siyuan-note/siyuan/issues/7112
-func AutoIndexEmbedBlock() {
-	for {
-		embedBlocks := sql.QueryEmptyContentEmbedBlocks()
-		task.AppendTask(task.DatabaseIndexEmbedBlock, autoIndexEmbedBlock, embedBlocks)
-		time.Sleep(10 * time.Minute)
-	}
-}
-
-func autoIndexEmbedBlock(embedBlocks []*sql.Block) {
-	for i, embedBlock := range embedBlocks {
-		stmt := strings.TrimPrefix(embedBlock.Markdown, "{{")
-		stmt = strings.TrimSuffix(stmt, "}}")
-		queryResultBlocks := sql.SelectBlocksRawStmtNoParse(stmt, 102400)
-		for _, block := range queryResultBlocks {
-			embedBlock.Content += block.Content
-		}
-		if "" == embedBlock.Content {
-			embedBlock.Content = "no query result"
-		}
-		sql.UpdateBlockContent(embedBlock)
-
-		if 63 <= i { // 一次任务中最多处理 64 个嵌入块，防止卡顿
-			break
-		}
-	}
-}
-
-func updateEmbedBlockContent(embedBlockID string, queryResultBlocks []*EmbedBlock) {
-	embedBlock := sql.GetBlock(embedBlockID)
-	if nil == embedBlock {
-		return
-	}
-
-	for _, block := range queryResultBlocks {
-		embedBlock.Content += block.Block.Markdown
-	}
-	if "" == embedBlock.Content {
-		embedBlock.Content = "no query result"
-	}
-	sql.UpdateBlockContent(embedBlock)
-}
-
-// AutoFixIndex 自动校验数据库索引 https://github.com/siyuan-note/siyuan/issues/7016
-func AutoFixIndex() {
-	for {
-		task.AppendTask(task.DatabaseIndexFix, autoFixIndex)
-		time.Sleep(10 * time.Minute)
-	}
-}
-
-var autoFixLock = sync.Mutex{}
-
-func autoFixIndex() {
-	defer logging.Recover()
-
-	// 根据文件系统补全块树
-	boxes := Conf.GetOpenedBoxes()
-	for _, box := range boxes {
-		boxPath := filepath.Join(util.DataDir, box.ID)
-		var paths []string
-		filepath.Walk(boxPath, func(path string, info os.FileInfo, err error) error {
-			if !info.IsDir() && filepath.Ext(path) == ".sy" {
-				p := path[len(boxPath):]
-				p = filepath.ToSlash(p)
-				paths = append(paths, p)
-			}
-			return nil
-		})
-
-		size := len(paths)
-
-		redundantPaths := treenode.GetRedundantPaths(box.ID, paths)
-		for _, p := range redundantPaths {
-			treenode.RemoveBlockTreesByPath(p)
-		}
-
-		missingPaths := treenode.GetNotExistPaths(box.ID, paths)
-		for i, p := range missingPaths {
-			id := path.Base(p)
-			id = strings.TrimSuffix(id, ".sy")
-			if !ast.IsNodeIDPattern(id) {
-				continue
-			}
-
-			reindexTreeByPath(box.ID, p, i, size)
-			if util.IsExiting {
-				break
-			}
-		}
-
-		if util.IsExiting {
-			break
-		}
-	}
-
-	// 清理已关闭的笔记本块树
-	boxes = Conf.GetClosedBoxes()
-	for _, box := range boxes {
-		treenode.RemoveBlockTreesByBoxID(box.ID)
-	}
-
-	// 对比块树和数据库并订正数据库
-	rootUpdatedMap := treenode.GetRootUpdated()
-	dbRootUpdatedMap, err := sql.GetRootUpdated("blocks")
-	if nil == err {
-		reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap, "blocks")
-	}
-	dbFtsRootUpdatedMap, err := sql.GetRootUpdated("blocks_fts")
-	if nil == err {
-		reindexTreeByUpdated(rootUpdatedMap, dbFtsRootUpdatedMap, "blocks_fts")
-	}
-	if !Conf.Search.CaseSensitive {
-		dbFtsRootUpdatedMap, err = sql.GetRootUpdated("blocks_fts_case_insensitive")
-		if nil == err {
-			reindexTreeByUpdated(rootUpdatedMap, dbFtsRootUpdatedMap, "blocks_fts_case_insensitive")
-		}
-	}
-
-	// 去除重复的数据库块记录
-	duplicatedRootIDs := sql.GetDuplicatedRootIDs("blocks")
-	if 1 > len(duplicatedRootIDs) {
-		duplicatedRootIDs = sql.GetDuplicatedRootIDs("blocks_fts")
-		if 1 > len(duplicatedRootIDs) && !Conf.Search.CaseSensitive {
-			duplicatedRootIDs = sql.GetDuplicatedRootIDs("blocks_fts_case_insensitive")
-		}
-	}
-	size := len(duplicatedRootIDs)
-	for i, rootID := range duplicatedRootIDs {
-		root := sql.GetBlock(rootID)
-		if nil == root {
-			continue
-		}
-
-		logging.LogWarnf("exist more than one tree [%s], reindex it", rootID)
-		sql.RemoveTreeQueue(root.Box, rootID)
-		reindexTree(rootID, i, size)
-
-		if util.IsExiting {
-			break
-		}
-	}
-
-	util.PushStatusBar(Conf.Language(185))
-}
-
-func reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap map[string]string, blocksTable string) {
-	i := -1
-	size := len(rootUpdatedMap)
-	for rootID, updated := range rootUpdatedMap {
-		i++
-
-		if util.IsExiting {
-			break
-		}
-
-		rootUpdated := dbRootUpdatedMap[rootID]
-		if "" == rootUpdated {
-			logging.LogWarnf("not found tree [%s] in database, reindex it", rootID)
-			reindexTree(rootID, i, size)
-			continue
-		}
-
-		if "" == updated {
-			// BlockTree 迁移，v2.6.3 之前没有 updated 字段
-			reindexTree(rootID, i, size)
-			continue
-		}
-
-		btUpdated, _ := time.Parse("20060102150405", updated)
-		dbUpdated, _ := time.Parse("20060102150405", rootUpdated)
-		if dbUpdated.Before(btUpdated.Add(-10 * time.Minute)) {
-			logging.LogWarnf("tree [%s] is not up to date, reindex it", rootID)
-			reindexTree(rootID, i, size)
-			continue
-		}
-
-		if util.IsExiting {
-			break
-		}
-	}
-
-	for rootID, _ := range dbRootUpdatedMap {
-		if _, ok := rootUpdatedMap[rootID]; !ok {
-			logging.LogWarnf("tree [%s] is not in block tree, remove it from [%s]", rootID, blocksTable)
-			sql.DeleteTree(blocksTable, rootID)
-		}
-
-		if util.IsExiting {
-			break
-		}
-	}
-}
-
-func reindexTreeByPath(box, p string, i, size int) {
-	tree, err := LoadTree(box, p)
-	if nil != err {
-		return
-	}
-
-	reindexTree0(tree, i, size)
-}
-
-func reindexTree(rootID string, i, size int) {
-	root := treenode.GetBlockTree(rootID)
-	if nil == root {
-		logging.LogWarnf("root block not found", rootID)
-		return
-	}
-
-	tree, err := LoadTree(root.BoxID, root.Path)
-	if nil != err {
-		if os.IsNotExist(err) {
-			// 文件系统上没有找到该 .sy 文件，则订正块树
-			treenode.RemoveBlockTreesByRootID(rootID)
-		}
-		return
-	}
-
-	reindexTree0(tree, i, size)
-}
-
-func reindexTree0(tree *parse.Tree, i, size int) {
-	updated := tree.Root.IALAttr("updated")
-	if "" == updated {
-		updated = util.TimeFromID(tree.Root.ID)
-		tree.Root.SetIALAttr("updated", updated)
-		indexWriteJSONQueue(tree)
-	} else {
-		treenode.ReindexBlockTree(tree)
-		sql.UpsertTreeQueue(tree)
-	}
-	util.PushStatusBar(fmt.Sprintf(Conf.Language(183), i, size, html.EscapeHTMLStr(path.Base(tree.HPath))))
 }

@@ -18,18 +18,21 @@ package model
 
 import (
 	"fmt"
-	"github.com/siyuan-note/siyuan/kernel/task"
+	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/88250/lute/parse"
 	"github.com/dustin/go-humanize"
 	"github.com/emirpasic/gods/sets/hashset"
+	"github.com/panjf2000/ants/v2"
 	"github.com/siyuan-note/eventbus"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -49,24 +52,11 @@ func (box *Box) Index() {
 	task.AppendTask(task.DatabaseIndexRef, IndexRefs)
 }
 
-var indexing = false
-
-func waitForIndexing() {
-	for indexing {
-		time.Sleep(time.Millisecond * 100)
-	}
-}
-
 func index(boxID string) {
 	box := Conf.Box(boxID)
 	if nil == box {
 		return
 	}
-
-	indexing = true
-	defer func() {
-		indexing = false
-	}()
 
 	util.SetBootDetails("Listing files...")
 	files := box.ListFiles("/")
@@ -82,15 +72,20 @@ func index(boxID string) {
 	var treeSize int64
 	i := 0
 	util.PushStatusBar(fmt.Sprintf("["+box.Name+"] "+Conf.Language(64), len(files)))
-	for _, file := range files {
-		if file.isdir || !strings.HasSuffix(file.name, ".sy") {
-			continue
-		}
 
+	poolSize := runtime.NumCPU()
+	if 4 < poolSize {
+		poolSize = 4
+	}
+	waitGroup := &sync.WaitGroup{}
+	p, _ := ants.NewPoolWithFunc(poolSize, func(arg interface{}) {
+		defer waitGroup.Done()
+
+		file := arg.(*FileInfo)
 		tree, err := filesys.LoadTree(box.ID, file.path, luteEngine)
 		if nil != err {
 			logging.LogErrorf("read box [%s] tree [%s] failed: %s", box.ID, file.path, err)
-			continue
+			return
 		}
 
 		docIAL := parse.IAL2MapUnEsc(tree.Root.KramdownIAL)
@@ -104,8 +99,8 @@ func index(boxID string) {
 		}
 
 		cache.PutDocIAL(file.path, docIAL)
-		treenode.ReindexBlockTree(tree)
-		sql.UpsertTreeQueue(tree)
+		treenode.IndexBlockTree(tree)
+		sql.IndexTreeQueue(box.ID, file.path)
 
 		util.IncBootProgress(bootProgressPart, fmt.Sprintf(Conf.Language(92), util.ShortPathForBootingDisplay(tree.Path)))
 		treeSize += file.size
@@ -114,12 +109,23 @@ func index(boxID string) {
 			util.PushStatusBar(fmt.Sprintf(Conf.Language(88), i, len(files)-i))
 		}
 		i++
+	})
+	for _, file := range files {
+		if file.isdir || !strings.HasSuffix(file.name, ".sy") {
+			continue
+		}
+
+		waitGroup.Add(1)
+		p.Invoke(file)
 	}
+	waitGroup.Wait()
+	p.Release()
 
 	box.UpdateHistoryGenerated() // 初始化历史生成时间为当前时间
 	end := time.Now()
 	elapsed := end.Sub(start).Seconds()
 	logging.LogInfof("rebuilt database for notebook [%s] in [%.2fs], tree [count=%d, size=%s]", box.ID, elapsed, treeCount, humanize.Bytes(uint64(treeSize)))
+	runtime.GC()
 	return
 }
 
@@ -181,24 +187,78 @@ func IndexRefs() {
 	util.PushStatusBar(fmt.Sprintf(Conf.Language(55), i))
 }
 
-func init() {
-	eventbus.Subscribe(eventbus.EvtSQLInsertBlocks, func(context map[string]interface{}, blockCount int, hash string) {
-		if util.ContainerAndroid == util.Container || util.ContainerIOS == util.Container {
-			// Android/iOS 端不显示数据索引和搜索索引状态提示 https://github.com/siyuan-note/siyuan/issues/6392
-			return
-		}
+// IndexEmbedBlockJob 嵌入块支持搜索 https://github.com/siyuan-note/siyuan/issues/7112
+func IndexEmbedBlockJob() {
+	embedBlocks := sql.QueryEmptyContentEmbedBlocks()
+	task.AppendTask(task.DatabaseIndexEmbedBlock, autoIndexEmbedBlock, embedBlocks)
+}
 
-		msg := fmt.Sprintf(Conf.Language(89), blockCount, hash)
-		util.SetBootDetails(msg)
-		util.ContextPushMsg(context, msg)
-	})
+func autoIndexEmbedBlock(embedBlocks []*sql.Block) {
+	for i, embedBlock := range embedBlocks {
+		stmt := strings.TrimPrefix(embedBlock.Markdown, "{{")
+		stmt = strings.TrimSuffix(stmt, "}}")
+		queryResultBlocks := sql.SelectBlocksRawStmtNoParse(stmt, 102400)
+		for _, block := range queryResultBlocks {
+			embedBlock.Content += block.Content
+		}
+		if "" == embedBlock.Content {
+			embedBlock.Content = "no query result"
+		}
+		sql.UpdateBlockContent(embedBlock)
+
+		if 63 <= i { // 一次任务中最多处理 64 个嵌入块，防止卡顿
+			break
+		}
+	}
+}
+
+func updateEmbedBlockContent(embedBlockID string, queryResultBlocks []*EmbedBlock) {
+	embedBlock := sql.GetBlock(embedBlockID)
+	if nil == embedBlock {
+		return
+	}
+
+	for _, block := range queryResultBlocks {
+		embedBlock.Content += block.Block.Markdown
+	}
+	if "" == embedBlock.Content {
+		embedBlock.Content = "no query result"
+	}
+	sql.UpdateBlockContent(embedBlock)
+}
+
+func init() {
+	//eventbus.Subscribe(eventbus.EvtSQLInsertBlocks, func(context map[string]interface{}, current, total, blockCount int, hash string) {
+	//	if util.ContainerAndroid == util.Container || util.ContainerIOS == util.Container {
+	//		// Android/iOS 端不显示数据索引和搜索索引状态提示 https://github.com/siyuan-note/siyuan/issues/6392
+	//		return
+	//	}
+	//
+	//	msg := fmt.Sprintf(Conf.Language(89), current, total, blockCount, hash)
+	//	util.SetBootDetails(msg)
+	//	util.ContextPushMsg(context, msg)
+	//})
 	eventbus.Subscribe(eventbus.EvtSQLInsertBlocksFTS, func(context map[string]interface{}, blockCount int, hash string) {
 		if util.ContainerAndroid == util.Container || util.ContainerIOS == util.Container {
 			// Android/iOS 端不显示数据索引和搜索索引状态提示 https://github.com/siyuan-note/siyuan/issues/6392
 			return
 		}
 
-		msg := fmt.Sprintf(Conf.Language(90), blockCount, hash)
+		current := context["current"].(int) + 1
+		total := context["total"]
+		msg := fmt.Sprintf(Conf.Language(90), current, total, blockCount, hash)
+		util.SetBootDetails(msg)
+		util.ContextPushMsg(context, msg)
+	})
+	eventbus.Subscribe(eventbus.EvtSQLDeleteBlocks, func(context map[string]interface{}, rootID string) {
+		if util.ContainerAndroid == util.Container || util.ContainerIOS == util.Container {
+			// Android/iOS 端不显示数据索引和搜索索引状态提示 https://github.com/siyuan-note/siyuan/issues/6392
+			return
+		}
+
+		current := context["current"].(int) + 1
+		total := context["total"]
+		msg := fmt.Sprintf(Conf.Language(93), current, total, rootID)
 		util.SetBootDetails(msg)
 		util.ContextPushMsg(context, msg)
 	})
