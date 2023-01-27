@@ -1,6 +1,6 @@
 {
   "name": "Sillot",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "syv": "2.7.0",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
@@ -89,6 +89,7 @@
     "@electron/remote": "^2.0.8",
     "electron-fetch": "^1.7.4",
     "electron-store": "^8.1.0",
+    "lodash": "^4.17.21",
     "pnpm": "7.26.0"
   }
 }
