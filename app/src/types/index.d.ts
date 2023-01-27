@@ -35,6 +35,7 @@ interface Window {
     siyuan: ISiyuan
     Sillot: ISillot
     _: any
+    __ace: any
     webkit: any
     html2canvas: (element: Element) => Promise<any>;
     JSAndroid: {
@@ -219,9 +220,13 @@ interface ISiyuan {
 }
 
 interface ISillot {
-    IDBloaded: boolean,
-    disableDocSetPadding: boolean,
-    hljsRender: any,
+    status: {
+        IDBloaded: boolean,
+        disableDocSetPadding: boolean,
+    },
+    funs: {
+        hljsRender: any,
+    }
 }
 
 interface IScrollAttr {

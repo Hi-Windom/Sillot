@@ -12,6 +12,7 @@ specifiers:
   '@typescript-eslint/parser': ^5.30.6
   babel-loader: ^8.2.5
   blueimp-md5: ^2.19.0
+  brace: ^0.11.1
   clean-webpack-plugin: ^4.0.0
   css-loader: ^6.7.1
   dayjs: ^1.11.5
@@ -42,6 +43,7 @@ specifiers:
 
 dependencies:
   '@electron/remote': 2.0.8_electron@23.0.0-beta.4
+  brace: registry.npmmirror.com/brace/0.11.1
   electron-fetch: 1.7.4
   electron-store: registry.npmmirror.com/electron-store/8.1.0
   lodash: registry.npmmirror.com/lodash/4.17.21
@@ -5208,6 +5210,12 @@ packages:
     name: boolean
     version: 3.2.0
     optional: true
+
+  registry.npmmirror.com/brace/0.11.1:
+    resolution: {integrity: sha512-Fc8Ne62jJlKHiG/ajlonC4Sd66Pq68fFwK4ihJGNZpGqboc324SQk+lRvMzpPRuJOmfrJefdG8/7JdWX4bzJ2Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/brace/-/brace-0.11.1.tgz}
+    name: brace
+    version: 0.11.1
+    dev: false
 
   registry.npmmirror.com/buffer-crc32/0.2.13:
     resolution: {integrity: sha512-VO9Ht/+p3SN7SKWqcrgEzjGbRSJYTx+Q1pTQC0wrWqHx0vpJraQ6GtHx8tvcg1rlK1byhU5gccxgOgj7B0TDkQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/buffer-crc32/-/buffer-crc32-0.2.13.tgz}

@@ -27,6 +27,11 @@ import { getLocalStorage } from "./protyle/util/compatibility";
 import { importIDB } from './util/sillot-idb-backup-and-restore'
 import { highlightRender } from "./protyle/markdown/highlightRender";
 const lodash = require('lodash');
+const ace = require('brace')
+require('brace/mode/javascript')
+require('brace/theme/monokai')
+require('brace/ext/language_tools') //很重要 自动补全 提示
+
 
 class App {
     constructor() {
@@ -130,7 +135,7 @@ class App {
             }),
             menus: new Menus()
         };
-        window.Sillot = { IDBloaded: false, disableDocSetPadding: false, hljsRender: highlightRender }
+        window.Sillot = { status: { IDBloaded: false, disableDocSetPadding: false }, funs: { hljsRender: highlightRender } }
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
             let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1)
@@ -138,8 +143,38 @@ class App {
             fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, async (r) => {
                 // console.log(r);
                 await importIDB(r.data).then(() => {
-                    window.Sillot.IDBloaded = true;
+                    window.Sillot.status.IDBloaded = true;
                     window._ = lodash;
+                    window.__ace = ()=>{
+                        let container = document.createElement("div");
+                        container.style.width = "100vw";
+                        container.style.height = "100vh";
+                        container.id = "javascript-editor";
+                        document.body.appendChild(container);
+                        var editor = ace.edit('javascript-editor');
+                        editor.getSession().setMode('ace/mode/javascript'); // 设置代码语言不适合暴露，只能在分支代码实现
+                        editor.setTheme('ace/theme/monokai'); // 设置代码主题不适合暴露，只能在分支代码实现
+                        editor.setOptions({
+                            wrap: true, // 换行
+                            autoScrollEditorIntoView: false, // 自动滚动编辑器视图
+                            enableLiveAutocompletion: true, // 智能补全
+                            enableBasicAutocompletion: true // 启用基本完成 不推荐使用
+                          })
+                        return editor
+                        // 简单用法：
+                        // let y = __ace()
+                        // y.setValue(`function g(y){
+                        //     console.log("ok")
+                        //     return false
+                        // }
+                        // f(`)
+                        // y.getSession().on('change', function() {
+                        //     console.log(y.getValue())
+                        //   })
+                        // y.getSession().selection.on('changeSelection', function(e) {
+                        //     console.warn(y.session.getTextRange(y.getSelectionRange()))
+                        // });
+                    };
                     getLocalStorage(() => {
                         fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
                             window.siyuan.languages = lauguages;
