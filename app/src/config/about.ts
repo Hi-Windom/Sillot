@@ -119,7 +119,7 @@ export const about = {
 </label>
 <label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
-        ${window.siyuan.languages.currentVer} v${Constants.SIYUAN_VERSION}
+        ${window.siyuan.languages.currentVer} v${Constants.SIYUAN_VERSION}（${window.siyuan.languages.baseSY} v${Constants.SIYUAN_ORIGIN_VERSION}）
         <span id="isInsider"></span>
         <div class="b3-label__text">${window.siyuan.languages.visitAnnouncements}</div>
     </div>

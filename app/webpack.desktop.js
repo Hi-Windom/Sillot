@@ -131,7 +131,7 @@ module.exports = (env, argv) => {
           path.join(__dirname, 'stage/build/desktop')],
       }),
       new webpack.DefinePlugin({
-        SIYUAN_VERSION: JSON.stringify(pkg.version),
+        SIYUAN_VERSION: JSON.stringify(pkg.version),SIYUAN_ORIGIN_VERSION: JSON.stringify(pkg.syv),
         NODE_ENV: JSON.stringify(argv.mode),
       }),
       new MiniCssExtractPlugin({
