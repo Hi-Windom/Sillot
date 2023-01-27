@@ -25,7 +25,8 @@ import { resizeDrag } from "./layout/util";
 import { getAllTabs } from "./layout/getAll";
 import { getLocalStorage } from "./protyle/util/compatibility";
 import { importIDB } from './util/sillot-idb-backup-and-restore'
-import * as path from "path";
+import { highlightRender } from "./protyle/markdown/highlightRender";
+const lodash = require('lodash');
 
 class App {
     constructor() {
@@ -129,7 +130,7 @@ class App {
             }),
             menus: new Menus()
         };
-        window.Sillot = { IDBloaded: false, disableDocSetPadding: false }
+        window.Sillot = { IDBloaded: false, disableDocSetPadding: false, hljsRender: highlightRender }
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
             let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1)
@@ -138,6 +139,7 @@ class App {
                 // console.log(r);
                 await importIDB(r.data).then(() => {
                     window.Sillot.IDBloaded = true;
+                    window._ = lodash;
                     getLocalStorage(() => {
                         fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
                             window.siyuan.languages = lauguages;
