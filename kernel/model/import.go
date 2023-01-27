@@ -45,7 +45,6 @@ import (
 	"github.com/88250/lute/render"
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
-	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -524,7 +523,7 @@ func ImportFromLocalPath(boxID, localPath string, toPath string) (err error) {
 			hPath = strings.TrimSuffix(hPath, ext)
 			if info.IsDir() {
 				tree = treenode.NewTree(boxID, targetPath, hPath, title)
-				if err = filesys.WriteTree(tree); nil != err {
+				if err = indexWriteJSONQueue(tree); nil != err {
 					return io.EOF
 				}
 				return nil
@@ -610,22 +609,14 @@ func ImportFromLocalPath(boxID, localPath string, toPath string) (err error) {
 			})
 
 			reassignIDUpdated(tree)
-			if err = filesys.WriteTree(tree); nil != err {
-				return io.EOF
-			}
+			indexWriteJSONQueue(tree)
+
 			i++
 			if 0 == i%4 {
-				util.PushEndlessProgress(fmt.Sprintf(Conf.Language(66), util.ShortPathForBootingDisplay(tree.Path)))
+				util.PushEndlessProgress(fmt.Sprintf(Conf.Language(66), fmt.Sprintf("%d ", i)+util.ShortPathForBootingDisplay(tree.Path)))
 			}
 			return nil
 		})
-
-		if nil != err {
-			return err
-		}
-
-		IncSync()
-		FullReindex()
 	} else { // 导入单个文件
 		fileName := filepath.Base(localPath)
 		if !strings.HasSuffix(fileName, ".md") && !strings.HasSuffix(fileName, ".markdown") {
@@ -703,13 +694,11 @@ func ImportFromLocalPath(boxID, localPath string, toPath string) (err error) {
 		})
 
 		reassignIDUpdated(tree)
-		if err = indexWriteJSONQueue(tree); nil != err {
-			return
-		}
-		IncSync()
+		indexWriteJSONQueue(tree)
 	}
 
 	IncSync()
+	util.ReloadUI()
 	runtime.GC()
 	return
 }

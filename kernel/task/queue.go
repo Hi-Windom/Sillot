@@ -47,7 +47,6 @@ func PrependTask(action string, handler interface{}, args ...interface{}) {
 		return
 	}
 
-	cancelTask(action, args...)
 	taskQueue = append([]*Task{newTask(action, handler, args...)}, taskQueue...)
 }
 
@@ -60,28 +59,7 @@ func AppendTask(action string, handler interface{}, args ...interface{}) {
 		return
 	}
 
-	cancelTask(action, args...)
 	taskQueue = append(taskQueue, newTask(action, handler, args...))
-}
-
-func cancelTask(action string, args ...interface{}) {
-	for i := len(taskQueue) - 1; i >= 0; i-- {
-		task := taskQueue[i]
-		if action == task.Action {
-			if len(task.Args) != len(args) {
-				continue
-			}
-
-			for j, arg := range args {
-				if arg != task.Args[j] {
-					continue
-				}
-			}
-
-			taskQueue = append(taskQueue[:i], taskQueue[i+1:]...)
-			break
-		}
-	}
 }
 
 func newTask(action string, handler interface{}, args ...interface{}) *Task {
@@ -119,21 +97,23 @@ func StatusJob() {
 	tasks := taskQueue
 	data := map[string]interface{}{}
 	var items []map[string]interface{}
+	count := map[string]int{}
 	for _, task := range tasks {
-		if OCRImage == task.Action || DatabaseIndexEmbedBlock == task.Action {
-			continue
-		}
-
 		actionLangs := util.TaskActionLangs[util.Lang]
 		action := task.Action
+		if c := count[action]; 3 < c {
+			logging.LogWarnf("too many tasks [%s], ignore show its status", action)
+			continue
+		}
+		count[action]++
+
 		if nil != actionLangs {
 			if label := actionLangs[task.Action]; nil != label {
 				action = label.(string)
 			}
 		}
-		item := map[string]interface{}{
-			"action": action,
-		}
+
+		item := map[string]interface{}{"action": action}
 		items = append(items, item)
 	}
 	if 1 > len(items) {
@@ -181,7 +161,7 @@ func execTask(task *Task) {
 		}
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*12)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*7)
 	defer cancel()
 	ch := make(chan bool, 1)
 	go func() {
