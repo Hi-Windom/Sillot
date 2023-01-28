@@ -28,7 +28,7 @@ import { importIDB } from './util/sillot-idb-backup-and-restore'
 import { highlightRender } from "./protyle/markdown/highlightRender";
 const lodash = require('lodash');
 const ace = require('brace')
-require('brace/mode')
+require('brace/mode/javascript')
 require('brace/theme/monokai')
 require('brace/ext/language_tools') //很重要 自动补全 提示
 
