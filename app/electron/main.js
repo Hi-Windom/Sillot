@@ -79,7 +79,6 @@ const showErrorWindow = (title, content) => {
     frame: false,
     icon: path.join(appDir, 'stage', 'icon-large.png'),
     webPreferences: {
-      nativeWindowOpen: true,
       nodeIntegration: true,
       webviewTag: true,
       webSecurity: false,
@@ -193,7 +192,6 @@ const boot = () => {
     trafficLightPosition: {x: 8, y: 8},
     webPreferences: {
       nodeIntegration: true,
-      nativeWindowOpen: true,
       webviewTag: true,
       webSecurity: false,
       contextIsolation: false,
@@ -375,9 +373,6 @@ const initKernel = (workspace, port, lang) => {
       frame: false,
       icon: path.join(appDir, 'stage', 'icon-large.png'),
       transparent: 'linux' !== process.platform,
-      webPreferences: {
-        nativeWindowOpen: true,
-      },
     })
 
     const kernelName = 'win32' === process.platform
@@ -393,7 +388,7 @@ const initKernel = (workspace, port, lang) => {
     }
 
     if (!isDevEnv || workspaces.length > 0) {
-      if (port && "" !== port) {
+      if (port && '' !== port) {
         kernelPort = port
       } else {
         const getAvailablePort = () => {
@@ -424,13 +419,13 @@ const initKernel = (workspace, port, lang) => {
     if (isDevEnv && workspaces.length === 0) {
       cmds.push('--mode', 'dev')
     }
-    if (workspace && "" !== workspace) {
+    if (workspace && '' !== workspace) {
       cmds.push('--workspace', workspace)
     }
-    if (port && "" !== port) {
+    if (port && '' !== port) {
       cmds.push('--port', port)
     }
-    if (lang && "" !== lang) {
+    if (lang && '' !== lang) {
       cmds.push('--lang', lang)
     }
     let cmd = `ui version [${appVer}], booting kernel [${kernelPath} ${cmds.join(
@@ -675,7 +670,7 @@ app.whenReady().then(() => {
   })
   ipcMain.on('siyuan-closetab', (event, data) => {
     BrowserWindow.getAllWindows().forEach(item => {
-        item.webContents.send('siyuan-closetab', data)
+      item.webContents.send('siyuan-closetab', data)
     })
   })
   ipcMain.on('siyuan-export-pdf', (event, data) => {
@@ -735,6 +730,29 @@ app.whenReady().then(() => {
       writeLog('exited ui')
     }
   })
+  ipcMain.on('siyuan-openwindow', (event, data) => {
+    const win = new BrowserWindow({
+      show: true,
+      backgroundColor: '#FFF',
+      trafficLightPosition: {x: 8, y: 13},
+      width: screen.getPrimaryDisplay().size.width * 0.7,
+      height: screen.getPrimaryDisplay().size.height * 0.9,
+      minWidth: 493,
+      minHeight: 376,
+      fullscreenable: true,
+      frame: 'darwin' === process.platform,
+      icon: path.join(appDir, 'stage', 'icon-large.png'),
+      titleBarStyle: 'hidden',
+      webPreferences: {
+        contextIsolation: false,
+        nodeIntegration: true,
+        webviewTag: true,
+        webSecurity: false,
+      },
+    })
+    win.loadURL(data)
+    require('@electron/remote/main').enable(win.webContents)
+  })
   ipcMain.on('siyuan-open-workspace', (event, data) => {
     const foundWorkspace = workspaces.find((item, index) => {
       if (item.workspaceDir === data.workspace) {
@@ -743,7 +761,7 @@ app.whenReady().then(() => {
       }
     })
     if (!foundWorkspace) {
-      initKernel(data.workspace, "", data.lang).then((isSucc) => {
+      initKernel(data.workspace, '', data.lang).then((isSucc) => {
         if (isSucc) {
           boot()
         }
@@ -806,10 +824,9 @@ app.whenReady().then(() => {
       })
     })
   })
-
   ipcMain.on('siyuan-lock-screen', () => {
     BrowserWindow.getAllWindows().forEach(item => {
-      item.browserWindow.webContents.send('siyuan-lock-screen')
+      item.webContents.send('siyuan-lock-screen')
     })
   })
 
@@ -821,7 +838,6 @@ app.whenReady().then(() => {
       icon: path.join(appDir, 'stage', 'icon-large.png'),
       transparent: 'linux' !== process.platform,
       webPreferences: {
-        nativeWindowOpen: true,
         nodeIntegration: true,
         webviewTag: true,
         webSecurity: false,
@@ -850,7 +866,7 @@ app.whenReady().then(() => {
     firstOpenWindow.show()
     // 初始化启动
     ipcMain.on('siyuan-first-init', (event, data) => {
-      initKernel(data.workspace, "", data.lang).then((isSucc) => {
+      initKernel(data.workspace, '', data.lang).then((isSucc) => {
         if (isSucc) {
           boot()
         }
@@ -874,7 +890,7 @@ app.whenReady().then(() => {
     if (port) {
       writeLog('got arg [--port=' + port + ']')
     }
-    initKernel(workspace, port, "").then((isSucc) => {
+    initKernel(workspace, port, '').then((isSucc) => {
       if (isSucc) {
         boot()
       }
@@ -890,10 +906,6 @@ app.on('open-url', (event, url) => { // for macOS
       }
     })
   }
-})
-
-app.on('browser-window-created', (_, window) => {
-  require("@electron/remote/main").enable(window.webContents)
 })
 
 app.on('second-instance', (event, argv) => {
@@ -922,7 +934,7 @@ app.on('second-instance', (event, argv) => {
     return
   }
   if (workspace) {
-    initKernel(workspace, port, "").then((isSucc) => {
+    initKernel(workspace, port, '').then((isSucc) => {
       if (isSucc) {
         boot()
       }
@@ -972,7 +984,6 @@ app.on('before-quit', (event) => {
 })
 
 const {powerMonitor} = require('electron')
-const {write} = require('fs')
 
 powerMonitor.on('suspend', () => {
   writeLog('system suspend')
