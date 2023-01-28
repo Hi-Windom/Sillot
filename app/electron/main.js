@@ -673,6 +673,11 @@ app.whenReady().then(() => {
       }
     })
   })
+  ipcMain.on('siyuan-closetab', (event, data) => {
+    BrowserWindow.getAllWindows().forEach(item => {
+        item.webContents.send('siyuan-closetab', data)
+    })
+  })
   ipcMain.on('siyuan-export-pdf', (event, data) => {
     BrowserWindow.fromId(data.id).webContents.send('siyuan-export-pdf', data)
   })
@@ -803,7 +808,7 @@ app.whenReady().then(() => {
   })
 
   ipcMain.on('siyuan-lock-screen', () => {
-    workspaces.forEach(item => {
+    BrowserWindow.getAllWindows().forEach(item => {
       item.browserWindow.webContents.send('siyuan-lock-screen')
     })
   })

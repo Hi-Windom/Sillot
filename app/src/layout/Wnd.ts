@@ -15,7 +15,7 @@ import {Graph} from "./dock/Graph";
 import {hasClosestByAttribute, hasClosestByClassName, hasClosestByTag} from "../protyle/util/hasClosest";
 import {Constants} from "../constants";
 /// #if !BROWSER
-import {webFrame} from "electron";
+import {webFrame, ipcRenderer} from "electron";
 import {getCurrentWindow} from "@electron/remote";
 import {setTabPosition} from "../window/setHeader";
 /// #endif
@@ -146,7 +146,8 @@ export class Wnd {
                 it.style.opacity = ".1";
                 return;
             }
-            if (!event.dataTransfer.types.includes(Constants.SIYUAN_DROP_TAB) || !window.siyuan.dragElement) {
+            // 不能使用 !window.siyuan.dragElement，因为移动页签到新窗口后，再把主窗口页签拖拽新窗口页签上时，该值为空
+            if (!event.dataTransfer.types.includes(Constants.SIYUAN_DROP_TAB)) {
                 return;
             }
             event.preventDefault();
@@ -160,10 +161,10 @@ export class Wnd {
                     return true;
                 }
             });
-            if (!newTabHeaderElement && !oldTabHeaderElement.classList.contains("item--pin")) {
+            if (!newTabHeaderElement  && oldTabHeaderElement && !oldTabHeaderElement.classList.contains("item--pin")) {
                 it.classList.add("layout-tab-bar--drag");
             }
-            if (!exitDrag) {
+            if (!exitDrag && oldTabHeaderElement) {
                 if (oldTabHeaderElement.classList.contains("item--pin")) {
                     return;
                 }
@@ -171,6 +172,12 @@ export class Wnd {
                 oldTabHeaderElement.setAttribute("data-clone", "true");
                 it.append(oldTabHeaderElement);
                 return;
+            } else if (!exitDrag && !oldTabHeaderElement) { // 拖拽到新窗口
+                oldTabHeaderElement = document.createElement("li");
+                oldTabHeaderElement.style.opacity = "0.1";
+                oldTabHeaderElement.innerHTML = '<svg class="svg"><use xlink:href="#iconFile"></use></svg>';
+                oldTabHeaderElement.setAttribute("data-clone", "true");
+                it.append(oldTabHeaderElement);
             }
             if (!newTabHeaderElement) {
                 return;
@@ -199,6 +206,7 @@ export class Wnd {
             });
             it.style.opacity = "";
         });
+        const that = this;
         this.headersElement.addEventListener("drop", function (event: DragEvent & { target: HTMLElement }) {
             const it = this as HTMLElement;
             if (event.dataTransfer.types.includes(Constants.SIYUAN_DROP_FILE)) {
@@ -216,7 +224,20 @@ export class Wnd {
                 it.style.opacity = "";
                 return;
             }
-            const oldTab = getInstanceById(event.dataTransfer.getData(Constants.SIYUAN_DROP_TAB)) as Tab;
+            const tabId = event.dataTransfer.getData(Constants.SIYUAN_DROP_TAB);
+            let oldTab = getInstanceById(tabId) as Tab;
+            /// #if !BROWSER
+            if (!oldTab) { // 从主窗口拖拽到页签新窗口
+                JSONToCenter(JSON.parse(event.dataTransfer.getData(Constants.SIYUAN_DROP_TABTOWINDOW)), that);
+                oldTab = that.children[that.children.length - 1];
+                ipcRenderer.send(Constants.SIYUAN_CLOSETAB, tabId);
+                it.querySelector("li[data-clone='true']").remove();
+                that.switchTab(oldTab.headElement);
+            }
+            /// #endif
+            if (!oldTab) {
+                return;
+            }
             it.classList.remove("layout-tab-bar--drag");
 
             const nextTabHeaderElement = (Array.from(it.childNodes).find((item: HTMLElement) => {
@@ -298,9 +319,15 @@ export class Wnd {
             const targetWnd = getInstanceById(targetWndElement.getAttribute("data-id")) as Wnd;
             const tabId = event.dataTransfer.getData(Constants.SIYUAN_DROP_TAB);
             let oldTab = getInstanceById(tabId) as Tab;
-            if (isWindow() && !oldTab) { // 从主窗口拖拽到页签新窗口
+            /// #if !BROWSER
+            if (!oldTab) { // 从主窗口拖拽到页签新窗口
                 JSONToCenter(JSON.parse(event.dataTransfer.getData(Constants.SIYUAN_DROP_TABTOWINDOW)), this);
                 oldTab = this.children[this.children.length - 1];
+                ipcRenderer.send(Constants.SIYUAN_CLOSETAB, tabId);
+            }
+            /// #endif
+            if (!oldTab) {
+                return;
             }
             if (oldTab.model instanceof Asset) {
                 // https://github.com/siyuan-note/siyuan/issues/6890

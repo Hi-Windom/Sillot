@@ -1,11 +1,11 @@
 {
   "name": "Sillot",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "syv": "2.7.0",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
-  "packageManager": "pnpm@7.18.1",
+  "packageManager": "pnpm@7.26.1",
   "scripts": {
     "lint": "eslint . --fix --ext .ts",
     "dev": "webpack --mode development",
