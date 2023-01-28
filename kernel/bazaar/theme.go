@@ -156,7 +156,7 @@ func InstalledThemes() (ret []*Theme) {
 }
 
 func isBuiltInTheme(dirName string) bool {
-	return "默认主题 daylight" == dirName || "默认主题 midnight" == dirName || "Sofill-" == dirName
+	return "默认主题 daylight" == dirName || "默认主题 midnight" == dirName || "Sofill+" == dirName
 }
 
 func InstallTheme(repoURL, repoHash, installPath string, systemID string) error {

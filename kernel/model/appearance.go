@@ -46,11 +46,11 @@ func InitAppearance() {
 	loadThemes()
 
 	if !gulu.Str.Contains(Conf.Appearance.ThemeDark, Conf.Appearance.DarkThemes) {
-		Conf.Appearance.ThemeDark = "Sofill-"
+		Conf.Appearance.ThemeDark = "默认主题 midnight"
 		Conf.Appearance.ThemeJS = true
 	}
 	if !gulu.Str.Contains(Conf.Appearance.ThemeLight, Conf.Appearance.LightThemes) {
-		Conf.Appearance.ThemeLight = "Sofill-"
+		Conf.Appearance.ThemeLight = "默认主题 daylight"
 		Conf.Appearance.ThemeJS = true
 	}
 
