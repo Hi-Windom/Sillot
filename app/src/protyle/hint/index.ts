@@ -583,6 +583,10 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                     }
                     nodeElement.outerHTML = newHTML;
                     nodeElement = protyle.wysiwyg.element.querySelector(`[data-node-id="${id}"]`);
+                    // 普通块插入代码块 代码块编辑增强 #85
+                    if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
+                        console.error(id)
+                    }
                     // https://github.com/siyuan-note/siyuan/issues/6864
                     if (nodeElement.getAttribute("data-type") === "NodeTable") {
                         nodeElement.querySelectorAll("colgroup col").forEach((item: HTMLElement) => {
@@ -600,6 +604,10 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                     const oldHTML = nodeElement.outerHTML;
                     const newId = newHTML.substr(newHTML.indexOf('data-node-id="') + 14, 22);
                     nodeElement = protyle.wysiwyg.element.querySelector(`[data-node-id="${newId}"]`);
+                    // 非普通块插入代码块 代码块编辑增强 #85
+                    if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
+                        console.error(newId)
+                    }
                     // https://github.com/siyuan-note/siyuan/issues/6864
                     if (nodeElement.getAttribute("data-type") === "NodeTable") {
                         nodeElement.querySelectorAll("colgroup col").forEach((item: HTMLElement) => {
