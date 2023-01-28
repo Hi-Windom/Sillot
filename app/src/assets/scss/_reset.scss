@@ -55,7 +55,7 @@ body {
     -webkit-font-smoothing: auto;
 
     .toolbar {
-      padding: 0;
+      padding: 0 0 0 5px;
     }
 
     .fullscreen {
@@ -83,7 +83,7 @@ body {
     }
 
     &.body--blur .layout-tab-bar {
-      background-color: var(--b3-toolbar-blur-background);
+      opacity: .38;
     }
   }
 }
