@@ -123,7 +123,7 @@ function clearDatabase(idbDatabase: { transaction: (arg0: any, arg1: string) => 
 }
 
 export async function importIDB(result: any) {
-  if (window.Sillot.IDBloaded && !window.location.search.startsWith("?b=Sillot")) { return }
+  if (window.Sillot.status.IDBloaded && !window.location.search.startsWith("?b=Sillot")) { return }
   let importObject: any = result.data
   let dbList: Array<string> = Object.keys(importObject);
   let resolved: number = 0;

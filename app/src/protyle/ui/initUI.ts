@@ -5,6 +5,8 @@ import {isMobile} from "../../util/functions";
 import {Constants} from "../../constants";
 import {hasClosestByAttribute, hasClosestByClassName} from "../util/hasClosest";
 
+
+
 export const initUI = (protyle: IProtyle) => {
     protyle.contentElement = document.createElement("div");
     protyle.contentElement.className = "protyle-content";
@@ -84,7 +86,7 @@ export const removeLoading = (protyle: IProtyle) => {
 };
 
 export const setPadding = (protyle: IProtyle) => {
-    if (protyle.options.action.includes(Constants.CB_GET_HISTORY) || window.Sillot.disableDocSetPadding) {
+    if (protyle.options.action.includes(Constants.CB_GET_HISTORY) || window.Sillot.status.disableDocSetPadding) {
         return;
     }
     let min16 = 16;
