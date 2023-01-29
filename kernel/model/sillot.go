@@ -24,9 +24,11 @@ func UserHomeDir() string {
 }
 
 func GetSillotAppDataDir() string {
-	// windows only
 	homeDir := UserHomeDir()
-	return filepath.Join(homeDir, "AppData", "Roaming", "Sillot-Electron")
+	if runtime.GOOS == "windows" {
+		return filepath.Join(homeDir, "AppData", "Roaming", "Sillot-Electron")
+	}
+	return filepath.Join(homeDir, "Library", "Application Support", "Sillot-Electron")
 }
 
 var storedConfiges = sync.Mutex{}
