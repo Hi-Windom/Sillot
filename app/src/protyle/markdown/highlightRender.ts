@@ -6,10 +6,12 @@ import {hasClosestByClassName} from "../util/hasClosest";
 
 export const highlightRender = (element: Element, cdn = Constants.PROTYLE_CDN) => {
     let codeElements: NodeListOf<Element>;
+    let _action_nodes: NodeListOf<Element>;
     let isPreview = false;
     if (element.classList.contains("code-block")) {
         // 编辑器内代码块编辑渲染
         codeElements = element.querySelectorAll("[spellcheck]");
+        _action_nodes = element.querySelectorAll(`.protyle-action`)
     } else {
         if (element.classList.contains("item__readme")) {
             // bazaar reademe
@@ -23,12 +25,23 @@ export const highlightRender = (element: Element, cdn = Constants.PROTYLE_CDN) =
             isPreview = true;
         } else {
             codeElements = element.querySelectorAll(".code-block [spellcheck]");
+            _action_nodes = element.querySelectorAll(`.code-block>.protyle-action`)
         }
     }
     if (codeElements.length === 0) {
         return;
     }
 
+    if (_action_nodes) {
+        // 给所有代码块添加编辑按钮 代码块编辑增强 #85
+        _action_nodes.forEach((i:any) => {
+            let e = i.querySelector("span.protyle-action__code_edit")
+            let c = i.querySelector(`span.protyle-icon--first.protyle-action__copy`)
+            if (!e && c) {
+                c.insertAdjacentHTML('afterend', `<span class="protyle-icon protyle-action__code_edit"><svg><use xlink:href="#iconEdit"></use></svg></span>`)
+            }
+        })
+    }
     setCodeTheme(cdn);
 
     addScript(`${cdn}/js/highlight.js/highlight.min.js?v=11.7.0`, "protyleHljsScript").then(() => {
