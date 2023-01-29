@@ -37,14 +37,14 @@
         }
 
         .b3-button {
-            margin: 26px 0 0;
-            width: clamp(260px,58vw,380px);
+            margin: 31px 0 0;
+            width: clamp(260px,58vw,500px);
             cursor: pointer;
             color: #fff;
-            border-radius: 4px;
-            line-height: 1.86;
-            font-size: 1.13em;
-            letter-spacing: 0.31em;
+            border-radius: 8px;
+            line-height: 2.6;
+            font-size: 1.31em;
+            letter-spacing: 0.05em;
             padding: 5px 8px;
             white-space: nowrap;
             display: inline-flex;
@@ -56,6 +56,7 @@
             text-align: center;
             font-family: "Helvetica Neue", "Luxi Sans", "DejaVu Sans", "Hiragino Sans GB", "Microsoft Yahei", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", "EmojiSymbols";
             background-color: var(--b3-theme-primary);
+            filter: hue-rotate(22deg);
         }
 
         .b3-button svg {
@@ -93,14 +94,14 @@
         }
 
         .b3-text-filed {
-            width: clamp(260px,58vw,380px);
+            width: clamp(260px,58vw,500px);
             border: 0;
             border-radius: 4px;
             box-shadow: inset 0 0 77px -58px var(--b3-theme-primary), 0 0 0 3px var(--b3-theme-primary-lightest);
             padding: 0 13px;
-            line-height: 1.86;
-            letter-spacing: 0.2em;
-            font-size: 1.86em;
+            line-height: 2;
+            letter-spacing: 0.05em;
+            font-size: 2em;
             box-sizing: border-box;
             color: var(--b3-theme-on-background);
             transition: box-shadow 120ms 0ms cubic-bezier(0, 0, 0.2, 1);
@@ -180,15 +181,16 @@
 
         .ft__on-surface {
             color: var(--b3-theme-on-surface);
-            font-size: 12px;
-            margin: 16px 0;
+            font-size: 13px;
+            margin: 31px 0 0;
+            letter-spacing: 0.02em;
         }
     </style>
 </head>
 <body>
 <div style="-webkit-app-region: drag;height: 32px;width: 100%;position: absolute;top: 0;"></div>
 <div style="position: relative;z-index: 2;text-align: center">
-    <h1 style="margin-bottom: 48px;color: var(--b3-theme-primary-lighter);filter: invert(1);">{{.workspace}}</h1>
+    <h1 style="color: var(--b3-theme-primary);filter: invert(1) drop-shadow(2px 1px 2px #88888888);letter-spacing: 0.13em;font-size: 2.7em;">{{.workspace}}</h1>
     <input class="b3-text-filed" id="authCode" type="password" placeholder="{{.l0}}"/><br>
     <div style="position: relative;width: 240px;margin: 8px auto 0;display: none">
         <img id="captchaImg" style="top: 1px;position: absolute;height: 28px;right: 1px;cursor: pointer">
