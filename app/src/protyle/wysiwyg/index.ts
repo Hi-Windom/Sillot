@@ -1687,6 +1687,20 @@ export class WYSIWYG {
                 return;
             }
 
+            // 响应点击事件 代码块编辑增强 #85
+            const codeEditElement = hasClosestByClassName(event.target, "protyle-action__code_edit");
+            if (codeEditElement && !protyle.disabled) {
+                let action = codeEditElement.parentElement
+                let block = action.parentElement
+                let code = block.querySelector(`[spellcheck]`)
+                let id = block.getAttribute("data-node-id")
+                console.log(id)
+                window.__ace.createEditor(id, action.textContent, code.textContent);
+                event.stopPropagation();
+                event.preventDefault();
+                return;
+            }
+
             const menuElement = hasClosestByClassName(event.target, "protyle-action__menu");
             if (menuElement) {
                 protyle.gutter.renderMenu(protyle, menuElement.parentElement.parentElement);

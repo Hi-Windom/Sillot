@@ -33,9 +33,12 @@ interface Window {
     __localStorage__setItem: (key: string, value: string) => void
     dataLayer: any[]
     siyuan: ISiyuan
+    // Sillot extend start
     Sillot: ISillot
     _: any
     __ace: any
+    __Swal: any
+    // Sillot extend end
     webkit: any
     html2canvas: (element: Element) => Promise<any>;
     JSAndroid: {

@@ -34,12 +34,18 @@ export const highlightRender = (element: Element, cdn = Constants.PROTYLE_CDN) =
 
     if (_action_nodes) {
         // 给所有代码块添加编辑按钮 代码块编辑增强 #85
-        _action_nodes.forEach((i:any) => {
-            let e = i.querySelector("span.protyle-action__code_edit")
-            let c = i.querySelector(`span.protyle-icon--first.protyle-action__copy`)
-            if (!e && c) {
-                c.insertAdjacentHTML('afterend', `<span class="protyle-icon protyle-action__code_edit"><svg><use xlink:href="#iconEdit"></use></svg></span>`)
-            }
+        new Promise((resolve, reject) => {
+            _action_nodes.forEach((i:any) => {
+                let e = i.querySelector("span.protyle-action__code_edit")
+                let c = i.querySelector(`span.protyle-icon--first.protyle-action__copy`)
+                if (!e && c) {
+                    c.insertAdjacentHTML('afterend', `<span class="protyle-icon protyle-action__code_edit"><svg><use xlink:href="#iconEdit"></use></svg></span>`)
+                }
+            })
+            let rs = document.querySelectorAll(`.code-block .protyle-action__code_edit`)
+            resolve(rs)
+        }).then((e) => {
+            // console.log(e)
         })
     }
     setCodeTheme(cdn);

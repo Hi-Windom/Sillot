@@ -27,10 +27,8 @@ import { getLocalStorage } from "./protyle/util/compatibility";
 import { importIDB } from './util/sillot-idb-backup-and-restore'
 import { highlightRender } from "./protyle/markdown/highlightRender";
 const lodash = require('lodash');
-const ace = require('brace')
-require('brace/mode/javascript')
-require('brace/theme/monokai')
-require('brace/ext/language_tools') //很重要 自动补全 提示
+import {exAce} from './sillot/ace'
+import {exSwal} from './sillot/sweetalert'
 
 
 class App {
@@ -145,41 +143,8 @@ class App {
                 await importIDB(r.data).then(() => {
                     window.Sillot.status.IDBloaded = true;
                     window._ = lodash;
-                    window.__ace = (id:string)=>{
-                        let container = document.createElement("div");
-                        container.style.width = "100vw";
-                        container.style.height = "100vh";
-                        container.style.position = "fixed";
-                        container.style.zIndex = "999";
-                        container.style.fontSize = "1.31em";
-                        container.id = id;
-                        container.className = "ace-container";
-                        document.body.appendChild(container);
-                        var editor = ace.edit(id);
-                        editor.getSession().setMode('ace/mode/javascript'); // 设置代码语言不适合暴露，只能在分支代码实现
-                        editor.setTheme('ace/theme/monokai'); // 设置代码主题不适合暴露，只能在分支代码实现
-                        editor.setOptions({
-                            wrap: true, // 换行
-                            autoScrollEditorIntoView: false, // 自动滚动编辑器视图
-                            enableLiveAutocompletion: true, // 智能补全
-                            enableBasicAutocompletion: true, // 启用基本完成
-                            tooltipFollowsMouse: true
-                          })
-                        return editor
-                        // 简单用法：
-                        // let y = __ace()
-                        // y.setValue(`function g(y){
-                        //     console.log("ok")
-                        //     return false
-                        // }
-                        // f(`)
-                        // y.getSession().on('change', function() {
-                        //     console.log(y.getValue())
-                        //   })
-                        // y.getSession().selection.on('changeSelection', function(e) {
-                        //     console.warn(y.session.getTextRange(y.getSelectionRange()))
-                        // });
-                    };
+                    exSwal();
+                    exAce();
                     getLocalStorage(() => {
                         fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
                             window.siyuan.languages = lauguages;
