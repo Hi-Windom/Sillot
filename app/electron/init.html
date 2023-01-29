@@ -37,14 +37,15 @@
 
         .b3-select {
             border: 1px solid rgba(0, 0, 0, .06);
-            border-radius: 4px;
-            padding: 4px 8px;
+            border-radius: 5px;
+            padding: 5px 8px;
             line-height: 20px;
             box-sizing: border-box;
             color: #202124;
+            filter: contrast(0.95) drop-shadow(1px 115px 22px #88888888);
             transition: box-shadow 120ms 0ms cubic-bezier(0, 0, 0.2, 1);
             background-color: #fff;
-            height: 28px;
+            height: 31px;
             font-size: 14px;
             width: 96px;
         }
@@ -58,7 +59,7 @@
             cursor: pointer;
             color: #fff;
             border-radius: 4px;
-            line-height: 20px;
+            line-height: 22px;
             padding: 4px 8px;
             background-color: #218bff;
             white-space: nowrap;
@@ -84,14 +85,15 @@
 
         .b3-label {
             padding: 12px 24px;
-            line-height: 20px;
+            line-height: 22px;
             display: flex;
             text-align: left;
             border-bottom: 1px solid rgba(0, 0, 0, .06);
         }
 
         .b3-label__text {
-            color: #5f6368;
+            color: #262539;
+            filter: opacity(0.58);
             font-size: 14px;
             margin-top: 4px;
         }
@@ -146,14 +148,22 @@
             display: none !important;
         }
 
+        .BBN {
+            color: #609797;
+            filter: invert(1) drop-shadow(-2px 2px 1px #cccccccc);
+            letter-spacing: 1.86px;
+        }
+
         .slogan {
-            color: #5f6368;
+            color: #384e5d;
+            filter: invert(1);
             font-size: 15px;
+            letter-spacing: 0.31px;
         }
 
         .notice {
             font-size: 14px;
-            color: #5f6368;
+            color: #f22648;
         }
 
         .icon {
@@ -194,7 +204,7 @@
 <div id="zhCN" class="fn__flex-column">
     <div class="fn__flex-1"></div>
     <img class="icon">
-    <h2>思源笔记</h2>
+    <h2 class="BBN">思源笔记 - 汐洛分支</h2>
     <div class="slogan">构建你永恒的数字花园</div>
     <div class="fn__flex-1"></div>
     <label class="b3-label">
@@ -206,10 +216,7 @@
         <div class="fn__flex-1"></div>
         <select class="b3-select lang">
             <option value="en_US">English</option>
-            <option value="es_ES">Español</option>
-            <option value="fr_FR">Français</option>
             <option value="zh_CN">简体中文</option>
-            <option value="zh_CHT">繁體中文</option>
         </select>
     </label>
     <label class="b3-label">
@@ -235,7 +242,7 @@
 <div class="fn__none fn__flex-column" id="enUS">
     <div class="fn__flex-1"></div>
     <img class="icon">
-    <h2>SiYuan</h2>
+    <h2 class="BBN">SiYuan - Sillot Branch</h2>
     <div class="slogan">Build Your Eternal Digital Garden</div>
     <div class="fn__flex-1"></div>
     <label class="b3-label">
@@ -249,10 +256,7 @@
         <div class="fn__flex-1"></div>
         <select class="b3-select lang">
             <option value="en_US">English</option>
-            <option value="es_ES">Español</option>
-            <option value="fr_FR">Français</option>
             <option value="zh_CN">简体中文</option>
-            <option value="zh_CHT">繁體中文</option>
         </select>
     </label>
     <label class="b3-label">
