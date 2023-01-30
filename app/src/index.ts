@@ -27,6 +27,7 @@ import { getLocalStorage } from "./protyle/util/compatibility";
 import { importIDB } from './util/sillot-idb-backup-and-restore'
 import { highlightRender } from "./protyle/markdown/highlightRender";
 const lodash = require('lodash');
+const localforage = require('localforage');
 import {exAce} from './sillot/ace'
 import {exSwal} from './sillot/sweetalert'
 
@@ -143,6 +144,7 @@ class App {
                 await importIDB(r.data).then(() => {
                     window.Sillot.status.IDBloaded = true;
                     window._ = lodash;
+                    window.__localforage = localforage;
                     exSwal();
                     exAce();
                     getLocalStorage(() => {

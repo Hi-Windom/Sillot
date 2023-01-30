@@ -1694,7 +1694,6 @@ export class WYSIWYG {
                 let block = action.parentElement
                 let code = block.querySelector(`[spellcheck]`)
                 let id = block.getAttribute("data-node-id")
-                console.log(id)
                 window.__ace.createEditor(id, action.textContent, code.textContent);
                 event.stopPropagation();
                 event.preventDefault();

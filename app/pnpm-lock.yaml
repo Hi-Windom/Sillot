@@ -27,6 +27,7 @@ specifiers:
   html-webpack-plugin: ^5.5.0
   iconv-lite: ^0.6.3
   ifdef-loader: ^2.3.2
+  localforage: ^1.10.0
   lodash: ^4.17.21
   mini-css-extract-plugin: 2.3.0
   path-browserify: ^1.0.1
@@ -47,6 +48,7 @@ dependencies:
   brace: registry.npmmirror.com/brace/0.11.1
   electron-fetch: 1.7.4
   electron-store: registry.npmmirror.com/electron-store/8.1.0
+  localforage: registry.npmmirror.com/localforage/1.10.0
   lodash: registry.npmmirror.com/lodash/4.17.21
   pnpm: registry.npmmirror.com/pnpm/7.26.0
   sweetalert2: registry.npmmirror.com/sweetalert2/11.7.1
@@ -5666,6 +5668,12 @@ packages:
     dev: true
     optional: true
 
+  registry.npmmirror.com/immediate/3.0.6:
+    resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/immediate/-/immediate-3.0.6.tgz}
+    name: immediate
+    version: 3.0.6
+    dev: false
+
   registry.npmmirror.com/is-fullwidth-code-point/3.0.0:
     resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/is-fullwidth-code-point/-/is-fullwidth-code-point-3.0.0.tgz}
     name: is-fullwidth-code-point
@@ -5724,6 +5732,22 @@ packages:
     version: 4.5.2
     dependencies:
       json-buffer: registry.npmmirror.com/json-buffer/3.0.1
+
+  registry.npmmirror.com/lie/3.1.1:
+    resolution: {integrity: sha512-RiNhHysUjhrDQntfYSfY4MU24coXXdEOgw9WGcKHNeEwffDYbF//u87M1EWaMGzuFoSbqW0C9C6lEEhDOAswfw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/lie/-/lie-3.1.1.tgz}
+    name: lie
+    version: 3.1.1
+    dependencies:
+      immediate: registry.npmmirror.com/immediate/3.0.6
+    dev: false
+
+  registry.npmmirror.com/localforage/1.10.0:
+    resolution: {integrity: sha512-14/H1aX7hzBBmmh7sGPd+AOMkkIrHM3Z1PAyGgZigA1H1p5O5ANnMyWzvpAETtG68/dC4pC0ncy3+PPGzXZHPg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/localforage/-/localforage-1.10.0.tgz}
+    name: localforage
+    version: 1.10.0
+    dependencies:
+      lie: registry.npmmirror.com/lie/3.1.1
+    dev: false
 
   registry.npmmirror.com/locate-path/3.0.0:
     resolution: {integrity: sha512-7AO748wWnIhNqAuaty2ZWHkQHRSNfPVIsPIfwEOWO22AmaoVrWavlOcMR5nzTLNYvp36X220/maaRsrec1G65A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/locate-path/-/locate-path-3.0.0.tgz}

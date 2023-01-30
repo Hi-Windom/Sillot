@@ -224,24 +224,11 @@ export function exAce() {
           "data": data,
           "id": id
         }, res => {
-          console.warn(res)
+          // console.warn(res)
           editor?.destroy();
           editor?.container.remove();
         })
       }
     })
   }
-  // 简单用法：
-  // let y = __ace()
-  // y.setValue(`function g(y){
-  //     console.log("ok")
-  //     return false
-  // }
-  // f(`)
-  // y.getSession().on('change', function() {
-  //     console.log(y.getValue())
-  //   })
-  // y.getSession().selection.on('changeSelection', function(e) {
-  //     console.warn(y.session.getTextRange(y.getSelectionRange()))
-  // });
 }

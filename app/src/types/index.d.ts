@@ -38,6 +38,7 @@ interface Window {
     _: any
     __ace: any
     __Swal: any
+    __localforage: any
     // Sillot extend end
     webkit: any
     html2canvas: (element: Element) => Promise<any>;
