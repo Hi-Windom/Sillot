@@ -1,6 +1,6 @@
 {
   "name": "Sillot",
-  "version": "0.3.24",
+  "version": "0.3.25",
   "syv": "2.7.1",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
@@ -80,6 +80,7 @@
     "safer-buffer": "^2.1.2",
     "sass": "^1.53.0",
     "sass-loader": "^12.6.0",
+    "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.3",
     "ts-loader": "^9.3.1",
     "typescript": "^4.7.4",
@@ -95,6 +96,8 @@
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "pnpm": "7.26.0",
-    "sweetalert2": "^11.7.1"
+    "sweetalert2": "^11.7.1",
+    "vue": "^3.2.45",
+    "vue-toast-notification": "^3.0"
   }
 }

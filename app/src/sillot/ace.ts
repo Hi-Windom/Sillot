@@ -1,4 +1,4 @@
-import {fetchPost} from '../util/fetch'
+import { fetchPost } from '../util/fetch'
 import Swal from 'sweetalert2'
 import * as ace from 'brace'
 // 引入扩展插件
@@ -8,6 +8,7 @@ import 'brace/ext/whitespace' // 显示不可见字符
 import 'brace/ext/emmet'
 // 引入语言模式
 import 'brace/mode/text'
+import 'brace/mode/plain_text'
 import 'brace/mode/c_cpp'
 import 'brace/mode/csharp'
 import 'brace/mode/css'
@@ -50,6 +51,7 @@ import "brace/theme/cobalt"
 import "brace/theme/tomorrow_night_blue"
 // 引入 snippets
 import 'brace/snippets/text'
+import 'brace/snippets/plain_text'
 import 'brace/snippets/c_cpp'
 import 'brace/snippets/csharp'
 import 'brace/snippets/css'
@@ -84,18 +86,16 @@ import 'brace/snippets/typescript'
 import 'brace/snippets/vbscript'
 import 'brace/snippets/xml'
 import 'brace/snippets/yaml'
-const ace_themes = {
+const ace_themes: any = {
   monokai: 'ace/theme/monokai',
   chaos: "ace/theme/chaos",
   chrome: "ace/theme/chrome",
   cobalt: "ace/theme/cobalt",
   tomorrow_night_blue: "ace/theme/tomorrow_night_blue"
 }
-const ace_modes = {
-  '': 'ace/mode/text',
+const ace_modes: any = {
+  plaintext: 'ace/mode/plain_text',
   text: 'ace/mode/text',
-  default: 'ace/mode/text',
-  plaintext: 'ace/mode/text',
   cpp: 'ace/mode/c_cpp',
   csharp: 'ace/mode/csharp',
   'c#': 'ace/mode/csharp',
@@ -104,7 +104,7 @@ const ace_modes = {
   go: 'ace/mode/golang',
   html: 'ace/mode/html',
   java: 'ace/mode/java',
-  javjsascript: 'ace/mode/javascript',
+  javascript: 'ace/mode/javascript',
   js: 'ace/mode/javascript',
   json: 'ace/mode/json',
   julia: 'ace/mode/julia',
@@ -146,27 +146,88 @@ export function exAce() {
     return await Swal.fire({
       title: '',
       html:
-        `<div class="ace-container" style="height:100%">
-        <div id="ace_statusBar"></div>
+        `<div class="ace-container" style="height: calc(100% - 10px);">
+        <div id="ace_toolBar" style="height:38px;padding:5px;margin-right:58px;display:flex;font-size:16px;align-items:center;">
+          <div id="ace_bindBlock" style="flex-grow:1;text-align:left;">正在编辑：[${id}]</div>
+          <div id="ace_fontsizeSelector_container" style="margin:0 5px;"> 字号：
+            <select id="ace_fontsizeSelector" class="b3-select fn__size200">
+              <option value="12px">12px</option>
+              <option value="14px">14px</option>
+              <option value="16px" selected>16px</option>
+              <option value="18px">18px</option>
+              <option value="20px">20px</option>
+              <option value="22px">22px</option>
+            </select>
+          </div>
+          <div id="ace_modeSelector_container" style="margin:0 5px;"> 语言模式：
+            <select id="ace_modeSelector" class="b3-select fn__size200">
+            </select>
+          </div>
+          <div id="ace_themeSelector_container" style="margin:0 5px;"> 配色主题：
+            <select id="ace_themeSelector" class="b3-select fn__size200">
+              <option value="monokai">monokai</option>
+              <option value="chaos">chaos</option>
+              <option value="chrome">chrome</option>
+              <option value="cobalt">cobalt</option>
+              <option value="tomorrow_night_blue">tomorrow_night_blue</option>
+            </select>
+          </div>
+        </div>
         <textarea id="aceEditorTextareaOriginElement"></textarea>
         </div>`,
       showCloseButton: true,
       showCancelButton: false,
       showConfirmButton: false,
-      width: "88vw",
+      width: "100vw", // 点击遮罩关闭弹窗会导致焦点跑到文档开头，因此全屏弹窗只允许右上角控件关闭
       didOpen: (thisE) => {
         let _t = thisE.querySelector(`.ace-container textarea`) as HTMLElement
         if (_t) {
-          thisE.style.height = "85vh"
-          editor = ace.edit("aceEditorTextareaOriginElement")
+          editor = ace.edit("aceEditorTextareaOriginElement") // 放在最前面
           window.__ace.editor = editor // 曲线救国
+          let _swal2_container = thisE.parentElement // div.swal2-container
+          let _HTML_c = thisE.querySelector(`#swal2-html-container`) as HTMLElement
+          let _ace_c = _HTML_c.querySelector(`.ace-container`) as HTMLElement
+          let _ace_e = _ace_c.querySelector(`.ace_editor`) as HTMLElement
+          let _rule_line = thisE.querySelector(`.ace_print-margin`) as HTMLElement
+          let _s_fontsize = _ace_c.querySelector(`#ace_fontsizeSelector`) as HTMLSelectElement
+          let _s_mode = _ace_c.querySelector(`#ace_modeSelector`) as HTMLSelectElement
+          let _s_theme = _ace_c.querySelector(`#ace_themeSelector`) as HTMLSelectElement
+          _swal2_container.style.padding = "0"
+          _swal2_container.style.zIndex = "998" // 默认的 1060 层级会遮挡 vue-toast-notification 或其他元素
+          thisE.style.animation = "none"
+          thisE.style.height = "100vh"
+          let _s_mode_options = ''
+          window._.forEach(window.__ace.modes, (value: any, key: any) => {
+            _s_mode_options += `<option value="${value}">${key}</option>`
+          })
+          _s_mode.innerHTML = _s_mode_options
+          _s_fontsize.addEventListener('change', (e) => {
+            window.__ace.editor.setFontSize(_s_fontsize.value)
+          })
+          _s_mode.addEventListener('change', (e) => {
+            window.__ace.editor.getSession().setMode(_s_mode.value);
+          })
+          _s_theme.addEventListener('change', (e) => {
+            window.__ace.editor.setTheme(ace_themes[_s_theme.value]);
+          })
           let _mode = window.__ace.modes[initMode]
           if (_mode) {
             editor.getSession().setMode(_mode);
+            _s_mode.value = _mode
           } else {
-            editor.getSession().setMode(window.__ace.modes.default);
+            editor.getSession().setMode(window.__ace.modes.text);
+            _s_mode.value = window.__ace.modes.text
           }
-          editor.setTheme(ace_themes.chrome);
+          let _syMode = window.siyuan.config.appearance.mode
+          if (_syMode && _syMode == 1) {
+            // 暗黑模式
+            editor.setTheme(ace_themes.chaos)
+            _s_theme.value = 'chaos'
+          } else {
+            // 明亮模式
+            editor.setTheme(ace_themes.chrome);
+            _s_theme.value = 'chrome'
+          }
           editor.setOptions({
             wrap: true, // 换行
             enableLiveAutocompletion: true, // ext/language_tools
@@ -185,32 +246,37 @@ export function exAce() {
           editor.$blockScrolling = Infinity // Automatically scrolling cursor into view after selection change this will be disabled in the next version set editor.$blockScrolling = Infinity to disable this message
           editor.commands.addCommands([{
             name: "saveCode",
-            bindKey: {win: "Ctrl-s", mac: "Ctrl-s"},
-            exec: function(e:any) {
-              console.warn("保存未实现");
+            bindKey: { win: "Ctrl-s", mac: "Ctrl-s" },
+            exec: function (e: any) {
+              let v = window.__ace.editor.getValue()
+              let data = "````" + initMode + "\n" + v
+              fetchPost("/api/block/updateBlock", {
+                "dataType": "markdown",
+                "data": data,
+                "id": id
+              }, res => {
+                window.__toast.success("已保存", { position: "bottom", duration: 1300, queue: true });
+              })
             },
             readOnly: true
           }]);
+          _HTML_c.style.height = "100vh"
+          _HTML_c.style.margin = "0"
+          _HTML_c.style.backgroundColor = "var(--b3-theme-background)"
+          _HTML_c.style.color = "var(--b3-theme-on-background)"
+          _ace_e.style.height = "calc(100% - 40px)"
+          _ace_e.style.margin = "0"
+          _rule_line.style.left = "clamp(300px, 68vw, 900px)"
           editor.session.setTabSize(2)
           editor.setFontSize("16px")
-          let _HTML_c = thisE.querySelector(`#swal2-html-container`) as HTMLElement
-          _HTML_c.style.height = "85vh"
-          _HTML_c.style.padding = "30px 50px 0 0"
-          _HTML_c.style.margin = "0"
-          let _ace_c = _HTML_c.querySelector(`.ace-container`) as HTMLElement
-          _ace_c.style.height = "calc(100% - 30px)"
-          let _ace_e = _ace_c.querySelector(`.ace_editor`) as HTMLElement
-          // _ace_e.style.fontSize = "16px"
-          _ace_e.style.height = "100%"
-          _ace_e.style.margin = "0"
           editor.setValue(initCode)
           editor.gotoLine(1)
           editor.resize() // 非常重要
-          editor.getSession().on('change', ()=> {
+          editor.getSession().on('change', () => {
             window.__ace.editor.resize()
           })
-          editor.getSession().selection.on('changeSelection', ()=>{});
-          editor.getSession().selection.on('changeCursor', ()=>{});
+          editor.getSession().selection.on('changeSelection', () => { });
+          editor.getSession().selection.on('changeCursor', () => { });
           return editor; // 在 promise 里无法有效返回值
         } else {
           console.error("Invalid editor")
@@ -224,7 +290,13 @@ export function exAce() {
           "data": data,
           "id": id
         }, res => {
-          // console.warn(res)
+          console.log(res)
+          if (res.code == 0) {
+            window.__toast.success("已保存", { position: "bottom", duration: 1300, queue: true });
+          }
+          else {
+            window.__toast.error(res.msg, { position: "bottom", duration: 3100, queue: false });
+          }
           editor?.destroy();
           editor?.container.remove();
         })
