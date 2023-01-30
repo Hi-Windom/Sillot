@@ -30,6 +30,7 @@ const lodash = require('lodash');
 const localforage = require('localforage');
 import {exAce} from './sillot/ace'
 import {exSwal} from './sillot/sweetalert'
+import {exApp1} from './sillot/vue-toast-notification'
 
 
 class App {
@@ -145,6 +146,7 @@ class App {
                     window.Sillot.status.IDBloaded = true;
                     window._ = lodash;
                     window.__localforage = localforage;
+                    exApp1();
                     exSwal();
                     exAce();
                     getLocalStorage(() => {

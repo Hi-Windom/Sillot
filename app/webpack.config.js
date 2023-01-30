@@ -80,6 +80,17 @@ module.exports = (env, argv) => {
           ],
         },
         {
+          test:/\.css$/,
+          use: [
+            {
+              loader: 'style-loader'
+            },
+            {
+              loader: 'css-loader'
+            }
+          ]
+        },
+        {
           test: /\.woff$/,
           type: 'asset/resource',
           generator: {
