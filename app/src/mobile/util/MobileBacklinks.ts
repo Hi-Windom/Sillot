@@ -12,7 +12,7 @@ export class MobileBacklinks {
 
     constructor() {
         this.element = document.querySelector('#sidebar [data-type="sidebar-backlink"]');
-        this.element.innerHTML = `<div class="toolbar">
+        this.element.innerHTML = /*html*/ `<div class="toolbar">
     <div class="fn__space"></div>
     <div class="toolbar__text">
         ${window.siyuan.languages.backlinks}

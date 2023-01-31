@@ -57,7 +57,7 @@ export class MobileFiles extends Model {
             },
         });
         const filesElement = document.querySelector('#sidebar [data-type="sidebar-file"]');
-        filesElement.innerHTML = `<div class="toolbar">
+        filesElement.innerHTML = /*html*/ `<div class="toolbar">
     <div class="fn__space"></div>
     <div class="toolbar__text">${window.siyuan.languages.fileTree}</div>
     <div class="fn__flex-1 fn__space"></div>

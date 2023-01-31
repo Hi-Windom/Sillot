@@ -21,7 +21,7 @@ export class Inbox extends Model {
         this.element = tab.panelElement;
         this.element.classList.add("fn__flex-column", "file-tree", "sy__inbox");
 
-        this.element.innerHTML = `<div class="block__icons">
+        this.element.innerHTML = /*html*/ `<div class="block__icons">
     <div class="block__logo">
         <svg><use xlink:href="#iconInbox"></use></svg>
         ${window.siyuan.languages.inbox}&nbsp;

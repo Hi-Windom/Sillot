@@ -37,14 +37,14 @@ const renderProvider = (provider: number) => {
     ${window.siyuan.languages.syncOfficialProviderIntro}
 </div>`;
     } else if (provider === 2) {
-        const tip = `<div class="b3-label b3-label--inner">
+        const tip = /*html*/ `<div class="b3-label b3-label--inner">
     ${window.siyuan.languages.syncThirdPartyProviderS3Intro}
     <div class="fn__hr"></div>
     ${window.siyuan.languages.featureBetaStage}
     <div class="fn__hr"></div>
     ${window.siyuan.languages.syncThirdPartyProviderTip}
 </div>`;
-        return `${tip}
+        return /*html*/ `${tip}
 <label class="b3-label b3-label--noborder fn__flex config__item">
     <div class="fn__flex-center fn__size200">Endpoint</div>
     <div class="fn__space"></div>
@@ -102,7 +102,7 @@ const renderProvider = (provider: number) => {
     <div class="fn__hr"></div>    
     ${window.siyuan.languages.syncThirdPartyProviderTip}
 </div>`;
-        return `${tip}
+        return /*html*/ `${tip}
 <label class="b3-label b3-label--noborder fn__flex config__item">
     <div class="fn__flex-center fn__size200">Endpoint</div>
     <div class="fn__space"></div>
@@ -157,7 +157,7 @@ const bindProviderEvent = () => {
                 reposDataElement.innerHTML = response.msg;
                 return;
             } else {
-                reposDataElement.innerHTML = `<div class="fn__flex">
+                reposDataElement.innerHTML = /*html*/ `<div class="fn__flex">
     <div class="fn__flex-1">
         ${window.siyuan.languages.cloudStorage}
         <div class="fn__hr"></div>

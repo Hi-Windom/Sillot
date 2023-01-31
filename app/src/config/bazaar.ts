@@ -18,7 +18,7 @@ export const bazaar = {
     genHTML() {
         const localSort = window.siyuan.storage[Constants.LOCAL_BAZAAR];
         const loadingHTML = `<div style="height: ${bazaar.element.clientHeight - 72}px;display: flex;align-items: center;justify-content: center;"><img src="/stage/loading-pure.svg"></div>`;
-        return `<div class="fn__flex-column" style="height: 100%">
+        return /*html*/ `<div class="fn__flex-column" style="height: 100%">
 <div class="layout-tab-bar fn__flex">
     <div data-type="theme" class="item item--full item--focus"><span class="fn__flex-1"></span><span class="item__text">${window.siyuan.languages.theme}</span><span class="fn__flex-1"></span></div>
     <div data-type="template" class="item item--full"><span class="fn__flex-1"></span><span class="item__text">${window.siyuan.languages.template}</span><span class="fn__flex-1"></span></div>
@@ -247,7 +247,7 @@ export const bazaar = {
         } else if (bazaarType === "templates") {
             navTitle = window.siyuan.languages.template;
         }
-        readmeElement.innerHTML = ` <div class="item__side">
+        readmeElement.innerHTML = /*html*/ ` <div class="item__side">
     <div class="fn__flex">
         <button class="b3-button b3-button--outline" data-type="goBack" title="Go back"><svg><use xlink:href="#iconLeft"></use></svg></button>
         <div class="item__nav">${navTitle}</div>

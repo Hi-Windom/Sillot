@@ -1,6 +1,6 @@
 {
   "name": "Sillot",
-  "version": "0.3.25",
+  "version": "0.3.26",
   "syv": "2.7.1",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
@@ -98,6 +98,7 @@
     "pnpm": "7.26.0",
     "sweetalert2": "^11.7.1",
     "vue": "^3.2.45",
-    "vue-toast-notification": "^3.0"
+    "vue-toast-notification": "^3.0",
+    "vue-toastification": "2.0.0-rc.5"
   }
 }
