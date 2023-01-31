@@ -26,7 +26,6 @@
 <div id="commonMenu" class="b3-menu fn__none"></div>
 <div id="message" class="b3-snackbars"></div>
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
-<div id="app2" data-bind="vue" data-lib="vue-toastification"></div>
 <script src="../../sillot/vue.global.prod.js" defer init></script>
 <script>
   setTimeout(() => {
