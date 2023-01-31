@@ -31,6 +31,7 @@ const localforage = require('localforage');
 import {exAce} from './sillot/ace'
 import {exSwal} from './sillot/sweetalert'
 import {exApp1} from './sillot/vue-toast-notification'
+import {exApp2} from './sillot/vue-toastification'
 
 
 class App {
@@ -147,6 +148,7 @@ class App {
                     window._ = lodash;
                     window.__localforage = localforage;
                     exApp1();
+                    exApp2();
                     exSwal();
                     exAce();
                     getLocalStorage(() => {

@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self'"/>-->
     <style id="editorFontSize" type="text/css"></style>
     <style id="editorAttr" type="text/css"></style>
-     <script src="../../sillot/petite-vue.iife.js" defer init></script>
+     <script type="module" src="../../sillot/vue.esm-browser.prod.js" defer init></script>
 </head>
 <body class="fn__flex-column">
 <div id="loading" class="b3-dialog b3-dialog--open">
@@ -27,6 +27,8 @@
 <div id="message" class="b3-snackbars"></div>
 <div id="app1" data-bind="vue" data-lib="vue-toast-notification"></div>
 <div id="app2" data-bind="vue" data-lib="vue-toastification"></div>
+     <!--<script src="../../sillot/petite-vue.iife.js" defer init></script>-->
+     <!--<script src="../../sillot/vue.global.prod.js" defer init></script>-->
 <script>
   setTimeout(() => {
     const refreshElement = document.getElementById("loadingRefresh")

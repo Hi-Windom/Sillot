@@ -7,6 +7,7 @@ const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const BundleAnalyzerPlugin = require(
   'webpack-bundle-analyzer').BundleAnalyzerPlugin
 const TerserPlugin = require('terser-webpack-plugin')
+const { VueLoaderPlugin } = require("vue-loader")
 
 module.exports = (env, argv) => {
   return {
@@ -114,6 +115,10 @@ module.exports = (env, argv) => {
           ]
         },
         {
+          test:/\.vue$/,
+          loader: 'vue-loader'
+        },
+        {
           test: /\.woff$/,
           type: 'asset/resource',
           generator: {
@@ -136,6 +141,7 @@ module.exports = (env, argv) => {
     },
     plugins: [
       // new BundleAnalyzerPlugin(),
+      new VueLoaderPlugin(),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
         cleanOnceBeforeBuildPatterns: [
