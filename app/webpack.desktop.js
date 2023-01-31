@@ -38,7 +38,7 @@ module.exports = (env, argv) => {
       fallback: {
         'path': require.resolve('path-browserify'),
       },
-      extensions: ['.ts', '.js', '.tpl', '.scss'],
+      extensions: ['.ts', '.js', 'jsx', '.tpl', '.scss'],
     },
     module: {
       rules: [
@@ -112,6 +112,11 @@ module.exports = (env, argv) => {
               loader: 'css-loader'
             }
           ]
+        },
+        {
+          test: /\.jsx?$/,
+          include: path.join(__dirname, 'src'),
+          loader: 'babel-loader'
         },
         {
           test: /\.woff$/,

@@ -22,7 +22,7 @@ module.exports = (env, argv) => {
       'window': './src/window/index.ts',
     },
     resolve: {
-      extensions: ['.ts', '.js', '.tpl', '.scss', '.png', '.svg'],
+      extensions: ['.ts', '.js', 'jsx', '.tpl', '.scss', '.png', '.svg'],
     },
     optimization: {
       minimize: true,
@@ -89,6 +89,11 @@ module.exports = (env, argv) => {
               loader: 'css-loader'
             }
           ]
+        },
+        {
+          test: /\.jsx?$/,
+          include: path.join(__dirname, 'src'),
+          loader: 'babel-loader'
         },
         {
           test: /\.woff$/,

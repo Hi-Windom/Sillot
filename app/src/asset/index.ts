@@ -84,7 +84,7 @@ export class Asset extends Model {
             this.element.innerHTML = `<div class="asset"><video controls="controls" src="${this.path.startsWith("file") ? this.path : document.getElementById("baseURL").getAttribute("href") + "/" + this.path}"></video></div>`;
         } else if (type === ".pdf") {
             /// #if !MOBILE
-            this.element.innerHTML = `<div class="pdf__outer" id="outerContainer">
+            this.element.innerHTML = /*html*/ `<div class="pdf__outer" id="outerContainer">
       <div id="sidebarContainer">
         <div id="toolbarSidebar">
           <div id="toolbarSidebarLeft">

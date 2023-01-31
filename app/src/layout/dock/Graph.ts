@@ -85,7 +85,7 @@ export class Graph extends Model {
         this.element.classList.add("graph", "file-tree", this.type === "global" ? "sy__globalGraph" : "sy__graph");
         let panelHTML;
         if (this.type === "global") {
-            panelHTML = `
+            panelHTML = /*html*/ `
 <label>
     <span>${window.siyuan.languages.headings}</span> 
     <input data-type="heading" type="checkbox" class="b3-switch"${window.siyuan.config.graph.global.type.heading ? " checked" : ""}/>
@@ -169,7 +169,7 @@ export class Graph extends Model {
 <div class="fn__hr"></div>
 <button class="b3-button b3-button--small fn__block">${window.siyuan.languages.reset}</button>`;
         } else {
-            panelHTML = `
+            panelHTML = /*html*/ `
 <label>
     <span>${window.siyuan.languages.headings}</span> 
     <input data-type="heading" type="checkbox" class="b3-switch"${window.siyuan.config.graph.local.type.heading ? " checked" : ""}/>
@@ -249,7 +249,7 @@ export class Graph extends Model {
 <div class="fn__hr"></div>
 <button class="b3-button b3-button--small fn__block">${window.siyuan.languages.reset}</button>`;
         }
-        this.element.innerHTML = `
+        this.element.innerHTML = /*html*/ `
 <div class="block__icons"> 
     <div class="block__logo">
         <svg><use xlink:href="#icon${this.type === "global" ? "GlobalGraph" : "Graph"}"></use></svg>

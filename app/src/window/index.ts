@@ -126,6 +126,7 @@ class App {
         };
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
+            console.warn('window.index 新开窗口')
             getLocalStorage(() => {
                 fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
                     window.siyuan.languages = lauguages;

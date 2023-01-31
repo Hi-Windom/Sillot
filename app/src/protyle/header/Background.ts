@@ -22,7 +22,7 @@ export class Background {
     constructor(protyle: IProtyle) {
         this.element = document.createElement("div");
         this.element.className = "protyle-background";
-        this.element.innerHTML = `<div class="protyle-background__img">
+        this.element.innerHTML = /*html*/ `<div class="protyle-background__img">
     <img class="fn__none">
     <div class="protyle-icons">
         <span class="protyle-icon protyle-icon--first b3-tooltips b3-tooltips__sw" style="position: relative" aria-label="${window.siyuan.languages.upload}"><input type="file" style="position: absolute;width: 22px;height: 100%;top: 0;left: 0;opacity: .001;overflow: hidden;cursor: pointer;"><svg><use xlink:href="#iconUpload"></use></svg></span>

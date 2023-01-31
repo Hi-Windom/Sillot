@@ -178,7 +178,7 @@ export const addEmoji = (unicode: string) => {
 
 export const openEmojiPanel = (id: string, target: HTMLElement, isNotebook = false) => {
     window.siyuan.menus.menu.remove();
-    window.siyuan.menus.menu.element.innerHTML = `<div class="emojis" style="width: ${isMobile() ? "80vw" : "360px"}">
+    window.siyuan.menus.menu.element.innerHTML = /*html*/ `<div class="emojis" style="width: ${isMobile() ? "80vw" : "360px"}">
 <div class="fn__flex">
     <span class="fn__space"></span>
     <label class="b3-form__icon fn__flex-1">
