@@ -32,7 +32,7 @@ export function Example(id) {
   const root = ReactDOM.createRoot(document.getElementById(id));  // https://beta.reactjs.org/reference/react/createElement 示例
   root.render((
     <>
-      <button onClick={window.__toastify} style="display: none">Notify</button>;
+      <button onClick={window.__toastify} style={{display: "none"}}>Notify</button>
       <ToastContainer />
     </>
   ));
