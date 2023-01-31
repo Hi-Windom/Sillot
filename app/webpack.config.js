@@ -5,7 +5,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
-const { VueLoaderPlugin } = require("vue-loader")
 
 module.exports = (env, argv) => {
   return {
@@ -23,7 +22,7 @@ module.exports = (env, argv) => {
       'window': './src/window/index.ts',
     },
     resolve: {
-      extensions: ['.ts', '.js', '.tpl', '.scss', '.png', '.svg'],
+      extensions: ['.ts', '.js', 'jsx', '.tpl', '.scss', '.png', '.svg'],
     },
     optimization: {
       minimize: true,
@@ -92,8 +91,9 @@ module.exports = (env, argv) => {
           ]
         },
         {
-          test:/\.vue$/,
-          loader: 'vue-loader'
+          test: /\.jsx?$/,
+          include: path.join(__dirname, 'src'),
+          loader: 'babel-loader'
         },
         {
           test: /\.woff$/,
@@ -117,7 +117,6 @@ module.exports = (env, argv) => {
       ],
     },
     plugins: [
-      new VueLoaderPlugin(),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
         cleanOnceBeforeBuildPatterns: [

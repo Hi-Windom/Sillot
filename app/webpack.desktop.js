@@ -7,7 +7,6 @@ const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const BundleAnalyzerPlugin = require(
   'webpack-bundle-analyzer').BundleAnalyzerPlugin
 const TerserPlugin = require('terser-webpack-plugin')
-const { VueLoaderPlugin } = require("vue-loader")
 
 module.exports = (env, argv) => {
   return {
@@ -39,7 +38,7 @@ module.exports = (env, argv) => {
       fallback: {
         'path': require.resolve('path-browserify'),
       },
-      extensions: ['.ts', '.js', '.tpl', '.scss'],
+      extensions: ['.ts', '.js', 'jsx', '.tpl', '.scss'],
     },
     module: {
       rules: [
@@ -115,8 +114,9 @@ module.exports = (env, argv) => {
           ]
         },
         {
-          test:/\.vue$/,
-          loader: 'vue-loader'
+          test: /\.jsx?$/,
+          include: path.join(__dirname, 'src'),
+          loader: 'babel-loader'
         },
         {
           test: /\.woff$/,
@@ -141,7 +141,6 @@ module.exports = (env, argv) => {
     },
     plugins: [
       // new BundleAnalyzerPlugin(),
-      new VueLoaderPlugin(),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
         cleanOnceBeforeBuildPatterns: [
