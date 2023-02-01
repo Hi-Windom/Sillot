@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-<a href="README.md" style="margin:13px">English</a>|<a href="README_Sillot.md" style="margin:13px">汐洛</a>
+<a href="README.md">English</a>&emsp;|&emsp;<a href="README_Sillot.md">汐洛</a>
 </p>
 
 ## 💡 简介
