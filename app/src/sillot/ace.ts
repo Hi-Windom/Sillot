@@ -30,7 +30,7 @@ import 'brace/mode/nsis'
 import 'brace/mode/objectivec'
 import 'brace/mode/perl'
 import 'brace/mode/pgsql'
-import 'brace/mode/php'
+// import 'brace/mode/php'
 import 'brace/mode/powershell'
 import 'brace/mode/python'
 import 'brace/mode/r'
@@ -73,7 +73,7 @@ import 'brace/snippets/nsis'
 import 'brace/snippets/objectivec'
 import 'brace/snippets/perl'
 import 'brace/snippets/pgsql'
-import 'brace/snippets/php'
+// import 'brace/snippets/php'
 import 'brace/snippets/powershell'
 import 'brace/snippets/python'
 import 'brace/snippets/r'
@@ -119,7 +119,7 @@ const ace_modes: any = {
   objectivec: 'ace/mode/objectivec',
   perl: 'ace/mode/perl',
   pgsql: 'ace/mode/pgsql',
-  php: 'ace/mode/php',
+  // php: 'ace/mode/php',
   powershell: 'ace/mode/powershell',
   python: 'ace/mode/python',
   r: 'ace/mode/r',

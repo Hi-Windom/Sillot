@@ -17,7 +17,7 @@
     "build:desktop": "webpack --mode production --config webpack.desktop.js",
     "build:export": "webpack --mode production --config webpack.export.js",
     "build-sillot": "webpack --mode production && pnpm run build:desktop && pnpm run build:export",
-    "dev-sillot": "webpack --mode development && pnpm run dev:desktop && pnpm run dev:export",
+    "ABA": "NODE_ENV=production webpack --mode production --config webpack.ABA.js",
     "start": "NODE_ENV=development electron ./electron/main.js",
     "dist-appx": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --config electron-appx-builder.yml",
     "dist": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --config electron-builder.yml",

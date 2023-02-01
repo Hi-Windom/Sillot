@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
 
-export function Example(id) {
+export function Example(id: string) {
   // 在devtool运行 __.toastify() 测试
   window.__.toastify = () => {
     toast("Default Notification !");
@@ -39,3 +39,9 @@ export function Example(id) {
     </>
   ));
 }
+
+// export class toastify {
+//   constructor(props) {
+//     this.root = ReactDOM.createRoot(document.getElementById(id));  // https://beta.reactjs.org/reference/react/createElement 示例
+//   }
+// }
