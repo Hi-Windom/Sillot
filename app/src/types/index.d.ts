@@ -61,6 +61,16 @@ interface Window {
     openFileByURL(URL: string): boolean
 }
 
+// Sillot extend start
+interface ISillot {
+    status: {
+        IDBloaded: boolean,
+        disableDocSetPadding: boolean,
+    },
+    funs: {
+        hljsRender: any,
+    }
+}
 interface ISillotDoubleUnderline {
     ace: any
     Swal: any
@@ -68,6 +78,7 @@ interface ISillotDoubleUnderline {
     toast: any
     toastify: any
 }
+// Sillot extend end
 
 interface IWorkspace {
     path: string
@@ -229,16 +240,6 @@ interface ISiyuan {
     bookmarkLabel?: string[]
     blockPanels: import("../block/Panel").BlockPanel[],
     dialogs: import("../dialog").Dialog[],
-}
-
-interface ISillot {
-    status: {
-        IDBloaded: boolean,
-        disableDocSetPadding: boolean,
-    },
-    funs: {
-        hljsRender: any,
-    }
 }
 
 interface IScrollAttr {

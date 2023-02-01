@@ -16,7 +16,7 @@ export class SillotEnv {
       Swal: Swal,
       localforage: localforage,
       toast: null,
-      toastify: new Toastify({ id: 'app1' })
+      toastify: new Toastify({ id: 'app1', limit: 5, theme: "colored" }),
     }
     window._ = lodash;
     exApp1();
