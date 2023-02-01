@@ -67,7 +67,12 @@ module.exports = (env, argv) => {
             path.resolve(__dirname, 'src/assets/scss'),
           ],
           use: [
-            MiniCssExtractPlugin.loader,
+            {
+              loader: MiniCssExtractPlugin.loader,
+              options: {
+                publicPath: '../../'
+              }
+            },
             {
               loader: 'css-loader', // translates CSS into CommonJS
             },

@@ -28,6 +28,7 @@ export const image = {
 </div>`;
     },
     bindEvent: () => {
+        const assetsListElement = image.element.querySelector("#assetsList");
         image.element.querySelector("#removeAll").addEventListener("click", () => {
             confirmDialog(window.siyuan.languages.clearUnused,
                 `${window.siyuan.languages.clearAll}`,
@@ -38,14 +39,12 @@ export const image = {
                                 item.parent.parent.removeTab(item.parent.id);
                             }
                         });
-                        fetchPost("/api/asset/getUnusedAssets", {}, response => {
-                            image.onUnusedassets(response.data);
-                        });
+                        assetsListElement.innerHTML = `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
+                        image.element.querySelector(".config-assets__preview").innerHTML = "";
                     });
                 });
         });
 
-        const assetsListElement = image.element.querySelector("#assetsList");
         assetsListElement.addEventListener("click", (event) => {
             let target = event.target as HTMLElement;
             while (target && !target.isEqualNode(assetsListElement)) {
@@ -68,14 +67,14 @@ export const image = {
                                             item.parent.parent.removeTab(item.parent.id);
                                         }
                                     });
+                                    const liElement = target.parentElement;
+                                    if (liElement.parentElement.querySelectorAll("li").length === 1) {
+                                        liElement.parentElement.innerHTML = `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
+                                    } else {
+                                        liElement.remove();
+                                    }
+                                    image.element.querySelector(".config-assets__preview").innerHTML = "";
                                 });
-                                const liElement = target.parentElement;
-                                if (liElement.parentElement.querySelectorAll("li").length === 1) {
-                                    liElement.parentElement.remove();
-                                } else {
-                                    liElement.remove();
-                                }
-                                image.element.querySelector(".config-assets__preview").innerHTML = "";
                             });
                     }
                     event.preventDefault();

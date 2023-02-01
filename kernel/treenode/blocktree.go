@@ -36,7 +36,7 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
-var blockTrees = sync.Map{}
+var blockTrees = &sync.Map{}
 
 type btSlice struct {
 	data    map[string]*BlockTree
@@ -53,22 +53,6 @@ type BlockTree struct {
 	HPath    string // 文档可读路径
 	Updated  string // 更新时间
 	Type     string // 类型
-}
-
-func GetRootUpdated() (ret map[string]string) {
-	ret = map[string]string{}
-	blockTrees.Range(func(key, value interface{}) bool {
-		slice := value.(*btSlice)
-		slice.m.Lock()
-		for _, b := range slice.data {
-			if b.RootID == b.ID {
-				ret[b.RootID] = b.Updated
-			}
-		}
-		slice.m.Unlock()
-		return true
-	})
-	return
 }
 
 func GetBlockTreeByPath(path string) (ret *BlockTree) {
@@ -110,62 +94,6 @@ func CountBlocks() (ret int) {
 		slice.m.Unlock()
 		return true
 	})
-	return
-}
-
-func GetRedundantPaths(boxID string, paths []string) (ret []string) {
-	pathsMap := map[string]bool{}
-	for _, path := range paths {
-		pathsMap[path] = true
-	}
-
-	btPathsMap := map[string]bool{}
-	blockTrees.Range(func(key, value interface{}) bool {
-		slice := value.(*btSlice)
-		slice.m.Lock()
-		for _, b := range slice.data {
-			if b.BoxID == boxID {
-				btPathsMap[b.Path] = true
-			}
-		}
-		slice.m.Unlock()
-		return true
-	})
-
-	for p, _ := range btPathsMap {
-		if !pathsMap[p] {
-			ret = append(ret, p)
-		}
-	}
-	ret = gulu.Str.RemoveDuplicatedElem(ret)
-	return
-}
-
-func GetNotExistPaths(boxID string, paths []string) (ret []string) {
-	pathsMap := map[string]bool{}
-	for _, path := range paths {
-		pathsMap[path] = true
-	}
-
-	btPathsMap := map[string]bool{}
-	blockTrees.Range(func(key, value interface{}) bool {
-		slice := value.(*btSlice)
-		slice.m.Lock()
-		for _, b := range slice.data {
-			if b.BoxID == boxID {
-				btPathsMap[b.Path] = true
-			}
-		}
-		slice.m.Unlock()
-		return true
-	})
-
-	for p, _ := range pathsMap {
-		if !btPathsMap[p] {
-			ret = append(ret, p)
-		}
-	}
-	ret = gulu.Str.RemoveDuplicatedElem(ret)
 	return
 }
 
@@ -248,34 +176,6 @@ func RemoveBlockTreesByRootID(rootID string) {
 		slice.m.Lock()
 		for _, b := range slice.data {
 			if b.RootID == rootID {
-				ids = append(ids, b.RootID)
-			}
-		}
-		slice.m.Unlock()
-		return true
-	})
-
-	ids = gulu.Str.RemoveDuplicatedElem(ids)
-	for _, id := range ids {
-		val, ok := blockTrees.Load(btHash(id))
-		if !ok {
-			continue
-		}
-		slice := val.(*btSlice)
-		slice.m.Lock()
-		delete(slice.data, id)
-		slice.m.Unlock()
-		slice.changed = time.Now()
-	}
-}
-
-func RemoveBlockTreesByPath(path string) {
-	var ids []string
-	blockTrees.Range(func(key, value interface{}) bool {
-		slice := value.(*btSlice)
-		slice.m.Lock()
-		for _, b := range slice.data {
-			if b.Path == path {
 				ids = append(ids, b.RootID)
 			}
 		}
@@ -386,8 +286,15 @@ func IndexBlockTree(tree *parse.Tree) {
 		}
 		slice := val.(*btSlice)
 		slice.m.Lock()
-		slice.data[n.ID] = &BlockTree{ID: n.ID, ParentID: parentID, RootID: tree.ID, BoxID: tree.Box, Path: tree.Path, HPath: tree.HPath, Updated: n.IALAttr("updated"), Type: TypeAbbr(n.Type.String())}
-		slice.changed = time.Now()
+		if bt := slice.data[n.ID]; nil != bt {
+			if bt.Updated != n.IALAttr("updated") {
+				slice.data[n.ID] = &BlockTree{ID: n.ID, ParentID: parentID, RootID: tree.ID, BoxID: tree.Box, Path: tree.Path, HPath: tree.HPath, Updated: n.IALAttr("updated"), Type: TypeAbbr(n.Type.String())}
+				slice.changed = time.Now()
+			}
+		} else {
+			slice.data[n.ID] = &BlockTree{ID: n.ID, ParentID: parentID, RootID: tree.ID, BoxID: tree.Box, Path: tree.Path, HPath: tree.HPath, Updated: n.IALAttr("updated"), Type: TypeAbbr(n.Type.String())}
+			slice.changed = time.Now()
+		}
 		slice.m.Unlock()
 		return ast.WalkContinue
 	})
@@ -401,6 +308,7 @@ func InitBlockTree(force bool) {
 		if nil != err {
 			logging.LogErrorf("remove blocktree file failed: %s", err)
 		}
+		blockTrees = &sync.Map{}
 		return
 	}
 
@@ -485,7 +393,7 @@ func SaveBlockTree(force bool) {
 
 		key := arg.(map[string]interface{})["key"].(string)
 		slice := arg.(map[string]interface{})["value"].(*btSlice)
-		if !force && (slice.changed.IsZero() || slice.changed.After(start.Add(-7*time.Second))) {
+		if !force && slice.changed.IsZero() {
 			return
 		}
 
@@ -508,16 +416,21 @@ func SaveBlockTree(force bool) {
 		size += uint64(len(data))
 	})
 
+	var count int
 	blockTrees.Range(func(key, value interface{}) bool {
 		slice := value.(*btSlice)
-		if !force && (slice.changed.IsZero() || slice.changed.After(start.Add(-7*time.Second))) {
+		if !force && slice.changed.IsZero() {
 			return true
 		}
 
+		count++
 		waitGroup.Add(1)
 		p.Invoke(map[string]interface{}{"key": key, "value": value})
 		return true
 	})
+	if 0 < count {
+		//logging.LogInfof("wrote block trees [%d]", count)
+	}
 
 	waitGroup.Wait()
 	p.Release()
