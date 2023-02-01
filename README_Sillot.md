@@ -1,9 +1,9 @@
 <p align="center">
-<img alt="Sillot" src="./app/stage/icon-large.png">
+<img alt="Sillot" src="./app/stage/icon.png">
 </p>
 
 <p align="center">
-<a href="README.md">SiYuan</a> | <a href="README_zh_CN.md">思源</a>
+<a href="README.md" style="margin:13px">SiYuan</a>|<a href="README_zh_CN.md" style="margin:13px">思源</a>
 
 </p>
 
