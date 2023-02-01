@@ -36,12 +36,7 @@ interface Window {
     // Sillot extend start
     Sillot: ISillot
     _: any
-    __ace: any
-    __Swal: any
-    __localforage: any
-    __toast: any
-    __toastification: any
-    __toastify: any
+    __: ISillotDoubleUnderline
     React: any
     ReactDOM: any
     // Sillot extend end
@@ -64,6 +59,14 @@ interface Window {
     hideKeyboardToolbar(): void
 
     openFileByURL(URL: string): boolean
+}
+
+interface ISillotDoubleUnderline {
+    ace: any
+    Swal: any
+    localforage: any
+    toast: any
+    toastify: any
 }
 
 interface IWorkspace {

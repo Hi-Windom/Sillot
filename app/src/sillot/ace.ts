@@ -136,12 +136,12 @@ const ace_modes: any = {
 }
 
 export function exAce() {
-  window.__ace = {
+  window.__.ace = {
     themes: ace_themes,
     modes: ace_modes,
     editor: null
   };
-  window.__ace.createEditor = async (id: string, initMode: string, initCode: string) => {
+  window.__.ace.createEditor = async (id: string, initMode: string, initCode: string) => {
     let editor: any = false
     return await Swal.fire({
       title: '',
@@ -183,7 +183,7 @@ export function exAce() {
         let _t = thisE.querySelector(`.ace-container textarea`) as HTMLElement
         if (_t) {
           editor = ace.edit("aceEditorTextareaOriginElement") // 放在最前面
-          window.__ace.editor = editor // 曲线救国
+          window.__.ace.editor = editor // 曲线救国
           let _swal2_container = thisE.parentElement // div.swal2-container
           let _HTML_c = thisE.querySelector(`#swal2-html-container`) as HTMLElement
           let _ace_c = _HTML_c.querySelector(`.ace-container`) as HTMLElement
@@ -197,26 +197,26 @@ export function exAce() {
           thisE.style.animation = "none"
           thisE.style.height = "100vh"
           let _s_mode_options = ''
-          window._.forEach(window.__ace.modes, (value: any, key: any) => {
+          window._.forEach(window.__.ace.modes, (value: any, key: any) => {
             _s_mode_options += `<option value="${value}">${key}</option>`
           })
           _s_mode.innerHTML = _s_mode_options
           _s_fontsize.addEventListener('change', (e) => {
-            window.__ace.editor.setFontSize(_s_fontsize.value)
+            window.__.ace.editor.setFontSize(_s_fontsize.value)
           })
           _s_mode.addEventListener('change', (e) => {
-            window.__ace.editor.getSession().setMode(_s_mode.value);
+            window.__.ace.editor.getSession().setMode(_s_mode.value);
           })
           _s_theme.addEventListener('change', (e) => {
-            window.__ace.editor.setTheme(ace_themes[_s_theme.value]);
+            window.__.ace.editor.setTheme(ace_themes[_s_theme.value]);
           })
-          let _mode = window.__ace.modes[initMode]
+          let _mode = window.__.ace.modes[initMode]
           if (_mode) {
             editor.getSession().setMode(_mode);
             _s_mode.value = _mode
           } else {
-            editor.getSession().setMode(window.__ace.modes.text);
-            _s_mode.value = window.__ace.modes.text
+            editor.getSession().setMode(window.__.ace.modes.text);
+            _s_mode.value = window.__.ace.modes.text
           }
           let _syMode = window.siyuan.config.appearance.mode
           if (_syMode && _syMode == 1) {
@@ -248,14 +248,14 @@ export function exAce() {
             name: "saveCode",
             bindKey: { win: "Ctrl-s", mac: "Ctrl-s" },
             exec: function (e: any) {
-              let v = window.__ace.editor.getValue()
+              let v = window.__.ace.editor.getValue()
               let data = "````" + initMode + "\n" + v
               fetchPost("/api/block/updateBlock", {
                 "dataType": "markdown",
                 "data": data,
                 "id": id
               }, res => {
-                window.__toast.success("已保存", { position: "bottom", duration: 1300, queue: true });
+                window.__.toast.success("已保存", { position: "bottom", duration: 1300, queue: true });
               })
             },
             readOnly: true
@@ -273,7 +273,7 @@ export function exAce() {
           editor.gotoLine(1)
           editor.resize() // 非常重要
           editor.getSession().on('change', () => {
-            window.__ace.editor.resize()
+            window.__.ace.editor.resize()
           })
           editor.getSession().selection.on('changeSelection', () => { });
           editor.getSession().selection.on('changeCursor', () => { });
@@ -283,7 +283,7 @@ export function exAce() {
         }
       },
       willClose: (thisE) => {
-        let v = window.__ace.editor.getValue()
+        let v = window.__.ace.editor.getValue()
         let data = "````" + initMode + "\n" + v
         fetchPost("/api/block/updateBlock", {
           "dataType": "markdown",
@@ -292,10 +292,10 @@ export function exAce() {
         }, res => {
           console.log(res)
           if (res.code == 0) {
-            window.__toast.success("已保存", { position: "bottom", duration: 1300, queue: true });
+            window.__.toast.success("已保存", { position: "bottom", duration: 1300, queue: true });
           }
           else {
-            window.__toast.error(res.msg, { position: "bottom", duration: 3100, queue: false });
+            window.__.toast.error(res.msg, { position: "bottom", duration: 3100, queue: false });
           }
           editor?.destroy();
           editor?.container.remove();

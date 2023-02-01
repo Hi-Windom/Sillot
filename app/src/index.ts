@@ -29,11 +29,11 @@ import { highlightRender } from "./protyle/markdown/highlightRender";
 const lodash = require('lodash');
 const localforage = require('localforage');
 import {exAce} from './sillot/ace'
-import {exSwal} from './sillot/sweetalert'
 import {exApp1} from './sillot/vue-toast-notification'
 import {Example} from './sillot/react-toastify.jsx'
 import * as React from 'react'; // 兼容性好
 import * as ReactDOM from 'react-dom'; // 兼容性好
+import Swal from 'sweetalert2'
 
 class App {
     constructor() {
@@ -138,6 +138,13 @@ class App {
             menus: new Menus()
         };
         window.Sillot = { status: { IDBloaded: false, disableDocSetPadding: false }, funs: { hljsRender: highlightRender } }
+        window.__ = {
+            ace: null,
+            Swal: Swal,
+            localforage: localforage,
+            toast: null,
+            toastify: null
+        }
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
             let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1)
@@ -147,12 +154,10 @@ class App {
                 await importIDB(r.data).then(() => {
                     window.Sillot.status.IDBloaded = true;
                     window._ = lodash;
-                    window.__localforage = localforage;
                     exApp1();
                     window.React = React;
                     window.ReactDOM = ReactDOM;
                     Example("app1");
-                    exSwal();
                     exAce();
                     getLocalStorage(() => {
                         fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {

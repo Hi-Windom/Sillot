@@ -5,8 +5,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 
 export function Example(id) {
-  // 在devtool运行 __toastify() 测试
-  window.__toastify = () => {
+  // 在devtool运行 __.toastify() 测试
+  window.__.toastify = () => {
     toast("Default Notification !");
 
     toast.success("Success Notification !", {
@@ -34,7 +34,7 @@ export function Example(id) {
   const root = ReactDOM.createRoot(document.getElementById(id));  // https://beta.reactjs.org/reference/react/createElement 示例
   root.render((
     <>
-      <button onClick={window.__toastify} style={{display: "none"}}>Notify</button>
+      <button onClick={window.__.toastify} style={{display: "none"}}>Notify</button>
       <ToastContainer />
     </>
   ));
