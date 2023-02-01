@@ -55,22 +55,6 @@ type BlockTree struct {
 	Type     string // 类型
 }
 
-func GetRootUpdated() (ret map[string]string) {
-	ret = map[string]string{}
-	blockTrees.Range(func(key, value interface{}) bool {
-		slice := value.(*btSlice)
-		slice.m.Lock()
-		for _, b := range slice.data {
-			if b.RootID == b.ID {
-				ret[b.RootID] = b.Updated
-			}
-		}
-		slice.m.Unlock()
-		return true
-	})
-	return
-}
-
 func GetBlockTreeByPath(path string) (ret *BlockTree) {
 	blockTrees.Range(func(key, value interface{}) bool {
 		slice := value.(*btSlice)
@@ -110,62 +94,6 @@ func CountBlocks() (ret int) {
 		slice.m.Unlock()
 		return true
 	})
-	return
-}
-
-func GetRedundantPaths(boxID string, paths []string) (ret []string) {
-	pathsMap := map[string]bool{}
-	for _, path := range paths {
-		pathsMap[path] = true
-	}
-
-	btPathsMap := map[string]bool{}
-	blockTrees.Range(func(key, value interface{}) bool {
-		slice := value.(*btSlice)
-		slice.m.Lock()
-		for _, b := range slice.data {
-			if b.BoxID == boxID {
-				btPathsMap[b.Path] = true
-			}
-		}
-		slice.m.Unlock()
-		return true
-	})
-
-	for p, _ := range btPathsMap {
-		if !pathsMap[p] {
-			ret = append(ret, p)
-		}
-	}
-	ret = gulu.Str.RemoveDuplicatedElem(ret)
-	return
-}
-
-func GetNotExistPaths(boxID string, paths []string) (ret []string) {
-	pathsMap := map[string]bool{}
-	for _, path := range paths {
-		pathsMap[path] = true
-	}
-
-	btPathsMap := map[string]bool{}
-	blockTrees.Range(func(key, value interface{}) bool {
-		slice := value.(*btSlice)
-		slice.m.Lock()
-		for _, b := range slice.data {
-			if b.BoxID == boxID {
-				btPathsMap[b.Path] = true
-			}
-		}
-		slice.m.Unlock()
-		return true
-	})
-
-	for p, _ := range pathsMap {
-		if !btPathsMap[p] {
-			ret = append(ret, p)
-		}
-	}
-	ret = gulu.Str.RemoveDuplicatedElem(ret)
 	return
 }
 
@@ -248,34 +176,6 @@ func RemoveBlockTreesByRootID(rootID string) {
 		slice.m.Lock()
 		for _, b := range slice.data {
 			if b.RootID == rootID {
-				ids = append(ids, b.RootID)
-			}
-		}
-		slice.m.Unlock()
-		return true
-	})
-
-	ids = gulu.Str.RemoveDuplicatedElem(ids)
-	for _, id := range ids {
-		val, ok := blockTrees.Load(btHash(id))
-		if !ok {
-			continue
-		}
-		slice := val.(*btSlice)
-		slice.m.Lock()
-		delete(slice.data, id)
-		slice.m.Unlock()
-		slice.changed = time.Now()
-	}
-}
-
-func RemoveBlockTreesByPath(boxID, path string) {
-	var ids []string
-	blockTrees.Range(func(key, value interface{}) bool {
-		slice := value.(*btSlice)
-		slice.m.Lock()
-		for _, b := range slice.data {
-			if b.Path == path && b.BoxID == boxID {
 				ids = append(ids, b.RootID)
 			}
 		}
