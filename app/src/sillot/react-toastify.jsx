@@ -1,9 +1,11 @@
-import React from 'react';
+import * as React from 'react'; // 兼容性好
+import * as ReactDOM from 'react-dom'; // 兼容性好
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
 
 export function Example(id) {
+  // 在devtool运行 __toastify() 测试
   window.__toastify = () => {
     toast("Default Notification !");
 

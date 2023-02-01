@@ -32,11 +32,8 @@ import {exAce} from './sillot/ace'
 import {exSwal} from './sillot/sweetalert'
 import {exApp1} from './sillot/vue-toast-notification'
 import {Example} from './sillot/react-toastify.jsx'
-import * as React from 'react'; // 只有这样引用才能正常工作
-import * as ReactDOM from 'react-dom'; // 只有这样引用才能正常工作
-import test from './sillot/react-toastify-c.jsx'
-import { toast } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
+import * as React from 'react'; // 兼容性好
+import * as ReactDOM from 'react-dom'; // 兼容性好
 
 class App {
     constructor() {
