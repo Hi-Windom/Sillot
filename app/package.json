@@ -1,7 +1,7 @@
 {
   "name": "Sillot",
-  "version": "0.3.33",
-  "syv": "2.7.1",
+  "version": "0.3.35",
+  "syv": "2.7.2",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
@@ -91,7 +91,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "@electron/remote": "^2.0.8",
+    "@electron/remote": "^2.0.9",
     "brace": "^0.11.1",
     "electron-fetch": "^1.7.4",
     "electron-store": "^8.1.0",
