@@ -22,7 +22,7 @@ module.exports = (env, argv) => {
       'window': './src/window/index.ts',
     },
     resolve: {
-      extensions: ['.ts', '.js', 'jsx', '.tpl', '.scss', '.png', '.svg'],
+      extensions: ['.ts', '.js', '.jsx', '.tsx', '.tpl', '.scss', '.png', '.svg'],
     },
     optimization: {
       minimize: true,

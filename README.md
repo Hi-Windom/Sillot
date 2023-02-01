@@ -10,7 +10,7 @@ Build Your Eternal Digital Garden
 </p>
 
 <p align="center">
-<a href="README_zh_CN.md">中文</a>
+<a href="README_zh_CN.md">中文</a>&emsp;|&emsp;<a href="README_Sillot.md">Sillot</a>
 </p>
 
 ## 💡 Introduction
