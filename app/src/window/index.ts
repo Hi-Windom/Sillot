@@ -21,6 +21,8 @@ import {initMessage} from "../dialog/message";
 import {getAllTabs} from "../layout/getAll";
 import {getLocalStorage} from "../protyle/util/compatibility";
 import {init} from "../window/init";
+import { importIDB } from '../util/sillot-idb-backup-and-restore'
+import { SillotEnv } from "../sillot";
 
 class App {
     constructor() {
@@ -124,24 +126,32 @@ class App {
             }),
             menus: new Menus()
         };
+        new SillotEnv()
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
-            console.warn('window.index 新开窗口')
-            getLocalStorage(() => {
-                fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
-                    window.siyuan.languages = lauguages;
-                    fetchPost("/api/setting/getCloudUser", {}, userResponse => {
-                        window.siyuan.user = userResponse.data;
-                        init();
-                        setTitle(window.siyuan.languages.siyuanNote);
-                        initMessage();
+            console.warn('window.index 新开窗口 隔离环境')
+            let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1)
+            fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, async (r) => {
+                // console.log(r);
+                await importIDB(r.data).then(() => {
+                    window.Sillot.status.IDBloaded = true;
+                    getLocalStorage(() => {
+                        fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
+                            window.siyuan.languages = lauguages;
+                            fetchPost("/api/setting/getCloudUser", {}, userResponse => {
+                                window.siyuan.user = userResponse.data;
+                                init();
+                                setTitle(window.siyuan.languages.siyuanNote);
+                                initMessage();
+                            });
+                        });
                     });
                 });
+                setNoteBook();
+                initBlockPopover();
+                promiseTransactions();
             });
         });
-        setNoteBook();
-        initBlockPopover();
-        promiseTransactions();
     }
 }
 
