@@ -25,15 +25,7 @@ import { resizeDrag } from "./layout/util";
 import { getAllTabs } from "./layout/getAll";
 import { getLocalStorage } from "./protyle/util/compatibility";
 import { importIDB } from './util/sillot-idb-backup-and-restore'
-import { highlightRender } from "./protyle/markdown/highlightRender";
-const lodash = require('lodash');
-const localforage = require('localforage');
-import {exAce} from './sillot/ace'
-import {exApp1} from './sillot/vue-toast-notification'
-import {Example} from './sillot/react-toastify.jsx'
-import * as React from 'react'; // 兼容性好
-import * as ReactDOM from 'react-dom'; // 兼容性好
-import Swal from 'sweetalert2'
+import { SillotEnv } from "./sillot";
 
 class App {
     constructor() {
@@ -137,14 +129,7 @@ class App {
             }),
             menus: new Menus()
         };
-        window.Sillot = { status: { IDBloaded: false, disableDocSetPadding: false }, funs: { hljsRender: highlightRender } }
-        window.__ = {
-            ace: null,
-            Swal: Swal,
-            localforage: localforage,
-            toast: null,
-            toastify: null
-        }
+        new SillotEnv()
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
             let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1)
@@ -153,12 +138,6 @@ class App {
                 // console.log(r);
                 await importIDB(r.data).then(() => {
                     window.Sillot.status.IDBloaded = true;
-                    window._ = lodash;
-                    exApp1();
-                    window.React = React;
-                    window.ReactDOM = ReactDOM;
-                    Example("app1");
-                    exAce();
                     getLocalStorage(() => {
                         fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
                             window.siyuan.languages = lauguages;
