@@ -39,7 +39,6 @@ import {pushBack} from "../mobile/util/MobileBackFoward";
 import {exportAsset} from "./util";
 import {removeLink} from "../protyle/toolbar/Link";
 import {alignImgCenter, alignImgLeft} from "../protyle/wysiwyg/commonHotkey";
-import {getEnableHTML} from "../protyle/wysiwyg/removeEmbed";
 import {renameTag} from "../util/noRelyPCFunction";
 
 export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
@@ -300,26 +299,6 @@ export const contentMenu = (protyle: IProtyle, nodeElement: Element) => {
                     item.firstElementChild.remove();
                 });
                 copyPlainText(cloneContents.textContent);
-            }
-        }).element);
-        window.siyuan.menus.menu.append(new MenuItem({
-            label: window.siyuan.languages.copy + " HTML",
-            click() {
-                focusByRange(getEditorRange(nodeElement));
-                let html = "";
-                getSelection().getRangeAt(0).cloneContents().childNodes.forEach(item => {
-                    if (item.nodeType === 3) {
-                        html += item.textContent;
-                    } else {
-                        html += (item as Element).outerHTML;
-                    }
-                });
-                if (protyle.disabled) {
-                    html = getEnableHTML(html);
-                }
-                const tempElement = document.createElement("template");
-                tempElement.innerHTML = protyle.lute.BlockDOM2HTML(html);
-                writeText(tempElement.content.firstElementChild.innerHTML);
             }
         }).element);
         if (protyle.disabled) {
@@ -686,13 +665,13 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
         openMenu(imgSrc, false, false);
     }
     window.siyuan.menus.menu.popup({x: position.clientX, y: position.clientY});
-    const textElements = window.siyuan.menus.menu.element.querySelectorAll("textarea")
+    const textElements = window.siyuan.menus.menu.element.querySelectorAll("textarea");
     textElements[0].focus();
     window.siyuan.menus.menu.removeCB = () => {
         imgElement.setAttribute("alt", textElements[2].value.replace(/\n|\r\n|\r|\u2028|\u2029/g, ""));
         nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
         updateTransaction(protyle, id, nodeElement.outerHTML, html);
-    }
+    };
 };
 
 export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText = false) => {
@@ -844,7 +823,7 @@ export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText 
         y: rect.top + 26,
         h: 26
     });
-    const textElements = window.siyuan.menus.menu.element.querySelectorAll("textarea")
+    const textElements = window.siyuan.menus.menu.element.querySelectorAll("textarea");
     if (focusText || protyle.lute.IsValidLinkDest(linkAddress)) {
         textElements[1].select();
     } else {
@@ -866,7 +845,7 @@ export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText 
         }
         nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
         updateTransaction(protyle, id, nodeElement.outerHTML, html);
-    }
+    };
 };
 
 export const tagMenu = (protyle: IProtyle, tagElement: HTMLElement) => {
