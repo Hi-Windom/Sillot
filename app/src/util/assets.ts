@@ -32,9 +32,9 @@ export const loadAssets = (data: IAppearance) => {
     }
 
     const defaultStyleElement = document.getElementById("themeDefaultStyle");
-    let defaultThemeAddress = `/appearance/themes/${data.mode === 1 ? "默认主题 midnight" : "默认主题 daylight"}/${data.customCSS ? "custom" : "theme"}.css?v=${data.customCSS ? new Date().getTime() : Constants.SIYUAN_VERSION}`;
-    if ((data.mode === 1 && data.themeDark !== "默认主题 midnight") || (data.mode === 0 && data.themeLight !== "默认主题 daylight")) {
-        defaultThemeAddress = `/appearance/themes/${data.mode === 1 ? "默认主题 midnight" : "默认主题 daylight"}/theme.css?v=${Constants.SIYUAN_VERSION}`;
+    let defaultThemeAddress = `/appearance/themes/${data.mode === 1 ? "默认主题 goodnight" : "默认主题 goodday"}/${data.customCSS ? "custom" : "theme"}.css?v=${data.customCSS ? new Date().getTime() : Constants.SIYUAN_VERSION}`;
+    if ((data.mode === 1 && data.themeDark !== "默认主题 goodnight") || (data.mode === 0 && data.themeLight !== "默认主题 goodday")) {
+        defaultThemeAddress = `/appearance/themes/${data.mode === 1 ? "默认主题 goodnight" : "默认主题 goodday"}/theme.css?v=${Constants.SIYUAN_VERSION}`;
     }
     if (defaultStyleElement) {
         if (!defaultStyleElement.getAttribute("href").startsWith(defaultThemeAddress)) {
@@ -45,7 +45,7 @@ export const loadAssets = (data: IAppearance) => {
         addStyle(defaultThemeAddress, "themeDefaultStyle");
     }
     const styleElement = document.getElementById("themeStyle");
-    if ((data.mode === 1 && data.themeDark !== "默认主题 midnight") || (data.mode === 0 && data.themeLight !== "默认主题 daylight")) {
+    if ((data.mode === 1 && data.themeDark !== "默认主题 goodnight") || (data.mode === 0 && data.themeLight !== "默认主题 goodday")) {
         const themeAddress = `/appearance/themes/${data.mode === 1 ? data.themeDark : data.themeLight}/${data.customCSS ? "custom" : "theme"}.css?v=${data.customCSS ? new Date().getTime() : data.themeVer}`;
         if (styleElement) {
             if (!styleElement.getAttribute("href").startsWith(themeAddress)) {
