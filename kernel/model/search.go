@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/siyuan-note/siyuan/kernel/task"
 	"path"
 	"regexp"
 	"sort"
@@ -28,6 +27,8 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/siyuan-note/siyuan/kernel/task"
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute"
@@ -553,31 +554,47 @@ func fullTextSearchRefBlock(keyword string, beforeLen int) (ret []*Block) {
 	if !Conf.Search.CaseSensitive {
 		table = "blocks_fts_case_insensitive"
 	}
-
+	// snippet（）参数：
+	// 1. 一个整数，指示从中选择返回文本的FTS表列的索引。列从零开始从左到右进行编号。负值表示应该自动选择该列。
+	// 2. 要在返回的文本中匹配每个词组之前插入的文本。
+	// 3. 要在返回的文本中匹配每个词组之后插入的文本。
+	// 4. 要添加到选定文本的开头或结尾的文本，以分别指示返回的文本不会在其列的开头或结尾出现。
+	// 5. 返回文本中令牌的最大数量。这必须大于零并且等于或小于64。
 	projections := "id, parent_id, root_id, hash, box, path, " +
 		"snippet(" + table + ", 6, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 64) AS hpath, " +
 		"snippet(" + table + ", 7, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 64) AS name, " +
 		"snippet(" + table + ", 8, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 64) AS alias, " +
-		"snippet(" + table + ", 9, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 64) AS memo, " +
-		"tag, " +
+		"snippet(" + table + ", 9, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 64) AS memo, " + "tag, " +
 		"snippet(" + table + ", 11, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 64) AS content, " +
 		"fcontent, markdown, length, type, subtype, ial, sort, created, updated"
 	stmt := "SELECT " + projections + " FROM " + table + " WHERE " + table + " MATCH '" + columnFilter() + ":(" + quotedKeyword + ")' AND type IN " + Conf.Search.TypeFilter()
-	orderBy := ` order by case
-             when name = '${keyword}' then 10
-             when alias = '${keyword}' then 20
-             when memo = '${keyword}' then 30
-             when content = '${keyword}' and type = 'd' then 40
-             when content LIKE '%${keyword}%' and type = 'd' then 41
-             when name LIKE '%${keyword}%' then 50
-             when alias LIKE '%${keyword}%' then 60
-             when content = '${keyword}' and type = 'h' then 70
-             when content LIKE '%${keyword}%' and type = 'h' then 71
-             when fcontent = '${keyword}' and type = 'i' then 80
-             when fcontent LIKE '%${keyword}%' and type = 'i' then 81
-             when memo LIKE '%${keyword}%' then 90
-             when content LIKE '%${keyword}%' and type != 'i' and type != 'l' then 100
-             else 65535 end ASC, sort ASC, length ASC`
+	// HintHint面板排序完全匹配优先 #10
+	// 当在 Order by 中使用Case语句时： ASC，数字越小权重越高； DESC，数字越大权重越高
+	orderCase1 := `
+	when name LIKE '%${keyword}%' then 55
+	when alias LIKE '%${keyword}%' then 55
+	when content LIKE '%${keyword}%' and type = 'd' then 60
+	when content LIKE '%${keyword}%' and type != 'd' then 70
+	when fcontent LIKE '%${keyword}%' and type = 'i' then 100
+	when memo LIKE '%${keyword}%' then 100
+	`
+	orderCase2 := `
+	when name LIKE '${keyword}*' then 40
+	when alias LIKE '${keyword}*' then 45
+	when content LIKE '${keyword}*' and type = 'd' then 25
+	when content LIKE '${keyword}*' and type != 'd' then 50
+	when fcontent LIKE '${keyword}*' and type = 'i' then 60
+	when memo LIKE '${keyword}*' then 65
+	`
+	orderCase3 := `
+	when name = '${keyword}' then 10
+	when alias = '${keyword}' then 20
+	when content = '${keyword}' and type = 'd' then 1
+	when content = '${keyword}' and type != 'd' then 5
+	when fcontent = '${keyword}' and type = 'i' then 25
+	when memo = '${keyword}' then 30
+	`
+	orderBy := ` order by case` + orderCase1 + orderCase2 + orderCase3 + `else 65535 end ASC, sort ASC, length ASC`
 	orderBy = strings.ReplaceAll(orderBy, "${keyword}", keyword)
 	stmt += orderBy + " LIMIT " + strconv.Itoa(Conf.Search.Limit)
 	blocks := sql.SelectBlocksRawStmt(stmt, Conf.Search.Limit)

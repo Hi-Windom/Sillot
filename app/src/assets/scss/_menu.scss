@@ -13,6 +13,13 @@
     display: none;
   }
 
+  & .b3s-menu-textarea {
+    min-height: 28px;
+    max-height: 7.5em;
+    min-width: 131px;
+    max-width: 13em;
+  }
+
   &--list {
     overflow: auto;
     max-height: 70vh;
