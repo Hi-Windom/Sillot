@@ -33,7 +33,12 @@ const appDir = path.dirname(app.getAppPath())
 const isDevEnv = process.env.NODE_ENV === 'development'
 // const appVer = app.getVersion()
 const branchVer = app.getVersion()
-const pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString())
+var pkg = {}
+if (isDevEnv) {
+  pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json")).toString())
+} else {
+  pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString())
+}
 const appVer = pkg["syv"]
 const confDir = path.join(app.getPath('home'), '.config', 'siyuan')
 const windowStatePath = path.join(confDir, 'windowState.json')
