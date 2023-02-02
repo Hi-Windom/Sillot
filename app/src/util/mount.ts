@@ -85,6 +85,10 @@ export const mountHelp = () => {
             callback: Constants.CB_MOUNT_HELP,
             notebook: notebookId
         });
+        fetchPost("/api/notebook/openNotebook", {
+            callback: Constants.CB_MOUNT_HELP, // 根据 .siyuan/conf.json 解析笔记本名和图标
+            notebook: Constants.HELP_PATH.zh_CN_Sillot
+        });
     });
 };
 

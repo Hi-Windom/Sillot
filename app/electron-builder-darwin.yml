@@ -35,7 +35,7 @@ extraResources:
     to: "stage"
   - from: "guide"
     to: "guide"
-    filter: "!**/{.DS_Store,.git,.gitignore,.idea}"
+    filter: "!**/{.DS_Store,.git,.gitignore,.idea,20210808180117-czj9bvb,20211226090932-5lcq56f}"
   - from: "appearance/icons"
     to: "appearance/icons"
     filter: "!**/{.DS_Store}"

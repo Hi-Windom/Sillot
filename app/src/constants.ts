@@ -90,7 +90,8 @@ export abstract class Constants {
     // help path
     public static readonly HELP_PATH = {
         zh_CN: "20210808180117-czj9bvb",
-        zh_CHT: "20211226090932-5lcq56f",
+        zh_CHT: "20210808180117-czj9bvb",
+        zh_CN_Sillot: "20230202000000-c123456",
         en_US: "20210808180117-6v0mkxr",
         fr_FR: "20210808180117-6v0mkxr",
     };
