@@ -499,7 +499,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
     const titleElement = assetElement.querySelector(".protyle-action__title") as HTMLElement;
     const html = nodeElement.outerHTML;
     window.siyuan.menus.menu.append(new MenuItem({
-        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200" placeholder="${window.siyuan.languages.imageURL}">${imgElement.getAttribute("src")}</textarea><div class="fn__hr--small"></div>`,
+        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200 b3s-menu-textarea" placeholder="${window.siyuan.languages.imageURL}">${imgElement.getAttribute("src")}</textarea><div class="fn__hr--small"></div>`,
         bind(element) {
             element.querySelector("textarea").addEventListener("change", (event) => {
                 const value = (event.target as HTMLInputElement).value.replace(/\n|\r\n|\r|\u2028|\u2029/g, "");
@@ -517,7 +517,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
         }
     }).element);
     window.siyuan.menus.menu.append(new MenuItem({
-        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200" placeholder="${window.siyuan.languages.title}"></textarea><div class="fn__hr--small"></div>`,
+        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200 b3s-menu-textarea" placeholder="${window.siyuan.languages.title}"></textarea><div class="fn__hr--small"></div>`,
         bind(element) {
             const inputElement = element.querySelector("textarea");
             inputElement.value = titleElement.textContent;
@@ -531,7 +531,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
         }
     }).element);
     window.siyuan.menus.menu.append(new MenuItem({
-        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200" placeholder="${window.siyuan.languages.tooltipText}"></textarea><div class="fn__hr--small"></div>`,
+        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200 b3s-menu-textarea" placeholder="${window.siyuan.languages.tooltipText}"></textarea><div class="fn__hr--small"></div>`,
         bind(element) {
             element.querySelector("textarea").value = imgElement.getAttribute("alt") || "";
         }
@@ -684,7 +684,7 @@ export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText 
     const html = nodeElement.outerHTML;
     const linkAddress = linkElement.getAttribute("data-href");
     window.siyuan.menus.menu.append(new MenuItem({
-        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200" placeholder="${window.siyuan.languages.link}"></textarea><div class="fn__hr--small"></div>`,
+        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200 b3s-menu-textarea" placeholder="${window.siyuan.languages.link}"></textarea><div class="fn__hr--small"></div>`,
         bind(element) {
             const inputElement = element.querySelector("textarea");
             inputElement.value = linkAddress || "";
@@ -704,7 +704,7 @@ export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText 
         }
     }).element);
     window.siyuan.menus.menu.append(new MenuItem({
-        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200" placeholder="${window.siyuan.languages.anchor}"></textarea><div class="fn__hr--small"></div>`,
+        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200 b3s-menu-textarea" placeholder="${window.siyuan.languages.anchor}"></textarea><div class="fn__hr--small"></div>`,
         bind(element) {
             const inputElement = element.querySelector("textarea");
             // https://github.com/siyuan-note/siyuan/issues/6798
@@ -746,7 +746,7 @@ export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText 
         }
     }).element);
     window.siyuan.menus.menu.append(new MenuItem({
-        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200" placeholder="${window.siyuan.languages.title}"></textarea><div class="fn__hr--small"></div>`,
+        label: `<div class="fn__hr--small"></div><textarea rows="1" class="b3-text-field fn__size200 b3s-menu-textarea" placeholder="${window.siyuan.languages.title}"></textarea><div class="fn__hr--small"></div>`,
         bind(element) {
             const inputElement = element.querySelector("textarea");
             inputElement.value = Lute.UnEscapeHTMLStr(linkElement.getAttribute("data-title") || "");
