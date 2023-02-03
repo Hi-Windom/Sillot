@@ -1,6 +1,6 @@
 {
   "name": "Sillot",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "syv": "2.7.2",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
@@ -61,6 +61,7 @@
     "@simonwep/pickr": "^1.8.2",
     "@types/node": "^18.11.18",
     "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
     "babel-loader": "^9.1.2",
@@ -92,6 +93,9 @@
   },
   "dependencies": {
     "@electron/remote": "^2.0.9",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/joy": "5.0.0-alpha.65",
     "brace": "^0.11.1",
     "electron-fetch": "^1.9.1",
     "electron-store": "^8.1.0",
@@ -104,5 +108,10 @@
     "sweetalert2": "^11.7.1",
     "vue": "^3.2.45",
     "vue-toast-notification": "^3.0"
+  },
+  "resolutions": {
+    "lodash": "4.17.21",
+    "vue": "3.2.45",
+    "react": "18.2.0"
   }
 }
