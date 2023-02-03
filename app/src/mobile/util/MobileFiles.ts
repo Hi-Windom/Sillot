@@ -174,7 +174,7 @@ export class MobileFiles extends Model {
                         const notebookId = ulElement.getAttribute("data-url");
                         if (!window.siyuan.config.readonly) {
                             if (type === "new") {
-                                newFile(notebookId, pathString, true);
+                                newFile(notebookId, pathString);
                             } else if (type === "more-root") {
                                 initNavigationMenu(target.parentElement).popup({x, y});
                                 window.siyuan.menus.menu.element.style.zIndex = "310";
@@ -219,7 +219,7 @@ export class MobileFiles extends Model {
                 sort: window.siyuan.config.fileTree.sort,
                 alwaysSelectOpenedFile: window.siyuan.config.fileTree.alwaysSelectOpenedFile,
                 refCreateSavePath: window.siyuan.config.fileTree.refCreateSavePath,
-                createDocNameTemplate: window.siyuan.config.fileTree.createDocNameTemplate,
+                docCreateSavePath: window.siyuan.config.fileTree.docCreateSavePath,
                 openFilesUseCurrentTab: window.siyuan.config.fileTree.openFilesUseCurrentTab,
                 maxListCount: window.siyuan.config.fileTree.maxListCount,
             }, () => {
