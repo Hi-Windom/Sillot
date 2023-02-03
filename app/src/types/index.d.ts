@@ -387,7 +387,7 @@ declare interface IFileTree {
     removeDocWithoutConfirm: boolean
     allowCreateDeeper: boolean
     refCreateSavePath: string
-    createDocNameTemplate: string
+    docCreateSavePath: string
     sort: number
     maxOpenTabCount: number
     maxListCount: number
