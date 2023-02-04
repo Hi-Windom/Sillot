@@ -352,6 +352,20 @@ export const initWindow = () => {
                 }
             });
         });
+        ipcRenderer.on(Constants.SILLOT_OPENURL, (event, url) => {
+            if (!/^sillot:/.test(url)) {
+                return;
+            }
+            alert(url)
+            ipcRenderer.send(Constants.SILLOT_SHOW, url); // 业务处理在 main.js
+        });
+        ipcRenderer.on(Constants.SISI_OPENURL, (event, url) => {
+            if (!/^sisi:/.test(url)) {
+                return;
+            }
+            alert(url)
+            ipcRenderer.send(Constants.SISI_SHOW, url); // 业务处理在 main.js
+        });
         ipcRenderer.on(Constants.SIYUAN_SAVE_CLOSE, (event, close) => {
             winOnClose(currentWindow, close);
         });
