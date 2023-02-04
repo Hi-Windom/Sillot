@@ -283,7 +283,7 @@ const boot = () => {
     new Date().getTime())
 
   // 菜单
-  const productName = 'SiYuan'
+  const productName = 'Sillot'
   const template = [
     {
       label: productName,
