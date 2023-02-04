@@ -1,5 +1,7 @@
-import * as React from "react"; // 兼容性好
-import * as ReactDOM from "react-dom"; // 兼容性好
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
+// https://zhuanlan.zhihu.com/p/148081795
+// https://blog.leodots.me/post/40-think-about-allowSyntheticDefaultImports.html
 import {
   toast,
   ToastContainer,

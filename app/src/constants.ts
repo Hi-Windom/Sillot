@@ -24,6 +24,8 @@ export abstract class Constants {
 
     // 渲染进程调主进程
     public static readonly SIYUAN_SHOW: string = "siyuan-show";
+    public static readonly SILLOT_SHOW: string = "sillot-show";
+    public static readonly SISI_SHOW: string = "sisi-show";
     public static readonly SIYUAN_LOCK_SCREEN: string = "siyuan-lock-screen";
     public static readonly SIYUAN_CONFIG_TRAY: string = "siyuan-config-tray";
     public static readonly SIYUAN_OPEN_WORKSPACE: string = "siyuan-open-workspace";
@@ -31,6 +33,8 @@ export abstract class Constants {
     public static readonly SIYUAN_HOTKEY: string = "siyuan-hotkey";
     public static readonly SIYUAN_INIT: string = "siyuan-init";
     public static readonly SIYUAN_OPENURL: string = "siyuan-openurl";
+    public static readonly SILLOT_OPENURL: string = "sillot-openurl";
+    public static readonly SISI_OPENURL: string = "sisi-openurl";
     public static readonly SIYUAN_OPENWINDOW: string = "siyuan-openwindow";
     public static readonly SIYUAN_CLOSETAB: string = "siyuan-closetab";
     public static readonly SIYUAN_SAVE_CLOSE: string = "siyuan-save-close";

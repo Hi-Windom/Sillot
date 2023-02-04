@@ -5,6 +5,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
+const BundleAnalyzerPlugin = require(
+  'webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = (env, argv) => {
   return {
@@ -25,7 +27,10 @@ module.exports = (env, argv) => {
       extensions: ['.ts', '.js', '.jsx', '.tsx', '.tpl', '.scss', '.png', '.svg'],
     },
     optimization: {
-      minimize: true,
+      splitChunks: {
+        chunks: 'all',
+      },
+      minimize: true, // 调试时关闭
       minimizer: [
         new TerserPlugin({
           terserOptions: {
@@ -50,8 +55,8 @@ module.exports = (env, argv) => {
           },
         },
         {
-          test: /\.ts(x?)$/,
-          include: [path.resolve(__dirname, 'src')],
+          test: /\.ts$/,
+          exclude: /node_modules/,
           use: [
             {
               loader: 'ts-loader',
@@ -66,9 +71,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.scss$/,
-          include: [
-            path.resolve(__dirname, 'src/assets/scss'),
-          ],
+          exclude: /node_modules/,
           use: [
             {
               loader: MiniCssExtractPlugin.loader,
@@ -96,10 +99,18 @@ module.exports = (env, argv) => {
           ]
         },
         {
-          test: /\.jsx?$/,
-          include: path.join(__dirname, 'src'),
-          loader: 'babel-loader'
-        },
+          test: /\.[jt]sx$/,
+          exclude: /node_modules/,
+          use: {
+              loader: 'babel-loader',
+              options: {
+                  presets: ['@babel/preset-react', '@babel/preset-typescript'],
+                  plugins: [
+                      '@babel/plugin-transform-runtime',
+                  ]
+              }
+          }
+      },
         {
           test: /\.woff$/,
           type: 'asset/resource',
@@ -122,6 +133,7 @@ module.exports = (env, argv) => {
       ],
     },
     plugins: [
+      // new BundleAnalyzerPlugin(),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
         cleanOnceBeforeBuildPatterns: [

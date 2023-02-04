@@ -43,7 +43,7 @@ export const mermaidRender = (element: Element, cdn = Constants.PROTYLE_CDN) => 
         if (window.siyuan.config.appearance.mode === 1) {
             config.theme = "dark";
         }
-        mermaid.initialize(config);
+        mermaid?.initialize(config);
         if (mermaidElements[0].firstElementChild.clientWidth === 0) {
             const tabElement = hasClosestByClassName(mermaidElements[0], "protyle", true);
             if (!tabElement) {

@@ -1,11 +1,18 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
-    "noImplicitAny": true,
+    "noImplicitAny": false,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": false,
     "module": "commonjs",
     "target": "es6",
-    "jsx": "react",
+    "jsx": "react-jsxdev",
     "lib": ["ES2022","DOM","DOM.Iterable"],
+    "outDir": "./dist/",
     "typeRoots": [
       "./node_modules/@types"
     ],
@@ -19,5 +26,5 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
 }

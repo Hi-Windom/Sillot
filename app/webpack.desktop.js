@@ -22,6 +22,9 @@ module.exports = (env, argv) => {
       'main': './src/index.ts',
     },
     optimization: {
+      splitChunks: {
+        chunks: 'all',
+      },
       minimize: true,
       minimizer: [
         new TerserPlugin({
@@ -71,8 +74,8 @@ module.exports = (env, argv) => {
           },
         },
         {
-          test: /\.ts(x?)$/,
-          include: [path.resolve(__dirname, 'src')],
+          test: /\.ts$/,
+          exclude: /node_modules/,
           use: [
             {
               loader: 'ts-loader',
@@ -89,9 +92,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.scss$/,
-          include: [
-            path.resolve(__dirname, 'src/assets/scss'),
-          ],
+          exclude: /node_modules/,
           use: [
             {
               loader: MiniCssExtractPlugin.loader,
@@ -119,10 +120,18 @@ module.exports = (env, argv) => {
           ]
         },
         {
-          test: /\.jsx?$/,
-          include: path.join(__dirname, 'src'),
-          loader: 'babel-loader'
-        },
+          test: /\.[jt]sx$/,
+          exclude: /node_modules/,
+          use: {
+              loader: 'babel-loader',
+              options: {
+                  presets: ['@babel/preset-react', '@babel/preset-typescript'],
+                  plugins: [
+                      '@babel/plugin-transform-runtime',
+                  ]
+              }
+          }
+      },
         {
           test: /\.woff$/,
           type: 'asset/resource',

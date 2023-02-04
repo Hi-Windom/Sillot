@@ -283,7 +283,7 @@ const boot = () => {
     new Date().getTime())
 
   // 菜单
-  const productName = 'SiYuan'
+  const productName = 'Sillot'
   const template = [
     {
       label: productName,
@@ -573,7 +573,26 @@ const initKernel = (workspace, port, lang) => {
   })
 }
 
-app.setAsDefaultProtocolClient('siyuan')
+// 注册自定义协议
+function setProtocol(agreement) {
+  let isSet = false // 是否注册成功
+
+  app.removeAsDefaultProtocolClient(agreement) // 每次运行都删除自定义协议 然后再重新注册
+  // 开发模式下在window运行需要做兼容
+  if (process.env.NODE_ENV === 'development' && process.platform === 'win32') {
+    // 设置electron.exe 和 app的路径
+    isSet = app.setAsDefaultProtocolClient(agreement, process.execPath, [
+      path.resolve(process.argv[1]),
+    ])
+  } else {
+    isSet = app.setAsDefaultProtocolClient(agreement)
+  }
+  console.log(`${agreement}是否注册成功：`, isSet) // 并无实际输出可看
+}
+
+setProtocol('siyuan')
+setProtocol('sillot')
+setProtocol('sisi')
 
 app.commandLine.appendSwitch('disable-web-security')
 app.commandLine.appendSwitch('auto-detect', 'false')
@@ -604,7 +623,7 @@ app.whenReady().then(() => {
       {
         label: lang.openSource,
         click: () => {
-          shell.openExternal('https://github.com/siyuan-note/siyuan')
+          shell.openExternal('https://github.com/Hi-Windom/Sillot')
         },
       },
       {
@@ -662,6 +681,17 @@ app.whenReady().then(() => {
   ipcMain.on('siyuan-show', (event, id) => {
     showWindow(BrowserWindow.fromId(id))
   })
+  ipcMain.on("sillot-show", (event, name) => {
+    if (/^sillot:\/\//.test(name) || /^sillot:\\\\/.test(name)) {
+      shell.showItemInFolder(name.replace("sillot://", ""));
+      return;
+    }
+  });
+  ipcMain.on("sisi-show", (event, name) => {
+    if (/^sisi:\/\//.test(name) || /^sisi:\\\\/.test(name)) {
+      return;
+    }
+  });
   ipcMain.on('siyuan-config-tray', (event, data) => {
     workspaces.find(item => {
       if (item.id === data.id) {
@@ -910,10 +940,30 @@ app.on('open-url', (event, url) => { // for macOS
         item.browserWindow.webContents.send('siyuan-openurl', url)
       }
     })
+  } else if (url.startsWith('sillot:')) {
+    // 业务处理在 onGetConfig.ts
+    if (url.startsWith('sillot://') || url.startsWith('sillot:\\\\'))
+    {
+      workspaces.forEach(item => {
+        if (item.browserWindow && !item.browserWindow.isDestroyed()) {
+          item.browserWindow.webContents.send('sillot-openurl', url)
+        }
+      })
+    }
+  } else if (url.startsWith('sisi:')) {
+    // 业务处理在 onGetConfig.ts
+    if (url.startsWith('sisi://') || url.startsWith('sisi:\\\\'))
+    {
+      workspaces.forEach(item => {
+        if (item.browserWindow && !item.browserWindow.isDestroyed()) {
+          item.browserWindow.webContents.send('sisi-openurl', url)
+        }
+      })
+    }
   }
 })
 
-app.on('second-instance', (event, argv) => {
+app.on('second-instance', (event, argv) => { // for windows
   writeLog('second-instance [' + argv + ']')
   let workspace = argv.find((arg) => arg.startsWith('--workspace='))
   if (workspace) {
@@ -948,11 +998,36 @@ app.on('second-instance', (event, argv) => {
   }
 
   const siyuanURL = argv.find((arg) => arg.startsWith('siyuan://'))
+  const sillotURL = argv.find((arg) => arg.startsWith('sillot:'))
+  const sisiURL = argv.find((arg) => arg.startsWith('sisi:'))
   workspaces.forEach(item => {
     if (item.browserWindow && !item.browserWindow.isDestroyed() && siyuanURL) {
       item.browserWindow.webContents.send('siyuan-openurl', siyuanURL)
     }
   })
+
+  if (sillotURL) {
+    // 业务处理在 onGetConfig.ts
+    if (sillotURL.startsWith('sillot://') || sillotURL.startsWith('sillot:\\\\'))
+    {
+      workspaces.forEach(item => {
+        if (item.browserWindow && !item.browserWindow.isDestroyed()) {
+          item.browserWindow.webContents.send('sillot-openurl', sillotURL)
+        }
+      })
+    }
+  }
+  if (sisiURL) {
+    // 业务处理在 onGetConfig.ts
+    if (sisiURL.startsWith('sisi://') || sisiURL.startsWith('sisi:\\\\'))
+    {
+      workspaces.forEach(item => {
+        if (item.browserWindow && !item.browserWindow.isDestroyed()) {
+          item.browserWindow.webContents.send('sisi-openurl', sisiURL)
+        }
+      })
+    }
+  }
 
   if (!siyuanURL && 0 < workspaces.length) {
     showWindow(workspaces[0].browserWindow)

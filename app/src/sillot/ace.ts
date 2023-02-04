@@ -255,10 +255,15 @@ export function exAce() {
                 "data": data,
                 "id": id
               }, res => {
-                window.__.toast.success("已保存", { position: "bottom", duration: 1300, queue: true });
+                if (res.code == 0) {
+                  window.__.toast.success("已保存", { position: "bottom", duration: 1300, queue: true });
+                }
+                else {
+                  window.__.toast.error(res.msg, { position: "bottom", duration: 3100, queue: false });
+                }
               })
             },
-            readOnly: true
+            readOnly: true // false if this command should not apply in readOnly mode
           }]);
           _HTML_c.style.height = "100vh"
           _HTML_c.style.margin = "0"

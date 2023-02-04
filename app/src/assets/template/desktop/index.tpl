@@ -2,6 +2,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate" />
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,7 +12,7 @@
     <style id="editorFontSize" type="text/css"></style>
     <style id="editorAttr" type="text/css"></style>
 </head>
-<body class="fn__flex-column">
+<body class="branch--Sillot fn__flex-column">
 <div id="loading" class="b3-dialog b3-dialog--open">
     <div class="b3-dialog__scrim" style="background-color: #212224"></div>
     <img style="position: absolute;width: 36vh;" src="../../icon.png">
