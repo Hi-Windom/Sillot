@@ -24,6 +24,6 @@ export class SillotEnv {
     window.React = React;
     window.ReactDOM = ReactDOM;
     exAce();
-    eMonaco();
+    // eMonaco();
   }
 }

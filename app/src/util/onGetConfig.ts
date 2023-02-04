@@ -492,7 +492,6 @@ export const initWindow = () => {
         return;
     }
     document.body.classList.add("body--win32");
-    document.body.classList.add("branch--Sillot");
 
     // 添加窗口控件
     const controlsHTML = `<div class="toolbar__item b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.min}" id="minWindow">
