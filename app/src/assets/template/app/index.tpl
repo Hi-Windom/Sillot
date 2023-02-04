@@ -2,6 +2,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate" />
     <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag
     <meta http-equiv="Content-Security-Policy" content="script-src 'self'"/>-->
     <style id="editorFontSize" type="text/css"></style>
@@ -26,6 +28,7 @@
 <div id="commonMenu" class="b3-menu fn__none"></div>
 <div id="message" class="b3-snackbars"></div>
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
+<div id="app2" data-bind="react" data-lib="monaco-editor"></div>
 <script src="../../sillot/vue.global.prod.js" defer init></script>
 <script>
   setTimeout(() => {

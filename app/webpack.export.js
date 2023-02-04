@@ -24,6 +24,9 @@ module.exports = (env, argv) => {
       'protyle-method': './src/protyle/method.ts',
     },
     optimization: {
+      splitChunks: {
+        chunks: 'all',
+      },
       minimize: true,
       minimizer: [
         new TerserPlugin({

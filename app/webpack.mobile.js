@@ -22,6 +22,9 @@ module.exports = (env, argv) => {
       'main': './src/mobile/index.ts',
     },
     optimization: {
+      splitChunks: {
+        chunks: 'all',
+      },
       minimize: true,
       minimizer: [
         new TerserPlugin({
