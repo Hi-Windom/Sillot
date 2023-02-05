@@ -1,6 +1,6 @@
 {
   "name": "Sillot",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "syv": "2.7.2",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
@@ -116,7 +116,8 @@
     "electron-store": "^8.1.0",
     "monaco-editor": "^0.34.1",
     "monaco-editor-nls": "^3.0.0",
-    "pnpm": "7.26.0"
+    "pnpm": "7.26.0",
+    "react-jinke-music-player": "^4.24.2"
   },
   "resolutions": {
     "lodash": "4.17.21"
