@@ -77,6 +77,7 @@ interface ISillotDoubleUnderline {
     localforage: any
     toast: any
     toastify: any
+    hottt: any
 }
 // Sillot extend end
 

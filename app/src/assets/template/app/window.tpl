@@ -20,6 +20,7 @@
 <div id="commonMenu" class="b3-menu fn__none"></div>
 <div id="message" class="b3-snackbars"></div>
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
+<div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
 <script src="../../sillot/vue.global.prod.js" defer init></script>
 </body>
 </html>
