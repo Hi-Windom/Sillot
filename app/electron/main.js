@@ -16,6 +16,7 @@
 
 const {
   app,
+  session,
   BrowserWindow,
   shell,
   Menu,
@@ -602,6 +603,28 @@ app.commandLine.appendSwitch('enable-features', 'PlatformHEVCDecoderSupport')
 app.setPath('userData', app.getPath('userData') + '-Electron') // `~/.config` 下 Electron 相关文件夹名称改为 `SiYuan-Electron` https://github.com/siyuan-note/siyuan/issues/3349
 
 app.whenReady().then(() => {
+  const loadExtension = (P)=> {
+    fs.readdir(P,function(err,files) {
+      if (!err) {
+        files.forEach(function(filename) {
+          var filedir = path.join(P, filename);
+          fs.stat(filedir,function(eror, stats) {
+            var isDir = stats.isDirectory()
+            if(isDir) {
+              session.defaultSession.loadExtension(
+                filedir,
+                // 打开本地文件也应用拓展
+                { allowFileAccess: true }
+              )
+              return
+            }
+          })
+        })
+      }
+    })
+  }
+  let ReactDeveloperToolsRoot = path.join(app.getPath("userData"), "extensions", "ReactDeveloperTools")
+  loadExtension(ReactDeveloperToolsRoot)
 
   let resetWindowStateOnRestart = false
   const resetTrayMenu = (tray, lang, mainWindow) => {
