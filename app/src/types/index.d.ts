@@ -90,7 +90,6 @@ interface ISillotDoubleUnderline {
     ace: any
     Swal: any
     localforage: any
-    toast: any
     toastify: any
     hottt: any
 }
