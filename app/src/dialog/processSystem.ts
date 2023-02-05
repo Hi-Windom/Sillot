@@ -13,7 +13,7 @@ import {getCurrentWindow} from "@electron/remote";
 import {escapeHtml} from "../util/escape";
 import {getWorkspaceName} from "../util/noRelyPCFunction";
 import {needSubscribe} from "../util/needSubscribe";
-import { exportIDB } from '../util/sillot-idb-backup-and-restore'
+import { exportIDB } from '../sillot/util/sillot-idb-backup-and-restore'
 
 export const lockScreen = () => {
     /// #if BROWSER

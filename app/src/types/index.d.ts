@@ -37,6 +37,7 @@ interface Window {
     Sillot: ISillot
     _: any
     __: ISillotDoubleUnderline
+    sout: ISout
     React: any
     ReactDOM: any
     // Sillot extend end
@@ -70,6 +71,20 @@ interface ISillot {
     funs: {
         hljsRender: any,
     }
+}
+interface ISout {
+    log: any
+    slog: any
+    print: any
+    info: any
+    success: any
+    warn: any
+    unsure: any
+    ops: any
+    error: any
+    good: any
+    wink: any
+    bad: any
 }
 interface ISillotDoubleUnderline {
     ace: any

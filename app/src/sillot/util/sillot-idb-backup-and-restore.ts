@@ -60,7 +60,7 @@ function importFromJson(idbDatabase: IDBRequest, importObject: any) {
         )
         // transaction.addEventListener('error', reject)
         transaction.onerror = function (event: any) {
-          console.error('transaction error: ' + transaction.error);
+          window.sout.error('transaction error: ' + transaction.error);
           reject()
         };
         let count = 0
@@ -141,20 +141,20 @@ export async function importIDB(result: any) {
           kList.forEach((key: any) => {
             if (!db.objectStoreNames.contains(key)) {
               db.createObjectStore(key);
-              console.warn(key)
+              window.sout.warn(key)
             }
           })
         }
         DBOpenRequest.onsuccess = function (event) {
           // 第一次打开数据库时，会先触发upgradeneeded事件，然后触发success事件
           importFromJson(DBOpenRequest, importObject[dbName]).then(() => { resolved += 1; }).catch((e) => {
-            console.error(e)
+            window.sout.error(e)
             resolved += 1;
           })
         }
         // 失败时触发
         DBOpenRequest.onerror = (event) => {
-          console.error(event);
+          window.sout.error(event);
           reject(event);
         };
       }
@@ -185,7 +185,7 @@ export async function exportIDB() {
       }
       // 失败时触发
       DBOpenRequest.onerror = (event) => {
-        console.error(event);
+        window.sout.error(event);
       };
     });
     while (true) {

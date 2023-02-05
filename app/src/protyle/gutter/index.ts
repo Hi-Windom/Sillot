@@ -412,6 +412,7 @@ export class Gutter {
     }
 
     public renderMultipleMenu(protyle: IProtyle, selectsElement: Element[]) {
+        // 选中多个块的菜单
         let isList = false;
         let isContinue = false;
         let hasEmbedBlock = false;
@@ -432,6 +433,26 @@ export class Gutter {
             }
         });
         if (!isList && !protyle.disabled) {
+            let SillotExtSubmennu: IMenu[] = [];
+            SillotExtSubmennu.push({
+                label: "MD 源码编辑",
+                click() {
+                    window.sout.log("MD 源码编辑")
+                }
+            })
+            SillotExtSubmennu.push({
+                label: "KMD 源码编辑",
+                click() {
+                    window.sout.log("KMD 源码编辑")
+                }
+            })
+            window.siyuan.menus.menu.append(new MenuItem({
+                label: "汐洛扩展菜单",
+                icon: "iconMore",
+                type: "submenu",
+                submenu: SillotExtSubmennu
+            }).element);
+            window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
             const turnIntoSubmenu: IMenu[] = [];
             if (isContinue) {
                 turnIntoSubmenu.push(this.turnsIntoOne({
@@ -678,6 +699,7 @@ export class Gutter {
     }
 
     public renderMenu(protyle: IProtyle, buttonElement: Element) {
+        // 单个块的菜单
         hideElements(["util", "toolbar", "hint"], protyle);
         window.siyuan.menus.menu.remove();
         const id = buttonElement.getAttribute("data-node-id");
@@ -714,6 +736,26 @@ export class Gutter {
         hideElements(["select"], protyle);
         nodeElement.classList.add("protyle-wysiwyg--select");
         countBlockWord([id], protyle.block.rootID);
+        let SillotExtSubmennu: IMenu[] = [];
+        SillotExtSubmennu.push({
+            label: "MD 源码编辑",
+            click() {
+                window.sout.log("MD 源码编辑")
+            }
+        })
+        SillotExtSubmennu.push({
+            label: "KMD 源码编辑",
+            click() {
+                window.sout.log("KMD 源码编辑")
+            }
+        })
+        window.siyuan.menus.menu.append(new MenuItem({
+            label: "汐洛扩展菜单",
+            icon: "iconMore",
+            type: "submenu",
+            submenu: SillotExtSubmennu
+        }).element);
+        window.siyuan.menus.menu.append(new MenuItem({ type: "separator" }).element);
         // "heading1-6", "list", "ordered-list", "check", "quote", "code", "table", "line", "math", "paragraph"
         if (type === "NodeParagraph" && !protyle.disabled) {
             turnIntoSubmenu.push(this.turnsIntoOne({
