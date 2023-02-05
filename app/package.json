@@ -1,6 +1,6 @@
 {
   "name": "Sillot",
-  "version": "0.4.24",
+  "version": "0.4.25",
   "syv": "2.7.2",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
@@ -74,7 +74,7 @@
     "css-loader": "^6.7.1",
     "csstype": "^3.0.10",
     "dayjs": "^1.11.5",
-    "electron": "23.0.0-beta.6",
+    "electron": "23.0.0-beta.8",
     "electron-builder": "^23.6.0",
     "encoding": "^0.1.13",
     "eslint": "^8.33.0",

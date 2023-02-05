@@ -8,8 +8,7 @@ call pnpm run build
 cd ..
 
 echo ' ===== Cleaning Builds ===== '
-taskkill /f /t /im SiYuan.exe
-taskkill /f /t /im SiYuan-Kernel.exe
+call python ./scripts/sillot-win-dev.py
 del /S /Q /F app\build 1>nul
 del /S /Q /F app\kernel 1>nul
 
