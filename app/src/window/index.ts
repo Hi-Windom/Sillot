@@ -21,7 +21,7 @@ import {initMessage} from "../dialog/message";
 import {getAllTabs} from "../layout/getAll";
 import {getLocalStorage} from "../protyle/util/compatibility";
 import {init} from "../window/init";
-import { importIDB } from '../util/sillot-idb-backup-and-restore'
+import { importIDB } from '../sillot/util/sillot-idb-backup-and-restore'
 import { SillotEnv } from "../sillot";
 
 class App {

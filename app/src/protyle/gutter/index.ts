@@ -437,13 +437,13 @@ export class Gutter {
             SillotExtSubmennu.push({
                 label: "MD 源码编辑",
                 click() {
-                    console.log("MD 源码编辑")
+                    window.sout.log("MD 源码编辑")
                 }
             })
             SillotExtSubmennu.push({
                 label: "KMD 源码编辑",
                 click() {
-                    console.log("KMD 源码编辑")
+                    window.sout.log("KMD 源码编辑")
                 }
             })
             window.siyuan.menus.menu.append(new MenuItem({
@@ -740,13 +740,13 @@ export class Gutter {
         SillotExtSubmennu.push({
             label: "MD 源码编辑",
             click() {
-                console.log("MD 源码编辑")
+                window.sout.log("MD 源码编辑")
             }
         })
         SillotExtSubmennu.push({
             label: "KMD 源码编辑",
             click() {
-                console.log("KMD 源码编辑")
+                window.sout.log("KMD 源码编辑")
             }
         })
         window.siyuan.menus.menu.append(new MenuItem({
