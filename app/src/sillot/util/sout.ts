@@ -1,4 +1,4 @@
-export function exSout() {
+export default function exSout() {
   // 参考资料：https://juejin.cn/post/6844904007102627847
   window.sout = {
     debug: true,
@@ -159,4 +159,5 @@ export function exSout() {
       window.sout.tracker("test");
     }
   }
+  return 0
 }
