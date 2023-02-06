@@ -1,7 +1,10 @@
 {
-  "backlinkTurnTo": "引用轉移",
+  "targetBlockID": "目標塊 ID",
+  "transferBlockRefTip": "將該塊的所有引用轉移到目標塊上",
+  "transferBlockRef": "轉移引用",
   "sortByFiletree": "使用文檔樹排序規則",
   "tabToWindow": "移動到新窗口",
+  "openByNewWindow": "使用新窗口打開",
   "exitFocus": "退出聚焦",
   "pointExchangeSize": "積分兌換",
   "panels": "面板",
