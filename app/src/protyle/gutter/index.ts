@@ -33,8 +33,6 @@ import {duplicateBlock} from "../wysiwyg/commonHotkey";
 import {movePathTo} from "../../util/pathName";
 import {hintMoveBlock} from "../hint/extend";
 import {makeCard} from "../../card/makeCard";
-import {Dialog} from "../../dialog";
-import {isMobile} from "../../util/functions";
 import {transferBlockRef} from "../../menus/block";
 
 export class Gutter {
@@ -624,8 +622,8 @@ export class Gutter {
             click() {
                 duplicateBlock(selectsElement, protyle);
             }
-        }]
-        const copyTextRefMenu = this.genCopyTextRef(selectsElement)
+        }];
+        const copyTextRefMenu = this.genCopyTextRef(selectsElement);
         if (copyTextRefMenu) {
             copyMenu.splice(2, 0, copyTextRefMenu);
         }
@@ -1026,8 +1024,8 @@ export class Gutter {
             click() {
                 duplicateBlock([nodeElement], protyle);
             }
-        }])
-        const copyTextRefMenu = this.genCopyTextRef([nodeElement])
+        }]);
+        const copyTextRefMenu = this.genCopyTextRef([nodeElement]);
         if (copyTextRefMenu) {
             copyMenu.splice(copyMenu.length - 1, 0, copyTextRefMenu);
         }
@@ -1415,9 +1413,9 @@ export class Gutter {
                     insertEmptyBlock(protyle, "afterend", id);
                 }
             }).element);
-            const countElement = nodeElement.lastElementChild.querySelector(".protyle-attr--refcount")
+            const countElement = nodeElement.lastElementChild.querySelector(".protyle-attr--refcount");
             if (countElement && countElement.textContent) {
-                transferBlockRef(id)
+                transferBlockRef(id);
             }
         }
         window.siyuan.menus.menu.append(new MenuItem({
@@ -1775,17 +1773,17 @@ export class Gutter {
 
     private genCopyTextRef(selectsElement: Element[]): false | IMenu {
         if (isNotEditBlock(selectsElement[0])) {
-            return false
+            return false;
         }
         return {
             label: `${window.siyuan.languages.copy} ${window.siyuan.languages.text} *`,
             click() {
                 // 用于标识复制文本 *
-                selectsElement[0].setAttribute("data-reftext", "true")
+                selectsElement[0].setAttribute("data-reftext", "true");
                 focusByRange(getEditorRange(selectsElement[0]));
                 document.execCommand("copy");
             }
-        }
+        };
     }
 
     public render(protyle: IProtyle, element: Element, wysiwyg: HTMLElement) {
