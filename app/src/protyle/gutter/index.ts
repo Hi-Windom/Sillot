@@ -1,9 +1,4 @@
-import {
-    hasClosestBlock,
-    hasClosestByAttribute,
-    hasClosestByMatchTag,
-    hasClosestByTag
-} from "../util/hasClosest";
+import {hasClosestBlock, hasClosestByAttribute, hasClosestByMatchTag, hasClosestByTag} from "../util/hasClosest";
 import {getIconByType} from "../../editor/getIcon";
 import {iframeMenu, setFold, tableMenu, videoMenu, zoomOut} from "../../menus/protyle";
 import {MenuItem} from "../../menus/Menu";
@@ -11,7 +6,8 @@ import {copySubMenu, openAttr, openWechatNotify} from "../../menus/commonMenuIte
 import {copyPlainText, updateHotkeyTip, writeText} from "../util/compatibility";
 import {
     transaction,
-    turnsIntoOneTransaction, turnsIntoTransaction,
+    turnsIntoOneTransaction,
+    turnsIntoTransaction,
     updateBatchTransaction,
     updateTransaction
 } from "../wysiwyg/transaction";
@@ -37,6 +33,9 @@ import {duplicateBlock} from "../wysiwyg/commonHotkey";
 import {movePathTo} from "../../util/pathName";
 import {hintMoveBlock} from "../hint/extend";
 import {makeCard} from "../../card/makeCard";
+import {Dialog} from "../../dialog";
+import {isMobile} from "../../util/functions";
+import {transferBlockRef} from "../../menus/block";
 
 export class Gutter {
     public element: HTMLElement;
@@ -1416,6 +1415,10 @@ export class Gutter {
                     insertEmptyBlock(protyle, "afterend", id);
                 }
             }).element);
+            const countElement = nodeElement.lastElementChild.querySelector(".protyle-attr--refcount")
+            if (countElement && countElement.textContent) {
+                transferBlockRef(id)
+            }
         }
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.jumpToParentNext,

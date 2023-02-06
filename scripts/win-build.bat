@@ -8,7 +8,6 @@ call pnpm run build
 cd ..
 
 echo ' ===== Cleaning Builds ===== '
-call python ./scripts/sillot-win-dev.py
 del /S /Q /F app\build 1>nul
 del /S /Q /F app\kernel 1>nul
 

@@ -14,6 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+
+// 此文件中的控制台输出，可以使用 debugtron 查看
+// https://github.com/pd4d10/debugtron
+
 const {
   app,
   session,

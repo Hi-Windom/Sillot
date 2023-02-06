@@ -35,6 +35,7 @@ interface Window {
     siyuan: ISiyuan
     // Sillot extend start
     Sillot: ISillot
+    nodebugger: any
     _: any
     __: ISillotDoubleUnderline
     sout: ISout
@@ -73,6 +74,8 @@ interface ISillot {
     }
 }
 interface ISout {
+    debug: boolean
+    showAll: any
     log: any
     slog: any
     print: any
@@ -85,6 +88,7 @@ interface ISout {
     good: any
     wink: any
     bad: any
+    tracker: any
 }
 interface ISillotDoubleUnderline {
     ace: any
