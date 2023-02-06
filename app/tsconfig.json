@@ -18,7 +18,8 @@
     ],
     "types": [
       "./src/types",
-      "node"
+      "node",
+      "jest"
     ]
   },
   "include": [
