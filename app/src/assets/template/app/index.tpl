@@ -30,6 +30,7 @@
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
 <div id="app2" data-bind="react" data-lib="monaco-editor"></div>
 <div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
+<div id="app4" data-bind="react" data-lib="react-music-player"></div>
 <script src="../../sillot/vue.global.prod.js" defer init></script>
 <script>
   setTimeout(() => {

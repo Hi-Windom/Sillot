@@ -256,10 +256,10 @@ export function exAce() {
                 "id": id
               }, res => {
                 if (res.code == 0) {
-                  window.__.toast.success("已保存", { position: "bottom", duration: 1300, queue: true });
+                  window.__.toastify.success({message:"已保存",position:"bottom-center",duration:1})
                 }
                 else {
-                  window.__.toast.error(res.msg, { position: "bottom", duration: 3100, queue: false });
+                  window.__.toastify.error({message:res.msg,position:"bottom-center",duration:1});
                 }
               })
             },
@@ -297,10 +297,10 @@ export function exAce() {
         }, res => {
           console.log(res)
           if (res.code == 0) {
-            window.__.toast.success("已保存", { position: "bottom", duration: 1300, queue: true });
+            window.__.toastify.success({message:"已保存",position:"bottom-center",duration:1})
           }
           else {
-            window.__.toast.error(res.msg, { position: "bottom", duration: 3100, queue: false });
+            window.__.toastify.error({message:res.msg,position:"bottom-center",duration:1});
           }
           editor?.destroy();
           editor?.container.remove();
