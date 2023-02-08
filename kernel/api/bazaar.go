@@ -314,3 +314,26 @@ func uninstallBazaarTheme(c *gin.Context) {
 		"appearance": model.Conf.Appearance,
 	}
 }
+
+func getInstalledPlugin(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ret.Data = map[string]interface{}{
+		"packages": model.InstalledPlugins(),
+	}
+}
+
+func loadPlugin(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	name := arg["name"].(string)
+
+	ret.Data = model.GetPluginByName(name)
+}

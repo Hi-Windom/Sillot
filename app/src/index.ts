@@ -25,6 +25,8 @@ import {resizeDrag} from "./layout/util";
 import {getAllTabs} from "./layout/getAll";
 import {getLocalStorage} from "./protyle/util/compatibility";
 
+import { PluginSystem } from "./plugin";
+
 class App {
     constructor() {
         addScriptSync(`${Constants.PROTYLE_CDN}/js/lute/lute.min.js?v=${Constants.SIYUAN_VERSION}`, "protyleLuteScript");
@@ -151,3 +153,5 @@ class App {
 }
 
 new App();
+
+new PluginSystem().init();

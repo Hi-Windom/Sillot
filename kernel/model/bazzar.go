@@ -222,3 +222,13 @@ func UninstallBazaarTemplate(templateName string) error {
 	}
 	return nil
 }
+
+func InstalledPlugins() (plugins []*bazaar.Plugin) {
+	plugins = bazaar.InstalledPlugins()
+	return
+}
+
+func GetPluginByName(name string) (plugin *bazaar.Plugin) {
+	plugin = bazaar.GetPluginByName(name)
+	return
+}
