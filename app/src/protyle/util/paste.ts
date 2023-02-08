@@ -166,7 +166,11 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
     });
     const code = processPasteCode(textHTML, textPlain);
     const range = getEditorRange(protyle.wysiwyg.element);
-    if (siyuanHTML) {
+    if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
+        // 粘贴在代码位置
+        insertHTML(textPlain, protyle);
+        return;
+    } else if (siyuanHTML) {
         // 编辑器内部粘贴
         const tempElement = document.createElement("div");
         tempElement.innerHTML = siyuanHTML;
@@ -188,10 +192,9 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
         const tempInnerHTML = tempElement.innerHTML;
         insertHTML(tempInnerHTML, protyle, isBlock);
         filterClipboardHint(protyle, tempInnerHTML);
-    } else if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
-        // 粘贴在代码位置
-        insertHTML(textPlain, protyle);
-        return;
+        blockRender(protyle, protyle.wysiwyg.element);
+        processRender(protyle.wysiwyg.element);
+        highlightRender(protyle.wysiwyg.element);
     } else if (code) {
         if (!code.startsWith('<div data-type="NodeCodeBlock" class="code-block" data-node-id="')) {
             const wbrElement = document.createElement("wbr");
@@ -222,9 +225,7 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
         }
     } else {
         let isHTML = false;
-        if (textHTML.startsWith(Constants.ZWSP) || textHTML.endsWith(Constants.ZWSP)) {
-            isHTML = true;
-        } else if (textHTML.replace("<!--StartFragment--><!--EndFragment-->", "").trim() !== "") {
+        if (textHTML.replace("<!--StartFragment--><!--EndFragment-->", "").trim() !== "") {
             textHTML = textHTML.replace("<!--StartFragment-->", "").replace("<!--EndFragment-->", "").trim();
             if (files && files.length === 1 && (
                 textHTML.startsWith("<img") ||  // 浏览器上复制单个图片

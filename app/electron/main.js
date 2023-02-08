@@ -38,8 +38,24 @@ const appDir = path.dirname(app.getAppPath())
 const isDevEnv = process.env.NODE_ENV === 'development'
 // const appVer = app.getVersion()
 const branchVer = app.getVersion()
+try { require("electron-reloader")(module); } catch {}
+var VitePort;
+try {
+  VitePort = process.env.PORT;
+} catch {
+  VitePort = 3000;
+}
+var isVite;
+try {
+  isVite =  process.env.VITE == 'vite';
+} catch {
+  isVite = false;
+}
+console.log('debug: $isDevEnv = ' + isDevEnv)
+console.log('debug: $isVite = ' + isVite)
+
 var pkg = {}
-if (isDevEnv) {
+if (isDevEnv && !isVite) {
   pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json")).toString())
 } else {
   pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString())
@@ -53,9 +69,8 @@ let workspaces = [] // workspaceDir, id, browserWindow, tray
 let kernelPort = 6806
 require('@electron/remote/main').initialize()
 
-if (!app.requestSingleInstanceLock()) {
+if (!isDevEnv && !app.requestSingleInstanceLock()) {
   app.quit()
-  return
 }
 
 try {
@@ -188,6 +203,7 @@ const boot = () => {
   }
 
   // 创建主窗体
+  console.log('action: 创建主窗体')
   const currentWindow = new BrowserWindow({
     show: false,
     backgroundColor: '#FFF', // 桌面端主窗体背景色设置为 `#FFF` Fix https://github.com/siyuan-note/siyuan/issues/4544
@@ -284,8 +300,20 @@ const boot = () => {
   })
 
   // 加载主界面
-  currentWindow.loadURL(getServer() + '/stage/build/app/index.html?v=' +
-    new Date().getTime())
+  function loadVite(VitePort) {
+    currentWindow.loadURL(`http://localhost:${VitePort}`).catch(() => {
+        setTimeout(() => { loadVite(VitePort); }, 200);
+    });
+    currentWindow.openDevTools()
+  }
+  if (isVite) {
+    // for Vite
+    loadVite(VitePort);
+  } else {
+    currentWindow.loadURL(
+      getServer() + "/stage/build/app/index.html?v=" + new Date().getTime()
+    );
+  }
 
   // 菜单
   const productName = 'Sillot'
@@ -388,7 +416,14 @@ const initKernel = (workspace, port, lang) => {
     const kernelName = 'win32' === process.platform
       ? 'SiYuan-Kernel.exe'
       : 'SiYuan-Kernel'
-    const kernelPath = path.join(appDir, 'kernel', kernelName)
+    // const kernelPath = path.join(appDir, 'kernel', kernelName)
+    let kernelPath
+    if (!isVite) {
+      kernelPath = path.join(appDir, 'kernel', kernelName)
+    } else {
+      kernelPath = path.join(appDir,'app', 'kernel', kernelName)
+    }
+    console.log('debug: $kernelPath = ' + kernelPath)
     if (!fs.existsSync(kernelPath)) {
       showErrorWindow('⚠️ 内核文件丢失 Kernel is missing',
         `<div>内核可执行文件丢失，请重新安装思源，并将思源加入杀毒软件信任列表。</div><div>The kernel binary is not found, please reinstall SiYuan and add SiYuan into the trust list of your antivirus software.</div>`)
@@ -484,6 +519,7 @@ const initKernel = (workspace, port, lang) => {
               if (workspaces && 0 < workspaces.length) {
                 showWindow(workspaces[0].browserWindow)
               }
+              console.warn(workspaces)
 
               showErrorWindow(
                 '⚠️ 工作空间已被锁定 The workspace is locked',
@@ -592,7 +628,7 @@ function setProtocol(agreement) {
   } else {
     isSet = app.setAsDefaultProtocolClient(agreement)
   }
-  console.log(`${agreement}是否注册成功：`, isSet) // 并无实际输出可看
+  console.log(`${agreement}是否注册成功：`, isSet)
 }
 
 setProtocol('siyuan')
@@ -689,6 +725,12 @@ app.whenReady().then(() => {
     tray.setContextMenu(contextMenu)
   }
 
+  const hideWindow = (wnd) => {
+    // 通过 `Alt+M` 最小化后焦点回到先前的窗口 https://github.com/siyuan-note/siyuan/issues/7275
+    wnd.minimize()
+    wnd.hide()
+  }
+
   const showHideWindow = (tray, lang, mainWindow) => {
     if (!mainWindow.isVisible()) {
       if (mainWindow.isMinimized()) {
@@ -696,7 +738,7 @@ app.whenReady().then(() => {
       }
       mainWindow.show()
     } else {
-      mainWindow.hide()
+      hideWindow(mainWindow)
     }
 
     resetTrayMenu(tray, lang, mainWindow)
@@ -722,7 +764,7 @@ app.whenReady().then(() => {
   ipcMain.on('siyuan-config-tray', (event, data) => {
     workspaces.find(item => {
       if (item.id === data.id) {
-        item.browserWindow.hide()
+        hideWindow(item.browserWindow)
         if ('win32' === process.platform || 'linux' === process.platform) {
           resetTrayMenu(item.tray, data.languages, item.browserWindow)
         }
@@ -879,10 +921,10 @@ app.whenReady().then(() => {
               if (!mainWindow.isFocused()) {
                 mainWindow.show()
               } else {
-                mainWindow.hide()
+                hideWindow(mainWindow)
               }
             } else {
-              mainWindow.hide()
+              hideWindow(mainWindow)
             }
           } else {
             mainWindow.show()
@@ -1110,11 +1152,11 @@ powerMonitor.on('resume', async () => {
   writeLog('system resume')
   const isOnline = async () => {
     try {
-      const result = await fetch('https://icanhazip.com', {timeout: 1000})
+      const result = await fetch('https://www.baidu.com', {timeout: 1000})
       return 200 === result.status
     } catch (e) {
       try {
-        const result = await fetch('https://www.baidu.com', {timeout: 1000})
+        const result = await fetch('https://icanhazip.com', {timeout: 1000})
         return 200 === result.status
       } catch (e) {
         return false
