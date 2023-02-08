@@ -41,3 +41,5 @@ yarn.lock
 /.history
 /.vscode
 /app/jestCD
+/app/out
+/app/dist-electron
