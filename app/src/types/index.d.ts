@@ -75,20 +75,21 @@ interface ISillot {
 }
 interface ISout {
     debug: boolean
-    showAll: any
-    log: any
-    slog: any
-    print: any
-    info: any
-    success: any
-    warn: any
-    unsure: any
-    ops: any
-    error: any
-    good: any
-    wink: any
-    bad: any
-    tracker: any
+    showAll(): void
+    log(m: any): void
+    slog(m: any): void
+    print(m: any, head?: string): void
+    info(m: any, head?: string): void
+    success(m: any, head?: string): void
+    warn(m: any, head?: string): void
+    unsure(m: any, head?: string): void
+    ops(m: any, head?: string): void
+    error(m: any, head?: string): void
+    good(m: any, head?: string): void
+    wink(m: any, head?: string): void
+    bad(m: any, head?: string): void
+    tracker(m: any): void
+    table(m: Array<object>): void
 }
 interface ISillotDoubleUnderline {
     ace: any
