@@ -28,7 +28,7 @@ export class SillotEnv {
     window.ReactDOM = ReactDOM;
     exAce();
     // eMonaco();
-    new MusicPlayer({id: 'app4'})
+    // new MusicPlayer({id: 'app4'})
     window.nodebugger = {
       focusBlock: focusBlock,
       focusByOffset: focusByOffset,
