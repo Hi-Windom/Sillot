@@ -863,6 +863,10 @@ app.whenReady().then(() => {
     })
     win.loadURL(data)
     require('@electron/remote/main').enable(win.webContents)
+    win.webContents.on('devtools-open-url', (event, url) => {
+      // 支持在devtools打开网址 #188 需要 electron@24.0.0+
+      shell.openExternal(url)
+    })
   })
   ipcMain.on('siyuan-open-workspace', (event, data) => {
     const foundWorkspace = workspaces.find((item, index) => {
