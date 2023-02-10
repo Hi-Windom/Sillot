@@ -470,6 +470,7 @@ declare interface IConfig {
         container: "std" | "android" | "docker" | "ios"
         isMicrosoftStore: boolean
         os: "windows" | "linux" | "darwin"
+        osPlatform: string
         homeDir: string
         xanadu: boolean
         udanax: boolean
