@@ -305,6 +305,9 @@ const boot = () => {
         setTimeout(() => { loadVite(VitePort); }, 200);
     });
     currentWindow.openDevTools()
+    currentWindow.webContents.on('devtools-open-url', (event, url) => {
+      shell.openExternal(url)
+    })
   }
   if (isVite) {
     // for Vite
@@ -313,6 +316,10 @@ const boot = () => {
     currentWindow.loadURL(
       getServer() + "/stage/build/app/index.html?v=" + new Date().getTime()
     );
+    currentWindow.webContents.on('devtools-open-url', (event, url) => {
+      // 支持在devtools打开网址 #188 需要 electron@24.0.0+
+      shell.openExternal(url)
+    })
   }
 
   // 菜单
