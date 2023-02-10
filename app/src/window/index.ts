@@ -133,17 +133,17 @@ class App {
             let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1)
             fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, async (r) => {
                 // console.log(r);
-                await importIDB(r.data).then(() => {
+                importIDB(r.data).then(() => {
                     window.Sillot.status.IDBloaded = true;
-                    getLocalStorage(() => {
-                        fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
-                            window.siyuan.languages = lauguages;
-                            fetchPost("/api/setting/getCloudUser", {}, userResponse => {
-                                window.siyuan.user = userResponse.data;
-                                init();
-                                setTitle(window.siyuan.languages.siyuanNote);
-                                initMessage();
-                            });
+                });
+                getLocalStorage(() => {
+                    fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
+                        window.siyuan.languages = lauguages;
+                        fetchPost("/api/setting/getCloudUser", {}, userResponse => {
+                            window.siyuan.user = userResponse.data;
+                            init();
+                            setTitle(window.siyuan.languages.siyuanNote);
+                            initMessage();
                         });
                     });
                 });
