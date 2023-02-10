@@ -20,7 +20,6 @@ export class HiJoy {
     if (!e) {
       return;
     }
-    e.style.position = "fixed";
     this.root = Client.createRoot(e);
     this.root.render(
       <>
