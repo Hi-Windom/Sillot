@@ -125,9 +125,9 @@ func SearchRefBlock(id, rootID, keyword string, beforeLen int) (ret []*Block, ne
 		// 查询为空时默认的块引排序规则按最近使用优先 https://github.com/siyuan-note/siyuan/issues/3218
 		refs := sql.QueryRefsRecent()
 		for _, ref := range refs {
-			tree := cachedTrees[ref.RootID]
+			tree := cachedTrees[ref.DefBlockRootID]
 			if nil == tree {
-				tree, _ = loadTreeByBlockID(ref.RootID)
+				tree, _ = loadTreeByBlockID(ref.DefBlockRootID)
 			}
 			if nil == tree {
 				continue
@@ -960,19 +960,19 @@ func markReplaceSpan(n *ast.Node, unlinks *[]*ast.Node, keywords []string, markS
 					c.TextMarkTextContent = string(c.Tokens)
 					if n.IsTextMarkType("a") {
 						c.TextMarkAHref, c.TextMarkATitle = n.TextMarkAHref, n.TextMarkATitle
-					} else if n.IsTextMarkType("block-ref") {
+					} else if treenode.IsBlockRef(n) {
 						c.TextMarkBlockRefID = n.TextMarkBlockRefID
 						c.TextMarkBlockRefSubtype = n.TextMarkBlockRefSubtype
-					} else if n.IsTextMarkType("file-annotation-ref") {
+					} else if treenode.IsFileAnnotationRef(n) {
 						c.TextMarkFileAnnotationRefID = n.TextMarkFileAnnotationRefID
 					}
 				} else if ast.NodeTextMark == c.Type {
 					if n.IsTextMarkType("a") {
 						c.TextMarkAHref, c.TextMarkATitle = n.TextMarkAHref, n.TextMarkATitle
-					} else if n.IsTextMarkType("block-ref") {
+					} else if treenode.IsBlockRef(n) {
 						c.TextMarkBlockRefID = n.TextMarkBlockRefID
 						c.TextMarkBlockRefSubtype = n.TextMarkBlockRefSubtype
-					} else if n.IsTextMarkType("file-annotation-ref") {
+					} else if treenode.IsFileAnnotationRef(n) {
 						c.TextMarkFileAnnotationRefID = n.TextMarkFileAnnotationRefID
 					}
 				}

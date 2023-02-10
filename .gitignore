@@ -40,6 +40,6 @@ yarn.lock
 # Sillot extend
 /.history
 /.vscode
-/Sillot-bonder
-/SBonder
-/app/src-SB
+/app/jestCD
+/app/out
+/app/dist-electron

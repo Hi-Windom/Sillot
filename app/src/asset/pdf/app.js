@@ -2130,7 +2130,7 @@ async function loadFakeWorker () {
 
   if (typeof PDFJSDev === 'undefined' || !PDFJSDev.test('PRODUCTION')) {
     // NOTE
-    window.pdfjsWorker = await import(`${Constants.PROTYLE_CDN}/js/pdf/pdf.worker.js?v=3.0.150`)
+    window.pdfjsWorker = await import(/* @vite-ignore */`${Constants.PROTYLE_CDN}/js/pdf/pdf.worker.js?v=3.0.150`)
     return
   }
   await loadScript(PDFWorker.workerSrc)

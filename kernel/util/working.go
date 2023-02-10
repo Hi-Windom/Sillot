@@ -43,7 +43,7 @@ import (
 var Mode = "prod"
 
 const (
-	Ver       = "2.7.2"
+	Ver       = "2.7.4"
 	IsInsider = false
 )
 
@@ -195,11 +195,11 @@ func initWorkspaceDir(workspaceArg string) {
 		}
 	}
 
-	defaultWorkspaceDir := filepath.Join(HomeDir, "Documents", "SiYuan")
+	defaultWorkspaceDir := filepath.Join(HomeDir, "Documents", "Sillot")
 	if gulu.OS.IsWindows() {
 		// 改进 Windows 端默认工作空间路径 https://github.com/siyuan-note/siyuan/issues/5622
 		if userProfile := os.Getenv("USERPROFILE"); "" != userProfile {
-			defaultWorkspaceDir = filepath.Join(userProfile, "Documents", "SiYuan")
+			defaultWorkspaceDir = filepath.Join(userProfile, "Documents", "Sillot")
 		}
 	}
 	if err := os.MkdirAll(defaultWorkspaceDir, 0755); nil != err && !os.IsExist(err) {

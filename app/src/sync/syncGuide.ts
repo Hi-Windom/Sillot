@@ -137,7 +137,49 @@ export const syncGuide = (element?: Element) => {
         setSync();
         return;
     }
-    fetchPost("/api/sync/performSync", {});
+    if (window.siyuan.config.sync.mode !== 3) {
+        fetchPost("/api/sync/performSync", {});
+        return;
+    }
+    const manualDialog = new Dialog({
+        title: window.siyuan.languages.chooseSyncDirection,
+        content: `<div class="b3-dialog__content">
+    <label class="fn__flex b3-label">
+        <input type="radio" name="upload" value="true">
+        <span class="fn__space"></span>
+        <div>
+            ${window.siyuan.languages.uploadData2Cloud}
+            <div class="b3-label__text">${window.siyuan.languages.uploadData2CloudTip}</div>
+        </div>
+    </label>
+    <label class="fn__flex b3-label">
+        <input type="radio" name="upload" value="false">
+        <span class="fn__space"></span>
+        <div>
+            ${window.siyuan.languages.downloadDataFromCloud}
+            <div class="b3-label__text">${window.siyuan.languages.downloadDataFromCloudTip}</div>
+        </div>
+    </label>
+</div>
+<div class="b3-dialog__action">
+    <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
+    <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
+</div>`,
+        width: isMobile() ? "80vw" : "520px",
+    });
+    const btnsElement = manualDialog.element.querySelectorAll(".b3-button");
+    btnsElement[0].addEventListener("click", () => {
+        manualDialog.destroy();
+    });
+    btnsElement[1].addEventListener("click", () => {
+        const uploadElement = manualDialog.element.querySelector("input[name=upload]:checked") as HTMLInputElement;
+        if (!uploadElement) {
+            showMessage(window.siyuan.languages.plsChoose);
+            return;
+        }
+        fetchPost("/api/sync/performSync", {upload: uploadElement.value === "true"});
+        manualDialog.destroy();
+    });
 };
 
 const setSync = (key?: string, dialog?: Dialog) => {

@@ -46,10 +46,12 @@ export const saveScroll = (protyle: IProtyle, getObject = false) => {
     fetchPost("/api/attr/setBlockAttrs", {id: protyle.block.rootID, attrs: {scroll: jsonAttr}}, () => {
         protyle.wysiwyg.element.setAttribute("scroll", jsonAttr);
     });
+    window.sout.tracker(range)
 };
 
 export const restoreScroll = (protyle: IProtyle, scrollAttr: IScrollAttr) => {
     preventScroll(protyle);
+    window.sout.tracker(protyle)
     if (protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id") === scrollAttr.startId &&
         protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id") === scrollAttr.endId) {
         // 需等动画效果完毕，才能获得最大高度。否则尾部定位无法滚动到底部

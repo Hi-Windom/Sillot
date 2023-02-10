@@ -1,9 +1,4 @@
-import {
-    hasClosestBlock,
-    hasClosestByAttribute,
-    hasClosestByMatchTag,
-    hasClosestByTag
-} from "../util/hasClosest";
+import {hasClosestBlock, hasClosestByAttribute, hasClosestByMatchTag, hasClosestByTag} from "../util/hasClosest";
 import {getIconByType} from "../../editor/getIcon";
 import {iframeMenu, setFold, tableMenu, videoMenu, zoomOut} from "../../menus/protyle";
 import {MenuItem} from "../../menus/Menu";
@@ -11,7 +6,8 @@ import {copySubMenu, openAttr, openWechatNotify} from "../../menus/commonMenuIte
 import {copyPlainText, updateHotkeyTip, writeText} from "../util/compatibility";
 import {
     transaction,
-    turnsIntoOneTransaction, turnsIntoTransaction,
+    turnsIntoOneTransaction,
+    turnsIntoTransaction,
     updateBatchTransaction,
     updateTransaction
 } from "../wysiwyg/transaction";
@@ -37,6 +33,7 @@ import {duplicateBlock} from "../wysiwyg/commonHotkey";
 import {movePathTo} from "../../util/pathName";
 import {hintMoveBlock} from "../hint/extend";
 import {makeCard} from "../../card/makeCard";
+import {transferBlockRef} from "../../menus/block";
 
 export class Gutter {
     public element: HTMLElement;
@@ -61,6 +58,7 @@ export class Gutter {
             }
             event.target.style.opacity = "0.1";
             window.siyuan.dragElement = event.target;
+            event.dataTransfer.setData(Constants.SIYUAN_DROP_GUTTER, selectIds.toString());
             window.siyuan.dragElement.setAttribute("data-selected-ids", selectIds.toString());
         });
         this.element.addEventListener("dragend", () => {
@@ -625,8 +623,8 @@ export class Gutter {
             click() {
                 duplicateBlock(selectsElement, protyle);
             }
-        }]
-        const copyTextRefMenu = this.genCopyTextRef(selectsElement)
+        }];
+        const copyTextRefMenu = this.genCopyTextRef(selectsElement);
         if (copyTextRefMenu) {
             copyMenu.splice(2, 0, copyTextRefMenu);
         }
@@ -1027,8 +1025,8 @@ export class Gutter {
             click() {
                 duplicateBlock([nodeElement], protyle);
             }
-        }])
-        const copyTextRefMenu = this.genCopyTextRef([nodeElement])
+        }]);
+        const copyTextRefMenu = this.genCopyTextRef([nodeElement]);
         if (copyTextRefMenu) {
             copyMenu.splice(copyMenu.length - 1, 0, copyTextRefMenu);
         }
@@ -1416,6 +1414,10 @@ export class Gutter {
                     insertEmptyBlock(protyle, "afterend", id);
                 }
             }).element);
+            const countElement = nodeElement.lastElementChild.querySelector(".protyle-attr--refcount");
+            if (countElement && countElement.textContent) {
+                transferBlockRef(id);
+            }
         }
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.jumpToParentNext,
@@ -1772,17 +1774,17 @@ export class Gutter {
 
     private genCopyTextRef(selectsElement: Element[]): false | IMenu {
         if (isNotEditBlock(selectsElement[0])) {
-            return false
+            return false;
         }
         return {
             label: `${window.siyuan.languages.copy} ${window.siyuan.languages.text} *`,
             click() {
                 // 用于标识复制文本 *
-                selectsElement[0].setAttribute("data-reftext", "true")
+                selectsElement[0].setAttribute("data-reftext", "true");
                 focusByRange(getEditorRange(selectsElement[0]));
                 document.execCommand("copy");
             }
-        }
+        };
     }
 
     public render(protyle: IProtyle, element: Element, wysiwyg: HTMLElement) {

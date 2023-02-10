@@ -7,9 +7,10 @@ import { HotToast } from "./react-hot-toast";
 import * as React from 'react'; // 兼容性好
 import * as ReactDOM from 'react-dom'; // 兼容性好
 import Swal from 'sweetalert2'
-import { exSout } from "./util/sout";
+import exSout from "./util/sout";
 import {eMonaco} from './monaco-editor.js'
 import { MusicPlayer } from "./react-music-player";
+import { focusBlock,focusByOffset,focusSideBlock,focusByRange } from "../protyle/util/selection";
 
 export class SillotEnv {
   constructor() {
@@ -27,6 +28,12 @@ export class SillotEnv {
     window.ReactDOM = ReactDOM;
     exAce();
     // eMonaco();
-    new MusicPlayer({id: 'app4'})
+    // new MusicPlayer({id: 'app4'})
+    window.nodebugger = {
+      focusBlock: focusBlock,
+      focusByOffset: focusByOffset,
+      focusSideBlock: focusSideBlock,
+      focusByRange: focusByRange
+    }
   }
 }

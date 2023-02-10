@@ -105,6 +105,11 @@ func FlushQueue() {
 
 	context := map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBar}
 	total := len(ops)
+	if 512 < total {
+		disableCache()
+		defer enableCache()
+	}
+
 	for i, op := range ops {
 		if util.IsExiting {
 			return
@@ -118,8 +123,9 @@ func FlushQueue() {
 		context["current"] = i
 		context["total"] = total
 		if err = execOp(op, tx, context); nil != err {
+			tx.Rollback()
 			logging.LogErrorf("queue operation failed: %s", err)
-			return
+			continue
 		}
 
 		if err = commitTx(tx); nil != err {

@@ -27,6 +27,7 @@ import {pasteAsPlainText, pasteText} from "../protyle/util/paste";
 /// #if !MOBILE
 import {openFileById, updateBacklinkGraph} from "../editor/util";
 import {openGlobalSearch} from "../search/util";
+import {openNewWindowById} from "../window/openNewWindow";
 /// #endif
 import {getSearch, isMobile} from "../util/functions";
 import {removeFoldHeading} from "../protyle/util/heading";
@@ -149,6 +150,15 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
             });
         }
     }).element);
+    /// #if !BROWSER
+    window.siyuan.menus.menu.append(new MenuItem({
+        label: window.siyuan.languages.openByNewWindow,
+        icon: "iconOpenWindow",
+        click() {
+            openNewWindowById(refBlockId);
+        }
+    }).element);
+    /// #endif
     /// #endif
     let submenu: IMenu[] = [];
     if (element.getAttribute("data-subtype") === "s") {
