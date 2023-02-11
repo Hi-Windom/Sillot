@@ -1,4 +1,4 @@
-name: CI/CD For Sillot
+name: Sillot CI/CD
 
 on:
   push:
