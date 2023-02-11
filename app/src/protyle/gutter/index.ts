@@ -741,14 +741,14 @@ export class Gutter {
             label: "MD 源码编辑",
             click() {
                 window.sout.log("MD 源码编辑")
-                new MDDialog({id:"app5"})
+                new HiJoy({id:"app5"})
             }
         })
         SillotExtSubmennu.push({
             label: "KMD 源码编辑",
             click() {
                 window.sout.log("KMD 源码编辑")
-                new HiJoy({id:"app5"})
+                new MDDialog({id:"app5",nodeID:id})
             }
         })
         window.siyuan.menus.menu.append(new MenuItem({
