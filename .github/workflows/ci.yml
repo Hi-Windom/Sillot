@@ -2,7 +2,6 @@ name: CI/CD For Sillot
 
 on:
   push:
-    branches: [publish]
     tags:
     - 'v*'
 
@@ -29,7 +28,7 @@ jobs:
         run: |
           echo "::set-output name=release_title::$(git show --format=%s --no-patch | head -1)"
           echo "::set-output name=release_version::$(TZ=Asia/Shanghai date +'v%Y%m%d%H%M')"
-          changelog=$(python scripts/parse-changelog.py -t ${{ github.ref }} Hi-Windom/Sillot)
+          changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} Hi-Windom/Sillot)
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
           changelog="${changelog//$'\r'/'%0D'}"

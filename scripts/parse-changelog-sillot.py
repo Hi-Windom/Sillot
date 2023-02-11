@@ -56,7 +56,7 @@ def find_milestone(repo, title):
     pat = re.search("v([0-9.]+)", title)
     if not pat:
         return None
-    version = pat.group(1)
+    version = ".".join(pat.group(1).split(".")[:2])
     for milestone in repo.get_milestones():
         if version in milestone.title:
             return milestone
