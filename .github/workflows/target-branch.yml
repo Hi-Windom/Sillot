@@ -1,4 +1,4 @@
-name: Make sure new PRs are sent to master-dev
+name: PR check
 
 on:
   pull_request_target:
