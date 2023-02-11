@@ -12,7 +12,9 @@ import Switch from "@mui/joy/Switch";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import loader from "@monaco-editor/loader";
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 import { uriFromPath } from "../../util/path";
+import { fetchPost } from "../../../util/fetch";
 const path = require("path");
 
 const marksCodeFontSize = [
@@ -72,8 +74,9 @@ function CloseModal() {
             <Select
               color="primary"
               placeholder="Mode"
-              defaultValue="MD"
+              defaultValue="KMD"
               variant="soft"
+              style={{maxWidth:"13em",margin:"2% 0"}}
             >
               <Option value="MD">Markdown</Option>
               <Option value="KMD">KMarkdown</Option>
@@ -81,6 +84,12 @@ function CloseModal() {
             <Checkbox
               color="primary"
               label="及时保存"
+              size="md"
+              variant="soft"
+            />
+            <Checkbox
+              color="primary"
+              label="自动换行"
               size="md"
               variant="soft"
             />
@@ -108,6 +117,8 @@ function CloseModal() {
               className="editor-monaco"
               style={{
                 width: "800px",
+                maxWidth: "88vw",
+                maxHeight: "calc(100vh - 300px)",
                 height: "600px",
                 border: "1px solid #ccc",
               }}
@@ -122,8 +133,10 @@ function CloseModal() {
 export default class MDDialog {
   public readonly root: any;
   public readonly id: string;
-  constructor(props: { id: string }) {
+  public readonly nodeID: string;
+  constructor(props: { id: string,nodeID: string}) {
     this.id = props.id;
+    this.nodeID = props.nodeID;
     let e = document.getElementById(props.id);
     if (!e) {
       return;
@@ -149,12 +162,27 @@ export default class MDDialog {
     /// #endif
     loader.init().then((monacoInstance) => {
       console.log("Here is the monaco instance", monacoInstance);
-      monacoInstance.editor.create(document.getElementById("monaco-editor"), {
-        value: "123",
-        contextmenu: true,
-        language: "markdown",
-        theme: "vs-dark",
-      });
+      window.sout.info(this.nodeID)
+      fetchPost("/api/block/getBlockKramdown", {
+        "id": this.nodeID
+      }, res => {
+        window.sout.success(res)
+        if (res.code == 0) {
+          let data = res.data.kramdown
+          let editor = monacoInstance.editor.create(document.getElementById("monaco-editor"), {
+            value: data,
+            contextmenu: true,
+            language: "markdown",
+            theme: "vs-dark",
+            automaticLayout: true
+          });
+          window.sout.tracker(editor);
+        }
+        else {
+          this.root.render()
+          window.__.toastify.error({message:res.msg,position:"bottom-center",duration:1});
+        }
+      })
     });
   }
 }
