@@ -33,7 +33,7 @@ jobs:
         id: release_info
         run: |
           echo "::set-output name=release_title::$(git show --format=%s --no-patch | head -1)"
-          echo "::set-output name=release_version::${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'v%Y%m%d')"
+          echo "::set-output name=release_version::v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')"
           changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} Hi-Windom/Sillot)
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
