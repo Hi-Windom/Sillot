@@ -35,6 +35,7 @@ import {hintMoveBlock} from "../hint/extend";
 import {makeCard} from "../../card/makeCard";
 import {transferBlockRef} from "../../menus/block";
 import {HiJoy} from "../../sillot/joyUI/com_/hi"
+import MDDialog from "../../sillot/joyUI/com_/MDeditor";
 
 export class Gutter {
     public element: HTMLElement;
@@ -740,13 +741,14 @@ export class Gutter {
             label: "MD 源码编辑",
             click() {
                 window.sout.log("MD 源码编辑")
-                new HiJoy({id:"app5"})
+                new MDDialog({id:"app5"})
             }
         })
         SillotExtSubmennu.push({
             label: "KMD 源码编辑",
             click() {
                 window.sout.log("KMD 源码编辑")
+                new HiJoy({id:"app5"})
             }
         })
         window.siyuan.menus.menu.append(new MenuItem({
