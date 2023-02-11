@@ -1,14 +1,11 @@
-name: CI/CD For SiYuan
+name: CI/CD For Sillot
 
 on:
   push:
     tags:
-      - '*-dev*'
-  workflow_dispatch:
-  
+    - 'v*'
 
 jobs:
-
   create_release:
     name: Create Release
     runs-on: ubuntu-latest
@@ -31,25 +28,25 @@ jobs:
         run: |
           echo "::set-output name=release_title::$(git show --format=%s --no-patch | head -1)"
           echo "::set-output name=release_version::$(TZ=Asia/Shanghai date +'v%Y%m%d%H%M')"
-          changelog=$(python scripts/parse-changelog.py -t ${{ github.ref }} siyuan-note/siyuan)
+          changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} Hi-Windom/Sillot)
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
           changelog="${changelog//$'\r'/'%0D'}"
           echo "::set-output name=release_body::$changelog"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
 
       - name: Extract version from package.json
         uses: sergeysova/jq-action@v2
         id: version
         with:
-          cmd: 'jq .version app/package.json -r'
+          cmd: "jq .version app/package.json -r"
 
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
         with:
           release_name: ${{ steps.release_info.outputs.release_version }}
           tag_name: ${{ github.ref }}
@@ -63,37 +60,37 @@ jobs:
     strategy:
       matrix:
         config:
-          - os: ubuntu-20.04
-            kernel_path: "../app/kernel-linux/SiYuan-Kernel"
-            build_args: "-s -w -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
-            electron_args: "dist-linux"
-            goos: "linux"
-            goarch: "amd64"
-            suffix: "linux.AppImage"
-          - os: ubuntu-20.04
-            kernel_path: "../app/kernel-linux/SiYuan-Kernel"
-            build_args: "-s -w -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
-            electron_args: "dist-linux"
-            goos: "linux"
-            goarch: "amd64"
-            suffix: "linux.tar.gz"
+          # - os: ubuntu-20.04
+          #   kernel_path: "../app/kernel-linux/SiYuan-Kernel"
+          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+          #   electron_args: "dist-linux"
+          #   goos: "linux"
+          #   goarch: "amd64"
+          #   suffix: "linux.AppImage"
+          # - os: ubuntu-20.04
+          #   kernel_path: "../app/kernel-linux/SiYuan-Kernel"
+          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+          #   electron_args: "dist-linux"
+          #   goos: "linux"
+          #   goarch: "amd64"
+          #   suffix: "linux.tar.gz"
           - os: macos-latest
             kernel_path: "../app/kernel-darwin/SiYuan-Kernel"
-            build_args: "-s -w -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
+            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist-darwin"
             goos: "darwin"
             goarch: "amd64"
             suffix: "mac.dmg"
           - os: macos-latest
             kernel_path: "../app/kernel-darwin-arm64/SiYuan-Kernel"
-            build_args: "-s -w -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
+            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist-darwin-arm64"
             goos: "darwin"
             goarch: "arm64"
             suffix: "mac-arm64.dmg"
           - os: windows-2019
             kernel_path: "../app/kernel/SiYuan-Kernel.exe"
-            build_args: "-s -w -H=windowsgui -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
+            build_args: "-s -w -H=windowsgui -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist"
             goos: "windows"
             gobin: "bin"
@@ -102,104 +99,104 @@ jobs:
             suffix: "win.exe"
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan
+      - uses: actions/checkout@v3
+        with:
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot
 
-    - name: Set up MingGW
-      uses: msys2/setup-msys2@v2
-      if: "contains( matrix.config.goos, 'windows')"
-      with:
-        install: p7zip mingw-w64-x86_64-lua
+      - name: Set up MingGW
+        uses: msys2/setup-msys2@v2
+        if: "contains( matrix.config.goos, 'windows')"
+        with:
+          install: p7zip mingw-w64-x86_64-lua
 
-    - name: Set up TDM-GCC
-      run: msys2 -c "bash go/src/github.com/siyuan-note/siyuan/scripts/get-tdm-gcc.sh tdm https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm-1/tdm-gcc-10.3.0.exe" && echo "CC=${{ github.workspace }}/tdm/bin/gcc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      if: "contains( matrix.config.goarch, '386')"
-      working-directory: ${{ github.workspace }}
+      - name: Set up TDM-GCC
+        run: msys2 -c "bash go/src/github.com/Hi-Windom/Sillot/scripts/get-tdm-gcc.sh tdm https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm-1/tdm-gcc-10.3.0.exe" && echo "CC=${{ github.workspace }}/tdm/bin/gcc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        if: "contains( matrix.config.goarch, '386')"
+        working-directory: ${{ github.workspace }}
 
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.19
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
 
-    - name: Set up goversioninfo
-      run: go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo && go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
-      if: "contains( matrix.config.goos, 'windows')"
-      working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/kernel
-      env:
-        GO111MODULE: on
-        CGO_ENABLED: 1
-        GOOS: ${{ matrix.config.goos }}
-        GOPATH: ${{ github.workspace }}/go
-        GOARCH: ${{ matrix.config.goarch }}
+      - name: Set up goversioninfo
+        run: go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo && go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
+        if: "contains( matrix.config.goos, 'windows')"
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/kernel
+        env:
+          GO111MODULE: on
+          CGO_ENABLED: 1
+          GOOS: ${{ matrix.config.goos }}
+          GOPATH: ${{ github.workspace }}/go
+          GOARCH: ${{ matrix.config.goarch }}
 
-    - name: Set up Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-    - name: Install Node pnpm
-      run: npm install -g pnpm
-      working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app
+      - name: Install Node pnpm
+        run: npm install -g pnpm
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
-    - name: Install Node Dependencies
-      run: pnpm install
-      working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app
-      
-    - name: Building UI
-      run: pnpm run build
-      working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app
+      - name: Install Node Dependencies
+        run: pnpm install
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
-    - name: Remove Build Directory
-      uses: JesseTG/rm@v1.0.2
-      with:
-        path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/build
+      - name: Building UI
+        run: pnpm run build
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
-    - name: Remove Kernel Directory for Linux
-      uses: JesseTG/rm@v1.0.2
-      with:
-        path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/kernel-linux
+      - name: Remove Build Directory
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/build
 
-    - name: Remove Kernel Directory for Windows
-      uses: JesseTG/rm@v1.0.2
-      with:
-        path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/kernel
+      - name: Remove Kernel Directory for Linux
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/kernel-linux
 
-    - name: Remove Kernel Directory for macOS
-      uses: JesseTG/rm@v1.0.2
-      with:
-        path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/kernel-darwin
+      - name: Remove Kernel Directory for Windows
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/kernel
 
-    - name: Remove Kernel Directory for macOS ARM64
-      uses: JesseTG/rm@v1.0.2
-      with:
-        path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/kernel-darwin-arm64
+      - name: Remove Kernel Directory for macOS
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/kernel-darwin
 
-    - name: Generate Icon Resource and Properties/Version Info For Windows
-      run: ${{ github.workspace }}\go\${{ matrix.config.gobin }}\goversioninfo -platform-specific=true -icon="resource\icon.ico" -manifest="resource\goversioninfo.exe.manifest"
-      if: "contains( matrix.config.goos, 'windows')"
-      working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/kernel
-    
-    - name: Building Kernel
-      run: go build --tags fts5 -o "${{ matrix.config.kernel_path }}" -v -ldflags "${{ matrix.config.build_args }}"
-      working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/kernel
-      env:
-        GO111MODULE: on
-        CGO_ENABLED: 1
-        GOOS: ${{ matrix.config.goos }}
-        GOPATH: ${{ github.workspace }}/go
-        GOARCH: ${{ matrix.config.goarch }}
-      
-    - name: Building Electron
-      run: pnpm run ${{ matrix.config.electron_args }}
-      working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app
+      - name: Remove Kernel Directory for macOS ARM64
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/kernel-darwin-arm64
 
-    - name: Upload Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.create_release.outputs.upload_url }}
-        asset_name: siyuan-${{ needs.create_release.outputs.release_version }}-${{ matrix.config.suffix }}
-        asset_path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/build/siyuan-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}
-        asset_content_type: application/octet-stream
+      - name: Generate Icon Resource and Properties/Version Info For Windows
+        run: ${{ github.workspace }}\go\${{ matrix.config.gobin }}\goversioninfo -platform-specific=true -icon="resource\icon.ico" -manifest="resource\goversioninfo.exe.manifest"
+        if: "contains( matrix.config.goos, 'windows')"
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/kernel
+
+      - name: Building Kernel
+        run: go build --tags fts5 -o "${{ matrix.config.kernel_path }}" -v -ldflags "${{ matrix.config.build_args }}"
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/kernel
+        env:
+          GO111MODULE: on
+          CGO_ENABLED: 1
+          GOOS: ${{ matrix.config.goos }}
+          GOPATH: ${{ github.workspace }}/go
+          GOARCH: ${{ matrix.config.goarch }}
+
+      - name: Building Electron
+        run: pnpm run ${{ matrix.config.electron_args }}
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
+
+      - name: Upload Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_name: siyuan-${{ needs.create_release.outputs.release_version }}-${{ matrix.config.suffix }}
+          asset_path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/build/siyuan-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}
+          asset_content_type: application/octet-stream
