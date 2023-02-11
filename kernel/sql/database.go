@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -67,8 +68,8 @@ func InitDatabase(forceRebuild bool) (err error) {
 	defer initDatabaseLock.Unlock()
 
 	ClearBlockCache()
-	DisableCache()
-	defer EnableCache()
+	disableCache()
+	defer enableCache()
 
 	util.IncBootProgress(2, "Initializing database...")
 
@@ -1267,6 +1268,7 @@ func closeDatabase() (err error) {
 	}
 
 	err = db.Close()
+	debug.FreeOSMemory()
 	runtime.GC() // 没有这句的话文件句柄不会释放，后面就无法删除文件
 	return
 }

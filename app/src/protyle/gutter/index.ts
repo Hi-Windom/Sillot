@@ -1,9 +1,4 @@
-import {
-    hasClosestBlock,
-    hasClosestByAttribute,
-    hasClosestByMatchTag,
-    hasClosestByTag
-} from "../util/hasClosest";
+import {hasClosestBlock, hasClosestByAttribute, hasClosestByMatchTag, hasClosestByTag} from "../util/hasClosest";
 import {getIconByType} from "../../editor/getIcon";
 import {iframeMenu, setFold, tableMenu, videoMenu, zoomOut} from "../../menus/protyle";
 import {MenuItem} from "../../menus/Menu";
@@ -11,7 +6,8 @@ import {copySubMenu, openAttr, openWechatNotify} from "../../menus/commonMenuIte
 import {copyPlainText, updateHotkeyTip, writeText} from "../util/compatibility";
 import {
     transaction,
-    turnsIntoOneTransaction, turnsIntoTransaction,
+    turnsIntoOneTransaction,
+    turnsIntoTransaction,
     updateBatchTransaction,
     updateTransaction
 } from "../wysiwyg/transaction";
@@ -37,6 +33,7 @@ import {duplicateBlock} from "../wysiwyg/commonHotkey";
 import {movePathTo} from "../../util/pathName";
 import {hintMoveBlock} from "../hint/extend";
 import {makeCard} from "../../card/makeCard";
+import {transferBlockRef} from "../../menus/block";
 
 export class Gutter {
     public element: HTMLElement;
@@ -61,6 +58,7 @@ export class Gutter {
             }
             event.target.style.opacity = "0.1";
             window.siyuan.dragElement = event.target;
+            event.dataTransfer.setData(Constants.SIYUAN_DROP_GUTTER, selectIds.toString());
             window.siyuan.dragElement.setAttribute("data-selected-ids", selectIds.toString());
         });
         this.element.addEventListener("dragend", () => {
@@ -566,49 +564,54 @@ export class Gutter {
                 }).element);
             }
         }
+        const copyMenu: IMenu[] = [{
+            label: window.siyuan.languages.copy,
+            accelerator: "⌘C",
+            click() {
+                if (isNotEditBlock(selectsElement[0])) {
+                    let html = "";
+                    selectsElement.forEach(item => {
+                        html += removeEmbed(item);
+                    });
+                    writeText(protyle.lute.BlockDOM2StdMd(html).trimEnd());
+                } else {
+                    focusByRange(getEditorRange(selectsElement[0]));
+                    document.execCommand("copy");
+                }
+            }
+        }, {
+            label: window.siyuan.languages.copyPlainText,
+            accelerator: window.siyuan.config.keymap.editor.general.copyPlainText.custom,
+            click() {
+                let html = "";
+                selectsElement.forEach(item => {
+                    item.querySelectorAll("[spellcheck]").forEach(editItem => {
+                        const cloneNode = editItem.cloneNode(true) as HTMLElement;
+                        cloneNode.querySelectorAll('[data-type="backslash"]').forEach(slashItem => {
+                            slashItem.firstElementChild.remove();
+                        });
+                        html += cloneNode.textContent + "\n";
+                    });
+                });
+                copyPlainText(html.trimEnd());
+            }
+        }, {
+            label: window.siyuan.languages.duplicate,
+            accelerator: window.siyuan.config.keymap.editor.general.duplicate.custom,
+            disabled: protyle.disabled,
+            click() {
+                duplicateBlock(selectsElement, protyle);
+            }
+        }];
+        const copyTextRefMenu = this.genCopyTextRef(selectsElement);
+        if (copyTextRefMenu) {
+            copyMenu.splice(2, 0, copyTextRefMenu);
+        }
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.copy,
             icon: "iconCopy",
             type: "submenu",
-            submenu: [{
-                label: window.siyuan.languages.copy,
-                accelerator: "⌘C",
-                click() {
-                    if (isNotEditBlock(selectsElement[0])) {
-                        let html = "";
-                        selectsElement.forEach(item => {
-                            html += removeEmbed(item);
-                        });
-                        writeText(protyle.lute.BlockDOM2StdMd(html).trimEnd());
-                    } else {
-                        focusByRange(getEditorRange(selectsElement[0]));
-                        document.execCommand("copy");
-                    }
-                }
-            }, {
-                label: window.siyuan.languages.copyPlainText,
-                accelerator: window.siyuan.config.keymap.editor.general.copyPlainText.custom,
-                click() {
-                    let html = "";
-                    selectsElement.forEach(item => {
-                        item.querySelectorAll("[spellcheck]").forEach(editItem => {
-                            const cloneNode = editItem.cloneNode(true) as HTMLElement;
-                            cloneNode.querySelectorAll('[data-type="backslash"]').forEach(slashItem => {
-                                slashItem.firstElementChild.remove();
-                            });
-                            html += cloneNode.textContent + "\n";
-                        });
-                    });
-                    copyPlainText(html.trimEnd());
-                }
-            }, {
-                label: window.siyuan.languages.duplicate,
-                accelerator: window.siyuan.config.keymap.editor.general.duplicate.custom,
-                disabled: protyle.disabled,
-                click() {
-                    duplicateBlock(selectsElement, protyle);
-                }
-            }]
+            submenu: copyMenu,
         }).element);
         if (protyle.disabled) {
             return;
@@ -673,7 +676,7 @@ export class Gutter {
     }
 
     public renderMenu(protyle: IProtyle, buttonElement: Element) {
-        hideElements(["hint"], protyle);
+        hideElements(["util", "toolbar", "hint"], protyle);
         window.siyuan.menus.menu.remove();
         const id = buttonElement.getAttribute("data-node-id");
         const selectsElement = protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select");
@@ -948,43 +951,48 @@ export class Gutter {
                 submenu: turnIntoSubmenu
             }).element);
         }
+        const copyMenu = (copySubMenu(id, true, nodeElement) as IMenu[]).concat([{
+            label: window.siyuan.languages.copy,
+            accelerator: "⌘C",
+            click() {
+                if (isNotEditBlock(nodeElement)) {
+                    writeText(protyle.lute.BlockDOM2StdMd(removeEmbed(nodeElement)).trimEnd());
+                } else {
+                    focusByRange(getEditorRange(nodeElement));
+                    document.execCommand("copy");
+                }
+            }
+        }, {
+            label: window.siyuan.languages.copyPlainText,
+            accelerator: window.siyuan.config.keymap.editor.general.copyPlainText.custom,
+            click() {
+                let text = "";
+                nodeElement.querySelectorAll("[spellcheck]").forEach(item => {
+                    const cloneNode = item.cloneNode(true) as HTMLElement;
+                    cloneNode.querySelectorAll('[data-type="backslash"]').forEach(slashItem => {
+                        slashItem.firstElementChild.remove();
+                    });
+                    text += cloneNode.textContent + "\n";
+                });
+                copyPlainText(text.trimEnd());
+            }
+        }, {
+            label: window.siyuan.languages.duplicate,
+            accelerator: window.siyuan.config.keymap.editor.general.duplicate.custom,
+            disabled: protyle.disabled,
+            click() {
+                duplicateBlock([nodeElement], protyle);
+            }
+        }]);
+        const copyTextRefMenu = this.genCopyTextRef([nodeElement]);
+        if (copyTextRefMenu) {
+            copyMenu.splice(copyMenu.length - 1, 0, copyTextRefMenu);
+        }
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.copy,
             icon: "iconCopy",
             type: "submenu",
-            submenu: (copySubMenu(id, true, nodeElement) as IMenu[]).concat([{
-                label: window.siyuan.languages.copy,
-                accelerator: "⌘C",
-                click() {
-                    if (isNotEditBlock(nodeElement)) {
-                        writeText(protyle.lute.BlockDOM2StdMd(removeEmbed(nodeElement)).trimEnd());
-                    } else {
-                        focusByRange(getEditorRange(nodeElement));
-                        document.execCommand("copy");
-                    }
-                }
-            }, {
-                label: window.siyuan.languages.copyPlainText,
-                accelerator: window.siyuan.config.keymap.editor.general.copyPlainText.custom,
-                click() {
-                    let text = "";
-                    nodeElement.querySelectorAll("[spellcheck]").forEach(item => {
-                        const cloneNode = item.cloneNode(true) as HTMLElement;
-                        cloneNode.querySelectorAll('[data-type="backslash"]').forEach(slashItem => {
-                            slashItem.firstElementChild.remove();
-                        });
-                        text += cloneNode.textContent + "\n";
-                    });
-                    copyPlainText(text.trimEnd());
-                }
-            }, {
-                label: window.siyuan.languages.duplicate,
-                accelerator: window.siyuan.config.keymap.editor.general.duplicate.custom,
-                disabled: protyle.disabled,
-                click() {
-                    duplicateBlock([nodeElement], protyle);
-                }
-            }])
+            submenu: copyMenu
         }).element);
         if (!protyle.disabled) {
             window.siyuan.menus.menu.append(new MenuItem({
@@ -1364,6 +1372,10 @@ export class Gutter {
                     insertEmptyBlock(protyle, "afterend", id);
                 }
             }).element);
+            const countElement = nodeElement.lastElementChild.querySelector(".protyle-attr--refcount");
+            if (countElement && countElement.textContent) {
+                transferBlockRef(id);
+            }
         }
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.jumpToParentNext,
@@ -1431,7 +1443,7 @@ export class Gutter {
             updateHTML = `${window.siyuan.languages.modifiedAt} ${dayjs(updateHTML).format("YYYY-MM-DD HH:mm:ss")}<br>`;
         }
         window.siyuan.menus.menu.append(new MenuItem({
-            iconHTML:Constants.ZWSP,
+            iconHTML: Constants.ZWSP,
             type: "readonly",
             label: `${updateHTML}${window.siyuan.languages.createdAt} ${dayjs(id.substr(0, 14)).format("YYYY-MM-DD HH:mm:ss")}`,
         }).element);
@@ -1716,6 +1728,21 @@ export class Gutter {
         }, {
             type: "separator"
         }]);
+    }
+
+    private genCopyTextRef(selectsElement: Element[]): false | IMenu {
+        if (isNotEditBlock(selectsElement[0])) {
+            return false;
+        }
+        return {
+            label: `${window.siyuan.languages.copy} ${window.siyuan.languages.text} *`,
+            click() {
+                // 用于标识复制文本 *
+                selectsElement[0].setAttribute("data-reftext", "true");
+                focusByRange(getEditorRange(selectsElement[0]));
+                document.execCommand("copy");
+            }
+        };
     }
 
     public render(protyle: IProtyle, element: Element, wysiwyg: HTMLElement) {

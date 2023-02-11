@@ -157,6 +157,7 @@ interface INotebook {
     closed: boolean
     icon: string
     sort: number
+    sortMode: number
 }
 
 interface ISiyuan {
@@ -361,7 +362,7 @@ declare interface IFileTree {
     removeDocWithoutConfirm: boolean
     allowCreateDeeper: boolean
     refCreateSavePath: string
-    createDocNameTemplate: string
+    docCreateSavePath: string
     sort: number
     maxOpenTabCount: number
     maxListCount: number
@@ -423,6 +424,7 @@ declare interface IConfig {
         container: "std" | "android" | "docker" | "ios"
         isMicrosoftStore: boolean
         os: "windows" | "linux" | "darwin"
+        osPlatform: string
         homeDir: string
         xanadu: boolean
         udanax: boolean
@@ -434,7 +436,7 @@ declare interface IConfig {
         autoLaunch: boolean
     }
     localIPs: string[]
-    readonly: boolean
+    readonly: boolean   // 全局只读
     uiLayout: Record<string, any>
     langs: { label: string, name: string }[]
     appearance: IAppearance

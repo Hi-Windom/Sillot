@@ -37,39 +37,48 @@ type Task struct {
 	Handler reflect.Value
 	Args    []interface{}
 	Created time.Time
-}
-
-func PrependTask(action string, handler interface{}, args ...interface{}) {
-	queueLock.Lock()
-	defer queueLock.Unlock()
-
-	if util.IsExiting {
-		//logging.LogWarnf("task queue is paused, action [%s] will be ignored", action)
-		return
-	}
-
-	taskQueue = append([]*Task{newTask(action, handler, args...)}, taskQueue...)
+	Timeout time.Duration
 }
 
 func AppendTask(action string, handler interface{}, args ...interface{}) {
-	queueLock.Lock()
-	defer queueLock.Unlock()
+	AppendTaskWithTimeout(action, 24*time.Hour, handler, args...)
+}
 
+func AppendTaskWithTimeout(action string, timeout time.Duration, handler interface{}, args ...interface{}) {
 	if util.IsExiting {
 		//logging.LogWarnf("task queue is paused, action [%s] will be ignored", action)
 		return
 	}
 
-	taskQueue = append(taskQueue, newTask(action, handler, args...))
-}
+	currentActions := getCurrentActions()
+	if gulu.Str.Contains(action, currentActions) && gulu.Str.Contains(action, uniqueActions) {
+		//logging.LogWarnf("task [%s] is already in queue, will be ignored", action)
+		return
+	}
 
-func newTask(action string, handler interface{}, args ...interface{}) *Task {
-	return &Task{
+	queueLock.Lock()
+	defer queueLock.Unlock()
+	taskQueue = append(taskQueue, &Task{
 		Action:  action,
+		Timeout: timeout,
 		Handler: reflect.ValueOf(handler),
 		Args:    args,
 		Created: time.Now(),
+	})
+}
+
+func getCurrentActions() (ret []string) {
+	queueLock.Lock()
+	defer queueLock.Unlock()
+
+	if "" != currentTaskAction {
+		ret = append(ret, currentTaskAction)
 	}
+
+	for _, task := range taskQueue {
+		ret = append(ret, task.Action)
+	}
+	return
 }
 
 const (
@@ -85,6 +94,16 @@ const (
 	ReloadUI                = "task.reload.ui"                 // 重载 UI
 )
 
+// uniqueActions 描述了唯一的任务，即队列中只能存在一个在执行的任务。
+var uniqueActions = []string{
+	RepoCheckout,
+	DatabaseIndexFull,
+	DatabaseIndexCommit,
+	OCRImage,
+	HistoryGenerateDoc,
+	DatabaseIndexEmbedBlock,
+}
+
 func Contain(action string, moreActions ...string) bool {
 	actions := append(moreActions, action)
 	actions = gulu.Str.RemoveDuplicatedElem(actions)
@@ -99,13 +118,12 @@ func Contain(action string, moreActions ...string) bool {
 
 func StatusJob() {
 	tasks := taskQueue
-	data := map[string]interface{}{}
 	var items []map[string]interface{}
 	count := map[string]int{}
+	actionLangs := util.TaskActionLangs[util.Lang]
 	for _, task := range tasks {
-		actionLangs := util.TaskActionLangs[util.Lang]
 		action := task.Action
-		if c := count[action]; 3 < c {
+		if c := count[action]; 2 < c {
 			logging.LogWarnf("too many tasks [%s], ignore show its status", action)
 			continue
 		}
@@ -120,9 +138,19 @@ func StatusJob() {
 		item := map[string]interface{}{"action": action}
 		items = append(items, item)
 	}
+
+	if "" != currentTaskAction {
+		if nil != actionLangs {
+			if label := actionLangs[currentTaskAction]; nil != label {
+				items = append([]map[string]interface{}{map[string]interface{}{"action": label.(string)}}, items...)
+			}
+		}
+	}
+
 	if 1 > len(items) {
 		items = []map[string]interface{}{}
 	}
+	data := map[string]interface{}{}
 	data["tasks"] = items
 	util.PushBackgroundTask(data)
 }
@@ -153,6 +181,8 @@ func popTask() (ret *Task) {
 	return
 }
 
+var currentTaskAction string
+
 func execTask(task *Task) {
 	defer logging.Recover()
 
@@ -165,7 +195,9 @@ func execTask(task *Task) {
 		}
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*7)
+	currentTaskAction = task.Action
+
+	ctx, cancel := context.WithTimeout(context.Background(), task.Timeout)
 	defer cancel()
 	ch := make(chan bool, 1)
 	go func() {
@@ -175,8 +207,10 @@ func execTask(task *Task) {
 
 	select {
 	case <-ctx.Done():
-		//logging.LogWarnf("task [%s] timeout", task.Action)
+		logging.LogWarnf("task [%s] timeout", task.Action)
 	case <-ch:
 		//logging.LogInfof("task [%s] done", task.Action)
 	}
+
+	currentTaskAction = ""
 }

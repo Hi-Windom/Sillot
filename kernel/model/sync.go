@@ -28,13 +28,88 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/dustin/go-humanize"
+	"github.com/siyuan-note/dejavu"
 	"github.com/siyuan-note/dejavu/cloud"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
+	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
+
+func SyncDataDownload() {
+	defer logging.Recover()
+
+	if !checkSync(false, false, true) {
+		return
+	}
+
+	util.BroadcastByType("main", "syncing", 0, Conf.Language(81), nil)
+	if !util.IsOnline() { // 这个操作比较耗时，所以要先推送 syncing 事件后再判断网络，这样才能给用户更即时的反馈
+		util.BroadcastByType("main", "syncing", 2, Conf.Language(28), nil)
+		return
+	}
+
+	syncLock.Lock()
+	defer syncLock.Unlock()
+
+	now := util.CurrentTimeMillis()
+	Conf.Sync.Synced = now
+
+	err := syncRepoDownload()
+	synced := util.Millisecond2Time(Conf.Sync.Synced).Format("2006-01-02 15:04:05") + "\n\n"
+	if nil == err {
+		synced += Conf.Sync.Stat
+	} else {
+		synced += fmt.Sprintf(Conf.Language(80), formatErrorMsg(err))
+	}
+	msg := fmt.Sprintf(Conf.Language(82), synced)
+	Conf.Sync.Stat = msg
+	Conf.Save()
+	code := 1
+	if nil != err {
+		code = 2
+	}
+	util.BroadcastByType("main", "syncing", code, msg, nil)
+}
+
+func SyncDataUpload() {
+	defer logging.Recover()
+
+	if !checkSync(false, false, true) {
+		return
+	}
+
+	util.BroadcastByType("main", "syncing", 0, Conf.Language(81), nil)
+	if !util.IsOnline() { // 这个操作比较耗时，所以要先推送 syncing 事件后再判断网络，这样才能给用户更即时的反馈
+		util.BroadcastByType("main", "syncing", 2, Conf.Language(28), nil)
+		return
+	}
+
+	syncLock.Lock()
+	defer syncLock.Unlock()
+
+	now := util.CurrentTimeMillis()
+	Conf.Sync.Synced = now
+
+	err := syncRepoUpload()
+	synced := util.Millisecond2Time(Conf.Sync.Synced).Format("2006-01-02 15:04:05") + "\n\n"
+	if nil == err {
+		synced += Conf.Sync.Stat
+	} else {
+		synced += fmt.Sprintf(Conf.Language(80), formatErrorMsg(err))
+	}
+	msg := fmt.Sprintf(Conf.Language(82), synced)
+	Conf.Sync.Stat = msg
+	Conf.Save()
+	code := 1
+	if nil != err {
+		code = 2
+	}
+	util.BroadcastByType("main", "syncing", code, msg, nil)
+	return
+}
 
 var (
 	syncSameCount        = 0
@@ -58,6 +133,10 @@ func BootSyncData() {
 	defer logging.Recover()
 
 	if !checkSync(true, false, false) {
+		return
+	}
+
+	if !util.IsOnline() {
 		return
 	}
 
@@ -100,6 +179,12 @@ func syncData(boot, exit, byHand bool) {
 		return
 	}
 
+	util.BroadcastByType("main", "syncing", 0, Conf.Language(81), nil)
+	if !util.IsOnline() { // 这个操作比较耗时，所以要先推送 syncing 事件后再判断网络，这样才能给用户更即时的反馈
+		util.BroadcastByType("main", "syncing", 2, Conf.Language(28), nil)
+		return
+	}
+
 	syncLock.Lock()
 	defer syncLock.Unlock()
 
@@ -117,7 +202,6 @@ func syncData(boot, exit, byHand bool) {
 	now := util.CurrentTimeMillis()
 	Conf.Sync.Synced = now
 
-	util.BroadcastByType("main", "syncing", 0, Conf.Language(81), nil)
 	err := syncRepo(exit, byHand)
 	synced := util.Millisecond2Time(Conf.Sync.Synced).Format("2006-01-02 15:04:05") + "\n\n"
 	if nil == err {
@@ -137,7 +221,11 @@ func syncData(boot, exit, byHand bool) {
 }
 
 func checkSync(boot, exit, byHand bool) bool {
-	if !boot && !exit && 2 == Conf.Sync.Mode && !byHand {
+	if 2 == Conf.Sync.Mode && !boot && !exit && !byHand { // 手动模式下只有启动和退出进行同步
+		return false
+	}
+
+	if 3 == Conf.Sync.Mode && !byHand { // 完全手动模式下只有手动进行同步
 		return false
 	}
 
@@ -171,25 +259,16 @@ func checkSync(boot, exit, byHand bool) bool {
 		planSyncAfter(64 * time.Minute)
 		return false
 	}
-
-	if !util.IsOnline() {
-		util.BroadcastByType("main", "syncing", 2, Conf.Language(28), nil)
-		return false
-	}
 	return true
 }
 
 // incReindex 增量重建索引。
 func incReindex(upserts, removes []string) {
 	util.IncBootProgress(3, "Sync reindexing...")
-	needPushRemoveProgress := 32 < len(removes)
-	needPushUpsertProgress := 32 < len(upserts)
 	msg := fmt.Sprintf(Conf.Language(35))
 	util.PushStatusBar(msg)
-	if needPushRemoveProgress || needPushUpsertProgress {
-		util.PushEndlessProgress(msg)
-	}
 
+	luteEngine := util.NewLute()
 	// 先执行 remove，否则移动文档时 upsert 会被忽略，导致未被索引
 	bootProgressPart := 10 / float64(len(removes))
 	for _, removeFile := range removes {
@@ -203,9 +282,6 @@ func incReindex(upserts, removes []string) {
 			msg = fmt.Sprintf(Conf.Language(39), block.RootID)
 			util.IncBootProgress(bootProgressPart, msg)
 			util.PushStatusBar(msg)
-			if needPushRemoveProgress {
-				util.PushEndlessProgress(msg)
-			}
 
 			treenode.RemoveBlockTreesByRootID(block.RootID)
 			sql.RemoveTreeQueue(block.BoxID, block.RootID)
@@ -214,9 +290,6 @@ func incReindex(upserts, removes []string) {
 
 	msg = fmt.Sprintf(Conf.Language(35))
 	util.PushStatusBar(msg)
-	if needPushRemoveProgress || needPushUpsertProgress {
-		util.PushEndlessProgress(msg)
-	}
 
 	bootProgressPart = 10 / float64(len(upserts))
 	for _, upsertFile := range upserts {
@@ -239,11 +312,8 @@ func incReindex(upserts, removes []string) {
 		msg = fmt.Sprintf(Conf.Language(40), strings.TrimSuffix(path.Base(p), ".sy"))
 		util.IncBootProgress(bootProgressPart, msg)
 		util.PushStatusBar(msg)
-		if needPushUpsertProgress {
-			util.PushEndlessProgress(msg)
-		}
 
-		tree, err0 := LoadTree(box, p)
+		tree, err0 := filesys.LoadTree(box, p, luteEngine)
 		if nil != err0 {
 			continue
 		}
@@ -415,28 +485,32 @@ func ListCloudSyncDir() (syncDirs []*Sync, hSize string, err error) {
 }
 
 func formatErrorMsg(err error) string {
-	if errors.Is(err, cloud.ErrCloudAuthFailed) {
-		return Conf.Language(31) + " v" + util.Ver
-	}
-
 	msg := err.Error()
-	msgLowerCase := strings.ToLower(msg)
-	if strings.Contains(msgLowerCase, "permission denied") || strings.Contains(msg, "access is denied") {
-		msg = Conf.Language(33) + " " + err.Error()
-	} else if strings.Contains(msgLowerCase, "device or resource busy") || strings.Contains(msg, "is being used by another") {
-		msg = fmt.Sprintf(Conf.Language(85), err)
-	} else if strings.Contains(msgLowerCase, "cipher: message authentication failed") {
-		msg = Conf.Language(135)
-	} else if strings.Contains(msgLowerCase, "repo fatal error") {
-		msg = Conf.Language(23)
-	} else if strings.Contains(msgLowerCase, "no such host") || strings.Contains(msgLowerCase, "connection failed") || strings.Contains(msgLowerCase, "hostname resolution") || strings.Contains(msgLowerCase, "No address associated with hostname") {
-		msg = Conf.Language(24)
-	} else if strings.Contains(msgLowerCase, "net/http: request canceled while waiting for connection") || strings.Contains(msgLowerCase, "exceeded while awaiting") || strings.Contains(msgLowerCase, "context deadline exceeded") || strings.Contains(msgLowerCase, "timeout") || strings.Contains(msgLowerCase, "context cancellation while reading body") {
-		msg = Conf.Language(24)
-	} else if strings.Contains(msgLowerCase, "connection was") || strings.Contains(msgLowerCase, "reset by peer") || strings.Contains(msgLowerCase, "refused") || strings.Contains(msgLowerCase, "socket") {
-		msg = Conf.Language(28)
-	} else if strings.Contains(msgLowerCase, "cloud object not found") {
+	if errors.Is(err, cloud.ErrCloudAuthFailed) {
+		msg = Conf.Language(31)
+	} else if errors.Is(err, cloud.ErrCloudObjectNotFound) {
 		msg = Conf.Language(129)
+	} else if errors.Is(err, dejavu.ErrLockCloudFailed) {
+		msg = Conf.Language(188)
+	} else if errors.Is(err, dejavu.ErrCloudLocked) {
+		msg = Conf.Language(189)
+	} else if errors.Is(err, dejavu.ErrRepoFatalErr) {
+		msg = Conf.Language(23)
+	} else {
+		msgLowerCase := strings.ToLower(msg)
+		if strings.Contains(msgLowerCase, "permission denied") || strings.Contains(msg, "access is denied") {
+			msg = Conf.Language(33)
+		} else if strings.Contains(msgLowerCase, "device or resource busy") || strings.Contains(msg, "is being used by another") {
+			msg = fmt.Sprintf(Conf.Language(85), err)
+		} else if strings.Contains(msgLowerCase, "cipher: message authentication failed") {
+			msg = Conf.Language(135)
+		} else if strings.Contains(msgLowerCase, "no such host") || strings.Contains(msgLowerCase, "connection failed") || strings.Contains(msgLowerCase, "hostname resolution") || strings.Contains(msgLowerCase, "No address associated with hostname") {
+			msg = Conf.Language(24)
+		} else if strings.Contains(msgLowerCase, "net/http: request canceled while waiting for connection") || strings.Contains(msgLowerCase, "exceeded while awaiting") || strings.Contains(msgLowerCase, "context deadline exceeded") || strings.Contains(msgLowerCase, "timeout") || strings.Contains(msgLowerCase, "context cancellation while reading body") {
+			msg = Conf.Language(24)
+		} else if strings.Contains(msgLowerCase, "connection was") || strings.Contains(msgLowerCase, "reset by peer") || strings.Contains(msgLowerCase, "refused") || strings.Contains(msgLowerCase, "socket") {
+			msg = Conf.Language(28)
+		}
 	}
 	msg = msg + " v" + util.Ver
 	return msg

@@ -39,7 +39,6 @@ func HandleSignal() {
 
 var (
 	firstRunHookDesktopUIProcJob = true
-	noUIProcCount                int
 )
 
 func HookDesktopUIProcJob() {
@@ -55,13 +54,38 @@ func HookDesktopUIProcJob() {
 	}
 
 	if 0 < util.CountSessions() {
+		// 如果存在活动的会话则说明 UI 进程还在运行
 		return
 	}
 
-	uiProcNames := []string{"siyuan", "electron"}
-	uiProcessCount := 0
+	uiProcCount := getAttachedUIProcCount()
+	if 0 < uiProcCount {
+		return
+	}
+
+	logging.LogWarnf("no active UI proc, continue to check from attached ui processes after 15s")
+	time.Sleep(15 * time.Second)
+	uiProcCount = getAttachedUIProcCount()
+	if 0 < uiProcCount {
+		return
+	}
+	logging.LogWarnf("no active UI proc, continue to check from all processes after 15s")
+	time.Sleep(15 * time.Second)
+	uiProcCount = getUIProcCount()
+	if 0 < uiProcCount {
+		logging.LogInfof("active UI proc count [%d]", uiProcCount)
+		return
+	}
+
+	logging.LogWarnf("confirmed no active UI proc, exit kernel process now")
+	Close(false, 1)
+}
+
+var uiProcNames = []string{"siyuan", "electron"}
+
+// getAttachedUIProcCount 获取已经附加的 UI 进程数。
+func getAttachedUIProcCount() (ret int) {
 	util.UIProcessIDs.Range(func(uiProcIDArg, _ interface{}) bool {
-		uiProcessCount++
 		uiProcID, err := strconv.Atoi(uiProcIDArg.(string))
 		if nil != err {
 			logging.LogErrorf("invalid UI proc ID [%s]: %s", uiProcIDArg, err)
@@ -75,29 +99,38 @@ func HookDesktopUIProcJob() {
 		}
 
 		if nil == proc {
-			noUIProcCount++
 			return true
 		}
 
 		procName := strings.ToLower(proc.Executable())
 		uiProcOk := false
 		for _, name := range uiProcNames {
-			uiProcOk = strings.Contains(procName, name)
+			if uiProcOk = strings.Contains(procName, name); uiProcOk {
+				break
+			}
 		}
-		if !uiProcOk {
-			noUIProcCount++
+		if uiProcOk {
+			ret++
 		}
 		return true
 	})
-	if 1 > uiProcessCount {
-		noUIProcCount++
-	}
+	return
+}
 
-	if 0 < noUIProcCount {
-		logging.LogInfof("no active UI proc count [%d]", noUIProcCount)
-		if 1 < noUIProcCount {
-			logging.LogInfof("confirmed no active UI proc, exit kernel process now")
-			Close(false, 1)
+// getUIProcCount 获取 UI 进程数。
+func getUIProcCount() (ret int) {
+	procs, _ := goPS.Processes()
+	for _, proc := range procs {
+		procName := strings.ToLower(proc.Executable())
+		uiProcOk := false
+		for _, name := range uiProcNames {
+			if uiProcOk = strings.Contains(procName, name); uiProcOk {
+				break
+			}
+		}
+		if uiProcOk {
+			ret++
 		}
 	}
+	return
 }

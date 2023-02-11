@@ -704,17 +704,6 @@ func AddPDFOutline(id, p string, merge bool) (err error) {
 		}
 	}
 
-	//if 4 == Conf.Export.BlockRefMode { // 块引转脚注
-	//	var footnotesBms []*pdfcpu.Bookmark
-	//	for _, bm := range footnotes {
-	//		footnotesBms = append(footnotesBms, bm)
-	//	}
-	//	sort.Slice(footnotesBms, func(i, j int) bool { return footnotesBms[i].PageFrom < footnotesBms[j].PageFrom })
-	//	for _, bm := range footnotesBms {
-	//		topBms = append(topBms, bm)
-	//	}
-	//}
-
 	outFile := inFile + ".tmp"
 	err = api.AddBookmarksFile(inFile, outFile, topBms, nil)
 	if nil != err {
@@ -1373,7 +1362,7 @@ func exportTree(tree *parse.Tree, wysiwyg, expandKaTexMacros, keepFold bool,
 			if n.IsTextMarkType("inline-math") {
 				n.TextMarkInlineMathContent = strings.TrimSpace(n.TextMarkInlineMathContent)
 				return ast.WalkContinue
-			} else if n.IsTextMarkType("file-annotation-ref") {
+			} else if treenode.IsFileAnnotationRef(n) {
 				refID := n.TextMarkFileAnnotationRefID
 				status := processFileAnnotationRef(refID, n, fileAnnotationRefMode)
 				unlinks = append(unlinks, n)

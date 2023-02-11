@@ -26,6 +26,7 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/parse"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/sql"
@@ -74,8 +75,6 @@ func GetDocInfo(rootID string) (ret *BlockInfo) {
 }
 
 func GetBlockRefText(id string) string {
-	WaitForWritingFiles()
-
 	bt := treenode.GetBlockTree(id)
 	if nil == bt {
 		return ErrBlockNotFound.Error()
@@ -93,9 +92,27 @@ func GetBlockRefText(id string) string {
 	return getNodeRefText(node)
 }
 
+func getBlockRefText(id string, tree *parse.Tree) (ret string) {
+	node := treenode.GetNodeInTree(tree, id)
+	if nil == node {
+		return
+	}
+
+	sqlBlock := sql.BuildBlockFromNode(node, tree)
+	if nil == sqlBlock {
+		return
+	}
+
+	ret = getNodeRefText(node)
+	ret = maxContent(ret, Conf.Editor.BlockRefDynamicAnchorTextMaxLen)
+	return
+}
+
 func getNodeRefText(node *ast.Node) string {
-	if name := node.IALAttr("name"); "" != name {
-		return name
+	if ret := node.IALAttr("name"); "" != ret {
+		ret = strings.TrimSpace(ret)
+		ret = util.EscapeHTML(ret)
+		return ret
 	}
 
 	switch node.Type {
@@ -267,6 +284,7 @@ func buildBlockBreadcrumb(node *ast.Node, excludeTypes []string) (ret []*BlockPa
 			}
 		}
 
+		name = strings.ReplaceAll(name, editor.Caret, "")
 		if add {
 			ret = append([]*BlockPath{{
 				ID:      id,

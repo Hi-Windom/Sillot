@@ -5,7 +5,13 @@ import {setPadding} from "../protyle/ui/initUI";
 import {setPosition} from "../util/setPosition";
 import {hideElements} from "../protyle/ui/hideElements";
 import {Constants} from "../constants";
+/// #if !BROWSER
+import {openNewWindowById} from "../window/openNewWindow";
+/// #endif
 import {disabledProtyle} from "../protyle/util/onGet";
+import {fetchPost} from "../util/fetch";
+import {lockFile} from "../dialog/processSystem";
+import {showMessage} from "../dialog/message";
 
 export class BlockPanel {
     public element: HTMLElement;
@@ -221,6 +227,10 @@ export class BlockPanel {
                             target.setAttribute("aria-label", window.siyuan.languages.unpin);
                             this.element.setAttribute("data-pin", "true");
                         }
+                    } else if (type === "open") {
+                        /// #if !BROWSER
+                        openNewWindowById(this.nodeIds[0]);
+                        /// #endif
                     }
                     event.preventDefault();
                     event.stopPropagation();
@@ -234,31 +244,49 @@ export class BlockPanel {
 
     private initProtyle(editorElement: HTMLElement) {
         const index = parseInt(editorElement.getAttribute("data-index"));
-        const action = [Constants.CB_GET_ALL];
-        if (this.targetElement.classList.contains("protyle-attr--refcount") ||
-            this.targetElement.classList.contains("counter")) {
-            action.push(Constants.CB_GET_BACKLINK);
-        }
-        const editor = new Protyle(editorElement, {
-            blockId: this.nodeIds[index],
-            defId: this.defIds[index] || this.defIds[0] || "",
-            action,
-            render: {
-                gutter: true,
-                breadcrumbDocName: true,
-                breadcrumbContext: true
-            },
-            typewriterMode: false,
-            after: (editor) => {
-                if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly) {
-                    disabledProtyle(editor.protyle);
-                }
-                editorElement.addEventListener("mouseleave", () => {
-                    hideElements(["gutter"], editor.protyle);
-                });
+        fetchPost("api/block/getBlockInfo", {id: this.nodeIds[index]}, (response) => {
+            if (response.code === 2) {
+                // 文件被锁定
+                lockFile(response.data);
+                return false;
             }
+            if (response.code === 3) {
+                showMessage(response.msg);
+                return;
+            }
+            const action = [];
+            if (response.data.rootID !== this.nodeIds[index]) {
+                action.push(Constants.CB_GET_ALL);
+            }
+            if (this.targetElement.classList.contains("protyle-attr--refcount") ||
+                this.targetElement.classList.contains("counter")) {
+                action.push(Constants.CB_GET_BACKLINK);
+            }
+            const editor = new Protyle(editorElement, {
+                blockId: this.nodeIds[index],
+                defId: this.defIds[index] || this.defIds[0] || "",
+                action,
+                render: {
+                    scroll: true,
+                    gutter: true,
+                    breadcrumbDocName: true,
+                },
+                typewriterMode: false,
+                after: (editor) => {
+                    if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly) {
+                        disabledProtyle(editor.protyle);
+                    }
+                    editorElement.addEventListener("mouseleave", () => {
+                        hideElements(["gutter"], editor.protyle);
+                    });
+                    if (response.data.rootID !== this.nodeIds[index]) {
+                        editor.protyle.breadcrumb.element.parentElement.insertAdjacentHTML("beforeend", `<span class="fn__space"></span>
+<div class="b3-tooltips b3-tooltips__w block__icon block__icon--show fn__flex-center" data-type="context" aria-label="${window.siyuan.languages.context}"><svg><use xlink:href="#iconAlignCenter"></use></svg></div>`);
+                    }
+                }
+            });
+            this.editors.push(editor);
         });
-        this.editors.push(editor);
     }
 
     public destroy() {
@@ -286,8 +314,15 @@ export class BlockPanel {
             this.destroy();
             return;
         }
+        let openHTML = "";
+        /// #if !BROWSER
+        if (this.nodeIds.length === 1) {
+            openHTML = `<span data-type="open" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.openByNewWindow}"><svg><use xlink:href="#iconOpenWindow"></use></svg></span>
+<span class="fn__space"></span>`;
+        }
+        /// #endif
         let html = `<div class="block__icons block__icons--border">
-    <span class="fn__space fn__flex-1"></span>
+    <span class="fn__space fn__flex-1"></span>${openHTML}
     <span data-type="pin" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.pin}"><svg><use xlink:href="#iconPin"></use></svg></span>
     <span class="fn__space"></span>
     <span data-type="close" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.close}"><svg style="width: 10px"><use xlink:href="#iconClose"></use></svg></span>

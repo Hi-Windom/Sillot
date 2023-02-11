@@ -613,6 +613,7 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
 };
 
 const addConfigMoreMenu = async (config: ISearchOption, edit: Protyle, element: Element, event: MouseEvent) => {
+    const criteria = await fetchSyncPost("/api/storage/getCriteria");
     window.siyuan.menus.menu.remove();
     const sortMenu = [{
         label: window.siyuan.languages.type,
@@ -788,7 +789,6 @@ const addConfigMoreMenu = async (config: ISearchOption, edit: Protyle, element: 
             });
         }
     }).element);
-    const criteria = await fetchSyncPost("/api/storage/getCriteria");
     const searchSubMenu: IMenu[] = [];
     criteria.data.forEach((item: ISearchOption) => {
         searchSubMenu.push({
@@ -903,6 +903,22 @@ const updateConfig = (element: Element, item: ISearchOption, config: ISearchOpti
     }
     (element.querySelector("#searchInput") as HTMLInputElement).value = item.k;
     (element.querySelector("#replaceInput") as HTMLInputElement).value = item.r;
+    let methodTip = window.siyuan.languages.searchMethod + " "
+    switch (item.method) {
+        case 0:
+            methodTip += window.siyuan.languages.keyword;
+            break;
+        case 1:
+            methodTip += window.siyuan.languages.querySyntax
+            break;
+        case 2:
+            methodTip += "SQL"
+            break;
+        case 3:
+            methodTip += window.siyuan.languages.regex
+            break;
+    }
+    element.querySelector("#searchSyntaxCheck").setAttribute("aria-label", methodTip);
     Object.assign(config, item);
     window.siyuan.storage[Constants.LOCAL_SEARCHEDATA] = Object.assign({}, config);
     setStorageVal(Constants.LOCAL_SEARCHEDATA, window.siyuan.storage[Constants.LOCAL_SEARCHEDATA]);

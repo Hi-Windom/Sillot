@@ -87,6 +87,22 @@ type Path struct {
 	Created string `json:"created"` // 创建时间
 }
 
+func IsBlockFolded(id string) bool {
+	for i := 0; i < 32; i++ {
+		b, _ := getBlock(id, nil)
+		if nil == b {
+			return false
+		}
+
+		if "1" == b.IAL["fold"] {
+			return true
+		}
+
+		id = b.ParentID
+	}
+	return false
+}
+
 func RecentUpdatedBlocks() (ret []*Block) {
 	ret = []*Block{}
 
@@ -96,6 +112,48 @@ func RecentUpdatedBlocks() (ret []*Block) {
 	}
 
 	ret = fromSQLBlocks(&sqlBlocks, "", 0)
+	return
+}
+
+func TransferBlockRef(fromID, toID string) (err error) {
+	toTree, _ := loadTreeByBlockID(toID)
+	if nil == toTree {
+		err = ErrBlockNotFound
+		return
+	}
+	toNode := treenode.GetNodeInTree(toTree, toID)
+	if nil == toNode {
+		err = ErrBlockNotFound
+		return
+	}
+	toRefText := getNodeRefText(toNode)
+
+	util.PushMsg(Conf.Language(116), 7000)
+
+	refIDs, _ := sql.QueryRefIDsByDefID(fromID, false)
+	for _, refID := range refIDs {
+		tree, _ := loadTreeByBlockID(refID)
+		if nil == tree {
+			continue
+		}
+		node := treenode.GetNodeInTree(tree, refID)
+		textMarks := node.ChildrenByType(ast.NodeTextMark)
+		for _, textMark := range textMarks {
+			if textMark.IsTextMarkType("block-ref") && textMark.TextMarkBlockRefID == fromID {
+				textMark.TextMarkBlockRefID = toID
+				if "d" == textMark.TextMarkBlockRefSubtype {
+					textMark.TextMarkTextContent = toRefText
+				}
+			}
+		}
+
+		if err = indexWriteJSONQueue(tree); nil != err {
+			return
+		}
+	}
+
+	sql.WaitForWritingDatabase()
+	util.ReloadUI()
 	return
 }
 
@@ -138,6 +196,9 @@ func SwapBlockRef(refID, defID string, includeChildren bool) (err error) {
 			}
 		}
 	}
+
+	refreshUpdated(defNode)
+	refreshUpdated(refNode)
 
 	refPivot := treenode.NewParagraph()
 	refNode.InsertBefore(refPivot)
@@ -199,13 +260,11 @@ func SwapBlockRef(refID, defID string, includeChildren bool) (err error) {
 	}
 	refPivot.Unlink()
 
-	treenode.IndexBlockTree(refTree)
-	if err = writeJSONQueue(refTree); nil != err {
+	if err = indexWriteJSONQueue(refTree); nil != err {
 		return
 	}
 	if !sameTree {
-		treenode.IndexBlockTree(defTree)
-		if err = writeJSONQueue(defTree); nil != err {
+		if err = indexWriteJSONQueue(defTree); nil != err {
 			return
 		}
 	}
@@ -235,7 +294,7 @@ func GetHeadingDeleteTransaction(id string) (transaction *Transaction, err error
 	nodes = append(nodes, treenode.HeadingChildren(node)...)
 
 	transaction = &Transaction{}
-	luteEngine := NewLute()
+	luteEngine := util.NewLute()
 	for _, n := range nodes {
 		op := &Operation{}
 		op.ID = n.ID
@@ -288,7 +347,7 @@ func GetHeadingChildrenDOM(id string) (ret string) {
 	nodes := append([]*ast.Node{}, heading)
 	children := treenode.HeadingChildren(heading)
 	nodes = append(nodes, children...)
-	luteEngine := NewLute()
+	luteEngine := util.NewLute()
 	ret = renderBlockDOMByNodes(nodes, luteEngine)
 	return
 }
@@ -324,7 +383,7 @@ func GetHeadingLevelTransaction(id string, level int) (transaction *Transaction,
 	}
 
 	transaction = &Transaction{}
-	luteEngine := NewLute()
+	luteEngine := util.NewLute()
 	for _, c := range childrenHeadings {
 		op := &Operation{}
 		op.ID = c.ID

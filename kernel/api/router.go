@@ -86,7 +86,7 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/filetree/searchDocs", model.CheckAuth, searchDocs)
 	ginServer.Handle("POST", "/api/filetree/listDocsByPath", model.CheckAuth, listDocsByPath)
 	ginServer.Handle("POST", "/api/filetree/getDoc", model.CheckAuth, getDoc)
-	ginServer.Handle("POST", "/api/filetree/getDocNameTemplate", model.CheckAuth, getDocNameTemplate)
+	ginServer.Handle("POST", "/api/filetree/getDocCreateSavePath", model.CheckAuth, getDocCreateSavePath)
 	ginServer.Handle("POST", "/api/filetree/getRefCreateSavePath", model.CheckAuth, getRefCreateSavePath)
 	ginServer.Handle("POST", "/api/filetree/changeSort", model.CheckAuth, changeSort)
 	ginServer.Handle("POST", "/api/filetree/lockFile", model.CheckAuth, lockFile)
@@ -170,6 +170,7 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/block/getHeadingChildrenIDs", model.CheckAuth, getHeadingChildrenIDs)
 	ginServer.Handle("POST", "/api/block/getHeadingChildrenDOM", model.CheckAuth, getHeadingChildrenDOM)
 	ginServer.Handle("POST", "/api/block/swapBlockRef", model.CheckAuth, swapBlockRef)
+	ginServer.Handle("POST", "/api/block/transferBlockRef", model.CheckAuth, transferBlockRef)
 
 	ginServer.Handle("POST", "/api/file/getFile", model.CheckAuth, getFile)
 	ginServer.Handle("POST", "/api/file/putFile", model.CheckAuth, putFile)

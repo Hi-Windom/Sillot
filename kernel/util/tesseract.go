@@ -23,17 +23,20 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/88250/gulu"
+	"github.com/dustin/go-humanize"
 	"github.com/siyuan-note/logging"
 )
 
 var (
 	TesseractBin       = "tesseract"
 	TesseractEnabled   bool
+	TesseractMaxSize   = 2 * 1000 * uint64(1000)
 	AssetsTexts        = map[string]string{}
 	AssetsTextsLock    = sync.Mutex{}
 	AssetsTextsChanged = false
@@ -64,12 +67,17 @@ func IsTesseractExtractable(p string) bool {
 	return strings.HasSuffix(lowerName, ".png") || strings.HasSuffix(lowerName, ".jpg") || strings.HasSuffix(lowerName, ".jpeg")
 }
 
+// tesseractOCRLock 用于 Tesseract OCR 加锁串行执行提升稳定性 https://github.com/siyuan-note/siyuan/issues/7265
+var tesseractOCRLock = sync.Mutex{}
+
 func Tesseract(imgAbsPath string) string {
 	if ContainerStd != Container || !TesseractEnabled {
 		return ""
 	}
 
 	defer logging.Recover()
+	tesseractOCRLock.Lock()
+	defer tesseractOCRLock.Unlock()
 
 	if !IsTesseractExtractable(imgAbsPath) {
 		return ""
@@ -77,6 +85,10 @@ func Tesseract(imgAbsPath string) string {
 
 	info, err := os.Stat(imgAbsPath)
 	if nil != err {
+		return ""
+	}
+
+	if TesseractMaxSize < uint64(info.Size()) {
 		return ""
 	}
 
@@ -119,16 +131,34 @@ func initTesseract() {
 		return
 	}
 
+	maxSizeVal := os.Getenv("SIYUAN_TESSERACT_MAX_SIZE")
+	if "" != maxSizeVal {
+		if maxSize, parseErr := strconv.ParseUint(maxSizeVal, 10, 64); nil == parseErr {
+			TesseractMaxSize = maxSize
+		}
+	}
+
 	TesseractLangs = filterTesseractLangs(langs)
-	logging.LogInfof("tesseract-ocr enabled [ver=%s, langs=%s]", ver, strings.Join(TesseractLangs, "+"))
+	logging.LogInfof("tesseract-ocr enabled [ver=%s, maxSize=%s, langs=%s]", ver, humanize.Bytes(TesseractMaxSize), strings.Join(TesseractLangs, "+"))
 }
 
 func filterTesseractLangs(langs []string) (ret []string) {
 	ret = []string{}
-	for _, lang := range langs {
-		if "eng" == lang || strings.HasPrefix(lang, "chi") || "fra" == lang || "spa" == lang || "deu" == lang ||
-			"rus" == lang || "osd" == lang {
-			ret = append(ret, lang)
+
+	envLangsVal := os.Getenv("SIYUAN_TESSERACT_LANGS")
+	if "" != envLangsVal {
+		envLangs := strings.Split(envLangsVal, "+")
+		for _, lang := range langs {
+			if gulu.Str.Contains(lang, envLangs) {
+				ret = append(ret, lang)
+			}
+		}
+	} else {
+		for _, lang := range langs {
+			if "eng" == lang || strings.HasPrefix(lang, "chi") || "fra" == lang || "spa" == lang || "deu" == lang ||
+				"rus" == lang || "osd" == lang {
+				ret = append(ret, lang)
+			}
 		}
 	}
 	return ret

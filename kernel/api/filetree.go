@@ -28,6 +28,7 @@ import (
 	"github.com/88250/gulu"
 	"github.com/gin-gonic/gin"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -86,7 +87,8 @@ func heading2Doc(c *gin.Context) {
 	}
 
 	model.WaitForWritingFiles()
-	tree, err := model.LoadTree(targetNotebook, targetPath)
+	luteEngine := util.NewLute()
+	tree, err := filesys.LoadTree(targetNotebook, targetPath, luteEngine)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -130,7 +132,8 @@ func li2Doc(c *gin.Context) {
 	}
 
 	model.WaitForWritingFiles()
-	tree, err := model.LoadTree(targetNotebook, targetPath)
+	luteEngine := util.NewLute()
+	tree, err := filesys.LoadTree(targetNotebook, targetPath, luteEngine)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -424,7 +427,8 @@ func createDailyNote(c *gin.Context) {
 
 	box := model.Conf.Box(notebook)
 	model.WaitForWritingFiles()
-	tree, err := model.LoadTree(box.ID, p)
+	luteEngine := util.NewLute()
+	tree, err := filesys.LoadTree(box.ID, p, luteEngine)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -517,7 +521,7 @@ func lockFile(c *gin.Context) {
 	}
 }
 
-func getDocNameTemplate(c *gin.Context) {
+func getDocCreateSavePath(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
@@ -528,22 +532,22 @@ func getDocNameTemplate(c *gin.Context) {
 
 	notebook := arg["notebook"].(string)
 	box := model.Conf.Box(notebook)
-	nameTemplate := model.Conf.FileTree.CreateDocNameTemplate
+	docCreateSavePathTpl := model.Conf.FileTree.DocCreateSavePath
 	if nil != box {
-		nameTemplate = box.GetConf().CreateDocNameTemplate
+		docCreateSavePathTpl = box.GetConf().DocCreateSavePath
 	}
-	if "" == nameTemplate {
-		nameTemplate = model.Conf.FileTree.CreateDocNameTemplate
+	if "" == docCreateSavePathTpl {
+		docCreateSavePathTpl = model.Conf.FileTree.DocCreateSavePath
 	}
 
-	name, err := model.RenderGoTemplate(nameTemplate)
+	p, err := model.RenderGoTemplate(docCreateSavePathTpl)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
 		return
 	}
 	ret.Data = map[string]interface{}{
-		"name": name,
+		"path": p,
 	}
 }
 
@@ -639,10 +643,6 @@ func listDocsByPath(c *gin.Context) {
 		"path":  p,
 		"files": files,
 	}
-
-	// 持久化文档面板排序
-	model.Conf.FileTree.Sort = sortMode
-	model.Conf.Save()
 }
 
 func getDoc(c *gin.Context) {

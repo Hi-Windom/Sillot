@@ -635,6 +635,12 @@ app.whenReady().then(() => {
     tray.setContextMenu(contextMenu)
   }
 
+  const hideWindow = (wnd) => {
+    // 通过 `Alt+M` 最小化后焦点回到先前的窗口 https://github.com/siyuan-note/siyuan/issues/7275
+    wnd.minimize()
+    wnd.hide()
+  }
+
   const showHideWindow = (tray, lang, mainWindow) => {
     if (!mainWindow.isVisible()) {
       if (mainWindow.isMinimized()) {
@@ -642,7 +648,7 @@ app.whenReady().then(() => {
       }
       mainWindow.show()
     } else {
-      mainWindow.hide()
+      hideWindow(mainWindow)
     }
 
     resetTrayMenu(tray, lang, mainWindow)
@@ -657,7 +663,7 @@ app.whenReady().then(() => {
   ipcMain.on('siyuan-config-tray', (event, data) => {
     workspaces.find(item => {
       if (item.id === data.id) {
-        item.browserWindow.hide()
+        hideWindow(item.browserWindow)
         if ('win32' === process.platform || 'linux' === process.platform) {
           resetTrayMenu(item.tray, data.languages, item.browserWindow)
         }
@@ -810,11 +816,20 @@ app.whenReady().then(() => {
           }
         } else {
           if (mainWindow.isVisible()) {
-            mainWindow.hide()
+            if (1 === workspaces.length) { // 改进 `Alt+M` 激活窗口 https://github.com/siyuan-note/siyuan/issues/7258
+              if (!mainWindow.isFocused()) {
+                mainWindow.show()
+              } else {
+                hideWindow(mainWindow)
+              }
+            } else {
+              hideWindow(mainWindow)
+            }
           } else {
             mainWindow.show()
           }
         }
+
         if ('win32' === process.platform || 'linux' === process.platform) {
           resetTrayMenu(item.tray, data.languages, mainWindow)
         }
@@ -991,11 +1006,11 @@ powerMonitor.on('resume', async () => {
   writeLog('system resume')
   const isOnline = async () => {
     try {
-      const result = await fetch('https://icanhazip.com', {timeout: 1000})
+      const result = await fetch('https://www.baidu.com', {timeout: 1000})
       return 200 === result.status
     } catch (e) {
       try {
-        const result = await fetch('https://www.baidu.com', {timeout: 1000})
+        const result = await fetch('https://icanhazip.com', {timeout: 1000})
         return 200 === result.status
       } catch (e) {
         return false

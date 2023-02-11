@@ -20,12 +20,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/siyuan-note/siyuan/kernel/task"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
+	"runtime/debug"
 	"sort"
 	"strings"
 	"sync"
@@ -40,18 +38,21 @@ import (
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
+	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
 // Box 笔记本。
 type Box struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	Icon   string `json:"icon"`
-	Sort   int    `json:"sort"`
-	Closed bool   `json:"closed"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Icon     string `json:"icon"`
+	Sort     int    `json:"sort"`
+	SortMode int    `json:"sortMode"`
+	Closed   bool   `json:"closed"`
 
 	historyGenerated int64 // 最近一次历史生成时间
 }
@@ -123,11 +124,12 @@ func ListNotebooks() (ret []*Box, err error) {
 
 		id := dir.Name()
 		ret = append(ret, &Box{
-			ID:     id,
-			Name:   boxConf.Name,
-			Icon:   boxConf.Icon,
-			Sort:   boxConf.Sort,
-			Closed: boxConf.Closed,
+			ID:       id,
+			Name:     boxConf.Name,
+			Icon:     boxConf.Icon,
+			Sort:     boxConf.Sort,
+			SortMode: boxConf.SortMode,
+			Closed:   boxConf.Closed,
 		})
 	}
 
@@ -226,19 +228,28 @@ func (box *Box) Ls(p string) (ret []*FileInfo, totals int, err error) {
 		}
 	}
 
-	files, err := ioutil.ReadDir(filepath.Join(util.DataDir, box.ID, p))
+	entries, err := os.ReadDir(filepath.Join(util.DataDir, box.ID, p))
 	if nil != err {
 		return
 	}
 
-	for _, f := range files {
+	for _, f := range entries {
+		info, infoErr := f.Info()
+		if nil != infoErr {
+			logging.LogErrorf("read file info failed: %s", infoErr)
+			continue
+		}
+
 		name := f.Name()
 		if util.IsReservedFilename(name) {
 			continue
 		}
 		if strings.HasSuffix(name, ".tmp") {
 			// 移除写入失败时产生的临时文件
-			os.Remove(filepath.Join(util.DataDir, box.ID, p, name))
+			removePath := filepath.Join(util.DataDir, box.ID, p, name)
+			if removeErr := os.Remove(removePath); nil != removeErr {
+				logging.LogWarnf("remove tmp file [%s] failed: %s", removePath, removeErr)
+			}
 			continue
 		}
 
@@ -246,7 +257,7 @@ func (box *Box) Ls(p string) (ret []*FileInfo, totals int, err error) {
 		fi := &FileInfo{}
 		fi.name = name
 		fi.isdir = f.IsDir()
-		fi.size = f.Size()
+		fi.size = info.Size()
 		fPath := path.Join(p, name)
 		if f.IsDir() {
 			fPath += "/"
@@ -376,12 +387,13 @@ func (box *Box) renameSubTrees(tree *parse.Tree) {
 func (box *Box) moveTrees0(files []*FileInfo) {
 	totals := len(files) + 5
 	showProgress := 64 < totals
+	luteEngine := util.NewLute()
 	for i, subFile := range files {
 		if !strings.HasSuffix(subFile.path, ".sy") {
 			continue
 		}
 
-		subTree, err := LoadTree(box.ID, subFile.path) // LoadTree 会重新构造 HPath
+		subTree, err := filesys.LoadTree(box.ID, subFile.path, luteEngine) // LoadTree 会重新构造 HPath
 		if nil != err {
 			continue
 		}
@@ -495,12 +507,13 @@ func ReloadUI() {
 }
 
 func FullReindex() {
-	task.PrependTask(task.DatabaseIndexFull, fullReindex)
+	task.AppendTask(task.DatabaseIndexFull, fullReindex)
 	task.AppendTask(task.DatabaseIndexRef, IndexRefs)
+	task.AppendTask(task.ReloadUI, util.ReloadUI)
 }
 
 func fullReindex() {
-	msgId := util.PushMsg(Conf.Language(35), 7*1000)
+	util.PushMsg(Conf.Language(35), 7*1000)
 	WaitForWritingFiles()
 
 	if err := sql.InitDatabase(true); nil != err {
@@ -509,20 +522,13 @@ func fullReindex() {
 	}
 	treenode.InitBlockTree(true)
 
-	sql.DisableCache()
 	openedBoxes := Conf.GetOpenedBoxes()
 	for _, openedBox := range openedBoxes {
 		index(openedBox.ID)
 	}
-	sql.EnableCache()
 	treenode.SaveBlockTree(true)
 	LoadFlashcards()
-	runtime.GC()
-	go func() {
-		time.Sleep(3 * time.Second)
-		util.PushClearMsg(msgId)
-		util.PushStatusBar(Conf.Language(108))
-	}()
+	debug.FreeOSMemory()
 }
 
 func ChangeBoxSort(boxIDs []string) {

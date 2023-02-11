@@ -17,7 +17,7 @@
 package sql
 
 import (
-	"runtime"
+	"runtime/debug"
 	"time"
 
 	"github.com/88250/lute/ast"
@@ -29,23 +29,23 @@ import (
 )
 
 var memCache, _ = ristretto.NewCache(&ristretto.Config{
-	NumCounters: 800000,
-	MaxCost:     1000 * 1000 * 100,
+	NumCounters: 10240,
+	MaxCost:     1024,
 	BufferItems: 64,
 })
 var disabled = true
 
-func EnableCache() {
+func enableCache() {
 	disabled = false
 }
 
-func DisableCache() {
+func disableCache() {
 	disabled = true
 }
 
 func ClearBlockCache() {
 	memCache.Clear()
-	runtime.GC()
+	debug.FreeOSMemory()
 }
 
 func putBlockCache(block *Block) {
