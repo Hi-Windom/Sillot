@@ -63,7 +63,7 @@ def find_milestone(repo, title):
 --
 海文东QQ频道：43in2c1qb9 同步更新安装包
 --
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Hi-Windom/Sillot/ci.yml?style=flat-square)<img src="https://img.shields.io/badge/Windows 10+-blue?logo=Windows 11" title="" style="margin: 3px auto;"/><img src="https://img.shields.io/badge/macOS-purple?logo=macOS" title="" style="margin: 3px auto;"/>
+[![CI](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml/badge.svg)](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml)<img src="https://img.shields.io/badge/Windows 10+-blue?logo=Windows 11" title="" style="margin: 3px auto;"/><img src="https://img.shields.io/badge/macOS-purple?logo=macOS" title="" style="margin: 3px auto;"/>
 ''')
     for milestone in repo.get_milestones():
         if version in milestone.title:
