@@ -1,4 +1,4 @@
-name: Make sure new PRs are sent to dev
+name: Make sure new PRs are sent to master-dev
 
 on:
   pull_request_target:
@@ -10,11 +10,21 @@ jobs:
     steps:
       - uses: Vankka/pr-target-branch-action@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
         with:
           target: master
-          exclude: dev
-          change-to: dev
+          exclude: master-dev
+          change-to: master-dev
           comment: |
-              Your PR was set to target `master`, PRs should be target `dev`
-              The base branch of this PR has been automatically changed to `dev`, please check that there are no merge conflicts
+            Your PR was set to target `master`, PRs should be target `master-dev`
+            The base branch of this PR has been automatically changed to `master-dev`, please check that there are no merge conflicts
+      - uses: Vankka/pr-target-branch-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
+        with:
+          target: dev
+          exclude: master-dev
+          change-to: master-dev
+          comment: |
+            Your PR was set to target `dev`, PRs should be target `master-dev`
+            The base branch of this PR has been automatically changed to `master-dev`, please check that there are no merge conflicts
