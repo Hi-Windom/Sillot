@@ -11,6 +11,9 @@ import Sheet from "@mui/joy/Sheet";
 import Switch from "@mui/joy/Switch";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
+import loader from "@monaco-editor/loader";
+import { uriFromPath } from "../../util/path";
+const path = require("path");
 
 const marksCodeFontSize = [
   {
@@ -100,6 +103,15 @@ function CloseModal() {
             >
               Modal title
             </Typography>
+            <div
+              id="monaco-editor"
+              className="editor-monaco"
+              style={{
+                width: "800px",
+                height: "600px",
+                border: "1px solid #ccc",
+              }}
+            ></div>
           </Sheet>
         </Modal>
       </CssVarsProvider>
@@ -118,5 +130,31 @@ export default class MDDialog {
     }
     this.root = Client.createRoot(e);
     this.root.render(<CloseModal />);
+    /// #if !BROWSER
+    let pp = path.join(
+      __dirname,
+      "../../app/node_modules/monaco-editor/min/vs"
+    ); // 思源路径特殊
+    // console.log(pp)
+    loader.config({
+      paths: {
+        vs: uriFromPath(pp),
+      },
+      "vs/nls": {
+        availableLanguages: {
+          "*": "zh-cn",
+        },
+      },
+    });
+    /// #endif
+    loader.init().then((monacoInstance) => {
+      console.log("Here is the monaco instance", monacoInstance);
+      monacoInstance.editor.create(document.getElementById("monaco-editor"), {
+        value: "123",
+        contextmenu: true,
+        language: "markdown",
+        theme: "vs-dark",
+      });
+    });
   }
 }
