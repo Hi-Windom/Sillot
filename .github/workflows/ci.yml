@@ -3,6 +3,8 @@ name: CI/CD For Sillot
 on:
   push:
     branches: [publish]
+    tags:
+    - 'v*'
 
 jobs:
   create_release:
