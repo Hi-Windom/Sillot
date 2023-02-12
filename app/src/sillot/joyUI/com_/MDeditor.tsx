@@ -23,12 +23,24 @@ import CircularProgress from "@mui/joy/CircularProgress";
 import HashLoader from "react-spinners/HashLoader";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
 import loader from "@monaco-editor/loader";
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 import { uriFromPath } from "../../util/path";
 import { fetchPost } from "../../../util/fetch";
 const path = require("path");
 import { initEditorOptions } from "./monaco-editor-confige";
-import { defineMonacoThemes } from "./monaco-editor-themes";
+import BirdsofParadise from "./monacoThemes/Birds-of-Paradise";
+import Blackboard from "./monacoThemes/Blackboard";
+import Cobalt from "./monacoThemes/Cobalt";
+import Cobalt2 from "./monacoThemes/Cobalt2";
+import Dracula from "./monacoThemes/Dracula";
+import IdleFingers from "./monacoThemes/idleFingers";
+import IPlastic from "./monacoThemes/iPlastic";
+import Katzenmilch from "./monacoThemes/Katzenmilch";
+import Monokai from "./monacoThemes/Monokai";
+import NightOwl from "./monacoThemes/Night-Owl";
+import Solarizedlight from "./monacoThemes/Solarized-light";
+import Sunburst from "./monacoThemes/Sunburst";
+import TomorrowNightEighties from "./monacoThemes/Tomorrow-Night-Eighties";
+import Zenburnesque from "./monacoThemes/Zenburnesque";
 
 // const marksCodeFontSize = [
 //   {
@@ -95,8 +107,23 @@ function Loader(props: { nodeID: any }) {
       });
       /// #endif
       loader.init().then((monacoInstance) => {
-        console.log("Here is the monaco instance", monacoInstance);
-        defineMonacoThemes();
+        monacoInstance.editor.defineTheme("Birds-of-Paradise", BirdsofParadise); // 不要放到箭头函数里
+        monacoInstance.editor.defineTheme("Blackboard", Blackboard);
+        monacoInstance.editor.defineTheme("Cobalt", Cobalt);
+        monacoInstance.editor.defineTheme("Cobalt2", Cobalt2);
+        monacoInstance.editor.defineTheme("Dracula", Dracula);
+        monacoInstance.editor.defineTheme("IdleFingers", IdleFingers);
+        monacoInstance.editor.defineTheme("IPlastic", IPlastic);
+        monacoInstance.editor.defineTheme("Katzenmilch", Katzenmilch);
+        monacoInstance.editor.defineTheme("Monokai", Monokai);
+        monacoInstance.editor.defineTheme("Night-Owl", NightOwl);
+        monacoInstance.editor.defineTheme("Solarized-light", Solarizedlight);
+        monacoInstance.editor.defineTheme("Sunburst", Sunburst);
+        monacoInstance.editor.defineTheme(
+          "Tomorrow-Night-Eighties",
+          TomorrowNightEighties
+        );
+        monacoInstance.editor.defineTheme("Zenburnesque", Zenburnesque);
         const _editor = monacoInstance.editor.create(
           document.getElementById("monaco-editor"),
           initEditorOptions
@@ -196,9 +223,10 @@ function Configer() {
   const [readonly, setReadonly] = React.useState(true);
   const _props = React.useContext(SharedProps);
   const group = {
-    "build-in": ["vs", "vs-dark"],
-    light: ["Birds-of-Paradise", "IPlastic", "Katzenmilch", "Solarized-light"],
+    "build-in": ["vs", "vs-dark", "hc-light", "hc-black"],
+    light: ["IPlastic", "Katzenmilch", "Solarized-light"],
     dark: [
+      "Birds-of-Paradise",
       "Blackboard",
       "Cobalt",
       "Cobalt2",
@@ -251,7 +279,7 @@ function Configer() {
         <Select
           color="primary"
           placeholder="Theme"
-          defaultValue="KMD"
+          defaultValue=""
           variant="soft"
           indicator={<KeyboardArrowDown />}
           slotProps={{
@@ -279,7 +307,7 @@ function Configer() {
               },
             },
           }}
-          style={{ minWidth: "13em", margin: "1% 0.3%" }}
+          style={{ minWidth: "20em", margin: "1% 0.3%" }}
           onChange={(e, newValue) =>
             _props.editor.updateOptions({ theme: newValue })
           }
@@ -332,24 +360,6 @@ function Configer() {
               </List>
             </React.Fragment>
           ))}
-          {/* <Option value="vs">VS</Option>
-          <Option value="vs-dark">VS Dark</Option>
-          <Option value="Birds-of-Paradise">Birds of Paradise</Option>
-          <Option value="Blackboard">Blackboard</Option>
-          <Option value="Cobalt">Cobalt</Option>
-          <Option value="Cobalt2">Cobalt2</Option>
-          <Option value="Dracula">Dracula</Option>
-          <Option value="IdleFingers">IdleFingers</Option>
-          <Option value="IPlastic">IPlastic</Option>
-          <Option value="Katzenmilch">Katzenmilch</Option>
-          <Option value="Monokai">Monokai</Option>
-          <Option value="Night-Owl">Night Owl</Option>
-          <Option value="Solarized-light">Solarized-light</Option>
-          <Option value="Sunburst">Sunburst</Option>
-          <Option value="Tomorrow-Night-Eighties">
-            Tomorrow-Night-Eighties
-          </Option>
-          <Option value="Zenburnesque">Zenburnesque</Option> */}
         </Select>
         <Checkbox
           color="primary"

@@ -58,3 +58,37 @@ export const initEditorOptions: monaco.editor.IStandaloneEditorConstructionOptio
   // suggestFontSize: 16, // 自动建议的字体大小，默认使用编辑器字体大小可以跟随滚轮缩放
   tabSize: 2, // TAB 缩进量
 };
+
+// 值得一提的是，根据monaco-editor的说法，整个支持的语言分为两组：
+
+// 具有丰富和验证的语言IntelliSense
+// TypeScript
+// JavaScript
+// CSS
+// LESS
+// SCSS
+// JSON
+// HTML
+
+// 仅具有基本语法着色的语言
+// XML
+// PHP
+// C#
+// C++
+// Razor
+// Markdown
+// Diff
+// Java
+// VB
+// CoffeeScript
+// Handlebars
+// Batch
+// Pug
+// F#
+// Lua
+// Powershell
+// Python
+// Ruby
+// SASS
+// R
+// Objective-C
