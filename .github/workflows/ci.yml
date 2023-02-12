@@ -3,7 +3,7 @@ name: Sillot CI/CD
 on:
   push:
     tags:
-    - 'v*'
+      - "v*"
 
 jobs:
   create_release:
@@ -23,17 +23,23 @@ jobs:
           python-version: "3.10"
       - run: pip install PyGithub
 
-      - name: Extract version from package.json
+      - name: Extract Sillot version from package.json
         uses: sergeysova/jq-action@v2
         id: version
         with:
           cmd: "jq .version app/package.json -r"
 
+      - name: Extract SiYuan version from package.json
+        uses: sergeysova/jq-action@v2
+        id: syv
+        with:
+          cmd: "jq .syv app/package.json -r"
+
       - name: Gather Release Information
         id: release_info
         run: |
           echo "::set-output name=release_title::$(git show --format=%s --no-patch | head -1)"
-          echo "::set-output name=release_version::v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')"
+          echo "::set-output name=release_version::v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}"
           changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} Hi-Windom/Sillot)
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
