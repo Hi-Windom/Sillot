@@ -593,7 +593,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                     nodeElement = protyle.wysiwyg.element.querySelector(`[data-node-id="${id}"]`);
                     // 普通块插入代码块 代码块编辑增强 #85
                     if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
-                        console.error(id)
+                        console.error(id);
                     }
                     // https://github.com/siyuan-note/siyuan/issues/6864
                     if (nodeElement.getAttribute("data-type") === "NodeTable") {
@@ -614,7 +614,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                     nodeElement = protyle.wysiwyg.element.querySelector(`[data-node-id="${newId}"]`);
                     // 非普通块插入代码块 代码块编辑增强 #85
                     if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
-                        console.error(newId)
+                        console.error(newId);
                     }
                     // https://github.com/siyuan-note/siyuan/issues/6864
                     if (nodeElement.getAttribute("data-type") === "NodeTable") {

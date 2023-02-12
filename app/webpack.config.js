@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const BundleAnalyzerPlugin = require(
-  'webpack-bundle-analyzer').BundleAnalyzerPlugin
+  "webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 module.exports = (env, argv) => {
   return {
@@ -24,11 +24,11 @@ module.exports = (env, argv) => {
       "window": "./src/window/index.ts",
     },
     resolve: {
-      extensions: ['.ts', '.js', '.jsx', '.tsx', '.tpl', '.scss', '.png', '.svg'],
+      extensions: [".ts", ".js", ".jsx", ".tsx", ".tpl", ".scss", ".png", ".svg"],
     },
     optimization: {
       splitChunks: {
-        chunks: 'all',
+        chunks: "all",
       },
       minimize: true, // 调试时关闭
       minimizer: [
@@ -76,7 +76,7 @@ module.exports = (env, argv) => {
             {
               loader: MiniCssExtractPlugin.loader,
               options: {
-                publicPath: '../../'
+                publicPath: "../../"
               }
             },
             {
@@ -91,10 +91,10 @@ module.exports = (env, argv) => {
           test:/\.css$/,
           use: [
             {
-              loader: 'style-loader'
+              loader: "style-loader"
             },
             {
-              loader: 'css-loader'
+              loader: "css-loader"
             }
           ]
         },
@@ -102,11 +102,11 @@ module.exports = (env, argv) => {
           test: /\.[jt]sx$/,
           exclude: /node_modules/,
           use: {
-              loader: 'babel-loader',
+              loader: "babel-loader",
               options: {
-                  presets: ['@babel/preset-react', '@babel/preset-typescript'],
+                  presets: ["@babel/preset-react", "@babel/preset-typescript"],
                   plugins: [
-                      '@babel/plugin-transform-runtime',
+                      "@babel/plugin-transform-runtime",
                   ]
               }
           }

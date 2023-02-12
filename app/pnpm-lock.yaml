@@ -62,6 +62,7 @@ specifiers:
   react-dom: 18.2.0
   react-hot-toast: ^2.4.0
   react-jinke-music-player: ^4.24.2
+  react-spinners: ^0.13.8
   react-toastify: ^9.1.1
   safer-buffer: ^2.1.2
   sass: ^1.53.0
@@ -140,6 +141,7 @@ devDependencies:
   react-dom: registry.npmmirror.com/react-dom/18.2.0_react@18.2.0
   react-hot-toast: registry.npmmirror.com/react-hot-toast/2.4.0_owo25xnefcwdq3zjgtohz6dbju
   react-jinke-music-player: registry.npmmirror.com/react-jinke-music-player/4.24.2_biqbaboplfbrettd7655fr4n2y
+  react-spinners: registry.npmmirror.com/react-spinners/0.13.8_biqbaboplfbrettd7655fr4n2y
   react-toastify: registry.npmmirror.com/react-toastify/9.1.1_biqbaboplfbrettd7655fr4n2y
   safer-buffer: registry.npmmirror.com/safer-buffer/2.1.2
   sass: registry.npmmirror.com/sass/1.58.0
@@ -9108,6 +9110,19 @@ packages:
     name: react-refresh
     version: 0.14.0
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  registry.npmmirror.com/react-spinners/0.13.8_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-3e+k56lUkPj0vb5NDXPVFAOkPC//XyhKPJjvcGjyMNPWsBKpplfeyialP74G7H7+It7KzhtET+MvGqbKgAqpZA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/react-spinners/-/react-spinners-0.13.8.tgz}
+    id: registry.npmmirror.com/react-spinners/0.13.8
+    name: react-spinners
+    version: 0.13.8
+    peerDependencies:
+      react: ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: registry.npmmirror.com/react/18.2.0
+      react-dom: registry.npmmirror.com/react-dom/18.2.0_react@18.2.0
     dev: true
 
   registry.npmmirror.com/react-toastify/9.1.1_biqbaboplfbrettd7655fr4n2y:

@@ -11,7 +11,7 @@ export const highlightRender = (element: Element, cdn = Constants.PROTYLE_CDN) =
     if (element.classList.contains("code-block")) {
         // 编辑器内代码块编辑渲染
         codeElements = element.querySelectorAll("[spellcheck]");
-        _action_nodes = element.querySelectorAll(`.protyle-action`)
+        _action_nodes = element.querySelectorAll(".protyle-action");
     } else {
         if (element.classList.contains("item__readme")) {
             // bazaar reademe
@@ -25,7 +25,7 @@ export const highlightRender = (element: Element, cdn = Constants.PROTYLE_CDN) =
             isPreview = true;
         } else {
             codeElements = element.querySelectorAll(".code-block [spellcheck]");
-            _action_nodes = element.querySelectorAll(`.code-block>.protyle-action`)
+            _action_nodes = element.querySelectorAll(".code-block>.protyle-action");
         }
     }
     if (codeElements.length === 0) {
@@ -36,17 +36,17 @@ export const highlightRender = (element: Element, cdn = Constants.PROTYLE_CDN) =
         // 给所有代码块添加编辑按钮 代码块编辑增强 #85
         new Promise((resolve, reject) => {
             _action_nodes.forEach((i:any) => {
-                let e = i.querySelector("span.protyle-action__code_edit")
-                let c = i.querySelector(`span.protyle-icon--first.protyle-action__copy`)
+                const e = i.querySelector("span.protyle-action__code_edit");
+                const c = i.querySelector("span.protyle-icon--first.protyle-action__copy");
                 if (!e && c) {
-                    c.insertAdjacentHTML('afterend', `<span class="protyle-icon protyle-action__code_edit"><svg><use xlink:href="#iconEdit"></use></svg></span>`)
+                    c.insertAdjacentHTML("afterend", "<span class=\"protyle-icon protyle-action__code_edit\"><svg><use xlink:href=\"#iconEdit\"></use></svg></span>");
                 }
-            })
-            let rs = document.querySelectorAll(`.code-block .protyle-action__code_edit`)
-            resolve(rs)
+            });
+            const rs = document.querySelectorAll(".code-block .protyle-action__code_edit");
+            resolve(rs);
         }).then((e) => {
             // console.log(e)
-        })
+        });
     }
     setCodeTheme(cdn);
 

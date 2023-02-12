@@ -13,7 +13,7 @@ import {getCurrentWindow} from "@electron/remote";
 import {escapeHtml} from "../util/escape";
 import {getWorkspaceName} from "../util/noRelyPCFunction";
 import {needSubscribe} from "../util/needSubscribe";
-import { exportIDB } from '../sillot/util/sillot-idb-backup-and-restore'
+import { exportIDB } from "../sillot/util/sillot-idb-backup-and-restore";
 
 export const lockScreen = () => {
     /// #if BROWSER
@@ -23,7 +23,7 @@ export const lockScreen = () => {
     /// #else
     ipcRenderer.send(Constants.SIYUAN_LOCK_SCREEN);
     /// #endif
-    exportIDB()
+    exportIDB();
 };
 
 export const lockFile = (id: string) => {
@@ -157,7 +157,7 @@ export const exitSiYuan = () => {
             /// #endif
         }
     });
-    })
+    });
 };
 
 export const transactionError = (data: { code: number, data: string }) => {

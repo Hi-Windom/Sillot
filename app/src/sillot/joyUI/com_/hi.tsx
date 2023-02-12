@@ -16,7 +16,7 @@ export class HiJoy {
   constructor(props: { id: string }) {
     this.id = props.id;
     this.CloseButton = this.CloseButton.bind(this);
-    let e = document.getElementById(props.id);
+    const e = document.getElementById(props.id);
     if (!e) {
       return;
     }
@@ -100,10 +100,10 @@ export class HiJoy {
     return (
       <Button
       variant="outlined"
-      onClick={() => {this.root.render()}}
+      onClick={() => {this.root.render();}}
       >
         Close
       </Button>
-    )
+    );
   }
 }

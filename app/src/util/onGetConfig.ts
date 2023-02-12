@@ -356,14 +356,14 @@ export const initWindow = () => {
             if (!/^sillot:/.test(url)) {
                 return;
             }
-            alert(url)
+            alert(url);
             ipcRenderer.send(Constants.SILLOT_SHOW, url); // 业务处理在 main.js
         });
         ipcRenderer.on(Constants.SISI_OPENURL, (event, url) => {
             if (!/^sisi:/.test(url)) {
                 return;
             }
-            alert(url)
+            alert(url);
             ipcRenderer.send(Constants.SISI_SHOW, url); // 业务处理在 main.js
         });
         ipcRenderer.on(Constants.SIYUAN_SAVE_CLOSE, (event, close) => {

@@ -109,6 +109,7 @@
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.4.0",
     "react-jinke-music-player": "^4.24.2",
+    "react-spinners": "^0.13.8",
     "react-toastify": "^9.1.1",
     "safer-buffer": "^2.1.2",
     "sass": "^1.53.0",

@@ -24,7 +24,7 @@ import { initMessage } from "./dialog/message";
 import { resizeDrag } from "./layout/util";
 import { getAllTabs } from "./layout/getAll";
 import { getLocalStorage } from "./protyle/util/compatibility";
-import { importIDB } from './sillot/util/sillot-idb-backup-and-restore'
+import { importIDB } from "./sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "./sillot";
 
 class App {
@@ -129,16 +129,16 @@ class App {
             }),
             menus: new Menus()
         };
-        new SillotEnv()
+        new SillotEnv();
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
-            let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1)
+            const workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1);
             // console.log(workspaceName)
             fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, async (r) => {
                 // console.log(r);
                 importIDB(r.data).then(() => {
                     window.Sillot.status.IDBloaded = true;
-                });})
+                });});
             // 历史数据兼容，202306后可删除
             if (window.siyuan.config.uiLayout.left && !window.siyuan.config.uiLayout.left.data) {
                 window.siyuan.config.uiLayout.left = {

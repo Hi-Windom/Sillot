@@ -218,8 +218,8 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
             focusByWbr(protyle.wysiwyg.element, range);
         } else {
             // 粘贴内容转代码块 代码块编辑增强 #85
-            let x: Array<any> = window._.words(code, /[^, ,=,"]+/g)
-            console.error(x[window._.indexOf(x, 'data-node-id') + 1])
+            const x: Array<any> = window._.words(code, /[^, ,=,"]+/g);
+            console.error(x[window._.indexOf(x, "data-node-id") + 1]);
             insertHTML(code, protyle, true);
             highlightRender(protyle.wysiwyg.element);
         }

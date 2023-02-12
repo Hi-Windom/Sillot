@@ -37,7 +37,7 @@ process.noAsar = true;
 const appDir = path.dirname(app.getAppPath());
 const isDevEnv = process.env.NODE_ENV === "development";
 // const appVer = app.getVersion();
-const branchVer = app.getVersion()
+const branchVer = app.getVersion();
 try { require("electron-reloader")(module); } catch {}
 var VitePort;
 try {
@@ -47,20 +47,20 @@ try {
 }
 var isVite;
 try {
-  isVite =  process.env.VITE == 'vite';
+  isVite =  process.env.VITE == "vite";
 } catch {
   isVite = false;
 }
-console.log('debug: $isDevEnv = ' + isDevEnv)
-console.log('debug: $isVite = ' + isVite)
+console.log("debug: $isDevEnv = " + isDevEnv);
+console.log("debug: $isVite = " + isVite);
 
-var pkg = {}
+var pkg = {};
 if (isDevEnv && !isVite) {
-  pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json")).toString())
+  pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json")).toString());
 } else {
-  pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString())
+  pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString());
 }
-const appVer = pkg["syv"]
+const appVer = pkg["syv"];
 const confDir = path.join(app.getPath("home"), ".config", "siyuan");
 const windowStatePath = path.join(confDir, "windowState.json");
 let bootWindow;
@@ -204,7 +204,7 @@ const boot = () => {
     }
 
     // 创建主窗体
-  console.log('action: 创建主窗体')
+  console.log("action: 创建主窗体");
     const currentWindow = new BrowserWindow({
         show: false,
         backgroundColor: "#FFF", // 桌面端主窗体背景色设置为 `#FFF` Fix https://github.com/siyuan-note/siyuan/issues/4544
@@ -305,10 +305,10 @@ const boot = () => {
     currentWindow.loadURL(`http://localhost:${VitePort}`).catch(() => {
         setTimeout(() => { loadVite(VitePort); }, 200);
     });
-    currentWindow.openDevTools()
-    currentWindow.webContents.on('devtools-open-url', (event, url) => {
-      shell.openExternal(url)
-    })
+    currentWindow.openDevTools();
+    currentWindow.webContents.on("devtools-open-url", (event, url) => {
+      shell.openExternal(url);
+    });
   }
   if (isVite) {
     // for Vite
@@ -317,10 +317,10 @@ const boot = () => {
     currentWindow.loadURL(
       getServer() + "/stage/build/app/index.html?v=" + new Date().getTime()
     );
-    currentWindow.webContents.on('devtools-open-url', (event, url) => {
+    currentWindow.webContents.on("devtools-open-url", (event, url) => {
       // 支持在devtools打开网址 #188 需要 electron@24.0.0+
-      shell.openExternal(url)
-    })
+      shell.openExternal(url);
+    });
   }
 
     // 菜单
@@ -425,13 +425,13 @@ const initKernel = (workspace, port, lang) => {
             ? "SiYuan-Kernel.exe"
             : "SiYuan-Kernel";
         // const kernelPath = path.join(appDir, "kernel", kernelName);
-    let kernelPath
+    let kernelPath;
     if (!isVite) {
-      kernelPath = path.join(appDir, 'kernel', kernelName)
+      kernelPath = path.join(appDir, "kernel", kernelName);
     } else {
-      kernelPath = path.join(appDir,'app', 'kernel', kernelName)
+      kernelPath = path.join(appDir,"app", "kernel", kernelName);
     }
-    console.log('debug: $kernelPath = ' + kernelPath)
+    console.log("debug: $kernelPath = " + kernelPath);
         if (!fs.existsSync(kernelPath)) {
             showErrorWindow("⚠️ 内核文件丢失 Kernel is missing",
                 "<div>内核可执行文件丢失，请重新安装思源，并将思源加入杀毒软件信任列表。</div><div>The kernel binary is not found, please reinstall SiYuan and add SiYuan into the trust list of your antivirus software.</div>");
@@ -625,24 +625,24 @@ const initKernel = (workspace, port, lang) => {
 
 // 注册自定义协议
 function setProtocol(agreement) {
-  let isSet = false // 是否注册成功
+  let isSet = false; // 是否注册成功
 
-  app.removeAsDefaultProtocolClient(agreement) // 每次运行都删除自定义协议 然后再重新注册
+  app.removeAsDefaultProtocolClient(agreement); // 每次运行都删除自定义协议 然后再重新注册
   // 开发模式下在window运行需要做兼容
-  if (process.env.NODE_ENV === 'development' && process.platform === 'win32') {
+  if (process.env.NODE_ENV === "development" && process.platform === "win32") {
     // 设置electron.exe 和 app的路径
     isSet = app.setAsDefaultProtocolClient(agreement, process.execPath, [
       path.resolve(process.argv[1]),
-    ])
+    ]);
   } else {
-    isSet = app.setAsDefaultProtocolClient(agreement)
+    isSet = app.setAsDefaultProtocolClient(agreement);
   }
-  console.log(`${agreement}是否注册成功：`, isSet)
+  console.log(`${agreement}是否注册成功：`, isSet);
 }
 
 setProtocol("siyuan");
-setProtocol('sillot')
-setProtocol('sisi')
+setProtocol("sillot");
+setProtocol("sisi");
 
 app.commandLine.appendSwitch("disable-web-security");
 app.commandLine.appendSwitch("auto-detect", "false");
@@ -658,22 +658,22 @@ app.whenReady().then(() => {
         files.forEach(function(filename) {
           var filedir = path.join(P, filename);
           fs.stat(filedir,function(eror, stats) {
-            var isDir = stats.isDirectory()
+            var isDir = stats.isDirectory();
             if(isDir) {
               session.defaultSession.loadExtension(
                 filedir,
                 // 打开本地文件也应用拓展
                 { allowFileAccess: true }
-              )
-              return
+              );
+              return;
             }
-          })
-        })
+          });
+        });
       }
-    })
-  }
-  let ReactDeveloperToolsRoot = path.join(app.getPath("userData"), "extensions", "ReactDeveloperTools")
-  loadExtension(ReactDeveloperToolsRoot)
+    });
+  };
+  let ReactDeveloperToolsRoot = path.join(app.getPath("userData"), "extensions", "ReactDeveloperTools");
+  loadExtension(ReactDeveloperToolsRoot);
 
     let resetWindowStateOnRestart = false;
     const resetTrayMenu = (tray, lang, mainWindow) => {
@@ -865,10 +865,10 @@ app.whenReady().then(() => {
         });
         win.loadURL(data);
         require("@electron/remote/main").enable(win.webContents);
-      win.webContents.on('devtools-open-url', (event, url) => {
+      win.webContents.on("devtools-open-url", (event, url) => {
       // 支持在devtools打开网址 #188 需要 electron@24.0.0+
-      shell.openExternal(url)
-    })
+      shell.openExternal(url);
+    });
   });
     ipcMain.on("siyuan-open-workspace", (event, data) => {
         const foundWorkspace = workspaces.find((item) => {
@@ -1031,25 +1031,25 @@ app.on("open-url", (event, url) => { // for macOS
                 item.browserWindow.webContents.send("siyuan-openurl", url);
             }
         });
-  } else if (url.startsWith('sillot:')) {
+  } else if (url.startsWith("sillot:")) {
     // 业务处理在 onGetConfig.ts
-    if (url.startsWith('sillot://') || url.startsWith('sillot:\\\\'))
+    if (url.startsWith("sillot://") || url.startsWith("sillot:\\\\"))
     {
       workspaces.forEach(item => {
         if (item.browserWindow && !item.browserWindow.isDestroyed()) {
-          item.browserWindow.webContents.send('sillot-openurl', url)
+          item.browserWindow.webContents.send("sillot-openurl", url);
         }
-      })
+      });
     }
-  } else if (url.startsWith('sisi:')) {
+  } else if (url.startsWith("sisi:")) {
     // 业务处理在 onGetConfig.ts
-    if (url.startsWith('sisi://') || url.startsWith('sisi:\\\\'))
+    if (url.startsWith("sisi://") || url.startsWith("sisi:\\\\"))
     {
       workspaces.forEach(item => {
         if (item.browserWindow && !item.browserWindow.isDestroyed()) {
-          item.browserWindow.webContents.send('sisi-openurl', url)
+          item.browserWindow.webContents.send("sisi-openurl", url);
         }
-      })
+      });
     }
     }
 });
@@ -1089,8 +1089,8 @@ app.on("second-instance", (event, argv) => { // for windows
     }
 
   const siyuanURL = argv.find((arg) => arg.startsWith("siyuan://"));
-  const sillotURL = argv.find((arg) => arg.startsWith('sillot:'))
-  const sisiURL = argv.find((arg) => arg.startsWith('sisi:'))
+  const sillotURL = argv.find((arg) => arg.startsWith("sillot:"));
+  const sisiURL = argv.find((arg) => arg.startsWith("sisi:"));
     workspaces.forEach(item => {
         if (item.browserWindow && !item.browserWindow.isDestroyed() && siyuanURL) {
             item.browserWindow.webContents.send("siyuan-openurl", siyuanURL);
@@ -1099,24 +1099,24 @@ app.on("second-instance", (event, argv) => { // for windows
 
   if (sillotURL) {
     // 业务处理在 onGetConfig.ts
-    if (sillotURL.startsWith('sillot://') || sillotURL.startsWith('sillot:\\\\'))
+    if (sillotURL.startsWith("sillot://") || sillotURL.startsWith("sillot:\\\\"))
     {
       workspaces.forEach(item => {
         if (item.browserWindow && !item.browserWindow.isDestroyed()) {
-          item.browserWindow.webContents.send('sillot-openurl', sillotURL)
+          item.browserWindow.webContents.send("sillot-openurl", sillotURL);
         }
-      })
+      });
     }
   }
   if (sisiURL) {
     // 业务处理在 onGetConfig.ts
-    if (sisiURL.startsWith('sisi://') || sisiURL.startsWith('sisi:\\\\'))
+    if (sisiURL.startsWith("sisi://") || sisiURL.startsWith("sisi:\\\\"))
     {
       workspaces.forEach(item => {
         if (item.browserWindow && !item.browserWindow.isDestroyed()) {
-          item.browserWindow.webContents.send('sisi-openurl', sisiURL)
+          item.browserWindow.webContents.send("sisi-openurl", sisiURL);
         }
-      })
+      });
     }
   }
 

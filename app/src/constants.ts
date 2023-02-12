@@ -1,11 +1,11 @@
 // declare const SIYUAN_VERSION: string;
 // declare const NODE_ENV: string;
 // declare const SIYUAN_ORIGIN_VERSION: string;
-import * as pkg from '../package.json'
-var NODE_ENV = 'development'
-var SIYUAN_VERSION = pkg.version
-var SIYUAN_ORIGIN_VERSION = pkg.syv
-const _SIYUAN_ORIGIN_VERSION = SIYUAN_ORIGIN_VERSION
+import * as pkg from "../package.json";
+const NODE_ENV = "development";
+const SIYUAN_VERSION = pkg.version;
+const SIYUAN_ORIGIN_VERSION = pkg.syv;
+const _SIYUAN_ORIGIN_VERSION = SIYUAN_ORIGIN_VERSION;
 const _SIYUAN_VERSION = SIYUAN_VERSION;
 const _NODE_ENV = NODE_ENV;
 

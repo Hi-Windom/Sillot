@@ -3,7 +3,7 @@
 // declare const Toaster: react.FC<ToasterProps>;
 declare const Toaster: React;
 */
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 
@@ -13,7 +13,7 @@ export class HotToast {
     id: string;
   }) {
     this.root = ReactDOM.createRoot(document.getElementById(props.id));
-    this.root.render(<><Toaster /></>)
+    this.root.render(<><Toaster /></>);
   }
 
   public alert(message: string, options?: any) {
