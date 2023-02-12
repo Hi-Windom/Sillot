@@ -141,8 +141,9 @@ function Loader(props: { nodeID: any }) {
     },
     [] // 空数组保证只执行一次
   );
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState({display:"inherit"});
   React.useEffect(() => {
+    if(!editor) return; // 第一次初始化时不执行
     fetchPost(
       "/api/block/getBlockKramdown",
       {
@@ -153,12 +154,13 @@ function Loader(props: { nodeID: any }) {
           window.sout.info(nodeID);
           window.sout.success(res);
           editor.setValue(res.data.kramdown);
-          setLoading(false);
-          document.getElementById("monaco-editor-CircularProgress").style.display = "none";
+          setOpen(true);
+          setLoading({display:"none"});
+          // document.getElementById("monaco-editor-CircularProgress").style.display = "none";
           document.getElementById("monaco-editor-container").style.display = "inherit"
           window.sout.tracker(editor);
         } else {
-          setLoading(false);
+          setOpen(false);
           window.__.toastify.error({
             message: res.msg,
             position: "bottom-center",
@@ -199,7 +201,7 @@ function Loader(props: { nodeID: any }) {
             <CircularProgress
             id="monaco-editor-CircularProgress"
               variant="plain"
-              style={{ display: { loading } ? "inherit" : "none" }}
+              style={loading}
             />
             <div id="monaco-editor-container" style={{ display: { loading } ? "none" : "inherit" }}>
               <EditorContainer nodeID={nodeID} />
