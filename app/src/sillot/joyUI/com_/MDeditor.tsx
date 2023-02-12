@@ -325,8 +325,8 @@ function EditorContainer(props: { nodeID: string }) {
         id="monaco-editor"
         className="editor-monaco"
         style={{
-          width: "800px",
-          maxWidth: "88vw",
+          width: "85vw",
+          maxWidth: "2000px",
           maxHeight: "calc(100vh - 300px)",
           height: "600px",
           border: "1px solid #ccc",
