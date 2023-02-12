@@ -26,6 +26,7 @@ import {getAllTabs} from "./layout/getAll";
 import {getLocalStorage} from "./protyle/util/compatibility";
 
 import { PluginSystem } from "./plugin";
+import { Framework } from "./framework";
 
 class App {
     constructor() {
@@ -137,11 +138,17 @@ class App {
                     bootSync();
                     fetchPost("/api/setting/getCloudUser", {}, userResponse => {
                         window.siyuan.user = userResponse.data;
+
+                        // 临时作为入口
+                        const framework = new Framework();
+                        
                         onGetConfig(response.data.start);
                         account.onSetaccount();
                         resizeDrag();
                         setTitle(window.siyuan.languages.siyuanNote);
                         initMessage();
+
+                        new PluginSystem(framework).init();
                     });
                 });
             });
@@ -153,5 +160,3 @@ class App {
 }
 
 new App();
-
-new PluginSystem().init();

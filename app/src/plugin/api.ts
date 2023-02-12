@@ -1,19 +1,11 @@
-import { fetchPost } from "../util/fetch";
-import { PluginInfo } from "./plugin";
+import { Framework } from "../framework";
+import { ToolbarItem } from "../framework/toolbar-item";
 
-export const loadPluginFromServer = async (name: string): Promise<PluginInfo | null> => {
-    return new Promise((resolve) => {
-        fetchPost("/api/bazaar/loadPlugin", { name }, (res) => {
-            resolve(res.data);
-        });
-    });
-};
-
-export const loadInstalledPlugins = async (): Promise<any> => {
-    return new Promise((resolve) => {
-        fetchPost("/api/bazaar/getInstalledPlugin", (res: any) => {
-            const plugins = res.data.packages;
-            resolve(plugins);
-        });
-    });
-};
+export const apiGenerate = (framework: Framework) => ({
+    addToolbarLeft: (toolbarItem: ToolbarItem) => {
+        framework.toolbar.addLeft(toolbarItem);
+    },
+    addToolbarRight: (toolbarItem: ToolbarItem) => {
+        framework.toolbar.addRight(toolbarItem);
+    },
+});

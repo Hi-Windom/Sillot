@@ -1,1 +1,1 @@
-export const InternalPlugins = ['test'];
+export const InternalPlugins = ["test"];

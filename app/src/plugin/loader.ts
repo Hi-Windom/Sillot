@@ -1,16 +1,25 @@
 import { Plugin } from "./plugin";
-import { __require } from "./module";
 import { InternalPlugins } from "./config";
-import { loadPluginFromServer } from "./api";
+import { loadPluginFromServer } from "./request";
+import { Framework } from "../framework";
+import { apiGenerate } from "./api";
+import { modules } from "./module";
+
+let components: { [key: string]: any };
 
 export class PluginLoader {
     plugins: Map<string, Plugin>;
+    framework: Framework;
 
-    constructor() {
+    constructor(framework: Framework) {
+        this.framework = framework;
         this.plugins = new Map();
     }
 
     async loadPlugin(pluginName: string) {
+        if (!components) {
+            this.generateRequiredModules();
+        }
         if (InternalPlugins.find((v) => v === pluginName)) {
             return await this.loadInternalPlugin(pluginName);
         }
@@ -20,6 +29,12 @@ export class PluginLoader {
         function run(script: string, name: string) {
             return eval("(function anonymous(require,module,exports){".concat(script, "\n})\n//# sourceURL=").concat(name, "\n"));
         }
+        const __require = (name: string) => {
+            if (components[name]) {
+                return components[name];
+            }
+            throw new Error(`module ${name} not found`);
+        };
         run(pluginScript, name)(__require, module, exports);
         let pluginConstructor;
         if (!(pluginConstructor = (module.exports || exports).default || module.exports)) {
@@ -60,6 +75,15 @@ export class PluginLoader {
         return {
             pluginScript: content,
             name,
+        };
+    }
+
+    generateRequiredModules() {
+        components = {
+            "siyuan": {
+                ...modules,
+                ...apiGenerate(this.framework),
+            }
         };
     }
 }
