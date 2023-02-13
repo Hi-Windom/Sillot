@@ -25,6 +25,7 @@
 </div>
 <div id="dockBottom" class="dock"></div>
 <div id="status" class="fn__flex status"></div>
+<div id="SillotDrawer" style="position: fixed;bottom: 0;right: 0;z-index: 9999;"></div>
 <div id="commonMenu" class="b3-menu fn__none"></div>
 <div id="message" class="b3-snackbars"></div>
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>

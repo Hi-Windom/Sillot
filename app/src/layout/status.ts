@@ -12,6 +12,7 @@ import {getCurrentWindow} from "@electron/remote";
 import {MenuItem} from "../menus/Menu";
 import {Constants} from "../constants";
 import {resetFloatDockSize} from "./dock/util";
+import SillotDrawer from "./SillotDrawer";
 
 export const initStatus = (isWindow = false) => {
     /// #if !MOBILE
@@ -39,7 +40,7 @@ export const initStatus = (isWindow = false) => {
 <div id="statusHelp" class="toolbar__item b3-tooltips b3-tooltips__w fn__none" aria-label="${window.siyuan.languages.help}">
     <svg><use xlink:href="#iconHelp"></use></svg>
 </div>
-<div id="SillotDrawer" class="toolbar__item b3-tooltips b3-tooltips__w" aria-label="Sillot Drawer">
+<div id="SillotDrawerIntro" class="toolbar__item b3-tooltips b3-tooltips__w" aria-label="Sillot Drawer">
     <svg><use xlink:href="#iconList"></use></svg>
 </div>`;
 
@@ -97,6 +98,9 @@ export const initStatus = (isWindow = false) => {
                 window.siyuan.menus.menu.popup({x: rect.right, y: rect.top}, true);
                 event.stopPropagation();
                 break;
+            } else if (target.id === "SillotDrawerIntro") {
+                SillotDrawer({id: "SillotDrawer"});
+                event.stopPropagation();
             } else if (target.id === "statusHelp") {
                 if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
                     window.siyuan.menus.menu.element.getAttribute("data-name") === "statusHelp") {
