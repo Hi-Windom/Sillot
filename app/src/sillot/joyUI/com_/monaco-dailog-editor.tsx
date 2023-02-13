@@ -548,7 +548,6 @@ function EditorContainer() {
           maxWidth: "2000px",
           maxHeight: "calc(100vh - 300px)",
           height: "600px",
-          border: "1px solid #ccc",
         }}
       ></div>
     </>
