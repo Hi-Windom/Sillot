@@ -158,6 +158,7 @@ export const initAssets = () => {
 };
 
 export const addGA = () => {
+    return
     if (!window.siyuan.config.system.disableGoogleAnalytics) {
         addScript("https://www.googletagmanager.com/gtag/js?id=G-L7WEXVQCR9", "gaScript");
         window.dataLayer = window.dataLayer || [];
