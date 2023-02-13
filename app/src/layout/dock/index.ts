@@ -28,22 +28,22 @@ export class Dock {
             case "Left":
                 this.layout = window.siyuan.layout.layout.children[1].children[0] as Layout;
                 this.resizeElement = this.layout.element.nextElementSibling as HTMLElement;
-                this.layout.element.classList.add("layout--floatl")
+                this.layout.element.classList.add("layout--floatl");
                 break;
             case "Right":
                 this.layout = window.siyuan.layout.layout.children[1].children[2] as Layout;
                 this.resizeElement = this.layout.element.previousElementSibling as HTMLElement;
-                this.layout.element.classList.add("layout--floatr")
+                this.layout.element.classList.add("layout--floatr");
                 break;
             case "Top":
                 this.layout = window.siyuan.layout.layout.children[0] as Layout;
                 this.resizeElement = this.layout.element.nextElementSibling as HTMLElement;
-                this.layout.element.classList.add("layout--floatt")
+                this.layout.element.classList.add("layout--floatt");
                 break;
             case "Bottom":
                 this.layout = window.siyuan.layout.layout.children[2] as Layout;
                 this.resizeElement = this.layout.element.previousElementSibling as HTMLElement;
-                this.layout.element.classList.add("layout--floatb")
+                this.layout.element.classList.add("layout--floatb");
                 break;
         }
         this.element = document.getElementById("dock" + options.position);

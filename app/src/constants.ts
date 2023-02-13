@@ -1,6 +1,7 @@
 // declare const SIYUAN_VERSION: string;
 // declare const NODE_ENV: string;
 // declare const SIYUAN_ORIGIN_VERSION: string;
+import { SConst } from "./SConst";
 import * as pkg from "../package.json";
 const NODE_ENV = "development";
 const SIYUAN_VERSION = pkg.version;
@@ -9,7 +10,7 @@ const _SIYUAN_ORIGIN_VERSION = SIYUAN_ORIGIN_VERSION;
 const _SIYUAN_VERSION = SIYUAN_VERSION;
 const _NODE_ENV = NODE_ENV;
 
-export abstract class Constants {
+export abstract class Constants extends SConst { // Sillot extend
     public static readonly SIYUAN_ORIGIN_VERSION: string = _SIYUAN_ORIGIN_VERSION;
     public static readonly SIYUAN_VERSION: string = _SIYUAN_VERSION;
     public static readonly NODE_ENV: string = _NODE_ENV;
@@ -29,8 +30,6 @@ export abstract class Constants {
 
     // 渲染进程调主进程
     public static readonly SIYUAN_SHOW: string = "siyuan-show";
-    public static readonly SILLOT_SHOW: string = "sillot-show";
-    public static readonly SISI_SHOW: string = "sisi-show";
     public static readonly SIYUAN_LOCK_SCREEN: string = "siyuan-lock-screen";
     public static readonly SIYUAN_CONFIG_TRAY: string = "siyuan-config-tray";
     public static readonly SIYUAN_OPEN_WORKSPACE: string = "siyuan-open-workspace";
@@ -38,8 +37,6 @@ export abstract class Constants {
     public static readonly SIYUAN_HOTKEY: string = "siyuan-hotkey";
     public static readonly SIYUAN_INIT: string = "siyuan-init";
     public static readonly SIYUAN_OPENURL: string = "siyuan-openurl";
-    public static readonly SILLOT_OPENURL: string = "sillot-openurl";
-    public static readonly SISI_OPENURL: string = "sisi-openurl";
     public static readonly SIYUAN_OPENWINDOW: string = "siyuan-openwindow";
     public static readonly SIYUAN_CLOSETAB: string = "siyuan-closetab";
     public static readonly SIYUAN_SAVE_CLOSE: string = "siyuan-save-close";
@@ -100,7 +97,7 @@ export abstract class Constants {
     public static readonly HELP_PATH = {
         zh_CN: "20210808180117-czj9bvb",
         zh_CHT: "20210808180117-czj9bvb",
-        zh_CN_Sillot: "20230202000000-c123456",
+        zh_CN_Sillot: "20230202000000-c123456", // Sillot extend
         en_US: "20210808180117-6v0mkxr",
         fr_FR: "20210808180117-6v0mkxr",
     };

@@ -33,15 +33,6 @@ interface Window {
     __localStorage__setItem: (key: string, value: string) => void
     dataLayer: any[]
     siyuan: ISiyuan
-    // Sillot extend start
-    Sillot: ISillot
-    nodebugger: any
-    _: any
-    __: ISillotDoubleUnderline
-    sout: ISout
-    React: any
-    ReactDOM: any
-    // Sillot extend end
     webkit: any
     html2canvas: (element: Element) => Promise<any>;
     JSAndroid: {
@@ -63,43 +54,6 @@ interface Window {
     openFileByURL(URL: string): boolean
 }
 
-// Sillot extend start
-interface ISillot {
-    status: {
-        IDBloaded: boolean,
-        disableDocSetPadding: boolean,
-    },
-    funs: {
-        hljsRender: any,
-    },
-    lute: Lute
-}
-interface ISout {
-    debug: boolean
-    showAll(): void
-    log(m: any): void
-    slog(m: any): void
-    print(m: any, head?: string): void
-    info(m: any, head?: string): void
-    success(m: any, head?: string): void
-    warn(m: any, head?: string): void
-    unsure(m: any, head?: string): void
-    ops(m: any, head?: string): void
-    error(m: any, head?: string): void
-    good(m: any, head?: string): void
-    wink(m: any, head?: string): void
-    bad(m: any, head?: string): void
-    tracker(m: any): void
-    table(m: Array<object>): void
-}
-interface ISillotDoubleUnderline {
-    ace: any
-    Swal: any
-    localforage: any
-    toastify: any
-    hottt: any
-}
-// Sillot extend end
 
 interface IWorkspace {
     path: string

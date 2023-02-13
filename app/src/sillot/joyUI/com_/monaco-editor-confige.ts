@@ -80,7 +80,7 @@ export const colorsTheme = {
   dark: "success",
 };
 export function isLightTheme(theme: string): boolean {
-  let ltArray = [
+  const ltArray = [
     "vs",
     "hc-light",
     "IPlastic",

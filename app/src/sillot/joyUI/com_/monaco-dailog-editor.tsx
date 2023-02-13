@@ -126,7 +126,7 @@ function Loader(props: { nodeID: any; initConfig: any }) {
           TomorrowNightEighties
         );
         monacoInstance.editor.defineTheme("Zenburnesque", Zenburnesque);
-        let model_x = monacoInstance.editor.createModel("", initConfig.lang);
+        const model_x = monacoInstance.editor.createModel("", initConfig.lang);
         const _editor = monacoInstance.editor.create(
           document.getElementById("monaco-editor"),
           { ...initConfig, ...initEditorOptions, model: model_x }
@@ -462,7 +462,7 @@ function Configer() {
           defaultChecked
           style={{ margin: "0 1em", flex: 1 }}
           onChange={(event) => {
-            let isChecked = event.target.checked;
+            const isChecked = event.target.checked;
             _props.editor.updateOptions({ wordWrap: isChecked ? "on" : "off" });
           }}
         />
@@ -474,7 +474,7 @@ function Configer() {
               checked={readonly}
               disabled={!_props.initConfig.editable}
               onChange={(event) => {
-                let isChecked = event.target.checked;
+                const isChecked = event.target.checked;
                 _props.editor.updateOptions({ readOnly: isChecked }); // https://www.cnblogs.com/zzsdream/p/14055963.html
                 setReadonly(isChecked);
               }}
