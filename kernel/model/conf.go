@@ -168,6 +168,12 @@ func InitConf() {
 	if 32 < Conf.FileTree.MaxOpenTabCount {
 		Conf.FileTree.MaxOpenTabCount = 32
 	}
+	Conf.FileTree.DocCreateSavePath = strings.TrimSpace(Conf.FileTree.DocCreateSavePath)
+	for strings.HasSuffix(Conf.FileTree.DocCreateSavePath, "/") {
+		Conf.FileTree.DocCreateSavePath = strings.TrimSuffix(Conf.FileTree.DocCreateSavePath, "/")
+		Conf.FileTree.DocCreateSavePath = strings.TrimSpace(Conf.FileTree.DocCreateSavePath)
+	}
+
 	if nil == Conf.Tag {
 		Conf.Tag = conf.NewTag()
 	}
@@ -399,7 +405,8 @@ func Close(force bool, execInstallPkg int) (exitCode int) {
 	WaitForWritingFiles()
 
 	if !force {
-		if Conf.Sync.Enabled && ((IsSubscriber() && conf.ProviderSiYuan == Conf.Sync.Provider) || conf.ProviderSiYuan != Conf.Sync.Provider) {
+		if Conf.Sync.Enabled && 3 != Conf.Sync.Mode &&
+			((IsSubscriber() && conf.ProviderSiYuan == Conf.Sync.Provider) || conf.ProviderSiYuan != Conf.Sync.Provider) {
 			syncData(false, true, false)
 			if 0 != ExitSyncSucc {
 				exitCode = 1

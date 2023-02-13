@@ -15,7 +15,7 @@ specifiers:
   clean-webpack-plugin: ^4.0.0
   css-loader: ^6.7.1
   dayjs: ^1.11.5
-  electron: 22.1.0
+  electron: 23.0.0
   electron-builder: ^23.3.3
   electron-fetch: ^1.7.4
   encoding: ^0.1.13
@@ -39,7 +39,7 @@ specifiers:
   webpack-cli: ^4.10.0
 
 dependencies:
-  '@electron/remote': 2.0.9_electron@22.1.0
+  '@electron/remote': 2.0.9_electron@23.0.0
   electron-fetch: 1.7.4
   pnpm: 7.9.3
 
@@ -57,7 +57,7 @@ devDependencies:
   clean-webpack-plugin: 4.0.0_webpack@5.73.0
   css-loader: 6.7.1_webpack@5.73.0
   dayjs: 1.11.5
-  electron: 22.1.0
+  electron: 23.0.0
   electron-builder: 23.3.3
   encoding: 0.1.13
   eslint: 8.19.0
@@ -1264,7 +1264,7 @@ packages:
       debug: 4.3.4
       env-paths: 2.2.1
       fs-extra: 8.1.0
-      got: 11.8.5
+      got: 11.8.6
       progress: 2.0.3
       semver: 6.3.0
       sumchecker: 3.0.1
@@ -1273,12 +1273,12 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /@electron/remote/2.0.9_electron@22.1.0:
+  /@electron/remote/2.0.9_electron@23.0.0:
     resolution: {integrity: sha512-LR0W0ID6WAKHaSs0x5LX9aiG+5pFBNAJL6eQAJfGkCuZPUa6nZz+czZLdlTDETG45CgF/0raSvCtYOYUpr6c+A==}
     peerDependencies:
       electron: '>= 13.0.0'
     dependencies:
-      electron: 22.1.0
+      electron: 23.0.0
     dev: false
 
   /@electron/universal/1.2.1:
@@ -2769,8 +2769,8 @@ packages:
     resolution: {integrity: sha512-YoVeFrGd/7ROjz4R9uPoND1K/hSRC/xADy9639ZmIZeJSaBnKdYx3I6LMPsY7CXLpK7JFgKQVzeZ/dk2br6Eaw==}
     dev: true
 
-  /electron/22.1.0:
-    resolution: {integrity: sha512-wz5s4N6V7zyKm4YQmXJImFoxO1Doai32ShYm0FzOLPBMwLMdQBV+REY+j1opRx0KJ9xJEIdjYgcA8OSw6vx3pA==}
+  /electron/23.0.0:
+    resolution: {integrity: sha512-S6hVtTAjauMiiWP9sBVR5RpcUC464cNZ06I2EMUjeZBq+KooS6tLmNsfw0zLpAXDp1qosjlBP3v71NTZ3gd9iA==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
     requiresBuild: true
@@ -3253,8 +3253,8 @@ packages:
       pinkie-promise: 2.0.1
     dev: true
 
-  /got/11.8.5:
-    resolution: {integrity: sha512-o0Je4NvQObAuZPHLFoRSkdG2lTgtcynqymzg2Vupdx6PorhaT5MCbIyXG6d4D94kk8ZG57QeosgdiqfJWhEhlQ==}
+  /got/11.8.6:
+    resolution: {integrity: sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==}
     engines: {node: '>=10.19.0'}
     dependencies:
       '@sindresorhus/is': 4.6.0
