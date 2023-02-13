@@ -35,7 +35,7 @@ import {hintMoveBlock} from "../hint/extend";
 import {makeCard} from "../../card/makeCard";
 import {transferBlockRef} from "../../menus/block";
 import {HiJoy} from "../../sillot/joyUI/com_/hi";
-import MDDialog from "../../sillot/joyUI/com_/MDeditor";
+import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
 
 export class Gutter {
     public element: HTMLElement;
@@ -748,7 +748,16 @@ export class Gutter {
             label: "KMD 源码编辑",
             click() {
                 window.sout.log("KMD 源码编辑");
-                MDDialog({id:"app5",nodeID:id});
+                const initTheme =
+                  window.siyuan.config.appearance.mode == 0 ? "vs" : "vs-dark";
+                MDDialog({
+                  id: "app5",
+                  nodeID: id,
+                  lang: "markdown",
+                  theme: initTheme,
+                  readonly: true,
+                  editable: false,
+                });
             }
         });
         window.siyuan.menus.menu.append(new MenuItem({

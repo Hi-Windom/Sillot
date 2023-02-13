@@ -71,7 +71,8 @@ interface ISillot {
     },
     funs: {
         hljsRender: any,
-    }
+    },
+    lute: Lute
 }
 interface ISout {
     debug: boolean

@@ -15,7 +15,7 @@ import { focusBlock,focusByOffset,focusSideBlock,focusByRange } from "../protyle
 export class SillotEnv {
   constructor() {
     exSout();
-    window.Sillot = { status: { IDBloaded: false, disableDocSetPadding: false }, funs: { hljsRender: highlightRender } };
+    window.Sillot = { status: { IDBloaded: false, disableDocSetPadding: false }, funs: { hljsRender: highlightRender }, lute: null };
     window.__ = {
       ace: null,
       Swal: Swal,
