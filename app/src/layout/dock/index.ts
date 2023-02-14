@@ -101,7 +101,7 @@ bottom: 82px;`);
                         } else if (this.position === "Right") {
                             this.layout.element.setAttribute("style", `width:${this.layout.element.clientWidth}px;
 opacity: ${hasActive ? 1 : 0};
-"right":${this.element.clientWidth}px;
+right:${this.element.clientWidth}px;
 top: ${document.getElementById("toolbar").offsetHeight + document.getElementById("dockTop").offsetHeight}px;
 bottom: ${document.getElementById("status").offsetHeight + document.getElementById("dockBottom").offsetHeight}px;`);
                         } else {
@@ -113,7 +113,6 @@ ${this.position === "Top" ? ("top:" + (this.element.offsetHeight + document.getE
                         }
                         target.setAttribute("aria-label", window.siyuan.languages.pin);
                         this.resizeElement.classList.add("fn__none");
-                        resizeTabs();
                     } else {
                         target.setAttribute("aria-label", window.siyuan.languages.unpin);
                         this.layout.element.style.opacity = "";
@@ -124,6 +123,7 @@ ${this.position === "Top" ? ("top:" + (this.element.offsetHeight + document.getE
                     }
                     target.classList.toggle("dock__item--pin");
                     this.layout.element.classList.toggle("layout--float");
+                    resizeTabs();
                     event.preventDefault();
                     break;
                 }
@@ -156,13 +156,13 @@ ${this.position === "Top" ? ("top:" + (this.element.offsetHeight + document.getE
                 if (this.position === "Left") {
                     this.layout.element.setAttribute("style", `opacity:0px;
 width:${this.layout.element.clientWidth}px;
-left:-${this.layout.element.clientWidth}px;
+left:-${this.layout.element.clientWidth + 8}px;
 top:112px;
 bottom: 82px;`);
                 } else if (this.position === "Right") {
                     this.layout.element.setAttribute("style", `opacity:0px;
 width:${this.layout.element.clientWidth}px;
-right:-${this.layout.element.clientWidth}px;
+right:-${this.layout.element.clientWidth + 8}px;
 top: ${document.getElementById("toolbar").offsetHeight + document.getElementById("dockTop").offsetHeight}px;
 bottom: ${document.getElementById("status").offsetHeight + document.getElementById("dockBottom").offsetHeight}px;`);
                 } else {
@@ -171,7 +171,7 @@ opacity:0px;
 height:${this.layout.element.clientHeight}px;
 left:0;
 right:0;
-${this.position === "Top" ? "top" : "bottom"}:-${this.layout.element.clientHeight}px;`);
+${this.position === "Top" ? "top" : "bottom"}:-${this.layout.element.clientHeight + 8}px;`);
                 }
                 this.layout.element.classList.add("layout--float");
                 this.resizeElement.classList.add("fn__none");
@@ -209,13 +209,13 @@ ${this.position === "Top" ? "top" : "bottom"}:-${this.layout.element.clientHeigh
         }
         this.layout.element.style.opacity = "0";
         if (this.position === "Left") {
-            this.layout.element.style.left = -this.layout.element.clientWidth + "px";
+            this.layout.element.style.left = -this.layout.element.clientWidth - 8 + "px";
         } else if (this.position === "Right") {
-            this.layout.element.style.right = -this.layout.element.clientWidth + "px";
+            this.layout.element.style.right = -this.layout.element.clientWidth - 8 + "px";
         } else if (this.position === "Top") {
-            this.layout.element.style.top = -this.layout.element.clientHeight + "px";
+            this.layout.element.style.top = -this.layout.element.clientHeight - 8 + "px";
         } else if (this.position === "Bottom") {
-            this.layout.element.style.bottom = -this.layout.element.clientHeight + "px";
+            this.layout.element.style.bottom = -this.layout.element.clientHeight - 8 + "px";
         }
         this.element.querySelector(".dock__item--activefocus")?.classList.remove("dock__item--activefocus");
         this.layout.element.querySelector(".layout__tab--active")?.classList.remove("layout__tab--active");
@@ -525,7 +525,7 @@ ${this.position === "Top" ? "top" : "bottom"}:-${this.layout.element.clientHeigh
         this.element.querySelectorAll(".dock__item--active").forEach((item) => {
             let size;
             if (this.position === "Left" || this.position === "Right") {
-                size = parseInt(item.getAttribute("data-width")) || 240;
+                size = parseInt(item.getAttribute("data-width")) || (["graph", "globalGraph", "backlink"].includes(item.getAttribute("data-type")) ? 320 : 240);
             } else {
                 size = parseInt(item.getAttribute("data-height")) || 240;
             }
