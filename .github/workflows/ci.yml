@@ -213,10 +213,10 @@ jobs:
         if: "contains( matrix.config.goos, 'windows')"
         with:
           type: 'zip'
-          filename: Sillot-Portable_${{ needs.create_release.outputs.release_version }}.zip
+          filename: Sillot-Portable_${{ needs.create_release.outputs.release_version }}-win.zip
           path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/build/win-unpacked/
-          exclusions: '*.git* LICENSES.chromium.html'
-          recursive_exclusions: '*.log'
+          exclusions: '*.git*'
+          recursive_exclusions: 'LICENSES.chromium.html'
 
       - name: Upload WinPortable to release
         uses: actions/upload-release-asset@v1
@@ -226,6 +226,6 @@ jobs:
           # 这里使用 bot
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_name: Sillot-Portable_${{ needs.create_release.outputs.release_version }}.zip
-          asset_path: Sillot-Portable_${{ needs.create_release.outputs.release_version }}.zip
+          asset_name: Sillot-Portable_${{ needs.create_release.outputs.release_version }}-win.zip
+          asset_path: Sillot-Portable_${{ needs.create_release.outputs.release_version }}-win.zip
           asset_content_type: application/octet-stream
