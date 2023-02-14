@@ -30,7 +30,7 @@ import {replaceLocalPath} from "../editor/rename";
 import {workspaceMenu} from "../menus/workspace";
 import {getWorkspaceName} from "./noRelyPCFunction";
 import {setTabPosition} from "../window/setHeader";
-import { Tab } from "../layout/Tab";
+import {Tab} from "../layout/Tab";
 
 const matchKeymap = (keymap: Record<string, IKeymapItem>, key1: "general" | "editor", key2?: "general" | "insert" | "heading" | "list" | "table") => {
     if (key1 === "general") {
@@ -356,14 +356,14 @@ export const initWindow = () => {
             if (!/^sillot:/.test(url)) {
                 return;
             }
-            alert(url)
+            alert(url);
             ipcRenderer.send(Constants.SILLOT_SHOW, url); // 业务处理在 main.js
         });
         ipcRenderer.on(Constants.SISI_OPENURL, (event, url) => {
             if (!/^sisi:/.test(url)) {
                 return;
             }
-            alert(url)
+            alert(url);
             ipcRenderer.send(Constants.SISI_SHOW, url); // 业务处理在 main.js
         });
         ipcRenderer.on(Constants.SIYUAN_SAVE_CLOSE, (event, close) => {
@@ -371,7 +371,7 @@ export const initWindow = () => {
         });
     }
     ipcRenderer.on(Constants.SIYUAN_CLOSETAB, (e, ipcData) => {
-       const tab =  getInstanceById(ipcData);
+        const tab = getInstanceById(ipcData);
         if (tab && tab instanceof Tab) {
             tab.parent.removeTab(ipcData);
         }
@@ -476,6 +476,25 @@ export const initWindow = () => {
     window.addEventListener("beforeunload", () => {
         currentWindow.off("focus", winOnFocus);
     }, false);
+    if (isWindow()) {
+        document.body.insertAdjacentHTML("beforeend", `<div class="toolbar__window">
+<div class="toolbar__item b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.pin}" id="pinWindow">
+    <svg>
+        <use xlink:href="#iconPin"></use>
+    </svg>
+</div></div>`);
+        const pinElement = document.getElementById("pinWindow");
+        pinElement.addEventListener("click", () => {
+            pinElement.classList.toggle("toolbar__item--active");
+            if (pinElement.classList.contains("toolbar__item--active")) {
+                pinElement.setAttribute("aria-label", window.siyuan.languages.unpin);
+                currentWindow.setAlwaysOnTop(true, "pop-up-menu");
+            } else {
+                pinElement.setAttribute("aria-label", window.siyuan.languages.pin);
+                currentWindow.setAlwaysOnTop(false);
+            }
+        });
+    }
     if ("darwin" === window.siyuan.config.system.os) {
         document.getElementById("drag")?.addEventListener("dblclick", () => {
             if (currentWindow.isMaximized()) {
@@ -529,7 +548,7 @@ export const initWindow = () => {
     </svg>
 </div>`;
     if (isWindow()) {
-        document.body.insertAdjacentHTML("beforeend", `<div class="toolbar__window">${controlsHTML}</div>`);
+        document.querySelector(".toolbar__window").insertAdjacentHTML("beforeend", controlsHTML);
     } else {
         document.getElementById("windowControls").innerHTML = controlsHTML;
     }

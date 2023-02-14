@@ -4,10 +4,12 @@ module.exports = {
     parser: "@typescript-eslint/parser",
     plugins: [
         "@typescript-eslint",
+        "react-hooks",
     ],
     extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
+        "plugin:react-hooks/recommended",
     ],
     rules: {
         semi: [2, "always"],
@@ -21,5 +23,7 @@ module.exports = {
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-explicit-any": "off",
+        "react-hooks/rules-of-hooks": "error", // 检查 Hook 的规则
+        "react-hooks/exhaustive-deps": "warn", // 检查 effect 的依赖
     },
 };

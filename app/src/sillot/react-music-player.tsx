@@ -6,11 +6,11 @@ import "react-jinke-music-player/assets/index.css";
 export class MusicPlayer {
   public readonly root: any;
   constructor(props: { id: string }) {
-    let e = document.getElementById(props.id);
+    const e = document.getElementById(props.id);
     if (!e) {
       return;
     }
-    let options = {
+    const options = {
       audioLists: [
         {
           name: "姬霓太美",

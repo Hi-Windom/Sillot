@@ -28,18 +28,22 @@ export class Dock {
             case "Left":
                 this.layout = window.siyuan.layout.layout.children[1].children[0] as Layout;
                 this.resizeElement = this.layout.element.nextElementSibling as HTMLElement;
+                this.layout.element.classList.add("layout--floatl");
                 break;
             case "Right":
                 this.layout = window.siyuan.layout.layout.children[1].children[2] as Layout;
                 this.resizeElement = this.layout.element.previousElementSibling as HTMLElement;
+                this.layout.element.classList.add("layout--floatr");
                 break;
             case "Top":
                 this.layout = window.siyuan.layout.layout.children[0] as Layout;
                 this.resizeElement = this.layout.element.nextElementSibling as HTMLElement;
+                this.layout.element.classList.add("layout--floatt");
                 break;
             case "Bottom":
                 this.layout = window.siyuan.layout.layout.children[2] as Layout;
                 this.resizeElement = this.layout.element.previousElementSibling as HTMLElement;
+                this.layout.element.classList.add("layout--floatb");
                 break;
         }
         this.element = document.getElementById("dock" + options.position);
@@ -86,27 +90,48 @@ export class Dock {
                     break;
                 } else if (target.classList.contains("dock__item")) {
                     this.pin = !target.classList.contains("dock__item--pin");
+                    const hasActive = this.element.querySelector(".dock__item--active");
                     if (!this.pin) {
-                        if (this.position === "Left" || this.position === "Right") {
-                            this.layout.element.setAttribute("style", `width:${this.layout.element.clientWidth}px;${this.position === "Right" ? "right" : "left"}:${this.element.clientWidth + .5}px; top: ${.5 + document.getElementById("toolbar").clientHeight + document.getElementById("dockTop").clientHeight}px; bottom: ${document.getElementById("status").clientHeight + document.getElementById("dockBottom").clientHeight + .5}px;`);
+                        if (this.position === "Left") {
+                            this.layout.element.setAttribute("style", `width:${this.layout.element.clientWidth}px;
+opacity: ${hasActive ? 1 : 0};
+left:${this.element.clientWidth}px;
+top: 112px;
+bottom: 82px;`);
+                        } else if (this.position === "Right") {
+                            this.layout.element.setAttribute("style", `width:${this.layout.element.clientWidth}px;
+opacity: ${hasActive ? 1 : 0};
+right:${this.element.clientWidth}px;
+top: ${document.getElementById("toolbar").offsetHeight + document.getElementById("dockTop").offsetHeight}px;
+bottom: ${document.getElementById("status").offsetHeight + document.getElementById("dockBottom").offsetHeight}px;`);
                         } else {
-                            this.layout.element.setAttribute("style", `height:${this.layout.element.clientHeight}px;left:0;right:0;${this.position === "Top" ? ("top:" + (.5 + this.element.clientHeight + document.getElementById("toolbar").clientHeight) + "px") : ("bottom:" + (.5 + this.element.clientHeight + document.getElementById("status").clientHeight) + "px")};`);
+                            this.layout.element.setAttribute("style", `height:${this.layout.element.clientHeight}px;
+opacity: ${hasActive ? 1 : 0};
+left:0;
+right:0;
+${this.position === "Top" ? ("top:" + (this.element.offsetHeight + document.getElementById("toolbar").offsetHeight) + "px") : ("bottom:" + (this.element.offsetHeight + document.getElementById("status").offsetHeight) + "px")};`);
                         }
                         target.setAttribute("aria-label", window.siyuan.languages.pin);
+                        this.resizeElement.classList.add("fn__none");
                     } else {
                         target.setAttribute("aria-label", window.siyuan.languages.unpin);
+                        this.layout.element.style.opacity = "";
+                        this.layout.element.style.transition = "var(--b3-width-transition)";
+                        if (hasActive) {
+                            this.resizeElement.classList.remove("fn__none");
+                        }
                     }
                     target.classList.toggle("dock__item--pin");
                     this.layout.element.classList.toggle("layout--float");
-                    this.resizeElement.classList.toggle("fn__none");
+                    resizeTabs();
                     event.preventDefault();
                     break;
                 }
                 target = target.parentElement;
             }
         });
-        this.layout.element.addEventListener("mouseleave", (event) => {
-            if (this.pin) {
+        this.layout.element.addEventListener("mouseleave", (event: MouseEvent & { toElement: HTMLElement }) => {
+            if (this.pin || event.toElement?.classList.contains("b3-menu")) {
                 return;
             }
             if (this.position === "Left" && event.clientX < 43) {
@@ -128,10 +153,25 @@ export class Dock {
         }
         if (!this.pin) {
             setTimeout(() => {
-                if (this.position === "Left" || this.position === "Right") {
-                    this.layout.element.setAttribute("style", `opacity:0px;width:${this.layout.element.clientWidth}px;${this.position === "Right" ? "right" : "left"}:-${this.layout.element.clientWidth}px; top: ${.5 + document.getElementById("toolbar").clientHeight + document.getElementById("dockTop").clientHeight}px; bottom: ${document.getElementById("status").clientHeight + document.getElementById("dockBottom").clientHeight + .5}px;`);
+                if (this.position === "Left") {
+                    this.layout.element.setAttribute("style", `opacity:0px;
+width:${this.layout.element.clientWidth}px;
+left:-${this.layout.element.clientWidth + 8}px;
+top:112px;
+bottom: 82px;`);
+                } else if (this.position === "Right") {
+                    this.layout.element.setAttribute("style", `opacity:0px;
+width:${this.layout.element.clientWidth}px;
+right:-${this.layout.element.clientWidth + 8}px;
+top: ${document.getElementById("toolbar").offsetHeight + document.getElementById("dockTop").offsetHeight}px;
+bottom: ${document.getElementById("status").offsetHeight + document.getElementById("dockBottom").offsetHeight}px;`);
                 } else {
-                    this.layout.element.setAttribute("style", `opacity:0px;height:${this.layout.element.clientHeight}px;left:0;right:0;${this.position === "Top" ? "top" : "bottom"}:-${this.layout.element.clientHeight}px;`);
+                    this.layout.element.setAttribute("style", `
+opacity:0px;
+height:${this.layout.element.clientHeight}px;
+left:0;
+right:0;
+${this.position === "Top" ? "top" : "bottom"}:-${this.layout.element.clientHeight + 8}px;`);
                 }
                 this.layout.element.classList.add("layout--float");
                 this.resizeElement.classList.add("fn__none");
@@ -139,20 +179,46 @@ export class Dock {
         }
     }
 
+    public showDock() {
+        if (this.pin || !this.element.querySelector(".dock__item--active") || this.layout.element.style.opacity === "1") {
+            return;
+        }
+        if ((this.position === "Left" || this.position === "Right") &&
+            this.layout.element.clientWidth === 0 && this.layout.element.style.width.startsWith("0")) {
+            return;
+        }
+        if ((this.position === "Top" || this.position === "Bottom") &&
+            this.layout.element.clientHeight === 0 && this.layout.element.style.height.startsWith("0")) {
+            return;
+        }
+        this.layout.element.style.opacity = "1";
+        if (this.position === "Left") {
+            this.layout.element.style.left = this.element.clientWidth + "px";
+        } else if (this.position === "Right") {
+            this.layout.element.style.right = this.element.clientWidth + "px";
+        } else if (this.position === "Top") {
+            this.layout.element.style.top = (this.element.offsetHeight + document.getElementById("toolbar").offsetHeight) + "px";
+        } else if (this.position === "Bottom") {
+            this.layout.element.style.bottom = (this.element.offsetHeight + document.getElementById("status").offsetHeight) + "px";
+        }
+    }
+
     public hideDock() {
-        if (this.layout.element.style.opacity === "0") {
+        if (this.layout.element.style.opacity === "0" || this.pin) {
             return;
         }
         this.layout.element.style.opacity = "0";
         if (this.position === "Left") {
-            this.layout.element.style.left = -this.layout.element.clientWidth + "px";
+            this.layout.element.style.left = -this.layout.element.clientWidth - 8 + "px";
         } else if (this.position === "Right") {
-            this.layout.element.style.right = -this.layout.element.clientWidth + "px";
+            this.layout.element.style.right = -this.layout.element.clientWidth - 8 + "px";
         } else if (this.position === "Top") {
-            this.layout.element.style.top = -this.layout.element.clientHeight + "px";
+            this.layout.element.style.top = -this.layout.element.clientHeight - 8 + "px";
         } else if (this.position === "Bottom") {
-            this.layout.element.style.bottom = -this.layout.element.clientHeight + "px";
+            this.layout.element.style.bottom = -this.layout.element.clientHeight - 8 + "px";
         }
+        this.element.querySelector(".dock__item--activefocus")?.classList.remove("dock__item--activefocus");
+        this.layout.element.querySelector(".layout__tab--active")?.classList.remove("layout__tab--active");
     }
 
     public toggleModel(type: TDockType, show = false, close = false) {
@@ -178,6 +244,7 @@ export class Dock {
                     }
                 });
                 if (needFocus) {
+                    this.showDock();
                     return;
                 }
             }
@@ -194,6 +261,7 @@ export class Dock {
                     document.getElementById("drag").classList.remove("fn__hidden");
                 }
                 this.resizeElement.classList.add("fn__none");
+                this.hideDock();
             }
         } else {
             this.element.querySelectorAll(`.dock__item--active[data-index="${index}"]`).forEach(item => {
@@ -311,7 +379,10 @@ export class Dock {
                 document.querySelector("body").classList.contains("body--win32") && this.layout.element.querySelector(".fullscreen")) {
                 document.getElementById("drag").classList.add("fn__hidden");
             }
-            this.resizeElement.classList.remove("fn__none");
+            if (this.pin) {
+                this.layout.element.style.opacity = "";
+                this.resizeElement.classList.remove("fn__none");
+            }
         }
 
         // dock 中两个面板的显示关系
@@ -368,6 +439,7 @@ export class Dock {
             anotherWnd.element.style.width = "";
         }
         resizeTabs();
+        this.showDock();
     }
 
     public add(index: number, sourceElement: Element) {
@@ -453,7 +525,7 @@ export class Dock {
         this.element.querySelectorAll(".dock__item--active").forEach((item) => {
             let size;
             if (this.position === "Left" || this.position === "Right") {
-                size = parseInt(item.getAttribute("data-width")) || 240; // 240 兼容历史数据
+                size = parseInt(item.getAttribute("data-width")) || (["graph", "globalGraph", "backlink"].includes(item.getAttribute("data-type")) ? 320 : 240);
             } else {
                 size = parseInt(item.getAttribute("data-height")) || 240;
             }

@@ -1742,10 +1742,10 @@ export class WYSIWYG {
             // 响应点击事件 代码块编辑增强 #85
             const codeEditElement = hasClosestByClassName(event.target, "protyle-action__code_edit");
             if (codeEditElement && !protyle.disabled) {
-                let action = codeEditElement.parentElement
-                let block = action.parentElement
-                let code = block.querySelector(`[spellcheck]`)
-                let id = block.getAttribute("data-node-id")
+                const action = codeEditElement.parentElement;
+                const block = action.parentElement;
+                const code = block.querySelector("[spellcheck]");
+                const id = block.getAttribute("data-node-id");
                 window.__.ace.createEditor(id, action.textContent, code.textContent);
                 event.stopPropagation();
                 event.preventDefault();

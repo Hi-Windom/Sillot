@@ -12,7 +12,7 @@ import {reloadProtyle} from "../protyle/util/reload";
 import {MenuItem} from "../menus/Menu";
 import {getDisplayName, getNotebookIcon, getNotebookName, movePathTo, pathPosix} from "../util/pathName";
 import {Protyle} from "../protyle";
-import {onGet} from "../protyle/util/onGet";
+import {disabledProtyle, onGet} from "../protyle/util/onGet";
 import {addLoading, setPadding} from "../protyle/ui/initUI";
 import {getIconByType} from "../editor/getIcon";
 import {unicode2Emoji} from "../emoji";
@@ -188,6 +188,9 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
             breadcrumbDocName: true
         },
     });
+    if (window.siyuan.config.editor.readOnly) {
+        disabledProtyle(edit.protyle);
+    }
     if (closeCB) {
         if (data.layout === 1) {
             if (data.col) {
@@ -1119,12 +1122,21 @@ const getArticle = (options: {
             k: options.k,
             mode: foldResponse.data ? 0 : 3,
             size: foldResponse.data ? Constants.SIZE_GET_MAX : window.siyuan.config.editor.dynamicLoadBlocks,
+            zoom: foldResponse.data,
         }, getResponse => {
             onGet(getResponse, options.edit.protyle, foldResponse.data ? [Constants.CB_GET_ALL, Constants.CB_GET_HTML] : [Constants.CB_GET_HL, Constants.CB_GET_HTML]);
             const matchElement = options.edit.protyle.wysiwyg.element.querySelector(`div[data-node-id="${options.id}"] span[data-type="search-mark"]`);
             if (matchElement) {
                 const contentRect = options.edit.protyle.contentElement.getBoundingClientRect();
                 options.edit.protyle.contentElement.scrollTop = options.edit.protyle.contentElement.scrollTop + matchElement.getBoundingClientRect().top - contentRect.top - contentRect.height / 2;
+            }
+            const exitFocusElement = options.edit.protyle.breadcrumb.element.parentElement.querySelector('[data-type="exit-focus"]');
+            if (!foldResponse.data) {
+                exitFocusElement.classList.add("fn__none");
+                exitFocusElement.nextElementSibling.classList.add("fn__none");
+            } else {
+                exitFocusElement.classList.remove("fn__none");
+                exitFocusElement.nextElementSibling.classList.remove("fn__none");
             }
         });
     });

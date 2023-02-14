@@ -1,0 +1,7 @@
+{
+  "$schema": "https://wixplosives.github.io/codux-config-schema/codux.config.schema.json",
+  "newComponent": {
+    "componentsPath": "src/_codux/components",
+    "templatesPath": "src/_codux/com-templates"
+  }
+}

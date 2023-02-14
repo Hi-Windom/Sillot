@@ -22,7 +22,7 @@ module.exports = (env, argv) => {
     },
     optimization: {
       splitChunks: {
-        chunks: 'all',
+        chunks: "all",
       },
       minimize: true,
       minimizer: [
@@ -79,7 +79,7 @@ module.exports = (env, argv) => {
             {
               loader: MiniCssExtractPlugin.loader,
               options: {
-                publicPath: '../../'
+                publicPath: "../../"
               }
             },
             {

@@ -22,7 +22,7 @@ module.exports = (env, argv) => {
     },
     optimization: {
       splitChunks: {
-        chunks: 'all',
+        chunks: "all",
       },
       minimize: true,
       minimizer: [
@@ -40,7 +40,7 @@ module.exports = (env, argv) => {
       fallback: {
         "path": require.resolve("path-browserify"),
       },
-      extensions: ['.ts', '.js', '.jsx', '.tsx', '.tpl', '.scss'],
+      extensions: [".ts", ".js", ".jsx", ".tsx", ".tpl", ".scss"],
     },
     module: {
       rules: [
@@ -96,7 +96,7 @@ module.exports = (env, argv) => {
             {
               loader: MiniCssExtractPlugin.loader,
               options: {
-                publicPath: '../../'
+                publicPath: "../../"
               }
             },
             {
@@ -111,10 +111,10 @@ module.exports = (env, argv) => {
           test:/\.css$/,
           use: [
             {
-              loader: 'style-loader'
+              loader: "style-loader"
             },
             {
-              loader: 'css-loader'
+              loader: "css-loader"
             }
           ]
         },
@@ -122,11 +122,11 @@ module.exports = (env, argv) => {
           test: /\.[jt]sx$/,
           exclude: /node_modules/,
           use: {
-              loader: 'babel-loader',
+              loader: "babel-loader",
               options: {
-                  presets: ['@babel/preset-react', '@babel/preset-typescript'],
+                  presets: ["@babel/preset-react", "@babel/preset-typescript"],
                   plugins: [
-                      '@babel/plugin-transform-runtime',
+                      "@babel/plugin-transform-runtime",
                   ]
               }
           }

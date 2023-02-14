@@ -21,7 +21,7 @@ import {initMessage} from "../dialog/message";
 import {getAllTabs} from "../layout/getAll";
 import {getLocalStorage} from "../protyle/util/compatibility";
 import {init} from "../window/init";
-import { importIDB } from '../sillot/util/sillot-idb-backup-and-restore'
+import { importIDB } from "../sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "../sillot";
 
 class App {
@@ -126,11 +126,11 @@ class App {
             }),
             menus: new Menus()
         };
-        new SillotEnv()
+        new SillotEnv();
         fetchPost("/api/system/getConf", {}, response => {
             window.siyuan.config = response.data.conf;
-            console.warn('window.index 新开窗口 隔离环境')
-            let workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1)
+            console.warn("window.index 新开窗口 隔离环境");
+            const workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1);
             fetchPost("/api/sillot/getConfigesStore", { f: `IDB__${workspaceName}__.json` }, async (r) => {
                 // console.log(r);
                 importIDB(r.data).then(() => {

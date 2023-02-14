@@ -191,7 +191,7 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
         });
         const tempInnerHTML = tempElement.innerHTML;
         insertHTML(tempInnerHTML, protyle, isBlock);
-        filterClipboardHint(protyle, tempInnerHTML);
+        filterClipboardHint(protyle, protyle.lute.BlockDOM2StdMd(tempInnerHTML));
         blockRender(protyle, protyle.wysiwyg.element);
         processRender(protyle.wysiwyg.element);
         highlightRender(protyle.wysiwyg.element);
@@ -218,11 +218,12 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
             focusByWbr(protyle.wysiwyg.element, range);
         } else {
             // 粘贴内容转代码块 代码块编辑增强 #85
-            let x: Array<any> = window._.words(code, /[^, ,=,"]+/g)
-            console.error(x[window._.indexOf(x, 'data-node-id') + 1])
+            const x: Array<any> = window._.words(code, /[^, ,=,"]+/g);
+            console.error(x[window._.indexOf(x, "data-node-id") + 1]);
             insertHTML(code, protyle, true);
             highlightRender(protyle.wysiwyg.element);
         }
+        hideElements(["hint"], protyle)
     } else {
         let isHTML = false;
         if (textHTML.replace("<!--StartFragment--><!--EndFragment-->", "").trim() !== "") {
@@ -281,7 +282,7 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
             }
             const textPlainDom = protyle.lute.Md2BlockDOM(textPlain);
             insertHTML(textPlainDom, protyle);
-            filterClipboardHint(protyle, textPlainDom);
+            filterClipboardHint(protyle, textPlain);
         }
         blockRender(protyle, protyle.wysiwyg.element);
         processRender(protyle.wysiwyg.element);

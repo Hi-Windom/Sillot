@@ -6,7 +6,7 @@ require (
 	github.com/88250/clipboard v0.1.5
 	github.com/88250/css v0.1.2
 	github.com/88250/gulu v1.2.3-0.20221117052724-cd06804db798
-	github.com/88250/lute v1.7.6-0.20230207141533-e80e4b21d7e1
+	github.com/88250/lute v1.7.6-0.20230212103910-a5da0bd24ec4
 	github.com/88250/pdfcpu v0.3.13
 	github.com/88250/vitess-sqlparser v0.0.0-20210205111146-56a2ded2aba1
 	github.com/ConradIrwin/font v0.0.0-20210318200717-ce8d41cc0732
@@ -38,9 +38,10 @@ require (
 	github.com/olahol/melody v1.1.1
 	github.com/panjf2000/ants/v2 v2.7.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/pyroscope-io/client v0.6.0
 	github.com/radovskyb/watcher v1.0.7
 	github.com/shirou/gopsutil/v3 v3.23.1
-	github.com/siyuan-note/dejavu v0.0.0-20230211034120-c61245065d20
+	github.com/siyuan-note/dejavu v0.0.0-20230212031819-32964d704bd2
 	github.com/siyuan-note/encryption v0.0.0-20220713091850-5ecd92177b75
 	github.com/siyuan-note/eventbus v0.0.0-20230203085647-fb624740be03
 	github.com/siyuan-note/filelock v0.0.0-20221117095924-e1947438a35e
@@ -105,6 +106,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
+	github.com/pyroscope-io/godeltaprof v0.1.0 // indirect
 	github.com/qiniu/go-sdk/v7 v7.14.0 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
 	github.com/quic-go/qtls-go1-18 v0.2.0 // indirect

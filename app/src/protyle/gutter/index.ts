@@ -34,8 +34,8 @@ import {movePathTo} from "../../util/pathName";
 import {hintMoveBlock} from "../hint/extend";
 import {makeCard} from "../../card/makeCard";
 import {transferBlockRef} from "../../menus/block";
-import {HiJoy} from "../../sillot/joyUI/com_/hi"
-import MDDialog from "../../sillot/joyUI/com_/MDeditor";
+import {HiJoy} from "../../sillot/joyUI/com_/hi";
+import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
 
 export class Gutter {
     public element: HTMLElement;
@@ -433,19 +433,19 @@ export class Gutter {
             }
         });
         if (!isList && !protyle.disabled) {
-            let SillotExtSubmennu: IMenu[] = [];
+            const SillotExtSubmennu: IMenu[] = [];
             SillotExtSubmennu.push({
                 label: "MD 源码编辑",
                 click() {
-                    window.sout.log("MD 源码编辑")
+                    window.sout.log("MD 源码编辑");
                 }
-            })
+            });
             SillotExtSubmennu.push({
                 label: "KMD 源码编辑",
                 click() {
-                    window.sout.log("KMD 源码编辑")
+                    window.sout.log("KMD 源码编辑");
                 }
-            })
+            });
             window.siyuan.menus.menu.append(new MenuItem({
                 label: "汐洛扩展菜单",
                 icon: "iconMore",
@@ -736,21 +736,30 @@ export class Gutter {
         hideElements(["select"], protyle);
         nodeElement.classList.add("protyle-wysiwyg--select");
         countBlockWord([id], protyle.block.rootID);
-        let SillotExtSubmennu: IMenu[] = [];
+        const SillotExtSubmennu: IMenu[] = [];
         SillotExtSubmennu.push({
             label: "MD 源码编辑",
             click() {
-                window.sout.log("MD 源码编辑")
-                new HiJoy({id:"app5"})
+                window.sout.log("MD 源码编辑");
+                new HiJoy({id:"app5"});
             }
-        })
+        });
         SillotExtSubmennu.push({
             label: "KMD 源码编辑",
             click() {
-                window.sout.log("KMD 源码编辑")
-                new MDDialog({id:"app5",nodeID:id})
+                window.sout.log("KMD 源码编辑");
+                const initTheme =
+                  window.siyuan.config.appearance.mode == 0 ? "vs" : "vs-dark";
+                MDDialog({
+                  id: "app5",
+                  nodeID: id,
+                  lang: "markdown",
+                  theme: initTheme,
+                  readonly: true,
+                  editable: false,
+                });
             }
-        })
+        });
         window.siyuan.menus.menu.append(new MenuItem({
             label: "汐洛扩展菜单",
             icon: "iconMore",

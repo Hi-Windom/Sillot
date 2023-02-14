@@ -137,6 +137,10 @@ export const syncGuide = (element?: Element) => {
         setSync();
         return;
     }
+    syncNow();
+};
+
+const syncNow = () => {
     if (window.siyuan.config.sync.mode !== 3) {
         fetchPost("/api/sync/performSync", {});
         return;
@@ -222,7 +226,7 @@ const setSync = (key?: string, dialog?: Dialog) => {
                 window.siyuan.config.sync.enabled = true;
                 processSync();
                 confirmDialog(window.siyuan.languages.syncConfGuide4, window.siyuan.languages.syncConfGuide5, () => {
-                    fetchPost("/api/sync/performSync", {});
+                    syncNow();
                 });
             });
         });
@@ -231,7 +235,7 @@ const setSync = (key?: string, dialog?: Dialog) => {
             dialog.destroy();
         }
         confirmDialog(window.siyuan.languages.syncConfGuide4, window.siyuan.languages.syncConfGuide5, () => {
-            fetchPost("/api/sync/performSync", {});
+            syncNow();
         });
     }
 };
