@@ -412,7 +412,7 @@ export class Gutter {
     }
 
     public renderMultipleMenu(protyle: IProtyle, selectsElement: Element[]) {
-        // 选中多个块的菜单
+        // 选中多个连续块的菜单
         let isList = false;
         let isContinue = false;
         let hasEmbedBlock = false;
@@ -434,18 +434,6 @@ export class Gutter {
         });
         if (!isList && !protyle.disabled) {
             const SillotExtSubmennu: IMenu[] = [];
-            SillotExtSubmennu.push({
-                label: "MD 源码编辑",
-                click() {
-                    window.sout.log("MD 源码编辑");
-                }
-            });
-            SillotExtSubmennu.push({
-                label: "KMD 源码编辑",
-                click() {
-                    window.sout.log("KMD 源码编辑");
-                }
-            });
             window.siyuan.menus.menu.append(new MenuItem({
                 label: "汐洛扩展菜单",
                 icon: "iconMore",
@@ -737,13 +725,13 @@ export class Gutter {
         nodeElement.classList.add("protyle-wysiwyg--select");
         countBlockWord([id], protyle.block.rootID);
         const SillotExtSubmennu: IMenu[] = [];
-        SillotExtSubmennu.push({
-            label: "MD 源码编辑",
-            click() {
-                window.sout.log("MD 源码编辑");
-                new HiJoy({id:"app5"});
-            }
-        });
+        // SillotExtSubmennu.push({
+        //     label: "MD 源码编辑",
+        //     click() {
+        //         window.sout.log("MD 源码编辑");
+        //         new HiJoy({id:"app5"});
+        //     }
+        // });
         SillotExtSubmennu.push({
             label: "KMD 源码编辑",
             click() {
