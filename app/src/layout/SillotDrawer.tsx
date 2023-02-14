@@ -66,11 +66,11 @@ function InstagramPost() {
         >
           <Avatar
             size="sm"
-            src="/static/logo.png"
+            src="/stage/icon.png"
             sx={{ p: 0.5, border: "2px solid", borderColor: "background.body" }}
           />
         </Box>
-        <Typography fontWeight="lg">MUI</Typography>
+        <Typography fontWeight="lg">Sillot</Typography>
         <IconButton
           variant="plain"
           color="neutral"
