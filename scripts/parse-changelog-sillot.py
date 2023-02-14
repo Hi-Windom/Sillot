@@ -59,7 +59,7 @@ def find_milestone(repo, title):
     version = ".".join(pat.group(1).split(".")[:2])
     print('''
 ---
-❤️ 如果你也热爱思源，欢迎一起共建汐洛分支 694357845@qq.com
+❤️ 欢迎共建思源笔记汐洛分支 694357845@qq.com
 💠 海文东QQ频道：43in2c1qb9 异步更新安装包
 🐱‍🏍 Sillot is currently in active development
 ⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
@@ -85,6 +85,7 @@ def find_milestone(repo, title):
 - [react-markdown](https://github.com/remarkjs/react-markdown)
 - [alist](https://github.com/alist-org/alist)
 - [obsidian-various-complements-plugin](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin)
+- [xterm.js](https://github.com/xtermjs/xterm.js)
 
 ### 🥉 铜牌开源力量
 
