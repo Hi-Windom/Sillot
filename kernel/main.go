@@ -19,6 +19,10 @@
 package main
 
 import (
+	"os"
+	"runtime"
+
+	"github.com/pyroscope-io/client/pyroscope"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/job"
 	"github.com/siyuan-note/siyuan/kernel/model"
@@ -28,6 +32,35 @@ import (
 )
 
 func main() {
+	// These 2 lines are only required if you're using mutex or block profiling
+	// Read the explanation below for how to set these rates:
+	runtime.SetMutexProfileFraction(5)
+	runtime.SetBlockProfileRate(5)
+
+	pyroscope.Start(pyroscope.Config{
+		ApplicationName: "sc.sillot.app",
+		ServerAddress:   "https://ingest.pyroscope.cloud",
+		AuthToken:       "psx-kdPTwtux2s8Xd6Df4ahD8T_DKFIVfgiWVTcW6fzoEWd_IGe_6fOtQwc",
+		Logger:          pyroscope.StandardLogger,
+		Tags:            map[string]string{"hostname": os.Getenv("HOSTNAME")},
+
+		ProfileTypes: []pyroscope.ProfileType{
+			// these profile types are enabled by default:
+			pyroscope.ProfileCPU,
+			pyroscope.ProfileAllocObjects,
+			pyroscope.ProfileAllocSpace,
+			pyroscope.ProfileInuseObjects,
+			pyroscope.ProfileInuseSpace,
+
+			// these profile types are optional:
+			pyroscope.ProfileGoroutines,
+			pyroscope.ProfileMutexCount,
+			pyroscope.ProfileMutexDuration,
+			pyroscope.ProfileBlockCount,
+			pyroscope.ProfileBlockDuration,
+		},
+	})
+
 	util.Boot()
 
 	model.InitConf()
