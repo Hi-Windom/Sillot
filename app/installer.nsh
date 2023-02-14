@@ -17,4 +17,8 @@ Caption "${PRODUCT_NAME} ${VERSION}"
     no:
         Quit
     yes:
+    MessageBox MB_ICONEXCLAMATION|MB_OKCANCEL "数据无价，请勿在生产环节使用汐洛分支！安装前应当先备份重要文件！是否继续？$\n$\n" IDOK yes2 IDCANCEL no2
+    no2:
+        Quit
+    yes2:
 !macroend

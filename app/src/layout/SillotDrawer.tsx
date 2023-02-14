@@ -81,7 +81,7 @@ function InstagramPost() {
         </IconButton>
       </Box>
       <CardOverflow>
-        <AspectRatio>
+        <AspectRatio sx={{ backgroundColor: "transparent" }}>
           <img src="/stage/icon.png" alt="" loading="lazy" />
         </AspectRatio>
       </CardOverflow>
@@ -127,17 +127,6 @@ function InstagramPost() {
       >
         8.1M Likes
       </Link>
-      <Typography fontSize="sm">
-        <Link
-          component="button"
-          color="neutral"
-          fontWeight="lg"
-          textColor="text.primary"
-        >
-          Sillot
-        </Link>{" "}
-        The React component library you always wanted
-      </Typography>
       <Link
         component="button"
         underline="none"

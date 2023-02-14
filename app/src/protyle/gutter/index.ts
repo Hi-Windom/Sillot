@@ -412,7 +412,7 @@ export class Gutter {
     }
 
     public renderMultipleMenu(protyle: IProtyle, selectsElement: Element[]) {
-        // 选中多个块的菜单
+        // 选中多个连续块的菜单
         let isList = false;
         let isContinue = false;
         let hasEmbedBlock = false;
@@ -434,18 +434,6 @@ export class Gutter {
         });
         if (!isList && !protyle.disabled) {
             const SillotExtSubmennu: IMenu[] = [];
-            SillotExtSubmennu.push({
-                label: "MD 源码编辑",
-                click() {
-                    window.sout.log("MD 源码编辑");
-                }
-            });
-            SillotExtSubmennu.push({
-                label: "KMD 源码编辑",
-                click() {
-                    window.sout.log("KMD 源码编辑");
-                }
-            });
             window.siyuan.menus.menu.append(new MenuItem({
                 label: "汐洛扩展菜单",
                 icon: "iconMore",
@@ -737,13 +725,13 @@ export class Gutter {
         nodeElement.classList.add("protyle-wysiwyg--select");
         countBlockWord([id], protyle.block.rootID);
         const SillotExtSubmennu: IMenu[] = [];
-        SillotExtSubmennu.push({
-            label: "MD 源码编辑",
-            click() {
-                window.sout.log("MD 源码编辑");
-                new HiJoy({id:"app5"});
-            }
-        });
+        // SillotExtSubmennu.push({
+        //     label: "MD 源码编辑",
+        //     click() {
+        //         window.sout.log("MD 源码编辑");
+        //         new HiJoy({id:"app5"});
+        //     }
+        // });
         SillotExtSubmennu.push({
             label: "KMD 源码编辑",
             click() {
@@ -1376,15 +1364,16 @@ export class Gutter {
             }).element);
         }
         window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
+        const SSSubmennu: IMenu[] = []; // https://github.com/Hi-Windom/Sillot/issues/175
         if (!protyle.options.backlinkData) {
-            window.siyuan.menus.menu.append(new MenuItem({
+            SSSubmennu.push({ // 聚焦
                 accelerator: `${updateHotkeyTip(window.siyuan.config.keymap.general.enter.custom)}/${updateHotkeyTip("⌘Click")}`,
                 label: window.siyuan.languages.enter,
                 click() {
                     zoomOut(protyle, id);
                 }
-            }).element);
-            window.siyuan.menus.menu.append(new MenuItem({
+            });
+            SSSubmennu.push({ // 聚焦到上层
                 accelerator: window.siyuan.config.keymap.general.enterBack.custom,
                 label: window.siyuan.languages.enterBack,
                 click() {
@@ -1404,10 +1393,10 @@ export class Gutter {
                         zoomOut(protyle, protyle.block.parent2ID, id);
                     }
                 }
-            }).element);
+            });
         }
         if (!protyle.disabled) {
-            window.siyuan.menus.menu.append(new MenuItem({
+            window.siyuan.menus.menu.append(new MenuItem({ // 起始插入行
                 icon: "iconBefore",
                 label: window.siyuan.languages["insert-before"],
                 accelerator: window.siyuan.config.keymap.editor.general.insertBefore.custom,
@@ -1417,7 +1406,7 @@ export class Gutter {
                     insertEmptyBlock(protyle, "beforebegin", id);
                 }
             }).element);
-            window.siyuan.menus.menu.append(new MenuItem({
+            window.siyuan.menus.menu.append(new MenuItem({ // 末尾插入行
                 icon: "iconAfter",
                 label: window.siyuan.languages["insert-after"],
                 accelerator: window.siyuan.config.keymap.editor.general.insertAfter.custom,
@@ -1432,27 +1421,35 @@ export class Gutter {
                 transferBlockRef(id);
             }
         }
-        window.siyuan.menus.menu.append(new MenuItem({
+        SSSubmennu.push({ // 跳转到上一层级的下一个块
             label: window.siyuan.languages.jumpToParentNext,
             accelerator: window.siyuan.config.keymap.editor.general.jumpToParentNext.custom,
             click() {
                 hideElements(["select"], protyle);
                 jumpToParentNext(protyle, nodeElement);
             }
-        }).element);
-        window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
-
+        });
         if (type !== "NodeThematicBreak") {
-            window.siyuan.menus.menu.append(new MenuItem({
+            SSSubmennu.push({ // 折叠/展开
                 label: window.siyuan.languages.fold,
                 accelerator: `${updateHotkeyTip(window.siyuan.config.keymap.editor.general.collapse.custom)}/${updateHotkeyTip("⌥Click")}`,
                 click() {
                     setFold(protyle, nodeElement);
                     focusBlock(nodeElement);
                 }
-            }).element);
+            });
+        }
+        window.siyuan.menus.menu.append(new MenuItem({
+            label: "层级操作",
+            icon: "iconMore",
+            type: "submenu",
+            submenu: SSSubmennu
+        }).element);
+        window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
+
+        if (type !== "NodeThematicBreak") {
             if (!protyle.disabled) {
-                window.siyuan.menus.menu.append(new MenuItem({
+                window.siyuan.menus.menu.append(new MenuItem({ // 属性
                     label: window.siyuan.languages.attr,
                     accelerator: window.siyuan.config.keymap.editor.general.attr.custom + "/" + updateHotkeyTip("⇧Click"),
                     click() {
