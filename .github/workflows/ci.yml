@@ -209,8 +209,8 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: zip WinPortable
-        if: matrix.os == 'windows-latest'
         uses: thedoctor0/zip-release@0.7.1
+        if: "contains( matrix.config.goos, 'windows')"
         with:
           type: 'zip'
           filename: Sillot-Portable_${{ needs.create_release.outputs.release_version }}.zip
@@ -220,7 +220,7 @@ jobs:
 
       - name: Upload WinPortable to release
         uses: actions/upload-release-asset@v1
-        if: matrix.os == 'windows-latest'
+        if: "contains( matrix.config.goos, 'windows')"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # 这里使用 bot
