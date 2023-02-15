@@ -28,6 +28,7 @@ const {
     ipcMain,
     globalShortcut,
     Tray,
+    Notification,
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -591,6 +592,10 @@ const initKernel = (workspace, port, lang) => {
             if (!isDevEnv && apiData.data !== appVer) {
                 writeLog(
                     `kernel [${apiData.data}] is running, shutdown it now and then start kernel [${appVer}]`);
+                new Notification({
+                    title:"版本不一致",
+                    body:`kernel [${apiData.data}] is running, shutdown it now and then start kernel [${appVer}]`,
+                 }).show();
                 fetch(getServer() + "/api/system/exit", {method: "POST"});
                 bootWindow.destroy();
                 resolve(false);
@@ -609,6 +614,10 @@ const initKernel = (workspace, port, lang) => {
                         }
                     } catch (e) {
                         writeLog("get boot progress failed: " + e.message);
+                        new Notification({
+                            title:"get boot progress failed",
+                            body:e.message,
+                         }).show();
                         fetch(getServer() + "/api/system/exit", {method: "POST"});
                         bootWindow.destroy();
                         resolve(false);
@@ -618,6 +627,10 @@ const initKernel = (workspace, port, lang) => {
             }
         } else {
             writeLog(`get kernel version failed: ${apiData.code}, ${apiData.msg}`);
+            new Notification({
+                title:`get kernel version failed: ${apiData.code}`,
+                body:apiData.msg,
+             }).show();
             resolve(false);
         }
     });
@@ -1189,6 +1202,10 @@ powerMonitor.on("resume", async () => {
 
     if (!online) {
         writeLog("network is offline, do not sync after system resume");
+        new Notification({
+            title:`network is offline`,
+            body:"Do not sync after system resume",
+         }).show();
         return;
     }
 

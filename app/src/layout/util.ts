@@ -625,9 +625,7 @@ export const addResize = (obj: Layout | Wnd) => {
                 const documentSelf = document;
                 const nextElement = resizeElement.nextElementSibling as HTMLElement;
                 const previousElement = resizeElement.previousElementSibling as HTMLElement;
-                nextElement.style.transition = "";
                 nextElement.style.overflow = "auto"; // 拖动时 layout__resize 会出现 https://github.com/siyuan-note/siyuan/issues/6221
-                previousElement.style.transition = "";
                 previousElement.style.overflow = "auto";
                 setSize(nextElement, direction);
                 setSize(previousElement, direction);
@@ -653,10 +651,10 @@ export const addResize = (obj: Layout | Wnd) => {
                     if (previousNowSize < 8 || nextNowSize < 8) {
                         return;
                     }
-                    if (window.siyuan.layout.leftDock?.layout.element.contains(previousElement) && previousNowSize < 188) {
+                    if (window.siyuan.layout.leftDock?.layout.element.contains(previousElement) && previousNowSize < 220) {
                         return;
                     }
-                    if (window.siyuan.layout.rightDock?.layout.element.contains(nextElement) && nextNowSize < 188) {
+                    if (window.siyuan.layout.rightDock?.layout.element.contains(nextElement) && nextNowSize < 320) {
                         return;
                     }
                     previousElement.style[direction === "lr" ? "width" : "height"] = previousNowSize + "px";
@@ -693,9 +691,7 @@ export const addResize = (obj: Layout | Wnd) => {
                     if (range) {
                         focusByRange(range);
                     }
-                    nextElement.style.transition = "var(--b3-width-transition)";
                     nextElement.style.overflow = "";
-                    previousElement.style.transition = "var(--b3-width-transition)";
                     previousElement.style.overflow = "";
                 };
             });
@@ -707,8 +703,6 @@ export const addResize = (obj: Layout | Wnd) => {
         }
         resizeElement.classList.add("layout__resize");
         obj.element.insertAdjacentElement("beforebegin", resizeElement);
-        obj.element.style.transition = "var(--b3-width-transition)";
-        (resizeElement.previousElementSibling as HTMLElement).style.transition = "var(--b3-width-transition)";
         resizeWnd(resizeElement, obj.resize);
     }
 };

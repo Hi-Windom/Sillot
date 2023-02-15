@@ -46,6 +46,7 @@ import (
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/httpclient"
 	"github.com/siyuan-note/logging"
+	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -360,7 +361,12 @@ func ExportDocx(id, savePath string, removeAssets, merge bool) (err error) {
 }
 
 func ExportMarkdownHTML(id, savePath string, docx, merge bool) (name, dom string) {
-	tree, _ := loadTreeByBlockID(id)
+	bt := treenode.GetBlockTree(id)
+	if nil == bt {
+		return
+	}
+
+	tree := prepareExportTree(bt)
 
 	if merge {
 		var mergeErr error
@@ -466,7 +472,13 @@ func ExportMarkdownHTML(id, savePath string, docx, merge bool) (name, dom string
 
 func ExportHTML(id, savePath string, pdf, image, keepFold, merge bool) (name, dom string) {
 	savePath = strings.TrimSpace(savePath)
-	tree, _ := loadTreeByBlockID(id)
+
+	bt := treenode.GetBlockTree(id)
+	if nil == bt {
+		return
+	}
+
+	tree := prepareExportTree(bt)
 
 	if merge {
 		var mergeErr error
@@ -583,6 +595,29 @@ func ExportHTML(id, savePath string, pdf, image, keepFold, merge bool) (name, do
 	luteEngine.SetSanitize(false)
 	renderer := render.NewProtyleExportRenderer(tree, luteEngine.RenderOptions)
 	dom = gulu.Str.FromBytes(renderer.Render())
+	return
+}
+
+func prepareExportTree(bt *treenode.BlockTree) (ret *parse.Tree) {
+	luteEngine := NewLute()
+	ret, _ = filesys.LoadTree(bt.BoxID, bt.Path, luteEngine)
+	if "d" != bt.Type {
+		node := treenode.GetNodeInTree(ret, bt.ID)
+		nodes := []*ast.Node{node}
+		if "h" == bt.Type {
+			children := treenode.HeadingChildren(node)
+			for _, child := range children {
+				nodes = append(nodes, child)
+			}
+		}
+
+		ret = parse.Parse("", []byte(""), luteEngine.ParseOptions)
+		first := ret.Root.FirstChild
+		for _, node := range nodes {
+			first.InsertBefore(node)
+		}
+	}
+	ret.HPath = bt.HPath
 	return
 }
 
@@ -1473,6 +1508,11 @@ func exportTree(tree *parse.Tree, wysiwyg, expandKaTexMacros, keepFold bool,
 				unlinks = append(unlinks, n)
 				return ast.WalkContinue
 			}
+		}
+
+		// 导出时去掉内容块闪卡样式 https://github.com/siyuan-note/siyuan/issues/7374
+		if n.IsBlock() {
+			n.RemoveIALAttr("custom-riff-decks")
 		}
 
 		switch n.Type {

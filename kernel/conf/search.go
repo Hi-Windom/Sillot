@@ -41,10 +41,10 @@ type Search struct {
 	Limit         int  `json:"limit"`
 	CaseSensitive bool `json:"caseSensitive"`
 
-	Name   bool `json:"name"`
-	Alias  bool `json:"alias"`
-	Memo   bool `json:"memo"`
-	Custom bool `json:"custom"`
+	Name  bool `json:"name"`
+	Alias bool `json:"alias"`
+	Memo  bool `json:"memo"`
+	IAL   bool `json:"ial"`
 
 	BacklinkMentionName          bool `json:"backlinkMentionName"`
 	BacklinkMentionAlias         bool `json:"backlinkMentionAlias"`
@@ -77,10 +77,10 @@ func NewSearch() *Search {
 		Limit:         64,
 		CaseSensitive: true,
 
-		Name:   true,
-		Alias:  true,
-		Memo:   true,
-		Custom: false,
+		Name:  true,
+		Alias: true,
+		Memo:  true,
+		IAL:   false,
 
 		BacklinkMentionName:          true,
 		BacklinkMentionAlias:         false,
@@ -107,9 +107,6 @@ func (s *Search) NAMFilter(keyword string) string {
 	}
 	if s.Memo {
 		buf.WriteString(" OR memo LIKE '%" + keyword + "%'")
-	}
-	if s.Custom {
-		buf.WriteString(" OR ial LIKE '%=%" + keyword + "%'")
 	}
 	return buf.String()
 }

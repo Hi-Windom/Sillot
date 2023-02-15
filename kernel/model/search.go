@@ -625,7 +625,7 @@ func fullTextSearchRefBlock(keyword string, beforeLen int) (ret []*Block) {
 	orderBy := ` order by case` + orderCase1 + orderCase2 + orderCase3 + `else 65535 end ASC, sort ASC, length ASC`
 	orderBy = strings.ReplaceAll(orderBy, "${keyword}", keyword)
 	stmt += orderBy + " LIMIT " + strconv.Itoa(Conf.Search.Limit)
-	blocks := sql.SelectBlocksRawStmt(stmt, Conf.Search.Limit)
+	blocks := sql.SelectBlocksRawStmtNoParse(stmt, Conf.Search.Limit)
 	ret = fromSQLBlocks(&blocks, "", beforeLen)
 	if 1 > len(ret) {
 		ret = []*Block{}
@@ -661,7 +661,7 @@ func fullTextSearchByRegexp(exp, boxFilter, pathFilter, typeFilter, orderBy stri
 	stmt += boxFilter + pathFilter
 	stmt += " " + orderBy
 	stmt += " LIMIT " + strconv.Itoa(Conf.Search.Limit)
-	blocks := sql.SelectBlocksRawStmt(stmt, Conf.Search.Limit)
+	blocks := sql.SelectBlocksRawStmtNoParse(stmt, Conf.Search.Limit)
 	ret = fromSQLBlocks(&blocks, "", beforeLen)
 	if 1 > len(ret) {
 		ret = []*Block{}
@@ -698,7 +698,8 @@ func fullTextSearchByFTS(query, boxFilter, pathFilter, typeFilter, orderBy strin
 		"tag, " +
 		"highlight(" + table + ", 11, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "') AS content, " +
 		"fcontent, markdown, length, type, subtype, ial, sort, created, updated"
-	stmt := "SELECT " + projections + " FROM " + table + " WHERE " + table + " MATCH '" + columnFilter() + ":(" + query + ")' AND type IN " + typeFilter
+	stmt := "SELECT " + projections + " FROM " + table + " WHERE (`" + table + "` MATCH '" + columnFilter() + ":(" + query + ")'"
+	stmt += ") AND type IN " + typeFilter
 	stmt += boxFilter + pathFilter
 	stmt += " " + orderBy
 	stmt += " LIMIT " + strconv.Itoa(Conf.Search.Limit)
@@ -729,7 +730,8 @@ func fullTextSearchCount(query, boxFilter, pathFilter, typeFilter string) (match
 		table = "blocks_fts_case_insensitive"
 	}
 
-	stmt := "SELECT COUNT(id) AS `matches`, COUNT(DISTINCT(root_id)) AS `docs` FROM `" + table + "` WHERE `" + table + "` MATCH '" + columnFilter() + ":(" + query + ")' AND type IN " + typeFilter
+	stmt := "SELECT COUNT(id) AS `matches`, COUNT(DISTINCT(root_id)) AS `docs` FROM `" + table + "` WHERE (`" + table + "` MATCH '" + columnFilter() + ":(" + query + ")'"
+	stmt += ") AND type IN " + typeFilter
 	stmt += boxFilter + pathFilter
 	result, _ := sql.Query(stmt)
 	if 1 > len(result) {
@@ -881,7 +883,7 @@ func fieldRegexp(regexp string) string {
 		buf.WriteString(regexp)
 		buf.WriteString("'")
 	}
-	if Conf.Search.Custom {
+	if Conf.Search.IAL {
 		buf.WriteString(" OR ial REGEXP '")
 		buf.WriteString(regexp)
 		buf.WriteString("'")
@@ -904,7 +906,7 @@ func columnFilter() string {
 	if Conf.Search.Memo {
 		buf.WriteString(" memo")
 	}
-	if Conf.Search.Custom {
+	if Conf.Search.IAL {
 		buf.WriteString(" ial")
 	}
 	buf.WriteString(" tag}")
