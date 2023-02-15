@@ -30,7 +30,7 @@ export class PluginLoader {
             return;
         }
         function run(script: string, name: string) {
-            return eval("use strict; (function anonymous(require,module,exports){".concat(script, "\n})\n//# sourceURL=").concat(name, "\n"));
+            return eval("\"use strict\"; (function anonymous(require,module,exports){".concat(script, "\n})\n//# sourceURL=").concat(name, "\n"));
         }
         const __require = (name: string) => {
             if (components[name]) {
