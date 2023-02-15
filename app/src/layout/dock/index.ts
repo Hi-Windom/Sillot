@@ -104,7 +104,6 @@ export class Dock {
                         target.setAttribute("aria-label", window.siyuan.languages.unpin);
                         this.layout.element.style.opacity = "";
                         this.layout.element.style.transform = "";
-                        this.layout.element.style.transition = "var(--b3-width-transition)";
                         if (hasActive) {
                             this.resizeElement.classList.remove("fn__none");
                         }
@@ -157,9 +156,7 @@ top: 112px;bottom: 82px;left:0`);
         } else if (this.position === "Right") {
             this.layout.element.setAttribute("style", `width:${this.layout.element.clientWidth}px;
 opacity:${show ? 1 : 0};
-right:0;
-top: ${document.getElementById("toolbar").offsetHeight + document.getElementById("dockTop").offsetHeight}px;
-bottom: ${document.getElementById("status").offsetHeight + document.getElementById("dockBottom").offsetHeight}px;`);
+right:0;top: 112px;bottom: 82px;`);
         } else {
             this.layout.element.setAttribute("style", `height:${this.layout.element.clientHeight}px;
 opacity:${show ? 1 : 0};
