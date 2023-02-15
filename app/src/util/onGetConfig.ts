@@ -175,6 +175,7 @@ export const onGetConfig = (isStart: boolean) => {
 };
 
 export const initBar = () => {
+    // Refactor to src/framework/toolbar.ts
     setProxy();
 };
 
