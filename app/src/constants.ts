@@ -336,13 +336,13 @@ export abstract class Constants extends SConst { // Sillot extend
             data: [
                 [{
                     type: "file",
-                    size: {width: 240, height: 0},
+                    size: {width: 220, height: 0},
                     show: true,
                     icon: "iconFiles",
                     hotkeyLangId: "fileTree",
                 }, {
                     type: "outline",
-                    size: {width: 240, height: 0},
+                    size: {width: 220, height: 0},
                     show: false,
                     icon: "iconAlignCenter",
                     hotkeyLangId: "outline",
@@ -354,13 +354,13 @@ export abstract class Constants extends SConst { // Sillot extend
                     hotkeyLangId: "inbox",
                 }], [{
                     type: "bookmark",
-                    size: {width: 240, height: 0},
+                    size: {width: 220, height: 0},
                     show: false,
                     icon: "iconBookmark",
                     hotkeyLangId: "bookmark",
                 }, {
                     type: "tag",
-                    size: {width: 240, height: 0},
+                    size: {width: 220, height: 0},
                     show: false,
                     icon: "iconTags",
                     hotkeyLangId: "tag",
@@ -372,19 +372,19 @@ export abstract class Constants extends SConst { // Sillot extend
             data: [
                 [{
                     type: "graph",
-                    size: {width: 360, height: 0},
+                    size: {width: 320, height: 0},
                     show: false,
                     icon: "iconGraph",
                     hotkeyLangId: "graphView",
                 }, {
                     type: "globalGraph",
-                    size: {width: 360, height: 0},
+                    size: {width: 320, height: 0},
                     show: false,
                     icon: "iconGlobalGraph",
                     hotkeyLangId: "globalGraph",
                 }], [{
                     type: "backlink",
-                    size: {width: 360, height: 0},
+                    size: {width: 320, height: 0},
                     show: false,
                     icon: "iconLink",
                     hotkeyLangId: "backlinks",
