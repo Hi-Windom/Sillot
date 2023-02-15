@@ -51,7 +51,7 @@ jobs:
       - name: Gather SiYuan Release Information
         id: release_info_siyuan
         run: |
-          changelog=$(python scripts/parse-changelog.py -t v${{ steps.version.outputs.value }} siyuan-note/siyuan)
+          changelog=$(python scripts/parse-changelog.py -t v${{ steps.syv.outputs.value }} siyuan-note/siyuan)
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
           changelog="${changelog//$'\r'/'%0D'}"
