@@ -27,6 +27,9 @@ import { getLocalStorage } from "./protyle/util/compatibility";
 import { importIDB } from "./sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "./sillot";
 
+import { PluginSystem } from "./plugin";
+import { Framework } from "./framework";
+
 class App {
     constructor() {
         addScriptSync(`${Constants.PROTYLE_CDN}/js/lute/lute.min.js?v=${Constants.SIYUAN_VERSION}`, "protyleLuteScript");
@@ -164,11 +167,17 @@ class App {
                     bootSync();
                     fetchPost("/api/setting/getCloudUser", {}, userResponse => {
                         window.siyuan.user = userResponse.data;
+
+                        // 临时作为入口
+                        const framework = new Framework();
+                        
                         onGetConfig(response.data.start);
                         account.onSetaccount();
                         resizeDrag();
                         setTitle(window.siyuan.languages.siyuanNote);
                         initMessage();
+
+                        new PluginSystem(framework).init();
                     });
                 });
             });
