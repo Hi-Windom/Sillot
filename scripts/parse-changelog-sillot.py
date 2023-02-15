@@ -66,7 +66,14 @@ def find_milestone(repo, title):
 --
 🌏 与绛亽新时代智慧彖乄一同见证全球开源力量
 --
-> 这只是一份赞扬清单，列出并不代表在海文东项目中实际应用，请以项目开源声明为准
+
+#### 使用微信赞赏帮助我们更好维护项目
+
+<p>
+<img src="https://github.com/Soltus/Soltus/blob/69b6ef7de274bcb69ec1783cdf3ab46dfb6ef9ec/src/images/sponser-weixin.jpg"/>
+</p>
+
+> 列出并不代表在海文东项目中实际应用，请以项目开源声明为准
 
 ### 🥇 金牌开源力量
 
