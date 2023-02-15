@@ -35,12 +35,23 @@ jobs:
         with:
           cmd: "jq .syv app/package.json -r"
 
-      - name: Gather Release Information
+      - name: Gather Sillot Release Information
         id: release_info
         run: |
           echo "::set-output name=release_title::$(git show --format=%s --no-patch | head -1)"
           echo "::set-output name=release_version::v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}"
           changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} Hi-Windom/Sillot)
+          changelog="${changelog//'%'/'%25'}"
+          changelog="${changelog//$'\n'/'%0A'}"
+          changelog="${changelog//$'\r'/'%0D'}"
+          echo "::set-output name=release_body::$changelog"
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
+
+      - name: Gather SiYuan Release Information
+        id: release_info_siyuan
+        run: |
+          changelog=$(python scripts/parse-changelog.py -t v${{ steps.version.outputs.value }} siyuan-note/siyuan)
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
           changelog="${changelog//$'\r'/'%0D'}"
@@ -56,7 +67,7 @@ jobs:
         with:
           release_name: ${{ steps.release_info.outputs.release_version }}
           tag_name: ${{ github.ref }}
-          body: ${{ steps.release_info.outputs.release_body }}
+          body: "${{ steps.release_info.outputs.release_body }}\n---\n${{ steps.release_info_siyuan.outputs.release_body }}"
           draft: false
           prerelease: true
 
