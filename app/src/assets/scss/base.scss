@@ -29,7 +29,7 @@
 @import "viewer";
 
 /*
-.status: 2
+.status: 3
 
 // 需小于 .block__popover
 // 需小于 ctrl+p https://github.com/siyuan-note/siyuan/issues/7174
@@ -187,18 +187,6 @@ progressLoading: 400
     padding-left: 0;
   }
 
-  &__window {
-    position: fixed;
-    top: 0;
-    right: 0;
-    display: flex;
-    z-index: 502;
-
-    .toolbar__item {
-      padding: 14px;
-    }
-  }
-
   #windowControls {
     top: 0;
     z-index: 502;
@@ -269,6 +257,23 @@ progressLoading: 400
     }
   }
 
+  &__window {
+    position: fixed;
+    top: 0;
+    right: 0;
+    display: flex;
+    z-index: 502;
+
+    .toolbar__item {
+      padding: 14.25px;
+
+      &:not(.toolbar__item--disabled):not(.toolbar__item--close):hover,
+      &--active {
+        background-color: var(--b3-theme-background-light);
+      }
+    }
+  }
+
   &__text {
     font-size: 12px;
     max-width: 96px;
@@ -283,7 +288,7 @@ progressLoading: 400
 .status {
   background-color: var(--b3-theme-surface);
   box-sizing: border-box;
-  z-index: 2;
+  z-index: 3;
   height: 32px;
   line-height: 32px;
   border-top: .5px solid var(--b3-border-color);

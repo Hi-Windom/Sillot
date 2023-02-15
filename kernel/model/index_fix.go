@@ -27,10 +27,12 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
+	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
 	"github.com/siyuan-note/logging"
+	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
@@ -41,6 +43,8 @@ import (
 func FixIndexJob() {
 	task.AppendTask(task.DatabaseIndexFix, removeDuplicateDatabaseIndex)
 	sql.WaitForWritingDatabase()
+
+	task.AppendTask(task.DatabaseIndexFix, resetDuplicateBlocksOnFileSys)
 
 	task.AppendTask(task.DatabaseIndexFix, fixBlockTreeByFileSys)
 	sql.WaitForWritingDatabase()
@@ -98,6 +102,107 @@ func removeDuplicateDatabaseIndex() {
 	}
 }
 
+// resetDuplicateBlocksOnFileSys 重置重复 ID 的块。 https://github.com/siyuan-note/siyuan/issues/7357
+func resetDuplicateBlocksOnFileSys() {
+	defer logging.Recover()
+
+	autoFixLock.Lock()
+	defer autoFixLock.Unlock()
+
+	util.PushStatusBar(Conf.Language(58))
+	boxes := Conf.GetBoxes()
+	luteEngine := lute.New()
+	blockIDs := map[string]bool{}
+	needRefreshUI := false
+	for _, box := range boxes {
+		boxPath := filepath.Join(util.DataDir, box.ID)
+		filepath.Walk(boxPath, func(path string, info os.FileInfo, err error) error {
+			if info.IsDir() || filepath.Ext(path) != ".sy" || strings.Contains(filepath.ToSlash(path), "/assets/") {
+				return nil
+			}
+
+			if !ast.IsNodeIDPattern(strings.TrimSuffix(info.Name(), ".sy")) {
+				logging.LogWarnf("invalid .sy file name [%s]", path)
+				box.moveCorruptedData(path)
+				return nil
+			}
+
+			p := path[len(boxPath):]
+			p = filepath.ToSlash(p)
+			tree, loadErr := filesys.LoadTree(box.ID, p, luteEngine)
+			if nil != loadErr {
+				logging.LogErrorf("load tree [%s] failed: %s", p, loadErr)
+				return nil
+			}
+
+			needOverwrite := false
+			ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+				if !entering || !n.IsBlock() {
+					return ast.WalkContinue
+				}
+
+				if "" == n.ID {
+					needOverwrite = true
+					n.ID = ast.NewNodeID()
+					n.SetIALAttr("id", n.ID)
+					return ast.WalkContinue
+				}
+
+				if !blockIDs[n.ID] {
+					blockIDs[n.ID] = true
+					return ast.WalkContinue
+				}
+
+				// 存在重复的块 ID
+
+				if ast.NodeDocument == n.Type {
+					// 如果是文档根节点，则直接重置这颗树
+					logging.LogWarnf("exist more than one tree with the same id [%s], reset it", box.ID+p)
+					recreateTree(tree, path)
+					needRefreshUI = true
+					return ast.WalkStop
+				}
+
+				// 其他情况，重置节点 ID
+				needOverwrite = true
+				n.ID = ast.NewNodeID()
+				n.SetIALAttr("id", n.ID)
+				needRefreshUI = true
+				return ast.WalkContinue
+			})
+
+			if needOverwrite {
+				logging.LogWarnf("exist more than one node with the same id in tree [%s], reset it", box.ID+p)
+				if writeErr := filesys.WriteTree(tree); nil != writeErr {
+					logging.LogErrorf("write tree [%s] failed: %s", p, writeErr)
+				}
+			}
+			return nil
+		})
+	}
+
+	if needRefreshUI {
+		util.ReloadUI()
+		go func() {
+			time.Sleep(time.Second * 3)
+			util.PushMsg(Conf.Language(190), 5000)
+		}()
+	}
+}
+
+func recreateTree(tree *parse.Tree, absPath string) {
+	resetTree(tree, "")
+	createTreeTx(tree)
+	if gulu.File.IsDir(strings.TrimSuffix(absPath, ".sy")) {
+		// 重命名子文档文件夹
+		if renameErr := os.Rename(strings.TrimSuffix(absPath, ".sy"), filepath.Join(filepath.Dir(absPath), tree.ID)); nil != renameErr {
+			logging.LogWarnf("rename [%s] failed: %s", absPath, renameErr)
+			return
+		}
+	}
+	os.RemoveAll(absPath)
+}
+
 // fixBlockTreeByFileSys 通过文件系统订正块树。
 func fixBlockTreeByFileSys() {
 	defer logging.Recover()
@@ -107,11 +212,12 @@ func fixBlockTreeByFileSys() {
 
 	util.PushStatusBar(Conf.Language(58))
 	boxes := Conf.GetOpenedBoxes()
+	luteEngine := lute.New()
 	for _, box := range boxes {
 		boxPath := filepath.Join(util.DataDir, box.ID)
 		var paths []string
 		filepath.Walk(boxPath, func(path string, info os.FileInfo, err error) error {
-			if !info.IsDir() && filepath.Ext(path) == ".sy" {
+			if !info.IsDir() && filepath.Ext(path) == ".sy" && !strings.Contains(filepath.ToSlash(path), "/assets/") {
 				p := path[len(boxPath):]
 				p = filepath.ToSlash(p)
 				paths = append(paths, p)
@@ -133,7 +239,7 @@ func fixBlockTreeByFileSys() {
 				continue
 			}
 
-			reindexTreeByPath(box.ID, p, i, size)
+			reindexTreeByPath(box.ID, p, i, size, luteEngine)
 			if util.IsExiting {
 				break
 			}
@@ -166,6 +272,7 @@ func fixDatabaseIndexByBlockTree() {
 func reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap map[string]string) {
 	i := -1
 	size := len(rootUpdatedMap)
+	luteEngine := util.NewLute()
 	for rootID, updated := range rootUpdatedMap {
 		i++
 
@@ -176,13 +283,13 @@ func reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap map[string]string) {
 		rootUpdated := dbRootUpdatedMap[rootID]
 		if "" == rootUpdated {
 			//logging.LogWarnf("not found tree [%s] in database, reindex it", rootID)
-			reindexTree(rootID, i, size)
+			reindexTree(rootID, i, size, luteEngine)
 			continue
 		}
 
 		if "" == updated {
 			// BlockTree 迁移，v2.6.3 之前没有 updated 字段
-			reindexTree(rootID, i, size)
+			reindexTree(rootID, i, size, luteEngine)
 			continue
 		}
 
@@ -190,7 +297,7 @@ func reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap map[string]string) {
 		dbUpdated, _ := time.Parse("20060102150405", rootUpdated)
 		if dbUpdated.Before(btUpdated.Add(-10 * time.Minute)) {
 			logging.LogWarnf("tree [%s] is not up to date, reindex it", rootID)
-			reindexTree(rootID, i, size)
+			reindexTree(rootID, i, size, luteEngine)
 			continue
 		}
 
@@ -231,8 +338,8 @@ func reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap map[string]string) {
 	sql.BatchRemoveTreeQueue(toRemoveRootIDs)
 }
 
-func reindexTreeByPath(box, p string, i, size int) {
-	tree, err := LoadTree(box, p)
+func reindexTreeByPath(box, p string, i, size int, luteEngine *lute.Lute) {
+	tree, err := filesys.LoadTree(box, p, luteEngine)
 	if nil != err {
 		return
 	}
@@ -240,14 +347,14 @@ func reindexTreeByPath(box, p string, i, size int) {
 	reindexTree0(tree, i, size)
 }
 
-func reindexTree(rootID string, i, size int) {
+func reindexTree(rootID string, i, size int, luteEngine *lute.Lute) {
 	root := treenode.GetBlockTree(rootID)
 	if nil == root {
 		logging.LogWarnf("root block [%s] not found", rootID)
 		return
 	}
 
-	tree, err := LoadTree(root.BoxID, root.Path)
+	tree, err := filesys.LoadTree(root.BoxID, root.Path, luteEngine)
 	if nil != err {
 		if os.IsNotExist(err) {
 			// 文件系统上没有找到该 .sy 文件，则订正块树

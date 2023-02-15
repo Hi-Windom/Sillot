@@ -135,7 +135,10 @@ const dockToJSON = (dock: Dock) => {
     if (data2.length > 0) {
         json.push(data2);
     }
-    return json;
+    return {
+        pin: dock.pin,
+        data: json
+    };
 };
 
 export const resetLayout = () => {

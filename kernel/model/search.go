@@ -97,7 +97,7 @@ func searchEmbedBlock(embedBlockID, stmt string, excludeIDs []string, headingMod
 	}
 
 	// 嵌入块支持搜索 https://github.com/siyuan-note/siyuan/issues/7112
-	task.AppendTask(task.DatabaseIndexEmbedBlock, updateEmbedBlockContent, embedBlockID, ret)
+	task.AppendTaskWithTimeout(task.DatabaseIndexEmbedBlock, 30*time.Second, updateEmbedBlockContent, embedBlockID, ret)
 
 	// 添加笔记本名称
 	var boxIDs []string
@@ -544,6 +544,7 @@ func buildTypeFilter(types map[string]bool) string {
 
 func searchBySQL(stmt string, beforeLen int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
 	stmt = gulu.Str.RemoveInvisible(stmt)
+	stmt = strings.TrimSpace(stmt)
 	blocks := sql.SelectBlocksRawStmt(stmt, Conf.Search.Limit)
 	ret = fromSQLBlocks(&blocks, "", beforeLen)
 	if 1 > len(ret) {
@@ -552,7 +553,11 @@ func searchBySQL(stmt string, beforeLen int) (ret []*Block, matchedBlockCount, m
 	}
 
 	stmt = strings.ToLower(stmt)
-	stmt = strings.ReplaceAll(stmt, "select * ", "select COUNT(id) AS `matches`, COUNT(DISTINCT(root_id)) AS `docs` ")
+	if strings.HasPrefix(stmt, "select a.* ") { // 多个搜索关键字匹配文档 https://github.com/siyuan-note/siyuan/issues/7350
+		stmt = strings.ReplaceAll(stmt, "select a.* ", "select COUNT(a.id) AS `matches`, COUNT(DISTINCT(a.root_id)) AS `docs` ")
+	} else {
+		stmt = strings.ReplaceAll(stmt, "select * ", "select COUNT(id) AS `matches`, COUNT(DISTINCT(root_id)) AS `docs` ")
+	}
 	result, _ := sql.Query(stmt)
 	if 1 > len(ret) {
 		return
@@ -943,19 +948,19 @@ func markReplaceSpan(n *ast.Node, unlinks *[]*ast.Node, keywords []string, markS
 					c.TextMarkTextContent = string(c.Tokens)
 					if n.IsTextMarkType("a") {
 						c.TextMarkAHref, c.TextMarkATitle = n.TextMarkAHref, n.TextMarkATitle
-					} else if n.IsTextMarkType("block-ref") {
+					} else if treenode.IsBlockRef(n) {
 						c.TextMarkBlockRefID = n.TextMarkBlockRefID
 						c.TextMarkBlockRefSubtype = n.TextMarkBlockRefSubtype
-					} else if n.IsTextMarkType("file-annotation-ref") {
+					} else if treenode.IsFileAnnotationRef(n) {
 						c.TextMarkFileAnnotationRefID = n.TextMarkFileAnnotationRefID
 					}
 				} else if ast.NodeTextMark == c.Type {
 					if n.IsTextMarkType("a") {
 						c.TextMarkAHref, c.TextMarkATitle = n.TextMarkAHref, n.TextMarkATitle
-					} else if n.IsTextMarkType("block-ref") {
+					} else if treenode.IsBlockRef(n) {
 						c.TextMarkBlockRefID = n.TextMarkBlockRefID
 						c.TextMarkBlockRefSubtype = n.TextMarkBlockRefSubtype
-					} else if n.IsTextMarkType("file-annotation-ref") {
+					} else if treenode.IsFileAnnotationRef(n) {
 						c.TextMarkFileAnnotationRefID = n.TextMarkFileAnnotationRefID
 					}
 				}

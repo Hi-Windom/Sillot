@@ -1006,7 +1006,7 @@
     "105": "El repositorio de datos corruptos se ha restablecido automáticamente",
     "106": "La longitud máxima está limitada a 512 caracteres",
     "107": "Moviendo documento [%s]",
-    "108": "TODO",
+    "108": "La sincronizaci\u00f3n de datos encontr\u00f3 en conflictos, puede ver el contenido del conflicto generado en [Historial de datos]",
     "109": "Eliminación de recordatorios completada [%s]",
     "110": "Renombrar...",
     "111": "Guardando documento [%s]...",
@@ -1087,6 +1087,7 @@
     "186": "Bloqueando el directorio de sincronización de la nube",
     "187": "Desbloqueando el directorio de sincronización en la nube",
     "188": "Error al bloquear el directorio de sincronizaci\u00f3n en la nube, int\u00e1ntelo de nuevo m\u00e1s tarde",
-    "189": "El directorio de sincronización en la nube todavía está bloqueado por otros dispositivos, inténtalo de nuevo más tarde"
+    "189": "El directorio de sincronización en la nube todavía está bloqueado por otros dispositivos, inténtalo de nuevo más tarde",
+    "190": "Se encontro un problema al validar el indice, el cual se soluciono automaticamente"
   }
 }

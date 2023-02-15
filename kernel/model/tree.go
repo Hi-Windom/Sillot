@@ -38,14 +38,18 @@ import (
 func resetTree(tree *parse.Tree, titleSuffix string) {
 	tree.ID = ast.NewNodeID()
 	tree.Root.ID = tree.ID
-	if t, parseErr := time.Parse("20060102150405", util.TimeFromID(tree.ID)); nil == parseErr {
-		titleSuffix += " " + t.Format("2006-01-02 15:04:05")
-	} else {
-		titleSuffix = "Duplicated " + time.Now().Format("2006-01-02 15:04:05")
+
+	if "" != titleSuffix {
+		if t, parseErr := time.Parse("20060102150405", util.TimeFromID(tree.ID)); nil == parseErr {
+			titleSuffix += " " + t.Format("2006-01-02 15:04:05")
+		} else {
+			titleSuffix = "Duplicated " + time.Now().Format("2006-01-02 15:04:05")
+		}
+		titleSuffix = "(" + titleSuffix + ")"
+		titleSuffix = " " + titleSuffix
 	}
-	titleSuffix = "(" + titleSuffix + ")"
 	tree.Root.SetIALAttr("id", tree.ID)
-	tree.Root.SetIALAttr("title", tree.Root.IALAttr("title")+" "+titleSuffix)
+	tree.Root.SetIALAttr("title", tree.Root.IALAttr("title")+titleSuffix)
 	tree.Root.RemoveIALAttr("scroll")
 	p := path.Join(path.Dir(tree.Path), tree.ID) + ".sy"
 	tree.Path = p
@@ -164,19 +168,8 @@ func loadTreeByBlockID(id string) (ret *parse.Tree, err error) {
 
 		return nil, ErrBlockNotFound
 	}
-	ret, err = LoadTree(bt.BoxID, bt.Path)
-	if nil != err {
-		return
-	}
-	return
-}
 
-func LoadTree(boxID, p string) (*parse.Tree, error) {
-	luteEngine := NewLute()
-	tree, err := filesys.LoadTree(boxID, p, luteEngine)
-	if nil != err {
-		logging.LogErrorf("load tree [%s] failed: %s", boxID+p, err)
-		return nil, err
-	}
-	return tree, nil
+	luteEngine := util.NewLute()
+	ret, err = filesys.LoadTree(bt.BoxID, bt.Path, luteEngine)
+	return
 }

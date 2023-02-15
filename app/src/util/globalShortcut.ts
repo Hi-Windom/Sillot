@@ -88,14 +88,48 @@ const switchDialogEvent = (event: MouseEvent, switchDialog: Dialog) => {
 };
 
 export const globalShortcut = () => {
-    window.addEventListener("mousemove", (event) => {
+    window.addEventListener("mousemove", (event: MouseEvent & { target: HTMLElement }) => {
         if (window.siyuan.hideBreadcrumb) {
             document.querySelectorAll(".protyle-breadcrumb__bar--hide").forEach(item => {
                 item.classList.remove("protyle-breadcrumb__bar--hide");
             });
             window.siyuan.hideBreadcrumb = false;
         }
+        if (!isWindow() && !hasClosestByClassName(event.target, "b3-dialog") && !hasClosestByClassName(event.target, "b3-menu")) {
+            if (event.clientX < 43) {
+                if (!window.siyuan.layout.leftDock.pin && window.siyuan.layout.leftDock.layout.element.clientWidth > 0 &&
+                    // 隐藏停靠栏会导致点击两侧内容触发浮动面板弹出，因此需减小鼠标范围
+                    (window.siyuan.layout.leftDock.element.clientWidth > 0 || (window.siyuan.layout.leftDock.element.clientWidth === 0 && event.clientX < 8))) {
+                    if (event.clientY > document.getElementById("toolbar").clientHeight + document.getElementById("dockTop").clientHeight &&
+                        event.clientY < window.innerHeight - document.getElementById("status").clientHeight - document.getElementById("dockBottom").clientHeight) {
+                        if (!hasClosestByClassName(event.target, "b3-menu") &&
+                            !hasClosestByClassName(event.target, "layout--float")) {
+                            window.siyuan.layout.leftDock.showDock();
+                        }
+                    } else {
+                        window.siyuan.layout.leftDock.hideDock();
+                    }
+                }
+            } else if (event.clientX > window.innerWidth - 41) {
+                if (!window.siyuan.layout.rightDock.pin && window.siyuan.layout.rightDock.layout.element.clientWidth > 0 &&
+                    (window.siyuan.layout.rightDock.element.clientWidth > 0 || (window.siyuan.layout.rightDock.element.clientWidth === 0 && event.clientX > window.innerWidth - 8))) {
+                    if (event.clientY > document.getElementById("toolbar").clientHeight + document.getElementById("dockTop").clientHeight &&
+                        event.clientY < window.innerHeight - document.getElementById("status").clientHeight - document.getElementById("dockBottom").clientHeight) {
+                        if (!hasClosestByClassName(event.target, "layout--float")) {
+                            window.siyuan.layout.rightDock.showDock();
+                        }
+                    } else {
+                        window.siyuan.layout.rightDock.hideDock();
+                    }
+                }
+            }
 
+            if (event.clientY < 75) {
+                window.siyuan.layout.topDock.showDock();
+            } else if (event.clientY > window.innerHeight - 73) {
+                window.siyuan.layout.bottomDock.showDock();
+            }
+        }
         const eventPath0 = event.composedPath()[0] as HTMLElement;
         if (eventPath0 && eventPath0.nodeType !== 3 && eventPath0.classList.contains("protyle-wysiwyg") && eventPath0.style.paddingLeft) {
             // 光标在编辑器右边也需要进行显示
@@ -789,6 +823,27 @@ export const globalShortcut = () => {
             } else {
                 window.siyuan.menus.menu.remove();
             }
+        }
+        // dock float 时，点击空白处，隐藏 dock
+        const floatDockLayoutElement = hasClosestByClassName(event.target, "layout--float")
+        if (floatDockLayoutElement) {
+            if (!floatDockLayoutElement.isSameNode(window.siyuan.layout.topDock.layout.element)) {
+                window.siyuan.layout.topDock.hideDock();
+            }
+            if (!floatDockLayoutElement.isSameNode(window.siyuan.layout.bottomDock.layout.element)) {
+                window.siyuan.layout.bottomDock.hideDock();
+            }
+            if (!floatDockLayoutElement.isSameNode(window.siyuan.layout.leftDock.layout.element)) {
+                window.siyuan.layout.leftDock.hideDock();
+            }
+            if (!floatDockLayoutElement.isSameNode(window.siyuan.layout.rightDock.layout.element)) {
+                window.siyuan.layout.rightDock.hideDock();
+            }
+        } else if (!hasClosestByClassName(event.target, "dock") && !isWindow()) {
+            window.siyuan.layout.topDock.hideDock();
+            window.siyuan.layout.bottomDock.hideDock();
+            window.siyuan.layout.leftDock.hideDock();
+            window.siyuan.layout.rightDock.hideDock();
         }
         if (!hasClosestByClassName(event.target, "pdf__outer")) {
             document.querySelectorAll(".pdf__util").forEach(item => {

@@ -105,7 +105,9 @@ func getAttachedUIProcCount() (ret int) {
 		procName := strings.ToLower(proc.Executable())
 		uiProcOk := false
 		for _, name := range uiProcNames {
-			uiProcOk = strings.Contains(procName, name)
+			if uiProcOk = strings.Contains(procName, name); uiProcOk {
+				break
+			}
 		}
 		if uiProcOk {
 			ret++
@@ -117,12 +119,19 @@ func getAttachedUIProcCount() (ret int) {
 
 // getUIProcCount 获取 UI 进程数。
 func getUIProcCount() (ret int) {
+	pid := os.Getpid()
 	procs, _ := goPS.Processes()
 	for _, proc := range procs {
+		if proc.Pid() == pid {
+			continue
+		}
+
 		procName := strings.ToLower(proc.Executable())
 		uiProcOk := false
 		for _, name := range uiProcNames {
-			uiProcOk = strings.Contains(procName, name)
+			if uiProcOk = strings.Contains(procName, name); uiProcOk {
+				break
+			}
 		}
 		if uiProcOk {
 			ret++
