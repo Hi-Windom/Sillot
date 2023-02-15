@@ -26,8 +26,11 @@ export class PluginLoader {
         const exports: { [key: string]: any } = {};
         const module = { exports };
         const { pluginScript, name } = await this.getPlugin(pluginName);
+        if (!pluginScript || !name) {
+            return;
+        }
         function run(script: string, name: string) {
-            return eval("(function anonymous(require,module,exports){".concat(script, "\n})\n//# sourceURL=").concat(name, "\n"));
+            return eval("use strict; (function anonymous(require,module,exports){".concat(script, "\n})\n//# sourceURL=").concat(name, "\n"));
         }
         const __require = (name: string) => {
             if (components[name]) {
@@ -41,7 +44,7 @@ export class PluginLoader {
             throw new Error(`Failed to load plugin ${pluginName}. No exports detected.`);
         }
         const plug = new pluginConstructor();
-        if (!(plug instanceof Plugin)){
+        if (!(plug instanceof Plugin)) {
             throw new Error(`Failed to load plugin ${pluginName}`);
         }
 
@@ -51,7 +54,7 @@ export class PluginLoader {
 
     async loadInternalPlugin(name: string) {
         try {
-            const mod = await import("../internal/plugin/" + name);
+            const mod = await require("../internal/plugin/" + name);
             const plugin = mod.default;
             const plug = new plugin();
             plug.onload();
@@ -71,7 +74,8 @@ export class PluginLoader {
     }
 
     async getPlugin(pluginName: string): Promise<{ pluginScript: string; name: string; }> {
-        const { name, content } = await loadPluginFromServer(pluginName);
+        const result = await loadPluginFromServer(pluginName);
+        const { name, content } = result || { name: "", content: "" };
         return {
             pluginScript: content,
             name,
