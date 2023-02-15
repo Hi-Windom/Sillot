@@ -67,7 +67,7 @@ jobs:
         with:
           release_name: ${{ steps.release_info.outputs.release_version }}
           tag_name: ${{ github.ref }}
-          body: "## [@Sillot](https://github.com/Hi-Windom/Sillot)\n--\n${{ steps.release_info.outputs.release_body }}\n---\n## [@SiYuan](https://github.com/siyuan-note/siyuan)\n--\n${{ steps.release_info_siyuan.outputs.release_body }}"
+          body: "${{ steps.release_info.outputs.release_body }}\n---\n${{ steps.release_info_siyuan.outputs.release_body }}"
           draft: false
           prerelease: true
 
