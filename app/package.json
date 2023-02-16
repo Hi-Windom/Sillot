@@ -87,7 +87,7 @@
     "css-loader": "^6.7.1",
     "csstype": "^3.0.10",
     "dayjs": "^1.11.5",
-    "electron": "24.0.0-alpha.1",
+    "electron": "24.0.0-alpha.2",
     "electron-builder": "^23.6.0",
     "electron-reloader": "^1.2.3",
     "encoding": "^0.1.13",
