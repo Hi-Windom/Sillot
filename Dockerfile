@@ -1,10 +1,8 @@
 FROM node:18 as NODE_BUILD
 WORKDIR /go/src/github.com/Hi-Windom/Sillot/
 ADD . /go/src/github.com/Hi-Windom/Sillot/
-ARG registry=http://mirrors.cloud.tencent.com/npm/
-RUN pnpm config set registry $registry
 RUN pnpm config set electron_mirror "https://npm.taobao.org/mirrors/electron/"
-RUN cd app && npm install -g pnpm && pnpm install && pnpm run build-sillot
+RUN cd app && npm install -g pnpm && pnpm install --registry=http://mirrors.cloud.tencent.com/npm && pnpm run build-sillot
 
 FROM golang:alpine as GO_BUILD
 WORKDIR /go/src/github.com/Hi-Windom/Sillot/
