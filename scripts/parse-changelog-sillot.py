@@ -66,13 +66,21 @@ def find_milestone(repo, title):
 --
 🌏 与绛亽新时代智慧彖乄一同见证全球开源力量
 --
-> 这只是一份赞扬清单，列出并不代表在海文东项目中实际应用，请以项目开源声明为准
+
+#### 使用微信赞赏帮助我们更好维护项目
+
+<p>
+<img src="https://github.com/Soltus/Soltus/blob/69b6ef7de274bcb69ec1783cdf3ab46dfb6ef9ec/src/images/sponser-weixin.jpg"/>
+</p>
+
+> 列出并不代表在海文东项目中实际应用，请以项目开源声明为准
 
 ### 🥇 金牌开源力量
 
 - [monaco-editor](https://github.com/microsoft/monaco-editor)
 - [am-editor](https://github.com/red-axe/am-editor)
 - [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
+- [JoyUI](https://github.com/mui/material-ui)
 - [React](https://github.com/facebook/react)
 
 ### 🥈 银牌开源力量
@@ -136,6 +144,7 @@ def get_issue_first_label(issue):
 def generate_msg(desc_mapping):
     """Print changelogs from direction."""
     print()
+    print('## [@Sillot](https://github.com/Hi-Windom/Sillot)\n')
     for header in docmap:
         if not desc_mapping[header]:
             continue
