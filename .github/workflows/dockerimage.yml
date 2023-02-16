@@ -33,4 +33,4 @@ jobs:
 
       - name: Build the Docker image
         run: |
-          docker buildx build --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v8 -t soltus/sillot:latest -t soltus/sillot:v0.7 .
+          docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:v0.7 .

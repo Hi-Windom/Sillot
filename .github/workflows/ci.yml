@@ -77,20 +77,20 @@ jobs:
     strategy:
       matrix:
         config:
-          # - os: ubuntu-20.04
-          #   kernel_path: "../app/kernel-linux/SiYuan-Kernel"
-          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
-          #   electron_args: "dist-linux"
-          #   goos: "linux"
-          #   goarch: "amd64"
-          #   suffix: "linux.AppImage"
-          # - os: ubuntu-20.04
-          #   kernel_path: "../app/kernel-linux/SiYuan-Kernel"
-          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
-          #   electron_args: "dist-linux"
-          #   goos: "linux"
-          #   goarch: "amd64"
-          #   suffix: "linux.tar.gz"
+          - os: ubuntu-20.04
+            kernel_path: "../app/kernel-linux/SiYuan-Kernel"
+            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+            electron_args: "dist-linux"
+            goos: "linux"
+            goarch: "amd64"
+            suffix: "linux.AppImage"
+          - os: ubuntu-20.04
+            kernel_path: "../app/kernel-linux/SiYuan-Kernel"
+            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+            electron_args: "dist-linux"
+            goos: "linux"
+            goarch: "amd64"
+            suffix: "linux.tar.gz"
           - os: macos-latest
             kernel_path: "../app/kernel-darwin/SiYuan-Kernel"
             build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
@@ -215,7 +215,7 @@ jobs:
           # 这里使用 bot
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_name: Sillot-Setup_${{ needs.create_release.outputs.release_version }}-${{ matrix.config.suffix }}
+          asset_name: Sillot-${{ needs.create_release.outputs.release_version }}-${{ matrix.config.suffix }}
           asset_path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/build/Sillot-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}
           asset_content_type: application/octet-stream
 
@@ -224,7 +224,7 @@ jobs:
         if: "contains( matrix.config.goos, 'windows')"
         with:
           type: 'zip'
-          filename: Sillot-Portable_${{ needs.create_release.outputs.release_version }}-win.zip
+          filename: Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
           path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/build/win-unpacked/
           exclusions: '*.git*'
           recursive_exclusions: 'LICENSES.chromium.html'
@@ -237,6 +237,6 @@ jobs:
           # 这里使用 bot
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_name: Sillot-Portable_${{ needs.create_release.outputs.release_version }}-win.zip
-          asset_path: Sillot-Portable_${{ needs.create_release.outputs.release_version }}-win.zip
+          asset_name: Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
+          asset_path: Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
           asset_content_type: application/octet-stream

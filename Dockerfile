@@ -1,7 +1,7 @@
 FROM node:18 as NODE_BUILD
 WORKDIR /go/src/github.com/Hi-Windom/Sillot/
 ADD . /go/src/github.com/Hi-Windom/Sillot/
-RUN cd app && npm install -g pnpm && pnpm install && pnpm run build-sillot
+RUN cd app && npm install -g pnpm && pnpm install --registry=http://registry.npmjs.org/ --silent && pnpm run build-sillot
 
 FROM golang:alpine as GO_BUILD
 WORKDIR /go/src/github.com/Hi-Windom/Sillot/
