@@ -80,6 +80,7 @@ def find_milestone(repo, title):
 - [monaco-editor](https://github.com/microsoft/monaco-editor)
 - [am-editor](https://github.com/red-axe/am-editor)
 - [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
+- [JoyUI](https://github.com/mui/material-ui)
 - [React](https://github.com/facebook/react)
 
 ### 🥈 银牌开源力量
