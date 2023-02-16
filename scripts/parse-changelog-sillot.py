@@ -63,6 +63,9 @@ def find_milestone(repo, title):
 💠 海文东QQ频道：43in2c1qb9 异步更新安装包
 🐱‍🏍 Sillot is currently in active development
 ⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
+<span>
+<img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/>
+</span>[![CI](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml/badge.svg)](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml)
 --
 🌏 与绛亽新时代智慧彖乄一同见证全球开源力量
 --
@@ -101,7 +104,6 @@ def find_milestone(repo, title):
 
 ---
 
-[![CI](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml/badge.svg)](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml)<img src="https://img.shields.io/badge/Windows 10+-blue?logo=Windows 11" title="" style="margin: 3px auto;"/><img src="https://img.shields.io/badge/macOS-purple?logo=macOS" title="" style="margin: 3px auto;"/>
 ''')
     for milestone in repo.get_milestones():
         if version in milestone.title:
