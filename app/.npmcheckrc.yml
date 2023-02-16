@@ -1,0 +1,36 @@
+# .npmcheckrc
+
+depcheck:
+  ignoreMatches: [
+      "pnpm", # 需要
+      "electron-store", # 读写文件需要
+      "electron-fetch", # 思源自带的，不清楚作用
+      "@electron/remote", # 核心需要
+      "monaco-editor",
+      "@monaco-editor/loader", # 加载 monaco editor
+      "monaco-editor-nls", # monaco editor 显示中文需要
+      "react-toastify", # 通知组件
+      "react-hot-toast", # 通知组件
+      "react-dom",
+      "react",
+      "brace", # ace 编辑器
+      # 暴露给window及其下属对象 //开始
+      "localforage", # IDB操作需要
+      "lodash", # 常用函数库
+      "sweetalert2", # 弹窗组件
+      # 暴露给window及其下属对象 //结束
+      "*-loader", # webpack需要
+      "*-webpack-plugin", # webpack需要
+      "@types/*", # 无所谓
+      "@babel/*", # 要的
+      "@mui/*", # 见鬼了
+      "@sillot/*", # 有内鬼
+    ]
+  ignoreBinPackage: true
+  specials: [] # // the target special parsers 配置了貌似没用
+  parsers: {} # // the target parsers 配置了貌似没用
+  ignorePatterns: [
+      # // files matching these patterns will be ignored 不检测的路径
+      "src",
+      "stage",
+    ]
