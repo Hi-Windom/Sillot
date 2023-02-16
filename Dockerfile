@@ -1,7 +1,9 @@
 FROM node:18 as NODE_BUILD
 WORKDIR /go/src/github.com/Hi-Windom/Sillot/
 ADD . /go/src/github.com/Hi-Windom/Sillot/
-RUN cd app && npm config set proxy null && npm cache clean --force && npm config set registry http://mirrors.cloud.tencent.com/npm && npm install -g pnpm && pnpm install --registry=http://mirrors.cloud.tencent.com/npm && pnpm config set electron_mirror "https://npm.taobao.org/mirrors/electron/" && pnpm run build-sillot
+RUN cd app && npm cache clean --force && npm config set registry http://mirrors.cloud.tencent.com/npm && npm install -g pnpm && pnpm config set electron_mirror "https://npm.taobao.org/mirrors/electron/"
+RUN pnpm install --registry=http://mirrors.cloud.tencent.com/npm
+RUN pnpm run build-sillot
 
 FROM golang:alpine as GO_BUILD
 WORKDIR /go/src/github.com/Hi-Windom/Sillot/
