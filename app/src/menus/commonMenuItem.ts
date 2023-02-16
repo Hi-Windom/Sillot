@@ -210,7 +210,7 @@ export const openFileAttr = (attrs: IObject, id: string, focusName = "bookmark")
     <label class="fn__flex">
         <span class="ft__on-surface fn__flex-center" style="text-align: right;white-space: nowrap;width: 100px">${window.siyuan.languages.memo}</span>
         <div class="fn__space"></div>
-        <textarea rows="2" class="b3-text-field fn__flex-1" data-name="memo">${attrs.memo || ""}</textarea>
+        <textarea rows="2" class="b3-text-field b3s-textarea-vlarge fn__flex-1" data-name="memo">${attrs.memo || ""}</textarea>
         <div class="fn__space"></div>
         <span class="block__icon fn__flex-center"><svg></svg></span>
     </label>
@@ -278,7 +278,7 @@ export const openFileAttr = (attrs: IObject, id: string, focusName = "bookmark")
         btnsElement[0].insertAdjacentHTML("beforebegin", `<div class="fn__flex customItem">
     <input placeholder="${window.siyuan.languages.attrName}" class="b3-text-field" style="width: 100px;text-align: right">
     <div class="fn__space"></div>
-    <textarea rows="1" class="b3-text-field fn__flex-1" placeholder="${window.siyuan.languages.attrValue1}"></textarea>
+    <textarea rows="1" class="b3-text-field b3s-textarea-v fn__flex-1" placeholder="${window.siyuan.languages.attrValue1}"></textarea>
     <div class="fn__space"></div>
     <span data-action="remove" class="block__icon fn__flex-center" style="opacity: 1;"><svg><use xlink:href="#iconMin"></use></svg></span>
 </div><div class="fn__hr--b"></div>`);
@@ -414,7 +414,7 @@ export const openAttr = (nodeElement: Element, protyle: IProtyle, focusName = "b
     <label class="fn__flex">
         <span class="ft__on-surface fn__flex-center" style="text-align: right;white-space: nowrap;width: 100px">${window.siyuan.languages.memo}</span>
         <div class="fn__space"></div>
-        <textarea class="b3-text-field fn__flex-1" rows="2" data-name="memo">${response.data.memo || ""}</textarea>
+        <textarea class="b3-text-field b3s-textarea-vlarge fn__flex-1" rows="2" data-name="memo">${response.data.memo || ""}</textarea>
         <div class="fn__space"></div>
         <span class="block__icon fn__flex-center"><svg></svg></span>
     </label>
@@ -485,7 +485,7 @@ export const openAttr = (nodeElement: Element, protyle: IProtyle, focusName = "b
             btnsElement[0].insertAdjacentHTML("beforebegin", `<div class="fn__flex customItem">
     <input placeholder="${window.siyuan.languages.attrName}" class="b3-text-field" style="width: 100px;text-align: right">
     <div class="fn__space"></div>
-    <textarea class="b3-text-field fn__flex-1" rows="1" placeholder="${window.siyuan.languages.attrValue1}"></textarea>
+    <textarea class="b3-text-field b3s-textarea-v fn__flex-1" rows="1" placeholder="${window.siyuan.languages.attrValue1}"></textarea>
     <div class="fn__space"></div>
     <span data-action="remove" class="block__icon fn__flex-center" style="opacity: 1;"><svg><use xlink:href="#iconMin"></use></svg></span>
 </div><div class="fn__hr--b"></div>`);
