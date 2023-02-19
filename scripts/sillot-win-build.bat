@@ -14,6 +14,7 @@ del /S /Q /F app\build 1>nul
 del /S /Q /F app\kernel 1>nul
 
 echo ' ===== Building Kernel ===== '
+echo 'for  C compiler "gcc" https://sourceforge.net/projects/mingw-w64/files/mingw-w64/'
 go version
 set GO111MODULE=on
 set GOPROXY=https://goproxy.io
