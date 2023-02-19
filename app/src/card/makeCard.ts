@@ -6,8 +6,9 @@ import {hideMessage, showMessage} from "../dialog/message";
 import {confirmDialog} from "../dialog/confirmDialog";
 import {hideElements} from "../protyle/ui/hideElements";
 import {viewCards} from "./viewCards";
+import {Constants} from "../constants";
 
-export const genCardItem = (item: ICard) => {
+export const genCardItem = (item: ICardPackage) => {
     return `<li data-id="${item.id}" class="b3-list-item b3-list-item--narrow${isMobile() ? "" : " b3-list-item--hide-action"}">
 <span class="b3-list-item__text">${item.name}</span>
 <span class="counter b3-tooltips b3-tooltips__w${isMobile() ? "" : " fn__none"}" aria-label="${window.siyuan.languages.riffCard}">${item.size}</span>
@@ -23,7 +24,7 @@ export const genCardItem = (item: ICard) => {
 <span data-type="delete" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.delete}">
     <svg><use xlink:href="#iconTrashcan"></use></svg>
 </span>
-<span data-type="view" class="b3-list-item__action">
+<span data-type="view" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.cardPreview}">
     <svg><use xlink:href="#iconEye"></use></svg>
 </span>
 <span class="b3-list-item__meta${isMobile() ? " fn__none" : ""}">${item.size}</span>
@@ -48,7 +49,7 @@ export const makeCard = (nodeElement: Element[]) => {
             }
             ids.push(item.getAttribute("data-node-id"));
         });
-        response.data.forEach((item: ICard) => {
+        response.data.forEach((item: ICardPackage) => {
             html += genCardItem(item);
         });
         const dialog = new Dialog({
@@ -126,7 +127,9 @@ export const makeCard = (nodeElement: Element[]) => {
                     event.preventDefault();
                     break;
                 } else if (type === "view") {
-                    viewCards(target.parentElement.getAttribute("data-id"), target.parentElement.querySelector(".b3-list-item__text").textContent, target.parentElement);
+                    viewCards(target.parentElement.getAttribute("data-id"), target.parentElement.querySelector(".b3-list-item__text").textContent, (removeResponse) => {
+                        target.parentElement.outerHTML = genCardItem(removeResponse.data);
+                    });
                     event.stopPropagation();
                     event.preventDefault();
                     break;
@@ -167,6 +170,20 @@ export const makeCard = (nodeElement: Element[]) => {
                 target = target.parentElement;
             }
         });
+    });
+};
+
+export const quickMakeCard = (nodeElement: Element[]) => {
+    const ids: string[] = [];
+    nodeElement.forEach(item => {
+        if (item.getAttribute("data-type") === "NodeThematicBreak") {
+            return;
+        }
+        ids.push(item.getAttribute("data-node-id"));
+    });
+    fetchPost("/api/riff/addRiffCards", {
+        deckID: Constants.QUICK_DECK_ID,
+        blockIDs: ids
     });
 };
 

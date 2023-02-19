@@ -9,27 +9,27 @@ import {unicode2Emoji} from "../emoji";
 import {addLoading} from "../protyle/ui/initUI";
 import {Constants} from "../constants";
 import {onGet} from "../protyle/util/onGet";
-import {genCardItem} from "./makeCard";
 
-export const viewCards = (deckID: string, title: string, sourceElement?: HTMLElement) => {
+export const viewCards = (deckID: string, title: string, cb:(response:IWebSocketData)=>void,isDoc = false) => {
     let pageIndex = 1;
-    let edit:Protyle;
-    fetchPost("/api/riff/getRiffCards", {deckID, page: pageIndex}, (response) => {
+    let edit: Protyle;
+    fetchPost(isDoc ? "/api/riff/getTreeRiffCards" : "/api/riff/getRiffCards", {
+        id: deckID,
+        page: pageIndex
+    }, (response) => {
         const dialog = new Dialog({
-            title,
             content: `<div class="fn__flex-column" style="height: 100%">
-    <div class="fn__hr"></div>
-    <div class="fn__flex">
+    <div class="fn__flex b3-form__space--small">
+        <span class="fn__flex-center">${title}</span>
+        <div class="fn__flex-1"></div>
         <span class="fn__space"></span>
         <span data-type="previous" class="block__icon block__icon--show b3-tooltips b3-tooltips__ne" disabled="disabled" aria-label="${window.siyuan.languages.previousLabel}"><svg><use xlink:href='#iconLeft'></use></svg></span>
         <span class="fn__space"></span>
         <span data-type="next" class="block__icon block__icon--show b3-tooltips b3-tooltips__ne" disabled="disabled" aria-label="${window.siyuan.languages.nextLabel}"><svg><use xlink:href='#iconRight'></use></svg></span>
         <span class="fn__space"></span>
         <span class="fn__flex-center ft__on-surface">${pageIndex}/${response.data.pageCount || 1}</span>
-        <div class="fn__flex-1"></div>
     </div>
-    <div class="fn__hr"></div>
-    <div class="${isMobile() ? "fn__flex-column" : "fn__flex"} fn__flex-1">
+    <div class="${isMobile() ? "fn__flex-column" : "fn__flex"} fn__flex-1" style="min-height: auto">
         <ul class="fn__flex-1 b3-list b3-list--background" style="user-select: none">
             ${renderViewItem(response.data.blocks)}
         </ul>
@@ -37,8 +37,8 @@ export const viewCards = (deckID: string, title: string, sourceElement?: HTMLEle
         <div class="fn__flex-1 b3-dialog__cardempty">${window.siyuan.languages.emptyContent}</div>
     </div>
 </div>`,
-            width: isMobile() ? "90vw" : "80vw",
-            height: "80vh",
+            width: isMobile() ? "98vw" : "80vw",
+            height: isMobile() ? "80vh" : "70vh",
             destroyCallback() {
                 if (edit) {
                     edit.destroy();
@@ -75,7 +75,7 @@ export const viewCards = (deckID: string, title: string, sourceElement?: HTMLEle
                     if (pageIndex <= 1) {
                         previousElement.setAttribute("disabled", "disabled");
                     }
-                    fetchPost("/api/riff/getRiffCards", {deckID, page: pageIndex}, (cardsResponse) => {
+                    fetchPost("/api/riff/getRiffCards", {id: deckID, page: pageIndex}, (cardsResponse) => {
                         if (pageIndex === cardsResponse.data.pageCount) {
                             nextElement.setAttribute("disabled", "disabled");
                         } else if (cardsResponse.data.pageCount > 1) {
@@ -94,7 +94,7 @@ export const viewCards = (deckID: string, title: string, sourceElement?: HTMLEle
                     }
                     pageIndex++;
                     previousElement.removeAttribute("disabled");
-                    fetchPost("/api/riff/getRiffCards", {deckID, page: pageIndex}, (cardsResponse) => {
+                    fetchPost("/api/riff/getRiffCards", {id: deckID, page: pageIndex}, (cardsResponse) => {
                         if (pageIndex === cardsResponse.data.pageCount) {
                             nextElement.setAttribute("disabled", "disabled");
                         } else if (cardsResponse.data.pageCount > 1) {
@@ -116,7 +116,7 @@ export const viewCards = (deckID: string, title: string, sourceElement?: HTMLEle
                     break;
                 } else if (type === "remove") {
                     fetchPost("/api/riff/removeRiffCards", {
-                        deckID,
+                        deckID: isDoc ? Constants.QUICK_DECK_ID : deckID,
                         blockIDs: [target.getAttribute("data-id")]
                     }, (removeResponse) => {
                         let nextElment = target.parentElement.nextElementSibling;
@@ -134,9 +134,7 @@ export const viewCards = (deckID: string, title: string, sourceElement?: HTMLEle
                             nextElment.classList.add("b3-list-item--focus");
                         }
                         target.parentElement.remove();
-                        if (sourceElement) {
-                            sourceElement.outerHTML = genCardItem(removeResponse.data);
-                        }
+                        cb(removeResponse);
                     });
                     event.stopPropagation();
                     event.preventDefault();

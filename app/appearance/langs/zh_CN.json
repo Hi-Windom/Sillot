@@ -1,4 +1,6 @@
 {
+  "addToDeck": "添加到卡包...",
+  "quickMakeCard": "快速制卡",
   "allAttrs": "所有属性名和属性值",
   "chooseSyncDirection": "选择同步方向",
   "uploadData2Cloud": "⬆️ 将数据上传到云端",
@@ -20,7 +22,7 @@
   "new": "新建",
   "share2LiandiConfirmTip": "确定将该文档分享到链滴吗？",
   "share2Liandi": "分享到链滴",
-  "noDueCard": "\uD83D\uDD2E 干得漂亮！目前已经没有更多复习任务，过一会再来看看吧！",
+  "noDueCard": "干得漂亮！目前已经没有更多复习任务，过一会再来看看吧！",
   "createDeck": "创建卡包",
   "addDeck": "加入卡包",
   "removeDeck": "从卡包中移除",
@@ -789,17 +791,14 @@
   "alignRight": "居右",
   "alternateText": "替代文本",
   "bold": "粗体",
-  "both": "编辑 & 预览",
+  "cardPreview": "预览",
   "check": "任务列表",
   "code": "代码块",
-  "code-theme": "代码块主题预览",
   "column": "列",
-  "content-theme": "内容主题预览",
   "copied": "已复制",
   "copy": "复制",
   "delete-column": "删除列",
   "delete-row": "删除行",
-  "devtools": "抽象语法树",
   "down": "下",
   "downloadTip": "该浏览器不支持下载功能",
   "edit-mode": "模式切换",
@@ -1092,6 +1091,7 @@
     "188": "锁定云端同步目录失败，请稍后再试",
     "189": "云端同步目录还在被其他设备锁定，请稍后再试",
     "190": "校验索引时发现一个问题，已经自动修复",
-    "191": "[%d/%d] 已经建立条历史数据索引"
+    "191": "[%d/%d] 已经建立条历史数据索引",
+    "192": "正在重建历史数据索引，请稍等..."
   }
 }

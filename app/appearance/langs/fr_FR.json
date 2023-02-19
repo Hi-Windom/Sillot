@@ -1,4 +1,6 @@
 {
+  "addToDeck": "Ajouter au deck...",
+  "quickMakeCard": "Carte de création rapide",
   "allAttrs": "Tous les noms d'attributs et les valeurs d'attributs",
   "chooseSyncDirection": "Choisir la direction de synchronisation",
   "uploadData2Cloud": "⬆️ Télécharger des données dans le cloud",
@@ -20,7 +22,7 @@
   "new": "Nouveau",
   "share2LiandiConfirmTip": "Êtes-vous sûr de partager ce document avec Liandi ?",
   "share2Liandi": "Partager avec Liandi",
-  "noDueCard": "\uD83D\uDD2E Excellent travail ! Il n'y a plus de tâches de révision pour le moment, revenez plus tard !",
+  "noDueCard": "Excellent travail ! Il n'y a plus de tâches de révision pour le moment, revenez plus tard !",
   "createDeck": "Créer un deck",
   "addDeck": "Ajouter au deck",
   "removeDeck": "Retirer du deck",
@@ -788,17 +790,14 @@
   "alignRight": "Droit",
   "alternateText": "Textes alternatifs",
   "bold": "Bold",
-  "both": "Editer & Aperçu",
+  "cardPreview": "Aperçu",
   "check": "Liste des tâches",
   "code": "Code Block",
-  "code-theme": "Aperçu du Thème Code Block",
   "column": "Colonne",
-  "content-theme": "Aperçu du Thème du Contenu",
   "copied": "Copié",
   "copy": "Copie",
   "delete-column": "Supprimer une Colonne",
   "delete-row": "Supprimer la rangée",
-  "devtools": "Arbre syntaxique abstrait",
   "down": "En bas",
   "downloadTip": "Ce navigateur ne prend pas en charge la fonction de téléchargement",
   "edit-mode": "Mode Toggle",
@@ -1091,6 +1090,7 @@
     "188": "Échec du verrouillage du répertoire de synchronisation cloud, veuillez réessayer plus tard",
     "189": "Le répertoire de synchronisation cloud est toujours verrouillé par d'autres appareils, veuillez réessayer plus tard",
     "190": "Un problème a été trouvé lors de la validation de l'index, qui a été automatiquement corrigé",
-    "191": "[%d/%d] Création d'un index de données historiques"
+    "191": "[%d/%d] Création d'un index de données historiques",
+    "192": "Reconstruction de l'index des données historiques, veuillez patienter..."
   }
 }

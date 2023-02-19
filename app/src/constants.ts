@@ -92,7 +92,7 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly TIMEOUT_BLOCKLOAD = 300;
     public static readonly TIMEOUT_TRANSITION = 150;
 
-    // help path
+    // id
     public static readonly HELP_PATH = {
         zh_CN: "20210808180117-czj9bvb",
         zh_CHT: "20210808180117-czj9bvb",
@@ -100,6 +100,8 @@ export abstract class Constants extends SConst { // Sillot extend
         en_US: "20210808180117-6v0mkxr",
         fr_FR: "20210808180117-6v0mkxr",
     };
+
+    public static readonly QUICK_DECK_ID = "20230218211946-2kw8jgx";
 
     public static readonly KEYCODE: { [key: string]: string[] } = {
         "186": [";", ":"],
@@ -116,7 +118,8 @@ export abstract class Constants extends SConst { // Sillot extend
     };
     // 冲突不使用 "⌘S/Q"
     // "⌘", "⇧", "⌥", "⌃"
-    // "⌘A", "⌘X", "⌘C", "⌘V", "⇧⌘V", "⌘/", "⇧↑", "⇧↓", "⇧→", "⇧←", "⇧⇥", "⇧⌘⇥", "⌃⇥", "⌘⇥", "⌃⌘⇥", "⇧⌘→", "⇧⌘←", "⌘Home", "⌘End", "⇧↩", "↩", "PageUp", "PageDown", "⌫", "⌦" 不可自定义
+    // "⌘A", "⌘X", "⌘C", "⌘V", "⇧⌘V", "⌘/", "⇧↑", "⇧↓", "⇧→", "⇧←", "⇧⇥", "⇧⌘⇥", "⌃⇥", "⌘⇥", "⌃⌘⇥", "⇧⌘→", "⇧⌘←",
+    // "⌘Home", "⌘End", "⇧↩", "↩", "PageUp", "PageDown", "⌫", "⌦" 不可自定义
     public static readonly SIYUAN_KEYMAP: IKeymap = {
         general: {
             editMode: {default: "⇧⌘G", custom: "⇧⌘G"},
@@ -167,6 +170,7 @@ export abstract class Constants extends SConst { // Sillot extend
                 openBy: {default: "⌥,", custom: "⌥,"},
                 insertRight: {default: "⌥.", custom: "⌥."},
                 attr: {default: "⌥⌘A", custom: "⌥⌘A"},
+                quickMakeCard: {default: "⌥⌘F", custom: "⌥⌘F"},
                 refresh: {default: "F5", custom: "F5"},
                 copyBlockRef: {default: "⇧⌘C", custom: "⇧⌘C"},
                 copyProtocol: {default: "⇧⌘H", custom: "⇧⌘H"},

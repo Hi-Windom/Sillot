@@ -18,7 +18,6 @@ package model
 
 import (
 	"errors"
-	"github.com/siyuan-note/siyuan/kernel/sql"
 	"math"
 	"os"
 	"path/filepath"
@@ -34,12 +33,70 @@ import (
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/riff"
 	"github.com/siyuan-note/siyuan/kernel/cache"
+	"github.com/siyuan-note/siyuan/kernel/filesys"
+	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
 var Decks = map[string]*riff.Deck{}
 var deckLock = sync.Mutex{}
+
+func GetTreeFlashcards(rootID string, page int) (blocks []*Block, total, pageCount int) {
+	blocks = []*Block{}
+
+	treeBlockIDs := getTreeSubTreeChildBlocks(rootID)
+	var allBlockIDs []string
+	const pageSize = 20
+	deck := Decks[builtinDeckID]
+	if nil == deck {
+		return
+	}
+
+	for bID, _ := range deck.BlockCard {
+		if _, ok := treeBlockIDs[bID]; !ok {
+			continue
+		}
+
+		allBlockIDs = append(allBlockIDs, bID)
+	}
+
+	allBlockIDs = gulu.Str.RemoveDuplicatedElem(allBlockIDs)
+	sort.Strings(allBlockIDs)
+
+	start := (page - 1) * pageSize
+	end := page * pageSize
+	if start > len(allBlockIDs) {
+		start = len(allBlockIDs)
+	}
+	if end > len(allBlockIDs) {
+		end = len(allBlockIDs)
+	}
+	blockIDs := allBlockIDs[start:end]
+	total = len(allBlockIDs)
+	pageCount = int(math.Ceil(float64(total) / float64(pageSize)))
+	if 1 > len(blockIDs) {
+		blocks = []*Block{}
+		return
+	}
+
+	sqlBlocks := sql.GetBlocks(blockIDs)
+	blocks = fromSQLBlocks(&sqlBlocks, "", 36)
+	if 1 > len(blocks) {
+		blocks = []*Block{}
+		return
+	}
+
+	for i, b := range blocks {
+		if nil == b {
+			blocks[i] = &Block{
+				ID:      blockIDs[i],
+				Content: Conf.Language(180),
+			}
+		}
+	}
+	return
+}
 
 func GetFlashcards(deckID string, page int) (blocks []*Block, total, pageCount int) {
 	blocks = []*Block{}
@@ -62,7 +119,9 @@ func GetFlashcards(deckID string, page int) (blocks []*Block, total, pageCount i
 		}
 	}
 
+	allBlockIDs = gulu.Str.RemoveDuplicatedElem(allBlockIDs)
 	sort.Strings(allBlockIDs)
+
 	start := (page - 1) * pageSize
 	end := page * pageSize
 	if start > len(allBlockIDs) {
@@ -120,6 +179,85 @@ type Flashcard struct {
 	DeckID   string                 `json:"deckID"`
 	BlockID  string                 `json:"blockID"`
 	NextDues map[riff.Rating]string `json:"nextDues"`
+}
+
+func GetTreeDueFlashcards(rootID string) (ret []*Flashcard, err error) {
+	deckLock.Lock()
+	defer deckLock.Unlock()
+
+	if syncingStorages {
+		err = errors.New(Conf.Language(81))
+		return
+	}
+
+	deck := Decks[builtinDeckID]
+	if nil == deck {
+		logging.LogWarnf("builtin deck not found")
+		return
+	}
+
+	treeBlockIDs := getTreeSubTreeChildBlocks(rootID)
+	cards := deck.Dues()
+	now := time.Now()
+	for _, card := range cards {
+		blockID := card.BlockID()
+		if !treeBlockIDs[blockID] {
+			continue
+		}
+
+		nextDues := map[riff.Rating]string{}
+		for rating, due := range card.NextDues() {
+			nextDues[rating] = strings.TrimSpace(humanize.RelTime(due, now, "", ""))
+		}
+
+		ret = append(ret, &Flashcard{
+			DeckID:   builtinDeckID,
+			BlockID:  blockID,
+			NextDues: nextDues,
+		})
+	}
+	if 1 > len(ret) {
+		ret = []*Flashcard{}
+	}
+	return
+}
+
+func getTreeSubTreeChildBlocks(rootID string) (treeBlockIDs map[string]bool) {
+	treeBlockIDs = map[string]bool{}
+
+	tree, err := loadTreeByBlockID(rootID)
+	if nil != err {
+		return
+	}
+
+	trees := []*parse.Tree{tree}
+	box := Conf.Box(tree.Box)
+	luteEngine := util.NewLute()
+	files := box.ListFiles(tree.Path)
+	for _, subFile := range files {
+		if !strings.HasSuffix(subFile.path, ".sy") {
+			continue
+		}
+
+		subTree, loadErr := filesys.LoadTree(box.ID, subFile.path, luteEngine)
+		if nil != loadErr {
+			continue
+		}
+
+		trees = append(trees, subTree)
+	}
+
+	for _, t := range trees {
+		ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if !entering || !n.IsBlock() || ast.NodeDocument == n.Type {
+				return ast.WalkContinue
+			}
+
+			treeBlockIDs[n.ID] = true
+			return ast.WalkContinue
+		})
+	}
+	return
 }
 
 func GetDueFlashcards(deckID string) (ret []*Flashcard, err error) {
@@ -295,7 +433,6 @@ func AddFlashcards(deckID string, blockIDs []string) (err error) {
 		return
 	}
 
-	var rootIDs []string
 	blockRoots := map[string]string{}
 	for _, blockID := range blockIDs {
 		bt := treenode.GetBlockTree(blockID)
@@ -303,10 +440,8 @@ func AddFlashcards(deckID string, blockIDs []string) (err error) {
 			continue
 		}
 
-		rootIDs = append(rootIDs, bt.RootID)
 		blockRoots[blockID] = bt.RootID
 	}
-	rootIDs = gulu.Str.RemoveDuplicatedElem(rootIDs)
 
 	trees := map[string]*parse.Tree{}
 	for _, blockID := range blockIDs {
@@ -353,16 +488,19 @@ func AddFlashcards(deckID string, blockIDs []string) (err error) {
 	}
 
 	deck := Decks[deckID]
-	if nil != deck {
-		for _, blockID := range blockIDs {
-			cardID := ast.NewNodeID()
-			deck.AddCard(cardID, blockID)
-		}
-		err = deck.Save()
-		if nil != err {
-			logging.LogErrorf("save deck [%s] failed: %s", deckID, err)
-			return
-		}
+	if nil == deck {
+		logging.LogWarnf("deck [%s] not found", deckID)
+		return
+	}
+
+	for _, blockID := range blockIDs {
+		cardID := ast.NewNodeID()
+		deck.AddCard(cardID, blockID)
+	}
+	err = deck.Save()
+	if nil != err {
+		logging.LogErrorf("save deck [%s] failed: %s", deckID, err)
+		return
 	}
 	return
 }
@@ -408,7 +546,24 @@ func LoadFlashcards() {
 			Decks[deck.ID] = deck
 		}
 	}
+
+	// 支持基于文档复习闪卡 https://github.com/siyuan-note/siyuan/issues/7057
+	foudBuiltinDeck := false
+	for _, deck := range Decks {
+		if builtinDeckID == deck.ID {
+			foudBuiltinDeck = true
+			break
+		}
+	}
+	if !foudBuiltinDeck {
+		deck, createErr := createDeck0("Built-in Deck", builtinDeckID)
+		if nil == createErr {
+			Decks[deck.ID] = deck
+		}
+	}
 }
+
+const builtinDeckID = "20230218211946-2kw8jgx"
 
 func RenameDeck(deckID, name string) (err error) {
 	deckLock.Lock()
@@ -469,8 +624,13 @@ func createDeck(name string) (deck *riff.Deck, err error) {
 		return
 	}
 
-	riffSavePath := getRiffDir()
 	deckID := ast.NewNodeID()
+	deck, err = createDeck0(name, deckID)
+	return
+}
+
+func createDeck0(name string, deckID string) (deck *riff.Deck, err error) {
+	riffSavePath := getRiffDir()
 	deck, err = riff.LoadDeck(riffSavePath, deckID)
 	if nil != err {
 		logging.LogErrorf("load deck [%s] failed: %s", deckID, err)
@@ -491,6 +651,10 @@ func GetDecks() (decks []*riff.Deck) {
 	defer deckLock.Unlock()
 
 	for _, deck := range Decks {
+		if deck.ID == builtinDeckID {
+			continue
+		}
+
 		decks = append(decks, deck)
 	}
 	if 1 > len(decks) {

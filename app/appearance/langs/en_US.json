@@ -1,4 +1,6 @@
 {
+  "addToDeck": "Add to Deck...",
+  "quickMakeCard": "Quick make card",
   "allAttrs": "All attribute names and attribute values",
   "chooseSyncDirection": "Choose sync direction",
   "uploadData2Cloud": "⬆️ Upload data to cloud",
@@ -20,7 +22,7 @@
   "new": "New",
   "share2LiandiConfirmTip": "Are you sure to share this document to Liandi?",
   "share2Liandi": "Share to Liandi",
-  "noDueCard": "\uD83D\uDD2E Great job! There are no more review tasks at the moment, check back later!",
+  "noDueCard": "Great job! There are no more review tasks at the moment, check back later!",
   "createDeck": "Create Deck",
   "addDeck": "Add to deck",
   "removeDeck": "Remove from deck",
@@ -789,17 +791,14 @@
   "alignRight": "Right",
   "alternateText": "Alternate text",
   "bold": "Bold",
-  "both": "editor & preview",
+  "cardPreview": "Preview",
   "check": "Task List",
   "code": "Code Block",
-  "code-theme": "Code Block Theme Preview",
   "column": "Column",
-  "content-theme": "Content Theme Preview",
   "copied": "Copied",
   "copy": "Copy",
   "delete-column": "Delete Column",
   "delete-row": "Delete Row",
-  "devtools": "Abstract Syntax Tree",
   "down": "Down",
   "downloadTip": "The browser does not support the download function",
   "edit-mode": "Toggle Mode",
@@ -1092,6 +1091,7 @@
     "188": "Failed to lock the cloud sync directory, please try again later",
     "189": "Cloud sync directory is still locked by other devices, please try again later",
     "190": "A problem was found while validating the index, which has been automatically fixed",
-    "191": "[%d/%d] Created historical data index"
+    "191": "[%d/%d] Created historical data index",
+    "192": "Rebuilding historical data index, please wait..."
   }
 }

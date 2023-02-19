@@ -32,7 +32,7 @@ import {mathRender} from "../markdown/mathRender";
 import {duplicateBlock} from "../wysiwyg/commonHotkey";
 import {movePathTo} from "../../util/pathName";
 import {hintMoveBlock} from "../hint/extend";
-import {makeCard} from "../../card/makeCard";
+import {makeCard, quickMakeCard} from "../../card/makeCard";
 import {transferBlockRef} from "../../menus/block";
 import {HiJoy} from "../../sillot/joyUI/com_/hi";
 import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
@@ -59,14 +59,15 @@ export class Gutter {
                 event.dataTransfer.setDragImage(protyle.wysiwyg.element.querySelector(`[data-node-id="${selectIds[0]}"]`), 0, 0);
             }
             event.target.style.opacity = "0.1";
-            window.siyuan.dragElement = event.target;
-            event.dataTransfer.setData(Constants.SIYUAN_DROP_GUTTER, selectIds.toString());
-            window.siyuan.dragElement.setAttribute("data-selected-ids", selectIds.toString());
+            window.siyuan.dragElement = protyle.wysiwyg.element;
+            event.dataTransfer.setData(`${Constants.SIYUAN_DROP_GUTTER}${event.target.getAttribute("data-type")}${Constants.ZWSP}${event.target.getAttribute("data-subtype")}${Constants.ZWSP}${selectIds}`,
+                protyle.wysiwyg.element.innerHTML);
         });
         this.element.addEventListener("dragend", () => {
             if (window.siyuan.dragElement) {
-                window.siyuan.dragElement.removeAttribute("data-selected-ids");
-                window.siyuan.dragElement.style.opacity = "";
+                this.element.querySelectorAll("button").forEach((item) => {
+                    item.style.opacity = "";
+                });
                 window.siyuan.dragElement = undefined;
             }
         });
@@ -677,7 +678,16 @@ export class Gutter {
         this.genWidths(selectsElement, protyle);
         window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
         window.siyuan.menus.menu.append(new MenuItem({
-            label: window.siyuan.languages.riffCard,
+            label: window.siyuan.languages.quickMakeCard,
+            accelerator: window.siyuan.config.keymap.editor.general.quickMakeCard.custom,
+            iconHTML: "<svg class=\"b3-menu__icon\" style=\"color:var(--b3-theme-primary)\"><use xlink:href=\"#iconRiffCard\"></use></svg>",
+            icon: "iconRiffCard",
+            click() {
+                quickMakeCard(selectsElement);
+            }
+        }).element);
+        window.siyuan.menus.menu.append(new MenuItem({
+            label: window.siyuan.languages.addToDeck,
             icon: "iconRiffCard",
             click() {
                 makeCard(selectsElement);
@@ -1482,7 +1492,16 @@ export class Gutter {
         }
         if (type !== "NodeThematicBreak") {
             window.siyuan.menus.menu.append(new MenuItem({
-                label: window.siyuan.languages.riffCard,
+                label: window.siyuan.languages.quickMakeCard,
+                accelerator: window.siyuan.config.keymap.editor.general.quickMakeCard.custom,
+                iconHTML: "<svg class=\"b3-menu__icon\" style=\"color:var(--b3-theme-primary)\"><use xlink:href=\"#iconRiffCard\"></use></svg>",
+                icon: "iconRiffCard",
+                click() {
+                    quickMakeCard([nodeElement]);
+                }
+            }).element);
+            window.siyuan.menus.menu.append(new MenuItem({
+                label: window.siyuan.languages.addToDeck,
                 icon: "iconRiffCard",
                 click() {
                     makeCard([nodeElement]);
