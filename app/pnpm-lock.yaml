@@ -66,6 +66,7 @@ specifiers:
   react-jinke-music-player: ^4.24.2
   react-spinners: ^0.13.8
   react-toastify: ^9.1.1
+  rome: ^11.0.0
   safer-buffer: ^2.1.2
   sass: ^1.58.1
   sass-loader: ^13.2.0
@@ -147,6 +148,7 @@ devDependencies:
   react-jinke-music-player: registry.npmmirror.com/react-jinke-music-player/4.24.2_biqbaboplfbrettd7655fr4n2y
   react-spinners: registry.npmmirror.com/react-spinners/0.13.8_biqbaboplfbrettd7655fr4n2y
   react-toastify: registry.npmmirror.com/react-toastify/9.1.1_biqbaboplfbrettd7655fr4n2y
+  rome: 11.0.0
   safer-buffer: registry.npmmirror.com/safer-buffer/2.1.2
   sass: registry.npmmirror.com/sass/1.58.1
   sass-loader: registry.npmmirror.com/sass-loader/13.2.0_sass@1.58.1+webpack@5.75.0
@@ -1470,6 +1472,54 @@ packages:
   /@popperjs/core/2.11.6:
     resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
     dev: true
+
+  /@rometools/cli-darwin-arm64/11.0.0:
+    resolution: {integrity: sha512-F3vkdY+s3FLIEnAjSbyHTuIPB88cLpccimW4ecid5I7S6GzGG3iUJI4xT00JhH73K4P/qW20/9r+kH1T9Du8Xg==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-darwin-x64/11.0.0:
+    resolution: {integrity: sha512-X6jhtS6Iml4GOzgNtnLwIp/KXXhSdqeVyfv69m/AHnIzx3gQAjPZ7BPnJLvTCbhe4SKHL+uTZYFSCJpkUUKE6w==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-linux-arm64/11.0.0:
+    resolution: {integrity: sha512-dktTJJlTpmycBZ2TwhJBcAO8ztK8DdevdyZnFFxdYRvtmJgTjIsC2UFayf/SbKew8B8q1IhI0it+D6ihAeIpeg==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-linux-x64/11.0.0:
+    resolution: {integrity: sha512-WVcnXPNdWGUWo0p4NU8YzuthjYR7q+b4vRcjdxtP1DlpphZmSsoC/RSE85nEqRAz8hChcKUansVzOPM8BSsuGA==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-win32-arm64/11.0.0:
+    resolution: {integrity: sha512-tPj6RThQzS7Q45jqQll7NlTYvNcsg/BEP3LYiiazqSh9FAFnMkrV6ewUcMPKWyAfiyLs7jlz4rRvdNRUSygzfQ==}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-win32-x64/11.0.0:
+    resolution: {integrity: sha512-bmBai8WHxYjsGk1+je7ZTfCUCWq30WJI3pQM8pzTA674lfGTZ9ymJoZwTaIMSO4rL5V9mlO6uLunsBKso9VqOg==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
 
   /@sinclair/typebox/0.25.22:
     resolution: {integrity: sha512-6U6r2L7rnM7EG8G1tWzIjdB3QlsHF4slgcqXNN/SF0xJOAr0nDmT2GedlkyO3mrv8mDTJ24UuOMWR3diBrCvQQ==}
@@ -4560,6 +4610,20 @@ packages:
       semver-compare: 1.0.0
       sprintf-js: 1.1.2
     optional: true
+
+  /rome/11.0.0:
+    resolution: {integrity: sha512-rRo6JOwpMLc3OkeTDRXkrmrDqnxDvZ75GS4f0jLDBNmRgDXWbu0F8eVnJoRn+VbK2AE7vWvhVOMBjnWowcopkQ==}
+    engines: {node: '>=14.*'}
+    hasBin: true
+    requiresBuild: true
+    optionalDependencies:
+      '@rometools/cli-darwin-arm64': 11.0.0
+      '@rometools/cli-darwin-x64': 11.0.0
+      '@rometools/cli-linux-arm64': 11.0.0
+      '@rometools/cli-linux-x64': 11.0.0
+      '@rometools/cli-win32-arm64': 11.0.0
+      '@rometools/cli-win32-x64': 11.0.0
+    dev: true
 
   /run-async/2.4.1:
     resolution: {integrity: sha512-tvVnVv01b8c1RrA6Ep7JkStj85Guv/YrMcwqYQnwjsAS2cTmmPGBBjAjpCW7RrSodNSoE2/qg9O4bceNvUuDgQ==}
