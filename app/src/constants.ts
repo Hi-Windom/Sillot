@@ -351,7 +351,7 @@ export abstract class Constants extends SConst { // Sillot extend
                     hotkeyLangId: "outline",
                 }, {
                     type: "inbox",
-                    size: {width: 252, height: 0},
+                    size: {width: 320, height: 0},
                     show: false,
                     icon: "iconInbox",
                     hotkeyLangId: "inbox",
