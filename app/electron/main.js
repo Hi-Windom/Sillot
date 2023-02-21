@@ -48,7 +48,7 @@ try {
 }
 var isVite;
 try {
-  isVite =  process.env.VITE == "vite";
+  isVite =  process.env.VITE === "vite";
 } catch {
   isVite = false;
 }
@@ -72,7 +72,6 @@ require("@electron/remote/main").initialize();
 
 if (!app.requestSingleInstanceLock()) {
     app.quit();
-    return;
 }
 
 try {
@@ -1203,7 +1202,7 @@ powerMonitor.on("resume", async () => {
     if (!online) {
         writeLog("network is offline, do not sync after system resume");
         new Notification({
-            title:`network is offline`,
+            title:"network is offline",
             body:"Do not sync after system resume",
          }).show();
         return;
