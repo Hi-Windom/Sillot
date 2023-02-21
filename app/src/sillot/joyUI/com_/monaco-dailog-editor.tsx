@@ -135,7 +135,7 @@ function Loader(props: { nodeID: any; initConfig: any }) {
         setEditor(_editor);
         setmmodel(model_x);
         setmonacoIns(monacoInstance);
-        _editor.updateOptions({ readOnly: initConfig.readonly || false });
+        _editor.updateOptions({ readOnly: initConfig.readonly });
         _editor.onDidChangeModelContent(() => {
           // window.sout.slog(_editor.getValue());
         });
