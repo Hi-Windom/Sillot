@@ -1,7 +1,6 @@
 import {appearance} from "./appearance";
 import {showMessage} from "../dialog/message";
 import {fetchPost} from "../util/fetch";
-import {hasClosestByClassName} from "../protyle/util/hasClosest";
 import {confirmDialog} from "../dialog/confirmDialog";
 import {highlightRender} from "../protyle/markdown/highlightRender";
 import {exportLayout} from "../layout/util";
@@ -151,7 +150,7 @@ export const bazaar = {
             repoURL: item.repoURL,
             repoHash: item.repoHash,
             downloaded: false,
-        }
+        };
         return `<div data-obj='${JSON.stringify(dataObj)}' class="b3-card${hide ? " fn__none" : ""}${item.current ? " b3-card--current" : ""}">
     <div class="b3-card__img"><img src="${item.previewURLThumb}"/></div>
     <div class="b3-card__info fn__flex">
@@ -202,7 +201,7 @@ export const bazaar = {
                     repoURL: item.repoURL,
                     repoHash: item.repoHash,
                     downloaded: true
-                }
+                };
                 html += `<div data-obj='${JSON.stringify(dataObj)}' class="b3-card${item.current ? " b3-card--current" : ""}">
     <div class="b3-card__img"><img src="${item.previewURLThumb}"/></div>
     <div class="b3-card__info">
@@ -270,7 +269,7 @@ export const bazaar = {
             repoURL: data.repoURL,
             repoHash: data.repoHash,
             downloaded: true
-        }
+        };
         readmeElement.innerHTML = /*html*/ ` <div class="item__side" data-obj='${JSON.stringify(dataObj1)}'>
     <div class="fn__flex">
         <button class="b3-button b3-button--outline" data-type="goBack" title="Go back"><svg><use xlink:href="#iconLeft"></use></svg></button>
@@ -415,7 +414,7 @@ export const bazaar = {
                 } else if (type === "install-t") {
                     if (!target.classList.contains("b3-button--progress")) {
                         confirmDialog(window.siyuan.languages.update, window.siyuan.languages.exportTplTip, () => {
-                            const dataObj = JSON.parse(target.parentElement.parentElement.getAttribute("data-obj"))
+                            const dataObj = JSON.parse(target.parentElement.parentElement.getAttribute("data-obj"));
                             const bazaarType: TBazaarType = dataObj.bazaarType;
                             let url = "/api/bazaar/installBazaarTemplate";
                             if (bazaarType === "themes") {
@@ -457,7 +456,7 @@ export const bazaar = {
                     event.stopPropagation();
                     break;
                 } else if (type === "uninstall") {
-                    const dataObj = JSON.parse(target.parentElement.parentElement.getAttribute("data-obj"))
+                    const dataObj = JSON.parse(target.parentElement.parentElement.getAttribute("data-obj"));
                     const bazaarType: TBazaarType = dataObj.bazaarType;
                     let url = "/api/bazaar/uninstallBazaarTemplate";
                     if (bazaarType === "themes") {
@@ -485,7 +484,7 @@ export const bazaar = {
                     event.stopPropagation();
                     break;
                 } else if (type === "switch") {
-                    const dataObj = JSON.parse(target.parentElement.parentElement.getAttribute("data-obj"))
+                    const dataObj = JSON.parse(target.parentElement.parentElement.getAttribute("data-obj"));
                     const bazaarType: TBazaarType = dataObj.bazaarType;
                     const packageName = dataObj.name;
                     const mode = dataObj.themeMode === "dark" ? 1 : 0;
@@ -495,7 +494,7 @@ export const bazaar = {
                         }), (appearanceResponse) => {
                             this._genMyHTML(bazaarType);
                             fetchPost("/api/bazaar/getBazaarIcon", {}, response => {
-                                response.data.appearance = appearanceResponse.data
+                                response.data.appearance = appearanceResponse.data;
                                 bazaar._onBazaar(response, "icons", true);
                                 bazaar._data.icons = response.data.packages;
                             });
@@ -515,7 +514,7 @@ export const bazaar = {
                             } else {
                                 this._genMyHTML("themes");
                                 fetchPost("/api/bazaar/getBazaarTheme", {}, response => {
-                                    response.data.appearance = appearanceResponse.data
+                                    response.data.appearance = appearanceResponse.data;
                                     bazaar._onBazaar(response, "themes", true);
                                     bazaar._data.themes = response.data.packages;
                                 });
@@ -534,7 +533,6 @@ export const bazaar = {
                     // switch tab
                     bazaar.element.querySelector(".layout-tab-bar .item--focus").classList.remove("item--focus");
                     target.classList.add("item--focus");
-                    const type = target.getAttribute("data-type");
                     bazaar.element.querySelectorAll(".bazaarPanel").forEach(item => {
                         if (type === item.getAttribute("data-type")) {
                             item.classList.remove("fn__none");
@@ -581,14 +579,15 @@ export const bazaar = {
                 if (selectElement.id === "bazaarSelect") {
                     // theme select
                     bazaar.element.querySelectorAll("#configBazaarTheme .b3-card").forEach((item) => {
+                       const dataObj = JSON.parse(item.getAttribute("data-obj"));
                         if (selectElement.value === "0") {
-                            if (item.getAttribute("data-type").indexOf("light") > -1) {
+                            if (dataObj.themeMode.indexOf("light") > -1) {
                                 item.classList.remove("fn__none");
                             } else {
                                 item.classList.add("fn__none");
                             }
                         } else if (selectElement.value === "1") {
-                            if (item.getAttribute("data-type").indexOf("dark") > -1) {
+                            if (dataObj.themeMode.indexOf("dark") > -1) {
                                 item.classList.remove("fn__none");
                             } else {
                                 item.classList.add("fn__none");
@@ -604,13 +603,13 @@ export const bazaar = {
                     let html = "";
                     if (selectElement.value === "0") { // 更新时间降序
                         Array.from(panelElement.querySelectorAll(".b3-card")).sort((a, b) => {
-                            return b.getAttribute("data-updated") < a.getAttribute("data-updated") ? -1 : 1;
+                            return JSON.parse(b.getAttribute("data-obj")).updated < JSON.parse(a.getAttribute("data-obj")).updated ? -1 : 1;
                         }).forEach((item) => {
                             html += item.outerHTML;
                         });
                     } else if (selectElement.value === "1") { // 更新时间升序
                         Array.from(panelElement.querySelectorAll(".b3-card")).sort((a, b) => {
-                            return b.getAttribute("data-updated") < a.getAttribute("data-updated") ? 1 : -1;
+                            return JSON.parse(b.getAttribute("data-obj")).updated < JSON.parse(a.getAttribute("data-obj")).updated ? 1 : -1;
                         }).forEach((item) => {
                             html += item.outerHTML;
                         });
@@ -661,7 +660,7 @@ export const bazaar = {
         if (localSort[bazaarType.replace("s", "")] === "1") {
             html = "";
             Array.from(element.querySelectorAll(".b3-card")).sort((a, b) => {
-                return b.getAttribute("data-updated") < a.getAttribute("data-updated") ? 1 : -1;
+                return JSON.parse(b.getAttribute("data-obj")).updated < JSON.parse(a.getAttribute("data-obj")).updated ? 1 : -1;
             }).forEach((item) => {
                 html += item.outerHTML;
             });
