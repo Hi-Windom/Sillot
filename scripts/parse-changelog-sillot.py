@@ -89,15 +89,7 @@ def find_milestone(repo, title):
 
 ### 🥈 银牌开源力量
 
-- [daisyui](https://github.com/saadeghi/daisyui)
-- [astro](https://github.com/withastro/astro)
-- [nivo](https://github.com/plouc/nivo)
-- [recharts](https://github.com/recharts/recharts)
-- [mobx](https://github.com/mobxjs/mobx)
-- [react-markdown](https://github.com/remarkjs/react-markdown)
-- [alist](https://github.com/alist-org/alist)
-- [obsidian-various-complements-plugin](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin)
-- [xterm.js](https://github.com/xtermjs/xterm.js)
+[daisyui](https://github.com/saadeghi/daisyui) | [astro](https://github.com/withastro/astro) | [nivo](https://github.com/plouc/nivo) | [recharts](https://github.com/recharts/recharts) | [mobx](https://github.com/mobxjs/mobx) | [react-markdown](https://github.com/remarkjs/react-markdown) | [alist](https://github.com/alist-org/alist) | [obsidian-various-complements-plugin](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin) | [xterm.js](https://github.com/xtermjs/xterm.js)
 
 ### 🥉 铜牌开源力量
 
