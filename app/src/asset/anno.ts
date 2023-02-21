@@ -584,7 +584,7 @@ const showHighlight = (selected: IPdfAnno, pdf: any, hl?: boolean) => {
 
 export const hlPDFRect = (element: HTMLElement, id: string) => {
     const currentElement = element.querySelector(`.pdf__rect[data-node-id="${id}"]`);
-    if (currentElement && currentElement.firstElementChild) {
+    if (currentElement?.firstElementChild) {
         const scrollElement = hasClosestByAttribute(currentElement, "id",
             "viewerContainer");
         if (scrollElement) {

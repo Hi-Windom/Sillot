@@ -12,6 +12,7 @@ module.exports = (env, argv) => {
     mode: argv.mode || "development",
     watch: argv.mode !== "production",
     devtool: argv.mode !== "production" ? "eval" : false,
+    target: ["web", "es2022"],
     output: {
       publicPath: "",
       filename: "[name].[chunkhash].js",

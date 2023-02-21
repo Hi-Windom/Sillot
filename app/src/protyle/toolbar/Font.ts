@@ -6,7 +6,7 @@ import {Constants} from "../../constants";
 import {hasClosestByAttribute} from "../util/hasClosest";
 
 export class Font extends ToolbarItem {
-    public element: HTMLElement;
+    declare public element: HTMLElement;
 
     constructor(protyle: IProtyle, menuItem: IMenuItem) {
         super(protyle, menuItem);

@@ -576,7 +576,7 @@ export class WYSIWYG {
                 }
                 protyle.selectElement.setAttribute("style", `background-color: ${protyle.selectElement.style.backgroundColor};top:${newTop}px;height:${newHeight}px;left:${newLeft + 2}px;width:${newWidth - 2}px;`);
                 const newMouseElement = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
-                if (mouseElement && mouseElement.isSameNode(newMouseElement) && !mouseElement.classList.contains("protyle-wysiwyg") &&
+                if (mouseElement?.isSameNode(newMouseElement) && !mouseElement.classList.contains("protyle-wysiwyg") &&
                     !mouseElement.classList.contains("list") && !mouseElement.classList.contains("bq") && !mouseElement.classList.contains("sb")) {
                     // 性能优化，同一个p元素不进行选中计算
                     return;
@@ -703,7 +703,7 @@ export class WYSIWYG {
                                     tableBlockElement.querySelectorAll("th, td").forEach((item: HTMLTableCellElement, index: number) => {
                                         if (item.classList.contains("fn__none")) {
                                             // 合并的元素中间有 fn__none 的元素
-                                            if (item.previousElementSibling && item.previousElementSibling.isSameNode(selectCellElements[selectCellElements.length - 1])) {
+                                            if (item.previousElementSibling?.isSameNode(selectCellElements[selectCellElements.length - 1])) {
                                                 selectCellElements.push(item);
                                                 if (!isTHead && item.parentElement.parentElement.tagName === "THEAD") {
                                                     isTHead = true;
@@ -741,7 +741,7 @@ export class WYSIWYG {
                                     let cellElement = selectCellElements[0];
                                     let colSpan = cellElement.colSpan;
                                     let index = 1;
-                                    while (cellElement.nextElementSibling && cellElement.nextElementSibling.isSameNode(selectCellElements[index])) {
+                                    while (cellElement.nextElementSibling?.isSameNode(selectCellElements[index])) {
                                         cellElement = cellElement.nextElementSibling as HTMLTableCellElement;
                                         if (!cellElement.classList.contains("fn__none")) { // https://github.com/siyuan-note/insider/issues/1007#issuecomment-1046195608
                                             colSpan += cellElement.colSpan;
@@ -1510,7 +1510,8 @@ export class WYSIWYG {
                     item.querySelector("table").classList.remove("select");
                     item.querySelector(".table__select").removeAttribute("style");
                 }
-                if (tableElement && tableElement.isSameNode(item) && item.querySelector(".table__select").getAttribute("style")) {
+                // rome-ignore lint/complexity/useOptionalChain: <explanation>
+if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table__select").getAttribute("style")) {
                     // 防止合并单元格的菜单消失
                     event.stopPropagation();
                 }
@@ -1520,7 +1521,8 @@ export class WYSIWYG {
             const blockRefElement = hasClosestByAttribute(event.target, "data-type", "block-ref");
             const aElement = hasClosestByAttribute(event.target, "data-type", "a");
             if (blockRefElement ||
-                (aElement && aElement.getAttribute("data-href").startsWith("siyuan://blocks/"))
+                // rome-ignore lint/complexity/useOptionalChain: <explanation>
+(aElement && aElement.getAttribute("data-href").startsWith("siyuan://blocks/"))
             ) {
                 event.stopPropagation();
                 event.preventDefault();
@@ -1936,7 +1938,7 @@ export class WYSIWYG {
                 if (startElement && endElement && startElement.isSameNode(endElement)) {
                     startElement = hasClosestBlock(range.endContainer);
                 }
-                if (startElement && endElement && (!startElement.isSameNode(endElement) || (shiftStartElement && shiftStartElement.isSameNode(startElement)))) {
+                if (startElement && endElement && (!startElement.isSameNode(endElement) || (shiftStartElement?.isSameNode(startElement)))) {
                     let toDown = true;
                     range.collapse(true);
                     if (shiftStartElement) {

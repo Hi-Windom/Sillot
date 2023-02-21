@@ -219,7 +219,7 @@ export function exAce() {
             _s_mode.value = window.__.ace.modes.text;
           }
           const _syMode = window.siyuan.config.appearance.mode;
-          if (_syMode && _syMode == 1) {
+          if (_syMode && _syMode === 1) {
             // 暗黑模式
             editor.setTheme(ace_themes.chaos);
             _s_theme.value = "chaos";
@@ -255,7 +255,7 @@ export function exAce() {
                 "data": data,
                 "id": id
               }, res => {
-                if (res.code == 0) {
+                if (res.code === 0) {
                   window.__.toastify.success({message:"已保存",position:"bottom-center",duration:1});
                 }
                 else {
@@ -296,7 +296,7 @@ export function exAce() {
           "id": id
         }, res => {
           console.log(res);
-          if (res.code == 0) {
+          if (res.code === 0) {
             window.__.toastify.success({message:"已保存",position:"bottom-center",duration:1});
           }
           else {

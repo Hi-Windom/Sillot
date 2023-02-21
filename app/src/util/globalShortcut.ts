@@ -267,7 +267,7 @@ export const globalShortcut = () => {
         window.siyuan.ctrlIsPressed = false;
         window.siyuan.shiftIsPressed = false;
         window.siyuan.altIsPressed = false;
-        if (switchDialog && switchDialog.element.parentElement) {
+        if (switchDialog?.element.parentElement) {
             if (event.key === "Tab") {
                 let currentLiElement = switchDialog.element.querySelector(".b3-list-item--focus");
                 currentLiElement.classList.remove("b3-list-item--focus");
@@ -430,7 +430,7 @@ export const globalShortcut = () => {
         }
         const isTabWindow = isWindow();
         if (event.ctrlKey && !event.metaKey && event.key === "Tab") {
-            if (switchDialog && switchDialog.element.parentElement) {
+            if (switchDialog?.element.parentElement) {
                 return;
             }
             let tabHtml = "";
@@ -696,7 +696,7 @@ export const globalShortcut = () => {
                 range = document.createRange();
             }
             const lastBackStack = window.siyuan.backStack[window.siyuan.backStack.length - 1];
-            if (lastBackStack && lastBackStack.protyle.toolbar.range) {
+            if (lastBackStack?.protyle.toolbar.range) {
                 focusByRange(lastBackStack.protyle.toolbar.range);
             } else {
                 const editor = getAllModels().editor[0];
@@ -1029,7 +1029,7 @@ const editKeydown = (event: KeyboardEvent) => {
     }
     const activePanelElement = document.querySelector(".layout__tab--active");
     let isFileFocus = false;
-    if (activePanelElement && activePanelElement.classList.contains("sy__file")) {
+    if (activePanelElement?.classList.contains("sy__file")) {
         isFileFocus = true;
     }
     let searchKey = "";

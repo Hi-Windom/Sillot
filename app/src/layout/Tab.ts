@@ -138,7 +138,7 @@ export class Tab {
     }
 
     public pin() {
-        if (!this.headElement.previousElementSibling || (this.headElement.previousElementSibling && this.headElement.previousElementSibling.classList.contains("item--pin"))) {
+        if (!this.headElement.previousElementSibling || (this.headElement.previousElementSibling?.classList.contains("item--pin"))) {
             // 如果是第一个，或者前一个是 pinned，则不处理
         } else {
             let tempTab: Tab;

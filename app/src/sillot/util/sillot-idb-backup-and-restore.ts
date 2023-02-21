@@ -67,7 +67,7 @@ function importFromJson(idbDatabase: IDBRequest, importObject: any) {
         importObject[storeName].forEach((toAdd: any) => {
           let value: any = Object.values(toAdd)[0];
           const key: any = Object.keys(toAdd)[0];
-          if (!value || Object.keys(value).length == 0) {
+          if (!value || Object.keys(value).length === 0) {
             value = "";
           }
           const request = transaction.objectStore(storeName);
@@ -160,7 +160,7 @@ export async function importIDB(result: any) {
       }
     });
     while (true) {
-      if (resolved == dbList.length || waittime > 10.0) { break; } else {
+      if (resolved === dbList.length || waittime > 10.0) { break; } else {
         await sleep(100);
         waittime += 0.1;
       }

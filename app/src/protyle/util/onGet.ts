@@ -120,7 +120,7 @@ export const onGet = (data: IWebSocketData, protyle: IProtyle, action: string[] 
             content: html,
             expand: data.data.isBacklinkExpand,
             action,
-            unScroll: (scrollObj && scrollObj.focusId) ? true : false,
+            unScroll: (scrollObj?.focusId) ? true : false,
             isSyncing: data.data.isSyncing,
         }, protyle);
         setTitle(response.data.ial.title);

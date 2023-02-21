@@ -304,7 +304,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                 protyle, event, nodeElement, editorElement, range,
                 cb(selectElements) {
                     const previousElement = selectElements[0].previousElementSibling as HTMLElement;
-                    if (previousElement && previousElement.getAttribute("data-node-id")) {
+                    if (previousElement?.getAttribute("data-node-id")) {
                         previousElement.classList.add("protyle-wysiwyg--select");
                         selectElements.forEach(item => {
                             item.removeAttribute("select-end");
@@ -330,7 +330,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                 cb(selectElements) {
                     const selectLastElement = selectElements[selectElements.length - 1];
                     const nextElement = selectLastElement.nextElementSibling as HTMLElement;
-                    if (nextElement && nextElement.getAttribute("data-node-id")) {
+                    if (nextElement?.getAttribute("data-node-id")) {
                         nextElement.classList.add("protyle-wysiwyg--select");
                         selectElements.forEach(item => {
                             item.removeAttribute("select-end");
@@ -357,7 +357,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     const startEndElement = getStartEndElement(selectElements);
                     if (startEndElement.startElement.getBoundingClientRect().top >= startEndElement.endElement.getBoundingClientRect().top) {
                         const previousElement = startEndElement.endElement.previousElementSibling as HTMLElement;
-                        if (previousElement && previousElement.getAttribute("data-node-id")) {
+                        if (previousElement?.getAttribute("data-node-id")) {
                             previousElement.classList.add("protyle-wysiwyg--select");
                             previousElement.setAttribute("select-end", "true");
                             startEndElement.endElement.removeAttribute("select-end");
@@ -394,7 +394,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     const startEndElement = getStartEndElement(selectElements);
                     if (startEndElement.startElement.getBoundingClientRect().top <= startEndElement.endElement.getBoundingClientRect().top) {
                         const nextElement = startEndElement.endElement.nextElementSibling as HTMLElement;
-                        if (nextElement && nextElement.getAttribute("data-node-id")) {
+                        if (nextElement?.getAttribute("data-node-id")) {
                             nextElement.classList.add("protyle-wysiwyg--select");
                             nextElement.setAttribute("select-end", "true");
                             startEndElement.endElement.removeAttribute("select-end");

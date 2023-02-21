@@ -312,7 +312,7 @@ export class Title {
                 }).element);
                 window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
                 const countElement = this.element.lastElementChild.querySelector(".protyle-attr--refcount");
-                if (countElement && countElement.textContent) {
+                if (countElement?.textContent) {
                     transferBlockRef(protyle.block.rootID);
                 }
                 window.siyuan.menus.menu.append(new MenuItem({

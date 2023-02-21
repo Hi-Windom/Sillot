@@ -16,7 +16,7 @@ export const getPreviousHeading = (element: Element) => {
 export const getPreviousBlock = (element: Element) => {
     let parentElement = element;
     while (parentElement) {
-        if (parentElement.previousElementSibling && parentElement.previousElementSibling.getAttribute("data-node-id")) {
+        if (parentElement.previousElementSibling?.getAttribute("data-node-id")) {
             return parentElement.previousElementSibling;
         }
         const pElement = hasClosestBlock(parentElement.parentElement);

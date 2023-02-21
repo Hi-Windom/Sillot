@@ -2,7 +2,7 @@ import {ToolbarItem} from "./ToolbarItem";
 import {hasClosestBlock, hasClosestByAttribute} from "../util/hasClosest";
 
 export class InlineMemo extends ToolbarItem {
-    public element: HTMLElement;
+    declare public element: HTMLElement;
 
     constructor(protyle: IProtyle, menuItem: IMenuItem) {
         super(protyle, menuItem);

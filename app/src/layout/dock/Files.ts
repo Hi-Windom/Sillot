@@ -20,7 +20,7 @@ import {isTouchDevice} from "../../util/functions";
 
 export class Files extends Model {
     public element: HTMLElement;
-    public parent: Tab;
+    declare public parent: Tab;
     private actionsElement: HTMLElement;
     public closeElement: HTMLElement;
 

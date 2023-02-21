@@ -703,7 +703,7 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
             event.preventDefault();
             return;
         }
-        if (target.classList && target.classList.contains("protyle-action")) {
+        if (target.classList?.contains("protyle-action")) {
             if (hasClosestByClassName(target, "protyle-wysiwyg__embed")) {
                 window.siyuan.dragElement = undefined;
                 event.preventDefault();

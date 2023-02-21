@@ -745,7 +745,7 @@ export class Gutter {
             click() {
                 window.sout.log("KMD 源码编辑");
                 const initTheme =
-                  window.siyuan.config.appearance.mode == 0 ? "vs" : "vs-dark";
+                  window.siyuan.config.appearance.mode === 0 ? "vs" : "vs-dark";
                 MDDialog({
                   id: "app5",
                   nodeID: id,
@@ -1425,7 +1425,7 @@ export class Gutter {
                 }
             }).element);
             const countElement = nodeElement.lastElementChild.querySelector(".protyle-attr--refcount");
-            if (countElement && countElement.textContent) {
+            if (countElement?.textContent) {
                 transferBlockRef(id);
             }
         }
@@ -1881,7 +1881,7 @@ export class Gutter {
                 if (type === "NodeBlockquote") {
                     space += 8;
                 }
-                if (nodeElement.previousElementSibling && nodeElement.previousElementSibling.getAttribute("data-node-id")) {
+                if (nodeElement.previousElementSibling?.getAttribute("data-node-id")) {
                     // 前一个块存在时，只显示到当前层级，但需显示折叠块的块标
                     // https://github.com/siyuan-note/siyuan/issues/2562 https://github.com/siyuan-note/siyuan/issues/2809
                     hideParent = true;

@@ -180,7 +180,7 @@ export class Breadcrumb {
                 window.siyuan.menus.menu.append(uploadMenu);
                 if (window.siyuan.config.system.container !== "android" || !window.JSAndroid) {
                     window.siyuan.menus.menu.append(new MenuItem({
-                        current: this.mediaRecorder && this.mediaRecorder.isRecording,
+                        current: this.mediaRecorder?.isRecording,
                         icon: "iconRecord",
                         label: this.mediaRecorder?.isRecording ? window.siyuan.languages.endRecord : window.siyuan.languages.startRecord,
                         click: async () => {
@@ -409,7 +409,7 @@ export class Breadcrumb {
         }
         this.id = id;
         const excludeTypes: string[] = [];
-        if (this.element.parentElement?.parentElement && this.element.parentElement.parentElement.classList.contains("b3-dialog__cardblock")) {
+        if (this.element.parentElement.parentElement?.classList.contains("b3-dialog__cardblock")) {
             // 闪卡面包屑不能显示答案
             excludeTypes.push("NodeTextMark-mark");
         }

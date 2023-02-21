@@ -236,7 +236,7 @@ export const getSelectionOffset = (selectElement: Node, editorElement?: Element,
         return position;
     }
     const preSelectionRange = range.cloneRange();
-    if (selectElement.childNodes[0] && selectElement.childNodes[0].childNodes[0]) {
+    if (selectElement.childNodes[0]?.childNodes[0]) {
         preSelectionRange.setStart(selectElement.childNodes[0].childNodes[0], 0);
     } else {
         preSelectionRange.selectNodeContents(selectElement);

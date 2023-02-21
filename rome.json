@@ -3,11 +3,11 @@
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
-    "indentSize":2,
+    "indentSize": 2,
     "lineWidth": 120,
     "formatWithErrors": true
   },
-  "javascript":{
+  "javascript": {
     "formatter": {
       "quoteStyle": "single"
     }
@@ -17,8 +17,13 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "off"
-      }
+        "noExplicitAny": "off",
+        "noAsyncPromiseExecutor": "off"
+      },
+      "performance": { "noDelete": "warn" },
+      "style": { "useTemplate": "warn" },
+      "complexity": { "useSimplifiedLogicExpression": "warn" },
+      "correctness": { "noUnreachable": "warn" }
     }
   }
 }

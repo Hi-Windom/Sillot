@@ -154,7 +154,7 @@ function Loader(props: { nodeID: any; initConfig: any }) {
         id: nodeID,
       },
       (res) => {
-        if (res.code == 0 && editor) {
+        if (res.code === 0 && editor) {
           window.sout.info(nodeID);
           window.sout.success(res);
           // editor.setValue(res.data.kramdown);
@@ -549,7 +549,7 @@ function EditorContainer() {
           maxHeight: "calc(100vh - 300px)",
           height: "600px",
         }}
-      ></div>
+      />
     </>
   );
 }

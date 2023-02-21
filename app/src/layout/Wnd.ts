@@ -403,7 +403,7 @@ export class Wnd {
         let currentTab: Tab;
         this.children.forEach((item) => {
             if (target === item.headElement) {
-                if (item.headElement && item.headElement.classList.contains("fn__none")) {
+                if (item.headElement?.classList.contains("fn__none")) {
                     // https://github.com/siyuan-note/siyuan/issues/267
                 } else {
                     if (item.headElement) {
@@ -421,7 +421,7 @@ export class Wnd {
                 }
             }
         });
-        if (currentTab && currentTab.headElement) {
+        if (currentTab?.headElement) {
             const initData = currentTab.headElement.getAttribute("data-initdata");
             if (initData) {
                 const json = JSON.parse(initData);
@@ -489,10 +489,10 @@ export class Wnd {
         }
         let oldFocusIndex = 0;
         this.children.forEach((item, index) => {
-            if (item.headElement && item.headElement.classList.contains("item--focus")) {
+            if (item.headElement?.classList.contains("item--focus")) {
                 oldFocusIndex = index;
                 let nextElement = item.headElement.nextElementSibling;
-                while (nextElement && nextElement.classList.contains("item--pin")) {
+                while (nextElement?.classList.contains("item--pin")) {
                     oldFocusIndex++;
                     nextElement = nextElement.nextElementSibling;
                 }
@@ -593,7 +593,7 @@ export class Wnd {
     private removeOverCounter(oldFocusIndex?: number) {
         if (typeof oldFocusIndex === "undefined") {
             this.children.forEach((item, index) => {
-                if (item.headElement && item.headElement.classList.contains("item--focus")) {
+                if (item.headElement?.classList.contains("item--focus")) {
                     oldFocusIndex = index;
                 }
             });
@@ -639,7 +639,7 @@ export class Wnd {
             return;
         }
         if (model instanceof Asset) {
-            if (model.pdfObject && model.pdfObject.pdfLoadingTask) {
+            if (model.pdfObject?.pdfLoadingTask) {
                 model.pdfObject.pdfLoadingTask.destroy();
             }
         }
@@ -885,9 +885,9 @@ export class Wnd {
                 return true;
             }
         });
-        if (element.previousElementSibling && element.previousElementSibling.classList.contains("layout__resize")) {
+        if (element.previousElementSibling?.classList.contains("layout__resize")) {
             element.previousElementSibling.remove();
-        } else if (element.nextElementSibling && element.nextElementSibling.classList.contains("layout__resize")) {
+        } else if (element.nextElementSibling?.classList.contains("layout__resize")) {
             element.nextElementSibling.remove();
         }
         element.remove();

@@ -473,7 +473,7 @@ export const resizeTabs = () => {
     resizeTimeout = window.setTimeout(() => {
         const models = getAllModels();
         models.editor.forEach((item) => {
-            if (item.editor && item.editor.protyle && item.element.parentElement) {
+            if (item.editor?.protyle && item.element.parentElement) {
                 hideElements(["gutter"], item.editor.protyle);
                 setPadding(item.editor.protyle);
                 if (typeof echarts !== "undefined") {
@@ -639,7 +639,7 @@ export const addResize = (obj: Layout | Wnd) => {
         let range: Range;
         resizeElement.addEventListener("mousedown", (event: MouseEvent) => {
             getAllModels().editor.forEach((item) => {
-                if (item.editor && item.editor.protyle && item.element.parentElement) {
+                if (item.editor?.protyle && item.element.parentElement) {
                     hideElements(["gutter"], item.editor.protyle);
                 }
             });

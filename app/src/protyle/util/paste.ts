@@ -143,7 +143,7 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
     if (!siyuanHTML) {
         // process word
         const doc = new DOMParser().parseFromString(textHTML, "text/html");
-        if (doc.body && doc.body.innerHTML) {
+        if (doc.body?.innerHTML) {
             textHTML = doc.body.innerHTML;
         }
         // windows 剪切板

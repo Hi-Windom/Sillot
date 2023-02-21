@@ -86,7 +86,7 @@ const hidePopover = (event: MouseEvent & { target: HTMLElement, path: HTMLElemen
     }
     popoverTargetElement = hasClosestByAttribute(event.target, "data-type", "block-ref") as HTMLElement ||
         hasClosestByAttribute(event.target, "data-type", "virtual-block-ref") as HTMLElement;
-    if (popoverTargetElement && popoverTargetElement.classList.contains("b3-tooltips")) {
+    if (popoverTargetElement?.classList?.contains("b3-tooltips")) {
         popoverTargetElement = undefined;
     }
     if (!popoverTargetElement) {
@@ -148,7 +148,7 @@ const getTarget = (event: MouseEvent & { target: HTMLElement }, aElement: false 
     }
     popoverTargetElement = hasClosestByAttribute(event.target, "data-type", "block-ref") as HTMLElement ||
         hasClosestByAttribute(event.target, "data-type", "virtual-block-ref") as HTMLElement;
-    if (popoverTargetElement && popoverTargetElement.classList.contains("b3-tooltips")) {
+    if (popoverTargetElement?.classList?.contains("b3-tooltips")) {
         popoverTargetElement = undefined;
     }
     if (!popoverTargetElement) {

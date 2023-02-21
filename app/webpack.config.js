@@ -13,7 +13,7 @@ module.exports = (env, argv) => {
     mode: argv.mode || "development",
     watch: argv.mode !== "production",
     devtool: argv.mode !== "production" ? "eval" : false,
-    target: "electron-renderer",
+    target: ["electron-renderer", "es2022"],
     output: {
       publicPath: "",
       filename: "[name].[chunkhash].js",
