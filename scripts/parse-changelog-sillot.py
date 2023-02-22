@@ -65,7 +65,7 @@ def find_milestone(repo, title):
 ⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
 🚢 [Docker Image Available](https://hub.docker.com/r/soltus/sillot)
 <span>
-<img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/>
+<img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 10+-black?logo=android" title=""/>
 </span>[![CI](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml/badge.svg)](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml)
 --
 🌏 与绛亽新时代智慧彖乄一同见证全球开源力量
