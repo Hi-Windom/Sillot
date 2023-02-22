@@ -161,7 +161,7 @@ jobs:
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
       - name: Building UI
-        run: pnpm run build-sillot
+        run: pnpm run build
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
       - name: Remove Build Directory
