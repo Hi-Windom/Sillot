@@ -26,22 +26,17 @@ export class Dock {
     constructor(options: { data: { pin: boolean, data: IDockTab[][] }, position: TDockPosition }) {
         switch (options.position) {
             case "Left":
-                this.layout = window.siyuan.layout.layout.children[1].children[0] as Layout;
+                this.layout = window.siyuan.layout.layout.children[0].children[0] as Layout;
                 this.resizeElement = this.layout.element.nextElementSibling as HTMLElement;
                 this.layout.element.classList.add("layout--floatl");
                 break;
             case "Right":
-                this.layout = window.siyuan.layout.layout.children[1].children[2] as Layout;
+                this.layout = window.siyuan.layout.layout.children[0].children[2] as Layout;
                 this.resizeElement = this.layout.element.previousElementSibling as HTMLElement;
                 this.layout.element.classList.add("layout--floatr");
                 break;
-            case "Top":
-                this.layout = window.siyuan.layout.layout.children[0] as Layout;
-                this.resizeElement = this.layout.element.nextElementSibling as HTMLElement;
-                this.layout.element.classList.add("layout--floatt");
-                break;
             case "Bottom":
-                this.layout = window.siyuan.layout.layout.children[2] as Layout;
+                this.layout = window.siyuan.layout.layout.children[1] as Layout;
                 this.resizeElement = this.layout.element.previousElementSibling as HTMLElement;
                 this.layout.element.classList.add("layout--floatb");
                 break;
@@ -152,18 +147,11 @@ export class Dock {
 
     public resetDockPosition(show: boolean) {
         if (this.position === "Left") {
-            this.layout.element.setAttribute("style", `width:${this.layout.element.clientWidth}px;
-opacity:${show ? 1 : 0};
-top: 112px;bottom: 82px;left:0`);
+            this.layout.element.setAttribute("style", `width:${this.layout.element.clientWidth}px;opacity:${show ? 1 : 0};`);
         } else if (this.position === "Right") {
-            this.layout.element.setAttribute("style", `width:${this.layout.element.clientWidth}px;
-opacity:${show ? 1 : 0};
-right:0;top: 112px;bottom: 82px;`);
+            this.layout.element.setAttribute("style", `width:${this.layout.element.clientWidth}px;opacity:${show ? 1 : 0};`);
         } else {
-            this.layout.element.setAttribute("style", `height:${this.layout.element.clientHeight}px;
-opacity:${show ? 1 : 0};
-left:0;right:0;
-${this.position === "Top" ? "top" : "bottom"}:0`);
+            this.layout.element.setAttribute("style", `height:${this.layout.element.clientHeight}px;opacity:${show ? 1 : 0};`);
         }
     }
 
@@ -482,13 +470,6 @@ ${this.position === "Top" ? "top" : "bottom"}:0`);
             case "Right":
                 direct = "w";
                 break;
-            case "Top":
-                if (index === 0) {
-                    direct = "se";
-                } else {
-                    direct = "sw";
-                }
-                break;
             case "Bottom":
                 if (index === 0) {
                     direct = "ne";
@@ -522,9 +503,9 @@ ${this.position === "Top" ? "top" : "bottom"}:0`);
         this.element.querySelectorAll(".dock__item--active").forEach((item) => {
             let size;
             if (this.position === "Left" || this.position === "Right") {
-                size = parseInt(item.getAttribute("data-width")) || (["graph", "globalGraph", "backlink"].includes(item.getAttribute("data-type")) ? 320 : 220);
+                size = parseInt(item.getAttribute("data-width")) || (["graph", "globalGraph", "backlink"].includes(item.getAttribute("data-type")) ? 320 : 224);
             } else {
-                size = parseInt(item.getAttribute("data-height")) || 220;
+                size = parseInt(item.getAttribute("data-height")) || 224;
             }
             if (size > max) {
                 max = size;

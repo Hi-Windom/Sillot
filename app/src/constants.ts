@@ -258,20 +258,6 @@ export abstract class Constants extends SConst { // Sillot extend
             "instance": "Layout",
             "children": [{
                 "direction": "lr",
-                "size": "0px",
-                "type": "top",
-                "instance": "Layout",
-                "children": [{
-                    "instance": "Wnd",
-                    "children": []
-                }, {
-                    "instance": "Wnd",
-                    "resize": "lr",
-                    "children": []
-                }]
-            }, {
-                "direction": "lr",
-                "resize": "tb",
                 "size": "auto",
                 "type": "normal",
                 "instance": "Layout",
@@ -326,10 +312,6 @@ export abstract class Constants extends SConst { // Sillot extend
                 }]
             }]
         },
-        top: {
-            pin: true,
-            data: []
-        },
         bottom: {
             pin: true,
             data: []
@@ -339,13 +321,13 @@ export abstract class Constants extends SConst { // Sillot extend
             data: [
                 [{
                     type: "file",
-                    size: {width: 220, height: 0},
+                    size: {width: 224, height: 0},
                     show: true,
                     icon: "iconFiles",
                     hotkeyLangId: "fileTree",
                 }, {
                     type: "outline",
-                    size: {width: 220, height: 0},
+                    size: {width: 224, height: 0},
                     show: false,
                     icon: "iconAlignCenter",
                     hotkeyLangId: "outline",
@@ -357,13 +339,13 @@ export abstract class Constants extends SConst { // Sillot extend
                     hotkeyLangId: "inbox",
                 }], [{
                     type: "bookmark",
-                    size: {width: 220, height: 0},
+                    size: {width: 224, height: 0},
                     show: false,
                     icon: "iconBookmark",
                     hotkeyLangId: "bookmark",
                 }, {
                     type: "tag",
-                    size: {width: 220, height: 0},
+                    size: {width: 224, height: 0},
                     show: false,
                     icon: "iconTags",
                     hotkeyLangId: "tag",

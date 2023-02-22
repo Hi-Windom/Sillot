@@ -31,6 +31,7 @@ import {newFile} from "../util/newFile";
 import {MenuItem} from "../menus/Menu";
 import {escapeHtml} from "../util/escape";
 import {isWindow} from "../util/functions";
+import {hideAllElements} from "../protyle/ui/hideElements";
 
 export class Wnd {
     public id: string;
@@ -784,10 +785,23 @@ export class Wnd {
                     return true;
                 }
             });
-            oldWnd.switchTab(oldWnd.children[oldWnd.children.length - 1].headElement);
+            if (!oldWnd.headersElement.querySelector(".item--focus")) {
+                let latestHeadElement: HTMLElement;
+                Array.from(oldWnd.headersElement.children).forEach((headItem: HTMLElement) => {
+                    if (!latestHeadElement) {
+                        latestHeadElement = headItem;
+                    } else if (headItem.getAttribute("data-activetime") > latestHeadElement.getAttribute("data-activetime")) {
+                        latestHeadElement = headItem;
+                    }
+                });
+                if (latestHeadElement) {
+                    oldWnd.switchTab(latestHeadElement, true);
+                }
+            }
         }
         tab.parent = this;
         resizeTabs();
+        hideAllElements(["toolbar"])
     }
 
     public split(direction: TDirection) {

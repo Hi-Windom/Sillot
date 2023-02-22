@@ -13,7 +13,6 @@
 
   &--floatl,
   &--floatr,
-  &--floatt,
   &--floatb {
     transition: var(--b3-width-transition);
   }
@@ -30,6 +29,9 @@
       border-left: 0;
       overflow: hidden;
       box-shadow: 8px 0 24px rgb(140 149 159 / 20%);
+      top: 112px;
+      bottom: 82px;
+      left: 0;
     }
 
     &.layout--floatr {
@@ -38,16 +40,17 @@
       border-right: 0;
       border-radius: 8px 0 0 8px;
       overflow: hidden;
-    }
-
-    &.layout--floatt {
-      border-bottom: 1px solid var(--b3-border-color);
-      box-shadow: var(--b3-dialog-shadow);
+      top: 112px;
+      bottom: 82px;
+      right: 0;
     }
 
     &.layout--floatb {
       border-top: 1px solid var(--b3-border-color);
       box-shadow: 0 -8px 24px rgb(140 149 159 / 20%);
+      left: 0;
+      right: 0;
+      bottom: 0;
     }
   }
 
@@ -320,10 +323,6 @@
 
   &#dockRight {
     border-left: .5px solid var(--b3-border-color);
-  }
-
-  &#dockTop {
-    border-bottom: .5px solid var(--b3-border-color);
   }
 
   &#dockBottom {
