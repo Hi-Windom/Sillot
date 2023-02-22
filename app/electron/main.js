@@ -67,7 +67,7 @@ const windowStatePath = path.join(confDir, "windowState.json");
 let bootWindow;
 let firstOpen = false;
 let workspaces = []; // workspaceDir, id, browserWindow, tray
-let kernelPort = 6806;
+let kernelPort = 58131;
 require("@electron/remote/main").initialize();
 
 if (!app.requestSingleInstanceLock()) {
@@ -228,7 +228,7 @@ const boot = () => {
         icon: path.join(appDir, "stage", "icon-large.png"),
     });
     require("@electron/remote/main").enable(currentWindow.webContents);
-    currentWindow.webContents.userAgent = "SiYuan/" + appVer +
+    currentWindow.webContents.userAgent = "Sillot-SiYuan/" + appVer +
         " https://b3log.org/siyuan Electron";
 
     currentWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);
@@ -422,8 +422,8 @@ const initKernel = (workspace, port, lang) => {
         });
 
         const kernelName = "win32" === process.platform
-            ? "SiYuan-Kernel.exe"
-            : "SiYuan-Kernel";
+            ? "SiYuan-Sillot-Kernel.exe"
+            : "SiYuan-Sillot-Kernel";
         // const kernelPath = path.join(appDir, "kernel", kernelName);
     let kernelPath;
     if (!isVite) {

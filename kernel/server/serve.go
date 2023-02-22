@@ -115,7 +115,7 @@ func Serve(fastMode bool) {
 				return
 			}
 
-			// 启动一个 6806 端口的反向代理服务器，这样浏览器扩展才能直接使用 127.0.0.1:6806，不用配置端口
+			// 启动一个 58131 端口的反向代理服务器，这样浏览器扩展才能直接使用 127.0.0.1:58131，不用配置端口
 			serverURL, _ := url.Parse("http://127.0.0.1:" + port)
 			proxy := httputil.NewSingleHostReverseProxy(serverURL)
 			logging.LogInfof("reverse proxy server [%s] is booting", host+":"+util.FixedPort)
@@ -135,7 +135,7 @@ func Serve(fastMode bool) {
 }
 
 func rewritePortJSON(pid, port string) {
-	portJSON := filepath.Join(util.HomeDir, ".config", "siyuan", "port.json")
+	portJSON := filepath.Join(util.HomeDir, ".config", "sillot", "port.json")
 	pidPorts := map[string]string{}
 	var data []byte
 	var err error

@@ -32,7 +32,7 @@ import (
 
 var (
 	SSL       = false
-	UserAgent = "SiYuan/" + Ver
+	UserAgent = "Sillot-SiYuan/" + Ver
 )
 
 const (

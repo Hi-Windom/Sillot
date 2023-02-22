@@ -5,7 +5,7 @@ echo ' ===== Building UI ===== '
 cd app
 call pnpm install
 echo ' ===== Building Mobile has been disabled ===== '
-call pnpm run build-sillot
+call pnpm run build
 cd ..
 
 echo ' ===== Cleaning Builds ===== '
@@ -31,7 +31,7 @@ set GOARCH=amd64
 
 @REM 更新依赖文件
 go mod tidy
-go build --tags fts5 -v -o "../app/kernel/SiYuan-Kernel.exe" -ldflags "-s -w -H=windowsgui" .
+go build --tags fts5 -v -o "../app/kernel/SiYuan-Sillot-Kernel.exe" -ldflags "-s -w -H=windowsgui" .
 
 cd ..
 

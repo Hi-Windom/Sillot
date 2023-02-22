@@ -171,7 +171,7 @@ export class Protyle {
                 k: options.key || "",
                 isBacklink: mergedOptions.action.includes(Constants.CB_GET_BACKLINK),
                 // 0: 仅当前 ID（默认值），1：向上 2：向下，3：上下都加载，4：加载最后
-                mode: (mergedOptions.action && mergedOptions.action.includes(Constants.CB_GET_CONTEXT)) ? 3 : 0,
+                mode: (mergedOptions.action?.includes(Constants.CB_GET_CONTEXT)) ? 3 : 0,
                 size: mergedOptions.action?.includes(Constants.CB_GET_ALL) ? Constants.SIZE_GET_MAX : window.siyuan.config.editor.dynamicLoadBlocks,
             }, getResponse => {
                 onGet(getResponse, this.protyle, mergedOptions.action, options.scrollAttr);
@@ -188,7 +188,7 @@ export class Protyle {
                 // 只能用 focusin，否则点击表格无法执行
                 this.protyle.wysiwyg.element.addEventListener("focusin", () => {
                     /// #if !MOBILE
-                    if (this.protyle && this.protyle.model) {
+                    if (this.protyle?.model) {
                         let needUpdate = true;
                         if (this.protyle.model.element.parentElement.parentElement.classList.contains("layout__wnd--active") && this.protyle.model.headElement.classList.contains("item--focus")) {
                             needUpdate = false;

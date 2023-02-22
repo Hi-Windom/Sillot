@@ -19,7 +19,6 @@ package model
 import (
 	"bytes"
 	"fmt"
-	"github.com/88250/lute/ast"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -28,6 +27,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/88250/lute/ast"
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute"
@@ -657,7 +658,7 @@ func GetMaskedConf() (ret *AppConf, err error) {
 
 func clearPortJSON() {
 	pid := fmt.Sprintf("%d", os.Getpid())
-	portJSON := filepath.Join(util.HomeDir, ".config", "siyuan", "port.json")
+	portJSON := filepath.Join(util.HomeDir, ".config", "sillot", "port.json")
 	pidPorts := map[string]string{}
 	var data []byte
 	var err error

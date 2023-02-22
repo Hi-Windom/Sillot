@@ -19,6 +19,7 @@ import {hideKeyboardToolbar, showKeyboardToolbar} from "./util/showKeyboardToolb
 import {getLocalStorage} from "../protyle/util/compatibility";
 import {openMobileFileById} from "./editor";
 import {getSearch} from "../util/functions";
+import { SillotEnv } from "../sillot";
 
 class App {
     constructor() {
@@ -41,6 +42,7 @@ class App {
                 }
             })
         };
+        new SillotEnv();
         // 不能使用 touchstart，否则会被 event.stopImmediatePropagation() 阻塞
         window.addEventListener("click", (event: MouseEvent & { target: HTMLElement }) => {
             if (!window.siyuan.menus.menu.element.contains(event.target) && !hasClosestByAttribute(event.target, "data-menu", "true")) {

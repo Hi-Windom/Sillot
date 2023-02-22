@@ -167,7 +167,7 @@ func ExportSystemLog() (zipPath string) {
 		return
 	}
 
-	appLog := filepath.Join(util.HomeDir, ".config", "siyuan", "app.log")
+	appLog := filepath.Join(util.HomeDir, ".config", "sillot", "app.log")
 	if gulu.File.IsExist(appLog) {
 		to := filepath.Join(exportFolder, "app.log")
 		if err := gulu.File.CopyFile(appLog, to); nil != err {

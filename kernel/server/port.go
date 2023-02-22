@@ -52,14 +52,14 @@ func killRunningKernel() {
 			continue
 		}
 		procName := strings.ToLower(process.Executable())
-		if strings.Contains(procName, "siyuan-kernel") {
+		if strings.Contains(procName, "SiYuan-Sillot-Kernel") {
 			kill(fmt.Sprintf("%d", process.Pid()))
 			killed = true
 		}
 	}
 
 	if killed {
-		portJSON := filepath.Join(util.HomeDir, ".config", "siyuan", "port.json")
+		portJSON := filepath.Join(util.HomeDir, ".config", "sillot", "port.json")
 		os.RemoveAll(portJSON)
 	}
 }
@@ -69,7 +69,7 @@ func killByPort(port string) {
 		return
 	}
 
-	portJSON := filepath.Join(util.HomeDir, ".config", "siyuan", "port.json")
+	portJSON := filepath.Join(util.HomeDir, ".config", "sillot", "port.json")
 	os.RemoveAll(portJSON)
 
 	pid := pidByPort(port)

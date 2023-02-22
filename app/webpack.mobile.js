@@ -12,6 +12,7 @@ module.exports = (env, argv) => {
     mode: argv.mode || "development",
     watch: argv.mode !== "production",
     devtool: argv.mode !== "production" ? "eval" : false,
+    target: ["web", "es2022"],
     output: {
       publicPath: "",
       filename: "[name].[chunkhash].js",
@@ -24,7 +25,7 @@ module.exports = (env, argv) => {
       splitChunks: {
         chunks: "all",
       },
-      minimize: true,
+      minimize: false,
       minimizer: [
         new TerserPlugin({
           terserOptions: {
@@ -40,7 +41,7 @@ module.exports = (env, argv) => {
       fallback: {
         "path": require.resolve("path-browserify"),
       },
-      extensions: [".ts", ".js", ".tpl", ".scss"],
+      extensions: [".ts", ".js", ".jsx", ".tsx", ".tpl", ".scss"],
     },
     module: {
       rules: [
@@ -54,7 +55,7 @@ module.exports = (env, argv) => {
           },
         },
         {
-          test: /\.ts(x?)$/,
+          test: /\.ts$/,
           include: [path.resolve(__dirname, "src")],
           use: [
             {
@@ -90,6 +91,37 @@ module.exports = (env, argv) => {
             },
           ],
         },
+        {
+          test:/\.css$/,
+          use: [
+            {
+              loader: "style-loader"
+            },
+            {
+              loader: "css-loader"
+            }
+          ]
+        },
+        {
+          test: /\.[jt]sx$/,
+          exclude: /node_modules/,
+          use: [{
+              loader: "babel-loader",
+              options: {
+                  presets: ["@babel/preset-react", "@babel/preset-typescript"],
+                  plugins: [
+                      "@babel/plugin-transform-runtime",
+                  ]
+              }
+          },
+          {
+            loader: "ifdef-loader", options: {
+              "ifdef-verbose": false,
+              BROWSER: true,
+              MOBILE: true,
+            },
+          }]
+      },
         {
           test: /\.woff$/,
           type: "asset/resource",

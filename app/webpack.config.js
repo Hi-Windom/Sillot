@@ -101,7 +101,7 @@ module.exports = (env, argv) => {
         {
           test: /\.[jt]sx$/,
           exclude: /node_modules/,
-          use: {
+          use: [{
               loader: "babel-loader",
               options: {
                   presets: ["@babel/preset-react", "@babel/preset-typescript"],
@@ -109,7 +109,13 @@ module.exports = (env, argv) => {
                       "@babel/plugin-transform-runtime",
                   ]
               }
-          }
+          },
+          {
+            loader: "ifdef-loader", options: {
+              BROWSER: false,
+              MOBILE: false,
+            },
+          }]
       },
         {
           test: /\.woff$/,

@@ -197,7 +197,7 @@ export async function exportIDB() {
     const formdata = new FormData();
     formdata.append("f", `IDB__${workspaceName}__.json`);
     formdata.append("data", JSON.stringify(exData));
-    const url = "http://127.0.0.1:6806/api/sillot/setConfigesStore";
+    const url = "http://127.0.0.1:58131/api/sillot/setConfigesStore";
     fetch(url, {
       body: formdata,
       method: "POST",

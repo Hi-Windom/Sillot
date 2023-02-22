@@ -185,8 +185,8 @@ func fixLegacyData(tip, node *ast.Node, idMap *map[string]bool, needFix, needMig
 			*needFix = true
 		}
 	case ast.NodeWidget:
-		if bytes.Contains(node.Tokens, util.StrToBytes("http://127.0.0.1:6806")) {
-			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("http://127.0.0.1:6806"), nil)
+		if bytes.Contains(node.Tokens, util.StrToBytes("http://127.0.0.1:58131")) {
+			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("http://127.0.0.1:58131"), nil)
 			*needFix = true
 		}
 	case ast.NodeList:
