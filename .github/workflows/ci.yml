@@ -78,35 +78,35 @@ jobs:
       matrix:
         config:
           - os: ubuntu-20.04
-            kernel_path: "../app/kernel-linux/SiYuan-Kernel"
+            kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
             build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist-linux"
             goos: "linux"
             goarch: "amd64"
             suffix: "linux.AppImage"
           - os: ubuntu-20.04
-            kernel_path: "../app/kernel-linux/SiYuan-Kernel"
+            kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
             build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist-linux"
             goos: "linux"
             goarch: "amd64"
             suffix: "linux.tar.gz"
           - os: macos-latest
-            kernel_path: "../app/kernel-darwin/SiYuan-Kernel"
+            kernel_path: "../app/kernel-darwin/SiYuan-Sillot-Kernel"
             build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist-darwin"
             goos: "darwin"
             goarch: "amd64"
             suffix: "mac.dmg"
           - os: macos-latest
-            kernel_path: "../app/kernel-darwin-arm64/SiYuan-Kernel"
+            kernel_path: "../app/kernel-darwin-arm64/SiYuan-Sillot-Kernel"
             build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist-darwin-arm64"
             goos: "darwin"
             goarch: "arm64"
             suffix: "mac-arm64.dmg"
           - os: windows-latest
-            kernel_path: "../app/kernel/SiYuan-Kernel.exe"
+            kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
             build_args: "-s -w -H=windowsgui -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist"
             goos: "windows"
@@ -161,7 +161,7 @@ jobs:
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
       - name: Building UI
-        run: pnpm run build-sillot
+        run: pnpm run build
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
       - name: Remove Build Directory

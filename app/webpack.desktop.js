@@ -12,6 +12,7 @@ module.exports = (env, argv) => {
     mode: argv.mode || "development",
     watch: argv.mode !== "production",
     devtool: argv.mode !== "production" ? "eval" : false,
+    target: ["web", "es2022"],
     output: {
       publicPath: "",
       filename: "[name].[chunkhash].js",
@@ -40,7 +41,7 @@ module.exports = (env, argv) => {
       fallback: {
         "path": require.resolve("path-browserify"),
       },
-      extensions: [".ts", ".js", ".jsx", ".tsx", ".tpl", ".scss"],
+      extensions: [".ts", ".js", ".jsx", ".tsx", ".tpl", ".scss", ".json"],
     },
     module: {
       rules: [
@@ -121,7 +122,7 @@ module.exports = (env, argv) => {
         {
           test: /\.[jt]sx$/,
           exclude: /node_modules/,
-          use: {
+          use: [{
               loader: "babel-loader",
               options: {
                   presets: ["@babel/preset-react", "@babel/preset-typescript"],
@@ -129,7 +130,14 @@ module.exports = (env, argv) => {
                       "@babel/plugin-transform-runtime",
                   ]
               }
-          }
+          },
+          {
+            loader: "ifdef-loader", options: {
+              "ifdef-verbose": false,
+              BROWSER: true,
+              MOBILE: false,
+            },
+          }]
       },
         {
           test: /\.woff$/,

@@ -239,7 +239,7 @@ export const keymap = {
         keymapListElement.addEventListener("click", (event) => {
             let target = event.target as HTMLElement;
             while (target && !target.isEqualNode(keymapListElement)) {
-                if (target.classList.contains("b3-tooltips")) {
+                if (target.classList?.contains("b3-tooltips")) {
                     const type = target.getAttribute("data-type");
                     const inputElement = target.parentElement.querySelector(".b3-text-field") as HTMLInputElement;
                     if (type === "reset") {

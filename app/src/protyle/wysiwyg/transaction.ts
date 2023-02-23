@@ -247,7 +247,7 @@ const promiseTransaction = () => {
                         Array.from(protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${operation.parentID}"]`)).forEach(item => {
                             if (item.getAttribute("data-type") === "NodeBlockQueryEmbed" || !hasClosestByAttribute(item.parentElement, "data-type", "NodeBlockQueryEmbed")) {
                                 // 列表特殊处理
-                                if (item.firstElementChild && item.firstElementChild.classList.contains("protyle-action") &&
+                                if (item.firstElementChild?.classList.contains("protyle-action") &&
                                     item.firstElementChild.nextElementSibling.getAttribute("data-node-id") !== operation.id) {
                                     item.firstElementChild.insertAdjacentHTML("afterend", operation.data);
                                     cursorElements.push(item.firstElementChild.nextElementSibling);

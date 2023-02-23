@@ -146,7 +146,7 @@ export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void,
     const inputElement = dialog.element.querySelector(".b3-text-field") as HTMLInputElement;
     inputElement.focus();
     const inputEvent = (event?: InputEvent) => {
-        if (event && event.isComposing) {
+        if (event?.isComposing) {
             return;
         }
         if (inputElement.value.trim() === "") {

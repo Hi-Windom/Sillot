@@ -43,7 +43,7 @@ import (
 var Mode = "prod"
 
 const (
-	Ver       = "2.7.6"
+	Ver       = "2.7.7"
 	IsInsider = true
 )
 
@@ -59,8 +59,8 @@ func Boot() {
 	initMime()
 	initHttpClient()
 
-	workspacePath := flag.String("workspace", "", "dir path of the workspace, default to ~/Documents/SiYuan/")
-	wdPath := flag.String("wd", WorkingDir, "working directory of SiYuan")
+	workspacePath := flag.String("workspace", "", "dir path of the workspace, default to ~/Documents/Sillot/")
+	wdPath := flag.String("wd", WorkingDir, "working directory of Sillot")
 	port := flag.String("port", "0", "port of the HTTP server")
 	readOnly := flag.String("readonly", "false", "read-only mode")
 	accessAuthCode := flag.String("accessAuthCode", "", "access auth code")
@@ -169,7 +169,7 @@ var (
 	HistoryDir     string        // 数据历史目录路径
 	TempDir        string        // 临时目录路径
 	LogPath        string        // 配置目录下的日志文件 siyuan.log 路径
-	DBName         = "siyuan.db" // SQLite 数据库文件名
+	DBName         = "sillot.db" // SQLite 数据库文件名
 	DBPath         string        // SQLite 数据库文件路径
 	HistoryDBPath  string        // SQLite 历史数据库文件路径
 	BlockTreePath  string        // 区块树文件路径
@@ -185,7 +185,7 @@ var (
 )
 
 func initWorkspaceDir(workspaceArg string) {
-	userHomeConfDir := filepath.Join(HomeDir, ".config", "siyuan")
+	userHomeConfDir := filepath.Join(HomeDir, ".config", "sillot")
 	workspaceConf := filepath.Join(userHomeConfDir, "workspace.json")
 	if !gulu.File.IsExist(workspaceConf) {
 		IsNewbie = ContainerStd == Container // 只有桌面端需要设置新手标识，前端自动挂载帮助文档
@@ -259,7 +259,7 @@ func initWorkspaceDir(workspaceArg string) {
 
 func ReadWorkspacePaths() (ret []string, err error) {
 	ret = []string{}
-	workspaceConf := filepath.Join(HomeDir, ".config", "siyuan", "workspace.json")
+	workspaceConf := filepath.Join(HomeDir, ".config", "sillot", "workspace.json")
 	data, err := os.ReadFile(workspaceConf)
 	if nil != err {
 		msg := fmt.Sprintf("read workspace conf [%s] failed: %s", workspaceConf, err)
@@ -289,7 +289,7 @@ func ReadWorkspacePaths() (ret []string, err error) {
 
 func WriteWorkspacePaths(workspacePaths []string) (err error) {
 	workspacePaths = gulu.Str.RemoveDuplicatedElem(workspacePaths)
-	workspaceConf := filepath.Join(HomeDir, ".config", "siyuan", "workspace.json")
+	workspaceConf := filepath.Join(HomeDir, ".config", "sillot", "workspace.json")
 	data, err := gulu.JSON.MarshalJSON(workspacePaths)
 	if nil != err {
 		msg := fmt.Sprintf("marshal workspace conf [%s] failed: %s", workspaceConf, err)
@@ -324,7 +324,7 @@ const (
 	ContainerIOS     = "ios"     // iOS 端
 
 	LocalHost = "127.0.0.1" // 伺服地址
-	FixedPort = "6806"      // 固定端口
+	FixedPort = "58131"     // 固定端口
 )
 
 func initPathDir() {

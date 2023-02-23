@@ -13,7 +13,7 @@ module.exports = (env, argv) => {
     mode: argv.mode || "development",
     watch: argv.mode !== "production",
     devtool: argv.mode !== "production" ? "eval" : false,
-    target: "electron-renderer",
+    target: ["electron-renderer", "es2022"],
     output: {
       publicPath: "",
       filename: "[name].[chunkhash].js",
@@ -24,7 +24,7 @@ module.exports = (env, argv) => {
       "window": "./src/window/index.ts",
     },
     resolve: {
-      extensions: [".ts", ".js", ".jsx", ".tsx", ".tpl", ".scss", ".png", ".svg"],
+      extensions: [".ts", ".js", ".jsx", ".tsx", ".tpl", ".scss", ".png", ".svg", ".json"],
     },
     optimization: {
       splitChunks: {
@@ -101,7 +101,7 @@ module.exports = (env, argv) => {
         {
           test: /\.[jt]sx$/,
           exclude: /node_modules/,
-          use: {
+          use: [{
               loader: "babel-loader",
               options: {
                   presets: ["@babel/preset-react", "@babel/preset-typescript"],
@@ -109,7 +109,13 @@ module.exports = (env, argv) => {
                       "@babel/plugin-transform-runtime",
                   ]
               }
-          }
+          },
+          {
+            loader: "ifdef-loader", options: {
+              BROWSER: false,
+              MOBILE: false,
+            },
+          }]
       },
         {
           test: /\.woff$/,

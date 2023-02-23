@@ -18,7 +18,7 @@ import {setEditMode} from "../protyle/util/setEditMode";
 import {rename} from "../editor/rename";
 import {Files} from "../layout/dock/Files";
 import {newDailyNote} from "./mount";
-import {hideElements} from "../protyle/ui/hideElements";
+import {hideAllElements, hideElements} from "../protyle/ui/hideElements";
 import {fetchPost} from "./fetch";
 import {goBack, goForward} from "./backForward";
 import {onGet} from "../protyle/util/onGet";
@@ -95,12 +95,13 @@ export const globalShortcut = () => {
             });
             window.siyuan.hideBreadcrumb = false;
         }
-        if (!isWindow() && !hasClosestByClassName(event.target, "b3-dialog") && !hasClosestByClassName(event.target, "b3-menu")) {
+        if (event.buttons === 0 &&  // 鼠标按键被按下时不触发
+            !isWindow() && !hasClosestByClassName(event.target, "b3-dialog") && !hasClosestByClassName(event.target, "b3-menu")) {
             if (event.clientX < 43) {
                 if (!window.siyuan.layout.leftDock.pin && window.siyuan.layout.leftDock.layout.element.clientWidth > 0 &&
                     // 隐藏停靠栏会导致点击两侧内容触发浮动面板弹出，因此需减小鼠标范围
                     (window.siyuan.layout.leftDock.element.clientWidth > 0 || (window.siyuan.layout.leftDock.element.clientWidth === 0 && event.clientX < 8))) {
-                    if (event.clientY > document.getElementById("toolbar").clientHeight + document.getElementById("dockTop").clientHeight &&
+                    if (event.clientY > document.getElementById("toolbar").clientHeight &&
                         event.clientY < window.innerHeight - document.getElementById("status").clientHeight - document.getElementById("dockBottom").clientHeight) {
                         if (!hasClosestByClassName(event.target, "b3-menu") &&
                             !hasClosestByClassName(event.target, "layout--float")) {
@@ -113,7 +114,7 @@ export const globalShortcut = () => {
             } else if (event.clientX > window.innerWidth - 41) {
                 if (!window.siyuan.layout.rightDock.pin && window.siyuan.layout.rightDock.layout.element.clientWidth > 0 &&
                     (window.siyuan.layout.rightDock.element.clientWidth > 0 || (window.siyuan.layout.rightDock.element.clientWidth === 0 && event.clientX > window.innerWidth - 8))) {
-                    if (event.clientY > document.getElementById("toolbar").clientHeight + document.getElementById("dockTop").clientHeight &&
+                    if (event.clientY > document.getElementById("toolbar").clientHeight &&
                         event.clientY < window.innerHeight - document.getElementById("status").clientHeight - document.getElementById("dockBottom").clientHeight) {
                         if (!hasClosestByClassName(event.target, "layout--float")) {
                             window.siyuan.layout.rightDock.showDock();
@@ -124,9 +125,7 @@ export const globalShortcut = () => {
                 }
             }
 
-            if (event.clientY < 75) {
-                window.siyuan.layout.topDock.showDock();
-            } else if (event.clientY > window.innerHeight - 73) {
+            if (event.clientY > window.innerHeight - 73) {
                 window.siyuan.layout.bottomDock.showDock();
             }
         }
@@ -267,7 +266,7 @@ export const globalShortcut = () => {
         window.siyuan.ctrlIsPressed = false;
         window.siyuan.shiftIsPressed = false;
         window.siyuan.altIsPressed = false;
-        if (switchDialog && switchDialog.element.parentElement) {
+        if (switchDialog?.element.parentElement) {
             if (event.key === "Tab") {
                 let currentLiElement = switchDialog.element.querySelector(".b3-list-item--focus");
                 currentLiElement.classList.remove("b3-list-item--focus");
@@ -430,7 +429,7 @@ export const globalShortcut = () => {
         }
         const isTabWindow = isWindow();
         if (event.ctrlKey && !event.metaKey && event.key === "Tab") {
-            if (switchDialog && switchDialog.element.parentElement) {
+            if (switchDialog?.element.parentElement) {
                 return;
             }
             let tabHtml = "";
@@ -696,7 +695,7 @@ export const globalShortcut = () => {
                 range = document.createRange();
             }
             const lastBackStack = window.siyuan.backStack[window.siyuan.backStack.length - 1];
-            if (lastBackStack && lastBackStack.protyle.toolbar.range) {
+            if (lastBackStack?.protyle.toolbar.range) {
                 focusByRange(lastBackStack.protyle.toolbar.range);
             } else {
                 const editor = getAllModels().editor[0];
@@ -824,12 +823,16 @@ export const globalShortcut = () => {
                 window.siyuan.menus.menu.remove();
             }
         }
+        // protyle.toolbar 点击空白处时进行隐藏
+        if (!hasClosestByClassName(event.target, "protyle-toolbar")) {
+            hideAllElements(["toolbar"]);
+        }
+        if (!hasClosestByClassName(event.target, "pdf__outer")) {
+            hideAllElements(["pdfutil"]);
+        }
         // dock float 时，点击空白处，隐藏 dock
         const floatDockLayoutElement = hasClosestByClassName(event.target, "layout--float", true);
         if (floatDockLayoutElement) {
-            if (!floatDockLayoutElement.isSameNode(window.siyuan.layout.topDock.layout.element)) {
-                window.siyuan.layout.topDock.hideDock();
-            }
             if (!floatDockLayoutElement.isSameNode(window.siyuan.layout.bottomDock.layout.element)) {
                 window.siyuan.layout.bottomDock.hideDock();
             }
@@ -840,15 +843,9 @@ export const globalShortcut = () => {
                 window.siyuan.layout.rightDock.hideDock();
             }
         } else if (!hasClosestByClassName(event.target, "dock") && !isWindow()) {
-            window.siyuan.layout.topDock.hideDock();
             window.siyuan.layout.bottomDock.hideDock();
             window.siyuan.layout.leftDock.hideDock();
             window.siyuan.layout.rightDock.hideDock();
-        }
-        if (!hasClosestByClassName(event.target, "pdf__outer")) {
-            document.querySelectorAll(".pdf__util").forEach(item => {
-                item.classList.add("fn__none");
-            });
         }
         const copyElement = hasTopClosestByClassName(event.target, "protyle-action__copy");
         if (copyElement) {
@@ -1029,7 +1026,7 @@ const editKeydown = (event: KeyboardEvent) => {
     }
     const activePanelElement = document.querySelector(".layout__tab--active");
     let isFileFocus = false;
-    if (activePanelElement && activePanelElement.classList.contains("sy__file")) {
+    if (activePanelElement?.classList.contains("sy__file")) {
         isFileFocus = true;
     }
     let searchKey = "";

@@ -18,6 +18,7 @@ package sql
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -214,7 +215,7 @@ func initHistoryDBConnection() {
 		historyDB.Close()
 	}
 
-	dsn := util.HistoryDBPath + "?_journal_mode=OFF" +
+	dsn := util.DBPath + "?_journal_mode=WAL" +
 		"&_synchronous=OFF" +
 		"&_mmap_size=2684354560" +
 		"&_secure_delete=OFF" +
@@ -223,15 +224,14 @@ func initHistoryDBConnection() {
 		"&_busy_timeout=7000" +
 		"&_ignore_check_constraints=ON" +
 		"&_temp_store=MEMORY" +
-		"&_case_sensitive_like=OFF" +
-		"&_locking_mode=EXCLUSIVE"
+		"&_case_sensitive_like=OFF"
 	var err error
 	historyDB, err = sql.Open("sqlite3_extended", dsn)
 	if nil != err {
 		logging.LogFatalf("create database failed: %s", err)
 	}
-	historyDB.SetMaxIdleConns(1)
-	historyDB.SetMaxOpenConns(1)
+	historyDB.SetMaxIdleConns(3)
+	historyDB.SetMaxOpenConns(3)
 	historyDB.SetConnMaxLifetime(365 * 24 * time.Hour)
 }
 
@@ -700,9 +700,10 @@ func buildBlockFromNode(n *ast.Node, tree *parse.Tree) (block *Block, attributes
 		fcontent = content
 		length = utf8.RuneCountInString(fcontent)
 	} else if n.IsContainerBlock() {
-		markdown, content = treenode.NodeStaticMdContent(n, luteEngine)
+		markdown = treenode.ExportNodeStdMd(n, luteEngine)
+		content = treenode.NodeStaticContent(n, nil, true)
 		fc := treenode.FirstLeafBlock(n)
-		fcontent = treenode.NodeStaticContent(fc, nil)
+		fcontent = treenode.NodeStaticContent(fc, nil, false)
 		parentID = n.Parent.ID
 		// 将标题块作为父节点
 		if h := heading(n); nil != h {
@@ -710,7 +711,8 @@ func buildBlockFromNode(n *ast.Node, tree *parse.Tree) (block *Block, attributes
 		}
 		length = utf8.RuneCountInString(fcontent)
 	} else {
-		markdown, content = treenode.NodeStaticMdContent(n, luteEngine)
+		markdown = treenode.ExportNodeStdMd(n, luteEngine)
+		content = treenode.NodeStaticContent(n, nil, true)
 		parentID = n.Parent.ID
 		// 将标题块作为父节点
 		if h := heading(n); nil != h {
@@ -819,10 +821,6 @@ func heading(node *ast.Node) *ast.Node {
 	return nil
 }
 
-func DeleteBlockByIDs(tx *sql.Tx, ids []string) (err error) {
-	return deleteBlocksByIDs(tx, ids)
-}
-
 func deleteByBoxTx(tx *sql.Tx, box string) (err error) {
 	if err = deleteBlocksByBoxTx(tx, box); nil != err {
 		return
@@ -868,9 +866,11 @@ func deleteBlocksByIDs(tx *sql.Tx, ids []string) (err error) {
 	if err = execStmtTx(tx, stmt); nil != err {
 		return
 	}
-	stmt = "DELETE FROM blocks_fts_case_insensitive WHERE id IN " + in.String()
-	if err = execStmtTx(tx, stmt); nil != err {
-		return
+	if !caseSensitive {
+		stmt = "DELETE FROM blocks_fts_case_insensitive WHERE id IN " + in.String()
+		if err = execStmtTx(tx, stmt); nil != err {
+			return
+		}
 	}
 	return
 }
@@ -884,9 +884,11 @@ func deleteBlocksByBoxTx(tx *sql.Tx, box string) (err error) {
 	if err = execStmtTx(tx, stmt, box); nil != err {
 		return
 	}
-	stmt = "DELETE FROM blocks_fts_case_insensitive WHERE box = ?"
-	if err = execStmtTx(tx, stmt, box); nil != err {
-		return
+	if !caseSensitive {
+		stmt = "DELETE FROM blocks_fts_case_insensitive WHERE box = ?"
+		if err = execStmtTx(tx, stmt, box); nil != err {
+			return
+		}
 	}
 	ClearCache()
 	return
@@ -992,9 +994,11 @@ func deleteByRootID(tx *sql.Tx, rootID string, context map[string]interface{}) (
 	if err = execStmtTx(tx, stmt, rootID); nil != err {
 		return
 	}
-	stmt = "DELETE FROM blocks_fts_case_insensitive WHERE root_id = ?"
-	if err = execStmtTx(tx, stmt, rootID); nil != err {
-		return
+	if !caseSensitive {
+		stmt = "DELETE FROM blocks_fts_case_insensitive WHERE root_id = ?"
+		if err = execStmtTx(tx, stmt, rootID); nil != err {
+			return
+		}
 	}
 	stmt = "DELETE FROM spans WHERE root_id = ?"
 	if err = execStmtTx(tx, stmt, rootID); nil != err {
@@ -1028,9 +1032,11 @@ func batchDeleteByRootIDs(tx *sql.Tx, rootIDs []string, context map[string]inter
 	if err = execStmtTx(tx, stmt); nil != err {
 		return
 	}
-	stmt = "DELETE FROM blocks_fts_case_insensitive WHERE root_id IN " + ids
-	if err = execStmtTx(tx, stmt); nil != err {
-		return
+	if !caseSensitive {
+		stmt = "DELETE FROM blocks_fts_case_insensitive WHERE root_id IN " + ids
+		if err = execStmtTx(tx, stmt); nil != err {
+			return
+		}
 	}
 	stmt = "DELETE FROM spans WHERE root_id IN " + ids
 	if err = execStmtTx(tx, stmt); nil != err {
@@ -1062,9 +1068,11 @@ func batchDeleteByPathPrefix(tx *sql.Tx, boxID, pathPrefix string) (err error) {
 	if err = execStmtTx(tx, stmt, boxID, pathPrefix+"%"); nil != err {
 		return
 	}
-	stmt = "DELETE FROM blocks_fts_case_insensitive WHERE box = ? AND path LIKE ?"
-	if err = execStmtTx(tx, stmt, boxID, pathPrefix+"%"); nil != err {
-		return
+	if !caseSensitive {
+		stmt = "DELETE FROM blocks_fts_case_insensitive WHERE box = ? AND path LIKE ?"
+		if err = execStmtTx(tx, stmt, boxID, pathPrefix+"%"); nil != err {
+			return
+		}
 	}
 	stmt = "DELETE FROM spans WHERE box = ? AND path LIKE ?"
 	if err = execStmtTx(tx, stmt, boxID, pathPrefix+"%"); nil != err {
@@ -1086,20 +1094,24 @@ func batchDeleteByPathPrefix(tx *sql.Tx, boxID, pathPrefix string) (err error) {
 	return
 }
 
-func batchUpdateHPath(tx *sql.Tx, boxID, rootID, oldHPath, newHPath string) (err error) {
-	stmt := "UPDATE blocks SET hpath = ? WHERE box = ? AND root_id = ? AND hpath = ?"
-	if err = execStmtTx(tx, stmt, newHPath, boxID, rootID, oldHPath); nil != err {
+func batchUpdateHPath(tx *sql.Tx, boxID, rootID, newHPath string, context map[string]interface{}) (err error) {
+	stmt := "UPDATE blocks SET hpath = ? WHERE box = ? AND root_id = ?"
+	if err = execStmtTx(tx, stmt, newHPath, boxID, rootID); nil != err {
 		return
 	}
-	stmt = "UPDATE blocks_fts SET hpath = ? WHERE box = ? AND root_id = ? AND hpath = ?"
-	if err = execStmtTx(tx, stmt, newHPath, boxID, rootID, oldHPath); nil != err {
+	stmt = "UPDATE blocks_fts SET hpath = ? WHERE box = ? AND root_id = ?"
+	if err = execStmtTx(tx, stmt, newHPath, boxID, rootID); nil != err {
 		return
 	}
-	stmt = "UPDATE blocks_fts_case_insensitive SET hpath = ? WHERE box = ? AND root_id = ? AND hpath = ?"
-	if err = execStmtTx(tx, stmt, newHPath, boxID, rootID, oldHPath); nil != err {
-		return
+	if !caseSensitive {
+		stmt = "UPDATE blocks_fts_case_insensitive SET hpath = ? WHERE box = ? AND root_id = ?"
+		if err = execStmtTx(tx, stmt, newHPath, boxID, rootID); nil != err {
+			return
+		}
 	}
 	ClearCache()
+	evtHash := fmt.Sprintf("%x", sha256.Sum256([]byte(rootID)))[:7]
+	eventbus.Publish(eventbus.EvtSQLInsertBlocksFTS, context, 1, evtHash)
 	return
 }
 

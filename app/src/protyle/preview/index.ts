@@ -174,7 +174,7 @@ export class Preview {
         }
         copyElement.querySelectorAll("[href],[src]").forEach(item => {
             const oldLink = item.getAttribute("href") || item.getAttribute("src");
-            if (oldLink && oldLink.startsWith("assets/")) {
+            if (oldLink?.startsWith("assets/")) {
                 const newLink = Constants.ASSETS_ADDRESS + window.siyuan.user.userId + "/" + oldLink;
                 if (item.getAttribute("href")) {
                     item.setAttribute("href", newLink);

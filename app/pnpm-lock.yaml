@@ -5,6 +5,8 @@ overrides:
 
 specifiers:
   '@babel/core': ^7.20.12
+  '@babel/plugin-proposal-nullish-coalescing-operator': ^7.18.6
+  '@babel/plugin-proposal-optional-chaining': ^7.21.0
   '@babel/plugin-transform-runtime': ^7.19.6
   '@babel/preset-env': ^7.20.2
   '@babel/preset-react': ^7.18.6
@@ -57,6 +59,7 @@ specifiers:
   mini-css-extract-plugin: 2.7.2
   monaco-editor: ^0.35.0
   monaco-editor-nls: ^3.0.0
+  monaco-editor-webpack-plugin: ^7.0.1
   npm-check: ^6.0.1
   path-browserify: ^1.0.1
   pnpm: 7.27.0
@@ -64,8 +67,10 @@ specifiers:
   react-dom: 18.2.0
   react-hot-toast: ^2.4.0
   react-jinke-music-player: ^4.24.2
+  react-monaco-editor: ^0.51.0
   react-spinners: ^0.13.8
   react-toastify: ^9.1.1
+  rome: ^11.0.0
   safer-buffer: ^2.1.2
   sass: ^1.58.1
   sass-loader: ^13.2.0
@@ -87,11 +92,13 @@ dependencies:
   '@monaco-editor/loader': registry.npmmirror.com/@monaco-editor/loader/1.3.2_monaco-editor@0.35.0
   electron-fetch: registry.npmmirror.com/electron-fetch/1.9.1
   electron-store: registry.npmmirror.com/electron-store/8.1.0
-  monaco-editor: registry.npmmirror.com/monaco-editor/0.35.0
+  monaco-editor: 0.35.0
   monaco-editor-nls: registry.npmmirror.com/monaco-editor-nls/3.0.0
 
 devDependencies:
   '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
+  '@babel/plugin-proposal-nullish-coalescing-operator': 7.18.6_@babel+core@7.20.12
+  '@babel/plugin-proposal-optional-chaining': 7.21.0_@babel+core@7.20.12
   '@babel/plugin-transform-runtime': registry.npmmirror.com/@babel/plugin-transform-runtime/7.19.6_@babel+core@7.20.12
   '@babel/preset-env': registry.npmmirror.com/@babel/preset-env/7.20.2_@babel+core@7.20.12
   '@babel/preset-react': registry.npmmirror.com/@babel/preset-react/7.18.6_@babel+core@7.20.12
@@ -138,6 +145,7 @@ devDependencies:
   localforage: registry.npmmirror.com/localforage/1.10.0
   lodash: registry.npmmirror.com/lodash/4.17.21
   mini-css-extract-plugin: registry.npmmirror.com/mini-css-extract-plugin/2.7.2_webpack@5.75.0
+  monaco-editor-webpack-plugin: 7.0.1_bbegtevx43l6vpk7djmbrepg3a
   npm-check: 6.0.1
   path-browserify: registry.npmmirror.com/path-browserify/1.0.1
   pnpm: registry.npmmirror.com/pnpm/7.27.0
@@ -145,8 +153,10 @@ devDependencies:
   react-dom: registry.npmmirror.com/react-dom/18.2.0_react@18.2.0
   react-hot-toast: registry.npmmirror.com/react-hot-toast/2.4.0_owo25xnefcwdq3zjgtohz6dbju
   react-jinke-music-player: registry.npmmirror.com/react-jinke-music-player/4.24.2_biqbaboplfbrettd7655fr4n2y
+  react-monaco-editor: 0.51.0_t6gquqjtv4phktk4jj27otyzyi
   react-spinners: registry.npmmirror.com/react-spinners/0.13.8_biqbaboplfbrettd7655fr4n2y
   react-toastify: registry.npmmirror.com/react-toastify/9.1.1_biqbaboplfbrettd7655fr4n2y
+  rome: 11.0.0
   safer-buffer: registry.npmmirror.com/safer-buffer/2.1.2
   sass: registry.npmmirror.com/sass/1.58.1
   sass-loader: registry.npmmirror.com/sass-loader/13.2.0_sass@1.58.1+webpack@5.75.0
@@ -286,6 +296,13 @@ packages:
       '@babel/types': 7.20.7
     dev: true
 
+  /@babel/helper-skip-transparent-expression-wrappers/7.20.0:
+    resolution: {integrity: sha512-5y1JYeNKfvnT8sZcK9DVRtpTbGiomYIHviSP3OQWmDPU3DeH4a1ZlT/N2lyQ5P8egjcRaT/Y9aNqUxK0WsnIIg==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      '@babel/types': 7.20.7
+    dev: true
+
   /@babel/helper-split-export-declaration/7.18.6:
     resolution: {integrity: sha512-bde1etTx6ZyTmobl9LLMMQsaizFVZrquTEHOqKeQESMKo4PlObf+8+JA25ZsIpZhT/WEd39+vOdLXAFG/nELpA==}
     engines: {node: '>=6.9.0'}
@@ -342,6 +359,29 @@ packages:
     hasBin: true
     dependencies:
       '@babel/types': 7.20.7
+    dev: true
+
+  /@babel/plugin-proposal-nullish-coalescing-operator/7.18.6_@babel+core@7.20.12:
+    resolution: {integrity: sha512-wQxQzxYeJqHcfppzBDnm1yAY0jSRkUXR2z8RePZYrKwMKgMlE8+Z6LUno+bd6LvbGh8Gltvy74+9pIYkr+XkKA==}
+    engines: {node: '>=6.9.0'}
+    peerDependencies:
+      '@babel/core': ^7.0.0-0
+    dependencies:
+      '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
+      '@babel/helper-plugin-utils': 7.20.2
+      '@babel/plugin-syntax-nullish-coalescing-operator': 7.8.3_@babel+core@7.20.12
+    dev: true
+
+  /@babel/plugin-proposal-optional-chaining/7.21.0_@babel+core@7.20.12:
+    resolution: {integrity: sha512-p4zeefM72gpmEe2fkUr/OnOXpWEf8nAgk7ZYVqqfFiyIG7oFfVZcCrU64hWn5xp4tQ9LkV4bTIa5rD0KANpKNA==}
+    engines: {node: '>=6.9.0'}
+    peerDependencies:
+      '@babel/core': ^7.0.0-0
+    dependencies:
+      '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
+      '@babel/helper-plugin-utils': 7.20.2
+      '@babel/helper-skip-transparent-expression-wrappers': 7.20.0
+      '@babel/plugin-syntax-optional-chaining': 7.8.3_@babel+core@7.20.12
     dev: true
 
   /@babel/plugin-syntax-async-generators/7.8.4_@babel+core@7.20.12:
@@ -413,7 +453,7 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
     dependencies:
-      '@babel/core': 7.20.12
+      '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
       '@babel/helper-plugin-utils': 7.20.2
     dev: true
 
@@ -449,7 +489,7 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
     dependencies:
-      '@babel/core': 7.20.12
+      '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
       '@babel/helper-plugin-utils': 7.20.2
     dev: true
 
@@ -1471,6 +1511,54 @@ packages:
     resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
     dev: true
 
+  /@rometools/cli-darwin-arm64/11.0.0:
+    resolution: {integrity: sha512-F3vkdY+s3FLIEnAjSbyHTuIPB88cLpccimW4ecid5I7S6GzGG3iUJI4xT00JhH73K4P/qW20/9r+kH1T9Du8Xg==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-darwin-x64/11.0.0:
+    resolution: {integrity: sha512-X6jhtS6Iml4GOzgNtnLwIp/KXXhSdqeVyfv69m/AHnIzx3gQAjPZ7BPnJLvTCbhe4SKHL+uTZYFSCJpkUUKE6w==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-linux-arm64/11.0.0:
+    resolution: {integrity: sha512-dktTJJlTpmycBZ2TwhJBcAO8ztK8DdevdyZnFFxdYRvtmJgTjIsC2UFayf/SbKew8B8q1IhI0it+D6ihAeIpeg==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-linux-x64/11.0.0:
+    resolution: {integrity: sha512-WVcnXPNdWGUWo0p4NU8YzuthjYR7q+b4vRcjdxtP1DlpphZmSsoC/RSE85nEqRAz8hChcKUansVzOPM8BSsuGA==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-win32-arm64/11.0.0:
+    resolution: {integrity: sha512-tPj6RThQzS7Q45jqQll7NlTYvNcsg/BEP3LYiiazqSh9FAFnMkrV6ewUcMPKWyAfiyLs7jlz4rRvdNRUSygzfQ==}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-win32-x64/11.0.0:
+    resolution: {integrity: sha512-bmBai8WHxYjsGk1+je7ZTfCUCWq30WJI3pQM8pzTA674lfGTZ9ymJoZwTaIMSO4rL5V9mlO6uLunsBKso9VqOg==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@sinclair/typebox/0.25.22:
     resolution: {integrity: sha512-6U6r2L7rnM7EG8G1tWzIjdB3QlsHF4slgcqXNN/SF0xJOAr0nDmT2GedlkyO3mrv8mDTJ24UuOMWR3diBrCvQQ==}
     dev: true
@@ -1934,6 +2022,10 @@ packages:
 
   /base64-js/1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
+    dev: true
+
+  /big.js/5.2.2:
+    resolution: {integrity: sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==}
     dev: true
 
   /binary-extensions/2.2.0:
@@ -2507,6 +2599,11 @@ packages:
 
   /emoji-regex/8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
+    dev: true
+
+  /emojis-list/3.0.0:
+    resolution: {integrity: sha512-/kyM18EfinwXZbno9FyUGeFh87KC8HRQBQGildHZbEuRyWFOmv1U10o9BBp8XVZDVNNuQKyIGIu5ZYAAXJ0V2Q==}
+    engines: {node: '>= 4'}
     dev: true
 
   /end-of-stream/1.4.4:
@@ -3768,6 +3865,15 @@ packages:
       strip-bom: 3.0.0
     dev: true
 
+  /loader-utils/2.0.4:
+    resolution: {integrity: sha512-xXqpXoINfFhgua9xiqD8fPFHgkoq1mmmpE92WlDbm9rNRd/EbRb+Gqf908T2DMfuHjjJlksiK2RbHVOdD/MqSw==}
+    engines: {node: '>=8.9.0'}
+    dependencies:
+      big.js: 5.2.2
+      emojis-list: 3.0.0
+      json5: 2.2.3
+    dev: true
+
   /locate-path/3.0.0:
     resolution: {integrity: sha512-7AO748wWnIhNqAuaty2ZWHkQHRSNfPVIsPIfwEOWO22AmaoVrWavlOcMR5nzTLNYvp36X220/maaRsrec1G65A==}
     engines: {node: '>=6'}
@@ -3954,6 +4060,20 @@ packages:
   /minimist/1.2.7:
     resolution: {integrity: sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==}
     dev: true
+
+  /monaco-editor-webpack-plugin/7.0.1_bbegtevx43l6vpk7djmbrepg3a:
+    resolution: {integrity: sha512-M8qIqizltrPlIbrb73cZdTWfU9sIsUVFvAZkL3KGjAHmVWEJ0hZKa/uad14JuOckc0GwnCaoGHvMoYtJjVyCzw==}
+    peerDependencies:
+      monaco-editor: '>= 0.31.0'
+      webpack: ^4.5.0 || 5.x
+    dependencies:
+      loader-utils: 2.0.4
+      monaco-editor: 0.35.0
+      webpack: registry.npmmirror.com/webpack/5.75.0_cf7cgeqdkm72g3fdehkr7aaod4
+    dev: true
+
+  /monaco-editor/0.35.0:
+    resolution: {integrity: sha512-BJfkAZ0EJ7JgrgWzqjfBNP9hPSS8NlfECEDMEIIiozV2UaPq22yeuOjgbd3TwMh3anH0krWZirXZfn8KUSxiOA==}
 
   /ms/2.0.0:
     resolution: {integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=}
@@ -4403,6 +4523,19 @@ packages:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: true
 
+  /react-monaco-editor/0.51.0_t6gquqjtv4phktk4jj27otyzyi:
+    resolution: {integrity: sha512-6jx1V8p6gHVKJHFaTvicOtmlhFjOJhekobeNd92ZAo7F5UvAin1cF7bxWLCKgtxClYZ7CB3Ar284Kpbhj22FpQ==}
+    peerDependencies:
+      '@types/react': '>=17 <= 18'
+      monaco-editor: ^0.34.1
+      react: '>=17 <= 18'
+    dependencies:
+      '@types/react': registry.npmmirror.com/@types/react/18.0.28
+      monaco-editor: 0.35.0
+      prop-types: 15.8.1
+      react: registry.npmmirror.com/react/18.2.0
+    dev: true
+
   /react-transition-group/4.4.5_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
     peerDependencies:
@@ -4560,6 +4693,20 @@ packages:
       semver-compare: 1.0.0
       sprintf-js: 1.1.2
     optional: true
+
+  /rome/11.0.0:
+    resolution: {integrity: sha512-rRo6JOwpMLc3OkeTDRXkrmrDqnxDvZ75GS4f0jLDBNmRgDXWbu0F8eVnJoRn+VbK2AE7vWvhVOMBjnWowcopkQ==}
+    engines: {node: '>=14.*'}
+    hasBin: true
+    requiresBuild: true
+    optionalDependencies:
+      '@rometools/cli-darwin-arm64': 11.0.0
+      '@rometools/cli-darwin-x64': 11.0.0
+      '@rometools/cli-linux-arm64': 11.0.0
+      '@rometools/cli-linux-x64': 11.0.0
+      '@rometools/cli-win32-arm64': 11.0.0
+      '@rometools/cli-win32-x64': 11.0.0
+    dev: true
 
   /run-async/2.4.1:
     resolution: {integrity: sha512-tvVnVv01b8c1RrA6Ep7JkStj85Guv/YrMcwqYQnwjsAS2cTmmPGBBjAjpCW7RrSodNSoE2/qg9O4bceNvUuDgQ==}
@@ -5313,7 +5460,7 @@ packages:
       '@babel/helper-member-expression-to-functions': registry.npmmirror.com/@babel/helper-member-expression-to-functions/7.20.7
       '@babel/helper-optimise-call-expression': registry.npmmirror.com/@babel/helper-optimise-call-expression/7.18.6
       '@babel/helper-replace-supers': registry.npmmirror.com/@babel/helper-replace-supers/7.20.7
-      '@babel/helper-skip-transparent-expression-wrappers': registry.npmmirror.com/@babel/helper-skip-transparent-expression-wrappers/7.20.0
+      '@babel/helper-skip-transparent-expression-wrappers': 7.20.0
       '@babel/helper-split-export-declaration': registry.npmmirror.com/@babel/helper-split-export-declaration/7.18.6
     transitivePeerDependencies:
       - supports-color
@@ -5343,7 +5490,7 @@ packages:
     dependencies:
       '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
       '@babel/helper-compilation-targets': registry.npmmirror.com/@babel/helper-compilation-targets/7.20.7_@babel+core@7.20.12
-      '@babel/helper-plugin-utils': registry.npmmirror.com/@babel/helper-plugin-utils/7.20.2
+      '@babel/helper-plugin-utils': 7.20.2
       debug: 4.3.4
       lodash.debounce: registry.npmmirror.com/lodash.debounce/4.0.8
       resolve: 1.22.1
@@ -5554,9 +5701,9 @@ packages:
     version: 7.18.6
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/helper-validator-identifier': registry.npmmirror.com/@babel/helper-validator-identifier/7.19.1
+      '@babel/helper-validator-identifier': 7.19.1
       chalk: 2.4.2
-      js-tokens: registry.npmmirror.com/js-tokens/4.0.0
+      js-tokens: 4.0.0
     dev: true
 
   registry.npmmirror.com/@babel/parser/7.20.15:
@@ -5594,7 +5741,7 @@ packages:
       '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
       '@babel/helper-plugin-utils': registry.npmmirror.com/@babel/helper-plugin-utils/7.20.2
       '@babel/helper-skip-transparent-expression-wrappers': registry.npmmirror.com/@babel/helper-skip-transparent-expression-wrappers/7.20.0
-      '@babel/plugin-proposal-optional-chaining': registry.npmmirror.com/@babel/plugin-proposal-optional-chaining/7.20.7_@babel+core@7.20.12
+      '@babel/plugin-proposal-optional-chaining': 7.21.0_@babel+core@7.20.12
     dev: true
 
   registry.npmmirror.com/@babel/plugin-proposal-async-generator-functions/7.20.7_@babel+core@7.20.12:
@@ -5704,20 +5851,6 @@ packages:
       '@babel/plugin-syntax-logical-assignment-operators': registry.npmmirror.com/@babel/plugin-syntax-logical-assignment-operators/7.10.4_@babel+core@7.20.12
     dev: true
 
-  registry.npmmirror.com/@babel/plugin-proposal-nullish-coalescing-operator/7.18.6_@babel+core@7.20.12:
-    resolution: {integrity: sha512-wQxQzxYeJqHcfppzBDnm1yAY0jSRkUXR2z8RePZYrKwMKgMlE8+Z6LUno+bd6LvbGh8Gltvy74+9pIYkr+XkKA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@babel/plugin-proposal-nullish-coalescing-operator/-/plugin-proposal-nullish-coalescing-operator-7.18.6.tgz}
-    id: registry.npmmirror.com/@babel/plugin-proposal-nullish-coalescing-operator/7.18.6
-    name: '@babel/plugin-proposal-nullish-coalescing-operator'
-    version: 7.18.6
-    engines: {node: '>=6.9.0'}
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
-    dependencies:
-      '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
-      '@babel/helper-plugin-utils': registry.npmmirror.com/@babel/helper-plugin-utils/7.20.2
-      '@babel/plugin-syntax-nullish-coalescing-operator': registry.npmmirror.com/@babel/plugin-syntax-nullish-coalescing-operator/7.8.3_@babel+core@7.20.12
-    dev: true
-
   registry.npmmirror.com/@babel/plugin-proposal-numeric-separator/7.18.6_@babel+core@7.20.12:
     resolution: {integrity: sha512-ozlZFogPqoLm8WBr5Z8UckIoE4YQ5KESVcNudyXOR8uqIkliTEgJ3RoketfG6pmzLdeZF0H/wjE9/cCEitBl7Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@babel/plugin-proposal-numeric-separator/-/plugin-proposal-numeric-separator-7.18.6.tgz}
     id: registry.npmmirror.com/@babel/plugin-proposal-numeric-separator/7.18.6
@@ -5761,21 +5894,6 @@ packages:
       '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
       '@babel/helper-plugin-utils': registry.npmmirror.com/@babel/helper-plugin-utils/7.20.2
       '@babel/plugin-syntax-optional-catch-binding': registry.npmmirror.com/@babel/plugin-syntax-optional-catch-binding/7.8.3_@babel+core@7.20.12
-    dev: true
-
-  registry.npmmirror.com/@babel/plugin-proposal-optional-chaining/7.20.7_@babel+core@7.20.12:
-    resolution: {integrity: sha512-T+A7b1kfjtRM51ssoOfS1+wbyCVqorfyZhT99TvxxLMirPShD8CzKMRepMlCBGM5RpHMbn8s+5MMHnPstJH6mQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.20.7.tgz}
-    id: registry.npmmirror.com/@babel/plugin-proposal-optional-chaining/7.20.7
-    name: '@babel/plugin-proposal-optional-chaining'
-    version: 7.20.7
-    engines: {node: '>=6.9.0'}
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
-    dependencies:
-      '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
-      '@babel/helper-plugin-utils': registry.npmmirror.com/@babel/helper-plugin-utils/7.20.2
-      '@babel/helper-skip-transparent-expression-wrappers': registry.npmmirror.com/@babel/helper-skip-transparent-expression-wrappers/7.20.0
-      '@babel/plugin-syntax-optional-chaining': registry.npmmirror.com/@babel/plugin-syntax-optional-chaining/7.8.3_@babel+core@7.20.12
     dev: true
 
   registry.npmmirror.com/@babel/plugin-proposal-private-methods/7.18.6_@babel+core@7.20.12:
@@ -5922,7 +6040,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
-      '@babel/helper-plugin-utils': registry.npmmirror.com/@babel/helper-plugin-utils/7.20.2
+      '@babel/helper-plugin-utils': 7.20.2
     dev: true
 
   registry.npmmirror.com/@babel/plugin-syntax-logical-assignment-operators/7.10.4_@babel+core@7.20.12:
@@ -6033,7 +6151,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
-      '@babel/helper-plugin-utils': registry.npmmirror.com/@babel/helper-plugin-utils/7.20.2
+      '@babel/helper-plugin-utils': 7.20.2
     dev: true
 
   registry.npmmirror.com/@babel/plugin-transform-arrow-functions/7.20.7_@babel+core@7.20.12:
@@ -6409,7 +6527,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
-      '@babel/helper-plugin-utils': registry.npmmirror.com/@babel/helper-plugin-utils/7.20.2
+      '@babel/helper-plugin-utils': 7.20.2
     dev: true
 
   registry.npmmirror.com/@babel/plugin-transform-react-jsx-source/7.19.6_@babel+core@7.20.12:
@@ -6422,7 +6540,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': registry.npmmirror.com/@babel/core/7.20.12
-      '@babel/helper-plugin-utils': registry.npmmirror.com/@babel/helper-plugin-utils/7.20.2
+      '@babel/helper-plugin-utils': 7.20.2
     dev: true
 
   registry.npmmirror.com/@babel/plugin-transform-react-jsx/7.20.13_@babel+core@7.20.12:
@@ -6636,11 +6754,11 @@ packages:
       '@babel/plugin-proposal-export-namespace-from': registry.npmmirror.com/@babel/plugin-proposal-export-namespace-from/7.18.9_@babel+core@7.20.12
       '@babel/plugin-proposal-json-strings': registry.npmmirror.com/@babel/plugin-proposal-json-strings/7.18.6_@babel+core@7.20.12
       '@babel/plugin-proposal-logical-assignment-operators': registry.npmmirror.com/@babel/plugin-proposal-logical-assignment-operators/7.20.7_@babel+core@7.20.12
-      '@babel/plugin-proposal-nullish-coalescing-operator': registry.npmmirror.com/@babel/plugin-proposal-nullish-coalescing-operator/7.18.6_@babel+core@7.20.12
+      '@babel/plugin-proposal-nullish-coalescing-operator': 7.18.6_@babel+core@7.20.12
       '@babel/plugin-proposal-numeric-separator': registry.npmmirror.com/@babel/plugin-proposal-numeric-separator/7.18.6_@babel+core@7.20.12
       '@babel/plugin-proposal-object-rest-spread': registry.npmmirror.com/@babel/plugin-proposal-object-rest-spread/7.20.7_@babel+core@7.20.12
       '@babel/plugin-proposal-optional-catch-binding': registry.npmmirror.com/@babel/plugin-proposal-optional-catch-binding/7.18.6_@babel+core@7.20.12
-      '@babel/plugin-proposal-optional-chaining': registry.npmmirror.com/@babel/plugin-proposal-optional-chaining/7.20.7_@babel+core@7.20.12
+      '@babel/plugin-proposal-optional-chaining': 7.21.0_@babel+core@7.20.12
       '@babel/plugin-proposal-private-methods': registry.npmmirror.com/@babel/plugin-proposal-private-methods/7.18.6_@babel+core@7.20.12
       '@babel/plugin-proposal-private-property-in-object': registry.npmmirror.com/@babel/plugin-proposal-private-property-in-object/7.20.5_@babel+core@7.20.12
       '@babel/plugin-proposal-unicode-property-regex': registry.npmmirror.com/@babel/plugin-proposal-unicode-property-regex/7.18.6_@babel+core@7.20.12
@@ -7174,7 +7292,7 @@ packages:
     peerDependencies:
       monaco-editor: '>= 0.21.0 < 1'
     dependencies:
-      monaco-editor: registry.npmmirror.com/monaco-editor/0.35.0
+      monaco-editor: 0.35.0
       state-local: registry.npmmirror.com/state-local/1.0.7
     dev: false
 
@@ -9710,7 +9828,7 @@ packages:
     dependencies:
       array-union: 1.0.2
       glob: registry.npmmirror.com/glob/7.2.3
-      object-assign: registry.npmmirror.com/object-assign/4.1.1
+      object-assign: 4.1.1
       pify: registry.npmmirror.com/pify/2.3.0
       pinkie-promise: 2.0.1
     dev: true
@@ -10723,12 +10841,6 @@ packages:
     resolution: {integrity: sha512-WYYa1lqaN1wsJOZ5j+LVHvmJgx23UbCG7XnzcY8x9DT59EZNmNsCmyMU1kyhmyNDE/KZeLCAXAM7BvQ/P6/B7w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/monaco-editor-nls/-/monaco-editor-nls-3.0.0.tgz}
     name: monaco-editor-nls
     version: 3.0.0
-    dev: false
-
-  registry.npmmirror.com/monaco-editor/0.35.0:
-    resolution: {integrity: sha512-BJfkAZ0EJ7JgrgWzqjfBNP9hPSS8NlfECEDMEIIiozV2UaPq22yeuOjgbd3TwMh3anH0krWZirXZfn8KUSxiOA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/monaco-editor/-/monaco-editor-0.35.0.tgz}
-    name: monaco-editor
-    version: 0.35.0
     dev: false
 
   registry.npmmirror.com/mrmime/1.0.1:

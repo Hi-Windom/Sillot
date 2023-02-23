@@ -27,6 +27,25 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
+func getTreeRiffCards(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	rootID := arg["id"].(string)
+	page := int(arg["page"].(float64))
+	blockIDs, total, pageCount := model.GetTreeFlashcards(rootID, page)
+	ret.Data = map[string]interface{}{
+		"blocks":    blockIDs,
+		"total":     total,
+		"pageCount": pageCount,
+	}
+}
+
 func getRiffCards(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -36,7 +55,7 @@ func getRiffCards(c *gin.Context) {
 		return
 	}
 
-	deckID := arg["deckID"].(string)
+	deckID := arg["id"].(string)
 	page := int(arg["page"].(float64))
 	blockIDs, total, pageCount := model.GetFlashcards(deckID, page)
 	ret.Data = map[string]interface{}{
@@ -64,6 +83,26 @@ func reviewRiffCard(c *gin.Context) {
 		ret.Msg = err.Error()
 		return
 	}
+}
+
+func getTreeRiffDueCards(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	rootID := arg["rootID"].(string)
+	cards, err := model.GetTreeDueFlashcards(rootID)
+	if nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	ret.Data = cards
 }
 
 func getRiffDueCards(c *gin.Context) {

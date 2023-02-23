@@ -31,6 +31,7 @@ import {newFile} from "../util/newFile";
 import {MenuItem} from "../menus/Menu";
 import {escapeHtml} from "../util/escape";
 import {isWindow} from "../util/functions";
+import {hideAllElements} from "../protyle/ui/hideElements";
 
 export class Wnd {
     public id: string;
@@ -46,7 +47,7 @@ export class Wnd {
         this.element = document.createElement("div");
         this.element.classList.add("fn__flex-1", "fn__flex");
         let dragHTML = '<div class="layout-tab-container__drag fn__none"></div>';
-        if (parentType === "left" || parentType === "right" || parentType === "top" || parentType === "bottom") {
+        if (parentType === "left" || parentType === "right" || parentType === "bottom") {
             dragHTML = "";
         }
         this.element.innerHTML = `<div data-type="wnd" data-id="${this.id}" class="fn__flex-column fn__flex fn__flex-1">
@@ -214,7 +215,7 @@ export class Wnd {
                 it.classList.remove("layout-tab-bars--drag");
                 return;
             }
-            const tabData = JSON.parse(event.dataTransfer.getData(Constants.SIYUAN_DROP_TAB))
+            const tabData = JSON.parse(event.dataTransfer.getData(Constants.SIYUAN_DROP_TAB));
             let oldTab = getInstanceById(tabData.id) as Tab;
             const wnd = getInstanceById(it.parentElement.getAttribute("data-id")) as Wnd;
             /// #if !BROWSER
@@ -324,7 +325,7 @@ export class Wnd {
             dragElement.classList.add("fn__none");
             const targetWndElement = event.target.parentElement.parentElement;
             const targetWnd = getInstanceById(targetWndElement.getAttribute("data-id")) as Wnd;
-            const tabData = JSON.parse(event.dataTransfer.getData(Constants.SIYUAN_DROP_TAB))
+            const tabData = JSON.parse(event.dataTransfer.getData(Constants.SIYUAN_DROP_TAB));
             let oldTab = getInstanceById(tabData.id) as Tab;
             /// #if !BROWSER
             if (!oldTab) { // 从主窗口拖拽到页签新窗口
@@ -403,7 +404,7 @@ export class Wnd {
         let currentTab: Tab;
         this.children.forEach((item) => {
             if (target === item.headElement) {
-                if (item.headElement && item.headElement.classList.contains("fn__none")) {
+                if (item.headElement?.classList.contains("fn__none")) {
                     // https://github.com/siyuan-note/siyuan/issues/267
                 } else {
                     if (item.headElement) {
@@ -421,7 +422,7 @@ export class Wnd {
                 }
             }
         });
-        if (currentTab && currentTab.headElement) {
+        if (currentTab?.headElement) {
             const initData = currentTab.headElement.getAttribute("data-initdata");
             if (initData) {
                 const json = JSON.parse(initData);
@@ -489,10 +490,10 @@ export class Wnd {
         }
         let oldFocusIndex = 0;
         this.children.forEach((item, index) => {
-            if (item.headElement && item.headElement.classList.contains("item--focus")) {
+            if (item.headElement?.classList.contains("item--focus")) {
                 oldFocusIndex = index;
                 let nextElement = item.headElement.nextElementSibling;
-                while (nextElement && nextElement.classList.contains("item--pin")) {
+                while (nextElement?.classList.contains("item--pin")) {
                     oldFocusIndex++;
                     nextElement = nextElement.nextElementSibling;
                 }
@@ -593,7 +594,7 @@ export class Wnd {
     private removeOverCounter(oldFocusIndex?: number) {
         if (typeof oldFocusIndex === "undefined") {
             this.children.forEach((item, index) => {
-                if (item.headElement && item.headElement.classList.contains("item--focus")) {
+                if (item.headElement?.classList.contains("item--focus")) {
                     oldFocusIndex = index;
                 }
             });
@@ -639,7 +640,7 @@ export class Wnd {
             return;
         }
         if (model instanceof Asset) {
-            if (model.pdfObject && model.pdfObject.pdfLoadingTask) {
+            if (model.pdfObject?.pdfLoadingTask) {
                 model.pdfObject.pdfLoadingTask.destroy();
             }
         }
@@ -656,7 +657,7 @@ export class Wnd {
                 if (this.children.length === 1) {
                     this.destroyModel(this.children[0].model);
                     this.children = [];
-                    if (["top", "bottom", "left", "right"].includes(this.parent.type)) {
+                    if (["bottom", "left", "right"].includes(this.parent.type)) {
                         item.panelElement.remove();
                     } else {
                         this.remove();
@@ -681,12 +682,18 @@ export class Wnd {
                 }
                 if (item.headElement) {
                     if (item.headElement.classList.contains("item--focus")) {
-                        let currentIndex = index + 1;
-                        if (index === this.children.length - 1) {
-                            currentIndex = index - 1;
-                        }
-                        if (this.children[currentIndex] && !closeAll) {
-                            this.switchTab(this.children[currentIndex].headElement, true);
+                        let latestHeadElement: HTMLElement;
+                        Array.from(item.headElement.parentElement.children).forEach((headItem: HTMLElement) => {
+                            if (!headItem.isSameNode(item.headElement)) {
+                                if (!latestHeadElement) {
+                                    latestHeadElement = headItem;
+                                } else if (headItem.getAttribute("data-activetime") > latestHeadElement.getAttribute("data-activetime")) {
+                                    latestHeadElement = headItem;
+                                }
+                            }
+                        });
+                        if (latestHeadElement && !closeAll) {
+                            this.switchTab(latestHeadElement, true);
                         }
                     }
                     if (animate) {
@@ -778,10 +785,23 @@ export class Wnd {
                     return true;
                 }
             });
-            oldWnd.switchTab(oldWnd.children[oldWnd.children.length - 1].headElement);
+            if (!oldWnd.headersElement.querySelector(".item--focus")) {
+                let latestHeadElement: HTMLElement;
+                Array.from(oldWnd.headersElement.children).forEach((headItem: HTMLElement) => {
+                    if (!latestHeadElement) {
+                        latestHeadElement = headItem;
+                    } else if (headItem.getAttribute("data-activetime") > latestHeadElement.getAttribute("data-activetime")) {
+                        latestHeadElement = headItem;
+                    }
+                });
+                if (latestHeadElement) {
+                    oldWnd.switchTab(latestHeadElement, true);
+                }
+            }
         }
         tab.parent = this;
         resizeTabs();
+        hideAllElements(["toolbar"]);
     }
 
     public split(direction: TDirection) {
@@ -879,9 +899,9 @@ export class Wnd {
                 return true;
             }
         });
-        if (element.previousElementSibling && element.previousElementSibling.classList.contains("layout__resize")) {
+        if (element.previousElementSibling?.classList.contains("layout__resize")) {
             element.previousElementSibling.remove();
-        } else if (element.nextElementSibling && element.nextElementSibling.classList.contains("layout__resize")) {
+        } else if (element.nextElementSibling?.classList.contains("layout__resize")) {
             element.nextElementSibling.remove();
         }
         element.remove();

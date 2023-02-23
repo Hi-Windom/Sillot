@@ -983,9 +983,9 @@ export const iframeMenu = (protyle: IProtyle, nodeElement: Element) => {
             element.querySelector("textarea").addEventListener("change", (event) => {
                 const value = (event.target as HTMLTextAreaElement).value.replace(/\n|\r\n|\r|\u2028|\u2029/g, "");
                 const biliMatch = value.match(/(?:www\.|\/\/)bilibili\.com\/video\/(\w+)/);
-                if (value.indexOf("bilibili.com") > -1 && (value.indexOf("bvid=") > -1 || (biliMatch && biliMatch[1]))) {
+                if (value.indexOf("bilibili.com") > -1 && (value.indexOf("bvid=") > -1 || (biliMatch?.[1]))) {
                     const params: IObject = {
-                        bvid: getSearch("bvid", value) || (biliMatch && biliMatch[1]),
+                        bvid: getSearch("bvid", value) || (biliMatch?.[1]),
                         page: "1",
                         high_quality: "1",
                         as_wide: "1",

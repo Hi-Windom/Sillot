@@ -32,7 +32,7 @@ import {mathRender} from "../markdown/mathRender";
 import {duplicateBlock} from "../wysiwyg/commonHotkey";
 import {movePathTo} from "../../util/pathName";
 import {hintMoveBlock} from "../hint/extend";
-import {makeCard} from "../../card/makeCard";
+import {makeCard, quickMakeCard} from "../../card/makeCard";
 import {transferBlockRef} from "../../menus/block";
 import {HiJoy} from "../../sillot/joyUI/com_/hi";
 import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
@@ -59,16 +59,15 @@ export class Gutter {
                 event.dataTransfer.setDragImage(protyle.wysiwyg.element.querySelector(`[data-node-id="${selectIds[0]}"]`), 0, 0);
             }
             event.target.style.opacity = "0.1";
-            window.siyuan.dragElement = event.target;
-            event.dataTransfer.setData(Constants.SIYUAN_DROP_GUTTER, selectIds.toString());
-            window.siyuan.dragElement.setAttribute("data-selected-ids", selectIds.toString());
+            window.siyuan.dragElement = protyle.wysiwyg.element;
+            event.dataTransfer.setData(`${Constants.SIYUAN_DROP_GUTTER}${event.target.getAttribute("data-type")}${Constants.ZWSP}${event.target.getAttribute("data-subtype")}${Constants.ZWSP}${selectIds}`,
+                protyle.wysiwyg.element.innerHTML);
         });
         this.element.addEventListener("dragend", () => {
-            if (window.siyuan.dragElement) {
-                window.siyuan.dragElement.removeAttribute("data-selected-ids");
-                window.siyuan.dragElement.style.opacity = "";
-                window.siyuan.dragElement = undefined;
-            }
+            this.element.querySelectorAll("button").forEach((item) => {
+                item.style.opacity = "";
+            });
+            window.siyuan.dragElement = undefined;
         });
         this.element.addEventListener("click", (event: MouseEvent & { target: HTMLInputElement }) => {
             const buttonElement = hasClosestByTag(event.target, "BUTTON");
@@ -677,7 +676,16 @@ export class Gutter {
         this.genWidths(selectsElement, protyle);
         window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
         window.siyuan.menus.menu.append(new MenuItem({
-            label: window.siyuan.languages.riffCard,
+            label: window.siyuan.languages.quickMakeCard,
+            accelerator: window.siyuan.config.keymap.editor.general.quickMakeCard.custom,
+            iconHTML: "<svg class=\"b3-menu__icon\" style=\"color:var(--b3-theme-primary)\"><use xlink:href=\"#iconRiffCard\"></use></svg>",
+            icon: "iconRiffCard",
+            click() {
+                quickMakeCard(selectsElement);
+            }
+        }).element);
+        window.siyuan.menus.menu.append(new MenuItem({
+            label: window.siyuan.languages.addToDeck,
             icon: "iconRiffCard",
             click() {
                 makeCard(selectsElement);
@@ -737,7 +745,7 @@ export class Gutter {
             click() {
                 window.sout.log("KMD 源码编辑");
                 const initTheme =
-                  window.siyuan.config.appearance.mode == 0 ? "vs" : "vs-dark";
+                  window.siyuan.config.appearance.mode === 0 ? "vs" : "vs-dark";
                 MDDialog({
                   id: "app5",
                   nodeID: id,
@@ -1417,7 +1425,7 @@ export class Gutter {
                 }
             }).element);
             const countElement = nodeElement.lastElementChild.querySelector(".protyle-attr--refcount");
-            if (countElement && countElement.textContent) {
+            if (countElement?.textContent) {
                 transferBlockRef(id);
             }
         }
@@ -1482,7 +1490,16 @@ export class Gutter {
         }
         if (type !== "NodeThematicBreak") {
             window.siyuan.menus.menu.append(new MenuItem({
-                label: window.siyuan.languages.riffCard,
+                label: window.siyuan.languages.quickMakeCard,
+                accelerator: window.siyuan.config.keymap.editor.general.quickMakeCard.custom,
+                iconHTML: "<svg class=\"b3-menu__icon\" style=\"color:var(--b3-theme-primary)\"><use xlink:href=\"#iconRiffCard\"></use></svg>",
+                icon: "iconRiffCard",
+                click() {
+                    quickMakeCard([nodeElement]);
+                }
+            }).element);
+            window.siyuan.menus.menu.append(new MenuItem({
+                label: window.siyuan.languages.addToDeck,
                 icon: "iconRiffCard",
                 click() {
                     makeCard([nodeElement]);
@@ -1864,7 +1881,7 @@ export class Gutter {
                 if (type === "NodeBlockquote") {
                     space += 8;
                 }
-                if (nodeElement.previousElementSibling && nodeElement.previousElementSibling.getAttribute("data-node-id")) {
+                if (nodeElement.previousElementSibling?.getAttribute("data-node-id")) {
                     // 前一个块存在时，只显示到当前层级，但需显示折叠块的块标
                     // https://github.com/siyuan-note/siyuan/issues/2562 https://github.com/siyuan-note/siyuan/issues/2809
                     hideParent = true;

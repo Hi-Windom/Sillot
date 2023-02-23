@@ -27,8 +27,6 @@ import (
 )
 
 func ListItem2Doc(srcListItemID, targetBoxID, targetPath string) (srcRootBlockID, newTargetPath string, err error) {
-	WaitForWritingFiles()
-
 	srcTree, _ := loadTreeByBlockID(srcListItemID)
 	if nil == srcTree {
 		err = ErrBlockNotFound
@@ -98,6 +96,7 @@ func ListItem2Doc(srcListItemID, targetBoxID, targetPath string) (srcRootBlockID
 	if nil == srcTree.Root.FirstChild {
 		srcTree.Root.AppendChild(treenode.NewParagraph())
 	}
+	treenode.RemoveBlockTreesByRootID(srcTree.ID)
 	if err = indexWriteJSONQueue(srcTree); nil != err {
 		return "", "", err
 	}

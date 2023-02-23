@@ -104,8 +104,6 @@ func (tx *Transaction) doUnfoldHeading(operation *Operation) (ret *TxErr) {
 }
 
 func Doc2Heading(srcID, targetID string, after bool) (srcTreeBox, srcTreePath string, err error) {
-	WaitForWritingFiles()
-
 	srcTree, _ := loadTreeByBlockID(srcID)
 	if nil == srcTree {
 		err = ErrBlockNotFound
@@ -224,8 +222,22 @@ func Doc2Heading(srcID, targetID string, after bool) (srcTreeBox, srcTreePath st
 		contentPivot.Unlink()
 	}
 
+	box := Conf.Box(srcTree.Box)
+	if removeErr := box.Remove(srcTree.Path); nil != removeErr {
+		logging.LogWarnf("remove tree [%s] failed: %s", srcTree.Path, removeErr)
+	}
+	box.removeSort([]string{srcTree.ID})
+	RemoveRecentDoc([]string{srcTree.ID})
+	evt := util.NewCmdResult("removeDoc", 0, util.PushModeBroadcast)
+	evt.Data = map[string]interface{}{
+		"ids": []string{srcTree.ID},
+	}
+	util.PushEvent(evt)
+
 	srcTreeBox, srcTreePath = srcTree.Box, srcTree.Path // 返回旧的文档块位置，前端后续会删除旧的文档块
 	targetTree.Root.SetIALAttr("updated", util.CurrentTimeSecondsStr())
+	treenode.RemoveBlockTreesByRootID(srcTree.ID)
+	treenode.RemoveBlockTreesByRootID(targetTree.ID)
 	err = indexWriteJSONQueue(targetTree)
 	IncSync()
 	RefreshBacklink(srcTree.ID)
@@ -234,8 +246,6 @@ func Doc2Heading(srcID, targetID string, after bool) (srcTreeBox, srcTreePath st
 }
 
 func Heading2Doc(srcHeadingID, targetBoxID, targetPath string) (srcRootBlockID, newTargetPath string, err error) {
-	WaitForWritingFiles()
-
 	srcTree, _ := loadTreeByBlockID(srcHeadingID)
 	if nil == srcTree {
 		err = ErrBlockNotFound
@@ -319,6 +329,7 @@ func Heading2Doc(srcHeadingID, targetBoxID, targetPath string) (srcRootBlockID, 
 	if nil == srcTree.Root.FirstChild {
 		srcTree.Root.AppendChild(treenode.NewParagraph())
 	}
+	treenode.RemoveBlockTreesByRootID(srcTree.ID)
 	if err = indexWriteJSONQueue(srcTree); nil != err {
 		return "", "", err
 	}

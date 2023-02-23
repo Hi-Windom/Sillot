@@ -92,7 +92,7 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly TIMEOUT_BLOCKLOAD = 300;
     public static readonly TIMEOUT_TRANSITION = 150;
 
-    // help path
+    // id
     public static readonly HELP_PATH = {
         zh_CN: "20210808180117-czj9bvb",
         zh_CHT: "20210808180117-czj9bvb",
@@ -100,6 +100,8 @@ export abstract class Constants extends SConst { // Sillot extend
         en_US: "20210808180117-6v0mkxr",
         fr_FR: "20210808180117-6v0mkxr",
     };
+
+    public static readonly QUICK_DECK_ID = "20230218211946-2kw8jgx";
 
     public static readonly KEYCODE: { [key: string]: string[] } = {
         "186": [";", ":"],
@@ -116,7 +118,8 @@ export abstract class Constants extends SConst { // Sillot extend
     };
     // 冲突不使用 "⌘S/Q"
     // "⌘", "⇧", "⌥", "⌃"
-    // "⌘A", "⌘X", "⌘C", "⌘V", "⇧⌘V", "⌘/", "⇧↑", "⇧↓", "⇧→", "⇧←", "⇧⇥", "⇧⌘⇥", "⌃⇥", "⌘⇥", "⌃⌘⇥", "⇧⌘→", "⇧⌘←", "⌘Home", "⌘End", "⇧↩", "↩", "PageUp", "PageDown", "⌫", "⌦" 不可自定义
+    // "⌘A", "⌘X", "⌘C", "⌘V", "⇧⌘V", "⌘/", "⇧↑", "⇧↓", "⇧→", "⇧←", "⇧⇥", "⇧⌘⇥", "⌃⇥", "⌘⇥", "⌃⌘⇥", "⇧⌘→", "⇧⌘←",
+    // "⌘Home", "⌘End", "⇧↩", "↩", "PageUp", "PageDown", "⌫", "⌦" 不可自定义
     public static readonly SIYUAN_KEYMAP: IKeymap = {
         general: {
             editMode: {default: "⇧⌘G", custom: "⇧⌘G"},
@@ -167,6 +170,7 @@ export abstract class Constants extends SConst { // Sillot extend
                 openBy: {default: "⌥,", custom: "⌥,"},
                 insertRight: {default: "⌥.", custom: "⌥."},
                 attr: {default: "⌥⌘A", custom: "⌥⌘A"},
+                quickMakeCard: {default: "⌥⌘F", custom: "⌥⌘F"},
                 refresh: {default: "F5", custom: "F5"},
                 copyBlockRef: {default: "⇧⌘C", custom: "⇧⌘C"},
                 copyProtocol: {default: "⇧⌘H", custom: "⇧⌘H"},
@@ -254,20 +258,6 @@ export abstract class Constants extends SConst { // Sillot extend
             "instance": "Layout",
             "children": [{
                 "direction": "lr",
-                "size": "0px",
-                "type": "top",
-                "instance": "Layout",
-                "children": [{
-                    "instance": "Wnd",
-                    "children": []
-                }, {
-                    "instance": "Wnd",
-                    "resize": "lr",
-                    "children": []
-                }]
-            }, {
-                "direction": "lr",
-                "resize": "tb",
                 "size": "auto",
                 "type": "normal",
                 "instance": "Layout",
@@ -322,10 +312,6 @@ export abstract class Constants extends SConst { // Sillot extend
                 }]
             }]
         },
-        top: {
-            pin: true,
-            data: []
-        },
         bottom: {
             pin: true,
             data: []
@@ -335,31 +321,31 @@ export abstract class Constants extends SConst { // Sillot extend
             data: [
                 [{
                     type: "file",
-                    size: {width: 220, height: 0},
+                    size: {width: 227, height: 0},
                     show: true,
                     icon: "iconFiles",
                     hotkeyLangId: "fileTree",
                 }, {
                     type: "outline",
-                    size: {width: 220, height: 0},
+                    size: {width: 227, height: 0},
                     show: false,
                     icon: "iconAlignCenter",
                     hotkeyLangId: "outline",
                 }, {
                     type: "inbox",
-                    size: {width: 252, height: 0},
+                    size: {width: 320, height: 0},
                     show: false,
                     icon: "iconInbox",
                     hotkeyLangId: "inbox",
                 }], [{
                     type: "bookmark",
-                    size: {width: 220, height: 0},
+                    size: {width: 227, height: 0},
                     show: false,
                     icon: "iconBookmark",
                     hotkeyLangId: "bookmark",
                 }, {
                     type: "tag",
-                    size: {width: 220, height: 0},
+                    size: {width: 227, height: 0},
                     show: false,
                     icon: "iconTags",
                     hotkeyLangId: "tag",

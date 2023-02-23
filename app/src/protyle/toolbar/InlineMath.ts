@@ -3,7 +3,7 @@ import {hasClosestBlock, hasClosestByAttribute} from "../util/hasClosest";
 import {hasNextSibling, hasPreviousSibling} from "../wysiwyg/getBlock";
 
 export class InlineMath extends ToolbarItem {
-    public element: HTMLElement;
+    declare public element: HTMLElement;
 
     constructor(protyle: IProtyle, menuItem: IMenuItem) {
         super(protyle, menuItem);
@@ -29,7 +29,7 @@ export class InlineMath extends ToolbarItem {
                 // https://github.com/siyuan-note/siyuan/issues/6007
                 range.cloneContents().childNodes.forEach((item: HTMLElement) => {
                     if ((item.nodeType !== 3 && item.getAttribute("data-type").indexOf("inline-math") > -1) ||
-                        (item.nodeType == 3 && item.textContent === "")) {
+                        (item.nodeType === 3 && item.textContent === "")) {
                         // 是否仅选中数学公式
                         hasMath = true;
                     } else {

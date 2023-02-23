@@ -17,9 +17,9 @@ import {Asset} from "../asset";
 import {Search} from "../search";
 import {Dock} from "./dock";
 import {focusByRange} from "../protyle/util/selection";
-import {hideElements} from "../protyle/ui/hideElements";
+import {hideAllElements, hideElements} from "../protyle/ui/hideElements";
 import {fetchPost} from "../util/fetch";
-import {hasClosestBlock} from "../protyle/util/hasClosest";
+import {hasClosestBlock, hasClosestByClassName} from "../protyle/util/hasClosest";
 import {getContenteditableElement} from "../protyle/wysiwyg/getBlock";
 import {Constants} from "../constants";
 import {openSearch} from "../search/spread";
@@ -74,9 +74,6 @@ export const getDockByType = (type: TDockType) => {
     }
     if (window.siyuan.layout.bottomDock.data[type]) {
         return window.siyuan.layout.bottomDock;
-    }
-    if (window.siyuan.layout.topDock.data[type]) {
-        return window.siyuan.layout.topDock;
     }
 };
 
@@ -155,7 +152,6 @@ export const exportLayout = (reload: boolean, cb?: () => void) => {
     const layoutJSON: any = {
         hideDock: useElement.getAttribute("xlink:href") === "#iconDock",
         layout: {},
-        top: dockToJSON(window.siyuan.layout.topDock),
         bottom: dockToJSON(window.siyuan.layout.bottomDock),
         left: dockToJSON(window.siyuan.layout.leftDock),
         right: dockToJSON(window.siyuan.layout.rightDock),
@@ -171,8 +167,7 @@ export const exportLayout = (reload: boolean, cb?: () => void) => {
 };
 
 const JSONToDock = (json: any) => {
-    window.siyuan.layout.centerLayout = window.siyuan.layout.layout.children[1].children[1] as Layout;
-    window.siyuan.layout.topDock = new Dock({position: "Top", data: json.top});
+    window.siyuan.layout.centerLayout = window.siyuan.layout.layout.children[0].children[1] as Layout;
     window.siyuan.layout.leftDock = new Dock({position: "Left", data: json.left});
     window.siyuan.layout.rightDock = new Dock({position: "Right", data: json.right});
     window.siyuan.layout.bottomDock = new Dock({position: "Bottom", data: json.bottom});
@@ -407,9 +402,9 @@ export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any) => {
 
     if (layout instanceof Layout || layout instanceof Wnd) {
         if (layout instanceof Layout &&
-            (layout.type === "top" || layout.type === "bottom" || layout.type === "left" || layout.type === "right")) {
+            (layout.type === "bottom" || layout.type === "left" || layout.type === "right")) {
             // 四周布局使用默认值，清空内容，重置时使用 dock 数据
-            if (layout.type === "top" || layout.type === "bottom") {
+            if (layout.type === "bottom") {
                 json.children = [{
                     "instance": "Wnd",
                     "children": []
@@ -473,7 +468,7 @@ export const resizeTabs = () => {
     resizeTimeout = window.setTimeout(() => {
         const models = getAllModels();
         models.editor.forEach((item) => {
-            if (item.editor && item.editor.protyle && item.element.parentElement) {
+            if (item.editor?.protyle && item.element.parentElement) {
                 hideElements(["gutter"], item.editor.protyle);
                 setPadding(item.editor.protyle);
                 if (typeof echarts !== "undefined") {
@@ -486,8 +481,17 @@ export const resizeTabs = () => {
                 }
                 // 保持光标位置不变 https://ld246.com/article/1673704873983/comment/1673765814595#comments
                 if (!item.element.classList.contains("fn__none") && item.editor.protyle.toolbar.range) {
+                    let rangeRect = item.editor.protyle.toolbar.range.getBoundingClientRect();
+                    if (rangeRect.height === 0) {
+                        const blockElement = hasClosestBlock(item.editor.protyle.toolbar.range.startContainer);
+                        if (blockElement) {
+                            rangeRect = blockElement.getBoundingClientRect();
+                        }
+                    }
+                    if (rangeRect.height === 0) {
+                        return;
+                    }
                     const protyleRect = item.editor.protyle.element.getBoundingClientRect();
-                    const rangeRect = item.editor.protyle.toolbar.range.getBoundingClientRect();
                     if (protyleRect.top + 30 > rangeRect.top || protyleRect.bottom < rangeRect.bottom) {
                         item.editor.protyle.toolbar.range.startContainer.parentElement.scrollIntoView(protyleRect.top > rangeRect.top);
                     }
@@ -505,10 +509,7 @@ export const resizeTabs = () => {
             });
         });
         pdfResize();
-        document.querySelectorAll(".protyle-gutters").forEach(item => {
-            item.classList.add("fn__none");
-            item.innerHTML = "";
-        });
+        hideAllElements(["gutter"]);
     }, 200);
 };
 
@@ -599,8 +600,22 @@ export const getInstanceById = (id: string, layout = window.siyuan.layout.center
 
 export const addResize = (obj: Layout | Wnd) => {
     if (!obj.resize) {
-        return
+        return;
     }
+
+    const getMinSize = (element: HTMLElement) => {
+        let minSize = 227;
+        Array.from(element.querySelectorAll(".file-tree")).find((item) => {
+            if (item.classList.contains("sy__backlink") || item.classList.contains("sy__graph")
+                || item.classList.contains("sy__globalGraph") || item.classList.contains("sy__inbox")) {
+                if (!item.classList.contains("fn__none") && !hasClosestByClassName(item, "fn__none")) {
+                    minSize = 320;
+                    return true;
+                }
+            }
+        });
+        return minSize;
+    };
     const resizeWnd = (resizeElement: HTMLElement, direction: string) => {
         const setSize = (item: HTMLElement, direction: string) => {
             if (item.classList.contains("fn__flex-1")) {
@@ -616,7 +631,7 @@ export const addResize = (obj: Layout | Wnd) => {
         let range: Range;
         resizeElement.addEventListener("mousedown", (event: MouseEvent) => {
             getAllModels().editor.forEach((item) => {
-                if (item.editor && item.editor.protyle && item.element.parentElement) {
+                if (item.editor?.protyle && item.element.parentElement) {
                     hideElements(["gutter"], item.editor.protyle);
                 }
             });
@@ -629,14 +644,9 @@ export const addResize = (obj: Layout | Wnd) => {
             const previousElement = resizeElement.previousElementSibling as HTMLElement;
             nextElement.style.overflow = "auto"; // 拖动时 layout__resize 会出现 https://github.com/siyuan-note/siyuan/issues/6221
             previousElement.style.overflow = "auto";
-            if (!nextElement.nextElementSibling) {
-                if (!previousElement.previousElementSibling) {
-                    setSize(previousElement, direction);
-                } else {
-                    setSize(nextElement, direction);
-                }
-            } else if (nextElement.nextElementSibling?.nextElementSibling &&
-                nextElement.parentElement.lastElementChild.isSameNode(nextElement.nextElementSibling.nextElementSibling)) {
+            if (!nextElement.nextElementSibling || nextElement.nextElementSibling.classList.contains("layout__dockresize")) {
+                setSize(nextElement, direction);
+            } else {
                 setSize(previousElement, direction);
             }
             const x = event[direction === "lr" ? "clientX" : "clientY"];
@@ -661,10 +671,16 @@ export const addResize = (obj: Layout | Wnd) => {
                 if (previousNowSize < 8 || nextNowSize < 8) {
                     return;
                 }
-                if (window.siyuan.layout.leftDock?.layout.element.contains(previousElement) && previousNowSize < 220) {
+                if (window.siyuan.layout.leftDock?.layout.element.isSameNode(previousElement) &&
+                    previousNowSize < getMinSize(previousElement)) {
                     return;
                 }
-                if (window.siyuan.layout.rightDock?.layout.element.contains(nextElement) && nextNowSize < 320) {
+                if (window.siyuan.layout.rightDock?.layout.element.isSameNode(nextElement) &&
+                    nextNowSize < getMinSize(nextElement)) {
+                    return;
+                }
+                if (window.siyuan.layout.bottomDock?.layout.element.isSameNode(nextElement) &&
+                    nextNowSize < 64) {
                     return;
                 }
                 if (!previousElement.classList.contains("fn__flex-1")) {
@@ -684,7 +700,6 @@ export const addResize = (obj: Layout | Wnd) => {
                 resizeTabs();
                 if (!isWindow()) {
                     window.siyuan.layout.leftDock.setSize();
-                    window.siyuan.layout.topDock.setSize();
                     window.siyuan.layout.bottomDock.setSize();
                     window.siyuan.layout.rightDock.setSize();
                 }

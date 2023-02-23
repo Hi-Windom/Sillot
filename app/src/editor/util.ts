@@ -76,7 +76,7 @@ const openFile = (options: IOpenFileOptions) => {
     // 文档已打开
     if (options.assetPath) {
         const asset = allModels.asset.find((item) => {
-            if (item.path == options.assetPath) {
+            if (item.path === options.assetPath) {
                 item.parent.parent.switchTab(item.parent.headElement);
                 item.parent.parent.showHeading();
                 item.goToPage(options.page);
@@ -165,7 +165,7 @@ const openFile = (options: IOpenFileOptions) => {
             let unUpdateTab: Tab;
             // 不能 reverse, 找到也不能提前退出循环，否则 https://github.com/siyuan-note/siyuan/issues/3271
             wnd.children.find((item) => {
-                if (item.headElement && item.headElement.classList.contains("item--unupdate") && !item.headElement.classList.contains("item--pin")) {
+                if (item.headElement?.classList.contains("item--unupdate") && !item.headElement.classList.contains("item--pin")) {
                     unUpdateTab = item;
                     if (item.headElement.classList.contains("item--focus")) {
                         // https://ld246.com/article/1658979494658
@@ -236,7 +236,7 @@ const switchEditor = (editor: Editor, options: IOpenFileOptions, allModels: IMod
     if ((!nodeElement || nodeElement?.clientHeight === 0) && options.id !== options.rootID) {
         fetchPost("/api/filetree/getDoc", {
             id: options.id,
-            mode: (options.action && options.action.includes(Constants.CB_GET_CONTEXT)) ? 3 : 0,
+            mode: (options.action?.includes(Constants.CB_GET_CONTEXT)) ? 3 : 0,
             size: window.siyuan.config.editor.dynamicLoadBlocks,
         }, getResponse => {
             onGet(getResponse, editor.editor.protyle, options.action);
@@ -322,7 +322,7 @@ const newTab = (options: IOpenFileOptions) => {
 
 export const updatePanelByEditor = (protyle?: IProtyle, focus = true, pushBackStack = false, reload = false) => {
     let title = window.siyuan.languages.siyuanNote;
-    if (protyle && protyle.path) {
+    if (protyle?.path) {
         // https://ld246.com/article/1637636106054/comment/1641485541929#comments
         if (protyle.element.classList.contains("fn__none") ||
             (!hasClosestByClassName(protyle.element, "layout__wnd--active") &&
@@ -384,7 +384,7 @@ const updateOutline = (models: IModels, protyle: IProtyle, reload = false) => {
     models.outline.find(item => {
         if (reload || (item.type === "pin" && (!protyle || item.blockId !== protyle.block?.rootID))) {
             let blockId = "";
-            if (protyle && protyle.block) {
+            if (protyle?.block) {
                 blockId = protyle.block.rootID;
             }
             if (blockId === item.blockId && !reload) {
@@ -426,7 +426,7 @@ const updateOutline = (models: IModels, protyle: IProtyle, reload = false) => {
 
 export const updateBacklinkGraph = (models: IModels, protyle: IProtyle) => {
     // https://ld246.com/article/1637636106054/comment/1641485541929#comments
-    if (protyle && protyle.element.classList.contains("fn__none") ||
+    if (protyle?.element.classList.contains("fn__none") ||
         (protyle && !hasClosestByClassName(protyle.element, "layout__wnd--active") &&
             document.querySelector(".layout__wnd--active")  // https://github.com/siyuan-note/siyuan/issues/4414
         )
@@ -439,7 +439,7 @@ export const updateBacklinkGraph = (models: IModels, protyle: IProtyle) => {
                 return;
             }
             let blockId = "";
-            if (protyle && protyle.block) {
+            if (protyle?.block) {
                 blockId = protyle.block.showAll ? protyle.block.id : protyle.block.parentID;
             }
             if (blockId === item.blockId) {
@@ -453,7 +453,7 @@ export const updateBacklinkGraph = (models: IModels, protyle: IProtyle) => {
             return;
         }
         let blockId = "";
-        if (protyle && protyle.block) {
+        if (protyle?.block) {
             blockId = protyle.block.showAll ? protyle.block.id : protyle.block.parentID;
         }
         if (blockId === item.blockId) {

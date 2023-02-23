@@ -102,7 +102,8 @@ function InstagramPost() {
         >
           {[...Array(5)].map((_, index) => (
             <Box
-              key={index}
+              // rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+key={index}
               sx={{
                 borderRadius: "50%",
                 width: `max(${6 - index}px, 3px)`,

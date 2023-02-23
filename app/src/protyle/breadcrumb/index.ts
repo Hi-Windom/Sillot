@@ -180,7 +180,7 @@ export class Breadcrumb {
                 window.siyuan.menus.menu.append(uploadMenu);
                 if (window.siyuan.config.system.container !== "android" || !window.JSAndroid) {
                     window.siyuan.menus.menu.append(new MenuItem({
-                        current: this.mediaRecorder && this.mediaRecorder.isRecording,
+                        current: this.mediaRecorder?.isRecording,
                         icon: "iconRecord",
                         label: this.mediaRecorder?.isRecording ? window.siyuan.languages.endRecord : window.siyuan.languages.startRecord,
                         click: async () => {
@@ -286,7 +286,7 @@ export class Breadcrumb {
                         }
                     }
                 }).element);
-                if (!needSubscribe("")) {
+                if (window.siyuan.user) { // 登录链滴账号后即可使用 `分享到链滴` https://github.com/siyuan-note/siyuan/issues/7392
                     window.siyuan.menus.menu.append(new MenuItem({
                         label: window.siyuan.languages.share2Liandi,
                         icon: "iconLiandi",
@@ -409,7 +409,7 @@ export class Breadcrumb {
         }
         this.id = id;
         const excludeTypes: string[] = [];
-        if (this.element.parentElement?.parentElement && this.element.parentElement.parentElement.classList.contains("b3-dialog__cardblock")) {
+        if (this.element.parentElement.parentElement?.classList.contains("b3-dialog__cardblock")) {
             // 闪卡面包屑不能显示答案
             excludeTypes.push("NodeTextMark-mark");
         }
@@ -423,11 +423,11 @@ export class Breadcrumb {
                     isCurrent = true;
                 }
                 if (index === 0 && !protyle.options.render.breadcrumbDocName) {
-                    html += `<span class="protyle-breadcrumb__item${isCurrent ? " protyle-breadcrumb__item--active" : ""}" data-node-id="${item.id}">
+                    html += `<span class="protyle-breadcrumb__item${isCurrent ? " protyle-breadcrumb__item--active" : ""}" data-node-id="${item.id}"${response.data.length === 1 ? ' style="max-width:none"' : ""}>
     <svg class="popover__block" data-id="${item.id}"><use xlink:href="#${getIconByType(item.type, item.subType)}"></use></svg>
 </span>`;
                 } else {
-                    html += `<span class="protyle-breadcrumb__item${isCurrent ? " protyle-breadcrumb__item--active" : ""}" data-node-id="${item.id}">
+                    html += `<span class="protyle-breadcrumb__item${isCurrent ? " protyle-breadcrumb__item--active" : ""}" data-node-id="${item.id}"${response.data.length === 1 ? ' style="max-width:none"' : ""}>
     <svg class="popover__block" data-id="${item.id}"><use xlink:href="#${getIconByType(item.type, item.subType)}"></use></svg>
     <span class="protyle-breadcrumb__text" title="${item.name}">${item.name}</span>
 </span>`;

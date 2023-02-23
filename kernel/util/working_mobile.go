@@ -42,7 +42,7 @@ func BootMobile(container, appDir, workspaceBaseDir, lang string) {
 
 	WorkingDir = filepath.Join(appDir, "app")
 	HomeDir = filepath.Join(workspaceBaseDir, "home")
-	userHomeConfDir := filepath.Join(HomeDir, ".config", "siyuan")
+	userHomeConfDir := filepath.Join(HomeDir, ".config", "sillot")
 	if !gulu.File.IsExist(userHomeConfDir) {
 		if err := os.MkdirAll(userHomeConfDir, 0755); nil != err && !os.IsExist(err) {
 			log.Printf("create user home conf folder [%s] failed: %s", userHomeConfDir, err)
@@ -51,7 +51,7 @@ func BootMobile(container, appDir, workspaceBaseDir, lang string) {
 
 	}
 
-	defaultWorkspaceDir := filepath.Join(workspaceBaseDir, "siyuan")
+	defaultWorkspaceDir := filepath.Join(workspaceBaseDir, "sillot")
 	if err := os.MkdirAll(defaultWorkspaceDir, 0755); nil != err && !os.IsExist(err) {
 		log.Printf("create default workspace folder [%s] failed: %s", defaultWorkspaceDir, err)
 		os.Exit(ExitCodeCreateWorkspaceDirErr)
@@ -94,7 +94,7 @@ func initWorkspaceDirMobile(workspaceBaseDir string) {
 					}
 
 					from := filepath.Join(workspaceBaseDir, entry.Name())
-					to := filepath.Join(workspaceBaseDir, "siyuan", entry.Name())
+					to := filepath.Join(workspaceBaseDir, "sillot", entry.Name())
 					if err = os.Rename(from, to); nil != err {
 						log.Printf("move workspace dir [%s] failed: %s", workspaceBaseDir, err)
 					} else {
@@ -108,9 +108,9 @@ func initWorkspaceDirMobile(workspaceBaseDir string) {
 		}
 	}
 
-	userHomeConfDir := filepath.Join(HomeDir, ".config", "siyuan")
+	userHomeConfDir := filepath.Join(HomeDir, ".config", "sillot")
 	workspaceConf := filepath.Join(userHomeConfDir, "workspace.json")
-	defaultWorkspaceDir := filepath.Join(workspaceBaseDir, "siyuan")
+	defaultWorkspaceDir := filepath.Join(workspaceBaseDir, "sillot")
 
 	var workspacePaths []string
 	if !gulu.File.IsExist(workspaceConf) {

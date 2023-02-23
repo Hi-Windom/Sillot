@@ -48,13 +48,13 @@ const initToolbarSearch = () => {
     inputElement.focus();
     inputElement.value = window.siyuan.storage[Constants.LOCAL_SEARCHEKEY];
     inputElement.addEventListener("compositionend", (event: InputEvent) => {
-        if (event && event.isComposing) {
+        if (event?.isComposing) {
             return;
         }
         toolbarSearchEvent();
     });
     inputElement.addEventListener("input", (event: InputEvent) => {
-        if (event && event.isComposing) {
+        if (event?.isComposing) {
             return;
         }
         toolbarSearchEvent();

@@ -12,7 +12,7 @@ import {setStorageVal, writeText} from "../protyle/util/compatibility";
 import {openCard} from "../card/openCard";
 import {openSetting} from "../config";
 import {getAllDocks} from "../layout/getAll";
-import {getDockByType, resizeTabs} from "../layout/util";
+import {getDockByType} from "../layout/util";
 import {lockScreen} from "../dialog/processSystem";
 import {showMessage} from "../dialog/message";
 import {unicode2Emoji} from "../emoji";
@@ -24,28 +24,10 @@ const togglePinDock = (dock: Dock, icon: string) => {
         icon,
         current: !dock.pin,
         click() {
-            dock.pin = !dock.pin;
-            const hasActive = dock.element.querySelector(".dock__item--active");
-            if (!dock.pin) {
-                dock.resetDockPosition(hasActive ? true : false);
-                dock.resizeElement.classList.add("fn__none");
-                if (hasActive) {
-                    dock.showDock(true);
-                } else {
-                    dock.hideDock(true);
-                }
-            } else {
-                dock.layout.element.style.opacity = "";
-                dock.layout.element.style.transform = "";
-                if (hasActive) {
-                    dock.resizeElement.classList.remove("fn__none");
-                }
-            }
-            dock.layout.element.classList.toggle("layout--float");
-            resizeTabs();
+            dock.togglePin();
         }
-    }
-}
+    };
+};
 
 export const workspaceMenu = (rect: DOMRect) => {
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
@@ -82,7 +64,6 @@ export const workspaceMenu = (rect: DOMRect) => {
             dockMenu.push(togglePinDock(window.siyuan.layout.leftDock, "iconLeftTop"));
             dockMenu.push(togglePinDock(window.siyuan.layout.rightDock, "iconRightTop"));
             dockMenu.push(togglePinDock(window.siyuan.layout.bottomDock, "iconBottomLeft"));
-            dockMenu.push(togglePinDock(window.siyuan.layout.topDock, "iconTopLeft"));
         }
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.panels,

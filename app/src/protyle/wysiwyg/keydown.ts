@@ -10,7 +10,7 @@ import {
 } from "../util/selection";
 import {
     hasClosestBlock,
-    hasClosestByAttribute,
+    hasClosestByAttribute, hasClosestByClassName,
     hasClosestByMatchTag,
     hasTopClosestByAttribute
 } from "../util/hasClosest";
@@ -70,6 +70,7 @@ import {preventScroll} from "../scroll/preventScroll";
 import {getSavePath} from "../../util/newFile";
 import {escapeHtml} from "../../util/escape";
 import {insertHTML} from "../util/insertHTML";
+import {quickMakeCard} from "../../card/makeCard";
 
 export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
     editorElement.addEventListener("keydown", (event: KeyboardEvent & { target: HTMLElement }) => {
@@ -303,7 +304,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                 protyle, event, nodeElement, editorElement, range,
                 cb(selectElements) {
                     const previousElement = selectElements[0].previousElementSibling as HTMLElement;
-                    if (previousElement && previousElement.getAttribute("data-node-id")) {
+                    if (previousElement?.getAttribute("data-node-id")) {
                         previousElement.classList.add("protyle-wysiwyg--select");
                         selectElements.forEach(item => {
                             item.removeAttribute("select-end");
@@ -329,7 +330,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                 cb(selectElements) {
                     const selectLastElement = selectElements[selectElements.length - 1];
                     const nextElement = selectLastElement.nextElementSibling as HTMLElement;
-                    if (nextElement && nextElement.getAttribute("data-node-id")) {
+                    if (nextElement?.getAttribute("data-node-id")) {
                         nextElement.classList.add("protyle-wysiwyg--select");
                         selectElements.forEach(item => {
                             item.removeAttribute("select-end");
@@ -356,7 +357,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     const startEndElement = getStartEndElement(selectElements);
                     if (startEndElement.startElement.getBoundingClientRect().top >= startEndElement.endElement.getBoundingClientRect().top) {
                         const previousElement = startEndElement.endElement.previousElementSibling as HTMLElement;
-                        if (previousElement && previousElement.getAttribute("data-node-id")) {
+                        if (previousElement?.getAttribute("data-node-id")) {
                             previousElement.classList.add("protyle-wysiwyg--select");
                             previousElement.setAttribute("select-end", "true");
                             startEndElement.endElement.removeAttribute("select-end");
@@ -393,7 +394,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     const startEndElement = getStartEndElement(selectElements);
                     if (startEndElement.startElement.getBoundingClientRect().top <= startEndElement.endElement.getBoundingClientRect().top) {
                         const nextElement = startEndElement.endElement.nextElementSibling as HTMLElement;
-                        if (nextElement && nextElement.getAttribute("data-node-id")) {
+                        if (nextElement?.getAttribute("data-node-id")) {
                             nextElement.classList.add("protyle-wysiwyg--select");
                             nextElement.setAttribute("select-end", "true");
                             startEndElement.endElement.removeAttribute("select-end");
@@ -969,7 +970,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             }
             const actionElementId = actionElement.getAttribute("data-node-id");
             if (selectText !== "") {
-                writeText(`((${actionElementId} "${selectText}"))`);
+                writeText(`((${actionElementId} "${Lute.EscapeHTMLStr(selectText)}"))`);
             } else {
                 fetchPost("/api/block/getRefText", {id: actionElementId}, (response) => {
                     writeText(`((${actionElementId} '${response.data}'))`);
@@ -993,6 +994,19 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             return true;
         }
 
+        if (matchHotKey(window.siyuan.config.keymap.editor.general.quickMakeCard.custom, event)) {
+            const selectElement: Element[] = [];
+            if (!hasClosestByClassName(nodeElement, "protyle-wysiwyg--select")) {
+                nodeElement.classList.add("protyle-wysiwyg--select");
+            }
+            protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select").forEach(item => {
+                selectElement.push(item);
+            });
+            quickMakeCard(selectElement);
+            event.preventDefault();
+            event.stopPropagation();
+            return true;
+        }
         if (matchHotKey(window.siyuan.config.keymap.editor.general.attr.custom, event)) {
             const topElement = getTopAloneElement(nodeElement);
             if (selectText === "") {

@@ -103,7 +103,7 @@ const removeLi = (protyle: IProtyle, blockElement: Element, range: Range) => {
 
     // 列表项合并到前一个列表项的最后一个块末尾
     const listItemElement = blockElement.parentElement;
-    if (listItemElement.previousElementSibling && listItemElement.previousElementSibling.classList.contains("protyle-breadcrumb__bar")) {
+    if (listItemElement.previousElementSibling?.classList.contains("protyle-breadcrumb__bar")) {
         return;
     }
     const listItemId = listItemElement.getAttribute("data-node-id");
@@ -357,7 +357,7 @@ export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Ran
         return;
     }
 
-    if (blockElement.previousElementSibling && blockElement.previousElementSibling.classList.contains("protyle-breadcrumb__bar")) {
+    if (blockElement.previousElementSibling?.classList.contains("protyle-breadcrumb__bar")) {
         return;
     }
 

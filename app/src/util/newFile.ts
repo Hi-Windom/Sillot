@@ -76,7 +76,7 @@ export const newFile = (notebookId?: string, currentPath?: string, paths?: strin
             } else {
                 fetchPost("/api/filetree/getHPathByPath", {
                     notebook: notebookId,
-                    path: currentPath.endsWith(".sy") ? currentPath : currentPath + ".sy"
+                    path: currentPath.endsWith(".sy") ? currentPath : `${currentPath}.sy`
                 }, (responseHPath) => {
                     fetchPost("/api/filetree/createDocWithMd", {
                         notebook: notebookId,
@@ -96,7 +96,7 @@ export const newFile = (notebookId?: string, currentPath?: string, paths?: strin
                 return;
             }
             const id = Lute.NewNodeID();
-            const newPath = pathPosix().join(getDisplayName(currentPath, false, true), id + ".sy");
+            const newPath = pathPosix().join(getDisplayName(currentPath, false, true), `${id}.sy`);
             if (paths) {
                 paths[paths.indexOf(undefined)] = newPath;
             }

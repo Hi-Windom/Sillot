@@ -41,7 +41,7 @@ var (
 
 type dbQueueOperation struct {
 	inQueueTime time.Time
-	action      string // upsert/delete/delete_id/rename/delete_box/delete_box_refs/insert_refs/index/delete_ids/update_block_content/delete_assets
+	action      string // upsert/delete/delete_id/rename/rename_sub_tree/delete_box/delete_box_refs/insert_refs/index/delete_ids/update_block_content/delete_assets
 
 	indexPath                     string      // index
 	upsertTree                    *parse.Tree // upsert/insert_refs
@@ -49,8 +49,7 @@ type dbQueueOperation struct {
 	removeTreeIDBox, removeTreeID string      // delete_id
 	removeTreeIDs                 []string    // delete_ids
 	box                           string      // delete_box/delete_box_refs/index
-	renameTree                    *parse.Tree // rename
-	renameTreeOldHPath            string      // rename
+	renameTree                    *parse.Tree // rename/rename_sub_tree
 	block                         *Block      // update_block_content
 	removeAssetHashes             []string    // delete_assets
 }
@@ -110,6 +109,12 @@ func FlushQueue() {
 		defer enableCache()
 	}
 
+	groupOpsTotal := map[string]int{}
+	for _, op := range ops {
+		groupOpsTotal[op.action]++
+	}
+
+	groupOpsCurrent := map[string]int{}
 	for i, op := range ops {
 		if util.IsExiting {
 			return
@@ -120,8 +125,9 @@ func FlushQueue() {
 			return
 		}
 
-		context["current"] = i
-		context["total"] = total
+		groupOpsCurrent[op.action]++
+		context["current"] = groupOpsCurrent[op.action]
+		context["total"] = groupOpsTotal[op.action]
 		if err = execOp(op, tx, context); nil != err {
 			tx.Rollback()
 			logging.LogErrorf("queue operation failed: %s", err)
@@ -161,11 +167,13 @@ func execOp(op *dbQueueOperation, tx *sql.Tx, context map[string]interface{}) (e
 	case "delete_ids":
 		err = batchDeleteByRootIDs(tx, op.removeTreeIDs, context)
 	case "rename":
-		err = batchUpdateHPath(tx, op.renameTree.Box, op.renameTree.ID, op.renameTreeOldHPath, op.renameTree.HPath)
+		err = batchUpdateHPath(tx, op.renameTree.Box, op.renameTree.ID, op.renameTree.HPath, context)
 		if nil != err {
 			break
 		}
 		err = updateRootContent(tx, path.Base(op.renameTree.HPath), op.renameTree.Root.IALAttr("updated"), op.renameTree.ID)
+	case "rename_sub_tree":
+		err = batchUpdateHPath(tx, op.renameTree.Box, op.renameTree.ID, op.renameTree.HPath, context)
 	case "delete_box":
 		err = deleteByBoxTx(tx, op.box)
 	case "delete_box_refs":
@@ -296,17 +304,35 @@ func UpsertTreeQueue(tree *parse.Tree) {
 	operationQueue = append(operationQueue, newOp)
 }
 
-func RenameTreeQueue(tree *parse.Tree, oldHPath string) {
+func RenameTreeQueue(tree *parse.Tree) {
 	dbQueueLock.Lock()
 	defer dbQueueLock.Unlock()
 
 	newOp := &dbQueueOperation{
-		renameTree:         tree,
-		renameTreeOldHPath: oldHPath,
-		inQueueTime:        time.Now(),
-		action:             "rename"}
+		renameTree:  tree,
+		inQueueTime: time.Now(),
+		action:      "rename",
+	}
 	for i, op := range operationQueue {
 		if "rename" == op.action && op.renameTree.ID == tree.ID { // 相同树则覆盖
+			operationQueue[i] = newOp
+			return
+		}
+	}
+	operationQueue = append(operationQueue, newOp)
+}
+
+func RenameSubTreeQueue(tree *parse.Tree) {
+	dbQueueLock.Lock()
+	defer dbQueueLock.Unlock()
+
+	newOp := &dbQueueOperation{
+		renameTree:  tree,
+		inQueueTime: time.Now(),
+		action:      "rename_sub_tree",
+	}
+	for i, op := range operationQueue {
+		if "rename_sub_tree" == op.action && op.renameTree.ID == tree.ID { // 相同树则覆盖
 			operationQueue[i] = newOp
 			return
 		}

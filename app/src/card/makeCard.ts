@@ -6,16 +6,13 @@ import {hideMessage, showMessage} from "../dialog/message";
 import {confirmDialog} from "../dialog/confirmDialog";
 import {hideElements} from "../protyle/ui/hideElements";
 import {viewCards} from "./viewCards";
+import {Constants} from "../constants";
 
-export const genCardItem = (item: ICard) => {
-    return `<li data-id="${item.id}" class="b3-list-item b3-list-item--narrow${isMobile() ? "" : " b3-list-item--hide-action"}">
-<span class="b3-list-item__text">${item.name}</span>
-<span class="counter b3-tooltips b3-tooltips__w${isMobile() ? "" : " fn__none"}" aria-label="${window.siyuan.languages.riffCard}">${item.size}</span>
-<span data-type="add" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.addDeck}">
-    <svg><use xlink:href="#iconAdd"></use></svg>
-</span>
-<span data-type="remove" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.removeDeck}">
-    <svg><use xlink:href="#iconMin"></use></svg>
+export const genCardItem = (item: ICardPackage) => {
+    return `<li data-id="${item.id}" data-name="${item.name}" class="b3-list-item b3-list-item--narrow${isMobile() ? "" : " b3-list-item--hide-action"}">
+<span class="b3-list-item__text">
+    <span>${item.name}</span>
+    <span class="b3-list-item__meta">${item.size}</span>
 </span>
 <span data-type="rename" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.rename}">
     <svg><use xlink:href="#iconEdit"></use></svg>
@@ -23,10 +20,15 @@ export const genCardItem = (item: ICard) => {
 <span data-type="delete" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.delete}">
     <svg><use xlink:href="#iconTrashcan"></use></svg>
 </span>
-<span data-type="view" class="b3-list-item__action">
+<span data-type="view" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.cardPreview}">
     <svg><use xlink:href="#iconEye"></use></svg>
 </span>
-<span class="b3-list-item__meta${isMobile() ? " fn__none" : ""}">${item.size}</span>
+<span data-type="remove" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.removeDeck}">
+    <svg><use xlink:href="#iconMin"></use></svg>
+</span>
+<span data-type="add" style="display: block" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.addDeck}">
+    <svg><use xlink:href="#iconAdd"></use></svg>
+</span>
 <span class="b3-list-item__meta${isMobile() ? " fn__none" : ""}">${item.updated}</span>
 </li>`;
 };
@@ -48,7 +50,7 @@ export const makeCard = (nodeElement: Element[]) => {
             }
             ids.push(item.getAttribute("data-node-id"));
         });
-        response.data.forEach((item: ICard) => {
+        response.data.forEach((item: ICardPackage) => {
             html += genCardItem(item);
         });
         const dialog = new Dialog({
@@ -115,7 +117,7 @@ export const makeCard = (nodeElement: Element[]) => {
                     event.preventDefault();
                     break;
                 } else if (type === "delete") {
-                    confirmDialog(window.siyuan.languages.confirm, `${window.siyuan.languages.confirmDelete} <b>${target.parentElement.querySelector(".b3-list-item__text").textContent}</b>?`, () => {
+                    confirmDialog(window.siyuan.languages.confirm, `${window.siyuan.languages.confirmDelete} <b>${target.parentElement.getAttribute("data-name")}</b>?`, () => {
                         fetchPost("/api/riff/removeRiffDeck", {
                             deckID: target.parentElement.getAttribute("data-id"),
                         }, () => {
@@ -126,7 +128,9 @@ export const makeCard = (nodeElement: Element[]) => {
                     event.preventDefault();
                     break;
                 } else if (type === "view") {
-                    viewCards(target.parentElement.getAttribute("data-id"), target.parentElement.querySelector(".b3-list-item__text").textContent, target.parentElement);
+                    viewCards(target.parentElement.getAttribute("data-id"), target.parentElement.getAttribute("data-name"), (removeResponse) => {
+                        target.parentElement.outerHTML = genCardItem(removeResponse.data);
+                    });
                     event.stopPropagation();
                     event.preventDefault();
                     break;
@@ -145,7 +149,7 @@ export const makeCard = (nodeElement: Element[]) => {
                     renameDialog.bindInput(inputElement, () => {
                         (btnsElement[1] as HTMLButtonElement).click();
                     });
-                    inputElement.value = target.parentElement.querySelector(".b3-list-item__text").textContent;
+                    inputElement.value = target.parentElement.getAttribute("data-name");
                     inputElement.focus();
                     inputElement.select();
                     btnsElement[0].addEventListener("click", () => {
@@ -156,7 +160,8 @@ export const makeCard = (nodeElement: Element[]) => {
                             name: inputElement.value,
                             deckID: target.parentElement.getAttribute("data-id"),
                         }, () => {
-                            target.parentElement.querySelector(".b3-list-item__text").textContent = inputElement.value;
+                            target.parentElement.querySelector(".b3-list-item__text span").textContent = inputElement.value;
+                            target.parentElement.setAttribute("data-name", inputElement.value);
                         });
                         renameDialog.destroy();
                     });
@@ -168,6 +173,32 @@ export const makeCard = (nodeElement: Element[]) => {
             }
         });
     });
+};
+
+export const quickMakeCard = (nodeElement: Element[]) => {
+    let isRemove = true;
+    const ids: string[] = [];
+    nodeElement.forEach(item => {
+        if (item.getAttribute("data-type") === "NodeThematicBreak") {
+            return;
+        }
+        item.classList.remove("protyle-wysiwyg--select");
+        ids.push(item.getAttribute("data-node-id"));
+        if ((item.getAttribute("custom-riff-decks") || "").indexOf(Constants.QUICK_DECK_ID) === -1) {
+            isRemove = false;
+        }
+    });
+    if (isRemove) {
+        fetchPost("/api/riff/removeRiffCards", {
+            deckID: Constants.QUICK_DECK_ID,
+            blockIDs: ids
+        });
+    } else {
+        fetchPost("/api/riff/addRiffCards", {
+            deckID: Constants.QUICK_DECK_ID,
+            blockIDs: ids
+        });
+    }
 };
 
 

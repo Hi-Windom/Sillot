@@ -113,7 +113,7 @@ export const getSyncCloudList = (cloudPanelElement: Element, reload = false, cb?
 };
 
 export const syncGuide = (element?: Element) => {
-    if (element && element.classList.contains("toolbar__item--active")) {
+    if (element?.classList.contains("toolbar__item--active")) {
         return;
     }
     if (isMobile()) {

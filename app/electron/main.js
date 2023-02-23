@@ -48,7 +48,7 @@ try {
 }
 var isVite;
 try {
-  isVite =  process.env.VITE == "vite";
+  isVite =  process.env.VITE === "vite";
 } catch {
   isVite = false;
 }
@@ -67,12 +67,11 @@ const windowStatePath = path.join(confDir, "windowState.json");
 let bootWindow;
 let firstOpen = false;
 let workspaces = []; // workspaceDir, id, browserWindow, tray
-let kernelPort = 6806;
+let kernelPort = 58131;
 require("@electron/remote/main").initialize();
 
 if (!app.requestSingleInstanceLock()) {
     app.quit();
-    return;
 }
 
 try {
@@ -229,7 +228,7 @@ const boot = () => {
         icon: path.join(appDir, "stage", "icon-large.png"),
     });
     require("@electron/remote/main").enable(currentWindow.webContents);
-    currentWindow.webContents.userAgent = "SiYuan/" + appVer +
+    currentWindow.webContents.userAgent = "Sillot-SiYuan/" + appVer +
         " https://b3log.org/siyuan Electron";
 
     currentWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);
@@ -423,8 +422,8 @@ const initKernel = (workspace, port, lang) => {
         });
 
         const kernelName = "win32" === process.platform
-            ? "SiYuan-Kernel.exe"
-            : "SiYuan-Kernel";
+            ? "SiYuan-Sillot-Kernel.exe"
+            : "SiYuan-Sillot-Kernel";
         // const kernelPath = path.join(appDir, "kernel", kernelName);
     let kernelPath;
     if (!isVite) {
@@ -1203,7 +1202,7 @@ powerMonitor.on("resume", async () => {
     if (!online) {
         writeLog("network is offline, do not sync after system resume");
         new Notification({
-            title:`network is offline`,
+            title:"network is offline",
             body:"Do not sync after system resume",
          }).show();
         return;

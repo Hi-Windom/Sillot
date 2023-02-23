@@ -149,7 +149,7 @@ export const exportConfig = {
             });
         });
         exportConfig.element.querySelectorAll("input").forEach((item) => {
-            if (item.id == "importData") {
+            if (item.id === "importData") {
                 item.addEventListener("change", (event: InputEvent & { target: HTMLInputElement }) => {
                     const formData = new FormData();
                     formData.append("file", event.target.files[0]);

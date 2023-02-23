@@ -135,7 +135,7 @@ function Loader(props: { nodeID: any; initConfig: any }) {
         setEditor(_editor);
         setmmodel(model_x);
         setmonacoIns(monacoInstance);
-        _editor.updateOptions({ readOnly: initConfig.readonly || false });
+        _editor.updateOptions({ readOnly: initConfig.readonly });
         _editor.onDidChangeModelContent(() => {
           // window.sout.slog(_editor.getValue());
         });
@@ -154,7 +154,7 @@ function Loader(props: { nodeID: any; initConfig: any }) {
         id: nodeID,
       },
       (res) => {
-        if (res.code == 0 && editor) {
+        if (res.code === 0 && editor) {
           window.sout.info(nodeID);
           window.sout.success(res);
           // editor.setValue(res.data.kramdown);
@@ -549,7 +549,7 @@ function EditorContainer() {
           maxHeight: "calc(100vh - 300px)",
           height: "600px",
         }}
-      ></div>
+      />
     </>
   );
 }

@@ -48,7 +48,7 @@ export const image = {
         assetsListElement.addEventListener("click", (event) => {
             let target = event.target as HTMLElement;
             while (target && !target.isEqualNode(assetsListElement)) {
-                if (target.classList.contains("b3-tooltips")) {
+                if (target.classList?.contains("b3-tooltips")) {
                     const pathString = target.parentElement.getAttribute("data-path");
                     const type = target.getAttribute("data-type");
                     if (type === "open") {

@@ -9,7 +9,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": false,
     "module": "commonjs",
-    "target": "es6",
+    "target": "ES2022",
     "jsx": "react-jsxdev",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "outDir": "./dist/",

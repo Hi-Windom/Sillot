@@ -18,13 +18,12 @@
     <img style="position: absolute;width: 36vh;" src="../../icon.png">
 </div>
 <div id="toolbar" class="toolbar fn__flex"></div>
-<div id="dockTop" class="dock"></div>
 <div class="fn__flex-1 fn__flex">
     <div id="dockLeft" class="dock dock--vertical"></div>
     <div id="layouts" class="layout fn__flex-1"></div>
     <div id="dockRight" class="dock dock--vertical"></div>
 </div>
-<div id="dockBottom" class="dock"></div>
+<div id="dockBottom" class="dock fn__none"></div>
 <div id="status" class="fn__flex status"></div>
 <div id="commonMenu" class="b3-menu fn__none"></div>
 <div id="message" class="b3-snackbars"></div>

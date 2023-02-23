@@ -17,13 +17,12 @@
     <button onclick="window.location.reload()" id="loadingRefresh" style="display: none;position: absolute;bottom: 16px;background: transparent;border: 1px solid #4285f4;color: #4285f4;border-radius: 4px;line-height: 20px;padding: 4px 8px;">Refresh</button>
 </div>
 <div id="toolbar" class="toolbar fn__flex"></div>
-<div id="dockTop" class="dock"></div>
 <div class="fn__flex-1 fn__flex">
     <div id="dockLeft" class="dock dock--vertical"></div>
     <div id="layouts" class="layout fn__flex-1"></div>
     <div id="dockRight" class="dock dock--vertical"></div>
 </div>
-<div id="dockBottom" class="dock"></div>
+<div id="dockBottom" class="dock fn__none"></div>
 <div id="status" class="fn__flex status"></div>
 <div id="SillotDrawer" style="position: fixed;bottom: 0;right: 0;z-index: 9999;"></div>
 <div id="commonMenu" class="b3-menu fn__none"></div>

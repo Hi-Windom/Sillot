@@ -4,7 +4,7 @@ export const removeFoldHeading = (nodeElement: Element) => {
     while (nextElement) {
         if (nextElement.classList.contains("sb")) {
             let nextFirstElement = nextElement.firstElementChild;
-            while (nextFirstElement && nextFirstElement.classList.contains("sb")) {
+            while (nextFirstElement?.classList.contains("sb")) {
                 nextFirstElement = nextFirstElement.firstElementChild;
             }
             if ((nextFirstElement.getAttribute("data-type") === "NodeHeading" &&

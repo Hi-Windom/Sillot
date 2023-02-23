@@ -1216,7 +1216,7 @@ const replace = (element: Element, config: ISearchOption, edit: Protyle, isAll: 
 };
 
 const inputEvent = (element: Element, config: ISearchOption, inputTimeout: number, edit: Protyle, event?: InputEvent) => {
-    if (event && event.isComposing) {
+    if (event?.isComposing) {
         return;
     }
     clearTimeout(inputTimeout);

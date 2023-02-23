@@ -65,7 +65,7 @@ def find_milestone(repo, title):
 ⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
 🚢 [Docker Image Available](https://hub.docker.com/r/soltus/sillot)
 <span>
-<img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/>
+<img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 10+-black?logo=android" title=""/>
 </span>[![CI](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml/badge.svg)](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml)
 --
 🌏 与绛亽新时代智慧彖乄一同见证全球开源力量
@@ -89,15 +89,7 @@ def find_milestone(repo, title):
 
 ### 🥈 银牌开源力量
 
-- [daisyui](https://github.com/saadeghi/daisyui)
-- [astro](https://github.com/withastro/astro)
-- [nivo](https://github.com/plouc/nivo)
-- [recharts](https://github.com/recharts/recharts)
-- [mobx](https://github.com/mobxjs/mobx)
-- [react-markdown](https://github.com/remarkjs/react-markdown)
-- [alist](https://github.com/alist-org/alist)
-- [obsidian-various-complements-plugin](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin)
-- [xterm.js](https://github.com/xtermjs/xterm.js)
+[daisyui](https://github.com/saadeghi/daisyui) | [astro](https://github.com/withastro/astro) | [nivo](https://github.com/plouc/nivo) | [recharts](https://github.com/recharts/recharts) | [mobx](https://github.com/mobxjs/mobx) | [react-markdown](https://github.com/remarkjs/react-markdown) | [alist](https://github.com/alist-org/alist) | [obsidian-various-complements-plugin](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin) | [xterm.js](https://github.com/xtermjs/xterm.js)
 
 ### 🥉 铜牌开源力量
 
