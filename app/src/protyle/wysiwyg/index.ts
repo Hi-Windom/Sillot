@@ -1516,6 +1516,10 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     event.stopPropagation();
                 }
             });
+            // 面包屑定位，需至于前，否则 return 的元素就无法进行面包屑定位
+            if (protyle.options.render.breadcrumb) {
+                protyle.breadcrumb.render(protyle);
+            }
             const range = getEditorRange(this.element);
             // 需放在嵌入块之前，否则嵌入块内的引用、链接、pdf 双链无法点击打开 https://ld246.com/article/1630479789513
             const blockRefElement = hasClosestByAttribute(event.target, "data-type", "block-ref");
@@ -1875,6 +1879,10 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 range.setStartAfter(imgElement);
                 range.collapse(true);
                 focusByRange(range);
+                // 需等待 range 更新再次进行渲染
+                if (protyle.options.render.breadcrumb) {
+                    protyle.breadcrumb.render(protyle);
+                }
                 return;
             }
 
@@ -1885,7 +1893,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     const lastEditElement = getContenteditableElement(getLastBlock(this.element.lastElementChild));
                     if (!lastEditElement ||
                         (this.element.lastElementChild.getAttribute("data-type") !== "NodeParagraph" && protyle.wysiwyg.element.getAttribute("data-doc-type") !== "NodeListItem") ||
-                        (this.element.lastElementChild.getAttribute("data-type") === "NodeParagraph" && getContenteditableElement(lastEditElement).textContent !== "")) {
+                        (this.element.lastElementChild.getAttribute("data-type") === "NodeParagraph" && getContenteditableElement(lastEditElement).innerHTML !== "")) {
                         const emptyElement = genEmptyElement(false, false);
                         this.element.insertAdjacentElement("beforeend", emptyElement);
                         transaction(protyle, [{
@@ -2066,11 +2074,6 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     });
                     countBlockWord(ids);
                 }
-            }
-
-            // 面包屑定位
-            if (protyle.options.render.breadcrumb) {
-                protyle.breadcrumb.render(protyle);
             }
         });
     }

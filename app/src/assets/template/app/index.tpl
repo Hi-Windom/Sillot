@@ -22,7 +22,7 @@
     <div id="layouts" class="layout fn__flex-1"></div>
     <div id="dockRight" class="dock dock--vertical"></div>
 </div>
-<div id="dockBottom" class="dock"></div>
+<div id="dockBottom" class="dock fn__none"></div>
 <div id="status" class="fn__flex status"></div>
 <div id="SillotDrawer" style="position: fixed;bottom: 0;right: 0;z-index: 9999;"></div>
 <div id="commonMenu" class="b3-menu fn__none"></div>
