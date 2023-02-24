@@ -414,7 +414,7 @@ declare interface IConfig {
     api: {
         token: string
     }
-    newbie: boolean
+    openHelp: boolean
     system: {
         networkProxy: {
             host: string
