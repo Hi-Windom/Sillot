@@ -1,4 +1,10 @@
 {
+  "cardShowAnswer": "Show Answer",
+  "cardRatingAgain": "Again",
+  "cardRatingHard": "Hard",
+  "cardRatingGood": "Good",
+  "cardRatingEasy": "Easy",
+  "pdfIsLoading": "PDF is loading, please try again later",
   "addToDeck": "Add to Deck...",
   "quickMakeCard": "Quick make card",
   "allAttrs": "All attribute names and attribute values",

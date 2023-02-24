@@ -54,35 +54,35 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
         ${window.siyuan.languages.noDueCard}
     </div>
     <div class="fn__flex card__action${blocks.length === 0 ? " fn__none" : ""}">
-        <button data-type="-1" class="b3-button fn__flex-1">Show (S)</button>
+        <button data-type="-1" class="b3-button fn__flex-1">${window.siyuan.languages.cardShowAnswer} (S)</button>
     </div>
     <div class="fn__flex card__action fn__none">
         <div>
             <span></span>
             <button data-type="0" aria-label="1 / j" class="b3-button b3-button--error b3-tooltips__s b3-tooltips">
-                <div>❌</div>
-                Again
+                <div>🙈</div>
+                ${window.siyuan.languages.cardRatingAgain} (1)
             </button>
         </div>
         <div>
             <span></span>
             <button data-type="1" aria-label="2 / k" class="b3-button b3-button--warning b3-tooltips__s b3-tooltips">
                 <div>😬</div>
-                Hard
+                ${window.siyuan.languages.cardRatingHard} (2)
             </button>
         </div>
         <div>
             <span></span>
             <button data-type="2" aria-label="3 / l" class="b3-button b3-button--info b3-tooltips__s b3-tooltips">
                 <div>😊</div>
-                Good
+                ${window.siyuan.languages.cardRatingGood} (3)
             </button>
         </div>
         <div>
             <span></span>
             <button data-type="3" aria-label="4 / ;" class="b3-button b3-button--success b3-tooltips__s b3-tooltips">
                 <div>🌈</div>
-                Easy
+                ${window.siyuan.languages.cardRatingEasy} (4)
             </button>
         </div>
     </div>
@@ -119,6 +119,8 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
     dialog.element.setAttribute("data-key", window.siyuan.config.keymap.general.riffCard.custom);
     const countElement = dialog.element.querySelector('[data-type="count"]');
     const actionElements = dialog.element.querySelectorAll(".card__action");
+    const selectElement = dialog.element.querySelector("select");
+    const titleElement = countElement.previousElementSibling;
     dialog.element.addEventListener("click", (event) => {
         const viewElement = hasClosestByAttribute(event.target as HTMLElement, "data-type", "view");
         if (viewElement) {
@@ -127,10 +129,9 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
                     countElement.lastElementChild.lastElementChild.innerHTML = removeResponse.data.size.toString();
                 });
             } else {
-                viewCards(countElement.previousElementSibling.getAttribute("data-id"),
-                    countElement.previousElementSibling.textContent, (removeResponse) => {
-                        countElement.lastElementChild.lastElementChild.innerHTML = removeResponse.data.size.toString();
-                    }, true);
+                viewCards(titleElement.getAttribute("data-id"), titleElement.textContent, (removeResponse) => {
+                    countElement.lastElementChild.lastElementChild.innerHTML = removeResponse.data.size.toString();
+                }, true);
             }
             event.preventDefault();
             event.stopPropagation();
@@ -174,33 +175,43 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
         if (["0", "1", "2", "3"].includes(type)) {
             fetchPost("/api/riff/reviewRiffCard", {
                 deckID: blocks[index].deckID,
+                cardID: blocks[index].cardID,
                 blockID: blocks[index].blockID,
                 rating: parseInt(type)
             }, () => {
                 index++;
                 editor.protyle.element.classList.add("card__block--hide");
                 if (index > blocks.length - 1) {
-                    countElement.classList.add("fn__none");
-                    editor.protyle.element.classList.add("fn__none");
-                    editor.protyle.element.nextElementSibling.classList.remove("fn__none");
-                    actionElements[0].classList.add("fn__none");
-                    actionElements[1].classList.add("fn__none");
+                    fetchPost(selectElement ? "/api/riff/getRiffDueCards" : "/api/riff/getTreeRiffDueCards", {
+                        rootID: titleElement.getAttribute("data-id"),
+                        deckID: selectElement?.value
+                    }, (treeCards) => {
+                        index = 0
+                        blocks = treeCards.data
+                        if (treeCards.data.length === 0) {
+                            allDone(countElement, editor, actionElements)
+                        } else {
+                            nextCard({
+                                countElement,
+                                editor,
+                                actionElements,
+                                index,
+                                blocks
+                            })
+                        }
+                    });
                     return;
                 }
-                actionElements[0].classList.remove("fn__none");
-                actionElements[1].classList.add("fn__none");
-                countElement.lastElementChild.firstElementChild.innerHTML = (index + 1).toString();
-                fetchPost("/api/filetree/getDoc", {
-                    id: blocks[index].blockID,
-                    mode: 0,
-                    size: Constants.SIZE_GET_MAX
-                }, (response) => {
-                    onGet(response, editor.protyle, [Constants.CB_GET_ALL, Constants.CB_GET_HTML]);
-                });
+                nextCard({
+                    countElement,
+                    editor,
+                    actionElements,
+                    index,
+                    blocks
+                })
             });
         }
     });
-    const selectElement = dialog.element.querySelector("select");
     if (!selectElement) {
         return;
     }
@@ -210,26 +221,42 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
             index = 0;
             editor.protyle.element.classList.add("card__block--hide");
             if (blocks.length > 0) {
-                countElement.lastElementChild.innerHTML = `<span>1</span>/${blocks.length}`;
-                countElement.classList.remove("fn__none");
-                editor.protyle.element.classList.remove("fn__none");
-                editor.protyle.element.nextElementSibling.classList.add("fn__none");
-                actionElements[0].classList.remove("fn__none");
-                actionElements[1].classList.add("fn__none");
-                fetchPost("/api/filetree/getDoc", {
-                    id: blocks[index].blockID,
-                    mode: 0,
-                    size: Constants.SIZE_GET_MAX
-                }, (response) => {
-                    onGet(response, editor.protyle, [Constants.CB_GET_ALL, Constants.CB_GET_HTML]);
-                });
+                nextCard({
+                    countElement,
+                    editor,
+                    actionElements,
+                    index,
+                    blocks
+                })
             } else {
-                countElement.classList.add("fn__none");
-                editor.protyle.element.classList.add("fn__none");
-                editor.protyle.element.nextElementSibling.classList.remove("fn__none");
-                actionElements[0].classList.add("fn__none");
-                actionElements[1].classList.add("fn__none");
+                allDone(countElement, editor, actionElements)
             }
         });
     });
+};
+
+const nextCard = (options: {
+    countElement: Element, editor: Protyle, actionElements: NodeListOf<Element>, index: number, blocks: ICard[]
+}) => {
+    options.actionElements[0].classList.remove("fn__none");
+    options.actionElements[1].classList.add("fn__none");
+    options.editor.protyle.element.classList.remove("fn__none");
+    options.editor.protyle.element.nextElementSibling.classList.add("fn__none");
+    options.countElement.lastElementChild.innerHTML = `<span>${options.index + 1}</span>/${options.blocks.length}`;
+    options.countElement.classList.remove("fn__none");
+    fetchPost("/api/filetree/getDoc", {
+        id: options.blocks[options.index].blockID,
+        mode: 0,
+        size: Constants.SIZE_GET_MAX
+    }, (response) => {
+        onGet(response, options.editor.protyle, [Constants.CB_GET_ALL, Constants.CB_GET_HTML]);
+    });
+}
+
+const allDone = (countElement: Element, editor: Protyle, actionElements: NodeListOf<Element>) => {
+    countElement.classList.add("fn__none");
+    editor.protyle.element.classList.add("fn__none");
+    editor.protyle.element.nextElementSibling.classList.remove("fn__none");
+    actionElements[0].classList.add("fn__none");
+    actionElements[1].classList.add("fn__none");
 };
