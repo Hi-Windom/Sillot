@@ -1,7 +1,6 @@
 @import "content";
 @import "toolbar";
 @import "wysiwyg";
-@import "search";
 
 .protyle-scroll {
   --b3-dynamicscroll-width: 200px;
@@ -430,6 +429,10 @@
 
   &:hover .protyle-title__icon {
     opacity: 1;
+  }
+
+  &[custom-riff-decks] {
+    box-shadow: 3px 0px 0px -1px var(--b3-protyle-inline-mark-background)
   }
 
   &__icon {

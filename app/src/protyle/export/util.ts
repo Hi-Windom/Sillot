@@ -38,7 +38,7 @@ export const exportImage = (id: string) => {
 </div>
 `,
         content: `<div class="b3-dialog__content" style="max-height: 70vh;overflow: auto;${isMobile() ? "padding:8px;" : ""};background-color: var(--b3-theme-background)">
-    <div style="${isMobile() ? "padding: 16px;margin: 16px 0" : "padding: 48px;margin: 8px 0 24px"};border: 1px solid var(--b3-border-color);border-radius: 10px;" class="b3-dialog__exportimg protyle-wysiwyg${window.siyuan.config.editor.displayBookmarkIcon ? " protyle-wysiwyg--attr" : ""}" id="preview"></div>
+    <div style="${isMobile() ? "padding: 16px;margin: 16px 0" : "padding: 48px;margin: 8px 0 24px"};border: 1px solid var(--b3-border-color);border-radius: 10px;" class="export-img protyle-wysiwyg${window.siyuan.config.editor.displayBookmarkIcon ? " protyle-wysiwyg--attr" : ""}" id="preview"></div>
     <div class="ft__smaller ft__on-surface fn__flex" style="font-size: 18.6px;color: var(--b3-theme-on-surface-light);filter: opacity(0.77);"><img style="height: 31px;margin: -3.1px 3.1px 0 31px;font-size: 18.6px;" src="stage/icon.png">Sillot</div>
     <div class="fn__hr--b"></div>
     <div class="fn__hr--b"></div>

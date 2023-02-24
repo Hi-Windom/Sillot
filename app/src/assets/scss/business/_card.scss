@@ -1,0 +1,69 @@
+.card {
+  &__empty {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    flex: 1;
+    text-align: center;
+    background-color: var(--b3-theme-background);
+    font-size: 16px;
+
+    & > div {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+  }
+
+  &__action {
+    padding: 8px 16px;
+
+    .b3-button {
+      padding: 8px;
+      display: block;
+      margin: 0 auto;
+      width: 90%;
+
+      & > div {
+        font-size: 46px;
+        display: block;
+        line-height: 46px;
+        margin-bottom: 4px;
+      }
+    }
+
+    & > div {
+      flex: 1;
+
+      & > span {
+        display: block;
+        color: var(--b3-theme-on-surface);
+        text-align: center;
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+    }
+  }
+
+  &__block {
+    .protyle-wysiwyg [data-node-id][custom-riff-decks] {
+      box-shadow: none;
+    }
+
+    &--hide {
+      .protyle-wysiwyg > .sb > div:nth-of-type(n+2):not(.protyle-attr) {
+        display: none;
+      }
+
+      .li > .list {
+        display: none;
+      }
+
+      span[data-type~=mark] {
+        transition: var(--b3-transition);
+        color: transparent !important;
+      }
+    }
+  }
+}
+
+
