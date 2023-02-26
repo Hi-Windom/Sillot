@@ -856,13 +856,17 @@ app.whenReady().then(() => {
         }
     });
     ipcMain.on("siyuan-openwindow", (event, data) => {
+        const mainWindow = BrowserWindow.fromId(data.id);
+        const mainBounds = mainWindow.getBounds();
+        const mainScreen = screen.getDisplayNearestPoint({x: mainBounds.x, y: mainBounds.y});
         const win = new BrowserWindow({
             show: true,
             backgroundColor: "#FFF",
             trafficLightPosition: {x: 8, y: 13},
-            width: screen.getPrimaryDisplay().size.width * 0.7,
-            height: screen.getPrimaryDisplay().size.height * 0.9,
+            width: mainScreen.size.width * 0.7,
+            height: mainScreen.size.height * 0.9,
             minWidth: 493,
+            center: true,
             minHeight: 376,
             fullscreenable: true,
             frame: "darwin" === process.platform,
@@ -875,7 +879,11 @@ app.whenReady().then(() => {
                 webSecurity: false,
             },
         });
-        win.loadURL(data);
+        win.loadURL(data.url);
+        const targetScreen = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+        if (mainScreen.id !== targetScreen.id) {
+            win.setBounds(targetScreen.workArea);
+        }
         require("@electron/remote/main").enable(win.webContents);
       win.webContents.on("devtools-open-url", (event, url) => {
       // 支持在devtools打开网址 #188 需要 electron@24.0.0+

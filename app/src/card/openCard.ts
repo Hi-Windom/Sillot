@@ -54,7 +54,12 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
         ${window.siyuan.languages.noDueCard}
     </div>
     <div class="fn__flex card__action${blocks.length === 0 ? " fn__none" : ""}">
-        <button data-type="-1" class="b3-button fn__flex-1">${window.siyuan.languages.cardShowAnswer} (S)</button>
+        <button class="b3-button b3-button--cancel" disabled="disabled" data-type="-2" style="width: 25%;min-width: 86px;display: flex">
+            <svg><use xlink:href="#iconLeft"></use></svg>
+            (p)
+        </button>
+        <span class="fn__space"></span>
+        <button data-type="-1" class="b3-button fn__flex-1">${window.siyuan.languages.cardShowAnswer} (${window.siyuan.languages.space})</button>
     </div>
     <div class="fn__flex card__action fn__none">
         <div>
@@ -143,8 +148,10 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
                 type = "2";
             } else if (event.detail === "4" || event.detail === ";") {
                 type = "3";
-            } else if (event.detail === "s") {
+            } else if (event.detail === " ") {
                 type = "-1";
+            } else if (event.detail === "p") {
+                type = "-2";
             }
         }
         if (!type) {
@@ -160,6 +167,9 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
         event.stopPropagation();
         hideElements(["toolbar", "hint", "util"], editor.protyle);
         if (type === "-1") {
+            if (actionElements[0].classList.contains("fn__none")) {
+                return;
+            }
             editor.protyle.element.classList.remove("card__block--hide");
             actionElements[0].classList.add("fn__none");
             actionElements[1].querySelectorAll(".b3-button").forEach((element, btnIndex) => {
@@ -168,7 +178,24 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
             actionElements[1].classList.remove("fn__none");
             return;
         }
-        if (["0", "1", "2", "3"].includes(type)) {
+        if (type === "-2") {
+            if (actionElements[0].classList.contains("fn__none")) {
+                return;
+            }
+            if (index > 0) {
+                index--;
+                editor.protyle.element.classList.add("card__block--hide");
+                nextCard({
+                    countElement,
+                    editor,
+                    actionElements,
+                    index,
+                    blocks
+                });
+            }
+            return;
+        }
+        if (["0", "1", "2", "3"].includes(type) && actionElements[0].classList.contains("fn__none")) {
             fetchPost("/api/riff/reviewRiffCard", {
                 deckID: blocks[index].deckID,
                 cardID: blocks[index].cardID,
@@ -181,10 +208,10 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
                         rootID: titleElement.getAttribute("data-id"),
                         deckID: selectElement?.value
                     }, (treeCards) => {
-                        index = 0
-                        blocks = treeCards.data
+                        index = 0;
+                        blocks = treeCards.data;
                         if (treeCards.data.length === 0) {
-                            allDone(countElement, editor, actionElements)
+                            allDone(countElement, editor, actionElements);
                         } else {
                             nextCard({
                                 countElement,
@@ -192,7 +219,7 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
                                 actionElements,
                                 index,
                                 blocks
-                            })
+                            });
                         }
                     });
                     return;
@@ -203,7 +230,7 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
                     actionElements,
                     index,
                     blocks
-                })
+                });
             });
         }
     });
@@ -222,9 +249,9 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
                     actionElements,
                     index,
                     blocks
-                })
+                });
             } else {
-                allDone(countElement, editor, actionElements)
+                allDone(countElement, editor, actionElements);
             }
         });
     });
@@ -239,6 +266,11 @@ const nextCard = (options: {
     options.editor.protyle.element.nextElementSibling.classList.add("fn__none");
     options.countElement.lastElementChild.innerHTML = `<span>${options.index + 1}</span>/${options.blocks.length}`;
     options.countElement.classList.remove("fn__none");
+    if (options.index === 0) {
+        options.actionElements[0].firstElementChild.setAttribute("disabled", "disabled");
+    } else {
+        options.actionElements[0].firstElementChild.removeAttribute("disabled");
+    }
     fetchPost("/api/filetree/getDoc", {
         id: options.blocks[options.index].blockID,
         mode: 0,
@@ -246,7 +278,7 @@ const nextCard = (options: {
     }, (response) => {
         onGet(response, options.editor.protyle, [Constants.CB_GET_ALL, Constants.CB_GET_HTML]);
     });
-}
+};
 
 const allDone = (countElement: Element, editor: Protyle, actionElements: NodeListOf<Element>) => {
     countElement.classList.add("fn__none");
