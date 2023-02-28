@@ -1,4 +1,3 @@
-import {focusByRange, getEditorRange} from "../protyle/util/selection";
 import {fetchPost} from "../util/fetch";
 import {Dialog} from "../dialog";
 import {isMobile} from "../util/functions";
@@ -7,11 +6,12 @@ import {confirmDialog} from "../dialog/confirmDialog";
 import {hideElements} from "../protyle/ui/hideElements";
 import {viewCards} from "./viewCards";
 import {Constants} from "../constants";
+import {escapeAttr, escapeHtml} from "../util/escape";
 
 export const genCardItem = (item: ICardPackage) => {
-    return `<li data-id="${item.id}" data-name="${item.name}" class="b3-list-item b3-list-item--narrow${isMobile() ? "" : " b3-list-item--hide-action"}">
+    return `<li data-id="${item.id}" data-name="${escapeAttr(item.name)}" class="b3-list-item b3-list-item--narrow${isMobile() ? "" : " b3-list-item--hide-action"}">
 <span class="b3-list-item__text">
-    <span>${item.name}</span>
+    <span>${escapeHtml(item.name)}</span>
     <span class="b3-list-item__meta">${item.size}</span>
 </span>
 <span data-type="rename" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.rename}">
@@ -33,30 +33,28 @@ export const genCardItem = (item: ICardPackage) => {
 </li>`;
 };
 
-export const makeCard = (nodeElement: Element[]) => {
+export const makeCard = (ids: string[]) => {
     window.siyuan.dialogs.find(item => {
         if (item.element.getAttribute("data-key") === "makeCard") {
             hideElements(["dialog"]);
             return true;
         }
     });
-    const range = getEditorRange(nodeElement[0]);
     fetchPost("/api/riff/getRiffDecks", {}, (response) => {
         let html = "";
-        const ids: string[] = [];
-        nodeElement.forEach(item => {
-            if (item.getAttribute("data-type") === "NodeThematicBreak") {
-                return;
-            }
-            ids.push(item.getAttribute("data-node-id"));
-        });
         response.data.forEach((item: ICardPackage) => {
             html += genCardItem(item);
         });
         const dialog = new Dialog({
             width: isMobile() ? "90vw" : "50vw",
             height: "70vh",
-            title: window.siyuan.languages.riffCard,
+            title: `<div class="fn__flex">
+<div class="fn__flex-1">${window.siyuan.languages.riffCard}</div>
+<span data-type="viewall" class="b3-button b3-button--cancel b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.cardPreview}">
+    <svg><use xlink:href="#iconEye"></use></svg>
+    ${window.siyuan.languages.all}
+</span>
+</div>`,
             content: `<div class="b3-dialog__content fn__flex-column" style="box-sizing: border-box;height: 100%">
     <div class="fn__flex">
         <input class="b3-text-field fn__flex-1">
@@ -69,9 +67,6 @@ export const makeCard = (nodeElement: Element[]) => {
     <div class="fn__hr"></div>
     <ul class="b3-list b3-list--background fn__flex-1">${html}</ul>
 </div>`,
-            destroyCallback() {
-                focusByRange(range);
-            }
         });
         dialog.element.setAttribute("data-key", "makeCard");
         dialog.element.style.zIndex = "200";
@@ -129,9 +124,14 @@ export const makeCard = (nodeElement: Element[]) => {
                     event.preventDefault();
                     break;
                 } else if (type === "view") {
-                    viewCards(target.parentElement.getAttribute("data-id"), target.parentElement.getAttribute("data-name"), (removeResponse) => {
+                    viewCards(target.parentElement.getAttribute("data-id"), escapeHtml(target.parentElement.getAttribute("data-name")),"", (removeResponse) => {
                         target.parentElement.outerHTML = genCardItem(removeResponse.data);
                     });
+                    event.stopPropagation();
+                    event.preventDefault();
+                    break;
+                } else if (type === "viewall") {
+                    viewCards("", window.siyuan.languages.all, "");
                     event.stopPropagation();
                     event.preventDefault();
                     break;
