@@ -204,7 +204,7 @@ func CheckAuth(c *gin.Context) {
 		}
 	}
 
-	if strings.HasSuffix(c.Request.RequestURI, "/check-auth") {
+	if "/check-auth" == c.Request.URL.Path { // 跳过访问授权页
 		c.Next()
 		return
 	}

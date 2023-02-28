@@ -139,10 +139,10 @@ export class Dock {
                         }
                     }
                 });
-                if (currentNowSize < minSize && direction === "lr" ) {
+                if (currentNowSize < minSize && direction === "lr") {
                     return;
                 }
-                if (currentNowSize < 64 && direction === "tb" ) {
+                if (currentNowSize < 64 && direction === "tb") {
                     return;
                 }
                 this.layout.element.style[direction === "lr" ? "width" : "height"] = currentNowSize + "px";
@@ -218,12 +218,13 @@ export class Dock {
         if (!reset) {
             this.layout.element.style.opacity = "1";
         }
+        this.layout.element.style.transform = "";
         if (this.position === "Left") {
-            this.layout.element.style.transform = `translateX(${this.element.clientWidth}px)`;
+            this.layout.element.style.left = `${this.element.clientWidth}px`;
         } else if (this.position === "Right") {
-            this.layout.element.style.transform = `translateX(-${this.element.clientWidth}px)`;
+            this.layout.element.style.right = `${this.element.clientWidth}px`;
         } else if (this.position === "Bottom") {
-            this.layout.element.style.transform = `translateY(-${this.element.offsetHeight + document.getElementById("status").offsetHeight}px)`;
+            this.layout.element.style.bottom = `${this.element.offsetHeight + document.getElementById("status").offsetHeight}px`;
         }
     }
 
@@ -233,12 +234,19 @@ export class Dock {
         ) {
             return;
         }
+        // https://github.com/siyuan-note/siyuan/issues/7504
+        if (document.activeElement && this.layout.element.contains(document.activeElement) && document.activeElement.classList.contains("b3-text-field")) {
+            return;
+        }
         if (this.position === "Left") {
             this.layout.element.style.transform = `translateX(-${this.layout.element.clientWidth + 8}px)`;
+            this.layout.element.style.left = "";
         } else if (this.position === "Right") {
             this.layout.element.style.transform = `translateX(${this.layout.element.clientWidth + 8}px)`;
+            this.layout.element.style.right = "";
         } else if (this.position === "Bottom") {
             this.layout.element.style.transform = `translateY(${this.layout.element.clientHeight + 8}px)`;
+            this.layout.element.style.bottom = "";
         }
         if (reset) {
             return;

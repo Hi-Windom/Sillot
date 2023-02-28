@@ -10,10 +10,10 @@ import {addLoading} from "../protyle/ui/initUI";
 import {Constants} from "../constants";
 import {disabledProtyle, onGet} from "../protyle/util/onGet";
 
-export const viewCards = (deckID: string, title: string, cb:(response:IWebSocketData)=>void,isDoc = false) => {
+export const viewCards = (deckID: string, title: string, deckType: "Tree" | "" | "Notebook", cb?: (response: IWebSocketData) => void) => {
     let pageIndex = 1;
     let edit: Protyle;
-    fetchPost(isDoc ? "/api/riff/getTreeRiffCards" : "/api/riff/getRiffCards", {
+    fetchPost(`/api/riff/get${deckType}RiffCards`, {
         id: deckID,
         page: pageIndex
     }, (response) => {
@@ -119,7 +119,7 @@ export const viewCards = (deckID: string, title: string, cb:(response:IWebSocket
                     break;
                 } else if (type === "remove") {
                     fetchPost("/api/riff/removeRiffCards", {
-                        deckID: isDoc ? Constants.QUICK_DECK_ID : deckID,
+                        deckID: deckType === "" ? deckID : Constants.QUICK_DECK_ID,
                         blockIDs: [target.getAttribute("data-id")]
                     }, (removeResponse) => {
                         let nextElment = target.parentElement.nextElementSibling;
@@ -132,14 +132,16 @@ export const viewCards = (deckID: string, title: string, cb:(response:IWebSocket
 
                         if (!nextElment) {
                             getArticle(edit, "");
-                            listElement.innerHTML = `<div class="b3-list--empty">${window.siyuan.languages.emptyContent}</div>`
+                            listElement.innerHTML = `<div class="b3-list--empty">${window.siyuan.languages.emptyContent}</div>`;
                         } else {
                             getArticle(edit, nextElment.getAttribute("data-id"));
                             listElement.querySelector(".b3-list-item--focus")?.classList.remove("b3-list-item--focus");
                             nextElment.classList.add("b3-list-item--focus");
                             target.parentElement.remove();
                         }
-                        cb(removeResponse);
+                        if (cb) {
+                            cb(removeResponse);
+                        }
                     });
                     event.stopPropagation();
                     event.preventDefault();

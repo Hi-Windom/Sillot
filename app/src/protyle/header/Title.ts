@@ -35,6 +35,7 @@ import {hideTooltip} from "../../dialog/tooltip";
 import {transferBlockRef} from "../../menus/block";
 import {openCardByData} from "../../card/openCard";
 import {makeCard, quickMakeCard} from "../../card/makeCard";
+import {viewCards} from "../../card/viewCards";
 
 export class Title {
     public element: HTMLElement;
@@ -364,28 +365,36 @@ export class Title {
             }).element);
             window.siyuan.menus.menu.append(new MenuItem({
                 label: window.siyuan.languages.riffCard,
-                iconHTML: '<svg class="b3-menu__icon" style="color: var(--b3-theme-secondary)"><use xlink:href="#iconRiffCard"></use></svg>',
-                click: () => {
-                    fetchPost("/api/riff/getTreeRiffDueCards", {rootID: protyle.block.rootID}, (response) => {
-                        openCardByData(response.data, `<span data-id="${protyle.block.rootID}"  class="fn__flex-center">${escapeHtml(this.editElement.textContent)}</span>`);
-                    });
-                }
-            }).element);
-            window.siyuan.menus.menu.append(new MenuItem({
-                label: window.siyuan.languages.quickMakeCard,
-                accelerator: window.siyuan.config.keymap.editor.general.quickMakeCard.custom,
-                iconHTML: '<svg class="b3-menu__icon" style="color:var(--b3-theme-primary)"><use xlink:href="#iconRiffCard"></use></svg>',
+                type: "submenu",
                 icon: "iconRiffCard",
-                click: () => {
-                    quickMakeCard([this.element]);
-                }
-            }).element);
-            window.siyuan.menus.menu.append(new MenuItem({
-                label: window.siyuan.languages.addToDeck,
-                icon: "iconRiffCard",
-                click: () => {
-                    makeCard([this.element]);
-                }
+                submenu: [{
+                    iconHTML: Constants.ZWSP,
+                    label: window.siyuan.languages.spaceRepetition,
+                    click: () => {
+                        fetchPost("/api/riff/getTreeRiffDueCards", {rootID: protyle.block.rootID}, (response) => {
+                            openCardByData(response.data, `<span data-id="${protyle.block.rootID}"  class="fn__flex-center">${escapeHtml(this.editElement.textContent)}</span>`);
+                        });
+                    }
+                }, {
+                    iconHTML: Constants.ZWSP,
+                    label: window.siyuan.languages.mgmt,
+                    click: () => {
+                        viewCards(protyle.block.rootID, escapeHtml(this.editElement.textContent), "Tree");
+                    }
+                }, {
+                    iconHTML: Constants.ZWSP,
+                    label: window.siyuan.languages.quickMakeCard,
+                    accelerator: window.siyuan.config.keymap.editor.general.quickMakeCard.custom,
+                    click: () => {
+                        quickMakeCard([this.element]);
+                    }
+                }, {
+                    iconHTML: Constants.ZWSP,
+                    label: window.siyuan.languages.addToDeck,
+                    click: () => {
+                        makeCard([protyle.block.rootID]);
+                    }
+                }],
             }).element);
             window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
             window.siyuan.menus.menu.append(new MenuItem({
@@ -409,8 +418,8 @@ ${window.siyuan.languages.createdAt} ${dayjs(response.data.ial.id.substr(0, 14))
             return false;
         }
         this.element.setAttribute("data-node-id", protyle.block.rootID);
-        if (response.data.ial['custom-riff-decks']) {
-            this.element.setAttribute("custom-riff-decks", response.data.ial['custom-riff-decks']);
+        if (response.data.ial["custom-riff-decks"]) {
+            this.element.setAttribute("custom-riff-decks", response.data.ial["custom-riff-decks"]);
         }
         protyle.background.render(response.data.ial, protyle.block.rootID);
         protyle.wysiwyg.renderCustom(response.data.ial);

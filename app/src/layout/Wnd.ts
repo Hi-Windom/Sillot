@@ -3,7 +3,7 @@ import {genUUID} from "../util/genID";
 import {
     getInstanceById,
     getWndByLayout, JSONToCenter,
-    newCenterEmptyTab,
+    newCenterEmptyTab, pdfIsLoading,
     resizeTabs,
     setPanelFocus,
     switchWnd
@@ -100,7 +100,7 @@ export class Wnd {
                 } else if (target.classList.contains("item__close") && target.getAttribute("data-type") === "more") {
                     this.renderTabList(event);
                     break;
-                } else if (target.tagName === "LI" && target.getAttribute("data-id")) {
+                } else if (target.tagName === "LI" && target.getAttribute("data-id") && !pdfIsLoading(this.element)) {
                     this.switchTab(target, true);
                     break;
                 }
@@ -223,7 +223,7 @@ export class Wnd {
                 if (wnd instanceof Wnd) {
                     JSONToCenter(tabData, wnd);
                     oldTab = wnd.children[wnd.children.length - 1];
-                    ipcRenderer.send(Constants.SIYUAN_CLOSETAB, tabData.id);
+                    ipcRenderer.send(Constants.SIYUAN_SEND_WINDOWS, {cmd: "closetab", data:  tabData.id});
                     it.querySelector("li[data-clone='true']").remove();
                     wnd.switchTab(oldTab.headElement);
                 }
@@ -331,7 +331,7 @@ export class Wnd {
             if (!oldTab) { // 从主窗口拖拽到页签新窗口
                 JSONToCenter(tabData, this);
                 oldTab = this.children[this.children.length - 1];
-                ipcRenderer.send(Constants.SIYUAN_CLOSETAB, tabData.id);
+                ipcRenderer.send(Constants.SIYUAN_SEND_WINDOWS, {cmd: "closetab", data: tabData.id});
             }
             /// #endif
             if (!oldTab) {
@@ -441,7 +441,7 @@ export class Wnd {
         if (currentTab && target === currentTab.headElement) {
             if (currentTab.model instanceof Graph) {
                 currentTab.model.onGraph(false);
-            } else if (currentTab.model instanceof Asset && currentTab.model.pdfObject) {
+            } else if (currentTab.model instanceof Asset && currentTab.model.pdfObject && currentTab.model.pdfObject.pdfViewer) {
                 // https://github.com/siyuan-note/siyuan/issues/5655
                 currentTab.model.pdfObject.pdfViewer.container.focus();
             }

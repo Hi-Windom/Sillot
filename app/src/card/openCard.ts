@@ -4,8 +4,7 @@ import {isMobile} from "../util/functions";
 import {Protyle} from "../protyle";
 import {Constants} from "../constants";
 import {disabledProtyle, onGet} from "../protyle/util/onGet";
-import {hasClosestByAttribute, hasClosestByClassName} from "../protyle/util/hasClosest";
-import {viewCards} from "./viewCards";
+import {hasClosestByClassName} from "../protyle/util/hasClosest";
 import {hideElements} from "../protyle/ui/hideElements";
 
 export const openCard = () => {
@@ -35,10 +34,6 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
     if (blocks.length > 0) {
         html += `<div class="fn__flex" style="align-items: center" data-type="count">
     <span class="fn__space"></span>
-    <span data-type="view" class="block__icon block__icon--show b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.cardPreview}">
-        <svg><use xlink:href="#iconEye"></use></svg>
-    </span>
-    <span class="fn__space"></span>
     <div class="ft__on-surface ft__smaller"><span>1</span>/<span>${blocks.length}</span></div>
 </div>`;
     }
@@ -54,35 +49,40 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
         ${window.siyuan.languages.noDueCard}
     </div>
     <div class="fn__flex card__action${blocks.length === 0 ? " fn__none" : ""}">
-        <button data-type="-1" class="b3-button fn__flex-1">Show (S)</button>
+        <button class="b3-button b3-button--cancel" disabled="disabled" data-type="-2" style="width: 25%;min-width: 86px;display: flex">
+            <svg><use xlink:href="#iconLeft"></use></svg>
+            (p)
+        </button>
+        <span class="fn__space"></span>
+        <button data-type="-1" class="b3-button fn__flex-1">${window.siyuan.languages.cardShowAnswer} (${window.siyuan.languages.space})</button>
     </div>
     <div class="fn__flex card__action fn__none">
         <div>
             <span></span>
             <button data-type="0" aria-label="1 / j" class="b3-button b3-button--error b3-tooltips__s b3-tooltips">
-                <div>❌</div>
-                Again
+                <div>🙈</div>
+                ${window.siyuan.languages.cardRatingAgain} (1)
             </button>
         </div>
         <div>
             <span></span>
             <button data-type="1" aria-label="2 / k" class="b3-button b3-button--warning b3-tooltips__s b3-tooltips">
                 <div>😬</div>
-                Hard
+                ${window.siyuan.languages.cardRatingHard} (2)
             </button>
         </div>
         <div>
             <span></span>
             <button data-type="2" aria-label="3 / l" class="b3-button b3-button--info b3-tooltips__s b3-tooltips">
                 <div>😊</div>
-                Good
+                ${window.siyuan.languages.cardRatingGood} (3)
             </button>
         </div>
         <div>
             <span></span>
             <button data-type="3" aria-label="4 / ;" class="b3-button b3-button--success b3-tooltips__s b3-tooltips">
                 <div>🌈</div>
-                Easy
+                ${window.siyuan.languages.cardRatingEasy} (4)
             </button>
         </div>
     </div>
@@ -119,23 +119,9 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
     dialog.element.setAttribute("data-key", window.siyuan.config.keymap.general.riffCard.custom);
     const countElement = dialog.element.querySelector('[data-type="count"]');
     const actionElements = dialog.element.querySelectorAll(".card__action");
+    const selectElement = dialog.element.querySelector("select");
+    const titleElement = countElement.previousElementSibling;
     dialog.element.addEventListener("click", (event) => {
-        const viewElement = hasClosestByAttribute(event.target as HTMLElement, "data-type", "view");
-        if (viewElement) {
-            if (selectElement) {
-                viewCards(selectElement.value, selectElement.options[selectElement.selectedIndex].text, (removeResponse) => {
-                    countElement.lastElementChild.lastElementChild.innerHTML = removeResponse.data.size.toString();
-                });
-            } else {
-                viewCards(countElement.previousElementSibling.getAttribute("data-id"),
-                    countElement.previousElementSibling.textContent, (removeResponse) => {
-                        countElement.lastElementChild.lastElementChild.innerHTML = removeResponse.data.size.toString();
-                    }, true);
-            }
-            event.preventDefault();
-            event.stopPropagation();
-            return;
-        }
         let type = "";
         if (typeof event.detail === "string") {
             if (event.detail === "1" || event.detail === "j") {
@@ -146,8 +132,10 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
                 type = "2";
             } else if (event.detail === "4" || event.detail === ";") {
                 type = "3";
-            } else if (event.detail === "s") {
+            } else if (event.detail === " ") {
                 type = "-1";
+            } else if (event.detail === "p") {
+                type = "-2";
             }
         }
         if (!type) {
@@ -163,6 +151,9 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
         event.stopPropagation();
         hideElements(["toolbar", "hint", "util"], editor.protyle);
         if (type === "-1") {
+            if (actionElements[0].classList.contains("fn__none")) {
+                return;
+            }
             editor.protyle.element.classList.remove("card__block--hide");
             actionElements[0].classList.add("fn__none");
             actionElements[1].querySelectorAll(".b3-button").forEach((element, btnIndex) => {
@@ -171,36 +162,64 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
             actionElements[1].classList.remove("fn__none");
             return;
         }
-        if (["0", "1", "2", "3"].includes(type)) {
+        if (type === "-2") {
+            if (actionElements[0].classList.contains("fn__none")) {
+                return;
+            }
+            if (index > 0) {
+                index--;
+                editor.protyle.element.classList.add("card__block--hide");
+                nextCard({
+                    countElement,
+                    editor,
+                    actionElements,
+                    index,
+                    blocks
+                });
+            }
+            return;
+        }
+        if (["0", "1", "2", "3"].includes(type) && actionElements[0].classList.contains("fn__none")) {
             fetchPost("/api/riff/reviewRiffCard", {
                 deckID: blocks[index].deckID,
-                blockID: blocks[index].blockID,
+                cardID: blocks[index].cardID,
                 rating: parseInt(type)
             }, () => {
                 index++;
                 editor.protyle.element.classList.add("card__block--hide");
                 if (index > blocks.length - 1) {
-                    countElement.classList.add("fn__none");
-                    editor.protyle.element.classList.add("fn__none");
-                    editor.protyle.element.nextElementSibling.classList.remove("fn__none");
-                    actionElements[0].classList.add("fn__none");
-                    actionElements[1].classList.add("fn__none");
+                    fetchPost(selectElement ? "/api/riff/getRiffDueCards" :
+                        (titleElement.getAttribute("data-id") ? "/api/riff/getTreeRiffDueCards" : "/api/riff/getNotebookRiffDueCards"), {
+                        rootID: titleElement.getAttribute("data-id"),
+                        deckID: selectElement?.value,
+                        notebook: titleElement.getAttribute("data-notebookid"),
+                    }, (treeCards) => {
+                        index = 0;
+                        blocks = treeCards.data;
+                        if (treeCards.data.length === 0) {
+                            allDone(countElement, editor, actionElements);
+                        } else {
+                            nextCard({
+                                countElement,
+                                editor,
+                                actionElements,
+                                index,
+                                blocks
+                            });
+                        }
+                    });
                     return;
                 }
-                actionElements[0].classList.remove("fn__none");
-                actionElements[1].classList.add("fn__none");
-                countElement.lastElementChild.firstElementChild.innerHTML = (index + 1).toString();
-                fetchPost("/api/filetree/getDoc", {
-                    id: blocks[index].blockID,
-                    mode: 0,
-                    size: Constants.SIZE_GET_MAX
-                }, (response) => {
-                    onGet(response, editor.protyle, [Constants.CB_GET_ALL, Constants.CB_GET_HTML]);
+                nextCard({
+                    countElement,
+                    editor,
+                    actionElements,
+                    index,
+                    blocks
                 });
             });
         }
     });
-    const selectElement = dialog.element.querySelector("select");
     if (!selectElement) {
         return;
     }
@@ -210,26 +229,47 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
             index = 0;
             editor.protyle.element.classList.add("card__block--hide");
             if (blocks.length > 0) {
-                countElement.lastElementChild.innerHTML = `<span>1</span>/${blocks.length}`;
-                countElement.classList.remove("fn__none");
-                editor.protyle.element.classList.remove("fn__none");
-                editor.protyle.element.nextElementSibling.classList.add("fn__none");
-                actionElements[0].classList.remove("fn__none");
-                actionElements[1].classList.add("fn__none");
-                fetchPost("/api/filetree/getDoc", {
-                    id: blocks[index].blockID,
-                    mode: 0,
-                    size: Constants.SIZE_GET_MAX
-                }, (response) => {
-                    onGet(response, editor.protyle, [Constants.CB_GET_ALL, Constants.CB_GET_HTML]);
+                nextCard({
+                    countElement,
+                    editor,
+                    actionElements,
+                    index,
+                    blocks
                 });
             } else {
-                countElement.classList.add("fn__none");
-                editor.protyle.element.classList.add("fn__none");
-                editor.protyle.element.nextElementSibling.classList.remove("fn__none");
-                actionElements[0].classList.add("fn__none");
-                actionElements[1].classList.add("fn__none");
+                allDone(countElement, editor, actionElements);
             }
         });
     });
+};
+
+const nextCard = (options: {
+    countElement: Element, editor: Protyle, actionElements: NodeListOf<Element>, index: number, blocks: ICard[]
+}) => {
+    options.actionElements[0].classList.remove("fn__none");
+    options.actionElements[1].classList.add("fn__none");
+    options.editor.protyle.element.classList.remove("fn__none");
+    options.editor.protyle.element.nextElementSibling.classList.add("fn__none");
+    options.countElement.lastElementChild.innerHTML = `<span>${options.index + 1}</span>/${options.blocks.length}`;
+    options.countElement.classList.remove("fn__none");
+    if (options.index === 0) {
+        options.actionElements[0].firstElementChild.setAttribute("disabled", "disabled");
+    } else {
+        options.actionElements[0].firstElementChild.removeAttribute("disabled");
+    }
+    fetchPost("/api/filetree/getDoc", {
+        id: options.blocks[options.index].blockID,
+        mode: 0,
+        size: Constants.SIZE_GET_MAX
+    }, (response) => {
+        onGet(response, options.editor.protyle, [Constants.CB_GET_ALL, Constants.CB_GET_HTML]);
+    });
+};
+
+const allDone = (countElement: Element, editor: Protyle, actionElements: NodeListOf<Element>) => {
+    countElement.classList.add("fn__none");
+    editor.protyle.element.classList.add("fn__none");
+    editor.protyle.element.nextElementSibling.classList.remove("fn__none");
+    actionElements[0].classList.add("fn__none");
+    actionElements[1].classList.add("fn__none");
 };

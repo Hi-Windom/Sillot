@@ -2,14 +2,16 @@ import {Constants} from "../constants";
 import {fetchPost} from "../util/fetch";
 /// #if !MOBILE
 import {getAllModels} from "../layout/getAll";
-import {ipcRenderer} from "electron";
 import {exportLayout} from "../layout/util";
+/// #endif
+/// #if !BROWSER
+import {ipcRenderer} from "electron";
+import {getCurrentWindow} from "@electron/remote";
 /// #endif
 import {hideMessage, showMessage} from "./message";
 import {Dialog} from "./index";
 import {isMobile} from "../util/functions";
 import {confirmDialog} from "./confirmDialog";
-import {getCurrentWindow} from "@electron/remote";
 import {escapeHtml} from "../util/escape";
 import {getWorkspaceName} from "../util/noRelyPCFunction";
 import {needSubscribe} from "../util/needSubscribe";
@@ -18,10 +20,10 @@ import { exportIDB } from "../sillot/util/sillot-idb-backup-and-restore";
 export const lockScreen = () => {
     /// #if BROWSER
     fetchPost("/api/system/logoutAuth", {}, () => {
-        window.location.href = "/";
+        window.location.href = `/check-auth?url=${window.location.href}`;
     });
     /// #else
-    ipcRenderer.send(Constants.SIYUAN_LOCK_SCREEN);
+    ipcRenderer.send(Constants.SIYUAN_SEND_WINDOWS, {cmd: "lockscreen"});
     /// #endif
     exportIDB();
 };
