@@ -17,12 +17,37 @@
 package model
 
 import (
+	"errors"
+	"fmt"
+
+	"github.com/88250/lute/parse"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/av"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 )
 
-func AddBlockToAttributeView(blockID, avID string) (err error) {
+func AddAttributeViewColumn(name string, typ string, columnIndex int, avID string) (err error) {
+	attrView, err := av.ParseAttributeView(avID)
+	if nil != err {
+		return
+	}
+
+	switch av.ColumnType(typ) {
+	case av.ColumnTypeText:
+		attrView.InsertColumn(columnIndex, av.NewColumnText(name))
+	default:
+		msg := fmt.Sprintf("invalid column type [%s]", typ)
+		logging.LogErrorf(msg)
+		err = errors.New(msg)
+		return
+	}
+
+	err = av.SaveAttributeView(attrView)
+	return
+}
+
+func AddAttributeViewBlock(blockID, avID string) (err error) {
 	tree, err := loadTreeByBlockID(blockID)
 	if nil != err {
 		return
@@ -47,11 +72,21 @@ func AddBlockToAttributeView(blockID, avID string) (err error) {
 
 	var row []av.Cell
 	row = append(row, av.NewCellBlock(block.ID))
-	for _, col := range attrView.Columns[1:] {
-		// TODO 为块添加列对应的属性
-		_ = col
+	if 1 < len(attrView.Columns) {
+		attrs := parse.IAL2Map(node.KramdownIAL)
+
+		for _, col := range attrView.Columns[1:] {
+			colName := col.Name()
+			attrs[colName] = ""
+		}
+
+		if err = setNodeAttrs(node, tree, attrs); nil != err {
+			return
+		}
 	}
 
 	attrView.Rows = append(attrView.Rows, row)
+
+	err = av.SaveAttributeView(attrView)
 	return
 }
