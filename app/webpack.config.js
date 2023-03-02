@@ -28,9 +28,17 @@ module.exports = (env, argv) => {
       splitChunks: {
         chunks: "all",
       },
-      minimize: true, // 调试时关闭
+      minimize: true,
       minimizer: [
-        new EsbuildPlugin(),
+        new EsbuildPlugin({
+          minify: false,
+          minifyWhitespace: true,
+          minifyIdentifiers: false,
+          minifySyntax: false,
+          keepNames: true,
+          // !minifyIdentifiers + keepNames保留全部标识符，体积稍微增大
+          target: ["es2022"],
+        }),
       ],
     },
     module: {
@@ -51,9 +59,8 @@ module.exports = (env, argv) => {
           use: [
             {
               loader: "esbuild-loader",
-              options: {
-                minify: false,
-                keepNames: true,
+              option: {
+                target: ["es2022"],
               },
             },
             {
@@ -95,6 +102,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.[jt]sx$/,
+          // 处理一个文件可以使用多个loader，loader的执行顺序和配置中的顺序是相反的，最后一个loader最先执行，第一个loader最后执行。ifdef-loader 一般都要放在最后来先执行
           exclude: /node_modules/,
           use: [{
               loader: "babel-loader",

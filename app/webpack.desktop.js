@@ -27,7 +27,12 @@ module.exports = (env, argv) => {
       },
       minimize: true,
       minimizer: [
-        new EsbuildPlugin(),
+        new EsbuildPlugin({
+          minify: true,
+          keepNames: true,
+          // 保留必要标识符，体积稍微增大
+          target: ["es2022"],
+        }),
       ],
     },
     resolve: {
@@ -72,9 +77,8 @@ module.exports = (env, argv) => {
           use: [
             {
               loader: "esbuild-loader",
-              options: {
-                minify: true,
-                keepNames: true,
+              option: {
+                target: ["es2022"],
               },
             },
             {
