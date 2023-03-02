@@ -58,7 +58,7 @@ module.exports = (env, argv) => {
           use: [
             {
               loader: "esbuild-loader",
-              option: {
+              options: {
                 target: ["es2022"],
               },
             },
