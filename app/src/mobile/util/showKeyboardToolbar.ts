@@ -6,13 +6,12 @@ import {Constants} from "../../constants";
 import {focusByRange, getSelectionPosition} from "../../protyle/util/selection";
 
 export const showKeyboardToolbar = (bottom = 0) => {
-    if (getSelection().rangeCount > 0) {
-        const range = getSelection().getRangeAt(0);
-        if (!window.siyuan.mobile.editor ||
-            !window.siyuan.mobile.editor.protyle.wysiwyg.element.contains(range.startContainer)) {
-            return;
-        }
-    } else {
+    if (getSelection().rangeCount === 0) {
+        return;
+    }
+    const range = getSelection().getRangeAt(0);
+    if (!window.siyuan.mobile.editor ||
+        !window.siyuan.mobile.editor.protyle.wysiwyg.element.contains(range.startContainer)) {
         return;
     }
     const toolbarElement = document.getElementById("keyboardToolbar");
@@ -36,9 +35,35 @@ export const showKeyboardToolbar = (bottom = 0) => {
     }, Constants.TIMEOUT_TRANSITION);
 };
 
+export const renderKeyboardToolbar = (protyle: IProtyle, range: Range) => {
+    const toolbarElement = document.getElementById("keyboardToolbar");
+    toolbarElement.innerHTML = `<div class="keyboard__dynamic">
+    <button data-type="indent"><svg><use xlink:href="#iconIndent"></use></svg></button>
+    <button data-type="outdent"><svg><use xlink:href="#iconOutdent"></use></svg></button>
+    
+    <button data-type="up"><svg><use xlink:href="#iconUp"></use></svg></button>
+    <button data-type="down"><svg><use xlink:href="#iconDown"></use></svg></button>
+    
+    <button data-type="before"><svg><use xlink:href="#iconBefore"></use></svg></button>
+    <button data-type="after"><svg><use xlink:href="#iconAfter"></use></svg></button>
+    
+    <button data-type="clear"><svg><use xlink:href="#iconClear"></use></svg></button>
+    
+    <button data-type="undo"><svg><use xlink:href="#iconUndo"></use></svg></button>
+    <button data-type="redo"><svg><use xlink:href="#iconRedo"></use></svg></button>
+</div>
+<span class="fn__flex-1"></span>
+<span class="keyboard__split"></span>
+<button data-type="done"><svg style="width: 36px"><use xlink:href="#iconRedo"></use></svg></button>`
+}
+
 export const hideKeyboardToolbar = () => {
     const toolbarElement = document.getElementById("keyboardToolbar");
     toolbarElement.classList.add("fn__none");
+};
+
+export const hideKeyboard = () => {
+    (document.activeElement as HTMLElement).blur();
 };
 
 export const initKeyboardToolbar = () => {
@@ -49,12 +74,16 @@ export const initKeyboardToolbar = () => {
         if (!buttonElement || !window.siyuan.mobile.editor) {
             return;
         }
-        if (window.siyuan.mobile.editor.protyle.disabled) {
-            return;
-        }
         event.preventDefault();
         event.stopPropagation();
         const type = buttonElement.getAttribute("data-type");
+        if (type === "done") {
+            hideKeyboard();
+            return;
+        }
+        if (window.siyuan.mobile.editor.protyle.disabled) {
+            return;
+        }
         const protyle = window.siyuan.mobile.editor.protyle;
         if (type === "undo") {
             protyle.undo.undo(protyle);

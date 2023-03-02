@@ -37,6 +37,10 @@ export const hintSlash = (key: string, protyle: IProtyle) => {
         value: "{{",
         html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconSQL"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.blockEmbed}</span><span class="b3-list-item__meta">{{</span></div>`,
     }, {
+        filter: ["属性试图", "shuxingshitu", "sxst", "attribute view"],
+        value: '<div data-type="NodeAttributeView" data-av-type="table"></div>',
+        html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"></svg><span class="b3-list-item__text">TODO</span></div>`,
+    }, {
         filter: ["文档", "子文档", "wendang", "wd", "ziwendang", "zwd", "xjwd"],
         value: Constants.ZWSP + 4,
         html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconFile"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.newFile}</span><span class="b3-menu__accelerator">${updateHotkeyTip(window.siyuan.config.keymap.general.newFile.custom)}</span></div>`,
@@ -167,15 +171,15 @@ export const hintSlash = (key: string, protyle: IProtyle) => {
         value: '<iframe sandbox="allow-forms allow-presentation allow-same-origin allow-scripts allow-modals" src="" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>',
         html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconLanguage"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.insertIframeURL}</span></div>`,
     }, {
-        filter: ["输入图片链接", "input image url", "shurutupianlianjie", "srtptp"],
+        filter: ["插入图片链接", "insert image link", "charutupianlianjie", "crtptp"],
         value: "![]()",
         html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconImage"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.insertImgURL}</span></div>`,
     }, {
-        filter: ["输入视频链接", "shurushipinlianjie", "srsplj", "input video url"],
+        filter: ["插入视频链接", "charushipinlianjie", "crsplj", "insert video url"],
         value: '<video controls="controls" src=""></video>',
         html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconVideo"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.insertVideoURL}</span></div>`,
     }, {
-        filter: ["输入音频链接", "shuruyinpinlianjie", "sryplj", "input audio url"],
+        filter: ["插入音频链接", "charuyinpinlianjie", "cryplj", "insert audio url"],
         value: '<audio controls="controls" src=""></audio>',
         html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconRecord"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.insertAudioURL}</span></div>`,
     }, {

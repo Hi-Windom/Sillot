@@ -210,6 +210,9 @@ func FindReplace(keyword, replacement string, ids []string, method int) (err err
 		return
 	}
 
+	r, _ := regexp.Compile(keyword)
+	escapedKey := util.EscapeHTML(keyword)
+	escapedR, _ := regexp.Compile(escapedKey)
 	ids = gulu.Str.RemoveDuplicatedElem(ids)
 	var renameRoots []*ast.Node
 	renameRootTitles := map[string]string{}
@@ -239,7 +242,6 @@ func FindReplace(keyword, replacement string, ids []string, method int) (err err
 						renameRoots = append(renameRoots, n)
 					}
 				} else if 3 == method {
-					r, _ := regexp.Compile(keyword)
 					if nil != r && r.MatchString(title) {
 						renameRootTitles[n.ID] = r.ReplaceAllString(title, replacement)
 						renameRoots = append(renameRoots, n)
@@ -251,22 +253,19 @@ func FindReplace(keyword, replacement string, ids []string, method int) (err err
 						n.Tokens = bytes.ReplaceAll(n.Tokens, []byte(keyword), []byte(replacement))
 					}
 				} else if 3 == method {
-					r, _ := regexp.Compile(keyword)
 					if nil != r && r.MatchString(string(n.Tokens)) {
 						n.Tokens = []byte(r.ReplaceAllString(string(n.Tokens), replacement))
 					}
 				}
 			case ast.NodeTextMark:
 				if n.IsTextMarkType("code") {
-					escapedKey := util.EscapeHTML(keyword)
 					if 0 == method {
 						if strings.Contains(n.TextMarkTextContent, escapedKey) {
 							n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, escapedKey, replacement)
 						}
 					} else if 3 == method {
-						r, _ := regexp.Compile(escapedKey)
-						if nil != r && r.MatchString(n.TextMarkTextContent) {
-							n.TextMarkTextContent = r.ReplaceAllString(n.TextMarkTextContent, replacement)
+						if nil != escapedR && escapedR.MatchString(n.TextMarkTextContent) {
+							n.TextMarkTextContent = escapedR.ReplaceAllString(n.TextMarkTextContent, replacement)
 						}
 					}
 				} else {
@@ -275,7 +274,6 @@ func FindReplace(keyword, replacement string, ids []string, method int) (err err
 							n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, keyword, replacement)
 						}
 					} else if 3 == method {
-						r, _ := regexp.Compile(keyword)
 						if nil != r && r.MatchString(n.TextMarkTextContent) {
 							n.TextMarkTextContent = r.ReplaceAllString(n.TextMarkTextContent, replacement)
 						}
@@ -299,7 +297,6 @@ func FindReplace(keyword, replacement string, ids []string, method int) (err err
 						n.TextMarkAHref = strings.ReplaceAll(n.TextMarkAHref, keyword, replacement)
 					}
 				} else if 3 == method {
-					r, _ := regexp.Compile(keyword)
 					if nil != r {
 						if r.MatchString(n.TextMarkTextContent) {
 							n.TextMarkTextContent = r.ReplaceAllString(n.TextMarkTextContent, replacement)
@@ -654,7 +651,6 @@ func fullTextSearchByKeyword(query, boxFilter, pathFilter, typeFilter string, or
 
 func fullTextSearchByRegexp(exp, boxFilter, pathFilter, typeFilter, orderBy string, beforeLen int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
 	exp = gulu.Str.RemoveInvisible(exp)
-	exp = regexp.QuoteMeta(exp)
 
 	fieldFilter := fieldRegexp(exp)
 	stmt := "SELECT * FROM `blocks` WHERE " + fieldFilter + " AND type IN " + typeFilter
