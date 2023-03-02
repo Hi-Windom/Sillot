@@ -20,7 +20,7 @@
 
 const {
     app,
-  session,
+    session,
     BrowserWindow,
     shell,
     Menu,
@@ -1037,6 +1037,43 @@ app.whenReady().then(() => {
             }
         });
     }
+
+    const filter = {
+      urls: [
+        "*://*/*.js",
+        "*://*/*.cjs",
+        "*://*/*.mjs",
+      ],
+    };
+    const ignore = [
+        "localhost",
+        "127.0.0.1",
+        "0.0.0.0",
+    ]
+    const trusted = [
+      "Hi-Windom",
+      "siyuan-note",
+      "Soltus",
+      "ci-hi",
+      "ci-win",
+      "ci-dom",
+    ];
+
+    session.defaultSession.webRequest.onBeforeRequest(
+      filter,
+      (details, callback) => {
+        let host = details.url.split("/")[2].split(":")[0];
+        let u = details.url.split("/")[3];
+        if (trusted.includes(u) || ignore.includes(host)) {
+            callback({ cancel: false });
+        } else {
+            callback({
+              cancel: false,
+              redirectURL: "https://github.com/Hi-Windom/Sillot/issues/266",
+            }); // 重定向而不是取消，不然控制台一片红不好看
+        }
+      }
+    );
 });
 
 app.on("open-url", (event, url) => { // for macOS
