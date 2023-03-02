@@ -41,6 +41,10 @@ module.exports = (env, argv) => {
         }),
       ],
     },
+    externals: {
+      bufferutil: "bufferutil",
+      "utf-8-validate": "utf-8-validate",
+    },
     module: {
       rules: [
         {
