@@ -30,7 +30,6 @@
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
 <div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
 <div id="app5" data-bind="react" data-lib="joyUI"></div>
-<script src="../../sillot/vue.global.prod.js" defer init></script>
 <!-- Start of Microsoft Clarity -->
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
