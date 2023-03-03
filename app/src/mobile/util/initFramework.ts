@@ -8,7 +8,6 @@ import {fetchPost} from "../../util/fetch";
 import {setInlineStyle} from "../../util/assets";
 import {renderSnippet} from "../../config/util/snippets";
 import {setEmpty} from "./setEmpty";
-import {disabledProtyle, enableProtyle} from "../../protyle/util/onGet";
 import {getOpenNotebookCount} from "../../util/pathName";
 import {popMenu} from "./menu";
 import {MobileFiles} from "./MobileFiles";
@@ -76,7 +75,7 @@ export const initFramework = () => {
         });
     });
     window.siyuan.mobile.files = new MobileFiles();
-    document.getElementById("toolbarFile").addEventListener("click", (event) => {
+    document.getElementById("toolbarFile").addEventListener("click", () => {
         hideKeyboardToolbar();
         hideKeyboard();
         sidebarElement.style.left = "0";
@@ -110,19 +109,8 @@ export const initFramework = () => {
         editIconElement.setAttribute("xlink:href", "#iconEdit");
     }
     editElement.addEventListener(getEventName(), () => {
-        const isReadonly = editIconElement.getAttribute("xlink:href") === "#iconEdit";
-        window.siyuan.config.editor.readOnly = isReadonly;
-        fetchPost("/api/setting/setEditor", window.siyuan.config.editor, () => {
-            if (!isReadonly) {
-                enableProtyle(window.siyuan.mobile.editor.protyle);
-                inputElement.readOnly = false;
-                editIconElement.setAttribute("xlink:href", "#iconEdit");
-            } else {
-                disabledProtyle(window.siyuan.mobile.editor.protyle);
-                inputElement.readOnly = true;
-                editIconElement.setAttribute("xlink:href", "#iconPreview");
-            }
-        });
+        window.siyuan.config.editor.readOnly = editIconElement.getAttribute("xlink:href") === "#iconEdit";
+        fetchPost("/api/setting/setEditor", window.siyuan.config.editor);
     });
     if (navigator.userAgent.indexOf("iPhone") > -1 && !window.siyuan.config.readonly && !window.siyuan.config.editor.readOnly) {
         // 不知道为什么 iPhone 中如果是编辑状态，点击文档后无法点击标题

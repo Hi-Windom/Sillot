@@ -16,12 +16,13 @@
 
 package av
 
-type ColumnText struct {
-	*BaseColumn
+import "github.com/88250/lute/ast"
+
+type Row struct {
+	ID    string  `json:"id"`
+	Cells []*Cell `json:"cells"`
 }
 
-func NewColumnText(name string) *ColumnText {
-	return &ColumnText{
-		BaseColumn: NewBaseColumn(name, ColumnTypeText),
-	}
+func NewRow() *Row {
+	return &Row{ID: ast.NewNodeID()}
 }
