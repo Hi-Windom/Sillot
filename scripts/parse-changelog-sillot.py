@@ -8,7 +8,8 @@ import github
 docmap = {
     "Feature": "引入特性",
     "Enhancement": "改进功能",
-    "Bug": "修复缺陷",
+    "Bug": "修复错误",
+    "Securiy": "修补漏洞",
     "Document": "文档相关",
     "Refactor": "开发重构",
     "Abolishment": "移除功能"
