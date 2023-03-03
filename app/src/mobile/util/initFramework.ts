@@ -17,7 +17,7 @@ import {hasTopClosestByTag} from "../../protyle/util/hasClosest";
 import {MobileBacklinks} from "./MobileBacklinks";
 import {MobileBookmarks} from "./MobileBookmarks";
 import {MobileTags} from "./MobileTags";
-import {hideKeyboardToolbar, initKeyboardToolbar} from "./showKeyboardToolbar";
+import {hideKeyboard, hideKeyboardToolbar, initKeyboardToolbar} from "./keyboardToolbar";
 import {getSearch} from "../../util/functions";
 import {syncGuide} from "../../sync/syncGuide";
 
@@ -31,7 +31,9 @@ export const initFramework = () => {
     let backlink: MobileBacklinks;
     let bookmark: MobileBookmarks;
     let tag: MobileTags;
-    sidebarElement.querySelector(".toolbar--border").addEventListener(getEventName(), (event: Event & { target: Element }) => {
+    sidebarElement.querySelector(".toolbar--border").addEventListener(getEventName(), (event: Event & {
+        target: Element
+    }) => {
         const svgElement = hasTopClosestByTag(event.target, "svg");
         if (!svgElement || svgElement.classList.contains("toolbar__icon--active")) {
             return;
@@ -74,7 +76,9 @@ export const initFramework = () => {
         });
     });
     window.siyuan.mobile.files = new MobileFiles();
-    document.getElementById("toolbarFile").addEventListener("click", () => {
+    document.getElementById("toolbarFile").addEventListener("click", (event) => {
+        hideKeyboardToolbar();
+        hideKeyboard();
         sidebarElement.style.left = "0";
         document.querySelector(".scrim").classList.remove("fn__none");
         const type = sidebarElement.querySelector(".toolbar--border .toolbar__icon--active").getAttribute("data-type");
@@ -120,6 +124,15 @@ export const initFramework = () => {
             }
         });
     });
+    if (navigator.userAgent.indexOf("iPhone") > -1 && !window.siyuan.config.readonly && !window.siyuan.config.editor.readOnly) {
+        // 不知道为什么 iPhone 中如果是编辑状态，点击文档后无法点击标题
+        setTimeout(() => {
+            editElement.dispatchEvent(new CustomEvent(getEventName()));
+            setTimeout(() => {
+                editElement.dispatchEvent(new CustomEvent(getEventName()));
+            }, Constants.TIMEOUT_INPUT);
+        }, Constants.TIMEOUT_INPUT);
+    }
 
     scrimElement.addEventListener(getEventName(), () => {
         closePanel();
@@ -170,9 +183,6 @@ export const initFramework = () => {
 const initEditorName = () => {
     const inputElement = document.getElementById("toolbarName") as HTMLInputElement;
     inputElement.setAttribute("placeholder", window.siyuan.languages._kernel[16]);
-    inputElement.addEventListener("focus", () => {
-        hideKeyboardToolbar();
-    });
     inputElement.addEventListener("blur", () => {
         if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly || window.siyuan.mobile.editor.protyle.disabled) {
             return;

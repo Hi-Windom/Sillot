@@ -4,9 +4,7 @@ const pkg = require("./package.json");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
-const TerserPlugin = require("terser-webpack-plugin");
-const BundleAnalyzerPlugin = require(
-  "webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const { EsbuildPlugin } = require("esbuild-loader");
 
 module.exports = (env, argv) => {
   return {
@@ -30,17 +28,22 @@ module.exports = (env, argv) => {
       splitChunks: {
         chunks: "all",
       },
-      minimize: true, // 调试时关闭
+      minimize: true,
       minimizer: [
-        new TerserPlugin({
-          terserOptions: {
-            format: {
-              comments: false,
-            },
-          },
-          extractComments: false,
+        new EsbuildPlugin({
+          minify: false,
+          minifyWhitespace: true,
+          minifyIdentifiers: false,
+          minifySyntax: false,
+          keepNames: true,
+          // !minifyIdentifiers + keepNames保留全部标识符，体积稍微增大
+          target: ["es2022"],
         }),
       ],
+    },
+    externals: {
+      bufferutil: "bufferutil",
+      "utf-8-validate": "utf-8-validate",
     },
     module: {
       rules: [
@@ -59,7 +62,10 @@ module.exports = (env, argv) => {
           exclude: /node_modules/,
           use: [
             {
-              loader: "ts-loader",
+              loader: "esbuild-loader",
+              options: {
+                target: ["es2022"],
+              },
             },
             {
               loader: "ifdef-loader", options: {
@@ -100,6 +106,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.[jt]sx$/,
+          // 处理一个文件可以使用多个loader，loader的执行顺序和配置中的顺序是相反的，最后一个loader最先执行，第一个loader最后执行。ifdef-loader 一般都要放在最后来先执行
           exclude: /node_modules/,
           use: [{
               loader: "babel-loader",

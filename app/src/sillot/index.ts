@@ -9,18 +9,30 @@ import * as ReactDOM from "react-dom"; // 兼容性好
 import Swal from "sweetalert2";
 import exSout from "./util/sout";
 import { MusicPlayer } from "./react-music-player";
-import { focusBlock,focusByOffset,focusSideBlock,focusByRange } from "../protyle/util/selection";
+import {
+  focusBlock,
+  focusByOffset,
+  focusSideBlock,
+  focusByRange,
+} from "../protyle/util/selection";
+
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 export class SillotEnv {
   constructor() {
     exSout();
-    window.Sillot = { status: { IDBloaded: false, disableDocSetPadding: false }, funs: { hljsRender: highlightRender }, lute: null };
+    window.Sillot = {
+      status: { IDBloaded: false, disableDocSetPadding: false },
+      funs: { hljsRender: highlightRender },
+      lute: null,
+    };
     window.__ = {
       ace: null,
       Swal: Swal,
       localforage: localforage,
       toastify: new Toastify({ id: "app1", limit: 5, theme: "colored" }),
-      hottt: new HotToast({id: "app3"}),
+      hottt: new HotToast({ id: "app3" }),
     };
     window._ = lodash;
     window.React = React;
@@ -31,7 +43,35 @@ export class SillotEnv {
       focusBlock: focusBlock,
       focusByOffset: focusByOffset,
       focusSideBlock: focusSideBlock,
-      focusByRange: focusByRange
+      focusByRange: focusByRange,
     };
+    /// #if !BROWSER
+    const httpServer = createServer();
+    const io = new Server(httpServer, {
+      cors: {
+        origin: "http://localhost:5173",
+        allowedHeaders: ["my-custom-header"],
+        credentials: true,
+      },
+    });
+
+    io.on("connection", (socket) => {
+      console.log(socket.id);
+      socket.emit("hello", "world");
+      socket.emit(
+        "createDOM",
+        "id1",
+        `
+      <p id="main">
+        <span class="prettify">
+          keep me and make me pretty!
+        </span>
+      </p>
+    `
+      );
+    });
+
+    httpServer.listen(3900);
+    ///#endif
   }
 }

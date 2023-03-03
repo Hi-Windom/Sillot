@@ -3,7 +3,7 @@ const webpack = require("webpack");
 const pkg = require("./package.json");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 // const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-const TerserPlugin = require("terser-webpack-plugin");
+const { EsbuildPlugin } = require("esbuild-loader");
 
 module.exports = (env, argv) => {
   return {
@@ -24,13 +24,14 @@ module.exports = (env, argv) => {
     optimization: {
       minimize: true,
       minimizer: [
-        new TerserPlugin({
-          terserOptions: {
-            format: {
-              comments: false,
-            },
-          },
-          extractComments: false,
+        new EsbuildPlugin({
+          minify: false,
+          minifyWhitespace: true,
+          minifyIdentifiers: false,
+          minifySyntax: false,
+          keepNames: true,
+          // !minifyIdentifiers + keepNames保留全部标识符，体积稍微增大
+          target: ["es2022"],
         }),
       ],
     },
@@ -47,7 +48,10 @@ module.exports = (env, argv) => {
           include: [path.resolve(__dirname, "src")],
           use: [
             {
-              loader: "ts-loader",
+              loader: "esbuild-loader",
+              options: {
+                target: ["es2022"],
+              },
             },
             {
               loader: "ifdef-loader",

@@ -10,6 +10,7 @@ import (
 	"github.com/88250/gulu"
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
+	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
 func UserHomeDir() string {
@@ -47,12 +48,13 @@ func SetStoredConfiges(f string, data string) (ret map[string]interface{}, err e
 
 func getStoredConfiges(f string) (ret map[string]interface{}, err error) {
 	ret = map[string]interface{}{}
-	lsPath := filepath.Join(GetSillotAppDataDir(), f)
-	if !gulu.File.IsExist(lsPath) {
+	// lsPath := filepath.Join(GetSillotAppDataDir(), f)
+	dirPath := filepath.Join(util.DataDir, "storage")
+	if !gulu.File.IsExist(dirPath) {
 		return
 	}
 
-	data, err := filelock.ReadFile(lsPath)
+	data, err := filelock.ReadFile(dirPath)
 	if nil != err {
 		logging.LogErrorf("read storage [local] failed: %s", err)
 		return
@@ -68,15 +70,23 @@ func getStoredConfiges(f string) (ret map[string]interface{}, err error) {
 func setStoredConfiges(f string, data string) (ret map[string]interface{}, err error) {
 	ret = map[string]interface{}{}
 	fmt.Print(f)
-	lsPath := filepath.Join(GetSillotAppDataDir(), f)
-	fmt.Print(lsPath)
-	if !gulu.File.IsExist(lsPath) {
-		file, _ := os.Create(lsPath)
-		file.Close()
-	}
-	if err = filelock.WriteFile(lsPath, []byte(data)); nil != err {
+	dirPath := filepath.Join(util.DataDir, "storage", "idb.json")
+
+	if err = filelock.WriteFile(dirPath, []byte(data)); nil != err {
 		logging.LogErrorf("write sort conf failed: %s", err)
 		return
+	}
+	if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+		lsPath := filepath.Join(GetSillotAppDataDir(), f)
+		fmt.Print(lsPath)
+		if !gulu.File.IsExist(lsPath) {
+			file, _ := os.Create(lsPath)
+			file.Close()
+		}
+		if err = filelock.WriteFile(lsPath, []byte(data)); nil != err {
+			logging.LogErrorf("write sort conf failed: %s", err)
+			return
+		}
 	}
 	return
 }

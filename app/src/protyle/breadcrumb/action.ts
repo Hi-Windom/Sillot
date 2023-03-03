@@ -6,7 +6,7 @@ import {fetchPost} from "../../util/fetch";
 import {Constants} from "../../constants";
 import {onGet} from "../util/onGet";
 import {saveScroll} from "../scroll/saveScroll";
-import {hideElements} from "../ui/hideElements";
+import {hideAllElements, hideElements} from "../ui/hideElements";
 import {hasClosestByClassName} from "../util/hasClosest";
 
 export const netImg2LocalAssets = (protyle: IProtyle) => {
@@ -76,6 +76,11 @@ export const fullscreen = (element: Element, btnElement?: Element) => {
     }
     /// #if !MOBILE
     if (element.classList.contains("protyle")) {
+        // 等待页面动画结束
+        setTimeout(() => {
+            hideAllElements(["gutter"]);
+        }, Constants.TIMEOUT_TRANSITION);
+
         window.siyuan.editorIsFullscreen = !isFullscreen;
     }
     getAllModels().editor.forEach(item => {

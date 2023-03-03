@@ -32,7 +32,6 @@
 <div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
 <div id="app4" data-bind="react" data-lib="react-music-player"></div>
 <div id="app5" data-bind="react" data-lib="joyUI"></div>
-<script src="../../sillot/vue.global.prod.js" defer init></script>
 <script>
   setTimeout(() => {
     const refreshElement = document.getElementById("loadingRefresh")

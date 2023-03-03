@@ -222,16 +222,34 @@
   border-radius: 4px;
 }
 
-#keyboardToolbar {
+.keyboard {
   position: fixed;
   bottom: 0;
   width: 100%;
   box-sizing: border-box;
-  height: 32px;
+  height: 42px;
   background: var(--b3-theme-background);
   z-index: 212;
   display: flex;
   border-top: 1px solid var(--b3-theme-surface-lighter);
+  overflow: hidden;
+
+  &__dynamic {
+    overflow: auto;
+    display: flex;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__split {
+    width: 1px;
+    height: 28px;
+    background: var(--b3-border-color);
+    align-self: center;
+    flex-shrink: 0;
+  }
 
   button {
     background: transparent;
@@ -239,11 +257,17 @@
     border: 0;
 
     svg {
-      height: 18px;
-      width: 18px;
-      padding: 4px;
-      margin: 4px;
+      height: 16px;
+      width: 16px;
+      float: left;
+      padding: 12px;
       color: var(--b3-theme-on-surface);
+
+      &.keyboard__svg--big {
+        width: 30px;
+        padding: 4px;
+        height: 32px;
+      }
     }
   }
 }

@@ -161,6 +161,7 @@ const (
 	TxErrCodeBlockNotFound    = 0
 	TxErrCodeUnableAccessFile = 1
 	TxErrCodeWriteTree        = 2
+	TxErrWriteAttributeView   = 3
 )
 
 type TxErr struct {
@@ -213,6 +214,10 @@ func performTx(tx *Transaction) (ret *TxErr) {
 			ret = tx.doUnfoldHeading(op)
 		case "setAttrs":
 			ret = tx.setAttrs(op)
+		case "insertAttrViewBlock":
+			ret = tx.doInsertAttrViewBlock(op)
+		case "removeAttrViewBlock":
+			ret = tx.doRemoveAttrViewBlock(op)
 		}
 
 		if nil != ret {
@@ -1021,6 +1026,7 @@ type Operation struct {
 	ParentID   string      `json:"parentID"`
 	PreviousID string      `json:"previousID"`
 	NextID     string      `json:"nextID"`
+	SrcIDs     []string    `json:"srcIDs"` // 用于将块拖拽到属性视图中
 	RetData    interface{} `json:"retData"`
 
 	discard bool // 用于标识是否在事务合并中丢弃
