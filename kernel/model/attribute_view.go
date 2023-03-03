@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/av"
@@ -32,13 +33,13 @@ func (tx *Transaction) doInsertAttrViewBlock(operation *Operation) (ret *TxErr) 
 	tree, err := tx.loadTree(firstSrcID)
 	if nil != err {
 		logging.LogErrorf("load tree [%s] failed: %s", firstSrcID, err)
-		return &TxErr{code: TxErrCodeBlockNotFound, id: firstSrcID}
+		return &TxErr{code: TxErrCodeBlockNotFound, id: firstSrcID, msg: err.Error()}
 	}
 
 	avID := operation.ParentID
 	for _, id := range operation.SrcIDs {
 		if err = addAttributeViewBlock(id, avID, tree); nil != err {
-			return &TxErr{code: TxErrWriteAttributeView, id: avID}
+			return &TxErr{code: TxErrWriteAttributeView, id: avID, msg: err.Error()}
 		}
 	}
 	return
@@ -59,8 +60,6 @@ func (tx *Transaction) doRemoveAttrViewBlock(operation *Operation) (ret *TxErr) 
 		}
 	}
 	return
-
-	return
 }
 
 func AddAttributeViewColumn(name string, typ string, columnIndex int, avID string) (err error) {
@@ -71,7 +70,7 @@ func AddAttributeViewColumn(name string, typ string, columnIndex int, avID strin
 
 	switch av.ColumnType(typ) {
 	case av.ColumnTypeText:
-		attrView.InsertColumn(columnIndex, av.NewColumnText(name))
+		attrView.InsertColumn(columnIndex, &av.Column{ID: ast.NewNodeID(), Name: name, Type: av.ColumnTypeText})
 	default:
 		msg := fmt.Sprintf("invalid column type [%s]", typ)
 		logging.LogErrorf(msg)
@@ -96,7 +95,7 @@ func removeAttributeViewBlock(blockID, avID string, tree *parse.Tree) (err error
 	}
 
 	for i, row := range attrView.Rows {
-		if row[0].Value() == blockID {
+		if row.Cells[0].Value == blockID {
 			attrView.Rows = append(attrView.Rows[:i], attrView.Rows[i+1:]...)
 			break
 		}
@@ -113,6 +112,11 @@ func addAttributeViewBlock(blockID, avID string, tree *parse.Tree) (err error) {
 		return
 	}
 
+	if ast.NodeAttributeView == node.Type {
+		// 不能将一个属性视图拖拽到另一个属性视图中
+		return
+	}
+
 	block := sql.BuildBlockFromNode(node, tree)
 	if nil == block {
 		err = ErrBlockNotFound
@@ -126,18 +130,18 @@ func addAttributeViewBlock(blockID, avID string, tree *parse.Tree) (err error) {
 
 	// 不允许重复添加相同的块到属性视图中
 	for _, row := range attrView.Rows {
-		if row[0].Value() == blockID {
+		if row.Cells[0].Value == blockID {
 			return
 		}
 	}
 
-	var row []av.Cell
-	row = append(row, av.NewCellBlock(block.ID))
+	row := av.NewRow()
+	row.Cells = append(row.Cells, &av.Cell{Value: blockID})
 	if 1 < len(attrView.Columns) {
 		attrs := parse.IAL2Map(node.KramdownIAL)
 
 		for _, col := range attrView.Columns[1:] {
-			colName := col.Name()
+			colName := col.Name
 			attrs[colName] = ""
 		}
 
