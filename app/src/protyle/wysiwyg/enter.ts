@@ -278,7 +278,7 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
     }
 
     // bq
-    if (editableElement.textContent.replace(Constants.ZWSP, "").replace("\n", "") === "" &&
+    if (editableElement.textContent.replace(Constants.ZWSP, "").replace(/\n/g, "") === "" &&
         blockElement.nextElementSibling && blockElement.nextElementSibling.classList.contains("protyle-attr") && blockElement.parentElement.getAttribute("data-type") === "NodeBlockquote") {
         range.insertNode(document.createElement("wbr"));
         const topElement = getTopEmptyElement(blockElement);
