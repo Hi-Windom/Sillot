@@ -64,7 +64,8 @@ def find_milestone(repo, title):
 💠 海文东QQ频道：43in2c1qb9 异步更新安装包
 🐱‍🏍 Sillot is currently in active development
 ⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
-🚢 [Docker Image Available](https://hub.docker.com/r/soltus/sillot)
+🚢 [Docker image available](https://hub.docker.com/r/soltus/sillot)
+📱 [Android application package available](https://github.com/Hi-Windom/Sillot-android)
 <span>
 <img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 10+-black?logo=android" title=""/>
 </span>[![CI](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml/badge.svg)](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml)
