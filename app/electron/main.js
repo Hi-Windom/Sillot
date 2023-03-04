@@ -1077,6 +1077,7 @@ app.whenReady().then(() => {
         if (trusted.includes(u) || ignore.includes(host)) {
             callback({ cancel: false });
         } else {
+            console.log( {url:details.url,res:"不受信的 js 请求将被重定向，请从本地加载 js"})
             callback({
               cancel: false,
               redirectURL: "https://bitbucket.org/hi-windom/hi/raw/main/js/403.js",
