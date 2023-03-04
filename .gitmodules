@@ -13,6 +13,3 @@
 [submodule "app/guide/20230202000000-c123456"]
 	path = app/guide/20230202000000-c123456
 	url = https://github.com/Hi-Windom/user-guide-zh_CN.git
-[submodule "app/SB"]
-	path = app/SB
-	url = https://github.com/Hi-Windom/SBonder.git
