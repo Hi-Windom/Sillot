@@ -1,17 +1,12 @@
 import {listIndent, listOutdent} from "../../protyle/wysiwyg/list";
-import {hasClosestBlock, hasClosestByMatchTag} from "../../protyle/util/hasClosest";
+import {hasClosestBlock, hasClosestByClassName, hasClosestByMatchTag} from "../../protyle/util/hasClosest";
 import {insertEmptyBlock} from "../../block/util";
 import {moveToDown, moveToUp} from "../../protyle/wysiwyg/move";
 import {Constants} from "../../constants";
 import {focusByRange, getSelectionPosition} from "../../protyle/util/selection";
 
 export const showKeyboardToolbar = (bottom = 0) => {
-    if (getSelection().rangeCount === 0) {
-        return;
-    }
-    const range = getSelection().getRangeAt(0);
-    if (!window.siyuan.mobile.editor ||
-        !window.siyuan.mobile.editor.protyle.wysiwyg.element.contains(range.startContainer)) {
+    if (getSelection().rangeCount === 0 || window.siyuan.config.editor.readOnly || window.siyuan.config.readonly) {
         return;
     }
     const toolbarElement = document.getElementById("keyboardToolbar");
@@ -21,6 +16,11 @@ export const showKeyboardToolbar = (bottom = 0) => {
     toolbarElement.classList.remove("fn__none");
     toolbarElement.style.bottom = bottom + "px";
 
+    const range = getSelection().getRangeAt(0);
+    if (!window.siyuan.mobile.editor ||
+        !window.siyuan.mobile.editor.protyle.wysiwyg.element.contains(range.startContainer)) {
+        return;
+    }
     setTimeout(() => {
         const contentElement = window.siyuan.mobile.editor.protyle.contentElement;
         const cursorTop = getSelectionPosition(contentElement).top - contentElement.getBoundingClientRect().top;
@@ -35,33 +35,23 @@ export const showKeyboardToolbar = (bottom = 0) => {
     }, Constants.TIMEOUT_TRANSITION);
 };
 
-export const renderKeyboardToolbar = (protyle: IProtyle, range: Range) => {
-    const toolbarElement = document.getElementById("keyboardToolbar");
-    const inlineHTML = `<button data-type="indent"><svg><use xlink:href="#iconBack"></use></svg></button>
-<button data-type="indent"><svg><use xlink:href="#iconRef"></use></svg></button>
-<button data-type="block-ref"<use xlink:href="#iconRef"></use></svg></button>
-<button data-type="a"><svg><use xlink:href="#iconLink"></use></svg></button>
-<button data-type="text"><svg><use xlink:href="#iconFont"></use></svg></button>
-<button data-type="strong"><svg><use xlink:href="#iconBold"></use></svg></button>
-<button data-type="em"><svg><use xlink:href="#iconItalic"></use></svg></button>
-<button data-type="u"><svg><use xlink:href="#iconUnderline"></use></svg></button>
-<button data-type="s"><svg><use xlink:href="#iconStrike"></use></svg></button>
-<button data-type="mark"><svg><use xlink:href="#iconMark"></use></svg></button>
-<button data-type="sup"><svg><use xlink:href="#iconSup"></use></svg></button>
-<button data-type="sub"><svg><use xlink:href="#iconSub"></use></svg></button>
-<button data-type="clear"><svg><use xlink:href="#iconClear"></use></svg></button>
-<button data-type="code"><svg><use xlink:href="#iconInlineCode"></use></svg></button>
-<button data-type="kbd"<use xlink:href="#iconKeymap"></use></svg></button>
-<button data-type="tag"><svg><use xlink:href="#iconTags"></use></svg></button>
-<button data-type="inline-math"><svg><use xlink:href="#iconMath"></use></svg></button>
-<button data-type="inline-memo"><svg><use xlink:href="#iconM"></use></svg></button>
-<button data-type="indent"><svg><use xlink:href="#iconClose"></use></svg></button>`;
-    const html = `<button data-type="add"><svg><use xlink:href="#iconAdd"></use></svg></button>
-<button data-type="indent"><svg class="keyboard__svg--big"><use xlink:href="#iconBIU"></use></svg></button>
+let renderKeyboardToolbarTimeout: number;
+export const renderKeyboardToolbar = () => {
+    clearTimeout(renderKeyboardToolbarTimeout)
+    renderKeyboardToolbarTimeout = window.setTimeout(() => {
+        if (getSelection().rangeCount === 0 || window.siyuan.config.editor.readOnly || window.siyuan.config.readonly) {
+            return;
+        }
+        const range = getSelection().getRangeAt(0);
+        let html = ""
+        if (hasClosestByClassName(range.startContainer, "protyle-wysiwyg", true)) {
+            const protyle = window.siyuan.mobile.editor.protyle;
+            html = `<button data-type="add"><svg><use xlink:href="#iconAdd"></use></svg></button>
+<button data-type="goinline"><svg class="keyboard__svg--big"><use xlink:href="#iconBIU"></use></svg></button>
 <button data-type="indent"><svg><use xlink:href="#iconTrashcan"></use></svg></button>
 <span class="keyboard__split"></span>
-<button data-type="undo"><svg><use xlink:href="#iconUndo"></use></svg></button>
-<button data-type="redo"><svg><use xlink:href="#iconRedo"></use></svg></button>
+<button ${protyle.undo.undoStack.length === 0 ? 'disabled="disabled"' : ""} data-type="undo"><svg><use xlink:href="#iconUndo"></use></svg></button>
+<button ${protyle.undo.redoStack.length === 0 ? 'disabled="disabled"' : ""} data-type="redo"><svg><use xlink:href="#iconRedo"></use></svg></button>
 <button data-type="redo"><svg><use xlink:href="#iconFont"></use></svg></button>
 <button data-type="redo"><svg><use xlink:href="#iconMore"></use></svg></button>
 <span class="keyboard__split"></span>
@@ -70,12 +60,36 @@ export const renderKeyboardToolbar = (protyle: IProtyle, range: Range) => {
 <button data-type="redo"><svg><use xlink:href="#iconUp"></use></svg></button>
 <button data-type="redo"><svg><use xlink:href="#iconDown"></use></svg></button>
 `;
-    toolbarElement.innerHTML = `<div class="fn__flex-1">
-    <div class="keyboard__dynamic">${html}</div>
-    <div class="fn__none keyboard__dynamic">${inlineHTML}</div>
+        }
+        const selectText = range.toString();
+        console.log(range)
+        document.getElementById("keyboardToolbar").innerHTML = `<div class="fn__flex-1">
+    <div class="${selectText ? "fn__none " : ""}keyboard__dynamic">${html}</div>
+    <div class="${selectText ? "" : "fn__none "}keyboard__dynamic">
+        <button data-type="goback"><svg><use xlink:href="#iconBack"></use></svg></button>
+        <button data-type="indent"><svg><use xlink:href="#iconRef"></use></svg></button>
+        <button data-type="block-ref"<use xlink:href="#iconRef"></use></svg></button>
+        <button data-type="a"><svg><use xlink:href="#iconLink"></use></svg></button>
+        <button data-type="text"><svg><use xlink:href="#iconFont"></use></svg></button>
+        <button data-type="strong"><svg><use xlink:href="#iconBold"></use></svg></button>
+        <button data-type="em"><svg><use xlink:href="#iconItalic"></use></svg></button>
+        <button data-type="u"><svg><use xlink:href="#iconUnderline"></use></svg></button>
+        <button data-type="s"><svg><use xlink:href="#iconStrike"></use></svg></button>
+        <button data-type="mark"><svg><use xlink:href="#iconMark"></use></svg></button>
+        <button data-type="sup"><svg><use xlink:href="#iconSup"></use></svg></button>
+        <button data-type="sub"><svg><use xlink:href="#iconSub"></use></svg></button>
+        <button data-type="clear"><svg><use xlink:href="#iconClear"></use></svg></button>
+        <button data-type="code"><svg><use xlink:href="#iconInlineCode"></use></svg></button>
+        <button data-type="kbd"<use xlink:href="#iconKeymap"></use></svg></button>
+        <button data-type="tag"><svg><use xlink:href="#iconTags"></use></svg></button>
+        <button data-type="inline-math"><svg><use xlink:href="#iconMath"></use></svg></button>
+        <button data-type="inline-memo"><svg><use xlink:href="#iconM"></use></svg></button>
+        <button data-type="goback"><svg class="keyboard__svg--close"><use xlink:href="#iconClose"></use></svg></button>
+    </div>
 </div>
 <span class="keyboard__split"></span>
 <button data-type="done"><svg style="width: 36px"><use xlink:href="#iconKeyboardHide"></use></svg></button>`;
+    }, 620) // 需等待 range 更新
 };
 
 export const hideKeyboardToolbar = () => {
@@ -87,35 +101,16 @@ export const hideKeyboard = () => {
     (document.activeElement as HTMLElement).blur();
 };
 
-const disabledKeyboardToolbar = () => {
-    document.querySelectorAll("#keyboardToolbar button").forEach(item => {
-        if (item.getAttribute("data-type") !== "all") {
-            item.setAttribute("disabled", "disabled");
-        }
-    });
-};
-
-const enKeyboardToolbar = () => {
-    document.querySelectorAll("#keyboardToolbar button").forEach(item => {
-        item.removeAttribute("disabled");
-    });
-};
-
 export const initKeyboardToolbar = () => {
-    window.addEventListener("focus", (event) => {
-        const target = event.target as HTMLElement;
-        if (["INPUT", "TEXTAREA"].includes(target.tagName)) {
-            disabledKeyboardToolbar();
-        } else if (target.classList.contains("protyle-wysiwyg")) {
-            enKeyboardToolbar();
-        }
-    }, true);
+    document.addEventListener("selectionchange", () => {
+        renderKeyboardToolbar()
+    }, false);
 
     const toolbarElement = document.getElementById("keyboardToolbar");
     toolbarElement.addEventListener("click", (event) => {
         const target = event.target as HTMLElement;
         const buttonElement = hasClosestByMatchTag(target, "BUTTON");
-        if (!buttonElement || !window.siyuan.mobile.editor) {
+        if (!buttonElement || buttonElement.getAttribute("disabled")) {
             return;
         }
         event.preventDefault();
@@ -125,7 +120,7 @@ export const initKeyboardToolbar = () => {
             hideKeyboard();
             return;
         }
-        if (window.siyuan.mobile.editor.protyle.disabled) {
+        if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly || !window.siyuan.mobile.editor) {
             return;
         }
         const protyle = window.siyuan.mobile.editor.protyle;
@@ -137,17 +132,29 @@ export const initKeyboardToolbar = () => {
             protyle.undo.redo(protyle);
             return;
         }
-        let range: Range;
-        if (getSelection().rangeCount > 0) {
-            range = getSelection().getRangeAt(0);
-        }
-        if (!range || (range && !protyle.wysiwyg.element.contains(range.startContainer))) {
+        if (type === "goback") {
+            const dynamicElements = document.querySelectorAll("#keyboardToolbar .keyboard__dynamic")
+            dynamicElements[0].classList.remove("fn__none")
+            dynamicElements[1].classList.add("fn__none")
             return;
         }
+        if (type === "goinline") {
+            const dynamicElements = document.querySelectorAll("#keyboardToolbar .keyboard__dynamic")
+            dynamicElements[1].classList.remove("fn__none")
+            dynamicElements[0].classList.add("fn__none")
+            return;
+        }
+
+        if (getSelection().rangeCount === 0) {
+            return;
+        }
+        const range = getSelection().getRangeAt(0);
         const nodeElement = hasClosestBlock(range.startContainer);
         if (!nodeElement) {
             return;
         }
+        // inline element
+        // block element
 
         if (type === "up") {
             moveToUp(protyle, nodeElement, range);
