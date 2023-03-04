@@ -1060,8 +1060,10 @@ app.whenReady().then(() => {
     ]
     const trusted = [
       "Hi-Windom",
+      "hi-windom",
       "siyuan-note",
       "Soltus",
+      "soltus",
       "ci-hi",
       "ci-win",
       "ci-dom",
@@ -1077,7 +1079,7 @@ app.whenReady().then(() => {
         } else {
             callback({
               cancel: false,
-              redirectURL: "https://github.com/Hi-Windom/Sillot/issues/266",
+              redirectURL: "https://bitbucket.org/hi-windom/hi/raw/main/js/403.js",
             }); // 重定向而不是取消，不然控制台一片红不好看
         }
       }
