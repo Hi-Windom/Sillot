@@ -1,3 +1,5 @@
+import {isMobile} from "./util/functions";
+
 // declare const SIYUAN_VERSION: string;
 // declare const NODE_ENV: string;
 // declare const SIYUAN_ORIGIN_VERSION: string;
@@ -43,7 +45,7 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly SIYUAN_EXPORT_PREVENT: string = "siyuan-export-prevent";
 
     // size
-    public static readonly SIZE_TOOLBAR_HEIGHT: number = 32;
+    public static readonly SIZE_TOOLBAR_HEIGHT: number = isMobile() ? 0 : 32;
     public static readonly SIZE_GET_MAX = 102400;
     public static readonly SIZE_UNDO = 64;
     public static readonly SIZE_TITLE = 512;

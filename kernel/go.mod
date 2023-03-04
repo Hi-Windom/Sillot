@@ -6,7 +6,7 @@ require (
 	github.com/88250/clipboard v0.1.5
 	github.com/88250/css v0.1.2
 	github.com/88250/gulu v1.2.3-0.20230223100136-26e5f16ac3c0
-	github.com/88250/lute v1.7.6-0.20230303043953-04b4d2f358fd
+	github.com/88250/lute v1.7.6-0.20230303060605-b654e00909d4
 	github.com/88250/pdfcpu v0.3.14-0.20230224021324-e51076eb6390
 	github.com/88250/vitess-sqlparser v0.0.0-20210205111146-56a2ded2aba1
 	github.com/ClarkThan/ahocorasick v0.0.0-20230220142845-f237b6348b3e
@@ -41,6 +41,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pyroscope-io/client v0.6.0
 	github.com/radovskyb/watcher v1.0.7
+	github.com/sashabaranov/go-gpt3 v1.3.3
 	github.com/shirou/gopsutil/v3 v3.23.1
 	github.com/siyuan-note/dejavu v0.0.0-20230223101417-691d54268764
 	github.com/siyuan-note/encryption v0.0.0-20220713091850-5ecd92177b75

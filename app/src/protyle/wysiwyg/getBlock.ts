@@ -86,7 +86,7 @@ export const getTopEmptyElement = (element: Element) => {
         } else {
             let hasText = false;
             Array.from(topElement.parentElement.querySelectorAll('[contenteditable="true"]')).find(item => {
-                if (item.textContent.replace(Constants.ZWSP, "").replace("\n", "") !== "") {
+                if (item.textContent.replace(Constants.ZWSP, "").replace(/\n/g, "") !== "") {
                     hasText = true;
                     return true;
                 }

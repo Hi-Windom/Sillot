@@ -14,9 +14,31 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package av
+package api
 
-type Cell struct {
-	ID    string `json:"id"`
-	Value string `json:"value"`
+import (
+	"github.com/siyuan-note/siyuan/kernel/model"
+	"net/http"
+
+	"github.com/88250/gulu"
+	"github.com/gin-gonic/gin"
+	"github.com/siyuan-note/siyuan/kernel/util"
+)
+
+func chatGPT(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	msg := arg["msg"].(string)
+	if "" == util.OpenAIAPIKey {
+		util.PushMsg(model.Conf.Language(193), 5000)
+		return
+	}
+
+	ret.Data = util.ChatGPT(msg)
 }
