@@ -332,4 +332,6 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/sillot/setConfigesStore", setConfigesStore)
 
 	ginServer.Handle("POST", "/api/av/renderAttributeView", model.CheckAuth, renderAttributeView)
+
+	ginServer.Handle("POST", "/api/ai/chatGPT", model.CheckAuth, chatGPT)
 }
