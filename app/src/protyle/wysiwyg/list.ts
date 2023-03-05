@@ -1,7 +1,8 @@
 import {focusByWbr} from "../util/selection";
 import {transaction, updateTransaction} from "./transaction";
 import {genEmptyBlock} from "../../block/util";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 import {Constants} from "../../constants";
 
 export const updateListOrder = (listElement: Element, sIndex?: number) => {
@@ -215,7 +216,7 @@ export const breakList = (protyle: IProtyle, blockElement: Element, range: Range
         }
     });
     undoOperations.reverse();
-    newListHTML = `<div data-subtype="${listItemElement.getAttribute("data-subtype")}" data-node-id="${newListId}" data-type="NodeList" class="list" updated="${dayjs().format("YYYYMMDDHHmmss")}">${newListHTML}<div class="protyle-attr" contenteditable="false">${Constants.ZWSP}</div></div>`;
+    newListHTML = `<div data-subtype="${listItemElement.getAttribute("data-subtype")}" data-node-id="${newListId}" data-type="NodeList" class="list" updated="${format(new Date(), 'yyyyMMddHHmmss')}">${newListHTML}<div class="protyle-attr" contenteditable="false">${Constants.ZWSP}</div></div>`;
     listItemElement.parentElement.insertAdjacentHTML("afterend", newListHTML);
     doOperations.push({
         id: newListId,
@@ -336,7 +337,7 @@ export const listOutdent = (protyle: IProtyle, liItemElements: Element[], range:
                 lastBlockElement.setAttribute("data-subtype", nextElement.getAttribute("data-subtype"));
                 lastBlockElement.setAttribute("data-node-id", newId);
                 lastBlockElement.setAttribute("data-type", "NodeList");
-                lastBlockElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                lastBlockElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                 lastBlockElement.innerHTML = `<div class="protyle-attr" contenteditable="false">${Constants.ZWSP}</div>`;
                 previousElement.after(lastBlockElement);
                 doOperations.push({
@@ -539,7 +540,7 @@ export const listOutdent = (protyle: IProtyle, liItemElements: Element[], range:
             lastBlockElement.setAttribute("data-subtype", nextElement.getAttribute("data-subtype"));
             lastBlockElement.setAttribute("data-node-id", newId);
             lastBlockElement.setAttribute("data-type", "NodeList");
-            lastBlockElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            lastBlockElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             lastBlockElement.innerHTML = `<div class="protyle-attr" contenteditable="false">${Constants.ZWSP}</div>`;
             doOperations.push({
                 action: "insert",

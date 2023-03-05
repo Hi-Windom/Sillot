@@ -21,7 +21,8 @@ import {isLocalPath, pathPosix} from "../../util/pathName";
 import {genEmptyElement} from "../../block/util";
 import {previewImage} from "../preview/image";
 import {contentMenu, imgMenu, linkMenu, refMenu, setFold, tagMenu, zoomOut} from "../../menus/protyle";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 import {dropEvent} from "../util/editorCommonEvent";
 import {input} from "./input";
 import {
@@ -1137,7 +1138,7 @@ export class WYSIWYG {
                         editableElement.innerHTML = "";
                     }
                 }
-                nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                 if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
                     range.insertNode(document.createElement("wbr"));
                     getContenteditableElement(nodeElement).removeAttribute("data-render");
@@ -1838,7 +1839,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                                 actionElement.querySelector("use").setAttribute("xlink:href", "#iconCheck");
                                 actionElement.parentElement.classList.add("protyle-task--done");
                             }
-                            actionElement.parentElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                            actionElement.parentElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                             updateTransaction(protyle, actionElement.parentElement.getAttribute("data-node-id"), actionElement.parentElement.outerHTML, html);
                         } else {
                             protyle.gutter.renderMenu(protyle, actionElement.parentElement);

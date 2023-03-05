@@ -42,7 +42,6 @@ specifiers:
   css-loader: ^6.7.1
   csstype: ^3.0.10
   date-fns: ^2.29.3
-  dayjs: ^1.11.5
   electron: 24.0.0-alpha.6
   electron-builder: ^23.6.0
   electron-fetch: ^1.9.1
@@ -142,7 +141,6 @@ devDependencies:
   css-loader: registry.npmmirror.com/css-loader/6.7.3_webpack@5.75.0
   csstype: registry.npmmirror.com/csstype/3.1.1
   date-fns: 2.29.3
-  dayjs: registry.npmmirror.com/dayjs/1.11.7
   electron: 24.0.0-alpha.6
   electron-builder: registry.npmmirror.com/electron-builder/23.6.0
   electron-reloader: registry.npmmirror.com/electron-reloader/1.2.3
@@ -9809,12 +9807,6 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       time-zone: registry.npmmirror.com/time-zone/1.0.0
-    dev: true
-
-  registry.npmmirror.com/dayjs/1.11.7:
-    resolution: {integrity: sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/dayjs/-/dayjs-1.11.7.tgz}
-    name: dayjs
-    version: 1.11.7
     dev: true
 
   registry.npmmirror.com/debounce-fn/4.0.0:

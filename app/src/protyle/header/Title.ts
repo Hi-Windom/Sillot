@@ -20,7 +20,8 @@ import {hasClosestByClassName} from "../util/hasClosest";
 import {matchHotKey} from "../util/hotKey";
 import {readText, updateHotkeyTip, writeText} from "../util/compatibility";
 import {escapeHtml} from "../../util/escape";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format,parse} from "date-fns";
 import {setPanelFocus} from "../../layout/util";
 import {updatePanelByEditor} from "../../editor/util";
 import {openBacklink, openGraph, openOutline} from "../../layout/dock/util";
@@ -400,8 +401,8 @@ export class Title {
             window.siyuan.menus.menu.append(new MenuItem({
                 iconHTML: Constants.ZWSP,
                 type: "readonly",
-                label: `${window.siyuan.languages.modifiedAt} ${dayjs(response.data.ial.updated).format("YYYY-MM-DD HH:mm:ss")}<br>
-${window.siyuan.languages.createdAt} ${dayjs(response.data.ial.id.substr(0, 14)).format("YYYY-MM-DD HH:mm:ss")}`
+                label: `${window.siyuan.languages.modifiedAt} ${format(new Date(~~response.data.ial.updated), 'yyyy-MM-dd HH:mm:ss')}<br>
+${window.siyuan.languages.createdAt} ${format(new Date(~~response.data.ial.id.subtring(0, 14)), 'yyyy-MM-dd HH:mm:ss')}`
             }).element);
             window.siyuan.menus.menu.popup(position);
         });
@@ -443,7 +444,7 @@ ${window.siyuan.languages.createdAt} ${dayjs(response.data.ial.id.substr(0, 14))
             this.element.querySelector(".protyle-attr").insertAdjacentHTML("beforeend", `<div class="protyle-attr--refcount popover__block" data-defids='${JSON.stringify([protyle.block.rootID])}' data-id='${JSON.stringify(response.data.refIDs)}'>${response.data.refCount}</div>`);
         }
         // 存在设置新建文档名模板，不能使用 Untitled 进行判断，https://ld246.com/article/1649301009888
-        if (new Date().getTime() - dayjs(response.data.id.split("-")[0]).toDate().getTime() < 2000) {
+        if (new Date().getTime() - parse(response.data.id.split("-")[0],"yyyyMMdd",new Date()).getTime() < 2000) {
             const range = this.editElement.ownerDocument.createRange();
             range.selectNodeContents(this.editElement);
             focusByRange(range);

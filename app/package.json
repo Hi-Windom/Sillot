@@ -94,7 +94,6 @@
     "css-loader": "^6.7.1",
     "csstype": "^3.0.10",
     "date-fns": "^2.29.3",
-    "dayjs": "^1.11.5",
     "electron": "24.0.0-alpha.6",
     "electron-builder": "^23.6.0",
     "electron-reloader": "^1.2.3",

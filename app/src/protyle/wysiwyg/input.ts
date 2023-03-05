@@ -1,7 +1,8 @@
 import {log} from "../util/log";
 import {focusBlock, focusByWbr} from "../util/selection";
 import {Constants} from "../../constants";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 import {transaction, updateTransaction} from "./transaction";
 import {mathRender} from "../markdown/mathRender";
 import {highlightRender} from "../markdown/highlightRender";
@@ -57,7 +58,7 @@ export const input = async (protyle: IProtyle, blockElement: HTMLElement, range:
         brElement.remove();
     }
 
-    blockElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+    blockElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
     if (editElement.innerHTML === "》<wbr>" || editElement.innerHTML.indexOf("\n》<wbr>") > -1) {
         editElement.innerHTML = editElement.innerHTML.replace("》<wbr>", "><wbr>");
     }

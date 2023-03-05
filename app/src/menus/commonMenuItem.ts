@@ -21,7 +21,8 @@ import {openAsset, openBy} from "../editor/util";
 /// #endif
 import {rename} from "../editor/rename";
 import {matchHotKey} from "../protyle/util/hotKey";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 import {Constants} from "../constants";
 import {exportImage} from "../protyle/export/util";
 
@@ -44,7 +45,7 @@ export const openWechatNotify = (nodeElement: Element) => {
     const reminder = nodeElement.getAttribute("custom-reminder-wechat");
     let reminderFormat = "";
     if (reminder) {
-        reminderFormat = dayjs(reminder).format("YYYY-MM-DDTHH:mm");
+        reminderFormat = format(new Date(~~reminder), 'yyyy-MM-ddTHH:mm');
     }
     const dialog = new Dialog({
         width: isMobile() ? "80vw" : "50vw",
@@ -91,7 +92,7 @@ export const openWechatNotify = (nodeElement: Element) => {
                 return;
             }
             btnsElement[2].setAttribute("disabled", "disabled");
-            const timed = dayjs(date).format("YYYYMMDDHHmmss");
+            const timed = format(new Date(~~date), 'yyyyMMddHHmmss');
             fetchPost("/api/block/setBlockReminder", {id, timed}, () => {
                 nodeElement.setAttribute("custom-reminder-wechat", timed);
                 dialog.destroy();
@@ -109,7 +110,7 @@ export const openFileWechatNotify = (protyle: IProtyle) => {
         const reminder = response.data.ial["custom-reminder-wechat"];
         let reminderFormat = "";
         if (reminder) {
-            reminderFormat = dayjs(reminder).format("YYYY-MM-DDTHH:mm");
+            reminderFormat = format(new Date(~~reminder), 'yyyy-MM-ddTHH:mm');
         }
         const dialog = new Dialog({
             width: isMobile() ? "80vw" : "50vw",
@@ -146,7 +147,7 @@ export const openFileWechatNotify = (protyle: IProtyle) => {
                 }
                 fetchPost("/api/block/setBlockReminder", {
                     id: protyle.block.rootID,
-                    timed: dayjs(date).format("YYYYMMDDHHmmss")
+                    timed: format(new Date(~~date), 'yyyyMMddHHmmss')
                 }, () => {
                     dialog.destroy();
                 });
@@ -165,7 +166,7 @@ export const openFileAttr = (attrs: IObject, id: string, focusName = "bookmark")
             notifyHTML = `<label class="fn__flex customItem">
     <span class="ft__on-surface fn__flex-center fn__ellipsis" style="text-align: right;width: 100px">${window.siyuan.languages.wechatReminder}</span>
     <div class="fn__space"></div>
-    <input class="b3-text-field fn__flex-1" type="datetime-local" readonly data-name="${item}" value="${dayjs(attrs[item]).format("YYYY-MM-DDTHH:mm")}">
+    <input class="b3-text-field fn__flex-1" type="datetime-local" readonly data-name="${item}" value="${format(new Date(~~attrs[item]), 'yyyy-MM-ddTHH:mm')}">
     <div class="fn__space"></div>
     <span class="block__icon fn__flex-center" style="opacity: 1;"><svg></svg></span>
 </label><div class="fn__hr--b"></div>`;
@@ -369,7 +370,7 @@ export const openAttr = (nodeElement: Element, protyle: IProtyle, focusName = "b
                 notifyHTML = `<label class="fn__flex customItem">
     <span class="ft__on-surface fn__flex-center fn__ellipsis" style="text-align: right;width: 100px">${window.siyuan.languages.wechatReminder}</span>
     <div class="fn__space"></div>
-    <input class="b3-text-field fn__flex-1" type="datetime-local" readonly data-name="${item}" value="${dayjs(response.data[item]).format("YYYY-MM-DDTHH:mm")}">
+    <input class="b3-text-field fn__flex-1" type="datetime-local" readonly data-name="${item}" value="${format(new Date(~~response.data[item]), 'yyyy-MM-ddTHH:mm')}">
     <div class="fn__space"></div>
     <span class="block__icon fn__flex-center" style="opacity: 1;"><svg></svg></span>
 </label><div class="fn__hr--b"></div>`;
@@ -552,7 +553,7 @@ export const openAttr = (nodeElement: Element, protyle: IProtyle, focusName = "b
                 nodeAttrHTML += refElement.outerHTML;
             }
             nodeElement.lastElementChild.innerHTML = nodeAttrHTML + Constants.ZWSP;
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
             dialog.destroy();
         });
