@@ -12,6 +12,5 @@ export function parseNumber2FormatString(dateString: string, f: string) {
     year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second
   );
   let result = format(dateObject, f);
-  console.log(result);
   return result;
 }

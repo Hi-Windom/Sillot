@@ -7,7 +7,8 @@ import {Constants} from "../../constants";
 import {setAccessAuthCode} from "../../config/util/setAccessAuthCode";
 import {mountHelp, newDailyNote, newNotebook} from "../../util/mount";
 import {repos} from "../../config/repos";
-import * as md5 from "blueimp-md5";
+// import * as md5 from "blueimp-md5";
+import {Md5} from 'ts-md5';
 import {showMessage} from "../../dialog/message";
 import {exitSiYuan, lockScreen, processSync} from "../../dialog/processSystem";
 import {confirmDialog} from "../../dialog/confirmDialog";
@@ -325,7 +326,7 @@ ${accountHTML}
                 loginBtnElement.addEventListener("click", () => {
                     fetchPost("/api/account/login", {
                         userName: userNameElement.value.replace(/(^\s*)|(\s*$)/g, ""),
-                        userPassword: md5(userPasswordElement.value),
+                        userPassword: Md5.hashStr(userPasswordElement.value),
                         captcha: captchaElement.value.replace(/(^\s*)|(\s*$)/g, ""),
                     }, (data) => {
                         if (data.code === 1) {
