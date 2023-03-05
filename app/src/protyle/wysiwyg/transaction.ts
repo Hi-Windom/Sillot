@@ -77,7 +77,7 @@ const promiseTransaction = () => {
         /// #if MOBILE
         if ((0 !== window.siyuan.config.sync.provider || (0 === window.siyuan.config.sync.provider && !needSubscribe(""))) &&
             window.siyuan.config.repo.key && window.siyuan.config.sync.enabled) {
-            document.getElementById("transactionTip").classList.remove("fn__none");
+            document.getElementById("toolbarSync").classList.remove("fn__none");
         }
         /// #endif
         if (response.data[0].doOperations[0].action === "setAttrs") {
@@ -727,6 +727,11 @@ export const turnsIntoOneTransaction = (options: {
                 action: "delete",
                 id,
             });
+        }
+        // 超级块内嵌入块无面包屑，需重新渲染 https://github.com/siyuan-note/siyuan/issues/7574
+        if (item.getAttribute("data-type") === "NodeBlockQueryEmbed") {
+            item.removeAttribute("data-render")
+            blockRender(options.protyle, item)
         }
     });
     transaction(options.protyle, doOperations, undoOperations);
