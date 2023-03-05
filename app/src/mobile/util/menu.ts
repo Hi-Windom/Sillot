@@ -7,7 +7,8 @@ import {Constants} from "../../constants";
 import {setAccessAuthCode} from "../../config/util/setAccessAuthCode";
 import {mountHelp, newDailyNote, newNotebook} from "../../util/mount";
 import {repos} from "../../config/repos";
-import * as md5 from "blueimp-md5";
+// import * as md5 from "blueimp-md5";
+import {Md5} from 'ts-md5';
 import {showMessage} from "../../dialog/message";
 import {exitSiYuan, lockScreen, processSync} from "../../dialog/processSystem";
 import {confirmDialog} from "../../dialog/confirmDialog";
@@ -154,7 +155,7 @@ export const popMenu = () => {
     <svg class="b3-list-item__graphic"><use xlink:href="#iconCloudSucc"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.syncNow}</span>
 </div>
 <div class="b3-list-item b3-list-item--big${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuHistory">
-    <svg class="b3-list-item__graphic"><use xlink:href="#iconVideo"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.dataHistory}</span>
+    <svg class="b3-list-item__graphic"><use xlink:href="#iconHistory"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.dataHistory}</span>
 </div>
 <div slot="border-bottom: 1px solid var(--b3-theme-surface-lighter);"></div>
 <div class="b3-list-item b3-list-item--big" id="menuAppearance">
@@ -325,7 +326,7 @@ ${accountHTML}
                 loginBtnElement.addEventListener("click", () => {
                     fetchPost("/api/account/login", {
                         userName: userNameElement.value.replace(/(^\s*)|(\s*$)/g, ""),
-                        userPassword: md5(userPasswordElement.value),
+                        userPassword: Md5.hashStr(userPasswordElement.value),
                         captcha: captchaElement.value.replace(/(^\s*)|(\s*$)/g, ""),
                     }, (data) => {
                         if (data.code === 1) {

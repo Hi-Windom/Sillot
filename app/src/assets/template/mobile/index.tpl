@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover; target-densityDpi=device-dpi;">
     <style id="editorFontSize" type="text/css"></style>
 </head>
 <body class="branch--Sillot fn__flex-column">
@@ -17,6 +17,9 @@
         <use xlink:href="#iconMenu"></use>
     </svg>
     <input class="toolbar__title b3-text-field fn__hidden" id="toolbarName">
+    <svg id="toolbarSync" class="toolbar__icon fn__none">
+        <use xlink:href="#iconCloudSucc"></use>
+    </svg>
     <svg id="toolbarEdit" class="toolbar__icon fn__hidden">
         <use xlink:href="#iconEdit"></use>
     </svg>
@@ -58,7 +61,6 @@
 <div id="message" class="b3-snackbars"></div>
 <div id="status" class="status status--hide"></div>
 <div id="keyboardToolbar" class="keyboard"></div>
-<div id="transactionTip" class="fn__none"></div>
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
 <div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
 <div id="app5" data-bind="react" data-lib="joyUI"></div>

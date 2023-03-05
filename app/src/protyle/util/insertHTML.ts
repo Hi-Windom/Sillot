@@ -1,5 +1,6 @@
 import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName} from "./hasClosest";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 import {transaction, updateTransaction} from "../wysiwyg/transaction";
 import {getContenteditableElement} from "../wysiwyg/getBlock";
 import {fixTableRange, focusBlock, focusByWbr, getEditorRange} from "./selection";
@@ -39,7 +40,7 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false) => 
         range.insertNode(document.createElement("wbr"));
         getContenteditableElement(blockElement).removeAttribute("data-render");
         highlightRender(blockElement);
-        blockElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+        blockElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
         updateTransaction(protyle, id, blockElement.outerHTML, oldHTML);
         setTimeout(() => {
             scrollCenter(protyle, blockElement);
@@ -105,7 +106,7 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false) => 
             }
             range.insertNode(tempElement.content.cloneNode(true));
             range.collapse(false);
-            blockElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            blockElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             // 使用 innerHTML,避免行内元素为代码块
             const trimStartText = editableElement ? editableElement.innerHTML.trimStart() : "";
             if (editableElement && (trimStartText.startsWith("```") || trimStartText.startsWith("~~~") || trimStartText.startsWith("···") ||
@@ -164,7 +165,7 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false) => 
                 liElement.setAttribute("data-subtype", item.getAttribute("data-subtype"));
                 liElement.setAttribute("data-node-id", addId);
                 liElement.setAttribute("data-type", "NodeList");
-                liElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                liElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                 liElement.classList.add("list");
                 liElement.append(item);
                 item = liElement;

@@ -1,0 +1,12 @@
+{
+  "name": "@sillot/bridge",
+  "version": "0.0.3",
+  "description": "",
+  "main": "index.cjs",
+  "module": "index.mjs",
+  "keywords": [],
+  "author": "Soltus",
+  "license": "ISC",
+  "devDependencies": {
+  }
+}

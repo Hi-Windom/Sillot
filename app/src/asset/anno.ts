@@ -1,7 +1,8 @@
 import {fetchPost} from "../util/fetch";
 import {setPosition} from "../util/setPosition";
 import {hasClosestByAttribute, hasClosestByClassName} from "../protyle/util/hasClosest";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 import {writeText} from "../protyle/util/compatibility";
 import {getAllModels} from "../layout/getAll";
 /// #if !BROWSER
@@ -434,7 +435,7 @@ const getHightlightCoordsByRect = (pdf: any, color: string, rectResizeElement: H
 
     const id = Lute.NewNodeID();
     const content = pdf.appConfig.file.replace(location.origin, "").substr(8).replace(/-\d{14}-\w{7}.pdf$/, "") +
-        `-P${startPage.id}-${dayjs().format("YYYYMMDDHHmmss")}`;
+        `-P${startPage.id}-${format(new Date(), 'yyyyMMddHHmmss')}`;
     const result = [{
         index: startPage.id - 1,
         coords: [startSelected],

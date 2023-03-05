@@ -21,7 +21,8 @@ import {scrollCenter} from "../../util/highlightById";
 import {transaction, updateTransaction} from "./transaction";
 import {onGet} from "../util/onGet";
 import {Constants} from "../../constants";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 
 export const commonHotkey = (protyle: IProtyle, event: KeyboardEvent) => {
     const target = event.target as HTMLElement;
@@ -255,7 +256,7 @@ export const goEnd = (protyle: IProtyle) => {
 };
 
 export const alignImgCenter = (protyle: IProtyle, nodeElement: Element, assetElements: Element[], id: string, html: string) => {
-    nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+    nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
     assetElements.forEach((item: HTMLElement) => {
         item.style.display = "block";
         let nextSibling = item.nextSibling;
@@ -285,7 +286,7 @@ export const alignImgCenter = (protyle: IProtyle, nodeElement: Element, assetEle
 };
 
 export const alignImgLeft = (protyle: IProtyle, nodeElement: Element, assetElements: Element[], id: string, html: string) => {
-    nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+    nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
     assetElements.forEach((item: HTMLElement) => {
         item.style.display = "";
         if (!hasNextSibling(item)) {

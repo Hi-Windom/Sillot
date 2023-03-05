@@ -28,7 +28,8 @@ import {openBy} from "../../editor/util";
 /// #endif
 import {fetchPost} from "../../util/fetch";
 import {isArrayEqual, isMobile} from "../../util/functions";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 import {insertEmptyBlock} from "../../block/util";
 import {matchHotKey} from "../util/hotKey";
 import {hideElements} from "../ui/hideElements";
@@ -717,7 +718,7 @@ export class Toolbar {
                 this.range.collapse(false);
             }
         }
-        nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+        nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
         updateTransaction(protyle, nodeElement.getAttribute("data-node-id"), nodeElement.outerHTML, html);
         const wbrElement = nodeElement.querySelector("wbr");
         if (wbrElement) {
@@ -794,7 +795,7 @@ export class Toolbar {
             } else {
                 focusByWbr(nodeElement, this.range);
             }
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, html);
         };
         const nodeRect = refElement.getBoundingClientRect();
@@ -1157,7 +1158,7 @@ export class Toolbar {
                 }
             }
 
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             const newHTML = protyle.lute.SpinBlockDOM(nodeElement.outerHTML);
             // HTML 块中包含多个 <pre> 时只能保存第一个 https://github.com/siyuan-note/siyuan/issues/5732
             if (types.includes("NodeHTMLBlock")) {
@@ -1222,7 +1223,7 @@ export class Toolbar {
                 (editElement as HTMLElement).textContent = editElement.textContent;
                 editElement.removeAttribute("data-render");
                 highlightRender(nodeElement);
-                nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                 updateTransaction(protyle, id, nodeElement.outerHTML, oldHtml);
                 oldHtml = nodeElement.outerHTML;
                 event.preventDefault();
@@ -1289,7 +1290,7 @@ export class Toolbar {
                 (editElement as HTMLElement).textContent = editElement.textContent;
                 editElement.removeAttribute("data-render");
                 highlightRender(nodeElement);
-                nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                 updateTransaction(protyle, id, nodeElement.outerHTML, oldHtml);
                 oldHtml = nodeElement.outerHTML;
                 this.subElement.classList.add("fn__none");

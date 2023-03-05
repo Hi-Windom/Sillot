@@ -1,4 +1,5 @@
-import * as md5 from "blueimp-md5";
+// import * as md5 from "blueimp-md5";
+import {Md5} from 'ts-md5';
 import {hideMessage, showMessage} from "../dialog/message";
 import {Constants} from "../constants";
 import {fetchPost} from "../util/fetch";
@@ -323,7 +324,7 @@ ${window.siyuan.languages.account8}`;
         loginBtnElement.addEventListener("click", () => {
             fetchPost("/api/account/login", {
                 userName: userNameElement.value.replace(/(^\s*)|(\s*$)/g, ""),
-                userPassword: md5(userPasswordElement.value),
+                userPassword: Md5.hashStr(userPasswordElement.value),
                 captcha: captchaElement.value.replace(/(^\s*)|(\s*$)/g, ""),
             }, (data) => {
                 let messageId;

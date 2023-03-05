@@ -802,11 +802,10 @@ app.whenReady().then(() => {
     ipcMain.on("siyuan-export-prevent", (event, id) => {
         BrowserWindow.fromId(id).webContents.on("will-navigate", (event, url) => {
             const currentURL = new URL(event.sender.getURL());
+            event.preventDefault();
             if (url.startsWith(getServer(currentURL.port))) {
                 return;
             }
-
-            event.preventDefault();
             shell.openExternal(url);
         });
     });
@@ -1055,13 +1054,16 @@ app.whenReady().then(() => {
     };
     const ignore = [
         "localhost",
+        "www.clarity.ms",
         "127.0.0.1",
         "0.0.0.0",
     ]
     const trusted = [
       "Hi-Windom",
+      "hi-windom",
       "siyuan-note",
       "Soltus",
+      "soltus",
       "ci-hi",
       "ci-win",
       "ci-dom",
@@ -1075,9 +1077,10 @@ app.whenReady().then(() => {
         if (trusted.includes(u) || ignore.includes(host)) {
             callback({ cancel: false });
         } else {
+            console.log( {url:details.url,res:"不受信的 js 请求将被重定向，请从本地加载 js"})
             callback({
               cancel: false,
-              redirectURL: "https://github.com/Hi-Windom/Sillot/issues/266",
+              redirectURL: "https://bitbucket.org/hi-windom/hi/raw/main/js/403.js",
             }); // 重定向而不是取消，不然控制台一片红不好看
         }
       }

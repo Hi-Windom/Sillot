@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./out/",
+    "emitDeclarationOnly": true,
     "noImplicitAny": false,
     "strict": false,
     "forceConsistentCasingInFileNames": true,

@@ -32,7 +32,8 @@ import {openNewWindowById} from "../window/openNewWindow";
 import {getSearch, isMobile} from "../util/functions";
 import {removeFoldHeading} from "../protyle/util/heading";
 import {lineNumberRender} from "../protyle/markdown/highlightRender";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 import {blockRender} from "../protyle/markdown/blockRender";
 import {renameAsset} from "../editor/rename";
 import {electronUndo} from "../protyle/undo";
@@ -60,7 +61,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
             inputElement.value = element.getAttribute("data-subtype") === "d" ? "" : element.textContent;
             inputElement.addEventListener("blur", (event) => {
                 if (nodeElement.outerHTML !== oldHTML) {
-                    nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                    nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                     updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
                     oldHTML = nodeElement.outerHTML;
                 }
@@ -168,7 +169,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
                 element.setAttribute("data-subtype", "d");
                 fetchPost("/api/block/getRefText", {id: refBlockId}, (response) => {
                     element.innerHTML = response.data;
-                    nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                    nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                     updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
                 });
                 focusByRange(protyle.toolbar.range);
@@ -179,7 +180,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
             label: window.siyuan.languages.turnToStatic,
             click() {
                 element.setAttribute("data-subtype", "s");
-                nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                 updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
                 focusByRange(protyle.toolbar.range);
             }
@@ -189,7 +190,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
         label: window.siyuan.languages.text,
         click() {
             element.outerHTML = `${element.innerHTML}<wbr>`;
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
             focusByWbr(nodeElement, protyle.toolbar.range);
         }
@@ -198,7 +199,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
         click() {
             element.setAttribute("data-subtype", "s");
             element.textContent = "*";
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
             focusByRange(protyle.toolbar.range);
         }
@@ -208,7 +209,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
             element.insertAdjacentHTML("beforebegin", element.innerHTML + " ");
             element.setAttribute("data-subtype", "s");
             element.textContent = "*";
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
             focusByRange(protyle.toolbar.range);
         }
@@ -217,7 +218,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
         icon: "iconLink",
         click() {
             element.outerHTML = `<span data-type="a" data-href="siyuan://blocks/${element.getAttribute("data-id")}">${element.innerHTML}</span><wbr>`;
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
             focusByWbr(nodeElement, protyle.toolbar.range);
         }
@@ -227,7 +228,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
             label: window.siyuan.languages.blockEmbed,
             icon: "iconSQL",
             click() {
-                const html = `<div data-content="select * from blocks where id='${refBlockId}'" data-node-id="${id}" data-type="NodeBlockQueryEmbed" class="render-node" updated="${dayjs().format("YYYYMMDDHHmmss")}">${nodeElement.querySelector(".protyle-attr").outerHTML}</div>`;
+                const html = `<div data-content="select * from blocks where id='${refBlockId}'" data-node-id="${id}" data-type="NodeBlockQueryEmbed" class="render-node" updated="${format(new Date(), 'yyyyMMddHHmmss')}">${nodeElement.querySelector(".protyle-attr").outerHTML}</div>`;
                 nodeElement.outerHTML = html;
                 updateTransaction(protyle, id, html, oldHTML);
                 blockRender(protyle, protyle.wysiwyg.element);
@@ -273,7 +274,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
         click() {
             element.insertAdjacentHTML("afterend", "<wbr>");
             element.remove();
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
             focusByWbr(nodeElement, protyle.toolbar.range);
         }
@@ -596,7 +597,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
         click() {
             writeText(protyle.lute.BlockDOM2StdMd(assetElement.outerHTML));
             (assetElement as HTMLElement).outerHTML = "<wbr>";
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, html);
             focusByWbr(protyle.wysiwyg.element, range);
         }
@@ -607,7 +608,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
         label: window.siyuan.languages.delete,
         click: function () {
             (assetElement as HTMLElement).outerHTML = "<wbr>";
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, html);
             focusByWbr(protyle.wysiwyg.element, range);
         }
@@ -661,7 +662,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
                         rangeElement.parentElement.setAttribute("aria-label", `${rangeElement.value}%`);
                     });
                     rangeElement.addEventListener("change", () => {
-                        nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                        nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                         updateTransaction(protyle, id, nodeElement.outerHTML, html);
                         window.siyuan.menus.menu.remove();
                         focusBlock(nodeElement);
@@ -683,7 +684,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
     textElements[0].focus();
     window.siyuan.menus.menu.removeCB = () => {
         imgElement.setAttribute("alt", textElements[2].value.replace(/\n|\r\n|\r|\u2028|\u2029/g, ""));
-        nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+        nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
         updateTransaction(protyle, id, nodeElement.outerHTML, html);
     };
 };
@@ -796,7 +797,7 @@ export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText 
                 linkElement.setAttribute("data-id", linkAddress?.replace("siyuan://blocks/", ""));
                 linkElement.removeAttribute("data-href");
                 linkElement.removeAttribute("data-title");
-                nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                 updateTransaction(protyle, id, nodeElement.outerHTML, html);
                 protyle.toolbar.range.selectNode(linkElement);
                 protyle.toolbar.range.collapse(false);
@@ -827,7 +828,7 @@ export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText 
             const oldHTML = nodeElement.outerHTML;
             linkElement.insertAdjacentHTML("afterend", "<wbr>");
             linkElement.remove();
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
             focusByWbr(nodeElement, protyle.toolbar.range);
         }
@@ -858,7 +859,7 @@ export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText 
             protyle.toolbar.range.collapse(false);
             focusByRange(protyle.toolbar.range);
         }
-        nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+        nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
         updateTransaction(protyle, id, nodeElement.outerHTML, html);
     };
 };
@@ -898,7 +899,7 @@ export const tagMenu = (protyle: IProtyle, tagElement: HTMLElement) => {
                         const oldHTML = nodeElement.outerHTML;
                         tagElement.insertAdjacentHTML("afterend", "<wbr>");
                         tagElement.remove();
-                        nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+                        nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
                         updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
                         focusByWbr(nodeElement, protyle.toolbar.range);
                     } else {
@@ -945,7 +946,7 @@ export const tagMenu = (protyle: IProtyle, tagElement: HTMLElement) => {
             const oldHTML = nodeElement.outerHTML;
             tagElement.insertAdjacentHTML("afterend", "<wbr>");
             tagElement.remove();
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
             focusByWbr(nodeElement, protyle.toolbar.range);
         }
@@ -963,7 +964,7 @@ const genImageWidthMenu = (label: string, assetElement: HTMLElement, imgElement:
     return {
         label,
         click() {
-            nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             assetElement.style.width = label === window.siyuan.languages.default ? "" : label;
             imgElement.style.width = label === window.siyuan.languages.default ? "" : "10000px";
             assetElement.style.maxWidth = label === window.siyuan.languages.default ? (imgElement.clientWidth + 10) + "px" : "";

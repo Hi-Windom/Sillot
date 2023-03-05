@@ -5,7 +5,8 @@ import {Constants} from "../constants";
 import {disabledProtyle, onGet} from "../protyle/util/onGet";
 import {hasClosestByClassName} from "../protyle/util/hasClosest";
 import {escapeHtml} from "../util/escape";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 
 const genItem = (data: [], data2?: { title: string, fileID: string }[]) => {
     if (!data || data.length === 0) {
@@ -143,12 +144,12 @@ export const showDiff = (data: { id: string, time: string }[]) => {
     </div>
     <div class="fn__flex-1 fn__flex">
         <div class="fn__none fn__flex-1 fn__flex-column">
-            <div class="history__date">${dayjs(response.data.left.created).format("YYYY-MM-DD HH:mm")}</div>
+            <div class="history__date">${format(response.data.left.created, 'yyyy-MM-dd HH:mm')}</div>
             <textarea class="history__text fn__none fn__flex-1"></textarea>
             <div class="fn__flex-1"></div>
         </div>
         <div class="fn__none fn__flex-1 fn__flex-column" style="border-left: 1px solid var(--b3-border-color);">
-            <div class="history__date">${dayjs(response.data.right.created).format("YYYY-MM-DD HH:mm")}</div>
+            <div class="history__date">${format(response.data.right.created, 'yyyy-MM-dd HH:mm')}</div>
             <textarea class="history__text fn__none fn__flex-1"></textarea>
             <div class="fn__flex-1"></div>
         </div>

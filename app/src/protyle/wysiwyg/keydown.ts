@@ -60,7 +60,8 @@ import {bindMenuKeydown} from "../../menus/Menu";
 import {fetchPost} from "../../util/fetch";
 import {scrollCenter} from "../../util/highlightById";
 import {BlockPanel} from "../../block/Panel";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 import {highlightRender} from "../markdown/highlightRender";
 import {countBlockWord} from "../../layout/status";
 import {openMobileFileById} from "../../mobile/editor";
@@ -1368,7 +1369,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                 taskItemElement.querySelector("use").setAttribute("xlink:href", "#iconCheck");
                 taskItemElement.classList.add("protyle-task--done");
             }
-            taskItemElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+            taskItemElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, taskItemElement.getAttribute("data-node-id"), taskItemElement.outerHTML, html);
             event.preventDefault();
             event.stopPropagation();

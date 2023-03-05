@@ -19,7 +19,8 @@ import {highlightRender} from "../markdown/highlightRender";
 import {blockRender} from "../markdown/blockRender";
 import {removeEmbed} from "../wysiwyg/removeEmbed";
 import {getContenteditableElement, getTopAloneElement, isNotEditBlock} from "../wysiwyg/getBlock";
-import * as dayjs from "dayjs";
+// import * as dayjs from "dayjs";
+import { parseNumber2FormatString } from "../../sillot/util/date";
 import {fetchPost, fetchSyncPost} from "../../util/fetch";
 import {cancelSB, insertEmptyBlock, jumpToParentNext} from "../../block/util";
 import {countBlockWord} from "../../layout/status";
@@ -36,6 +37,7 @@ import {makeCard, quickMakeCard} from "../../card/makeCard";
 import {transferBlockRef} from "../../menus/block";
 import {HiJoy} from "../../sillot/joyUI/com_/hi";
 import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
+import zhCN from "date-fns/locale/zh-CN";
 
 export class Gutter {
     public element: HTMLElement;
@@ -1516,12 +1518,12 @@ export class Gutter {
         }
         let updateHTML = nodeElement.getAttribute("updated") || "";
         if (updateHTML) {
-            updateHTML = `${window.siyuan.languages.modifiedAt} ${dayjs(updateHTML).format("YYYY-MM-DD HH:mm:ss")}<br>`;
+            updateHTML = `${window.siyuan.languages.modifiedAt} ${parseNumber2FormatString(updateHTML,'yyyy-MM-dd HH:mm:ss')}<br>`;
         }
         window.siyuan.menus.menu.append(new MenuItem({
             iconHTML: Constants.ZWSP,
             type: "readonly",
-            label: `${updateHTML}${window.siyuan.languages.createdAt} ${dayjs(id.substr(0, 14)).format("YYYY-MM-DD HH:mm:ss")}`,
+            label: `${updateHTML}${window.siyuan.languages.createdAt} ${parseNumber2FormatString(id.substring(0, 14),'yyyy-MM-dd HH:mm:ss')}`,
         }).element);
         return window.siyuan.menus.menu;
     }
