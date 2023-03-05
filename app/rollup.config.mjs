@@ -13,6 +13,7 @@ import json from "@rollup/plugin-json";
 import css from "rollup-plugin-import-css";
 import postcss from 'rollup-plugin-postcss'
 import pkg from "./package/package.json" assert { type: "json" };
+import pkg2 from "./package.json" assert { type: "json" };
 
 const libName = "sillotBridge";
 const banner = `/*!
@@ -22,7 +23,7 @@ const banner = `/*!
 */`
 
 export default defineConfig({
-  input: "bridge/index.ts",
+  input: "src/index.ts",
   output: [
     {
       file: "out/index.mjs",
@@ -34,21 +35,14 @@ export default defineConfig({
       format: "cjs",
       banner
     },
-    {
-      file: `out/${libName}.min.js`,
-      // 通用格式可以用于node和browser ，参加 https://juejin.cn/post/7051236803344334862
-      format: "umd",
-      // 外部引入的模块需要显式告知使用的三方模块的命名，结合下面的external使用
-      globals: {},
-      // 注意如果是umd格式的bundle的话name属性是必须的，这时可以在script标签引入后window下会挂载该属性的变量来使用你的类库方法
-      name: libName,
-      plugins: [terser()],
-      banner
-    },
   ],
   // 解释同globals配置，这个配置的意思是我简单处理把外部依赖不打包进bundle中，而是前置引入或者作为依赖安装使用
-  external: [],
+  external: [...Object.keys(pkg2.devDependencies), ...Object.keys(pkg2.dependencies)],
   plugins: [
+    typescript({
+      declaration: true,
+      sourceMap: false,
+    }),
     commonjs({ transformMixedEsModules: true }),
     json({
       compact: true,
@@ -56,10 +50,6 @@ export default defineConfig({
     // css(),
     postcss(),
     babel({babelHelpers: 'bundled',}),
-    typescript({
-      declaration: true,
-      sourceMap: false,
-    }),
     resolve({
       moduleDirectories: ["node_modules"],
     }),

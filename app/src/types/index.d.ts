@@ -49,7 +49,7 @@ interface Window {
 
     goBack(): void
 
-    showKeyboardToolbar(bottom?: number): void
+    showKeyboardToolbar(height: number): void
 
     hideKeyboardToolbar(): void
 

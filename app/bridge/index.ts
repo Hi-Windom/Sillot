@@ -1,1 +1,1 @@
-export * from '../src/constants'
+export {Constants} from '../src/constants'

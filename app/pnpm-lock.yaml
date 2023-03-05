@@ -41,6 +41,7 @@ specifiers:
   concurrently: ^7.6.0
   css-loader: ^6.7.1
   csstype: ^3.0.10
+  date-fns: ^2.29.3
   dayjs: ^1.11.5
   electron: 24.0.0-alpha.6
   electron-builder: ^23.6.0
@@ -140,6 +141,7 @@ devDependencies:
   concurrently: registry.npmmirror.com/concurrently/7.6.0
   css-loader: registry.npmmirror.com/css-loader/6.7.3_webpack@5.75.0
   csstype: registry.npmmirror.com/csstype/3.1.1
+  date-fns: 2.29.3
   dayjs: registry.npmmirror.com/dayjs/1.11.7
   electron: 24.0.0-alpha.6
   electron-builder: registry.npmmirror.com/electron-builder/23.6.0
@@ -3032,6 +3034,11 @@ packages:
 
   /csstype/3.1.1:
     resolution: {integrity: sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==}
+    dev: true
+
+  /date-fns/2.29.3:
+    resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
+    engines: {node: '>=0.11'}
     dev: true
 
   /debug/2.6.9:
@@ -9688,7 +9695,7 @@ packages:
     hasBin: true
     dependencies:
       chalk: registry.npmmirror.com/chalk/4.1.2
-      date-fns: registry.npmmirror.com/date-fns/2.29.3
+      date-fns: 2.29.3
       lodash: registry.npmmirror.com/lodash/4.17.21
       rxjs: registry.npmmirror.com/rxjs/7.8.0
       shell-quote: registry.npmmirror.com/shell-quote/1.8.0
@@ -9793,13 +9800,6 @@ packages:
     resolution: {integrity: sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/csstype/-/csstype-3.1.1.tgz}
     name: csstype
     version: 3.1.1
-    dev: true
-
-  registry.npmmirror.com/date-fns/2.29.3:
-    resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/date-fns/-/date-fns-2.29.3.tgz}
-    name: date-fns
-    version: 2.29.3
-    engines: {node: '>=0.11'}
     dev: true
 
   registry.npmmirror.com/date-time/3.1.0:

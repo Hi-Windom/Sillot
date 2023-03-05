@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <style id="editorFontSize" type="text/css"></style>
 </head>
 <body class="branch--Sillot fn__flex-column">
