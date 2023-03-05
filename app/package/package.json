@@ -1,6 +1,6 @@
 {
   "name": "@sillot/bridge",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "index.cjs",
   "module": "index.mjs",
