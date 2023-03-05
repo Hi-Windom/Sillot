@@ -42,7 +42,9 @@ export class SillotEnv {
       focusByOffset: focusByOffset,
       focusSideBlock: focusSideBlock,
       focusByRange: focusByRange,
+      /// #if !BROWSER
       bS: new bS(),
+      ///#endif
     };
   }
 }
