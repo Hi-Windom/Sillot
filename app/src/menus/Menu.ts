@@ -12,8 +12,21 @@ export class Menu {
         this.wheelEvent = "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
 
         this.element = document.getElementById("commonMenu");
-        this.element.addEventListener(isMobile() ? getEventName() : "mouseover", (event) => {
+        this.element.addEventListener(isMobile() ? "click" : "mouseover", (event) => {
             const target = event.target as Element;
+            if (isMobile()) {
+                const titleElement = hasClosestByClassName(target, "b3-menu__title");
+                if (titleElement) {
+                    const lastShowElements = this.element.querySelectorAll(".b3-menu__item--show");
+                    if (lastShowElements.length > 0) {
+                        lastShowElements[lastShowElements.length - 1].classList.remove("b3-menu__item--show");
+                    } else {
+                        this.remove();
+                    }
+                    return;
+                }
+            }
+
             const itemElement = hasClosestByClassName(target, "b3-menu__item");
             if (!itemElement) {
                 return;
@@ -35,7 +48,9 @@ export class Menu {
                 return;
             }
             itemElement.classList.add("b3-menu__item--show");
-            this.showSubMenu(subMenuElement);
+            if (!this.element.classList.contains("b3-menu--fullscreen")) {
+                this.showSubMenu(subMenuElement);
+            }
         });
     }
 
@@ -77,7 +92,7 @@ export class Menu {
 
         this.element.innerHTML = "";
         this.element.classList.add("fn__none");
-        this.element.classList.remove("b3-menu--list");
+        this.element.classList.remove("b3-menu--list", "b3-menu--fullscreen");
         this.element.removeAttribute("style");  // zIndex
         window.siyuan.menus.menu.element.removeAttribute("data-name");    // 标识再次点击不消失
     }
@@ -101,6 +116,15 @@ export class Menu {
 
         this.element.classList.remove("fn__none");
         setPosition(this.element, options.x - (isLeft ? window.siyuan.menus.menu.element.clientWidth : 0), options.y, options.h, options.w);
+    }
+
+    public fullscreen () {
+        this.element.classList.add("b3-menu--fullscreen");
+        this.element.insertAdjacentHTML("afterbegin", `<div class="b3-menu__title">
+<svg class="b3-menu__icon"><use xlink:href="#iconLeft"></use></svg>
+<span class="b3-menu__label">${window.siyuan.languages.back}</span>
+</div>`);
+        this.popup({x: 0, y: 0});
     }
 }
 
