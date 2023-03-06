@@ -84,6 +84,7 @@ specifiers:
   sass: ^1.58.3
   sass-loader: ^13.2.0
   socket.io: ^4.6.1
+  sout: ^1.0.5
   style-loader: ^3.3.1
   sweetalert2: ^11.7.3
   terser-webpack-plugin: ^5.3.3
@@ -179,6 +180,7 @@ devDependencies:
   sass: 1.58.3
   sass-loader: registry.npmmirror.com/sass-loader/13.2.0_sass@1.58.3+webpack@5.75.0
   socket.io: 4.6.1
+  sout: 1.0.5
   style-loader: registry.npmmirror.com/style-loader/3.3.1_webpack@5.75.0
   sweetalert2: 11.7.3
   terser-webpack-plugin: registry.npmmirror.com/terser-webpack-plugin/5.3.6_uq5mi6gw7pk55tcrj3rsxehkd4
@@ -6527,6 +6529,10 @@ packages:
 
   /sourcemap-codec/1.4.8:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
+    dev: true
+
+  /sout/1.0.5:
+    resolution: {integrity: sha512-Qewja1B6HUc4RVtLEEiOtRmn0M64z8/9PsfCPTMzuwzFxyg1XnOUGqPOnlsy7Mf1lX8Mhj4PyjUtLVaQxwJ9HQ==}
     dev: true
 
   /spdx-correct/3.1.1:
