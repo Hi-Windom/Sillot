@@ -56,6 +56,7 @@ require (
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673
 	golang.org/x/image v0.5.0
 	golang.org/x/mobile v0.0.0-20221110043201-43a038452099
+	golang.org/x/mod v0.8.0
 	golang.org/x/text v0.7.0
 )
 
@@ -132,7 +133,6 @@ require (
 	golang.org/x/arch v0.2.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/exp v0.0.0-20230223210539-50820d90acfd // indirect
-	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
