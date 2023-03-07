@@ -5,6 +5,7 @@ from collections import defaultdict
 
 import github
 
+# ensure the milestone is open before run this
 docmap = {
     "Feature": "引入特性",
     "Enhancement": "改进功能",
