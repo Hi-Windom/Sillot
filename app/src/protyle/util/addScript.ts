@@ -14,7 +14,7 @@ export const addScriptSync = (path: string, id: string) => {
     document.head.appendChild(scriptElement);
 };
 
-export const addScript = (path: string, id: string) => {
+export const addScript = (path: string, id: string, type?: string) => {
     return new Promise((resolve) => {
         if (document.getElementById(id)) {
             // 脚本加载后再次调用直接返回
@@ -24,6 +24,7 @@ export const addScript = (path: string, id: string) => {
         const scriptElement = document.createElement("script");
         scriptElement.src = path;
         scriptElement.async = true;
+        if (type) scriptElement.type = type;
         // 循环调用时 Chrome 不会重复请求 js
         document.head.appendChild(scriptElement);
         scriptElement.onload = () => {

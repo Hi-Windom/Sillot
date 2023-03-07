@@ -7,7 +7,7 @@ import { HotToast } from "./react-hot-toast";
 import * as React from "react"; // 兼容性好
 import * as ReactDOM from "react-dom"; // 兼容性好
 import Swal from "sweetalert2";
-import exSout from "./util/sout";
+import exSout from 'sout/console'
 import { MusicPlayer } from "./react-music-player";
 import {
   focusBlock,

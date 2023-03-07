@@ -60,7 +60,7 @@
 <div id="commonMenu" class="b3-menu fn__none"></div>
 <div id="message" class="b3-snackbars"></div>
 <div id="status" class="status status--hide"></div>
-<div id="keyboardToolbar" class="keyboard"></div>
+<div id="keyboardToolbar" class="keyboard fn__none"></div>
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
 <div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
 <div id="app5" data-bind="react" data-lib="joyUI"></div>

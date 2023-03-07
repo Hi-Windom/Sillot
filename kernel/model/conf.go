@@ -28,10 +28,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/88250/lute/ast"
-
 	"github.com/88250/gulu"
 	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
 	"github.com/Xuanwo/go-locale"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/getsentry/sentry-go"
@@ -39,8 +38,10 @@ import (
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/sql"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
+	"golang.org/x/mod/semver"
 	"golang.org/x/text/language"
 )
 
@@ -214,9 +215,15 @@ func InitConf() {
 		Conf.System = conf.NewSystem()
 		Conf.OpenHelp = true
 	} else {
-		Conf.OpenHelp = Conf.System.KernelVersion != util.Ver
+		if 0 < semver.Compare("v"+util.Ver, "v"+Conf.System.KernelVersion) {
+			logging.LogInfof("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.Ver)
+		} else {
+			logging.LogInfof("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.Ver)
+		}
+
 		Conf.System.KernelVersion = util.Ver
 		Conf.System.IsInsider = util.IsInsider
+		task.AppendTask(task.UpgradeUserGuide, upgradeUserGuide)
 	}
 	if nil == Conf.System.NetworkProxy {
 		Conf.System.NetworkProxy = &conf.NetworkProxy{}
@@ -773,4 +780,55 @@ func clearWorkspaceTemp() {
 	os.RemoveAll(filepath.Join(util.WorkspaceDir, "sync"))
 
 	logging.LogInfof("cleared workspace temp")
+}
+
+func upgradeUserGuide() {
+	defer logging.Recover()
+
+	dirs, err := os.ReadDir(util.DataDir)
+	if nil != err {
+		logging.LogErrorf("read dir [%s] failed: %s", util.DataDir, err)
+		return
+	}
+
+	for _, dir := range dirs {
+		if !IsUserGuide(dir.Name()) {
+			continue
+		}
+
+		boxID := dir.Name()
+		boxDirPath := filepath.Join(util.DataDir, boxID)
+		boxConf := conf.NewBoxConf()
+		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json")
+		if !gulu.File.IsExist(boxConfPath) {
+			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
+			continue
+		}
+
+		data, readErr := filelock.ReadFile(boxConfPath)
+		if nil != readErr {
+			logging.LogErrorf("read box conf [%s] failed: %s", boxConfPath, readErr)
+			continue
+		}
+		if readErr = gulu.JSON.UnmarshalJSON(data, boxConf); nil != readErr {
+			logging.LogErrorf("parse box conf [%s] failed: %s", boxConfPath, readErr)
+			continue
+		}
+
+		if boxConf.Closed {
+			continue
+		}
+
+		unindex(boxID)
+
+		if err = filelock.Remove(boxDirPath); nil != err {
+			return
+		}
+		p := filepath.Join(util.WorkingDir, "guide", boxID)
+		if err = filelock.Copy(p, boxDirPath); nil != err {
+			return
+		}
+
+		index(boxID)
+	}
 }

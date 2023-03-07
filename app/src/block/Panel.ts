@@ -254,6 +254,9 @@ export class BlockPanel {
                 showMessage(response.msg);
                 return;
             }
+            if (!this.targetElement) {
+                return;
+            }
             const action = [];
             if (response.data.rootID !== this.nodeIds[index]) {
                 action.push(Constants.CB_GET_ALL);
@@ -310,7 +313,7 @@ export class BlockPanel {
     }
 
     private render() {
-        if (!this.element.parentElement.parentElement) {
+        if (!document.body.contains(this.element)) {
             this.destroy();
             return;
         }

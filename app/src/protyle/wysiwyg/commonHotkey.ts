@@ -7,12 +7,10 @@ import {
     getSelectionOffset,
     setFirstNodeRange,
 } from "../util/selection";
-import {fullscreen, netImg2LocalAssets} from "../breadcrumb/action";
-import {setPadding} from "../ui/initUI";
+import {netImg2LocalAssets} from "../breadcrumb/action";
 /// #if !MOBILE
 import {openBacklink, openGraph, openOutline} from "../../layout/dock/util";
 /// #endif
-import {reloadProtyle} from "../util/reload";
 import {getContenteditableElement, hasNextSibling, hasPreviousSibling} from "./getBlock";
 import {hasClosestByMatchTag} from "../util/hasClosest";
 import {hideElements} from "../ui/hideElements";
@@ -37,20 +35,6 @@ export const commonHotkey = (protyle: IProtyle, event: KeyboardEvent) => {
         return true;
     }
 
-    if (matchHotKey(window.siyuan.config.keymap.editor.general.refresh.custom, event)) {
-        reloadProtyle(protyle);
-        event.preventDefault();
-        event.stopPropagation();
-        return true;
-    }
-
-    if (matchHotKey(window.siyuan.config.keymap.editor.general.fullscreen.custom, event)) {
-        fullscreen(protyle.element);
-        setPadding(protyle);
-        event.preventDefault();
-        event.stopPropagation();
-        return true;
-    }
     if (matchHotKey(window.siyuan.config.keymap.editor.general.netImg2LocalAsset.custom, event)) {
         netImg2LocalAssets(protyle);
         event.preventDefault();

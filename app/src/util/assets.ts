@@ -86,14 +86,14 @@ export const loadAssets = (data: IAppearance) => {
     setCodeTheme();
 
     const themeScriptElement = document.getElementById("themeScript");
-    const themeScriptAddress = `/appearance/themes/${data.mode === 1 ? data.themeDark : data.themeLight}/theme.js?v=${data.themeVer}`;
+    const themeScriptAddress = `/appearance/themes/${data.mode === 1 ? data.themeDark : data.themeLight}/theme.es.js?v=${data.themeVer}`;
     if (themeScriptElement) {
         if (!themeScriptElement.getAttribute("src").startsWith(themeScriptAddress)) {
             themeScriptElement.remove();
-            addScript(themeScriptAddress, "themeScript");
+            addScript(themeScriptAddress, "themeScript", "module");
         }
     } else {
-        addScript(themeScriptAddress, "themeScript");
+        addScript(themeScriptAddress, "themeScript", "module");
     }
 
     const iconDefaultScriptElement = document.getElementById("iconDefaultScript");
@@ -164,7 +164,8 @@ export const addGA = () => {
         window.dataLayer = window.dataLayer || [];
         /*eslint-disable */
         const gtag = function (...args: any[]) {
-            window.dataLayer.push(arguments);
+            // rome-ignore lint/style/noArguments: <explanation>
+window.dataLayer.push(arguments);
         };
         /*eslint-enable */
         gtag("js", new Date());

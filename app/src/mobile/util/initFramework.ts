@@ -3,7 +3,6 @@ import {closePanel} from "./closePanel";
 import {openMobileFileById} from "../editor";
 import {validateName} from "../../editor/rename";
 import {getEventName} from "../../protyle/util/compatibility";
-import {mountHelp} from "../../util/mount";
 import {fetchPost} from "../../util/fetch";
 import {setInlineStyle} from "../../util/assets";
 import {renderSnippet} from "../../config/util/snippets";
@@ -16,7 +15,7 @@ import {hasTopClosestByTag} from "../../protyle/util/hasClosest";
 import {MobileBacklinks} from "./MobileBacklinks";
 import {MobileBookmarks} from "./MobileBookmarks";
 import {MobileTags} from "./MobileTags";
-import {hideKeyboard, hideKeyboardToolbar, initKeyboardToolbar} from "./keyboardToolbar";
+import {activeBlur, hideKeyboardToolbar, initKeyboardToolbar} from "./keyboardToolbar";
 import {getSearch} from "../../util/functions";
 import {syncGuide} from "../../sync/syncGuide";
 
@@ -77,7 +76,7 @@ export const initFramework = () => {
     window.siyuan.mobile.files = new MobileFiles();
     document.getElementById("toolbarFile").addEventListener("click", () => {
         hideKeyboardToolbar();
-        hideKeyboard();
+        activeBlur();
         sidebarElement.style.left = "0";
         document.querySelector(".scrim").classList.remove("fn__none");
         const type = sidebarElement.querySelector(".toolbar--border .toolbar__icon--active").getAttribute("data-type");
@@ -132,9 +131,6 @@ export const initFramework = () => {
         closePanel();
     });
     initEditorName();
-    if (window.siyuan.config.openHelp) {
-        mountHelp();
-    }
     if (getOpenNotebookCount() > 0) {
         if (window.JSAndroid) {
             if (window.openFileByURL(window.JSAndroid.getBlockURL())) {

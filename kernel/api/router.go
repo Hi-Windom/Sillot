@@ -334,7 +334,5 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/av/renderAttributeView", model.CheckAuth, renderAttributeView)
 
 	ginServer.Handle("POST", "/api/ai/chatGPT", model.CheckAuth, chatGPT)
-	ginServer.Handle("POST", "/api/ai/chatGPTContinueWriteBlocks", model.CheckAuth, chatGPTContinueWriteBlocks)
-	ginServer.Handle("POST", "/api/ai/chatGPTTranslate", model.CheckAuth, chatGPTTranslate)
-	ginServer.Handle("POST", "/api/ai/chatGPTSummary", model.CheckAuth, chatGPTSummary)
+	ginServer.Handle("POST", "/api/ai/chatGPTWithAction", model.CheckAuth, chatGPTWithAction)
 }

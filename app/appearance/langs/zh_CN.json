@@ -1,4 +1,17 @@
 {
+  "aiContinueWrite": "续写",
+  "aiTranslate": "翻译",
+  "aiExtractSummary": "提取摘要",
+  "aiTranslate_zh_CN": "中文",
+  "aiTranslate_ja_JP": "日文",
+  "aiTranslate_ko_KR": "韩文",
+  "aiTranslate_en_US": "英文",
+  "aiTranslate_es_ES": "西班牙文",
+  "aiTranslate_fr_FR": "法文",
+  "aiTranslate_de_DE": "德文",
+  "aiBrainStorm": "头脑风暴",
+  "aiFixGrammarSpell": "修正语法和拼写",
+  "aiCustomAction": "自定义操作...",
   "attributeView": "属性视图",
   "mgmt": "管理",
   "spaceRepetition": "间隔重复",
@@ -896,7 +909,8 @@
     "task.history.generateDoc": "执行生成文件历史",
     "task.history.database.index.commit": "执行历史数据库索引提交",
     "task.database.index.embedBlock": "执行数据库索引嵌入块",
-    "task.reload.ui": "执行重载界面"
+    "task.reload.ui": "执行重载界面",
+    "task.upgrade.userGuide": "执行升级用户指南"
   },
   "_trayMenu": {
     "showWindow": "显示主窗口",

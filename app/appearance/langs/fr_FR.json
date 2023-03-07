@@ -1,4 +1,17 @@
 {
+  "aiContinueWrite": "Continuer à écrire",
+  "aiTranslate": "Traduire",
+  "aiExtractSummary": "Résumé de l'extrait",
+  "aiTranslate_zh_CN": "Chinois",
+  "aiTranslate_ja_JP": "Japonais",
+  "aiTranslate_ko_KR": "Coréen",
+  "aiTranslate_en_US": "Anglais",
+  "aiTranslate_es_ES": "Espagnol",
+  "aiTranslate_fr_FR": "Français",
+  "aiTranslate_de_DE": "Allemand",
+  "aiBrainStorm": "Remue-méninges",
+  "aiFixGrammarSpell": "Corrige la grammaire et l'orthographe",
+  "aiCustomAction": "Action personnalisée...",
   "attributeView": "Vista de atributos",
   "mgmt": "Gestion",
   "spaceRepetition": "Répétition espacée",
@@ -895,7 +908,8 @@
     "task.history.generateDoc": "Exécuter l'historique de GenerateDoc",
     "task.history.database.index.commit": "Effectuer la validation de l'index de la base de données d'historique",
     "task.database.index.embedBlock": "Exécuter le bloc d'intégration d'index de base de données",
-    "task.reload.ui": "Interface utilisateur de rechargement de tâche"
+    "task.reload.ui": "Interface utilisateur de rechargement de tâche",
+    "task.upgrade.userGuide": "Mise à niveau de la tâche de guide utilisateur",
   },
   "_trayMenu": {
     "showWindow": "Afficher la fenêtre principale",
