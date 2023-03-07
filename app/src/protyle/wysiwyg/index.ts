@@ -62,6 +62,7 @@ import {setTableAlign} from "../util/table";
 import {countBlockWord, countSelectWord} from "../../layout/status";
 import {showMessage} from "../../dialog/message";
 import {getBacklinkHeadingMore, loadBreadcrumb} from "./renderBacklink";
+import {removeSearchMark} from "../toolbar/util";
 
 export class WYSIWYG {
     public lastHTMLs: { [key: string]: string } = {};
@@ -139,6 +140,7 @@ export class WYSIWYG {
         if (// 表格行内公式之前无法插入文字 https://github.com/siyuan-note/siyuan/issues/3908
             inlineElement.tagName === "SPAN" &&
             inlineElement.textContent !== inputData &&
+            !currentTypes.includes("search-mark") &&    // https://github.com/siyuan-note/siyuan/issues/7586
             range.toString() === "" && range.startContainer.nodeType === 3 &&
             (currentTypes.includes("inline-memo") || currentTypes.includes("text") || currentTypes.includes("block-ref") || currentTypes.includes("file-annotation-ref") || currentTypes.includes("a")) &&
             !hasNextSibling(range.startContainer) && range.startContainer.textContent.length === range.startOffset &&
@@ -1182,6 +1184,9 @@ export class WYSIWYG {
             protyle.toolbar.range = getEditorRange(protyle.element);
             if (target.tagName === "SPAN" && !protyle.disabled) { // https://ld246.com/article/1665141518103
                 const types = protyle.toolbar.getCurrentType(protyle.toolbar.range);
+                if (types.length > 0) {
+                    removeSearchMark(target);
+                }
                 if (types.includes("block-ref")) {
                     refMenu(protyle, target);
                     // 阻止 popover
@@ -1190,20 +1195,16 @@ export class WYSIWYG {
                         target.removeAttribute("prevent-popover");
                     }, 620);
                     return false;
-                }
-                if (types.includes("file-annotation-ref")) {
+                } else if (types.includes("file-annotation-ref")) {
                     protyle.toolbar.showFileAnnotationRef(protyle, target);
                     return false;
-                }
-                if (types.includes("tag")) {
+                } else if (types.includes("tag")) {
                     tagMenu(protyle, target);
                     return false;
-                }
-                if (types.includes("inline-memo")) {
+                } else if (types.includes("inline-memo")) {
                     protyle.toolbar.showRender(protyle, target);
                     return false;
-                }
-                if (types.includes("a")) {
+                } else if (types.includes("a")) {
                     linkMenu(protyle, target);
                     if (window.siyuan.config.editor.floatWindowMode === 0 &&
                         target.getAttribute("data-href")?.startsWith("siyuan://blocks")) {

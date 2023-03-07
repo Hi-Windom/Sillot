@@ -49,6 +49,9 @@ import {openHistory} from "../history/history";
 import {openCard} from "../card/openCard";
 import {lockScreen} from "../dialog/processSystem";
 import {isWindow} from "./functions";
+import {reloadProtyle} from "../protyle/util/reload";
+import {fullscreen} from "../protyle/breadcrumb/action";
+import {setPadding} from "../protyle/ui/initUI";
 
 const getRightBlock = (element: HTMLElement, x: number, y: number) => {
     let index = 1;
@@ -103,6 +106,7 @@ export const globalShortcut = () => {
             window.siyuan.hideBreadcrumb = false;
         }
         if (event.buttons === 0 &&  // 鼠标按键被按下时不触发
+            window.siyuan.layout.bottomDock &&
             !isWindow() && !hasClosestByClassName(event.target, "b3-dialog") && !hasClosestByClassName(event.target, "b3-menu")) {
             if (event.clientX < 43) {
                 if (!window.siyuan.layout.leftDock.pin && window.siyuan.layout.leftDock.layout.element.clientWidth > 0 &&
@@ -1081,6 +1085,17 @@ const editKeydown = (event: KeyboardEvent) => {
     const target = event.target as HTMLElement;
     if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || hasClosestByAttribute(target, "contenteditable", null)) {
         return false;
+    }
+    if (matchHotKey(window.siyuan.config.keymap.editor.general.refresh.custom, event)) {
+        reloadProtyle(protyle);
+        event.preventDefault();
+        return true;
+    }
+    if (matchHotKey(window.siyuan.config.keymap.editor.general.fullscreen.custom, event)) {
+        fullscreen(protyle.element);
+        setPadding(protyle);
+        event.preventDefault();
+        return true;
     }
     if (matchHotKey(window.siyuan.config.keymap.editor.general.preview.custom, event)) {
         setEditMode(protyle, "preview");
