@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-<a href="README.md">SiYuan</a> | <a href="README_zh_CN.md">思源</a>
+<a href="README_zh_CN.md">思源（SiYuan）</a> | 汐洛（Sillot）
 
 </p>
 
