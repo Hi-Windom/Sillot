@@ -9,3 +9,8 @@
 <p align="center">
 <a href="README_zh_CN.md">思源（SiYuan）</a>&emsp;|&emsp;<a href="README_Sillot.md">汐洛（Sillot）</a>
 </p>
+
+<p align="center">
+<br><br>
+<img alt="split" src="./.github/split.png">
+</p>
