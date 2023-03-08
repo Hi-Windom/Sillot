@@ -38,6 +38,7 @@ import {transferBlockRef} from "../../menus/block";
 import {isMobile} from "../../util/functions";
 import {HiJoy} from "../../sillot/joyUI/com_/hi";
 import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
+import {AIActions} from "../../ai/actions";
 
 export class Gutter {
     public element: HTMLElement;
@@ -437,6 +438,7 @@ export class Gutter {
                 return true;
             }
         });
+        AIActions(selectsElement, protyle);
         if (!isList && !protyle.disabled) {
             const SillotExtSubmennu: IMenu[] = [];
             window.siyuan.menus.menu.append(new MenuItem({
@@ -776,6 +778,7 @@ export class Gutter {
             submenu: SillotExtSubmennu
         }).element);
         window.siyuan.menus.menu.append(new MenuItem({ type: "separator" }).element);
+        AIActions([nodeElement], protyle);
         // "heading1-6", "list", "ordered-list", "check", "quote", "code", "table", "line", "math", "paragraph"
         if (type === "NodeParagraph" && !protyle.disabled) {
             turnIntoSubmenu.push(this.turnsIntoOne({
