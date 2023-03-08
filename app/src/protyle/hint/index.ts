@@ -30,6 +30,7 @@ import {openMobileFileById} from "../../mobile/editor";
 import {getIconByType} from "../../editor/getIcon";
 import {processRender} from "../util/processCode";
 import {AIChat} from "../../ai/chat";
+import {isMobile} from "../../util/functions";
 
 export class Hint {
     public timeId: number;
@@ -491,7 +492,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                 }
                 return;
             }
-            insertHTML(protyle.lute.SpinBlockDOM(value), protyle);
+            insertHTML(protyle.lute.SpinBlockDOM(value), protyle, false, isMobile());
             blockRender(protyle, protyle.wysiwyg.element);
             return;
         } else if (this.splitChar === "/" || this.splitChar === "、") {
@@ -551,7 +552,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                 });
                 return;
             } else if (value === Constants.ZWSP + 5) {
-                AIChat(protyle);
+                AIChat(protyle, nodeElement);
                 return;
             } else if (Constants.INLINE_TYPE.includes(value)) {
                 range.deleteContents();
