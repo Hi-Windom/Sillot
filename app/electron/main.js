@@ -1057,6 +1057,7 @@ app.whenReady().then(() => {
     const ignore = [
         "localhost",
         "www.clarity.ms",
+        "e.clarity.ms",
         "127.0.0.1",
         "0.0.0.0",
     ]
