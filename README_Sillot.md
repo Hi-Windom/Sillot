@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-<a href="README.md">SiYuan</a> | <a href="README_zh_CN.md">思源</a>
+<a href="README_zh_CN.md">思源（SiYuan）</a> | 汐洛（Sillot）
 
 </p>
 
@@ -32,11 +32,19 @@ Sillot （汐洛）是彖乄驱动、极致优雅、开发者友好的思源笔�
 
 汐洛始终代表先进恣产力，始终拥护全球先进开源力量，坚定不移推动新彖乄面向未来持续发展。
 
+<p align="center">
+<img alt="framework" src="./screenshots/sillot/framework.png">
+</p>
+
 ## 极致优雅
 
 > 注：汐洛刚立项时，确立的是【开发者友好、社区优先、彖乄驱动】总方针。但遗憾的是，思源笔记社区不屑于这一方针，我们无奈移除 “社区优先”。
 
 汐洛始终坚持精品路线，从不在任何一个细节上妥协。专注于为目标用户提供最好的使用体验，这是实现极致优雅的必由之路。汐洛尊重非目标用户的声音，但并不关心。
+
+<p align="center">
+<img alt="framework" src="./screenshots/sillot/booting1.png">
+</p>
 
 ## 开发者友好
 
@@ -44,7 +52,4 @@ Sillot （汐洛）是彖乄驱动、极致优雅、开发者友好的思源笔�
 
 <p align="center">
 <img alt="split" src="./.github/split.png">
-</p>
-<p align="center">
-<img alt="framework" src="./screenshots/sillot/framework.png">
 </p>

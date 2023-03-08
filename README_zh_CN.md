@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-<a href="README.md">English</a>&emsp;|&emsp;<a href="README_Sillot.md">汐洛</a>
+思源（SiYuan）&emsp;|&emsp;<a href="README_Sillot.md">汐洛（Sillot）</a>
 </p>
 
 ## 💡 简介
@@ -261,6 +261,16 @@
 目前仅支持中国大陆地区用户订阅，非中国大陆地区用户请勿订阅。
 
 ## 🙏 鸣谢
+
+### 贡献者列表
+
+欢迎加入我们，一起为思源贡献代码。
+
+<a href="https://github.com/siyuan-note/siyuan/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=siyuan-note/siyuan" />
+</a>
+
+### 开源项目依赖列表
 
 思源的诞生离不开下列开源项目。
 
