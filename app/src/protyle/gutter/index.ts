@@ -439,7 +439,6 @@ export class Gutter {
                 return true;
             }
         });
-        AIActions(selectsElement, protyle);
         if (!isList && !protyle.disabled) {
             const SillotExtSubmennu: IMenu[] = [];
             window.siyuan.menus.menu.append(new MenuItem({
@@ -583,6 +582,7 @@ export class Gutter {
                 }).element);
             }
         }
+        AIActions(selectsElement, protyle);
         const copyMenu: IMenu[] = [{
             label: window.siyuan.languages.copy,
             accelerator: "⌘C",
@@ -782,7 +782,6 @@ export class Gutter {
             submenu: SillotExtSubmennu
         }).element);
         window.siyuan.menus.menu.append(new MenuItem({ type: "separator" }).element);
-        AIActions([nodeElement], protyle);
         // "heading1-6", "list", "ordered-list", "check", "quote", "code", "table", "line", "math", "paragraph"
         if (type === "NodeParagraph" && !protyle.disabled) {
             turnIntoSubmenu.push(this.turnsIntoOne({
@@ -1022,6 +1021,7 @@ export class Gutter {
                 submenu: turnIntoSubmenu
             }).element);
         }
+        AIActions([nodeElement], protyle);
         const copyMenu = (copySubMenu(id, true, nodeElement) as IMenu[]).concat([{
             label: window.siyuan.languages.copy,
             accelerator: "⌘C",
