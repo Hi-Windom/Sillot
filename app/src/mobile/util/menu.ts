@@ -745,8 +745,12 @@ const initAbout = () => {
     });
     const networkServeElement = modelMainElement.querySelector("#networkServe") as HTMLInputElement;
     networkServeElement.addEventListener("change", () => {
+        if(networkServeElement.checked){
+            let _r = window.JSAndroid.requestPermission("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS")
+        console.warn(_r)
+        }
         fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
-            exitSiYuan();
+            // exitSiYuan();
         });
     });
 };

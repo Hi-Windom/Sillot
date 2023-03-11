@@ -45,6 +45,8 @@ interface Window {
         writeImageClipboard(uri: string): void
         readClipboard(): string
         getBlockURL(): string
+        // Sillot extend
+        requestPermission(id: string): boolean
     }
 
     goBack(): void
