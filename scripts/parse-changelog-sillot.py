@@ -61,12 +61,11 @@ def find_milestone(repo, title):
     version = ".".join(pat.group(1).split(".")[:2])
     print('''
 ---
-❤️ 欢迎共建思源笔记汐洛分支 694357845@qq.com
-💠 海文东QQ频道：43in2c1qb9 异步更新安装包
-🐱‍🏍 Sillot is currently in active development
 ⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
-🚢 [Docker image available](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)
-📱 [Android application package available](https://github.com/Hi-Windom/Sillot-android/releases)
+❤️ 欢迎共建思源笔记汐洛分支 694357845@qq.com
+🚧 [Sillot is currently in active development](https://github.com/orgs/Hi-Windom/projects/2/views/2)
+
+🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)  📱 [Android application package](https://github.com/Hi-Windom/Sillot-android/releases)
 <span>
 <img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 10+-black?logo=android" title=""/>
 </span>[![CI](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml/badge.svg)](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml)
