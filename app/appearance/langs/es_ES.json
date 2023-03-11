@@ -1,4 +1,5 @@
 {
+  "ai": "Inteligencia Artificial",
   "aiContinueWrite": "Continuar escribiendo",
   "aiTranslate": "Traducir",
   "aiExtractSummary": "Extraer resumen",
@@ -10,7 +11,7 @@
   "aiTranslate_fr_FR": "Francés",
   "aiTranslate_de_DE": "Alemán",
   "aiBrainStorm": "Lluvia de ideas",
-  "aiFixGrammarSpell": "Corregir gramática y ortografía",
+  "aiFixGrammarSpell": "Corregir gramática, ortografía y errores tipográficos.",
   "aiCustomAction": "Acción personalizada...",
   "attributeView": "Vista de atributos",
   "mgmt": "Administración",
@@ -909,7 +910,7 @@
     "task.history.database.index.commit": "Ejecutar la confirmación del índice de la base de datos del historial",
     "task.database.index.embedBlock": "Ejecutar bloque de incrustación de índice de base de datos",
     "task.reload.ui": "IU de recarga de tareas",
-    "task.upgrade.userGuide": "Ejecutar la guía de usuario de actualización",
+    "task.upgrade.userGuide": "Ejecutar la guía de usuario de actualización"
   },
   "_trayMenu": {
     "showWindow": "Mostrar ventana",
@@ -974,7 +975,7 @@
     "49": "Por favor, especifique la ruta de guardado de las notas diarias en la Configuración de la Libreta",
     "50": "Resolviendo referencia [%s]",
     "51": "Bloque de contenido de la caché [%d]",
-    "52": "Cada vez que abra la guía del usuario se restablecerán los datos del cuaderno, así que no guarde ningún dato en ella",
+    "52": "Cada vez que inicie y abra la guía del usuario, los datos que contiene se restablecerán, así que no guarde ningún dato en la guía del usuario",
     "53": "No se ha habilitado la sincronizacion de datos",
     "54": "Indexando referencias...",
     "55": "Referencias indexadas de [%d] documentos",

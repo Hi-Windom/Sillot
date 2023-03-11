@@ -29,7 +29,7 @@ import {openFileById} from "../../editor/util";
 import {openMobileFileById} from "../../mobile/editor";
 import {getIconByType} from "../../editor/getIcon";
 import {processRender} from "../util/processCode";
-import {Dialog} from "../../dialog";
+import {AIChat} from "../../ai/chat";
 import {isMobile} from "../../util/functions";
 
 export class Hint {
@@ -323,13 +323,13 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                 const iconName = getIconByType(item.type);
                 let attrHTML = "";
                 if (item.name) {
-                    attrHTML += `<span class="fn__flex"><svg class="b3-list-item__hinticon"><use xlink:href="#iconN"></use></svg>${item.name}</span><span class="fn__space"></span>`;
+                    attrHTML += `<span class="fn__flex"><svg class="b3-list-item__hinticon"><use xlink:href="#iconN"></use></svg><span>${item.name}</span></span><span class="fn__space"></span>`;
                 }
                 if (item.alias) {
-                    attrHTML += `<span class="fn__flex"><svg class="b3-list-item__hinticon"><use xlink:href="#iconA"></use></svg>${item.alias}</span><span class="fn__space"></span>`;
+                    attrHTML += `<span class="fn__flex"><svg class="b3-list-item__hinticon"><use xlink:href="#iconA"></use></svg><span>${item.alias}</span></span><span class="fn__space"></span>`;
                 }
                 if (item.memo) {
-                    attrHTML += `<span class="fn__flex"><svg class="b3-list-item__hinticon"><use xlink:href="#iconM"></use></svg>${item.memo}</span>`;
+                    attrHTML += `<span class="fn__flex"><svg class="b3-list-item__hinticon"><use xlink:href="#iconM"></use></svg><span>${item.memo}</span></span>`;
                 }
                 if (attrHTML) {
                     attrHTML = `<div class="fn__flex b3-list-item__meta b3-list-item__showall">${attrHTML}</div>`;
@@ -492,7 +492,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                 }
                 return;
             }
-            insertHTML(protyle.lute.SpinBlockDOM(value), protyle);
+            insertHTML(protyle.lute.SpinBlockDOM(value), protyle, false, isMobile());
             blockRender(protyle, protyle.wysiwyg.element);
             return;
         } else if (this.splitChar === "/" || this.splitChar === "、") {
@@ -552,37 +552,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                 });
                 return;
             } else if (value === Constants.ZWSP + 5) {
-                const dialog = new Dialog({
-                    title: "AI Chat",
-                    content: `<div class="b3-dialog__content"><input class="b3-text-field fn__block" value=""></div>
-<div class="b3-dialog__action">
-    <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
-    <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
-</div>`,
-                    width: isMobile() ? "80vw" : "520px",
-                });
-                const inputElement = dialog.element.querySelector("input") as HTMLInputElement;
-                const btnsElement = dialog.element.querySelectorAll(".b3-button");
-                dialog.bindInput(inputElement, () => {
-                    (btnsElement[1] as HTMLButtonElement).click();
-                });
-                inputElement.focus();
-                btnsElement[0].addEventListener("click", () => {
-                    dialog.destroy();
-                });
-                btnsElement[1].addEventListener("click", () => {
-                    fetchPost("/api/ai/chatGPT", {
-                        msg: inputElement.value,
-                    }, (response) => {
-                        dialog.destroy();
-                        focusByRange(protyle.toolbar.range);
-                        let respContent = "";
-                        if (response.data && "" !== response.data) {
-                            respContent = "\n\n" + response.data;
-                        }
-                        insertHTML(`${inputElement.value}${respContent}`, protyle, true);
-                    });
-                });
+                AIChat(protyle, nodeElement);
                 return;
             } else if (Constants.INLINE_TYPE.includes(value)) {
                 range.deleteContents();

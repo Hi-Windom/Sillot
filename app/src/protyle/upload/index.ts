@@ -106,7 +106,7 @@ const genUploadedLabel = (responseText: string, protyle: IProtyle) => {
         succFileText += genAssetHTML(type, path, filename.substring(0, filename.length - type.length), filename);
         if (!Constants.SIYUAN_ASSETS_AUDIO.includes(type) && !Constants.SIYUAN_ASSETS_VIDEO.includes(type) &&
             keys.length - 1 !== index) {
-            succFileText += "\n";
+            succFileText += "\n\n";
         }
     });
     const range = getEditorRange(protyle.wysiwyg.element);
@@ -115,7 +115,8 @@ const genUploadedLabel = (responseText: string, protyle: IProtyle) => {
         range.setEndAfter(range.startContainer.parentElement);
         range.collapse(false);
     }
-    insertHTML(succFileText, protyle);
+    // 避免插入代码块中，其次因为都要独立成块 https://github.com/siyuan-note/siyuan/issues/7607
+    insertHTML(succFileText, protyle, true);
 };
 
 export const uploadLocalFiles = (files: string[], protyle: IProtyle, isUpload: boolean) => {

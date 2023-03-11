@@ -217,7 +217,7 @@ func InitConf() {
 	} else {
 		if 0 < semver.Compare("v"+util.Ver, "v"+Conf.System.KernelVersion) {
 			logging.LogInfof("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.Ver)
-		} else {
+		} else if 0 > semver.Compare("v"+util.Ver, "v"+Conf.System.KernelVersion) {
 			logging.LogInfof("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.Ver)
 		}
 
@@ -488,6 +488,10 @@ func NewLute() (ret *lute.Lute) {
 var confSaveLock = sync.Mutex{}
 
 func (conf *AppConf) Save() {
+	if util.ReadOnly {
+		return
+	}
+
 	confSaveLock.Lock()
 	confSaveLock.Unlock()
 

@@ -45,6 +45,8 @@ interface Window {
         writeImageClipboard(uri: string): void
         readClipboard(): string
         getBlockURL(): string
+        // Sillot extend
+        requestPermission(id: string): boolean
     }
 
     goBack(): void
@@ -395,7 +397,7 @@ declare interface IConfig {
         stat: string
         interval: number
         cloudName: string
-        provider: number
+        provider: number    // 0 官方同步， 2 S3， 3 WebDAV
         s3: {
             endpoint: string
             pathStyle: boolean

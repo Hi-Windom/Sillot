@@ -18,6 +18,9 @@ import {needSubscribe} from "../util/needSubscribe";
 import { exportIDB } from "../sillot/util/sillot-idb-backup-and-restore";
 
 export const lockScreen = () => {
+    if (window.siyuan.config.readonly) {
+        return
+    }
     /// #if BROWSER
     fetchPost("/api/system/logoutAuth", {}, () => {
         window.location.href = `/check-auth?url=${window.location.href}`;
@@ -339,7 +342,35 @@ export const downloadProgress = (data: { id: string, percent: number }) => {
 };
 
 export const processSync = (data?: IWebSocketData) => {
-    const iconElement = document.querySelector(isMobile() ? "#menuSyncNow" : "#barSync");
+    /// #if MOBILE
+    const menuSyncUseElement = document.querySelector("#menuSyncNow use");
+    const barSyncUseElement = document.querySelector("#toolbarSync use");
+    if (!data) {
+        if (!window.siyuan.config.sync.enabled || (0 === window.siyuan.config.sync.provider && needSubscribe(""))) {
+            menuSyncUseElement?.setAttribute("xlink:href", "#iconCloudOff");
+            barSyncUseElement.setAttribute("xlink:href", "#iconCloudOff");
+        } else {
+            menuSyncUseElement?.setAttribute("xlink:href", "#iconCloudSucc");
+            barSyncUseElement.setAttribute("xlink:href", "#iconCloudSucc");
+        }
+        return;
+    }
+    menuSyncUseElement?.parentElement.classList.remove("fn__rotate");
+    barSyncUseElement.parentElement.classList.remove("fn__rotate");
+    if (data.code === 0) {  // syncing
+        menuSyncUseElement?.parentElement.classList.add("fn__rotate");
+        barSyncUseElement.parentElement.classList.add("fn__rotate");
+        menuSyncUseElement?.setAttribute("xlink:href", "#iconRefresh");
+        barSyncUseElement.setAttribute("xlink:href", "#iconRefresh");
+    } else if (data.code === 2) {    // error
+        menuSyncUseElement?.setAttribute("xlink:href", "#iconCloudError");
+        barSyncUseElement.setAttribute("xlink:href", "#iconCloudError");
+    } else if (data.code === 1) {   // success
+        menuSyncUseElement?.setAttribute("xlink:href", "#iconCloudSucc");
+        barSyncUseElement.setAttribute("xlink:href", "#iconCloudSucc");
+    }
+    /// #else
+    const iconElement = document.querySelector("#barSync");
     if (!iconElement) {
         return;
     }
@@ -367,4 +398,5 @@ export const processSync = (data?: IWebSocketData) => {
         useElement.setAttribute("xlink:href", "#iconCloudSucc");
     }
     iconElement.setAttribute("aria-label", data.msg);
+    /// #endif
 };

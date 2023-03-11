@@ -38,6 +38,8 @@ import {transferBlockRef} from "../../menus/block";
 import {isMobile} from "../../util/functions";
 import {HiJoy} from "../../sillot/joyUI/com_/hi";
 import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
+import {AIActions} from "../../ai/actions";
+import {activeBlur} from "../../mobile/util/keyboardToolbar";
 
 export class Gutter {
     public element: HTMLElement;
@@ -580,6 +582,7 @@ export class Gutter {
                 }).element);
             }
         }
+        AIActions(selectsElement, protyle);
         const copyMenu: IMenu[] = [{
             label: window.siyuan.languages.copy,
             accelerator: "⌘C",
@@ -711,6 +714,9 @@ export class Gutter {
         // 单个块的菜单
         hideElements(["util", "toolbar", "hint"], protyle);
         window.siyuan.menus.menu.remove();
+        if (isMobile()) {
+            activeBlur();
+        }
         const id = buttonElement.getAttribute("data-node-id");
         const selectsElement = protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select");
         if (selectsElement.length > 1) {
@@ -1015,6 +1021,7 @@ export class Gutter {
                 submenu: turnIntoSubmenu
             }).element);
         }
+        AIActions([nodeElement], protyle);
         const copyMenu = (copySubMenu(id, true, nodeElement) as IMenu[]).concat([{
             label: window.siyuan.languages.copy,
             accelerator: "⌘C",

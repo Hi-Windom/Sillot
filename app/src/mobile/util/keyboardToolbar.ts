@@ -205,6 +205,7 @@ export const initKeyboardToolbar = () => {
         const protyle = window.siyuan.mobile.editor.protyle;
         if (slashBtnElement) {
             protyle.hint.fill(decodeURIComponent(slashBtnElement.getAttribute("data-value")), protyle);
+            focusByRange(protyle.toolbar.range);
             event.preventDefault();
             event.stopPropagation();
             return;
@@ -280,11 +281,13 @@ export const initKeyboardToolbar = () => {
                 y: 0
             });
             activeBlur();
+            hideKeyboardToolbar();
             return;
         } else if (type === "block") {
             protyle.gutter.renderMenu(protyle, nodeElement);
             window.siyuan.menus.menu.fullscreen();
             activeBlur();
+            hideKeyboardToolbar();
             return;
         } else if (type === "outdent") {
             listOutdent(protyle, [nodeElement.parentElement], range);

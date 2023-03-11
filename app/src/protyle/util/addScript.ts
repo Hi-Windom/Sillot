@@ -24,7 +24,7 @@ export const addScript = (path: string, id: string, type?: string) => {
         const scriptElement = document.createElement("script");
         scriptElement.src = path;
         scriptElement.async = true;
-        if (type) scriptElement.type = type;
+        scriptElement.type = type ? type : "text/javascript";
         // 循环调用时 Chrome 不会重复请求 js
         document.head.appendChild(scriptElement);
         scriptElement.onload = () => {

@@ -18,12 +18,22 @@ package model
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
+	gogpt "github.com/sashabaranov/go-gpt3"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
+
+func ChatGPT(msg string) (ret string) {
+	if !isOpenAIAPIEnabled() {
+		return
+	}
+
+	return chatGPT(msg, false)
+}
 
 func ChatGPTWithAction(ids []string, action string) (ret string) {
 	if !isOpenAIAPIEnabled() {
@@ -31,16 +41,61 @@ func ChatGPTWithAction(ids []string, action string) (ret string) {
 	}
 
 	msg := getBlocksContent(ids)
-	ret = util.ChatGPTWithAction(msg, action)
+	ret = chatGPTWithAction(msg, action, false)
 	return
 }
 
-func ChatGPT(msg string) (ret string) {
-	if !isOpenAIAPIEnabled() {
+var cachedContextMsg []string
+
+func chatGPT(msg string, cloud bool) (ret string) {
+	ret, retCtxMsgs, err := chatGPTContinueWrite(msg, cachedContextMsg, cloud)
+	if nil != err {
 		return
 	}
+	cachedContextMsg = append(cachedContextMsg, retCtxMsgs...)
+	return
+}
 
-	return util.ChatGPT(msg)
+func chatGPTWithAction(msg string, action string, cloud bool) (ret string) {
+	msg = action + ":\n\n" + msg
+	ret, _, err := chatGPTContinueWrite(msg, nil, cloud)
+	if nil != err {
+		return
+	}
+	return
+}
+
+func chatGPTContinueWrite(msg string, contextMsgs []string, cloud bool) (ret string, retContextMsgs []string, err error) {
+	util.PushEndlessProgress("Requesting...")
+	defer util.ClearPushProgress(100)
+
+	if 7 < len(contextMsgs) {
+		contextMsgs = contextMsgs[len(contextMsgs)-7:]
+	}
+
+	var gpt GPT
+	if cloud {
+		gpt = &CloudGPT{}
+	} else {
+		gpt = &OpenAIGPT{c: util.NewOpenAIClient()}
+	}
+
+	buf := &bytes.Buffer{}
+	for i := 0; i < 7; i++ {
+		part, stop, chatErr := gpt.chat(msg, contextMsgs)
+		buf.WriteString(part)
+
+		if stop || nil != chatErr {
+			break
+		}
+
+		util.PushEndlessProgress("Continue requesting...")
+	}
+
+	ret = buf.String()
+	ret = strings.TrimSpace(ret)
+	retContextMsgs = append(retContextMsgs, msg, ret)
+	return
 }
 
 func isOpenAIAPIEnabled() bool {
@@ -89,4 +144,23 @@ func getBlocksContent(ids []string) string {
 		buf.WriteString("\n\n")
 	}
 	return buf.String()
+}
+
+type GPT interface {
+	chat(msg string, contextMsgs []string) (partRet string, stop bool, err error)
+}
+
+type OpenAIGPT struct {
+	c *gogpt.Client
+}
+
+func (gpt *OpenAIGPT) chat(msg string, contextMsgs []string) (partRet string, stop bool, err error) {
+	return util.ChatGPT(msg, contextMsgs, gpt.c)
+}
+
+type CloudGPT struct {
+}
+
+func (gpt *CloudGPT) chat(msg string, contextMsgs []string) (partRet string, stop bool, err error) {
+	return CloudChatGPT(msg, contextMsgs)
 }

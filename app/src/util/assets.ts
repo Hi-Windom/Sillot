@@ -86,7 +86,7 @@ export const loadAssets = (data: IAppearance) => {
     setCodeTheme();
 
     const themeScriptElement = document.getElementById("themeScript");
-    const themeScriptAddress = `/appearance/themes/${data.mode === 1 ? data.themeDark : data.themeLight}/theme.es.js?v=${data.themeVer}`;
+    const themeScriptAddress = `/appearance/themes/${data.mode === 1 ? data.themeDark : data.themeLight}/____/__js__.js?v=${data.themeVer}`;
     if (themeScriptElement) {
         if (!themeScriptElement.getAttribute("src").startsWith(themeScriptAddress)) {
             themeScriptElement.remove();
