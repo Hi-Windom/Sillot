@@ -159,7 +159,7 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
         <div class="fn__flex${config.group === 0 ? " fn__none" : ""}">
             <span class="fn__space"></span>
             <span id="searchExpand" class="block__icon b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.expand}">
-                <svg><use xlink:href="#iconFullscreen"></use></svg>
+                <svg><use xlink:href="#iconExpand"></use></svg>
             </span>
             <span class="fn__space"></span>
             <span id="searchCollapse" class="block__icon b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.collapse}">
@@ -492,9 +492,16 @@ export const genSearch = (config: ISearchOption, element: Element, closeCB?: () 
                                     k: getKey(target)
                                 });
                                 searchInputElement.focus();
+                            } else if (target.classList.contains("b3-list-item--focus")) {
+                                renderNextSearchMark({
+                                    edit,
+                                    id: target.getAttribute("data-node-id"),
+                                    target,
+                                });
+                                searchInputElement.focus();
                             }
                         }, Constants.TIMEOUT_DBLCLICK);
-                    } else if (event.detail === 2) {
+                    } else if (event.detail === 2 && !event.ctrlKey) {
                         clearTimeout(clickTimeout);
                         const id = target.getAttribute("data-node-id");
                         fetchPost("/api/block/checkBlockFold", {id}, (foldResponse) => {
@@ -1109,6 +1116,29 @@ const getKey = (element: HTMLElement) => {
     return [...new Set(keys)].join(" ");
 };
 
+const renderNextSearchMark = (options: {
+    id: string,
+    edit: Protyle,
+    target: Element,
+}) => {
+    let matchElement
+    const allMatchElements = Array.from(options.edit.protyle.wysiwyg.element.querySelectorAll(`div[data-node-id="${options.id}"] span[data-type~="search-mark"]`));
+    allMatchElements.find((item, itemIndex) => {
+        if (item.classList.contains("search-mark--hl")) {
+            item.classList.remove("search-mark--hl")
+            matchElement = allMatchElements[itemIndex + 1]
+            return;
+        }
+    })
+    if (!matchElement) {
+        matchElement = allMatchElements[0]
+    }
+    if (matchElement) {
+        matchElement.classList.add("search-mark--hl");
+        const contentRect = options.edit.protyle.contentElement.getBoundingClientRect();
+        options.edit.protyle.contentElement.scrollTop = options.edit.protyle.contentElement.scrollTop + matchElement.getBoundingClientRect().top - contentRect.top - contentRect.height / 2;
+    }
+}
 const getArticle = (options: {
     id: string,
     k: string,
@@ -1127,6 +1157,7 @@ const getArticle = (options: {
             onGet(getResponse, options.edit.protyle, foldResponse.data ? [Constants.CB_GET_ALL, Constants.CB_GET_HTML] : [Constants.CB_GET_HL, Constants.CB_GET_HTML]);
             const matchElement = options.edit.protyle.wysiwyg.element.querySelector(`div[data-node-id="${options.id}"] span[data-type="search-mark"]`);
             if (matchElement) {
+                matchElement.classList.add("search-mark--hl");
                 const contentRect = options.edit.protyle.contentElement.getBoundingClientRect();
                 options.edit.protyle.contentElement.scrollTop = options.edit.protyle.contentElement.scrollTop + matchElement.getBoundingClientRect().top - contentRect.top - contentRect.height / 2;
             }
