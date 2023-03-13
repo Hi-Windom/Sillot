@@ -19,7 +19,7 @@ import { exportIDB } from "../sillot/util/sillot-idb-backup-and-restore";
 
 export const lockScreen = () => {
     if (window.siyuan.config.readonly) {
-        return
+        return;
     }
     /// #if BROWSER
     fetchPost("/api/system/logoutAuth", {}, () => {
@@ -323,11 +323,14 @@ export const setTitle = (title: string) => {
 };
 
 export const downloadProgress = (data: { id: string, percent: number }) => {
-    const bazzarElement = document.getElementById("configBazaarReadme");
-    if (!bazzarElement) {
+    const bazzarSideElement = document.querySelector("#configBazaarReadme .item__side");
+    if (!bazzarSideElement) {
         return;
     }
-    const btnElement = bazzarElement.querySelector('[data-type="install"]') as HTMLElement;
+    if (data.id !== JSON.parse(bazzarSideElement.getAttribute("data-obj")).repoURL) {
+        return;
+    }
+    const btnElement = bazzarSideElement.querySelector('[data-type="install"]') as HTMLElement;
     if (btnElement) {
         if (data.percent >= 1) {
             btnElement.parentElement.classList.add("fn__none");

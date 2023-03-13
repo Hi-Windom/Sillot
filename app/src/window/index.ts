@@ -92,9 +92,6 @@ class App {
                             case "statusbar":
                                 progressStatus(data);
                                 break;
-                            case "downloadProgress":
-                                downloadProgress(data.data);
-                                break;
                             case "txerr":
                                 transactionError(data);
                                 break;
