@@ -25,7 +25,7 @@ module.exports = (env, argv) => {
       splitChunks: {
         chunks: "all",
       },
-      minimize: false,
+      minimize: true,
       minimizer: [
         new EsbuildPlugin({
           minify: true,

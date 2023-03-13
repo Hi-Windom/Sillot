@@ -84,6 +84,7 @@ specifiers:
   sass: ^1.59.2
   sass-loader: ^13.2.0
   socket.io: ^4.6.1
+  sofill: ^1.0.41
   sout: ^1.0.6
   style-loader: ^3.3.1
   sweetalert2: ^11.7.3
@@ -180,6 +181,7 @@ devDependencies:
   sass: 1.59.2
   sass-loader: registry.npmmirror.com/sass-loader/13.2.0_sass@1.59.2+webpack@5.76.1
   socket.io: 4.6.1
+  sofill: 1.0.41_pkuazrhhykda3ntttrsuk4nfcq
   sout: 1.0.6
   style-loader: registry.npmmirror.com/style-loader/3.3.1_webpack@5.76.1
   sweetalert2: 11.7.3
@@ -6815,6 +6817,17 @@ packages:
       - bufferutil
       - supports-color
       - utf-8-validate
+    dev: true
+
+  /sofill/1.0.41_pkuazrhhykda3ntttrsuk4nfcq:
+    resolution: {integrity: sha512-sMxFgbOLkFA2ap73LuwRya6O/pEG9gdtabSZzB8oyI2PYEdZZWORLUxgkpiUnYTzUNo142gg+zH5UjaEzHNH2A==}
+    peerDependencies:
+      '@sillot/bridge': ^0.0.3
+      localforage: ^1.10.0
+      typescript: '>=3.7.0'
+    dependencies:
+      localforage: registry.npmmirror.com/localforage/1.10.0
+      typescript: registry.npmmirror.com/typescript/4.9.5
     dev: true
 
   /source-list-map/2.0.1:

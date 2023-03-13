@@ -290,8 +290,9 @@ func setNetworkServe(c *gin.Context) {
 	model.Conf.System.NetworkServe = networkServe
 	model.Conf.Save()
 
-	util.PushMsg(model.Conf.Language(42), 1000*15)
-	time.Sleep(time.Second * 3)
+	// https://github.com/Hi-Windom/Sillot/issues/299
+	// util.PushMsg(model.Conf.Language(42), 1000*15)
+	// time.Sleep(time.Second * 3)
 }
 
 func setGoogleAnalytics(c *gin.Context) {

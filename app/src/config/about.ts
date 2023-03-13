@@ -12,6 +12,7 @@ import {showMessage} from "../dialog/message";
 import {Dialog} from "../dialog";
 import {confirmDialog} from "../dialog/confirmDialog";
 import {setProxy} from "../util/onGetConfig";
+import {isAppMode} from "sofill/env"
 
 export const about = {
     element: undefined as Element,
@@ -48,7 +49,7 @@ export const about = {
     <div class="fn__space"></div>
     <input class="b3-switch fn__flex-center" id="uploadErrLog" type="checkbox"${window.siyuan.config.system.uploadErrLog ? " checked" : ""}>
 </label>
-<label class="b3-label fn__flex">
+<label class="b3-label fn__flex${isAppMode() ? "" : " fn__none"}">
     <div class="fn__flex-1">
         ${window.siyuan.languages.about11}
         <div class="b3-label__text">${window.siyuan.languages.about12}</div>

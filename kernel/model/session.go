@@ -211,7 +211,7 @@ func CheckAuth(c *gin.Context) {
 
 	if workspaceSession.AccessAuthCode != Conf.AccessAuthCode {
 		userAgentHeader := c.GetHeader("User-Agent")
-		if strings.HasPrefix(userAgentHeader, "Sillot-SiYuan/") || strings.HasPrefix(userAgentHeader, "Mozilla/") {
+		if strings.HasPrefix(userAgentHeader, "SiYuan-Sillot/") || strings.HasPrefix(userAgentHeader, "Mozilla/") {
 			if "GET" != c.Request.Method {
 				c.JSON(401, map[string]interface{}{"code": -1, "msg": Conf.Language(156)})
 				c.Abort()

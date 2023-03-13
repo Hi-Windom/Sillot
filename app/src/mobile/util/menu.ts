@@ -18,6 +18,7 @@ import {syncGuide} from "../../sync/syncGuide";
 import {openCard} from "../../card/openCard";
 import {pathPosix} from "../../util/pathName";
 import {activeBlur, hideKeyboardToolbar} from "./keyboardToolbar";
+import {isAppMode} from "sofill/env"
 
 const showAccountInfo = (modelElement: HTMLElement, modelMainElement: Element) => {
     closePanel();
@@ -398,7 +399,7 @@ const initAbout = () => {
     modelElement.style.top = "0";
     modelElement.querySelector(".toolbar__icon").innerHTML = '<use xlink:href="#iconInfo"></use>';
     modelElement.querySelector(".toolbar__text").textContent = window.siyuan.languages.about;
-    modelMainElement.innerHTML = `<div class="b3-label fn__flex${window.siyuan.config.readonly ? " fn__none" : ""}">
+    modelMainElement.innerHTML = `<div class="b3-label fn__flex${(window.siyuan.config.readonly || !isAppMode()) ? " fn__none" : ""}">
     <div class="fn__flex-1">
         ${window.siyuan.languages.about11}
         <div class="b3-label__text">${window.siyuan.languages.about12}</div>

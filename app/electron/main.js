@@ -229,7 +229,7 @@ const boot = () => {
         icon: path.join(appDir, "stage", "icon-large.png"),
     });
     require("@electron/remote/main").enable(currentWindow.webContents);
-    currentWindow.webContents.userAgent = "Sillot-SiYuan/" + appVer +
+    currentWindow.webContents.userAgent = "SiYuan-Sillot/" + appVer +
         " https://b3log.org/siyuan Electron";
 
     currentWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);

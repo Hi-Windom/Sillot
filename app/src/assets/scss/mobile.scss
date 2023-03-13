@@ -24,6 +24,10 @@
 @import "business/export";
 @import "business/card";
 
+// sillot extend start
+@import "sillot/logic";
+// sillot extend end
+
 .block__popover {
   width: 80vw;
 }

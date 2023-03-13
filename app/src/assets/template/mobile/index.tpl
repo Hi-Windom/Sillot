@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <style id="editorFontSize" type="text/css"></style>
 </head>
-<body class="branch--Sillot fn__flex-column">
+<body class="branch--Sillot body--mobile fn__flex-column">
 <div id="loading" class="b3-dialog b3-dialog--open">
     <div class="b3-dialog__scrim" style="background-color: #212224"></div>
     <img style="position: absolute;width: 36vh;" src="../../icon.png">
