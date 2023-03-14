@@ -1058,6 +1058,7 @@ app.whenReady().then(() => {
         "localhost",
         "www.clarity.ms",
         "e.clarity.ms",
+        "q.clarity.ms",
         "127.0.0.1",
         "0.0.0.0",
     ]
