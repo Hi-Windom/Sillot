@@ -1641,7 +1641,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
 
         /// #if !BROWSER
         if (matchHotKey("⇧⌘V", event)) {
-            event.returnValue = false;
+            event.returnValue = false; // 等效于 event.preventDefault() ，可能出于兼容性考虑
             event.preventDefault();
             event.stopPropagation();
             pasteAsPlainText(protyle);
