@@ -48,7 +48,6 @@ interface ISout {
 interface ISillotDoubleUnderline {
   ace: any;
   Swal: any;
-  localforage: any;
   toastify: any;
   hottt: any;
 }

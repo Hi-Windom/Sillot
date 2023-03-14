@@ -1,6 +1,5 @@
 import { highlightRender } from "../protyle/markdown/highlightRender";
 const lodash = require("lodash");
-const localforage = require("localforage");
 import { exAce } from "./ace";
 import { Toastify } from "./react-toastify";
 import { HotToast } from "./react-hot-toast";
@@ -28,7 +27,6 @@ export class SillotEnv {
     window.__ = {
       ace: null,
       Swal: Swal,
-      localforage: localforage,
       toastify: new Toastify({ id: "app1", limit: 5, theme: "colored" }),
       hottt: new HotToast({ id: "app3" }),
     };
