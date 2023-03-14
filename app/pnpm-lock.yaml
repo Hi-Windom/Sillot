@@ -84,7 +84,7 @@ specifiers:
   sass: ^1.59.2
   sass-loader: ^13.2.0
   socket.io: ^4.6.1
-  sofill: ^1.0.43
+  sofill: ^1.0.44
   sout: ^1.0.6
   style-loader: ^3.3.1
   sweetalert2: ^11.7.3
@@ -181,7 +181,7 @@ devDependencies:
   sass: 1.59.2
   sass-loader: registry.npmmirror.com/sass-loader/13.2.0_sass@1.59.2+webpack@5.76.1
   socket.io: 4.6.1
-  sofill: 1.0.43_pkuazrhhykda3ntttrsuk4nfcq
+  sofill: 1.0.44_pkuazrhhykda3ntttrsuk4nfcq
   sout: 1.0.6
   style-loader: registry.npmmirror.com/style-loader/3.3.1_webpack@5.76.1
   sweetalert2: 11.7.3
@@ -6819,8 +6819,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /sofill/1.0.43_pkuazrhhykda3ntttrsuk4nfcq:
-    resolution: {integrity: sha512-SmCHNoUPxlEUdBexjQx91/mTTYQT9JrdJ0FgO4985Y5CCooiSOIOhynqzYzzrH0qHZUIsTYJ3y1qoD/l5ojkxQ==}
+  /sofill/1.0.44_pkuazrhhykda3ntttrsuk4nfcq:
+    resolution: {integrity: sha512-xfj8+XaGlasI3DxZixD8hFpY2C9Kqg2CAezN+T6XKGSSZ8RSaq4YC+wYIAlOdYvu6LySg7M/FsFeslSS2iQe5Q==}
     peerDependencies:
       '@sillot/bridge': ^0.0.3
       localforage: ^1.10.0
