@@ -130,7 +130,7 @@ export class WYSIWYG {
             inlineElement.textContent.replace(Constants.ZWSP, "").length >= inputData.length &&
             !hasPreviousSibling(range.startContainer) && !hasPreviousSibling(inlineElement)) {
             const html = inlineElement.innerHTML.replace(Constants.ZWSP, "");
-            inlineElement.innerHTML = html.substr(dataLength);
+            inlineElement.innerHTML = html.substring(dataLength);
             const textNode = document.createTextNode(inputData);
             inlineElement.before(textNode);
             range.selectNodeContents(textNode);
@@ -150,7 +150,7 @@ export class WYSIWYG {
             const html = inlineElement.innerHTML;
             if (position.start === inlineElement.textContent.length) {
                 // 使用 inlineElement.textContent **$a$b** 中数学公式消失
-                inlineElement.innerHTML = html.substr(0, html.length - dataLength);
+                inlineElement.innerHTML = html.substring(0, html.length - dataLength);
                 const textNode = document.createTextNode(inputData);
                 inlineElement.after(textNode);
                 range.selectNodeContents(textNode);
@@ -747,7 +747,7 @@ export class WYSIWYG {
                                     selectCellElements.forEach((item, index) => {
                                         let cellHTML = item.innerHTML.trim();
                                         if (cellHTML.endsWith("<br>")) {
-                                            cellHTML = cellHTML.substr(0, cellHTML.length - 4);
+                                            cellHTML = cellHTML.substring(0, cellHTML.length - 4);
                                         }
                                         html += cellHTML + ((!cellHTML || index === selectCellElements.length - 1) ? "" : "<br>");
                                         if (index !== 0) {

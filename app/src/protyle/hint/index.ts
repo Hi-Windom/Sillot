@@ -423,7 +423,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                     range.setEnd(textNode, index + 2);
                     break;
                 }
-                const indexOne = textNode.textContent.indexOf(endSplit.substr(1));
+                const indexOne = textNode.textContent.indexOf(endSplit.substring(1));
                 if (indexOne > -1) {
                     matchEndChar += 1;
                 }
@@ -643,7 +643,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                     }
                     nodeElement.insertAdjacentHTML("afterend", newHTML);
                     const oldHTML = nodeElement.outerHTML;
-                    const newId = newHTML.substr(newHTML.indexOf('data-node-id="') + 14, 22);
+                    const newId = newHTML.substring(newHTML.indexOf('data-node-id="') + 14, 22);
                     nodeElement = protyle.wysiwyg.element.querySelector(`[data-node-id="${newId}"]`);
                     // 非普通块插入代码块 代码块编辑增强 #85
                     if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
@@ -824,8 +824,8 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
         }
         // 冒号前为数字或冒号不进行emoji提示
         if (this.splitChar === ":") {
-            this.enableEmoji = !(/\d/.test(currentLineValue.substr(this.lastIndex - 1, 1)) ||
-                currentLineValue.substr(this.lastIndex - 1, 2) === "::");
+            this.enableEmoji = !(/\d/.test(currentLineValue.substring(this.lastIndex - 1, 1)) ||
+                currentLineValue.substring(this.lastIndex - 1, 2) === "::");
 
         }
         const lineArray = currentLineValue.split(this.splitChar);

@@ -316,7 +316,7 @@ export const openFileAttr = (attrs: IObject, id: string, focusName = "bookmark")
             }
         });
         if (errorTip) {
-            showMessage(errorTip.substr(0, errorTip.length - 2) + " " + window.siyuan.languages.invalid);
+            showMessage(errorTip.substring(0, errorTip.length - 2) + " " + window.siyuan.languages.invalid);
         }
         /// #if !MOBILE
         getAllModels().editor.forEach(item => {
@@ -546,7 +546,7 @@ export const openAttr = (nodeElement: Element, protyle: IProtyle, focusName = "b
                 nodeElement.removeAttribute(item);
             });
             if (errorTip) {
-                showMessage(errorTip.substr(0, errorTip.length - 2) + " " + window.siyuan.languages.invalid);
+                showMessage(errorTip.substring(0, errorTip.length - 2) + " " + window.siyuan.languages.invalid);
             }
             const refElement = nodeElement.lastElementChild.querySelector(".protyle-attr--refcount");
             if (refElement) {

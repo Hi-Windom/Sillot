@@ -136,7 +136,7 @@ export const hotKey2Electron = (key: string) => {
     if (key.indexOf("⌥") > -1) {
         electronKey += "Alt+";
     }
-    return electronKey + key.substr(key.length - 1);
+    return electronKey + key.substring(key.length - 1);
 };
 
 export const getLocalStorage = (cb:()=>void) => {

@@ -110,7 +110,7 @@ export const image = {
 </span>`;
         data.unusedAssets.forEach((item) => {
             const idx = item.indexOf("assets/");
-            const dataPath = item.substr(idx);
+            const dataPath = item.substring(idx);
             html += `<li data-path="${dataPath}"  class="b3-list-item b3-list-item--hide-action">
     <span class="b3-list-item__text">${escapeHtml(item)}</span>
     ${boxOpenHTML}

@@ -1006,7 +1006,7 @@ export const iframeMenu = (protyle: IProtyle, nodeElement: Element) => {
                         // https://github.com/siyuan-note/siyuan/issues/4434
                         new URL(value.startsWith("http") ? value : "https:" + value).search.split("&").forEach((item, index) => {
                             if (index === 0) {
-                                item = item.substr(1);
+                                item = item.substring(1);
                             }
                             const keyValue = item.split("=");
                             params[keyValue[0]] = keyValue[1];

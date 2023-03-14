@@ -789,7 +789,7 @@ export const turnsIntoTransaction = (options: {
         }
         if (selectsElement.length === 1 && options.type === "Blocks2Hs" &&
             selectsElement[0].getAttribute("data-type") === "NodeHeading" &&
-            options.level === parseInt(selectsElement[0].getAttribute("data-subtype").substr(1))) {
+            options.level === parseInt(selectsElement[0].getAttribute("data-subtype").substring(1))) {
             // 快捷键同级转换，消除标题
             options.type = "Blocks2Ps";
         }

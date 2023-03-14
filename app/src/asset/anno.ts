@@ -141,7 +141,7 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
                         }
                     });
                     fetchPost("/api/asset/setFileAnnotation", {
-                        path: pdf.appConfig.file.replace(location.origin, "").substr(1) + ".sya",
+                        path: pdf.appConfig.file.replace(location.origin, "").substring(1) + ".sya",
                         data: JSON.stringify(config),
                     });
                 } else {
@@ -158,8 +158,8 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
                             const newElement = showHighlight(item, pdf);
                             if (index === 0) {
                                 rectElement = newElement;
-                                copyAnno(`${pdf.appConfig.file.replace(location.origin, "").substr(1)}/${rectElement.getAttribute("data-node-id")}`,
-                                    pdf.appConfig.file.replace(location.origin, "").substr(8).replace(/-\d{14}-\w{7}.pdf$/, ""));
+                                copyAnno(`${pdf.appConfig.file.replace(location.origin, "").substring(1)}/${rectElement.getAttribute("data-node-id")}`,
+                                    pdf.appConfig.file.replace(location.origin, "").substring(8).replace(/-\d{14}-\w{7}.pdf$/, ""));
                             }
                         });
                     }
@@ -177,7 +177,7 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
                 processed = true;
                 break;
             } else if (type === "remove") {
-                const urlPath = pdf.appConfig.file.replace(location.origin, "").substr(1);
+                const urlPath = pdf.appConfig.file.replace(location.origin, "").substring(1);
                 const config = getConfig(pdf);
                 delete config[rectElement.getAttribute("data-node-id")];
                 rectElement.remove();
@@ -192,8 +192,8 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
                 break;
             } else if (type === "copy") {
                 hideToolbar(element);
-                copyAnno(`${pdf.appConfig.file.replace(location.origin, "").substr(1)}/${rectElement.getAttribute("data-node-id")}`,
-                    pdf.appConfig.file.replace(location.origin, "").substr(8).replace(/-\d{14}-\w{7}.pdf$/, ""));
+                copyAnno(`${pdf.appConfig.file.replace(location.origin, "").substring(1)}/${rectElement.getAttribute("data-node-id")}`,
+                    pdf.appConfig.file.replace(location.origin, "").substring(8).replace(/-\d{14}-\w{7}.pdf$/, ""));
                 event.preventDefault();
                 event.stopPropagation();
                 processed = true;
@@ -214,7 +214,7 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
                     }
                 });
                 fetchPost("/api/asset/setFileAnnotation", {
-                    path: pdf.appConfig.file.replace(location.origin, "").substr(1) + ".sya",
+                    path: pdf.appConfig.file.replace(location.origin, "").substring(1) + ".sya",
                     data: JSON.stringify(config),
                 });
                 event.preventDefault();
@@ -434,7 +434,7 @@ const getHightlightCoordsByRect = (pdf: any, color: string, rectResizeElement: H
         }];
 
     const id = Lute.NewNodeID();
-    const content = pdf.appConfig.file.replace(location.origin, "").substr(8).replace(/-\d{14}-\w{7}.pdf$/, "") +
+    const content = pdf.appConfig.file.replace(location.origin, "").substring(8).replace(/-\d{14}-\w{7}.pdf$/, "") +
         `-P${startPage.id}-${format(new Date(), 'yyyyMMddHHmmss')}`;
     const result = [{
         index: startPage.id - 1,
@@ -646,7 +646,7 @@ const copyAnno = (idPath: string, fileName: string) => {
 };
 
 const setConfig = (pdf: any, id: string, data: IPdfAnno) => {
-    const urlPath = pdf.appConfig.file.replace(location.origin, "").substr(1);
+    const urlPath = pdf.appConfig.file.replace(location.origin, "").substring(1);
     const config = getConfig(pdf);
     config[id] = data;
     fetchPost("/api/asset/setFileAnnotation", {
@@ -659,7 +659,7 @@ const getConfig = (pdf: any) => {
     if (pdf.appConfig.config) {
         return pdf.appConfig.config;
     }
-    const urlPath = pdf.appConfig.file.replace(location.origin, "").substr(1) + ".sya";
+    const urlPath = pdf.appConfig.file.replace(location.origin, "").substring(1) + ".sya";
     fetchPost("/api/asset/getFileAnnotation", {
         path: urlPath,
     }, (response) => {

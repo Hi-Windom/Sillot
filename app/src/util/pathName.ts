@@ -24,7 +24,7 @@ export const getDisplayName = (filePath: string, basename = true, removeSY = fal
         name = pathPosix().basename(filePath);
     }
     if (removeSY && name.endsWith(".sy")) {
-        name = name.substr(0, name.length - 3);
+        name = name.substring(0, name.length - 3);
     }
     return name;
 };

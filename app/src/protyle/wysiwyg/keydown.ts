@@ -587,7 +587,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             const nodeEditableElement = getContenteditableElement(nodeElement) || nodeElement;
             const position = getSelectionOffset(nodeEditableElement, protyle.wysiwyg.element, range);
             const tdElement = hasClosestByMatchTag(range.startContainer, "TD");
-            if (event.key === "ArrowDown" && nodeEditableElement?.textContent.trimRight().substr(position.start).indexOf("\n") === -1 && (
+            if (event.key === "ArrowDown" && nodeEditableElement?.textContent.trimRight().substring(position.start).indexOf("\n") === -1 && (
                 (tdElement && !tdElement.parentElement.nextElementSibling && nodeElement.getAttribute("data-type") === "NodeTable" && !getNextBlock(nodeElement)) ||
                 (nodeElement.getAttribute("data-type") === "NodeCodeBlock" && !getNextBlock(nodeElement)) ||
                 (nodeElement.parentElement.getAttribute("data-type") === "NodeBlockquote" && nodeElement.nextElementSibling.classList.contains("protyle-attr") && !getNextBlock(nodeElement.parentElement))
@@ -616,7 +616,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                         }
                     }
                 } else {
-                    if (nodeEditableElement?.textContent.substr(0, position.end).indexOf("\n") === -1) {
+                    if (nodeEditableElement?.textContent.substring(0, position.end).indexOf("\n") === -1) {
                         let previousElement: HTMLElement = getPreviousBlock(nodeElement) as HTMLElement;
                         if (previousElement) {
                             previousElement = getLastBlock(previousElement) as HTMLElement;
@@ -677,7 +677,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     }
                     event.stopPropagation();
                     event.preventDefault();
-                } else if (nodeEditableElement?.textContent.substr(position.end + 1).indexOf("\n") === -1) {
+                } else if (nodeEditableElement?.textContent.substring(position.end + 1).indexOf("\n") === -1) {
                     // 下一个块是折叠块
                     const nextFoldElement = getNextBlock(nodeElement) as HTMLElement;
                     if (nextFoldElement && nextFoldElement.getAttribute("fold") === "1") {
@@ -1537,7 +1537,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                 if (!hljs.getLanguage(language)) {
                     language = "plaintext";
                 }
-                insertElement.innerHTML = hljs.highlight(text.substr(0, text.length - 1), {
+                insertElement.innerHTML = hljs.highlight(text.substring(0, text.length - 1), {
                     language,
                     ignoreIllegals: true
                 }).value;

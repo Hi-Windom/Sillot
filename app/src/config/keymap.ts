@@ -288,7 +288,7 @@ export const keymap = {
                         tip += `-${window.siyuan.languages[keys[2]]}`;
                     }
 
-                    if (["⌘", "⇧", "⌥", "⌃"].includes(keymapStr.substr(keymapStr.length - 1, 1)) ||
+                    if (["⌘", "⇧", "⌥", "⌃"].includes(keymapStr.substring(keymapStr.length - 1, 1)) ||
                         ["⌘A", "⌘X", "⌘C", "⌘V", "⇧⌘V", "⌘/", "⇧↑", "⇧↓", "⇧→", "⇧←", "⇧⇥", "⇧⌘⇥", "⌃⇥", "⌘⇥", "⌃⌘⇥", "⇧⌘→", "⇧⌘←", "⌘Home", "⌘End", "⇧↩", "↩", "PageUp", "PageDown", "⌫", "⌦"].includes(keymapStr)) {
                         showMessage(tip + "] " + window.siyuan.languages.invalid);
                         return;

@@ -199,7 +199,7 @@ export const showPopover = async () => {
         }
     } else if (popoverTargetElement.getAttribute("data-type")?.split(" ").includes("a")) {
         // 以思源协议开头的链接
-        ids = [popoverTargetElement.getAttribute("data-href").substr(16, 22)];
+        ids = [popoverTargetElement.getAttribute("data-href").substring(16, 22)];
     } else {
         // pdf
         let targetId;

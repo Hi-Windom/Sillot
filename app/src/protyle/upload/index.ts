@@ -40,8 +40,8 @@ const validateFile = (protyle: IProtyle, files: File[]) => {
         }
 
         const lastIndex = file.name.lastIndexOf(".");
-        const fileExt = lastIndex === -1 ? "" : file.name.substr(lastIndex);
-        const filename = lastIndex === -1 ? file.name : (protyle.options.upload.filename(file.name.substr(0, lastIndex)) + fileExt);
+        const fileExt = lastIndex === -1 ? "" : file.name.substring(lastIndex);
+        const filename = lastIndex === -1 ? file.name : (protyle.options.upload.filename(file.name.substring(0, lastIndex)) + fileExt);
 
         if (protyle.options.upload.accept) {
             const isAccept = protyle.options.upload.accept.split(",").some((item) => {
@@ -89,7 +89,7 @@ const genUploadedLabel = (responseText: string, protyle: IProtyle) => {
         errorTip = `<ul><li>${errorTip}</li>`;
         response.data.errFiles.forEach((data: string) => {
             const lastIndex = data.lastIndexOf(".");
-            const filename = lastIndex === -1 ? data : (protyle.options.upload.filename(data.substr(0, lastIndex)) + data.substr(lastIndex));
+            const filename = lastIndex === -1 ? data : (protyle.options.upload.filename(data.substring(0, lastIndex)) + data.substring(lastIndex));
             errorTip += `<li>${filename} ${window.siyuan.languages.uploadError}</li>`;
         });
         errorTip += "</ul>";
