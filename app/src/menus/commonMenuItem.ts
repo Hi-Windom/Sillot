@@ -295,7 +295,7 @@ const genAttr = (attrs: IObject, focusName = "bookmark", cb: (dialog: Dialog, rm
         }
         bindAttrInput(item, btnsElement[2]);
     });
-}
+};
 
 export const openFileAttr = (attrs: IObject, id: string, focusName = "bookmark") => {
     genAttr(attrs, focusName, (dialog) => {
@@ -308,7 +308,7 @@ export const openFileAttr = (attrs: IObject, id: string, focusName = "bookmark")
                 if (item.tagName === "INPUT") {
                     return;
                 }
-                name = "custom-" + (item.parentElement.querySelector(".b3-text-field") as HTMLInputElement).value
+                name = "custom-" + (item.parentElement.querySelector(".b3-text-field") as HTMLInputElement).value;
             }
             if (item.value.trim()) {
                 if (!/^[0-9a-zA-Z\-]*$/.test(name.replace("custom-", "")) || name === "custom-") {
@@ -379,7 +379,7 @@ export const openAttr = (nodeElement: Element, protyle: IProtyle, focusName = "b
                     if (item.tagName === "INPUT") {
                         return;
                     }
-                    name = "custom-" + (item.parentElement.querySelector(".b3-text-field") as HTMLInputElement).value
+                    name = "custom-" + (item.parentElement.querySelector(".b3-text-field") as HTMLInputElement).value;
                 }
                 if (item.value.trim()) {
                     if (!/^[0-9a-zA-Z\-]*$/.test(name.replace("custom-", "")) || name === "custom-") {
@@ -433,7 +433,7 @@ export const openAttr = (nodeElement: Element, protyle: IProtyle, focusName = "b
             nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, oldHTML);
             dialog.destroy();
-        })
+        });
     });
 };
 
