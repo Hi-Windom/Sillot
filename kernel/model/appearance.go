@@ -47,11 +47,11 @@ func InitAppearance() {
 
 	if !gulu.Str.Contains(Conf.Appearance.ThemeDark, Conf.Appearance.DarkThemes) {
 		Conf.Appearance.ThemeDark = "sillou"
-		Conf.Appearance.ThemeJS = true
+		Conf.Appearance.ThemeJS = false
 	}
 	if !gulu.Str.Contains(Conf.Appearance.ThemeLight, Conf.Appearance.LightThemes) {
 		Conf.Appearance.ThemeLight = "sillon"
-		Conf.Appearance.ThemeJS = true
+		Conf.Appearance.ThemeJS = false
 	}
 
 	loadIcons()
@@ -122,12 +122,12 @@ func loadThemes() {
 		if 0 == Conf.Appearance.Mode {
 			if Conf.Appearance.ThemeLight == name {
 				Conf.Appearance.ThemeVer = themeConf["version"].(string)
-				Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, name, "theme.js"))
+				Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, name, "____", "__js__.js"))
 			}
 		} else {
 			if Conf.Appearance.ThemeDark == name {
 				Conf.Appearance.ThemeVer = themeConf["version"].(string)
-				Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, name, "theme.js"))
+				Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, name, "____", "__js__.js"))
 			}
 		}
 
