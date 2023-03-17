@@ -164,7 +164,7 @@ func InstallBazaarTheme(repoURL, repoHash, themeName string, mode int, update bo
 			Conf.Appearance.ThemeDark = themeName
 		}
 		Conf.Appearance.Mode = mode
-		Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(installPath, "theme.js"))
+		Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(installPath, "____", "__js__.js"))
 		Conf.Save()
 	}
 

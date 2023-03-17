@@ -12,6 +12,7 @@ import {showMessage} from "../dialog/message";
 import {Dialog} from "../dialog";
 import {confirmDialog} from "../dialog/confirmDialog";
 import {setProxy} from "../util/onGetConfig";
+import {isAppMode} from "sofill/env"
 
 export const about = {
     element: undefined as Element,
@@ -48,7 +49,7 @@ export const about = {
     <div class="fn__space"></div>
     <input class="b3-switch fn__flex-center" id="uploadErrLog" type="checkbox"${window.siyuan.config.system.uploadErrLog ? " checked" : ""}>
 </label>
-<label class="b3-label fn__flex">
+<label class="b3-label fn__flex${isAppMode() ? "" : " fn__none"}">
     <div class="fn__flex-1">
         ${window.siyuan.languages.about11}
         <div class="b3-label__text">${window.siyuan.languages.about12}</div>
@@ -130,7 +131,7 @@ export const about = {
             <svg><use xlink:href="#iconRefresh"></use></svg>${window.siyuan.languages.checkUpdate}
         </button>
         <div class="fn__hr${isBrowser() ? "" : " fn__none"}"></div>
-        <button id="menuSafeQuit" class="b3-button b3-button--outline fn__block${["android", "ios"].includes(window.siyuan.config.system.container) ? "" : " fn__none"}">
+        <button id="menuSafeQuit" class="b3-button b3-button--outline fn__block${(window.webkit?.messageHandlers || window.JSAndroid) ? "" : " fn__none"}">
             <svg><use xlink:href="#iconQuit"></use></svg>${window.siyuan.languages.safeQuit}
         </button>
     </div>

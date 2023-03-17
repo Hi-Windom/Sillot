@@ -266,9 +266,9 @@ func setAppearanceMode(c *gin.Context) {
 	mode := int(arg["mode"].(float64))
 	model.Conf.Appearance.Mode = mode
 	if 0 == mode {
-		model.Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, model.Conf.Appearance.ThemeLight, "theme.js"))
+		model.Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, model.Conf.Appearance.ThemeLight, "____", "__js__.js"))
 	} else {
-		model.Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, model.Conf.Appearance.ThemeDark, "theme.js"))
+		model.Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, model.Conf.Appearance.ThemeDark, "____", "__js__.js"))
 	}
 	model.Conf.Save()
 
@@ -290,8 +290,9 @@ func setNetworkServe(c *gin.Context) {
 	model.Conf.System.NetworkServe = networkServe
 	model.Conf.Save()
 
-	util.PushMsg(model.Conf.Language(42), 1000*15)
-	time.Sleep(time.Second * 3)
+	// https://github.com/Hi-Windom/Sillot/issues/299
+	// util.PushMsg(model.Conf.Language(42), 1000*15)
+	// time.Sleep(time.Second * 3)
 }
 
 func setGoogleAnalytics(c *gin.Context) {

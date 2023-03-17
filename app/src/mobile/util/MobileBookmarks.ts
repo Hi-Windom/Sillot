@@ -14,13 +14,13 @@ export class MobileBookmarks {
 
     constructor() {
         this.element = document.querySelector('#sidebar [data-type="sidebar-bookmark"]');
-        this.element.innerHTML = `<div class="toolbar">
+        this.element.innerHTML = `<div class="toolbar toolbar--border toolbar--dark">
     <div class="fn__space"></div>
     <div class="toolbar__text">
         ${window.siyuan.languages.bookmark}
     </div>
     <span class="fn__space"></span>
-    <svg data-type="expand" class="toolbar__icon"><use xlink:href="#iconFullscreen"></use></svg>
+    <svg data-type="expand" class="toolbar__icon"><use xlink:href="#iconExpand"></use></svg>
     <span class="fn__space"></span>
     <svg data-type="collapse" class="toolbar__icon"><use xlink:href="#iconContract"></use></svg>
 </div>

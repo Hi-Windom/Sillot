@@ -6,6 +6,8 @@ import {fetchPost} from "../../util/fetch";
 import {getEditorRange} from "../util/selection";
 import {pathPosix} from "../../util/pathName";
 import {genAssetHTML} from "../../asset/renderAssets";
+import {hasClosestBlock} from "../util/hasClosest";
+import {getContenteditableElement} from "../wysiwyg/getBlock";
 
 export class Upload {
     public element: HTMLElement;
@@ -38,8 +40,8 @@ const validateFile = (protyle: IProtyle, files: File[]) => {
         }
 
         const lastIndex = file.name.lastIndexOf(".");
-        const fileExt = lastIndex === -1 ? "" : file.name.substr(lastIndex);
-        const filename = lastIndex === -1 ? file.name : (protyle.options.upload.filename(file.name.substr(0, lastIndex)) + fileExt);
+        const fileExt = lastIndex === -1 ? "" : file.name.substring(lastIndex);
+        const filename = lastIndex === -1 ? file.name : (protyle.options.upload.filename(file.name.substring(0, lastIndex)) + fileExt);
 
         if (protyle.options.upload.accept) {
             const isAccept = protyle.options.upload.accept.split(",").some((item) => {
@@ -87,7 +89,7 @@ const genUploadedLabel = (responseText: string, protyle: IProtyle) => {
         errorTip = `<ul><li>${errorTip}</li>`;
         response.data.errFiles.forEach((data: string) => {
             const lastIndex = data.lastIndexOf(".");
-            const filename = lastIndex === -1 ? data : (protyle.options.upload.filename(data.substr(0, lastIndex)) + data.substr(lastIndex));
+            const filename = lastIndex === -1 ? data : (protyle.options.upload.filename(data.substring(0, lastIndex)) + data.substring(lastIndex));
             errorTip += `<li>${filename} ${window.siyuan.languages.uploadError}</li>`;
         });
         errorTip += "</ul>";
@@ -96,7 +98,25 @@ const genUploadedLabel = (responseText: string, protyle: IProtyle) => {
     if (errorTip) {
         showMessage(errorTip);
     }
-
+    let insertBlock = true;
+    const range = getEditorRange(protyle.wysiwyg.element);
+    if (range.toString() === "" && range.startContainer.nodeType === 3 && protyle.toolbar.getCurrentType(range).length > 0) {
+        // 防止链接插入其他元素中 https://ld246.com/article/1676003478664
+        range.setEndAfter(range.startContainer.parentElement);
+        range.collapse(false);
+    }
+    // https://github.com/siyuan-note/siyuan/issues/7624
+    const nodeElement = hasClosestBlock(range.startContainer);
+    if (nodeElement) {
+        if (nodeElement.classList.contains("table")) {
+            insertBlock = false;
+        } else {
+            const editableElement = getContenteditableElement(nodeElement);
+            if (editableElement && editableElement.textContent !== "" && nodeElement.classList.contains("p")) {
+                insertBlock = false;
+            }
+        }
+    }
     let succFileText = "";
     const keys = Object.keys(response.data.succMap);
     keys.forEach((key, index) => {
@@ -106,17 +126,15 @@ const genUploadedLabel = (responseText: string, protyle: IProtyle) => {
         succFileText += genAssetHTML(type, path, filename.substring(0, filename.length - type.length), filename);
         if (!Constants.SIYUAN_ASSETS_AUDIO.includes(type) && !Constants.SIYUAN_ASSETS_VIDEO.includes(type) &&
             keys.length - 1 !== index) {
-            succFileText += "\n\n";
+            if (insertBlock) {
+                succFileText += "\n\n";
+            } else {
+                succFileText += "\n";
+            }
         }
     });
-    const range = getEditorRange(protyle.wysiwyg.element);
-    if (range.toString() === "" && range.startContainer.nodeType === 3 && protyle.toolbar.getCurrentType(range).length > 0) {
-        // 防止链接插入其他元素中 https://ld246.com/article/1676003478664
-        range.setEndAfter(range.startContainer.parentElement);
-        range.collapse(false);
-    }
     // 避免插入代码块中，其次因为都要独立成块 https://github.com/siyuan-note/siyuan/issues/7607
-    insertHTML(succFileText, protyle, true);
+    insertHTML(succFileText, protyle, insertBlock);
 };
 
 export const uploadLocalFiles = (files: string[], protyle: IProtyle, isUpload: boolean) => {

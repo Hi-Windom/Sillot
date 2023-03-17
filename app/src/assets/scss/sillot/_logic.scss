@@ -1,0 +1,7 @@
+body:not(.body--mobile.android) .SC_ableOnlyC__Android_mobile,
+body:not(.body--app) .SC_ableOnlyC__App,
+body.android .SC_disableC__Android,
+body.body--mobile.android .SC_disableC__Android_mobile,
+body.body--desktop.android .SC_disableC__Android_desktop {
+  display: none !important;
+}

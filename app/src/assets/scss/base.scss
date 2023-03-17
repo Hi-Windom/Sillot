@@ -31,6 +31,11 @@
 @import "viewerjs/viewer";
 @import "business/export";
 @import "business/card";
+@import "business/custom";
+
+// sillot extend start
+@import "sillot/logic";
+// sillot extend end
 
 /*
 .status: 2
@@ -58,7 +63,7 @@ ctrl+p 搜索: 202
 .keyboard: 222
 
 // 需小于 .b3-dialog 关于中的锁屏密码设置
-.side-panel: 220
+#menu & .side-panel: 220
 
 // 需小于 #windowControls
 // 需大于 .protyle-util https://github.com/siyuan-note/siyuan/issues/5069
@@ -127,22 +132,6 @@ html {
     &:hover {
       border-radius: 16px;
       background-color: var(--b3-theme-surface-light);
-    }
-  }
-}
-
-.custom-attr {
-  .b3-text-field {
-    border: 0;
-  }
-
-  &__add {
-    overflow: auto;
-    height: 30vh;
-    padding: 4px 0 4px 4px;
-
-    &::-webkit-scrollbar {
-      display: none;
     }
   }
 }

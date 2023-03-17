@@ -163,7 +163,7 @@ export const newFileContentBySelect = (protyle: IProtyle) => {
         html = tempElement.innerHTML;
     }
     if (fileNameShort.length > 10) {
-        fileNameShort = fileNameShort.substr(0, 10) + "...";
+        fileNameShort = fileNameShort.substring(0, 10) + "...";
     }
     fileNameShort = replaceFileName(fileNameShort);
     fetchPost("/api/filetree/createDoc", {

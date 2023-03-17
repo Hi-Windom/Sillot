@@ -2,6 +2,7 @@ import {BlockPanel} from "./Panel";
 import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName} from "../protyle/util/hasClosest";
 import {fetchSyncPost} from "../util/fetch";
 import {hideTooltip, showTooltip} from "../dialog/tooltip";
+import {isPadAppMode} from "sofill/env";
 
 let popoverTargetElement: HTMLElement;
 export const initBlockPopover = () => {
@@ -199,7 +200,7 @@ export const showPopover = async () => {
         }
     } else if (popoverTargetElement.getAttribute("data-type")?.split(" ").includes("a")) {
         // 以思源协议开头的链接
-        ids = [popoverTargetElement.getAttribute("data-href").substr(16, 22)];
+        ids = [popoverTargetElement.getAttribute("data-href").substring(16, 22)];
     } else {
         // pdf
         let targetId;
@@ -230,11 +231,13 @@ export const showPopover = async () => {
     if (!hasPin && popoverTargetElement.parentElement &&
         popoverTargetElement.parentElement.style.opacity !== "0.1" // 反向面板图标拖拽时不应该弹层
     ) {
-        window.siyuan.blockPanels.push(new BlockPanel({
-            targetElement: popoverTargetElement,
-            nodeIds: ids,
-            defIds,
-        }));
+        if (!isPadAppMode()) {
+            window.siyuan.blockPanels.push(new BlockPanel({
+                targetElement: popoverTargetElement,
+                nodeIds: ids,
+                defIds,
+            }));
+        }
     }
     popoverTargetElement = undefined;
 };

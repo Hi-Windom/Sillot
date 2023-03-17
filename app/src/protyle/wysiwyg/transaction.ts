@@ -426,22 +426,26 @@ export const onTransaction = (protyle: IProtyle, operation: IOperation, focus: b
         return;
     }
     if (operation.action === "updateAttrs") { // 调用接口才推送
-        let nodeAttrHTML = "";
         const data = operation.data as any;
         const attrsResult: IObject = {};
+        let bookmarkHTML = "";
+        let nameHTML = "";
+        let aliasHTML = "";
+        let memoHTML = "";
         Object.keys(data.new).forEach(key => {
             attrsResult[key] = data.new[key];
             const escapeHTML = Lute.EscapeHTMLStr(data.new[key]);
             if (key === "bookmark") {
-                nodeAttrHTML += `<div class="protyle-attr--bookmark">${escapeHTML}</div>`;
+                bookmarkHTML = `<div class="protyle-attr--bookmark">${escapeHTML}</div>`;
             } else if (key === "name") {
-                nodeAttrHTML += `<div class="protyle-attr--name"><svg><use xlink:href="#iconN"></use></svg>${escapeHTML}</div>`;
+                nameHTML = `<div class="protyle-attr--name"><svg><use xlink:href="#iconN"></use></svg>${escapeHTML}</div>`;
             } else if (key === "alias") {
-                nodeAttrHTML += `<div class="protyle-attr--alias"><svg><use xlink:href="#iconA"></use></svg>${escapeHTML}</div>`;
+                aliasHTML = `<div class="protyle-attr--alias"><svg><use xlink:href="#iconA"></use></svg>${escapeHTML}</div>`;
             } else if (key === "memo") {
-                nodeAttrHTML += `<div class="protyle-attr--memo b3-tooltips b3-tooltips__sw" aria-label="${escapeHTML}"><svg><use xlink:href="#iconM"></use></svg></div>`;
+                memoHTML = `<div class="protyle-attr--memo b3-tooltips b3-tooltips__sw" aria-label="${escapeHTML}"><svg><use xlink:href="#iconM"></use></svg></div>`;
             }
         });
+        let nodeAttrHTML = bookmarkHTML + nameHTML + aliasHTML + memoHTML;
         if (protyle.block.rootID === operation.id && protyle.title) {
             // 文档
             const refElement = protyle.title.element.querySelector(".protyle-attr--refcount");
@@ -789,7 +793,7 @@ export const turnsIntoTransaction = (options: {
         }
         if (selectsElement.length === 1 && options.type === "Blocks2Hs" &&
             selectsElement[0].getAttribute("data-type") === "NodeHeading" &&
-            options.level === parseInt(selectsElement[0].getAttribute("data-subtype").substr(1))) {
+            options.level === parseInt(selectsElement[0].getAttribute("data-subtype").substring(1))) {
             // 快捷键同级转换，消除标题
             options.type = "Blocks2Ps";
         }

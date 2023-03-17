@@ -1,5 +1,5 @@
 export const removeFoldHeading = (nodeElement: Element) => {
-    const nodeH = parseInt(nodeElement.getAttribute("data-subtype").substr(1));
+    const nodeH = parseInt(nodeElement.getAttribute("data-subtype").substring(1));
     let nextElement = nodeElement.nextElementSibling;
     while (nextElement) {
         if (nextElement.classList.contains("sb")) {
@@ -8,7 +8,7 @@ export const removeFoldHeading = (nodeElement: Element) => {
                 nextFirstElement = nextFirstElement.firstElementChild;
             }
             if ((nextFirstElement.getAttribute("data-type") === "NodeHeading" &&
-                    parseInt(nextFirstElement.getAttribute("data-subtype").substr(1)) > nodeH) ||
+                    parseInt(nextFirstElement.getAttribute("data-subtype").substring(1)) > nodeH) ||
                 nextFirstElement.getAttribute("data-type") !== "NodeHeading") {
                 const tempElement = nextElement;
                 nextElement = nextElement.nextElementSibling;
@@ -17,7 +17,7 @@ export const removeFoldHeading = (nodeElement: Element) => {
                 break;
             }
         } else {
-            const currentH = parseInt(nextElement.getAttribute("data-subtype")?.substr(1));
+            const currentH = parseInt(nextElement.getAttribute("data-subtype")?.substring(1));
             if (!nextElement.classList.contains("protyle-attr") && // 超级块末尾为属性
                 (isNaN(currentH) || currentH > nodeH)) {
                 const tempElement = nextElement;

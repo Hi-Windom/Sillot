@@ -202,7 +202,7 @@ func serveAppearance(ginServer *gin.Engine) {
 	}
 	siyuan.GET("/appearance/*filepath", func(c *gin.Context) {
 		filePath := filepath.Join(appearancePath, strings.TrimPrefix(c.Request.URL.Path, "/appearance/"))
-		if strings.HasSuffix(c.Request.URL.Path, "/theme.js") {
+		if strings.HasSuffix(c.Request.URL.Path, "/____/__js__.js") {
 			if !gulu.File.IsExist(filePath) {
 				// 主题 js 不存在时生成空内容返回
 				c.Data(200, "application/x-javascript", nil)

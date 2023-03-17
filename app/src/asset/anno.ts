@@ -3,7 +3,7 @@ import {setPosition} from "../util/setPosition";
 import {hasClosestByAttribute, hasClosestByClassName} from "../protyle/util/hasClosest";
 // import * as dayjs from "dayjs";
 import {format} from "date-fns";
-import {writeText} from "../protyle/util/compatibility";
+import {setStorageVal, writeText} from "../protyle/util/compatibility";
 import {getAllModels} from "../layout/getAll";
 /// #if !BROWSER
 import {NativeImage} from "electron";
@@ -110,14 +110,22 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
             documentSelf.onselect = null;
             rectAnnoElement.classList.remove("toggled");
             pdfConfig.mainContainer.classList.remove("rect-to-annotation");
-            rectResizeElement.setAttribute("data-render", "true");
-            const utilElement = element.querySelector(".pdf__util") as HTMLElement;
-            utilElement.classList.remove("pdf__util--hide", "fn__none");
-            const targetRect = rectResizeElement.getBoundingClientRect();
-            setPosition(utilElement, targetRect.left,
-                targetRect.top + targetRect.height + 4);
-            rectElement = null;
-            utilElement.classList.add("pdf__util--hide");
+
+            const coords = getHightlightCoordsByRect(pdf, window.siyuan.storage[Constants.LOCAL_PDFTHEME].annoColor || "var(--b3-pdf-background1)", rectResizeElement,
+                rectResizeElement.style.backgroundColor ? "text" : "border");
+            rectResizeElement.classList.add("fn__none");
+            if (coords) {
+                coords.forEach((item, index) => {
+                    const newElement = showHighlight(item, pdf);
+                    if (index === 0) {
+                        rectElement = newElement;
+                        copyAnno(`${pdf.appConfig.file.replace(location.origin, "").substr(1)}/${rectElement.getAttribute("data-node-id")}`,
+                            pdf.appConfig.file.replace(location.origin, "").substr(8).replace(/-\d{14}-\w{7}.pdf$/, ""));
+                    }
+                });
+            } else {
+                rectElement = null;
+            }
         };
     });
 
@@ -128,6 +136,8 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
             const type = target.getAttribute("data-type");
             if (target.classList.contains("color__square")) {
                 const color = target.style.backgroundColor;
+                window.siyuan.storage[Constants.LOCAL_PDFTHEME].annoColor = color;
+                setStorageVal(Constants.LOCAL_PDFTHEME, window.siyuan.storage[Constants.LOCAL_PDFTHEME]);
                 if (rectElement) {
                     const config = getConfig(pdf);
                     const annoItem = config[rectElement.getAttribute("data-node-id")];
@@ -141,25 +151,18 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
                         }
                     });
                     fetchPost("/api/asset/setFileAnnotation", {
-                        path: pdf.appConfig.file.replace(location.origin, "").substr(1) + ".sya",
+                        path: pdf.appConfig.file.replace(location.origin, "").substring(1) + ".sya",
                         data: JSON.stringify(config),
                     });
                 } else {
-                    let coords;
-                    if (pdfConfig.mainContainer.lastElementChild.classList.contains("fn__none")) {
-                        coords = getHightlightCoordsByRange(pdf, color);
-                    } else {
-                        coords = getHightlightCoordsByRect(pdf, color, pdfConfig.mainContainer.lastElementChild,
-                            pdfConfig.mainContainer.lastElementChild.style.backgroundColor ? "text" : "border");
-                        pdfConfig.mainContainer.lastElementChild.classList.add("fn__none");
-                    }
+                    const coords = getHightlightCoordsByRange(pdf, color);
                     if (coords) {
                         coords.forEach((item, index) => {
                             const newElement = showHighlight(item, pdf);
                             if (index === 0) {
                                 rectElement = newElement;
-                                copyAnno(`${pdf.appConfig.file.replace(location.origin, "").substr(1)}/${rectElement.getAttribute("data-node-id")}`,
-                                    pdf.appConfig.file.replace(location.origin, "").substr(8).replace(/-\d{14}-\w{7}.pdf$/, ""));
+                                copyAnno(`${pdf.appConfig.file.replace(location.origin, "").substring(1)}/${rectElement.getAttribute("data-node-id")}`,
+                                    pdf.appConfig.file.replace(location.origin, "").substring(8).replace(/-\d{14}-\w{7}.pdf$/, ""));
                             }
                         });
                     }
@@ -171,13 +174,12 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
                 break;
             } else if (target.classList.contains("pdf__rect")) {
                 showToolbar(element, undefined, target);
-                pdfConfig.mainContainer.lastElementChild.classList.add("fn__none");
                 event.preventDefault();
                 event.stopPropagation();
                 processed = true;
                 break;
             } else if (type === "remove") {
-                const urlPath = pdf.appConfig.file.replace(location.origin, "").substr(1);
+                const urlPath = pdf.appConfig.file.replace(location.origin, "").substring(1);
                 const config = getConfig(pdf);
                 delete config[rectElement.getAttribute("data-node-id")];
                 rectElement.remove();
@@ -192,8 +194,8 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
                 break;
             } else if (type === "copy") {
                 hideToolbar(element);
-                copyAnno(`${pdf.appConfig.file.replace(location.origin, "").substr(1)}/${rectElement.getAttribute("data-node-id")}`,
-                    pdf.appConfig.file.replace(location.origin, "").substr(8).replace(/-\d{14}-\w{7}.pdf$/, ""));
+                copyAnno(`${pdf.appConfig.file.replace(location.origin, "").substring(1)}/${rectElement.getAttribute("data-node-id")}`,
+                    pdf.appConfig.file.replace(location.origin, "").substring(8).replace(/-\d{14}-\w{7}.pdf$/, ""));
                 event.preventDefault();
                 event.stopPropagation();
                 processed = true;
@@ -214,7 +216,7 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
                     }
                 });
                 fetchPost("/api/asset/setFileAnnotation", {
-                    path: pdf.appConfig.file.replace(location.origin, "").substr(1) + ".sya",
+                    path: pdf.appConfig.file.replace(location.origin, "").substring(1) + ".sya",
                     data: JSON.stringify(config),
                 });
                 event.preventDefault();
@@ -231,36 +233,18 @@ export const initAnno = (file: string, element: HTMLElement, annoId: string, pdf
         }
 
         setTimeout(() => {
-            const rectIsResize = !pdfConfig.mainContainer.lastElementChild.classList.contains(
-                "fn__none");
             let isShow = false;
             const selection = window.getSelection();
             if (selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
                 if (range.toString() !== "" &&
                     hasClosestByClassName(range.commonAncestorContainer, "pdfViewer")) {
-                    if (rectIsResize) {
-                        range.collapse(true);
-                    } else {
-                        showToolbar(element, range);
-                        isShow = true;
-                    }
+                    showToolbar(element, range);
+                    isShow = true;
                 }
             }
-
             if (!isShow) {
-                if (rectIsResize) {
-                    if (!hasClosestByClassName(event.target as HTMLElement, "pdf__util") &&
-                        !hasClosestByClassName(event.target as HTMLElement, "pdf__resize") &&
-                        pdfConfig.mainContainer.lastElementChild.getAttribute(
-                            "data-render") !== "true") {
-                        hideToolbar(element);
-                        pdfConfig.mainContainer.lastElementChild.classList.add("fn__none");
-                    }
-                    pdfConfig.mainContainer.lastElementChild.removeAttribute("data-render");
-                } else {
-                    hideToolbar(element);
-                }
+                hideToolbar(element);
             }
         });
     });
@@ -434,7 +418,7 @@ const getHightlightCoordsByRect = (pdf: any, color: string, rectResizeElement: H
         }];
 
     const id = Lute.NewNodeID();
-    const content = pdf.appConfig.file.replace(location.origin, "").substr(8).replace(/-\d{14}-\w{7}.pdf$/, "") +
+    const content = pdf.appConfig.file.replace(location.origin, "").substring(8).replace(/-\d{14}-\w{7}.pdf$/, "") +
         `-P${startPage.id}-${format(new Date(), 'yyyyMMddHHmmss')}`;
     const result = [{
         index: startPage.id - 1,
@@ -646,7 +630,7 @@ const copyAnno = (idPath: string, fileName: string) => {
 };
 
 const setConfig = (pdf: any, id: string, data: IPdfAnno) => {
-    const urlPath = pdf.appConfig.file.replace(location.origin, "").substr(1);
+    const urlPath = pdf.appConfig.file.replace(location.origin, "").substring(1);
     const config = getConfig(pdf);
     config[id] = data;
     fetchPost("/api/asset/setFileAnnotation", {
@@ -659,7 +643,7 @@ const getConfig = (pdf: any) => {
     if (pdf.appConfig.config) {
         return pdf.appConfig.config;
     }
-    const urlPath = pdf.appConfig.file.replace(location.origin, "").substr(1) + ".sya";
+    const urlPath = pdf.appConfig.file.replace(location.origin, "").substring(1) + ".sya";
     fetchPost("/api/asset/getFileAnnotation", {
         path: urlPath,
     }, (response) => {

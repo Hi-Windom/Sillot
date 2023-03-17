@@ -526,7 +526,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             const selectElements = Array.from(protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select"));
             if (selectElements.length === 0) {
                 const inlineElement = hasClosestByAttribute(range.startContainer, "data-type", null);
-                if (inlineElement) {
+                if (inlineElement && inlineElement.tagName === "SPAN") {
                     const types = inlineElement.getAttribute("data-type").split(" ");
                     if (types.length > 0) {
                         protyle.toolbar.range = range;
@@ -587,7 +587,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             const nodeEditableElement = getContenteditableElement(nodeElement) || nodeElement;
             const position = getSelectionOffset(nodeEditableElement, protyle.wysiwyg.element, range);
             const tdElement = hasClosestByMatchTag(range.startContainer, "TD");
-            if (event.key === "ArrowDown" && nodeEditableElement?.textContent.trimRight().substr(position.start).indexOf("\n") === -1 && (
+            if (event.key === "ArrowDown" && nodeEditableElement?.textContent.trimRight().substring(position.start).indexOf("\n") === -1 && (
                 (tdElement && !tdElement.parentElement.nextElementSibling && nodeElement.getAttribute("data-type") === "NodeTable" && !getNextBlock(nodeElement)) ||
                 (nodeElement.getAttribute("data-type") === "NodeCodeBlock" && !getNextBlock(nodeElement)) ||
                 (nodeElement.parentElement.getAttribute("data-type") === "NodeBlockquote" && nodeElement.nextElementSibling.classList.contains("protyle-attr") && !getNextBlock(nodeElement.parentElement))
@@ -616,7 +616,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                         }
                     }
                 } else {
-                    if (nodeEditableElement?.textContent.substr(0, position.end).indexOf("\n") === -1) {
+                    if (nodeEditableElement?.textContent.substring(0, position.end).indexOf("\n") === -1) {
                         let previousElement: HTMLElement = getPreviousBlock(nodeElement) as HTMLElement;
                         if (previousElement) {
                             previousElement = getLastBlock(previousElement) as HTMLElement;
@@ -677,7 +677,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     }
                     event.stopPropagation();
                     event.preventDefault();
-                } else if (nodeEditableElement?.textContent.substr(position.end + 1).indexOf("\n") === -1) {
+                } else if (nodeEditableElement?.textContent.substring(position.end + 1).indexOf("\n") === -1) {
                     // 下一个块是折叠块
                     const nextFoldElement = getNextBlock(nodeElement) as HTMLElement;
                     if (nextFoldElement && nextFoldElement.getAttribute("fold") === "1") {
@@ -1293,7 +1293,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             return;
         }
 
-        if (!nodeElement.classList.contains("code-block")) {
+        if (!nodeElement.classList.contains("code-block") && !event.repeat) {
             const findToolbar = protyle.options.toolbar.find((menuItem: IMenuItem) => {
                 if (!menuItem.hotkey) {
                     return false;
@@ -1498,7 +1498,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             return;
         }
 
-        if (matchHotKey(window.siyuan.config.keymap.editor.general.duplicate.custom, event)) {
+        if (!event.repeat && matchHotKey(window.siyuan.config.keymap.editor.general.duplicate.custom, event)) {
             event.preventDefault();
             event.stopPropagation();
             let selectsElement: HTMLElement[] = Array.from(protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select"));
@@ -1537,7 +1537,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                 if (!hljs.getLanguage(language)) {
                     language = "plaintext";
                 }
-                insertElement.innerHTML = hljs.highlight(text.substr(0, text.length - 1), {
+                insertElement.innerHTML = hljs.highlight(text.substring(0, text.length - 1), {
                     language,
                     ignoreIllegals: true
                 }).value;
@@ -1641,7 +1641,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
 
         /// #if !BROWSER
         if (matchHotKey("⇧⌘V", event)) {
-            event.returnValue = false;
+            event.returnValue = false; // 等效于 event.preventDefault() ，可能出于兼容性考虑
             event.preventDefault();
             event.stopPropagation();
             pasteAsPlainText(protyle);

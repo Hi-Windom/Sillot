@@ -137,7 +137,7 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
     }
     // 复制标题及其下方块使用 writeText，需将 textPlain 转换为 textHTML
     if (textPlain.endsWith(Constants.ZWSP) && !textHTML && !siyuanHTML) {
-        siyuanHTML = textPlain.substr(0, textPlain.length - 1);
+        siyuanHTML = textPlain.substring(0, textPlain.length - 1);
     }
     // 剪切复制中首位包含空格或仅有空格 https://github.com/siyuan-note/siyuan/issues/5667
     if (!siyuanHTML) {

@@ -225,7 +225,7 @@ export const initWindow = () => {
             if (!/^siyuan:\/\/blocks\/\d{14}-\w{7}/.test(url)) {
                 return;
             }
-            const id = url.substr(16, 22);
+            const id = url.substring(16, 22);
             fetchPost("/api/block/checkBlockExist", {id}, existResponse => {
                 if (existResponse.data) {
                     openFileById({
