@@ -27,7 +27,7 @@
   }
 
   &--fullscreen {
-    top: 35px;
+    top: 0;
     left: 0;
     width: 100%;
     border: 0;
@@ -35,19 +35,84 @@
     bottom: 0;
     right: 0;
     max-height: none;
+    padding: 0;
+    border-radius: 0;
 
-    .b3-menu__submenu {
-      top: 45px;
-      left: 0;
-      bottom: 0;
-      max-height: none;
-      right: 0;
-      box-shadow: none;
-      border: 0;
-    }
+    .b3-menu {
+      &__submenu {
+        top: 49px;
+        left: 0;
+        bottom: 0;
+        max-height: none;
+        right: 0;
+        box-shadow: none;
+        border: 0;
+        padding: 27px 0 0 0;
 
-    .b3-menu__item--show > .b3-menu__submenu--row {
-      width: 100%;
+        & > .b3-menu__item:first-child {
+          border-top: .5px solid var(--b3-theme-background-light);
+        }
+      }
+
+      &__item {
+        border-bottom: .5px solid var(--b3-theme-background-light);
+        line-height: 42px;
+        background-color: var(--b3-theme-background);
+        text-decoration: none;
+
+        &:last-child {
+          margin-bottom: 24px;
+        }
+
+        &--show > .b3-menu__submenu--row {
+          width: 100%;
+        }
+
+        &--readonly {
+          line-height: 24px;
+          padding: 8px 16px;
+          margin: 0;
+          max-width: none;
+        }
+
+        .color__square {
+          margin: 0 16px 0 8px;
+        }
+      }
+
+      &__title {
+        border-bottom: .5px solid var(--b3-theme-background-light);
+        line-height: 48px;
+        padding: 0 8px;
+        display: flex;
+        background-color: var(--b3-theme-background);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+
+      &__separator {
+        margin: 0;
+        height: 24px;
+        background-color: var(--b3-menu-background);
+        border-bottom: .5px solid var(--b3-theme-background-light);
+      }
+
+      &__label {
+        font-size: 17px;
+      }
+
+      &__icon {
+        height: 17px;
+        width: 17px;
+        margin: 0 16px 0 8px;
+        border-radius: 4px;
+
+        &--arrow {
+          width: 12px;
+          margin: 0 8px 0 16px;
+        }
+      }
     }
   }
 
@@ -77,11 +142,6 @@
       overflow: hidden;
       -webkit-mask-image: linear-gradient(to left, rgba(0, 0, 0, 0) 0, #000 12px);
     }
-  }
-
-  &__title {
-    padding: 8px;
-    display: flex;
   }
 
   &__item {
@@ -120,13 +180,10 @@
           padding: 4px;
           align-content: flex-start;
 
-          .b3-menu__icon {
-            display: none;
-          }
-
           .b3-menu__item {
             width: auto;
-            padding: 4px;
+            height: 32px;
+            padding: 8px;
           }
 
           .b3-menu__label {
