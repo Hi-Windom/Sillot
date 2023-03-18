@@ -59,7 +59,6 @@ type AppConf struct {
 	Export         *conf.Export     `json:"export"`         // 导出配置
 	Graph          *conf.Graph      `json:"graph"`          // 关系图配置
 	UILayout       *conf.UILayout   `json:"uiLayout"`       // 界面布局，v2.8.0 后这个字段不再使用
-	UILayouts      []*conf.UILayout `json:"uiLayouts"`      // 界面布局列表
 	UserData       string           `json:"userData"`       // 社区用户信息，对 User 加密存储
 	User           *conf.User       `json:"-"`              // 社区用户内存结构，不持久化
 	Account        *conf.Account    `json:"account"`        // 帐号配置
@@ -149,9 +148,6 @@ func InitConf() {
 	Conf.Appearance.Lang = Conf.Lang
 	if nil == Conf.UILayout {
 		Conf.UILayout = &conf.UILayout{}
-	}
-	if 1 > len(Conf.UILayouts) {
-		Conf.UILayouts = []*conf.UILayout{}
 	}
 	if nil == Conf.Keymap {
 		Conf.Keymap = &conf.Keymap{}
@@ -347,13 +343,17 @@ func initLang() {
 	p := filepath.Join(util.WorkingDir, "appearance", "langs")
 	dir, err := os.Open(p)
 	if nil != err {
-		logging.LogFatalf("open language configuration folder [%s] failed: %s", p, err)
+		logging.LogErrorf("open language configuration folder [%s] failed: %s", p, err)
+		util.ReportFileSysFatalError(err)
+		return
 	}
 	defer dir.Close()
 
 	langNames, err := dir.Readdirnames(-1)
 	if nil != err {
-		logging.LogFatalf("list language configuration folder [%s] failed: %s", p, err)
+		logging.LogErrorf("list language configuration folder [%s] failed: %s", p, err)
+		util.ReportFileSysFatalError(err)
+		return
 	}
 
 	for _, langName := range langNames {
@@ -514,7 +514,9 @@ func (conf *AppConf) Save() {
 func (conf *AppConf) save0(data []byte) {
 	confPath := filepath.Join(util.ConfDir, "conf.json")
 	if err := filelock.WriteFile(confPath, data); nil != err {
-		logging.LogFatalf("write conf [%s] failed: %s", confPath, err)
+		logging.LogErrorf("write conf [%s] failed: %s", confPath, err)
+		util.ReportFileSysFatalError(err)
+		return
 	}
 }
 

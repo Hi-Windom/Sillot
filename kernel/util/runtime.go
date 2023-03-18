@@ -17,6 +17,7 @@
 package util
 
 import (
+	"bytes"
 	"fmt"
 	"math/rand"
 	"os"
@@ -130,15 +131,20 @@ var (
 	thirdPartySyncCheckTicker = time.NewTicker(time.Minute * 10)
 )
 
+func ReportFileSysFatalError(err error) {
+	stack := debug.Stack()
+	output := string(stack)
+	if 5 < strings.Count(output, "\n") {
+		lines := strings.Split(output, "\n")
+		output = strings.Join(lines[5:], "\n")
+	}
+	logging.LogErrorf("check file system status failed: %s, %s", err, output)
+	os.Exit(ExitCodeFileSysInconsistent)
+}
+
 func CheckFileSysStatus() {
 	if ContainerStd != Container {
 		return
-	}
-
-	reportFileSysFatalError := func(err error) {
-		stack := debug.Stack()
-		logging.LogErrorf("check file system status failed: %s, %s", err, stack)
-		os.Exit(ExitCodeFileSysInconsistent)
 	}
 
 	const fileSysStatusCheckFile = ".siyuan/filesys_status_check"
@@ -147,83 +153,92 @@ func CheckFileSysStatus() {
 		<-thirdPartySyncCheckTicker.C
 
 		if IsCloudDrivePath(WorkspaceDir) {
-			reportFileSysFatalError(fmt.Errorf("workspace dir [%s] is in third party sync dir", WorkspaceDir))
-			continue
+			ReportFileSysFatalError(fmt.Errorf("workspace dir [%s] is in third party sync dir", WorkspaceDir))
+			return
 		}
 
 		dir := filepath.Join(DataDir, fileSysStatusCheckFile)
 		if err := os.RemoveAll(dir); nil != err {
-			reportFileSysFatalError(err)
-			continue
+			ReportFileSysFatalError(err)
+			return
 		}
 
 		if err := os.MkdirAll(dir, 0755); nil != err {
-			reportFileSysFatalError(err)
-			continue
+			ReportFileSysFatalError(err)
+			return
 		}
 
-		for i := 0; i < 32; i++ {
+		for i := 0; i < 7; i++ {
 			tmp := filepath.Join(dir, "check_consistency")
 			data := make([]byte, 1024*4)
 			_, err := rand.Read(data)
 			if nil != err {
-				reportFileSysFatalError(err)
-				break
+				ReportFileSysFatalError(err)
+				return
 			}
 
 			if err = os.WriteFile(tmp, data, 0644); nil != err {
-				reportFileSysFatalError(err)
-				break
+				ReportFileSysFatalError(err)
+				return
 			}
 
-			time.Sleep(time.Second)
+			time.Sleep(5 * time.Second)
 
 			for j := 0; j < 32; j++ {
-				f, err := os.Open(tmp)
-				if nil != err {
-					reportFileSysFatalError(err)
+				renamed := tmp + "_renamed"
+				if err = os.Rename(tmp, renamed); nil != err {
+					ReportFileSysFatalError(err)
 					break
+				}
+
+				time.Sleep(time.Second)
+
+				f, err := os.Open(renamed)
+				if nil != err {
+					ReportFileSysFatalError(err)
+					return
 				}
 
 				if err = f.Close(); nil != err {
-					reportFileSysFatalError(err)
-					break
+					ReportFileSysFatalError(err)
+					return
 				}
 
-				time.Sleep(200 * time.Millisecond)
-
-				if err = os.Rename(tmp, tmp+"_renamed"); nil != err {
-					reportFileSysFatalError(err)
-					break
-				}
-
-				time.Sleep(200 * time.Millisecond)
-				if err = os.Rename(tmp+"_renamed", tmp); nil != err {
-					reportFileSysFatalError(err)
-					break
+				if err = os.Rename(renamed, tmp); nil != err {
+					ReportFileSysFatalError(err)
+					return
 				}
 
 				entries, err := os.ReadDir(dir)
 				if nil != err {
-					reportFileSysFatalError(err)
-					break
+					ReportFileSysFatalError(err)
+					return
 				}
 
-				count := 0
+				checkFilenames := bytes.Buffer{}
 				for _, entry := range entries {
 					if !entry.IsDir() && strings.Contains(entry.Name(), "check_") {
-						count++
+						checkFilenames.WriteString(entry.Name())
+						checkFilenames.WriteString("\n")
 					}
 				}
-				if 1 < count {
-					reportFileSysFatalError(fmt.Errorf("dir [%s] has more than 1 file", dir))
-					break
+				lines := strings.Split(strings.TrimSpace(checkFilenames.String()), "\n")
+				if 1 < len(lines) {
+					buf := bytes.Buffer{}
+					for _, line := range lines {
+						buf.WriteString("  ")
+						buf.WriteString(line)
+						buf.WriteString("\n")
+					}
+					output := buf.String()
+					ReportFileSysFatalError(fmt.Errorf("dir [%s] has more than 1 file:\n%s", dir, output))
+					return
 				}
 			}
 
 			if err = os.RemoveAll(tmp); nil != err {
-				reportFileSysFatalError(err)
-				break
+				ReportFileSysFatalError(err)
+				return
 			}
 
 		}
