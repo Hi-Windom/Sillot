@@ -40,23 +40,9 @@ const isDevEnv = process.env.NODE_ENV === "development";
 // const appVer = app.getVersion();
 const branchVer = app.getVersion();
 try { require("electron-reloader")(module); } catch {}
-var VitePort;
-try {
-  VitePort = process.env.PORT;
-} catch {
-  VitePort = 3000;
-}
-var isVite;
-try {
-  isVite =  process.env.VITE === "vite";
-} catch {
-  isVite = false;
-}
-console.log("debug: $isDevEnv = " + isDevEnv);
-console.log("debug: $isVite = " + isVite);
 
 var pkg = {};
-if (isDevEnv && !isVite) {
+if (isDevEnv) {
   pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json")).toString());
 } else {
   pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString());
@@ -82,37 +68,34 @@ try {
     }
 } catch (e) {
     console.error(e);
-    require("electron").dialog.showErrorBox("创建配置目录失败 Failed to create config directory",
-        "思源需要在用户家目录下创建配置文件夹（~/.config/siyuan），请确保该路径具有写入权限。\n\nSiYuan needs to create a configuration folder (~/.config/siyuan) in the user's home directory. Please make sure that the path has write permissions.");
+    require("electron").dialog.showErrorBox("创建配置目录失败 Failed to create config directory", "思源需要在用户家目录下创建配置文件夹（~/.config/siyuan），请确保该路径具有写入权限。\n\nSiYuan needs to create a configuration folder (~/.config/siyuan) in the user's home directory. Please make sure that the path has write permissions.");
     app.exit();
 }
 
 // type: port/id
-const exitApp = (type, id) => {
+const exitApp = (port, errorWindowId) => {
     let tray;
     let mainWindow;
+
+    // 关闭端口相同的所有非主窗口
+    BrowserWindow.getAllWindows().forEach((item) => {
+        const currentURL = new URL(item.getURL())
+        if (port.toString() === currentURL.port.toString()) {
+            if (currentURL.href.indexOf("/stage/build/app/?v=") > -1) {
+                mainWindow = item;
+            } else {
+                item.destroy();
+            }
+        }
+    });
     workspaces.find((item, index) => {
-        if (type === "id") {
-            if (item.id === id) {
-                mainWindow = item.browserWindow;
-                if (workspaces.length > 1) {
-                    item.browserWindow.destroy();
-                }
-                workspaces.splice(index, 1);
-                tray = item.tray;
-                return true;
+        if (mainWindow.id === item.browserWindow.id) {
+            if (workspaces.length > 1) {
+                item.browserWindow.destroy();
             }
-        } else {
-            const currentURL = new URL(item.browserWindow.getURL());
-            if (currentURL.port === id) {
-                mainWindow = item.browserWindow;
-                if (workspaces.length > 1) {
-                    item.browserWindow.destroy();
-                }
-                workspaces.splice(index, 1);
-                tray = item.tray;
-                return true;
-            }
+            workspaces.splice(index, 1);
+            tray = item.tray;
+            return true;
         }
     });
     if (tray && ("win32" === process.platform || "linux" === process.platform)) {
@@ -137,7 +120,16 @@ const exitApp = (type, id) => {
         } catch (e) {
             writeLog(e);
         }
-        app.exit();
+
+        if (errorWindowId) {
+            BrowserWindow.getAllWindows().forEach((item) => {
+                if (errorWindowId !== item.id) {
+                    item.destroy();
+                }
+            });
+        } else {
+            app.exit();
+        }
         globalShortcut.unregisterAll();
         writeLog("exited ui");
     }
@@ -162,10 +154,7 @@ const showErrorWindow = (title, content) => {
         frame: false,
         icon: path.join(appDir, "stage", "icon-large.png"),
         webPreferences: {
-            nodeIntegration: true,
-            webviewTag: true,
-            webSecurity: false,
-            contextIsolation: false,
+            nodeIntegration: true, webviewTag: true, webSecurity: false, contextIsolation: false,
         },
     });
     require("@electron/remote/main").enable(errWindow.webContents);
@@ -179,6 +168,7 @@ const showErrorWindow = (title, content) => {
         },
     });
     errWindow.show();
+    return errWindow.id;
 };
 
 const writeLog = (out) => {
@@ -195,8 +185,7 @@ const writeLog = (out) => {
             }
         }
         out = out.toString();
-        out = new Date().toISOString().replace(/T/, " ").replace(/\..+/, "") + " " +
-            out;
+        out = new Date().toISOString().replace(/T/, " ").replace(/\..+/, "") + " " + out;
         log += out + "\n";
         fs.writeFileSync(logFile, log);
     } catch (e) {
@@ -226,7 +215,8 @@ const boot = () => {
         isMaximized: true,
         fullscreen: false,
         isDevToolsOpened: false,
-        x: 0, y: 0,
+        x: 0,
+        y: 0,
         width: defaultWidth,
         height: defaultHeight,
     }, oldWindowState);
@@ -235,8 +225,7 @@ const boot = () => {
     let y = windowState.y;
     if (workArea) {
         // 窗口大小等同于或大于 workArea 时，缩小会隐藏到左下角
-        if (windowState.width >= workArea.width || windowState.height >=
-            workArea.height) {
+        if (windowState.width >= workArea.width || windowState.height >= workArea.height) {
             windowState.width = Math.min(defaultWidth, workArea.width);
             windowState.height = Math.min(defaultHeight, workArea.height);
         }
@@ -286,40 +275,37 @@ const boot = () => {
         icon: path.join(appDir, "stage", "icon-large.png"),
     });
     require("@electron/remote/main").enable(currentWindow.webContents);
-    currentWindow.webContents.userAgent = "SiYuan-Sillot/" + appVer +
-        " https://b3log.org/siyuan Electron";
+    currentWindow.webContents.userAgent = "SiYuan-Sillot/" + appVer + " https://b3log.org/siyuan Electron";
 
     currentWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);
 
     // 发起互联网服务请求时绕过安全策略 https://github.com/siyuan-note/siyuan/issues/5516
-    currentWindow.webContents.session.webRequest.onBeforeSendHeaders(
-        (details, cb) => {
-            if (-1 < details.url.indexOf("bili")) {
-                // B 站不移除 Referer https://github.com/siyuan-note/siyuan/issues/94
-                cb({requestHeaders: details.requestHeaders});
-                return;
-            }
-
-            for (let key in details.requestHeaders) {
-                if ("referer" === key.toLowerCase()) {
-                    delete details.requestHeaders[key];
-                }
-            }
+    currentWindow.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
+        if (-1 < details.url.indexOf("bili")) {
+            // B 站不移除 Referer https://github.com/siyuan-note/siyuan/issues/94
             cb({requestHeaders: details.requestHeaders});
-        });
-    currentWindow.webContents.session.webRequest.onHeadersReceived(
-        (details, cb) => {
-            for (let key in details.responseHeaders) {
-                if ("x-frame-options" === key.toLowerCase()) {
-                    delete details.responseHeaders[key];
-                } else if ("content-security-policy" === key.toLowerCase()) {
-                    delete details.responseHeaders[key];
-                } else if ("access-control-allow-origin" === key.toLowerCase()) {
-                    delete details.responseHeaders[key];
-                }
+            return;
+        }
+
+        for (let key in details.requestHeaders) {
+            if ("referer" === key.toLowerCase()) {
+                delete details.requestHeaders[key];
             }
-            cb({responseHeaders: details.responseHeaders});
-        });
+        }
+        cb({requestHeaders: details.requestHeaders});
+    });
+    currentWindow.webContents.session.webRequest.onHeadersReceived((details, cb) => {
+        for (let key in details.responseHeaders) {
+            if ("x-frame-options" === key.toLowerCase()) {
+                delete details.responseHeaders[key];
+            } else if ("content-security-policy" === key.toLowerCase()) {
+                delete details.responseHeaders[key];
+            } else if ("access-control-allow-origin" === key.toLowerCase()) {
+                delete details.responseHeaders[key];
+            }
+        }
+        cb({responseHeaders: details.responseHeaders});
+    });
 
     currentWindow.webContents.on("did-finish-load", () => {
         let siyuanOpenURL;
@@ -358,78 +344,33 @@ const boot = () => {
         }
     });
 
-  // 加载主界面
-  function loadVite(VitePort) {
-    currentWindow.loadURL(`http://localhost:${VitePort}`).catch(() => {
-        setTimeout(() => { loadVite(VitePort); }, 200);
-    });
-    currentWindow.openDevTools();
+    // 加载主界面
+    currentWindow.loadURL(getServer() + "/stage/build/app/index.html?v=" + new Date().getTime());
     currentWindow.webContents.on("devtools-open-url", (event, url) => {
-      shell.openExternal(url);
-    });
-  }
-  if (isVite) {
-    // for Vite
-    loadVite(VitePort);
-  } else {
-    currentWindow.loadURL(
-      getServer() + "/stage/build/app/index.html?v=" + new Date().getTime()
-    );
-    currentWindow.webContents.on("devtools-open-url", (event, url) => {
-      // 支持在devtools打开网址 #188 需要 electron@24.0.0+
-      shell.openExternal(url);
-    });
-  }
+        // 支持在devtools打开网址 #188 需要 electron@24.0.0+
+        shell.openExternal(url);
+      });
 
     // 菜单
     const productName = "Sillot";
-    const template = [
-        {
-            label: productName,
-            submenu: [
-                {
-                    label: `About ${productName}`,
-                    role: "about",
-                },
-                {type: "separator"},
-                {role: "services"},
-                {type: "separator"},
-                {
-                    label: `Hide ${productName}`,
-                    role: "hide",
-                },
-                {role: "hideOthers"},
-                {role: "unhide"},
-                {type: "separator"},
-                {
-                    label: `Quit ${productName}`,
-                    role: "quit",
-                },
-            ],
-        },
-        {
-            role: "editMenu",
-            submenu: [
-                {role: "cut"},
-                {role: "copy"},
-                {role: "paste"},
-                {role: "pasteAndMatchStyle", accelerator: "CmdOrCtrl+Shift+C"},
-                {role: "selectAll"},
-            ],
-        },
-        {
-            role: "windowMenu",
-            submenu: [
-                {role: "minimize"},
-                {role: "zoom"},
-                {role: "togglefullscreen"},
-                {type: "separator"},
-                {role: "toggledevtools"},
-                {type: "separator"},
-                {role: "front"},
-            ],
-        },
-    ];
+    const template = [{
+        label: productName, submenu: [{
+            label: `About ${productName}`, role: "about",
+        }, {type: "separator"}, {role: "services"}, {type: "separator"}, {
+            label: `Hide ${productName}`, role: "hide",
+        }, {role: "hideOthers"}, {role: "unhide"}, {type: "separator"}, {
+            label: `Quit ${productName}`, role: "quit",
+        },],
+    }, {
+        role: "editMenu",
+        submenu: [{role: "cut"}, {role: "copy"}, {role: "paste"}, {
+            role: "pasteAndMatchStyle",
+            accelerator: "CmdOrCtrl+Shift+C"
+        }, {role: "selectAll"},],
+    }, {
+        role: "windowMenu",
+        submenu: [{role: "minimize"}, {role: "zoom"}, {role: "togglefullscreen"}, {type: "separator"}, {role: "toggledevtools"}, {type: "separator"}, {role: "front"},],
+    },];
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
     // 当前页面链接使用浏览器打开
@@ -450,8 +391,7 @@ const boot = () => {
         event.preventDefault();
     });
     workspaces.push({
-        browserWindow: currentWindow,
-        id: currentWindow.id,
+        browserWindow: currentWindow, id: currentWindow.id,
     });
 };
 
@@ -479,20 +419,12 @@ const initKernel = (workspace, port, lang) => {
             transparent: "linux" !== process.platform,
         });
 
-        const kernelName = "win32" === process.platform
-            ? "SiYuan-Sillot-Kernel.exe"
-            : "SiYuan-Sillot-Kernel";
+        const kernelName = "win32" === process.platform ? "SiYuan-Sillot-Kernel.exe" : "SiYuan-Sillot-Kernel";
         // const kernelPath = path.join(appDir, "kernel", kernelName);
-    let kernelPath;
-    if (!isVite) {
-      kernelPath = path.join(appDir, "kernel", kernelName);
-    } else {
-      kernelPath = path.join(appDir,"app", "kernel", kernelName);
-    }
+    let kernelPath = path.join(appDir,"app", "kernel", kernelName);
     console.log("debug: $kernelPath = " + kernelPath);
         if (!fs.existsSync(kernelPath)) {
-            showErrorWindow("⚠️ 内核文件丢失 Kernel is missing",
-                "<div>内核可执行文件丢失，请重新安装思源，并将思源加入杀毒软件信任列表。</div><div>The kernel binary is not found, please reinstall SiYuan and add SiYuan into the trust list of your antivirus software.</div>");
+            showErrorWindow("⚠️ 内核文件丢失 Kernel is missing", "<div>内核可执行文件丢失，请重新安装思源，并将思源加入杀毒软件信任列表。</div><div>The kernel binary is not found, please reinstall SiYuan and add SiYuan into the trust list of your antivirus software.</div>");
             bootWindow.destroy();
             resolve(false);
             return;
@@ -539,74 +471,52 @@ const initKernel = (workspace, port, lang) => {
         if (lang && "" !== lang) {
             cmds.push("--lang", lang);
         }
-        let cmd = `ui version [${appVer}], booting kernel [${kernelPath} ${cmds.join(
-            " ")}]`;
+        let cmd = `ui version [${appVer}], booting kernel [${kernelPath} ${cmds.join(" ")}]`;
         writeLog(cmd);
-        let kernelProcessPid = "";
         if (!isDevEnv || workspaces.length > 0) {
             const cp = require("child_process");
-            const kernelProcess = cp.spawn(kernelPath,
-                cmds, {
-                    detached: false, // 桌面端内核进程不再以游离模式拉起 https://github.com/siyuan-note/siyuan/issues/6336
-                    stdio: "ignore",
-                },
-            );
-            kernelProcessPid = kernelProcess.pid;
-            writeLog("booted kernel process [pid=" + kernelProcessPid + ", port=" +
-                kernelPort + "]");
+            const kernelProcess = cp.spawn(kernelPath, cmds, {
+                detached: false, // 桌面端内核进程不再以游离模式拉起 https://github.com/siyuan-note/siyuan/issues/6336
+                stdio: "ignore",
+            },);
 
+            const currentKernelPort = kernelPort;
+            writeLog("booted kernel process [pid=" + kernelProcess.pid + ", port=" + kernelPort + "]");
             kernelProcess.on("close", (code) => {
-                writeLog(`kernel [pid=${kernelProcessPid}] exited with code [${code}]`);
+                writeLog(`kernel [pid=${kernelProcess.pid}, port=${currentKernelPort}] exited with code [${code}]`);
                 if (0 !== code) {
+                    let errorWindowId;
                     switch (code) {
                         case 20:
-                            showErrorWindow("⚠️ 数据库被锁定 The database is locked",
-                                "<div>数据库文件正在被其他进程占用，请检查是否同时存在多个内核进程（SiYuan Kernel）服务相同的工作空间。</div><div>The database file is being occupied by other processes, please check whether there are multiple kernel processes (SiYuan Kernel) serving the same workspace at the same time.</div>");
+                            errorWindowId = showErrorWindow("⚠️ 数据库被锁定 The database is locked", "<div>数据库文件正在被其他进程占用，请检查是否同时存在多个内核进程（SiYuan Kernel）服务相同的工作空间。</div><div>The database file is being occupied by other processes, please check whether there are multiple kernel processes (SiYuan Kernel) serving the same workspace at the same time.</div>");
                             break;
                         case 21:
-                            showErrorWindow("⚠️ 监听端口 " + kernelPort +
-                                " 失败 Failed to listen to port " + kernelPort,
-                                "<div>监听 " + kernelPort +
-                                " 端口失败，请确保程序拥有网络权限并不受防火墙和杀毒软件阻止。</div><div>Failed to listen to port " +
-                                kernelPort +
-                                ", please make sure the program has network permissions and is not blocked by firewalls and antivirus software.</div>");
+                            errorWindowId = showErrorWindow("⚠️ 监听端口 " + currentKernelPort + " 失败 Failed to listen to port " + currentKernelPort, "<div>监听 " + currentKernelPort + " 端口失败，请确保程序拥有网络权限并不受防火墙和杀毒软件阻止。</div><div>Failed to listen to port " + currentKernelPort + ", please make sure the program has network permissions and is not blocked by firewalls and antivirus software.</div>");
                             break;
                         case 22:
-                            showErrorWindow(
-                                "⚠️ 创建配置目录失败 Failed to create config directory",
-                                "<div>思源需要在用户家目录下创建配置文件夹（~/.config/siyuan），请确保该路径具有写入权限。</div><div>SiYuan needs to create a configuration folder (~/.config/siyuan) in the user\'s home directory. Please make sure that the path has write permissions.</div>");
+                            errorWindowId = showErrorWindow("⚠️ 创建配置目录失败 Failed to create config directory", "<div>思源需要在用户家目录下创建配置文件夹（~/.config/siyuan），请确保该路径具有写入权限。</div><div>SiYuan needs to create a configuration folder (~/.config/siyuan) in the user\'s home directory. Please make sure that the path has write permissions.</div>");
                             break;
                         case 24: // 工作空间已被锁定，尝试切换到第一个打开的工作空间
                             if (workspaces && 0 < workspaces.length) {
                                 showWindow(workspaces[0].browserWindow);
                             }
 
-                            showErrorWindow(
-                                "⚠️ 工作空间已被锁定 The workspace is locked",
-                                "<div>该工作空间正在被使用。</div><div>The workspace is in use.</div>");
+                            errorWindowId = showErrorWindow("⚠️ 工作空间已被锁定 The workspace is locked", "<div>该工作空间正在被使用。</div><div>The workspace is in use.</div>");
                             break;
                         case 25:
-                            showErrorWindow(
-                                "⚠️ 创建工作空间目录失败 Failed to create workspace directory",
-                                "<div>创建工作空间目录失败。</div><div>Failed to create workspace directory.</div>");
+                            errorWindowId = showErrorWindow("⚠️ 创建工作空间目录失败 Failed to create workspace directory", "<div>创建工作空间目录失败。</div><div>Failed to create workspace directory.</div>");
                             break;
                         case 26:
-                            showErrorWindow(
-                                "⚠️ 文件系统读写错误 File system access error",
-                                "<div>请检查文件系统权限，并确保没有其他程序正在读写文件<br>请勿使用第三方同步盘进行数据同步，否则数据会被损坏（iCloud/OneDrive/Dropbox/Google Drive/坚果云/百度网盘/腾讯微云等）</div><div>Please check file system permissions and make sure no other programs are reading or writing to the file<br>Do not use a third-party sync disk for data sync, otherwise the data will be damaged (OneDrive/Dropbox/Google Drive/Nutstore/Baidu Netdisk/Tencent Weiyun, etc.)</div>");
+                            errorWindowId = showErrorWindow("⚠️ 文件系统读写错误 File system access error", "<div>请检查文件系统权限，并确保没有其他程序正在读写文件；<br>请勿使用第三方同步盘进行数据同步，否则数据会被损坏（iCloud/OneDrive/Dropbox/Google Drive/坚果云/百度网盘/腾讯微云等）</div><div>Please check file system permissions and make sure no other programs are reading or writing to the file;<br>Do not use a third-party sync disk for data sync, otherwise the data will be damaged (OneDrive/Dropbox/Google Drive/Nutstore/Baidu Netdisk/Tencent Weiyun, etc.)</div>");
                             break;
                         case 0:
-                        case 1: // Fatal error
                             break;
                         default:
-                            showErrorWindow(
-                                "⚠️ 内核因未知原因退出 The kernel exited for unknown reasons",
-                                `<div>思源内核因未知原因退出 [code=${code}]，请尝试重启操作系统后再启动思源。如果该问题依然发生，请检查杀毒软件是否阻止思源内核启动。</div>
-<div>SiYuan Kernel exited for unknown reasons [code=${code}], please try to reboot your operating system and then start SiYuan again. If occurs this problem still, please check your anti-virus software whether kill the SiYuan Kernel.</div>`);
+                            errorWindowId = showErrorWindow("⚠️ 内核因未知原因退出 The kernel exited for unknown reasons", `<div>思源内核因未知原因退出 [code=${code}]，请尝试重启操作系统后再启动思源。如果该问题依然发生，请检查杀毒软件是否阻止思源内核启动。</div><div>SiYuan Kernel exited for unknown reasons [code=${code}], please try to reboot your operating system and then start SiYuan again. If occurs this problem still, please check your anti-virus software whether kill the SiYuan Kernel.</div>`);
                             break;
                     }
 
-                    exitApp("port", kernelPort);
+                    exitApp(currentKernelPort, errorWindowId);
                     bootWindow.destroy();
                     resolve(false);
                 }
@@ -632,9 +542,7 @@ const initKernel = (workspace, port, lang) => {
                 count++;
                 if (14 < count) {
                     writeLog("get kernel ver failed");
-                    showErrorWindow(
-                        "⚠️ 获取内核服务端口失败 Failed to get kernel serve port",
-                        "<div>获取内核服务端口失败，请确保程序拥有网络权限并不受防火墙和杀毒软件阻止。</div><div>Failed to get kernel serve port, please make sure the program has network permissions and is not blocked by firewalls and antivirus software.</div>");
+                    showErrorWindow("⚠️ 获取内核服务端口失败 Failed to get kernel serve port", "<div>获取内核服务端口失败，请确保程序拥有网络权限并不受防火墙和杀毒软件阻止。</div><div>Failed to get kernel serve port, please make sure the program has network permissions and is not blocked by firewalls and antivirus software.</div>");
                     bootWindow.destroy();
                     resolve(false);
                 }
@@ -648,8 +556,7 @@ const initKernel = (workspace, port, lang) => {
         if (0 === apiData.code) {
             writeLog("got kernel version [" + apiData.data + "]");
             if (!isDevEnv && apiData.data !== appVer) {
-                writeLog(
-                    `kernel [${apiData.data}] is running, shutdown it now and then start kernel [${appVer}]`);
+                writeLog(`kernel [${apiData.data}] is running, shutdown it now and then start kernel [${appVer}]`);
                 new Notification({
                     title:"版本不一致",
                     body:`kernel [${apiData.data}] is running, shutdown it now and then start kernel [${appVer}]`,
@@ -661,8 +568,7 @@ const initKernel = (workspace, port, lang) => {
                 let progressing = false;
                 while (!progressing) {
                     try {
-                        const progressResult = await fetch(
-                            getServer() + "/api/system/bootProgress");
+                        const progressResult = await fetch(getServer() + "/api/system/bootProgress");
                         const progressData = await progressResult.json();
                         if (progressData.data.progress >= 100) {
                             resolve(true);
@@ -746,50 +652,33 @@ app.whenReady().then(() => {
   let ReactDeveloperToolsRoot = path.join(app.getPath("userData"), "extensions", "ReactDeveloperTools");
   loadExtension(ReactDeveloperToolsRoot);
     const resetTrayMenu = (tray, lang, mainWindow) => {
-        const trayMenuTemplate = [
-            {
-                label: mainWindow.isVisible()
-                    ? lang.hideWindow
-                    : lang.showWindow,
-                click: () => {
-                    showHideWindow(tray, lang, mainWindow);
-                },
+        const trayMenuTemplate = [{
+            label: mainWindow.isVisible() ? lang.hideWindow : lang.showWindow, click: () => {
+                showHideWindow(tray, lang, mainWindow);
             },
-            {
-                label: lang.officialWebsite,
-                click: () => {
-                    shell.openExternal("https://b3log.org/siyuan/");
-                },
+        }, {
+            label: lang.officialWebsite, click: () => {
+                shell.openExternal("https://b3log.org/siyuan/");
             },
-            {
-                label: lang.openSource,
-                click: () => {
-                    shell.openExternal("https://github.com/Hi-Windom/Sillot");
-                },
+        }, {
+            label: lang.openSource, click: () => {
+                shell.openExternal("https://github.com/Hi-Windom/Sillot");
             },
-            {
-                label: lang.resetWindow,
-                type: "checkbox",
-                click: v => {
-                    resetWindowStateOnRestart = v.checked;
-                    mainWindow.webContents.send("siyuan-save-close", true);
-                },
+        }, {
+            label: lang.resetWindow, type: "checkbox", click: v => {
+                resetWindowStateOnRestart = v.checked;
+                mainWindow.webContents.send("siyuan-save-close", true);
             },
-            {
-                label: lang.quit,
-                click: () => {
-                    mainWindow.webContents.send("siyuan-save-close", true);
-                },
+        }, {
+            label: lang.quit, click: () => {
+                mainWindow.webContents.send("siyuan-save-close", true);
             },
-        ];
+        },];
 
         if ("win32" === process.platform) {
             // Windows 端支持窗口置顶 https://github.com/siyuan-note/siyuan/issues/6860
             trayMenuTemplate.splice(1, 0, {
-                label: mainWindow.isAlwaysOnTop()
-                    ? lang.cancelWindowTop
-                    : lang.setWindowTop,
-                click: () => {
+                label: mainWindow.isAlwaysOnTop() ? lang.cancelWindowTop : lang.setWindowTop, click: () => {
                     if (!mainWindow.isAlwaysOnTop()) {
                         mainWindow.setAlwaysOnTop(true);
                     } else {
@@ -866,8 +755,8 @@ app.whenReady().then(() => {
             shell.openExternal(url);
         });
     });
-    ipcMain.on("siyuan-quit", (event, id) => {
-        exitApp("id", id)
+    ipcMain.on("siyuan-quit", (event, port) => {
+        exitApp(port);
     });
     ipcMain.on("siyuan-openwindow", (event, data) => {
         const mainWindow = BrowserWindow.fromId(data.id);
@@ -947,8 +836,7 @@ app.whenReady().then(() => {
                 return true;
             }
         });
-        await fetch(getServer(data.port) + "/api/system/uiproc?pid=" + process.pid,
-            {method: "POST"});
+        await fetch(getServer(data.port) + "/api/system/uiproc?pid=" + process.pid, {method: "POST"});
     });
     ipcMain.on("siyuan-hotkey", (event, data) => {
         globalShortcut.unregisterAll();
@@ -999,10 +887,7 @@ app.whenReady().then(() => {
             icon: path.join(appDir, "stage", "icon-large.png"),
             transparent: "linux" !== process.platform,
             webPreferences: {
-                nodeIntegration: true,
-                webviewTag: true,
-                webSecurity: false,
-                contextIsolation: false,
+                nodeIntegration: true, webviewTag: true, webSecurity: false, contextIsolation: false,
             },
         });
         require("@electron/remote/main").enable(firstOpenWindow.webContents);
@@ -1013,17 +898,15 @@ app.whenReady().then(() => {
 
         // 改进桌面端初始化时使用的外观语言 https://github.com/siyuan-note/siyuan/issues/6803
         let languages = app.getPreferredSystemLanguages();
-        let language = languages && 0 < languages.length && "zh-Hans-CN" ===
-        languages[0] ? "zh_CN" : "en_US";
-        firstOpenWindow.loadFile(
-            initHTMLPath, {
-                query: {
-                    lang: language,
-                    home: app.getPath("home"),
-                    v: appVer,
-                    icon: path.join(appDir, "stage", "icon-large.png"),
-                },
-            });
+        let language = languages && 0 < languages.length && "zh-Hans-CN" === languages[0] ? "zh_CN" : "en_US";
+        firstOpenWindow.loadFile(initHTMLPath, {
+            query: {
+                lang: language,
+                home: app.getPath("home"),
+                v: appVer,
+                icon: path.join(appDir, "stage", "icon-large.png"),
+            },
+        });
         firstOpenWindow.show();
         // 初始化启动
         ipcMain.on("siyuan-first-init", (event, data) => {
@@ -1285,8 +1168,7 @@ powerMonitor.on("resume", async () => {
     workspaces.forEach(item => {
         const currentURL = new URL(item.browserWindow.getURL());
         const server = getServer(currentURL.port);
-        writeLog(
-            "sync after system resume [" + server + "/api/sync/performSync" + "]");
+        writeLog("sync after system resume [" + server + "/api/sync/performSync" + "]");
         fetch(server + "/api/sync/performSync", {method: "POST"});
     });
 });
