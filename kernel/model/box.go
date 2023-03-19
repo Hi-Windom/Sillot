@@ -211,7 +211,9 @@ func (box *Box) saveConf0(data []byte) {
 		logging.LogErrorf("save box conf [%s] failed: %s", confPath, err)
 	}
 	if err := filelock.WriteFile(confPath, data); nil != err {
-		logging.LogErrorf("save box conf [%s] failed: %s", confPath, err)
+		logging.LogErrorf("write box conf [%s] failed: %s", confPath, err)
+		util.ReportFileSysFatalError(err)
+		return
 	}
 }
 
@@ -491,7 +493,7 @@ func fullReindex() {
 	WaitForWritingFiles()
 
 	if err := sql.InitDatabase(true); nil != err {
-		os.Exit(util.ExitCodeReadOnlyDatabase)
+		os.Exit(logging.ExitCodeReadOnlyDatabase)
 		return
 	}
 	treenode.InitBlockTree(true)

@@ -1,4 +1,5 @@
 {
+  "saveLayout": "Guardar diseño",
   "ai": "Inteligencia Artificial",
   "aiContinueWrite": "Continuar escribiendo",
   "aiTranslate": "Traducir",
@@ -999,7 +1000,7 @@
     "73": "Importando, por favor espere...",
     "74": "El kernel no ha sido arrancado completamente [%d%%], por favor, inténtelo de nuevo más tarde",
     "75": "Error al intentar acceder al archivo",
-    "76": "El archivo de datos ha sido bloqueado por otro programa.",
+    "76": "TODO",
     "77": "Ruta inválida [%s]",
     "78": "Los viejos y nuevos caminos se repiten",
     "79": "Sólo admite la importación de documentos Markdown",
@@ -1119,6 +1120,7 @@
     "193": "Consulte el capítulo [Inteligencia artificial] de la guía del usuario para la configuración",
     "194": "Existen restricciones en la interfaz de Nutstore, utilice otros servicios WebDAV",
     "195": "La hora del sistema es incorrecta, calibre la hora del sistema y vuelva a intentarlo",
-    "196": "No configure el espacio de trabajo bajo la ruta de un disco de sincronización de terceros, de lo contrario, los datos se dañarán (OneDrive/Dropbox/Google Drive/Nutstore/Baidu Netdisk/Tencent Weiyun, etc.)"
+    "196": "No configure el espacio de trabajo bajo la ruta de un disco de sincronización de terceros, de lo contrario, los datos se dañarán (iCloud/OneDrive/Dropbox/Google Drive/Nutstore/Baidu Netdisk/Tencent Weiyun, etc.)",
+    "197": "Actualmente, el editor se encuentra en modo de solo lectura. Si necesita editar contenido, cambie al modo de edición"
   }
 }
