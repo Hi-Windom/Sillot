@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.10.14",
+  "version": "0.10.15",
   "syv": "2.8.0",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
@@ -69,7 +69,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@mui/icons-material": "^5.11.11",
-    "@mui/joy": "5.0.0-alpha.69",
+    "@mui/joy": "5.0.0-alpha.71",
     "@mui/material": "^5.11.13",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-commonjs": "^24.0.1",
