@@ -1001,7 +1001,7 @@
     "73": "Importing, please wait...",
     "74": "The kernel has not been fully booted [%d%%], please try again later",
     "75": "Attempt to access file failed",
-    "76": "The data file has been locked by another program.",
+    "76": "TODO",
     "77": "Invalid dir path [%s]",
     "78": "The old and new paths are repeated",
     "79": "Only supports importing Markdown document",
@@ -1121,6 +1121,7 @@
     "193": "Please refer to the [Artificial Intelligence] chapter of the User Guide for configuration",
     "194": "There are restrictions on the Nutstore interface, please use other WebDAV services",
     "195": "The system time is incorrect, please calibrate the system time and try again",
-    "196": "Do not set the workspace under the path of a third-party sync disk, otherwise the data will be damaged (OneDrive/Dropbox/Google Drive/Nutstore/Baidu Netdisk/Tencent Weiyun, etc.)"
+    "196": "Do not set the workspace under the path of a third-party sync disk, otherwise the data will be damaged (iCloud/OneDrive/Dropbox/Google Drive/Nutstore/Baidu Netdisk/Tencent Weiyun, etc.)",
+    "197": "Currently the editor is in read-only mode. If you need to edit content, please switch to edit mode"
   }
 }

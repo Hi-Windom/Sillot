@@ -68,6 +68,7 @@ let bootWindow;
 let firstOpen = false;
 let workspaces = []; // workspaceDir, id, browserWindow, tray
 let kernelPort = 58131;
+let resetWindowStateOnRestart = false;
 require("@electron/remote/main").initialize();
 
 if (!app.requestSingleInstanceLock()) {
@@ -84,6 +85,62 @@ try {
     require("electron").dialog.showErrorBox("创建配置目录失败 Failed to create config directory",
         "思源需要在用户家目录下创建配置文件夹（~/.config/siyuan），请确保该路径具有写入权限。\n\nSiYuan needs to create a configuration folder (~/.config/siyuan) in the user's home directory. Please make sure that the path has write permissions.");
     app.exit();
+}
+
+// type: port/id
+const exitApp = (type, id) => {
+    let tray;
+    let mainWindow;
+    workspaces.find((item, index) => {
+        if (type === "id") {
+            if (item.id === id) {
+                mainWindow = item.browserWindow;
+                if (workspaces.length > 1) {
+                    item.browserWindow.destroy();
+                }
+                workspaces.splice(index, 1);
+                tray = item.tray;
+                return true;
+            }
+        } else {
+            const currentURL = new URL(item.browserWindow.getURL());
+            if (currentURL.port === id) {
+                mainWindow = item.browserWindow;
+                if (workspaces.length > 1) {
+                    item.browserWindow.destroy();
+                }
+                workspaces.splice(index, 1);
+                tray = item.tray;
+                return true;
+            }
+        }
+    });
+    if (tray && ("win32" === process.platform || "linux" === process.platform)) {
+        tray.destroy();
+    }
+    if (workspaces.length === 0 && mainWindow) {
+        try {
+            if (resetWindowStateOnRestart) {
+                fs.writeFileSync(windowStatePath, "{}");
+            } else {
+                const bounds = mainWindow.getBounds();
+                fs.writeFileSync(windowStatePath, JSON.stringify({
+                    isMaximized: mainWindow.isMaximized(),
+                    fullscreen: mainWindow.isFullScreen(),
+                    isDevToolsOpened: mainWindow.webContents.isDevToolsOpened(),
+                    x: bounds.x,
+                    y: bounds.y,
+                    width: bounds.width,
+                    height: bounds.height,
+                }));
+            }
+        } catch (e) {
+            writeLog(e);
+        }
+        app.exit();
+        globalShortcut.unregisterAll();
+        writeLog("exited ui");
+    }
 }
 
 const getServer = (port = kernelPort) => {
@@ -519,11 +576,6 @@ const initKernel = (workspace, port, lang) => {
                                 "⚠️ 创建配置目录失败 Failed to create config directory",
                                 "<div>思源需要在用户家目录下创建配置文件夹（~/.config/siyuan），请确保该路径具有写入权限。</div><div>SiYuan needs to create a configuration folder (~/.config/siyuan) in the user\'s home directory. Please make sure that the path has write permissions.</div>");
                             break;
-                        case 23:
-                            showErrorWindow(
-                                "⚠️ 无法读写块树文件 Failed to access blocktree file",
-                                "<div>块树文件正在被其他程序锁定或者已经损坏，请删除 工作空间/temp/ 文件夹后重启</div><div>The block tree file is being locked by another program or is corrupted, please delete the workspace/temp/ folder and restart.</div>");
-                            break;
                         case 24: // 工作空间已被锁定，尝试切换到第一个打开的工作空间
                             if (workspaces && 0 < workspaces.length) {
                                 showWindow(workspaces[0].browserWindow);
@@ -540,8 +592,8 @@ const initKernel = (workspace, port, lang) => {
                             break;
                         case 26:
                             showErrorWindow(
-                                "⚠️ 文件系统不一致 File system inconsistent",
-                                "<div>请勿使用第三方同步盘进行数据同步，否则数据会被损坏（OneDrive/Dropbox/Google Drive/坚果云/百度网盘/腾讯微云等）</div><div>Do not use a third-party sync disk for data sync, otherwise the data will be damaged (OneDrive/Dropbox/Google Drive/Nutstore/Baidu Netdisk/Tencent Weiyun, etc.)</div>");
+                                "⚠️ 文件系统读写错误 File system access error",
+                                "<div>请检查文件系统权限，并确保没有其他程序正在读写文件<br>请勿使用第三方同步盘进行数据同步，否则数据会被损坏（iCloud/OneDrive/Dropbox/Google Drive/坚果云/百度网盘/腾讯微云等）</div><div>Please check file system permissions and make sure no other programs are reading or writing to the file<br>Do not use a third-party sync disk for data sync, otherwise the data will be damaged (OneDrive/Dropbox/Google Drive/Nutstore/Baidu Netdisk/Tencent Weiyun, etc.)</div>");
                             break;
                         case 0:
                         case 1: // Fatal error
@@ -554,6 +606,7 @@ const initKernel = (workspace, port, lang) => {
                             break;
                     }
 
+                    exitApp("port", kernelPort);
                     bootWindow.destroy();
                     resolve(false);
                 }
@@ -692,8 +745,6 @@ app.whenReady().then(() => {
   };
   let ReactDeveloperToolsRoot = path.join(app.getPath("userData"), "extensions", "ReactDeveloperTools");
   loadExtension(ReactDeveloperToolsRoot);
-
-    let resetWindowStateOnRestart = false;
     const resetTrayMenu = (tray, lang, mainWindow) => {
         const trayMenuTemplate = [
             {
@@ -816,44 +867,7 @@ app.whenReady().then(() => {
         });
     });
     ipcMain.on("siyuan-quit", (event, id) => {
-        const mainWindow = BrowserWindow.fromId(id);
-        let tray;
-        workspaces.find((item, index) => {
-            if (item.id === id) {
-                if (workspaces.length > 1) {
-                    mainWindow.destroy();
-                }
-                tray = item.tray;
-                workspaces.splice(index, 1);
-                return true;
-            }
-        });
-        if (tray && ("win32" === process.platform || "linux" === process.platform)) {
-            tray.destroy();
-        }
-        if (workspaces.length === 0) {
-            try {
-                if (resetWindowStateOnRestart) {
-                    fs.writeFileSync(windowStatePath, "{}");
-                } else {
-                    const bounds = mainWindow.getBounds();
-                    fs.writeFileSync(windowStatePath, JSON.stringify({
-                        isMaximized: mainWindow.isMaximized(),
-                        fullscreen: mainWindow.isFullScreen(),
-                        isDevToolsOpened: mainWindow.webContents.isDevToolsOpened(),
-                        x: bounds.x,
-                        y: bounds.y,
-                        width: bounds.width,
-                        height: bounds.height,
-                    }));
-                }
-            } catch (e) {
-                writeLog(e);
-            }
-            app.exit();
-            globalShortcut.unregisterAll();
-            writeLog("exited ui");
-        }
+        exitApp("id", id)
     });
     ipcMain.on("siyuan-openwindow", (event, data) => {
         const mainWindow = BrowserWindow.fromId(data.id);
