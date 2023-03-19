@@ -421,7 +421,12 @@ const initKernel = (workspace, port, lang) => {
 
         const kernelName = "win32" === process.platform ? "SiYuan-Sillot-Kernel.exe" : "SiYuan-Sillot-Kernel";
         // const kernelPath = path.join(appDir, "kernel", kernelName);
-    let kernelPath = path.join(appDir,"app", "kernel", kernelName);
+    let kernelPath;
+    if (!isDevEnv) {
+      kernelPath = path.join(appDir, "kernel", kernelName);
+    } else {
+      kernelPath = path.join(appDir,"app", "kernel", kernelName);
+    }
     console.log("debug: $kernelPath = " + kernelPath);
         if (!fs.existsSync(kernelPath)) {
             showErrorWindow("⚠️ 内核文件丢失 Kernel is missing", "<div>内核可执行文件丢失，请重新安装思源，并将思源加入杀毒软件信任列表。</div><div>The kernel binary is not found, please reinstall SiYuan and add SiYuan into the trust list of your antivirus software.</div>");
