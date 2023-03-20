@@ -104,8 +104,9 @@ const renderPDF = (id: string) => {
           position: fixed;
           right: 0;
           top: 0;
-          overflow: auto;
+          overflow-y: auto;
           bottom: 0;
+          overflow-x: hidden;
         }
         
         #preview {
@@ -239,6 +240,8 @@ const renderPDF = (id: string) => {
     const setLineNumberWidth = (element) => {
         // 为保持代码块宽度一致，全部都进行宽度设定 https://github.com/siyuan-note/siyuan/issues/7692 
         previewElement.querySelectorAll('.hljs').forEach((item) => {
+            // 强制换行 https://ld246.com/article/1679228783553
+            item.parentElement.setAttribute("linewrap", "true");
             item.parentElement.style.width = "";
             item.parentElement.style.width = item.parentElement.clientWidth + "px";
             item.removeAttribute('data-render');
@@ -247,6 +250,7 @@ const renderPDF = (id: string) => {
         previewElement.querySelectorAll('[data-type="NodeMathBlock"]').forEach((item) => {
             item.style.width = "";
             item.style.width = item.clientWidth + "px";
+            item.removeAttribute('data-render');
         })
         Protyle.mathRender(previewElement, "${servePath}/stage/protyle", true);
     }

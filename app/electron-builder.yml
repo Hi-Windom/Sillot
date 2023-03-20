@@ -40,6 +40,7 @@ nsis:
   shortcutName: "Sillot"
   license: "../LICENSE"
   include: "nsis/installer.nsh"
+  warningsAsErrors: false
   installerSidebar: "nsis/installerSidebar.bmp"
   uninstallerSidebar: "nsis/uninstallerSidebar.bmp"
 
