@@ -452,6 +452,7 @@ export const zoomOut = (protyle: IProtyle, id: string, focusId?: string, isPushB
             pushBack();
         }
     }
+    /// #if !MOBILE
     if (protyle.breadcrumb) {
         const exitFocusElement = protyle.breadcrumb.element.parentElement.querySelector('[data-type="exit-focus"]');
         if (id === protyle.block.rootID) {
@@ -462,6 +463,7 @@ export const zoomOut = (protyle: IProtyle, id: string, focusId?: string, isPushB
             exitFocusElement.nextElementSibling.classList.remove("fn__none");
         }
     }
+    /// #endif
     fetchPost("/api/filetree/getDoc", {
         id,
         size: id === protyle.block.rootID ? window.siyuan.config.editor.dynamicLoadBlocks : Constants.SIZE_GET_MAX,
