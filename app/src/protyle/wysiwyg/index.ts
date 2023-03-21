@@ -2041,7 +2041,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 focusByRange(range);
             }
 
-            if (ctrlIsPressed) {
+            if (ctrlIsPressed && range.toString() === "") {
                 let ctrlElement = hasClosestBlock(event.target);
                 if (ctrlElement) {
                     ctrlElement = getTopAloneElement(ctrlElement) as HTMLElement;
