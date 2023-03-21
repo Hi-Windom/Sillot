@@ -11,7 +11,6 @@ import {confirmDialog} from "../../dialog/confirmDialog";
 import {getThemeMode, setInlineStyle} from "../../util/assets";
 import {fetchPost} from "../../util/fetch";
 import {Dialog} from "../../dialog";
-import {lockFile} from "../../dialog/processSystem";
 import {pathPosix} from "../../util/pathName";
 import {replaceLocalPath} from "../../editor/rename";
 import {setStorageVal} from "../util/compatibility";
@@ -105,8 +104,9 @@ const renderPDF = (id: string) => {
           position: fixed;
           right: 0;
           top: 0;
-          overflow: auto;
+          overflow-y: auto;
           bottom: 0;
+          overflow-x: hidden;
         }
         
         #preview {
@@ -240,6 +240,8 @@ const renderPDF = (id: string) => {
     const setLineNumberWidth = (element) => {
         // 为保持代码块宽度一致，全部都进行宽度设定 https://github.com/siyuan-note/siyuan/issues/7692 
         previewElement.querySelectorAll('.hljs').forEach((item) => {
+            // 强制换行 https://ld246.com/article/1679228783553
+            item.parentElement.setAttribute("linewrap", "true");
             item.parentElement.style.width = "";
             item.parentElement.style.width = item.parentElement.clientWidth + "px";
             item.removeAttribute('data-render');
@@ -248,6 +250,7 @@ const renderPDF = (id: string) => {
         previewElement.querySelectorAll('[data-type="NodeMathBlock"]').forEach((item) => {
             item.style.width = "";
             item.style.width = item.clientWidth + "px";
+            item.removeAttribute('data-render');
         })
         Protyle.mathRender(previewElement, "${servePath}/stage/protyle", true);
     }
@@ -464,11 +467,6 @@ const getExportPath = (option: { type: string, id: string }, removeAssets?: bool
     fetchPost("/api/block/getBlockInfo", {
         id: option.id
     }, (response) => {
-        if (response.code === 2) {
-            // 文件被锁定
-            lockFile(response.data);
-            return;
-        }
         if (response.code === 3) {
             showMessage(response.msg);
             return;
