@@ -297,6 +297,9 @@ func InitConf() {
 	if 0 > Conf.Editor.BacklinkExpandCount {
 		Conf.Editor.BacklinkExpandCount = 0
 	}
+	if 0> Conf.Editor.BackmentionExpandCount {
+		Conf.Editor.BackmentionExpandCount = 0
+	}
 
 	if nil == Conf.Search {
 		Conf.Search = conf.NewSearch()
@@ -318,11 +321,25 @@ func InitConf() {
 	if nil == Conf.Flashcard {
 		Conf.Flashcard = conf.NewFlashcard()
 	}
+	if 1 > Conf.Flashcard.NewCardLimit {
+		Conf.Flashcard.NewCardLimit = 20
+	}
+	if 1 > Conf.Flashcard.ReviewCardLimit {
+		Conf.Flashcard.ReviewCardLimit = 200
+	}
 
-	// TODO 支持应用内配置人工智能 https://github.com/siyuan-note/siyuan/issues/7714
-	//if nil == Conf.AI {
-	//	Conf.AI = conf.NewAI()
-	//}
+	if nil == Conf.AI {
+		Conf.AI = conf.NewAI()
+	}
+
+	if "" != Conf.AI.OpenAI.APIKey {
+		logging.LogInfof("OpenAI API enabled\n"+
+			"    baseURL=%s\n"+
+			"    timeout=%ds\n"+
+			"    proxy=%s\n"+
+			"    maxTokens=%d",
+			Conf.AI.OpenAI.APIBaseURL, Conf.AI.OpenAI.APITimeout, Conf.AI.OpenAI.APIProxy, Conf.AI.OpenAI.APIMaxTokens)
+	}
 
 	Conf.ReadOnly = util.ReadOnly
 

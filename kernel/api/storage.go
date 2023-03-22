@@ -95,7 +95,7 @@ func getCriteria(c *gin.Context) {
 	ret.Data = data
 }
 
-func removeLocalStorageVal(c *gin.Context) {
+func removeLocalStorageVals(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
@@ -104,8 +104,13 @@ func removeLocalStorageVal(c *gin.Context) {
 		return
 	}
 
-	key := arg["key"].(string)
-	err := model.RemoveLocalStorageVal(key)
+	var keys []string
+	keysArg := arg["keys"].([]interface{})
+	for _, key := range keysArg {
+		keys = append(keys, key.(string))
+	}
+
+	err := model.RemoveLocalStorageVals(keys)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -113,9 +118,9 @@ func removeLocalStorageVal(c *gin.Context) {
 	}
 
 	app := arg["app"].(string)
-	evt := util.NewCmdResult("removeLocalStorageVal", 0, util.PushModeBroadcastMainExcludeSelfApp)
+	evt := util.NewCmdResult("removeLocalStorageVals", 0, util.PushModeBroadcastMainExcludeSelfApp)
 	evt.AppId = app
-	evt.Data = map[string]interface{}{"key": key}
+	evt.Data = map[string]interface{}{"keys": keys}
 	util.PushEvent(evt)
 }
 

@@ -112,9 +112,14 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 	}
 	if 1 != len(unzipRootPaths) {
 		logging.LogErrorf("invalid .sy.zip")
-		return errors.New("invalid .sy.zip")
+		return errors.New(Conf.Language(199))
 	}
 	unzipRootPath := unzipRootPaths[0]
+	name := filepath.Base(unzipRootPath)
+	if strings.HasPrefix(name, "data-20") && len("data-20230321175442") == len(name) {
+		return errors.New(Conf.Language(199))
+	}
+
 	luteEngine := util.NewLute()
 	blockIDs := map[string]string{}
 	trees := map[string]*parse.Tree{}
@@ -422,7 +427,7 @@ func ImportData(zipPath string) (err error) {
 		return errors.New("check data.zip failed")
 	}
 	if 0 < len(files) {
-		return errors.New("invalid data.zip")
+		return errors.New(Conf.Language(198))
 	}
 	dirs, err := os.ReadDir(unzipPath)
 	if nil != err {
@@ -430,7 +435,7 @@ func ImportData(zipPath string) (err error) {
 		return errors.New("check data.zip failed")
 	}
 	if 1 != len(dirs) {
-		return errors.New("invalid data.zip")
+		return errors.New(Conf.Language(198))
 	}
 
 	tmpDataPath := filepath.Join(unzipPath, dirs[0].Name())

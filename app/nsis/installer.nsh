@@ -6,6 +6,10 @@ Caption "${PRODUCT_NAME} ${VERSION}"
     MessageBox mb_iconStop "抱歉，Windows 10 以下系统不受支持"
     Quit
     ${EndIf}
+    MessageBox MB_ICONEXCLAMATION|MB_OKCANCEL "数据无价，请勿在生产环节使用汐洛分支！安装前应当先备份重要文件！是否继续？$\n$\n" IDOK yes2 IDCANCEL no2
+    no2:
+        Quit
+    yes2:
     nsExec::Exec 'TASKKILL /F /IM "Sillot.exe"'
     nsExec::Exec 'TASKKILL /F /IM "SiYuan.exe"'
     nsExec::Exec 'TASKKILL /F /IM "SiYuan-Sillot-Kernel.exe"'
@@ -18,10 +22,6 @@ Caption "${PRODUCT_NAME} ${VERSION}"
             The workspace data $R0 was detected in the installation path, please move the workspace folder to another location and try again.$\n"
         Quit
     ${EndIf}
-    MessageBox MB_ICONEXCLAMATION|MB_OKCANCEL "数据无价，请勿在生产环节使用汐洛分支！安装前应当先备份重要文件！是否继续？$\n$\n" IDOK yes2 IDCANCEL no2
-    no2:
-        Quit
-    yes2:
 !macroend
 
 

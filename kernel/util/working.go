@@ -43,7 +43,7 @@ import (
 var Mode = "prod"
 
 const (
-	Ver       = "2.8.0"
+	Ver       = "2.8.1"
 	IsInsider = true
 )
 
@@ -118,8 +118,6 @@ func Boot() {
 	bootBanner := figure.NewColorFigure("SiYuan", "isometric3", "green", true)
 	logging.LogInfof("\n" + bootBanner.String())
 	logBootInfo()
-
-	initOpenAI()
 }
 
 func setBootDetails(details string) {

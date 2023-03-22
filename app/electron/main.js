@@ -81,9 +81,13 @@ const exitApp = (port, errorWindowId) => {
         try {
             const currentURL = new URL(item.getURL());
             if (port.toString() === currentURL.port.toString()) {
-                if (currentURL.href.indexOf("/stage/build/app/?v=") > -1) {
-                    mainWindow = item;
-                } else {
+                const hasMain = workspaces.find((workspaceItem) => {
+                    if (workspaceItem.browserWindow.id === item.id) {
+                        mainWindow = item
+                        return true;
+                    }
+                })
+                if (!hasMain) {
                     item.destroy();
                 }
             }
@@ -92,7 +96,7 @@ const exitApp = (port, errorWindowId) => {
         }
     });
     workspaces.find((item, index) => {
-        if (mainWindow.id === item.browserWindow.id) {
+        if (mainWindow && mainWindow.id === item.browserWindow.id) {
             if (workspaces.length > 1) {
                 item.browserWindow.destroy();
             }

@@ -1,5 +1,5 @@
-productName: "SiYuan"
-appId: "org.b3log.siyuan"
+productName: "Sillot"
+appId: "sc.windom.sillot"
 asar: false
 compression: "normal"
 copyright: "© 2023 Hi-Windom"

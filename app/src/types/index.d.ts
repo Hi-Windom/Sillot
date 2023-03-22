@@ -308,6 +308,7 @@ declare interface IExport {
     paragraphBeginningSpace: boolean;
     addTitle: boolean;
     addFooter: boolean;
+    markdownYFM: boolean;
 }
 
 declare interface IEditor {
@@ -337,6 +338,7 @@ declare interface IEditor {
     virtualBlockRefInclude: string;
     blockRefDynamicAnchorTextMaxLen: number;
     backlinkExpandCount: number;
+    backmentionExpandCount: number;
 
     emoji: string[];
 }
@@ -393,6 +395,22 @@ declare interface IConfig {
     repo: {
         key: string
     },
+    flashcard: {
+        newCardLimit: number
+        reviewCardLimit: number
+        list: boolean
+        superBlock: boolean
+        deck: boolean
+    }
+    ai: {
+        openAI: {
+            apiBaseURL: string
+            apiKey: string
+            apiMaxTokens: number
+            apiProxy: string
+            apiTimeout: number
+        },
+    }
     sync: {
         generateConflictDoc: boolean
         enabled: boolean

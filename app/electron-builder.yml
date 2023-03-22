@@ -1,8 +1,5 @@
-# productName: "Sillot"
-# appId: "cn.sc.windom.sillot"
-# 改了连不上内核
-productName: "SiYuan"
-appId: "org.b3log.siyuan"
+productName: "Sillot"
+appId: "sc.windom.sillot"
 asar: false
 compression: "normal"
 copyright: "© 2023 Hi-Windom"
