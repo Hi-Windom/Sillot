@@ -13,3 +13,6 @@
 [submodule "app/out"]
 	path = app/out
 	url = https://github.com/Hi-Windom/Sillot-Bridge.git
+[submodule "app/appearance2"]
+	path = app/appearance2
+	url = https://github.com/Hi-Windom/Sillot-appearance.git
