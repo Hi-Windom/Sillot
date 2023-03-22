@@ -1,10 +1,6 @@
 name: Sillot CI/CD
 
 on:
-  workflow_dispatch:
-    push:
-      branches:
-        - master-dev--DISABLE
   push:
     tags:
       - "v*"

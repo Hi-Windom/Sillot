@@ -116,7 +116,7 @@ var (
 )
 
 var (
-	thirdPartySyncCheckTicker = time.NewTicker(time.Minute * 10)
+	thirdPartySyncCheckTicker = time.NewTicker(time.Second * 10)
 )
 
 func ReportFileSysFatalError(err error) {
@@ -246,6 +246,53 @@ func checkFileSysStatus() {
 
 func IsCloudDrivePath(absPath string) bool {
 	absPathLower := strings.ToLower(absPath)
+	if isICloudPath(absPathLower) {
+		return true
+	}
+
 	return strings.Contains(absPathLower, "onedrive") || strings.Contains(absPathLower, "dropbox") ||
 		strings.Contains(absPathLower, "google drive") || strings.Contains(absPathLower, "pcloud")
+}
+
+func isICloudPath(absPath string) bool {
+	if !gulu.OS.IsDarwin() {
+		return false
+	}
+
+	// macOS 端对工作空间放置在 iCloud 路径下做检查 https://github.com/siyuan-note/siyuan/issues/7747
+
+	iCloudRoot := filepath.Join(HomeDir, "Library", "Mobile Documents")
+	err := filepath.Walk(iCloudRoot, func(path string, info os.FileInfo, err error) error {
+		if nil != err {
+			return err
+		}
+
+		if 0 != info.Mode()&os.ModeSymlink && 0 != info.Mode()&os.ModeDir {
+			resolved, symErr := filepath.EvalSymlinks(path)
+			if nil != symErr {
+				logging.LogErrorf("resolve symlink [%s] failed: %s", path, symErr)
+				return nil
+			}
+			filepath.Walk(resolved, func(path string, info os.FileInfo, err error) error {
+				if nil != err {
+					return err
+				}
+
+				if absPath == strings.ToLower(path) {
+					logging.LogInfof("under symlink path: %s", path)
+					return fmt.Errorf("found")
+				}
+
+				return nil
+			})
+		}
+
+		logging.LogInfof("path: %s", path)
+		return nil
+	})
+	if nil != err {
+		logging.LogErrorf("walk iCloud dir [%s] failed: %s", iCloudRoot, err)
+	}
+
+	return false
 }
