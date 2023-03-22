@@ -18,12 +18,10 @@ jobs:
       release_version: ${{ steps.release_info.outputs.release_version }}
       version: ${{ steps.version.outputs.value }}
     steps:
-      - name: Checkout code
+      - name: Checkout repository and submodules
         uses: actions/checkout@v3
-      - name: Checkout submodules
-        uses: srt32/git-actions@v0.0.3
         with:
-          args: git submodule update --init --recursive
+          submodules: recursive
 
       - name: Setup Python
         uses: actions/setup-python@v3
