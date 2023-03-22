@@ -763,22 +763,15 @@ func LoadFlashcards() {
 		}
 	}
 
-	if 1 > len(Decks) {
-		deck, createErr := createDeck("Default Deck")
-		if nil == createErr {
-			Decks[deck.ID] = deck
-		}
-	}
-
 	// 支持基于文档复习闪卡 https://github.com/siyuan-note/siyuan/issues/7057
-	foudBuiltinDeck := false
+	foundBuiltinDeck := false
 	for _, deck := range Decks {
 		if builtinDeckID == deck.ID {
-			foudBuiltinDeck = true
+			foundBuiltinDeck = true
 			break
 		}
 	}
-	if !foudBuiltinDeck {
+	if !foundBuiltinDeck {
 		deck, createErr := createDeck0("Built-in Deck", builtinDeckID)
 		if nil == createErr {
 			Decks[deck.ID] = deck
@@ -915,8 +908,14 @@ func getDeckDueCards(deck *riff.Deck) (ret []riff.Card) {
 		fsrsCard := c.Impl().(*fsrs.Card)
 		if fsrs.New == fsrsCard.State {
 			newCount++
+			if newCount > Conf.Flashcard.NewCardLimit {
+				continue
+			}
 		} else {
 			reviewCount++
+			if reviewCount > Conf.Flashcard.ReviewCardLimit {
+				continue
+			}
 		}
 
 		ret = append(ret, c)

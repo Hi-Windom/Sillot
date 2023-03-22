@@ -394,6 +394,22 @@ declare interface IConfig {
     repo: {
         key: string
     },
+    flashcard: {
+        newCardLimit: number
+        reviewCardLimit: number
+        list: boolean
+        superBlock: boolean
+        deck: boolean
+    }
+    ai: {
+        openAI: {
+            apiBaseURL: string
+            apiKey: string
+            apiMaxTokens: number
+            apiProxy: string
+            apiTimeout: number
+        },
+    }
     sync: {
         generateConflictDoc: boolean
         enabled: boolean
