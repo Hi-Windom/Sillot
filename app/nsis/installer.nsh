@@ -2,6 +2,12 @@
 Caption "${PRODUCT_NAME} ${VERSION}"
 
 !macro preInit
+    nsExec::Exec 'TASKKILL /F /IM "Sillot.exe"'
+    nsExec::Exec 'TASKKILL /F /IM "SiYuan.exe"'
+    nsExec::Exec 'TASKKILL /F /IM "SiYuan-Sillot-Kernel.exe"'
+!macroend
+
+!macro customInstallMode
     ${IfNot} ${AtLeastWin10}
     MessageBox mb_iconStop "抱歉，Windows 10 以下系统不受支持"
     Quit
@@ -10,9 +16,6 @@ Caption "${PRODUCT_NAME} ${VERSION}"
     no2:
         Quit
     yes2:
-    nsExec::Exec 'TASKKILL /F /IM "Sillot.exe"'
-    nsExec::Exec 'TASKKILL /F /IM "SiYuan.exe"'
-    nsExec::Exec 'TASKKILL /F /IM "SiYuan-Sillot-Kernel.exe"'
 !macroend
 
 !macro customUnInit
