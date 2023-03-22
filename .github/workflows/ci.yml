@@ -14,10 +14,8 @@ jobs:
       release_version: ${{ steps.release_info.outputs.release_version }}
       version: ${{ steps.version.outputs.value }}
     steps:
-      - name: Checkout repository and submodules
+      - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          submodules: recursive
 
       - name: Setup Python
         uses: actions/setup-python@v3
@@ -118,8 +116,10 @@ jobs:
             suffix: "win.exe"
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
         with:
+          submodules: recursive
           path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot
 
       - name: Set up MingGW
