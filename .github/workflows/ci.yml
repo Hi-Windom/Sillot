@@ -1,6 +1,10 @@
 name: Sillot CI/CD
 
 on:
+  workflow_dispatch:
+    push:
+      branches:
+        - master-dev--DISABLE
   push:
     tags:
       - "v*"
@@ -16,6 +20,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Checkout submodules
+        uses: srt32/git-actions@v0.0.3
+        with:
+          args: git submodule update --init --recursive
 
       - name: Setup Python
         uses: actions/setup-python@v3
