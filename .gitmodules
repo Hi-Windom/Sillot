@@ -1,6 +1,3 @@
-[submodule "app/appearance"]
-	path = app/appearance
-	url = git@github.com:siyuan-note/appearance.git
 [submodule "app/guide/20210808180117-czj9bvb"]
 	path = app/guide/20210808180117-czj9bvb
 	url = git@github.com:siyuan-note/user-guide-zh_CN.git
