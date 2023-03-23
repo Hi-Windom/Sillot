@@ -703,7 +703,7 @@ func ProcessPDF(id, p string, merge, removeAssets bool) (err error) {
 	processPDFBookmarks(pdfCtx, headings)
 	processPDFLinkEmbedAssets(pdfCtx, assetDests, removeAssets)
 
-	pdfcpu.VersionStr = "SiYuan v" + util.Ver
+	pdfcpu.VersionStr = "Sillot v" + util.Ver
 	if writeErr := api.WriteContextFile(pdfCtx, p); nil != writeErr {
 		logging.LogErrorf("write pdf context failed: %s", writeErr)
 		return
@@ -844,7 +844,7 @@ func processPDFLinkEmbedAssets(pdfCtx *pdfcpu.Context, assetDests []string, remo
 		}
 
 		fn := filepath.Base(absPath)
-		fileSpecDict, newErr := pdfCtx.XRefTable.NewFileSpecDict(fn, pdfcpu.EncodeUTF16String(fn), "attached by SiYuan", *ir)
+		fileSpecDict, newErr := pdfCtx.XRefTable.NewFileSpecDict(fn, pdfcpu.EncodeUTF16String(fn), "attached by Sillot", *ir)
 		if nil != newErr {
 			logging.LogWarnf("new file spec dict failed: %s", newErr)
 			continue
