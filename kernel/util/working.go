@@ -96,7 +96,7 @@ func Boot() {
 	initWorkspaceDir(*workspacePath)
 
 	SSL = *ssl
-	LogPath = filepath.Join(TempDir, "siyuan.log")
+	LogPath = filepath.Join(TempDir, "sillot.log")
 	logging.SetLogPath(LogPath)
 
 	// 工作空间仅允许被一个内核进程伺服
@@ -168,7 +168,7 @@ var (
 	RepoDir        string        // 仓库目录路径
 	HistoryDir     string        // 数据历史目录路径
 	TempDir        string        // 临时目录路径
-	LogPath        string        // 配置目录下的日志文件 siyuan.log 路径
+	LogPath        string        // 配置目录下的日志文件 sillot.log 路径
 	DBName         = "sillot.db" // SQLite 数据库文件名
 	DBPath         string        // SQLite 数据库文件路径
 	HistoryDBPath  string        // SQLite 历史数据库文件路径

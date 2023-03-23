@@ -48,7 +48,7 @@ if (isDevEnv) {
   pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString());
 }
 const appVer = pkg["syv"];
-const confDir = path.join(app.getPath("home"), ".config", "siyuan");
+const confDir = path.join(app.getPath("home"), ".config", "sillot");
 const windowStatePath = path.join(confDir, "windowState.json");
 let bootWindow;
 let firstOpen = false;

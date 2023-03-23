@@ -162,6 +162,6 @@ func initWorkspaceDirMobile(workspaceBaseDir string) {
 	ThemesPath = filepath.Join(AppearancePath, "themes")
 	IconsPath = filepath.Join(AppearancePath, "icons")
 
-	LogPath = filepath.Join(TempDir, "siyuan.log")
+	LogPath = filepath.Join(TempDir, "sillot.log")
 	logging.SetLogPath(LogPath)
 }
