@@ -46,3 +46,20 @@ func GetRhyResult(force bool) (map[string]interface{}, error) {
 	rhyResultCacheTime = now
 	return cachedRhyResult, nil
 }
+
+func GetSillotReleasesResult(force bool) (map[string]interface{}, error) {
+
+	now := time.Now().Unix()
+	if 3600 >= now-rhyResultCacheTime && !force && 0 < len(cachedRhyResult) {
+		return cachedRhyResult, nil
+	}
+
+	request := httpclient.NewCloudRequest30s()
+	_, err := request.SetSuccessResult(&cachedRhyResult).Get("https://api.github.com/repos/Hi-Windom/Sillot/releases/latest")
+	if nil != err {
+		logging.LogErrorf("get version info failed: %s", err)
+		return nil, err
+	}
+	rhyResultCacheTime = now
+	return cachedRhyResult, nil
+}

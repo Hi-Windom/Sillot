@@ -80,7 +80,7 @@ type AppConf struct {
 func InitConf() {
 	initLang()
 
-	windowStateConf := filepath.Join(util.ConfDir, "windowState.json")
+	windowStateConf := filepath.Join(util.ConfDir, "sillot", "windowState.json")
 	if !gulu.File.IsExist(windowStateConf) {
 		if err := gulu.File.WriteFileSafer(windowStateConf, []byte("{}"), 0644); nil != err {
 			logging.LogErrorf("create [windowState.json] failed: %s", err)
@@ -297,7 +297,7 @@ func InitConf() {
 	if 0 > Conf.Editor.BacklinkExpandCount {
 		Conf.Editor.BacklinkExpandCount = 0
 	}
-	if 0> Conf.Editor.BackmentionExpandCount {
+	if 0 > Conf.Editor.BackmentionExpandCount {
 		Conf.Editor.BackmentionExpandCount = 0
 	}
 

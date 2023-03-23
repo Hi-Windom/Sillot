@@ -114,13 +114,16 @@ func checkDownloadInstallPkg() {
 
 func getUpdatePkg() (downloadPkgURLs []string, checksum string, err error) {
 	defer logging.Recover()
-	result, err := util.GetRhyResult(false)
+	result, err := util.GetSillotReleasesResult(false)
 	if nil != err {
 		return
 	}
 
-	ver := result["ver"].(string)
-	if isVersionUpToDate(ver) {
+	// ver := result["ver"].(string)
+	ver := result["tag_name"].(string)
+	_ver := strings.ReplaceAll(ver, "-sillot", "")
+	_ver = strings.ReplaceAll(_ver, "v", "")
+	if isVersionUpToDate(_ver) {
 		return
 	}
 
@@ -136,11 +139,11 @@ func getUpdatePkg() (downloadPkgURLs []string, checksum string, err error) {
 	} else if gulu.OS.IsLinux() {
 		suffix = "linux.AppImage"
 	}
-	pkg := "siyuan-" + ver + "-" + suffix
+	pkg := "/Sillot-" + result["name"].(string) + "-" + suffix
 
-	b3logURL := "https://release.b3log.org/siyuan/" + pkg
-	downloadPkgURLs = append(downloadPkgURLs, b3logURL)
-	githubURL := "https://github.com/siyuan-note/siyuan/releases/download/v" + ver + "/" + pkg
+	// b3logURL := "https://release.b3log.org/siyuan/" + pkg
+	// downloadPkgURLs = append(downloadPkgURLs, b3logURL)
+	githubURL := "https://github.com/Hi-Windom/Sillot/releases/download/" + ver + pkg
 	ghproxyURL := "https://ghproxy.com/" + githubURL
 	downloadPkgURLs = append(downloadPkgURLs, ghproxyURL)
 	downloadPkgURLs = append(downloadPkgURLs, githubURL)
@@ -249,20 +252,24 @@ func CheckUpdate(showMsg bool) {
 		return
 	}
 
-	result, err := util.GetRhyResult(showMsg)
+	result, err := util.GetSillotReleasesResult(showMsg)
 	if nil != err {
 		return
 	}
 
-	ver := result["ver"].(string)
-	release := result["release"].(string)
+	// ver := result["ver"].(string)
+	// release := result["release"].(string)
+	ver := result["tag_name"].(string)
+	_ver := strings.ReplaceAll(ver, "-sillot", "")
+	_ver = strings.ReplaceAll(_ver, "v", "")
+	release := "https://yy-ac.github.io/Hi-Windom/Sillot/release/v" + _ver
 	var msg string
 	var timeout int
-	if isVersionUpToDate(ver) {
-		msg = Conf.Language(10)
+	if isVersionUpToDate(_ver) {
+		msg = fmt.Sprintf(Conf.Language(10), util.Ver)
 		timeout = 3000
 	} else {
-		msg = fmt.Sprintf(Conf.Language(9), "<a href=\""+release+"\">"+release+"</a>")
+		msg = fmt.Sprintf(Conf.Language(9), "<a href=\""+release+"\">"+_ver+"</a>")
 		showMsg = true
 		timeout = 15000
 	}
@@ -279,7 +286,7 @@ func CheckUpdate(showMsg bool) {
 }
 
 func isVersionUpToDate(releaseVer string) bool {
-	return ver2num(releaseVer) <= ver2num(util.Ver)
+	return ver2num(releaseVer) <= ver2num(util.VerC)
 }
 
 func skipNewVerInstallPkg() bool {

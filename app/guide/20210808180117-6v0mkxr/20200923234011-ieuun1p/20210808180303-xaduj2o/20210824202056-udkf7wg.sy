@@ -33,7 +33,7 @@
 			"Children": [
 				{
 					"Type": "NodeText",
-					"Data": "The widget is a static webpage served by SiYuan Kernel. It accesses data through API and renders it through "
+					"Data": "The widget is a static webpage served by SiYuan-Sillot Kernel. It accesses data through API and renders it through "
 				},
 				{
 					"Type": "NodeTextMark",

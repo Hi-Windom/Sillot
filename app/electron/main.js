@@ -37,8 +37,8 @@ const fetch = require("electron-fetch").default;
 process.noAsar = true;
 const appDir = path.dirname(app.getAppPath());
 const isDevEnv = process.env.NODE_ENV === "development";
-// const appVer = app.getVersion();
-const branchVer = app.getVersion();
+const appVer = app.getVersion();
+// const branchVer = app.getVersion();
 try { require("electron-reloader")(module); } catch {}
 
 var pkg = {};
@@ -47,8 +47,8 @@ if (isDevEnv) {
 } else {
   pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString());
 }
-const appVer = pkg["syv"];
-const confDir = path.join(app.getPath("home"), ".config", "siyuan");
+const VerSY = pkg["syv"];
+const confDir = path.join(app.getPath("home"), ".config", "sillot");
 const windowStatePath = path.join(confDir, "windowState.json");
 let bootWindow;
 let firstOpen = false;
@@ -500,7 +500,7 @@ const initKernel = (workspace, port, lang) => {
                     let errorWindowId;
                     switch (code) {
                         case 20:
-                            errorWindowId = showErrorWindow("⚠️ 数据库被锁定 The database is locked", "<div>数据库文件正在被其他进程占用，请检查是否同时存在多个内核进程（SiYuan Kernel）服务相同的工作空间。</div><div>The database file is being occupied by other processes, please check whether there are multiple kernel processes (SiYuan Kernel) serving the same workspace at the same time.</div>");
+                            errorWindowId = showErrorWindow("⚠️ 数据库被锁定 The database is locked", "<div>数据库文件正在被其他进程占用，请检查是否同时存在多个内核进程（SiYuan-Sillot Kernel）服务相同的工作空间。</div><div>The database file is being occupied by other processes, please check whether there are multiple kernel processes (SiYuan-Sillot Kernel) serving the same workspace at the same time.</div>");
                             break;
                         case 21:
                             errorWindowId = showErrorWindow("⚠️ 监听端口 " + currentKernelPort + " 失败 Failed to listen to port " + currentKernelPort, "<div>监听 " + currentKernelPort + " 端口失败，请确保程序拥有网络权限并不受防火墙和杀毒软件阻止。</div><div>Failed to listen to port " + currentKernelPort + ", please make sure the program has network permissions and is not blocked by firewalls and antivirus software.</div>");
@@ -524,7 +524,7 @@ const initKernel = (workspace, port, lang) => {
                         case 0:
                             break;
                         default:
-                            errorWindowId = showErrorWindow("⚠️ 内核因未知原因退出 The kernel exited for unknown reasons", `<div>思源内核因未知原因退出 [code=${code}]，请尝试重启操作系统后再启动思源。如果该问题依然发生，请检查杀毒软件是否阻止思源内核启动。</div><div>SiYuan Kernel exited for unknown reasons [code=${code}], please try to reboot your operating system and then start SiYuan again. If occurs this problem still, please check your anti-virus software whether kill the SiYuan Kernel.</div>`);
+                            errorWindowId = showErrorWindow("⚠️ 内核因未知原因退出 The kernel exited for unknown reasons", `<div>思源内核因未知原因退出 [code=${code}]，请尝试重启操作系统后再启动思源。如果该问题依然发生，请检查杀毒软件是否阻止思源内核启动。</div><div>SiYuan-Sillot Kernel exited for unknown reasons [code=${code}], please try to reboot your operating system and then start SiYuan again. If occurs this problem still, please check your anti-virus software whether kill the SiYuan-Sillot Kernel.</div>`);
                             break;
                     }
 
@@ -567,7 +567,7 @@ const initKernel = (workspace, port, lang) => {
 
         if (0 === apiData.code) {
             writeLog("got kernel version [" + apiData.data + "]");
-            if (!isDevEnv && apiData.data !== appVer) {
+            if (!isDevEnv &&  !appVer.startsWith(apiData.data)) {
                 writeLog(`kernel [${apiData.data}] is running, shutdown it now and then start kernel [${appVer}]`);
                 new Notification({
                     title:"版本不一致",

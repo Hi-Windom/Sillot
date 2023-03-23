@@ -126,8 +126,8 @@ export const initFramework = () => {
             }, Constants.TIMEOUT_INPUT);
         }, Constants.TIMEOUT_INPUT);
     }
-    document.getElementById("modelClose").addEventListener(getEventName(), () => {
-        closePanel();
+    document.getElementById("modelClose").addEventListener("click", () => {
+        document.getElementById("model").style.top = "-200vh";
     });
     initEditorName();
     if (getOpenNotebookCount() > 0) {

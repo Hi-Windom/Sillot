@@ -62,7 +62,7 @@ def find_milestone(repo, title):
     print('''
 ---
 ⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
-❤️ 欢迎共建思源笔记汐洛分支 694357845@qq.com
+❤️ 欢迎共建汐洛 694357845@qq.com
 🚧 [Sillot is currently in active development](https://github.com/orgs/Hi-Windom/projects/2/views/2)
 
 🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)  📱 [Android application package](https://github.com/Hi-Windom/Sillot-android/releases)
@@ -72,12 +72,6 @@ def find_milestone(repo, title):
 --
 🌏 与绛亽新时代智慧彖乄一同见证全球开源力量
 --
-
-#### 使用微信赞赏帮助我们更好维护项目
-
-<p>
-<img src="https://github.com/Soltus/Soltus/blob/69b6ef7de274bcb69ec1783cdf3ab46dfb6ef9ec/src/images/sponser-weixin.jpg"/>
-</p>
 
 > 列出并不代表在海文东项目中实际应用，请以项目开源声明为准
 

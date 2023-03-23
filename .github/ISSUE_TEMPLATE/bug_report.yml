@@ -73,8 +73,8 @@ body:
     attributes:
       label: 日志文件 Log file
       description: |
-        请提供内核日志 `工作空间/temp/siyuan.log`
-        The program log file is located at `workspace/temp/siyuan.log`
+        请提供内核日志 `工作空间/temp/sillot.log`
+        The program log file is located at `workspace/temp/sillot.log`
     validations:
       required: false
   - type: textarea
