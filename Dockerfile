@@ -1,7 +1,7 @@
 FROM node:18 as NODE_BUILD
 WORKDIR /go/src/github.com/Hi-Windom/Sillot/
 ADD . /go/src/github.com/Hi-Windom/Sillot/
-RUN cd app && npm install -g pnpm && pnpm install --registry=http://registry.npmjs.org/ --silent && pnpm run build
+RUN cd app && npm install -g pnpm && pnpm install --registry=http://registry.npmjs.org/ --silent && pnpm run docker:build
 
 FROM golang:alpine as GO_BUILD
 WORKDIR /go/src/github.com/Hi-Windom/Sillot/
@@ -22,11 +22,11 @@ LABEL maintainer="Liang Ding<845765@qq.com> Soltus<694357845@qq.ocm>"
 
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
-RUN addgroup --gid 1000 siyuan && adduser --uid 1000 --ingroup siyuan --disabled-password siyuan && apk add --no-cache ca-certificates tzdata && chown -R siyuan:siyuan /opt/Sillot/
+RUN addgroup --gid 1000 sillot && adduser --uid 1000 --ingroup sillot --disabled-password sillot && apk add --no-cache ca-certificates tzdata && chown -R sillot:sillot /opt/Sillot/
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
 EXPOSE 58131
 
-USER siyuan
+USER sillot
 ENTRYPOINT [ "/opt/Sillot/kernel" ]
