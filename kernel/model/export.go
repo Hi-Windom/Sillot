@@ -174,9 +174,9 @@ func ExportSystemLog() (zipPath string) {
 			logging.LogErrorf("copy app log from [%s] to [%s] failed: %s", err, appLog, to)
 		}
 	}
-	kernelLog := filepath.Join(util.TempDir, "sillot.log")
+	kernelLog := filepath.Join(util.TempDir, "sillot.siyuan.log")
 	if gulu.File.IsExist(kernelLog) {
-		to := filepath.Join(exportFolder, "sillot.log")
+		to := filepath.Join(exportFolder, "sillot.siyuan.log")
 		if err := gulu.File.CopyFile(kernelLog, to); nil != err {
 			logging.LogErrorf("copy kernel log from [%s] to [%s] failed: %s", err, kernelLog, to)
 		}
