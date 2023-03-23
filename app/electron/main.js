@@ -670,7 +670,7 @@ app.whenReady().then(() => {
             },
         }, {
             label: lang.officialWebsite, click: () => {
-                shell.openExternal("https://b3log.org/siyuan/");
+                shell.openExternal("https://yy-ac.github.io/Hi-Windom/Sillot/");
             },
         }, {
             label: lang.openSource, click: () => {
