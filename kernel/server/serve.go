@@ -193,6 +193,11 @@ func serveAppearance(ginServer *gin.Engine) {
 			return
 		}
 
+		if util.ContainerDocker == util.Container {
+			c.Redirect(302, "/stage/build/docker/?b=Sillot&r="+gulu.Rand.String(7))
+			return
+		}
+
 		c.Redirect(302, "/stage/build/desktop/?b=Sillot&r="+gulu.Rand.String(7))
 	})
 
