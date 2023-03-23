@@ -70,7 +70,7 @@ export const about = {
     </button>
 </label>
 ${
-    isAppMode() ? `<label class="b3-label fn__flex config__item">
+    isAppMode(true) ? `<label class="b3-label fn__flex config__item">
 <div class="fn__flex-1">
     ${window.siyuan.languages.about5}
     <div class="b3-label__text">${window.siyuan.languages.about6}</div>
@@ -221,7 +221,7 @@ ${
             });
         });
         /// #endif
-        if(isAppMode()) {
+        if(isAppMode(true)) {
             about.element.querySelector("#authCode").addEventListener("click", () => {
                 setAccessAuthCode();
             });

@@ -199,7 +199,7 @@ export const editor = {
 <label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.historyRetentionDays} 
-        ${isAppMode() ? `<a href="javascript:void(0)" id="clearHistory">${window.siyuan.languages.clearHistory}</a>` : ""}
+        ${isAppMode(true) ? `<a href="javascript:void(0)" id="clearHistory">${window.siyuan.languages.clearHistory}</a>` : ""}
         <div class="b3-label__text">${window.siyuan.languages.historyRetentionDaysTip}</div>
     </div>
     <span class="fn__space"></span>
@@ -253,7 +253,7 @@ export const editor = {
                 fontFamilyElement.innerHTML = fontFamilyHTML;
             });
         }
-        isAppMode() ? editor.element.querySelector("#clearHistory").addEventListener("click", () => {
+        isAppMode(true) ? editor.element.querySelector("#clearHistory").addEventListener("click", () => {
             confirmDialog(window.siyuan.languages.clearHistory, window.siyuan.languages.confirmClearHistory, () => {
                 fetchPost("/api/history/clearWorkspaceHistory", {});
             });
