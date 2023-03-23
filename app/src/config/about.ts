@@ -33,7 +33,7 @@ export const about = {
     <div class="fn__space"></div>
     <input class="b3-switch fn__flex-center" id="downloadInstallPkg" type="checkbox"${window.siyuan.config.system.downloadInstallPkg ? " checked" : ""}>
 </label>
-<label class="b3-label fn__flex">
+<label class="b3-label fn__flex fn__none">
     <div class="fn__flex-1">
         ${window.siyuan.languages.googleAnalytics}
         <div class="b3-label__text">${window.siyuan.languages.googleAnalyticsTip}</div>
