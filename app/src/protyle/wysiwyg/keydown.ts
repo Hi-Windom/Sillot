@@ -10,7 +10,7 @@ import {
 } from "../util/selection";
 import {
     hasClosestBlock,
-    hasClosestByAttribute, hasClosestByClassName,
+    hasClosestByAttribute,
     hasClosestByMatchTag,
     hasTopClosestByAttribute
 } from "../util/hasClosest";
@@ -1008,7 +1008,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                 selectElement.push(item);
             });
             if (selectElement.length === 0) {
-                selectElement.push(nodeElement)
+                selectElement.push(nodeElement);
             }
             quickMakeCard(selectElement);
             event.preventDefault();
