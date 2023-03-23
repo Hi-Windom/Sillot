@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.11.11",
+  "version": "0.11.12",
   "syv": "2.8.1",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
@@ -123,7 +123,7 @@
     "react-monaco-editor": "^0.52.0",
     "react-spinners": "^0.13.8",
     "react-toastify": "^9.1.2",
-    "rollup": "^3.20.0",
+    "rollup": "^3.20.1",
     "rollup-plugin-import-css": "^3.2.1",
     "rollup-plugin-postcss": "^4.0.2",
     "rome": "^11.0.0",
