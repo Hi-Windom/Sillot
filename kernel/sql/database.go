@@ -1206,7 +1206,7 @@ func execStmtTx(tx *sql.Tx, stmt string, args ...interface{}) (err error) {
 			tx.Rollback()
 			closeDatabase()
 			removeDatabaseFile()
-			logging.LogFatalf(logging.ExitCodeReadOnlyDatabase, "database disk image [%s] is malformed, please restart SiYuan kernel to rebuild it", util.DBPath)
+			logging.LogFatalf(logging.ExitCodeReadOnlyDatabase, "database disk image [%s] is malformed, please restart SiYuan-Sillot Kernel to rebuild it", util.DBPath)
 		}
 		logging.LogErrorf("exec database stmt [%s] failed: %s\n  %s", stmt, err, logging.ShortStack())
 		return
