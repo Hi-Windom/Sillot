@@ -160,14 +160,16 @@ ${isAppMode() ? `<label class="b3-label fn__flex config__item">
     <span class="fn__space"></span>
     <input class="b3-switch fn__flex-center" id="hideStatusBar" type="checkbox"${window.siyuan.config.appearance.hideStatusBar ? " checked" : ""}>
 </label>
-<label class="fn__flex b3-label">
+${
+    isAppMode() ? `<label class="fn__flex b3-label">
     <div class="fn__flex-1">
         ${window.siyuan.languages.appearance10}
         <div class="b3-label__text">${window.siyuan.languages.appearance11}</div>
     </div>
     <span class="fn__space"></span>
     <input class="b3-switch fn__flex-center" id="closeButtonBehavior" type="checkbox"${window.siyuan.config.appearance.closeButtonBehavior === 0 ? "" : " checked"}>
-</label>`;
+</label>` : ""
+}`;
     },
     _send: () => {
         const themeLight = (appearance.element.querySelector("#themeLight") as HTMLSelectElement).value;

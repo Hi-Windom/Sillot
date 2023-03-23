@@ -5,6 +5,7 @@ import {confirmDialog} from "../dialog/confirmDialog";
 import {setPadding} from "../protyle/ui/initUI";
 import {reloadProtyle} from "../protyle/util/reload";
 import {updateHotkeyTip} from "../protyle/util/compatibility";
+import {isAppMode} from "sofill/env"
 
 export const editor = {
     element: undefined as Element,
@@ -198,7 +199,7 @@ export const editor = {
 <label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.historyRetentionDays} 
-        <a href="javascript:void(0)" id="clearHistory">${window.siyuan.languages.clearHistory}</a>
+        ${isAppMode() ? `<a href="javascript:void(0)" id="clearHistory">${window.siyuan.languages.clearHistory}</a>` : ""}
         <div class="b3-label__text">${window.siyuan.languages.historyRetentionDaysTip}</div>
     </div>
     <span class="fn__space"></span>
@@ -252,11 +253,11 @@ export const editor = {
                 fontFamilyElement.innerHTML = fontFamilyHTML;
             });
         }
-        editor.element.querySelector("#clearHistory").addEventListener("click", () => {
+        isAppMode() ? editor.element.querySelector("#clearHistory").addEventListener("click", () => {
             confirmDialog(window.siyuan.languages.clearHistory, window.siyuan.languages.confirmClearHistory, () => {
                 fetchPost("/api/history/clearWorkspaceHistory", {});
             });
-        });
+        }) : null;
 
         const setEditor = () => {
             let dynamicLoadBlocks = parseInt((editor.element.querySelector("#dynamicLoadBlocks") as HTMLInputElement).value);
