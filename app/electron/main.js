@@ -37,8 +37,8 @@ const fetch = require("electron-fetch").default;
 process.noAsar = true;
 const appDir = path.dirname(app.getAppPath());
 const isDevEnv = process.env.NODE_ENV === "development";
-// const appVer = app.getVersion();
-const branchVer = app.getVersion();
+const appVer = app.getVersion();
+// const branchVer = app.getVersion();
 try { require("electron-reloader")(module); } catch {}
 
 var pkg = {};
@@ -47,7 +47,7 @@ if (isDevEnv) {
 } else {
   pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString());
 }
-const appVer = pkg["syv"];
+const VerSY = pkg["syv"];
 const confDir = path.join(app.getPath("home"), ".config", "sillot");
 const windowStatePath = path.join(confDir, "windowState.json");
 let bootWindow;
@@ -567,7 +567,7 @@ const initKernel = (workspace, port, lang) => {
 
         if (0 === apiData.code) {
             writeLog("got kernel version [" + apiData.data + "]");
-            if (!isDevEnv && apiData.data !== appVer) {
+            if (!isDevEnv &&  !appVer.startsWith(apiData.data)) {
                 writeLog(`kernel [${apiData.data}] is running, shutdown it now and then start kernel [${appVer}]`);
                 new Notification({
                     title:"版本不一致",
