@@ -11,6 +11,7 @@ import {openSnippets} from "./util/snippets";
 import {openColorPicker} from "./util/colorPicker";
 import {loadAssets} from "../util/assets";
 import {resetFloatDockSize} from "../layout/dock/util";
+import {isAppMode} from "sofill/env"
 
 export const appearance = {
     element: undefined as Element,
@@ -118,15 +119,15 @@ export const appearance = {
         <svg><use xlink:href="#iconUndo"></use></svg>${window.siyuan.languages.reset}
     </button>
 </label>
-<label class="b3-label fn__flex config__item">
-    <div class="fn__flex-1 fn__flex-center">
-        ${window.siyuan.languages.codeSnippet}
-    </div>
-    <span class="fn__space"></span>
-    <button class="b3-button b3-button--outline fn__flex-center fn__size200" id="codeSnippet">
-        <svg><use xlink:href="#iconSettings"></use></svg>${window.siyuan.languages.config}
-    </button>
-</label>
+${isAppMode() ? `<label class="b3-label fn__flex config__item">
+<div class="fn__flex-1 fn__flex-center">
+    ${window.siyuan.languages.codeSnippet}
+</div>
+<span class="fn__space"></span>
+<button class="b3-button b3-button--outline fn__flex-center fn__size200" id="codeSnippet">
+    <svg><use xlink:href="#iconSettings"></use></svg>${window.siyuan.languages.config}
+</button>
+</label>` : ""}
 <label class="b3-label fn__flex config__item">
     <div class="fn__flex-1 fn__flex-center">
         ${window.siyuan.languages.theme13} 
@@ -216,9 +217,9 @@ export const appearance = {
         });
     },
     bindEvent: () => {
-        appearance.element.querySelector("#codeSnippet").addEventListener("click", () => {
+        isAppMode() ? appearance.element.querySelector("#codeSnippet").addEventListener("click", () => {
             openSnippets();
-        });
+        }) : null;
         appearance.element.querySelector("#appearanceCustomSetting").addEventListener("click", () => {
             openColorPicker();
         });
