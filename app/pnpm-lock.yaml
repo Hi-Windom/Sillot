@@ -66,7 +66,7 @@ specifiers:
   monaco-editor-webpack-plugin: ^7.0.1
   npm-check: ^6.0.1
   path-browserify: ^1.0.1
-  pnpm: 7.30.0
+  pnpm: 7.30.1
   postcss: ^8.4.21
   react: 18.2.0
   react-dom: 18.2.0
@@ -83,7 +83,7 @@ specifiers:
   sass: ^1.59.3
   sass-loader: ^13.2.1
   socket.io: ^4.6.1
-  sofill: ^1.0.53
+  sofill: ^1.0.54
   sout: ^1.0.6
   style-loader: ^3.3.2
   sweetalert2: ^11.7.3
@@ -162,7 +162,7 @@ devDependencies:
   monaco-editor-webpack-plugin: 7.0.1_uiyiuy2gnd5c75fjb2ce5b3kea
   npm-check: 6.0.1
   path-browserify: registry.npmmirror.com/path-browserify/1.0.1
-  pnpm: 7.30.0
+  pnpm: 7.30.1
   postcss: 8.4.21
   react: registry.npmmirror.com/react/18.2.0
   react-dom: registry.npmmirror.com/react-dom/18.2.0_react@18.2.0
@@ -179,7 +179,7 @@ devDependencies:
   sass: 1.59.3
   sass-loader: 13.2.1_sass@1.59.3+webpack@5.76.3
   socket.io: 4.6.1
-  sofill: 1.0.53_typescript@5.0.2
+  sofill: 1.0.54_typescript@5.0.2
   sout: 1.0.6
   style-loader: 3.3.2_webpack@5.76.3
   sweetalert2: 11.7.3
@@ -5788,8 +5788,8 @@ packages:
       xmlbuilder: 15.1.1
     dev: true
 
-  /pnpm/7.30.0:
-    resolution: {integrity: sha512-6SUdrWSZ4qvQ4uBVg7smnabVKOFrT7DgSz2NfViG54nRii4ODB395qmHprBiv5WBdlC/jZYBn99fSfmzIMI3WQ==}
+  /pnpm/7.30.1:
+    resolution: {integrity: sha512-ThkXKxTUIUd7HhXkwQ+zl3dSU1xPdf7cA9Khthm4GuUJDkM2KJOCBXqlzoHQepXD0i7GbURXAx+WKQ/m6taBrQ==}
     engines: {node: '>=14.6'}
     hasBin: true
     dev: true
@@ -6764,8 +6764,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /sofill/1.0.53_typescript@5.0.2:
-    resolution: {integrity: sha512-uu9BDGklvpfLjbhCJ8lxoxkXtrItMWdcqk5cTM4xeJGqN31e+iWRRj3HVpJfcuRK/1J+sVoAtnTkCe3KHJAp/Q==}
+  /sofill/1.0.54_typescript@5.0.2:
+    resolution: {integrity: sha512-0rjYw8E00bBw5bxfzc7NCn/FmJTbtBwtvLCxbYbeu2zehv6q152Su0FfPq0Ufd/c8SLu0qOGm1TCOVuzfCaOKQ==}
     peerDependencies:
       '@sillot/bridge': ^0.0.3
       localforage: ^1.10.0
