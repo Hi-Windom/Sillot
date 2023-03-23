@@ -38,7 +38,8 @@ func GetRhyResult(force bool) (map[string]interface{}, error) {
 	}
 
 	request := httpclient.NewCloudRequest30s()
-	_, err := request.SetSuccessResult(&cachedRhyResult).Get(AliyunServer + "/apis/siyuan/version?ver=" + Ver)
+	// _, err := request.SetSuccessResult(&cachedRhyResult).Get(AliyunServer + "/apis/siyuan/version?ver=" + Ver)
+	_, err := request.SetSuccessResult(&cachedRhyResult).Get("https://api.github.com/repos/Hi-Windom/Sillot/releases/latest")
 	if nil != err {
 		logging.LogErrorf("get version info failed: %s", err)
 		return nil, err

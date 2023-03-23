@@ -119,7 +119,8 @@ func getUpdatePkg() (downloadPkgURLs []string, checksum string, err error) {
 		return
 	}
 
-	ver := result["ver"].(string)
+	// ver := result["ver"].(string)
+	ver := result["tag_name"].(string)
 	if isVersionUpToDate(ver) {
 		return
 	}
@@ -136,11 +137,11 @@ func getUpdatePkg() (downloadPkgURLs []string, checksum string, err error) {
 	} else if gulu.OS.IsLinux() {
 		suffix = "linux.AppImage"
 	}
-	pkg := "siyuan-" + ver + "-" + suffix
+	pkg := "Sillot-" + result["name"].(string) + "-" + suffix
 
-	b3logURL := "https://release.b3log.org/siyuan/" + pkg
-	downloadPkgURLs = append(downloadPkgURLs, b3logURL)
-	githubURL := "https://github.com/siyuan-note/siyuan/releases/download/v" + ver + "/" + pkg
+	// b3logURL := "https://release.b3log.org/siyuan/" + pkg
+	// downloadPkgURLs = append(downloadPkgURLs, b3logURL)
+	githubURL := "https://github.com/Hi-Windom/Sillot/releases/download/v" + ver + "/" + pkg
 	ghproxyURL := "https://ghproxy.com/" + githubURL
 	downloadPkgURLs = append(downloadPkgURLs, ghproxyURL)
 	downloadPkgURLs = append(downloadPkgURLs, githubURL)
@@ -254,15 +255,18 @@ func CheckUpdate(showMsg bool) {
 		return
 	}
 
-	ver := result["ver"].(string)
-	release := result["release"].(string)
+	// ver := result["ver"].(string)
+	// release := result["release"].(string)
+	ver := result["tag_name"].(string)
+	_ver := strings.ReplaceAll(ver, "-sillot", "")
+	release := "https://yy-ac.github.io/Hi-Windom/Sillot/release/v" + _ver
 	var msg string
 	var timeout int
 	if isVersionUpToDate(ver) {
 		msg = Conf.Language(10)
 		timeout = 3000
 	} else {
-		msg = fmt.Sprintf(Conf.Language(9), "<a href=\""+release+"\">"+release+"</a>")
+		msg = fmt.Sprintf(Conf.Language(9), "<a href=\""+release+"\">"+ver+"</a>")
 		showMsg = true
 		timeout = 15000
 	}
@@ -324,7 +328,7 @@ func ver2num(a string) int {
 		if i < len(split) {
 			tmp = split[i]
 		} else {
-			tmp = "0"
+			tmp = "999" // 0.11 => 0.11.999
 		}
 		verArr = append(verArr, fmt.Sprintf("%04s", tmp))
 	}
