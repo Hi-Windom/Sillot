@@ -13,6 +13,8 @@
     "dev:desktop": "webpack --mode development --config webpack.desktop.js",
     "dev:export": "webpack --mode development --config webpack.export.js",
     "build": "pnpm run '/build:.*/'",
+    "docker:build": "pnpm run build:mobile && pnpm run build-docker",
+    "build-docker": "webpack --mode production --config webpack.docker.js",
     "build:app": "webpack --mode production",
     "build:mobile": "webpack --mode production --config webpack.mobile.js",
     "build:desktop": "webpack --mode production --config webpack.desktop.js",
