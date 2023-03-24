@@ -115,6 +115,7 @@ func Boot() {
 	}
 
 	initPathDir()
+	go initDeno()
 	go initPandoc()
 	go initTesseract()
 
@@ -177,6 +178,7 @@ var (
 	HistoryDBPath  string        // SQLite 历史数据库文件路径
 	BlockTreePath  string        // 区块树文件路径
 	PandocBinPath  string        // Pandoc 可执行文件路径
+	DenoBinPath    string        // Deno 可执行文件路径
 	AppearancePath string        // 配置目录下的外观目录 appearance/ 路径
 	ThemesPath     string        // 配置目录下的外观目录下的 themes/ 路径
 	IconsPath      string        // 配置目录下的外观目录下的 icons/ 路径
@@ -419,6 +421,45 @@ func initPandoc() {
 	logging.LogInfof("initialized built-in pandoc [ver=%s, bin=%s]", pandocVer, PandocBinPath)
 }
 
+func initDeno() {
+	if ContainerStd != Container || !gulu.OS.IsWindows() { // deno 支持跨平台，暂不集成非 win 平台的原因是缺少额外开发者维护
+		return
+	}
+
+	denoDir := filepath.Join(TempDir, "deno")
+	if gulu.OS.IsWindows() {
+		DenoBinPath = filepath.Join(denoDir, "deno.exe")
+	} else if gulu.OS.IsDarwin() || gulu.OS.IsLinux() {
+		DenoBinPath = filepath.Join(denoDir, "deno")
+	}
+	denoVer := getDenoVer(DenoBinPath)
+	if "" != denoVer {
+		logging.LogInfof("built-in deno [ver=%s, bin=%s]", denoVer, DenoBinPath)
+		return
+	}
+
+	denoZip := filepath.Join(WorkingDir, "deno.zip")
+	if "dev" == Mode || !gulu.File.IsExist(denoZip) {
+		if gulu.OS.IsWindows() {
+			denoZip = filepath.Join(WorkingDir, "apps/deno/deno-x86_64-pc-windows-msvc.zip")
+		} else if gulu.OS.IsDarwin() {
+			denoZip = filepath.Join(WorkingDir, "")
+		} else if gulu.OS.IsLinux() {
+			denoZip = filepath.Join(WorkingDir, "")
+		}
+	}
+	if err := gulu.Zip.Unzip(denoZip, denoDir); nil != err {
+		logging.LogErrorf("unzip deno failed: %s", err)
+		return
+	}
+
+	if gulu.OS.IsDarwin() || gulu.OS.IsLinux() {
+		exec.Command("chmod", "+x", DenoBinPath).CombinedOutput()
+	}
+	denoVer = getDenoVer(DenoBinPath)
+	logging.LogInfof("initialized built-in deno [ver=%s, bin=%s]", denoVer, DenoBinPath)
+}
+
 func getPandocVer(binPath string) (ret string) {
 	if "" == binPath {
 		return
@@ -431,6 +472,26 @@ func getPandocVer(binPath string) (ret string) {
 		parts := bytes.Split(data, []byte("\n"))
 		if 0 < len(parts) {
 			ret = strings.TrimPrefix(string(parts[0]), "pandoc")
+			ret = strings.ReplaceAll(ret, ".exe", "")
+			ret = strings.TrimSpace(ret)
+		}
+		return
+	}
+	return
+}
+
+func getDenoVer(binPath string) (ret string) {
+	if "" == binPath {
+		return
+	}
+
+	cmd := exec.Command(binPath, "--version")
+	gulu.CmdAttr(cmd)
+	data, err := cmd.CombinedOutput()
+	if nil == err && strings.HasPrefix(string(data), "deno") {
+		parts := bytes.Split(data, []byte("\n"))
+		if 0 < len(parts) {
+			ret = strings.TrimPrefix(string(parts[0]), "deno")
 			ret = strings.ReplaceAll(ret, ".exe", "")
 			ret = strings.TrimSpace(ret)
 		}

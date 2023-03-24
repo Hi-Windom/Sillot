@@ -37,6 +37,7 @@ import {transferBlockRef} from "../../menus/block";
 import {openCardByData} from "../../card/openCard";
 import {makeCard, quickMakeCard} from "../../card/makeCard";
 import {viewCards} from "../../card/viewCards";
+import {getNotebookName, pathPosix} from "../../util/pathName";
 
 export class Title {
     public element: HTMLElement;
@@ -380,7 +381,11 @@ export class Title {
                     iconHTML: Constants.ZWSP,
                     label: window.siyuan.languages.mgmt,
                     click: () => {
-                        viewCards(protyle.block.rootID, escapeHtml(this.editElement.textContent), "Tree");
+                        fetchPost("/api/filetree/getHPathByID", {
+                            id: protyle.block.rootID
+                        }, (response) => {
+                            viewCards(protyle.block.rootID, pathPosix().join(getNotebookName(protyle.notebookId), (response.data)), "Tree");
+                        });
                     }
                 }, {
                     iconHTML: Constants.ZWSP,
