@@ -1,6 +1,10 @@
 on:
-  release:
-    types: [published]
+  workflow_run:
+      workflows: ["Sillot CI/CD"]
+      types:
+        - completed
+  # release:
+  #   types: [published]
     # https://docs.github.com/zh/actions/using-workflows/events-that-trigger-workflows#release
 jobs:
   genHASH:
