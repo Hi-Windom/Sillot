@@ -1,9 +1,10 @@
 name: Sillot CI/CD
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_run:
+      workflows: ["Codecov"]
+      types:
+        - completed
 
 jobs:
   create_release:
