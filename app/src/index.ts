@@ -105,7 +105,7 @@ class App {
                                 downloadProgress(data.data);
                                 break;
                             case "txerr":
-                                transactionError(data);
+                                transactionError();
                                 break;
                             case "syncing":
                                 processSync(data);
