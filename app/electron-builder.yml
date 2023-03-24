@@ -73,3 +73,5 @@ extraResources:
     filter: "!**/{.DS_Store,custom.css}"
   - from: "pandoc/pandoc-windows-amd64.zip"
     to: "pandoc.zip"
+  - from: "apps/deno/deno-x86_64-pc-windows-msvc.zip"
+    to: "deno.zip"
