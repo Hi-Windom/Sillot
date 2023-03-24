@@ -1,6 +1,7 @@
 on:
   release:
     types: [published]
+    # https://docs.github.com/zh/actions/using-workflows/events-that-trigger-workflows#release
 jobs:
   genHASH:
     name: Create hash for release
@@ -10,6 +11,7 @@ jobs:
         with:
           hash-type: md5
           file-name: hashes-md5.txt
+          get-assets: true # This is useful if previous jobs in a workflow upload assets, as GitHub's list will not include them
       - uses: actions/upload-artifact@v2
         with:
           name: Asset Hashes
