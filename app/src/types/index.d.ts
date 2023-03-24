@@ -610,6 +610,7 @@ declare interface IBlockTree {
 }
 
 declare interface IBlock {
+    riffCardReps? :number   // 闪卡复习次数
     depth?: number,
     box?: string;
     path?: string;
