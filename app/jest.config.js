@@ -13,5 +13,7 @@ module.exports = {
   "globals": {
     "window": {}
   },
-  coverageDirectory: "<rootDir>/jestCD"
+  coverageDirectory: "<rootDir>/jestCD",
+  collectCoverage: true,
+    coverageReporters: ['text', 'cobertura'],
 };

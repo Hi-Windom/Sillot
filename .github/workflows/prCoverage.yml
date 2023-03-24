@@ -8,5 +8,19 @@ jobs:
   check-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Upload coverage reports to Codecov
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up Node 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install Node pnpm
+        run: npm install -g pnpm
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run tests and collect coverage
+        run: pnpm run test
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
