@@ -1,8 +1,11 @@
-name: Codecov for PRs
+name: Codecov
 
 on:
-  pull_request_target:
-    types: [opened, edited]
+  push:
+    tags:
+      - "v*"
+  # pull_request_target:
+  #   types: [opened, edited]
 
 jobs:
   check-branch:
