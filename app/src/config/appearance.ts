@@ -188,7 +188,7 @@ ${
             icons: window.siyuan.config.appearance.icons,
             lang: (appearance.element.querySelector("#lang") as HTMLSelectElement).value,
             customCSS: (appearance.element.querySelector("#appearanceCustom") as HTMLInputElement).checked,
-            closeButtonBehavior: (appearance.element.querySelector("#closeButtonBehavior") as HTMLInputElement).checked ? 1 : 0,
+            closeButtonBehavior: isAppMode() ? (appearance.element.querySelector("#closeButtonBehavior") as HTMLInputElement).checked ? 1 : 0 : 0,
             nativeEmoji: (appearance.element.querySelector("#nativeEmoji") as HTMLInputElement).checked,
             hideStatusBar: (appearance.element.querySelector("#hideStatusBar") as HTMLInputElement).checked,
         }, response => {
