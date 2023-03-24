@@ -3,7 +3,7 @@ const webpack = require("webpack");
 const pkg = require("./package.json");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 // const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const { EsbuildPlugin } = require("esbuild-loader");
 
@@ -19,7 +19,7 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, "stage/build/docker"),
     },
     entry: {
-      "main": "./src/index.ts",
+      main: "./src/index.ts",
     },
     optimization: {
       splitChunks: {
@@ -37,7 +37,7 @@ module.exports = (env, argv) => {
     },
     resolve: {
       fallback: {
-        "path": require.resolve("path-browserify"),
+        path: require.resolve("path-browserify"),
       },
       extensions: [".ts", ".js", ".jsx", ".tsx", ".tpl", ".scss", ".json"],
     },
@@ -46,7 +46,8 @@ module.exports = (env, argv) => {
         {
           test: /\.tpl/,
           include: [
-            path.resolve(__dirname, "src/assets/template/docker/index.tpl")],
+            path.resolve(__dirname, "src/assets/template/docker/index.tpl"),
+          ],
           loader: "html-loader",
           options: {
             sources: false,
@@ -98,8 +99,8 @@ module.exports = (env, argv) => {
             {
               loader: MiniCssExtractPlugin.loader,
               options: {
-                publicPath: "../../"
-              }
+                publicPath: "../../",
+              },
             },
             {
               loader: "css-loader", // translates CSS into CommonJS
@@ -110,36 +111,37 @@ module.exports = (env, argv) => {
           ],
         },
         {
-          test:/\.css$/,
+          test: /\.css$/,
           use: [
             {
-              loader: "style-loader"
+              loader: "style-loader",
             },
             {
-              loader: "css-loader"
-            }
-          ]
+              loader: "css-loader",
+            },
+          ],
         },
         {
           test: /\.[jt]sx$/,
           exclude: /node_modules/,
-          use: [{
+          use: [
+            {
               loader: "babel-loader",
               options: {
-                  presets: ["@babel/preset-react", "@babel/preset-typescript"],
-                  plugins: [
-                      "@babel/plugin-transform-runtime",
-                  ]
-              }
-          },
-          {
-            loader: "ifdef-loader", options: {
-              "ifdef-verbose": false,
-              BROWSER: true,
-              MOBILE: false,
+                presets: ["@babel/preset-react", "@babel/preset-typescript"],
+                plugins: ["@babel/plugin-transform-runtime"],
+              },
             },
-          }]
-      },
+            {
+              loader: "ifdef-loader",
+              options: {
+                "ifdef-verbose": false,
+                BROWSER: true,
+                MOBILE: false,
+              },
+            },
+          ],
+        },
         {
           test: /\.woff$/,
           type: "asset/resource",
@@ -166,10 +168,12 @@ module.exports = (env, argv) => {
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
         cleanOnceBeforeBuildPatterns: [
-          path.join(__dirname, "stage/build/docker")],
+          path.join(__dirname, "stage/build/docker"),
+        ],
       }),
       new webpack.DefinePlugin({
-        SIYUAN_VERSION: JSON.stringify(pkg.version),SIYUAN_ORIGIN_VERSION: JSON.stringify(pkg.syv),
+        SIYUAN_VERSION: JSON.stringify(pkg.version),
+        SIYUAN_ORIGIN_VERSION: JSON.stringify(pkg.syv),
         NODE_ENV: JSON.stringify(argv.mode),
       }),
       new MiniCssExtractPlugin({
