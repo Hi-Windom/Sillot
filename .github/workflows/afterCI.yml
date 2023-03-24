@@ -16,9 +16,9 @@ jobs:
       - uses: MCJack123/ghaction-generate-release-hashes@v3
         with:
           hash-type: md5
-          file-name: hashes-md5.txt
+          file-name: hashes.txt
           get-assets: false # This is useful if previous jobs in a workflow upload assets, as GitHub's list will not include them
       - uses: actions/upload-artifact@v2
         with:
           name: Asset Hashes
-          path: hashes-md5.txt
+          path: hashes.txt
