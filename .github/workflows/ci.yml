@@ -242,12 +242,3 @@ jobs:
           asset_name: Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
           asset_path: Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
           asset_content_type: application/octet-stream
-
-      - uses: MCJack123/ghaction-generate-release-hashes@v3
-        with:
-          hash-type: md5
-          file-name: hashes-md5.txt
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Asset Hashes
-          path: hashes-md5.txt
