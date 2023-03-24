@@ -2,8 +2,8 @@ name: Codecov
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - master
   # pull_request_target:
   #   types: [opened, edited]
 
