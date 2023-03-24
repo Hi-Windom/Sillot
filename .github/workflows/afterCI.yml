@@ -1,3 +1,5 @@
+name: after ci
+
 on:
   # workflow_run:
   #     workflows: ["Sillot CI/CD"]
