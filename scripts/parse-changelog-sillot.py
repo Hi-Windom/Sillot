@@ -60,7 +60,7 @@ def find_milestone(repo, title, lastestRelease):
     if not pat:
         return None
     version = ".".join(pat.group(1).split(".")[:2])
-    print(f'''
+    print(f'''<<$EOF
 ---
 <p align="center">
 <a href="https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml"><img src="https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml/badge.svg" style="cursor:pointer;height: 30px;margin: 3px auto;"/></a>
