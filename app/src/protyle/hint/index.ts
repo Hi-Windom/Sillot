@@ -441,7 +441,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
         // 新建文件
         if (Constants.BLOCK_HINT_KEYS.includes(this.splitChar) && value.startsWith("((newFile ") && value.endsWith(`${Lute.Caret}'))`)) {
             focusByRange(range);
-            const fileNames = value.substring(11, value.length - 4).split(`"${Constants.ZWSP}'`);
+            const fileNames = value.substring(11, value.length - 4 + 11).split(`"${Constants.ZWSP}'`);
             const realFileName = fileNames.length === 1 ? fileNames[0] : fileNames[1];
             getSavePath(protyle.path, protyle.notebookId, (pathString) => {
                 fetchPost("/api/filetree/createDocWithMd", {
@@ -643,7 +643,8 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                     }
                     nodeElement.insertAdjacentHTML("afterend", newHTML);
                     const oldHTML = nodeElement.outerHTML;
-                    const newId = newHTML.substring(newHTML.indexOf('data-node-id="') + 14, 22);
+                    const _index = newHTML.indexOf('data-node-id="');
+                    const newId = newHTML.substring(_index + 14, _index + 14 + 22);
                     nodeElement = protyle.wysiwyg.element.querySelector(`[data-node-id="${newId}"]`);
                     // 非普通块插入代码块 代码块编辑增强 #85
                     if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
@@ -824,8 +825,8 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
         }
         // 冒号前为数字或冒号不进行emoji提示
         if (this.splitChar === ":") {
-            this.enableEmoji = !(/\d/.test(currentLineValue.substring(this.lastIndex - 1, 1)) ||
-                currentLineValue.substring(this.lastIndex - 1, 2) === "::");
+            this.enableEmoji = !(/\d/.test(currentLineValue.substring(this.lastIndex - 1, this.lastIndex)) ||
+                currentLineValue.substring(this.lastIndex - 1, this.lastIndex + 1) === "::");
 
         }
         const lineArray = currentLineValue.split(this.splitChar);
