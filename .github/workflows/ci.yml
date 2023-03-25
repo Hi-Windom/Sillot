@@ -65,7 +65,9 @@ jobs:
         id: release_info_siyuan
         run: |
           changelog=$(python scripts/parse-changelog.py -t v${{ steps.syv.outputs.value }} siyuan-note/siyuan)
-          echo "release_body_siyuan=$changelog" >> $GITHUB_ENV
+          echo "release_body_siyuan<<$EOF" >> $GITHUB_ENV
+          echo "$changelog" >> $GITHUB_ENV
+          echo "$EOF" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
 
