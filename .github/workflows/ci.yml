@@ -54,7 +54,7 @@ jobs:
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
           changelog="${changelog//$'\r'/'%0D'}"
-          echo "release_body=<<$EOF$changelog$EOF" >> $GITHUB_OUTPUT
+          echo "release_body_sillot<<$EOF\n$changelog\n$EOF" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
 
@@ -65,7 +65,7 @@ jobs:
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
           changelog="${changelog//$'\r'/'%0D'}"
-          echo "release_body=$changelog" >> $GITHUB_OUTPUT
+          echo "release_body_siyuan=$changelog" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
 
@@ -77,7 +77,7 @@ jobs:
         with:
           release_name: ${{ steps.release_info.outputs.release_version }}
           tag_name: ${{ github.ref }}
-          body: "${{ steps.release_info.outputs.release_body }}\n---\n${{ steps.release_info_siyuan.outputs.release_body }}"
+          body: "${{ env.release_body_sillot }}\n---\n${{ env.release_body_siyuan }}"
           draft: false
           prerelease: true
 
