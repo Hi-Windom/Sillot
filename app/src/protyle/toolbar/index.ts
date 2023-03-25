@@ -1253,16 +1253,17 @@ export class Toolbar {
             }
         });
         inputElement.addEventListener("input", (event) => {
-            const mathLanguages: string[] = [];
+            const matchLanguages: string[] = [];
             Constants.CODE_LANGUAGES.forEach((item) => {
                 if (item.indexOf(inputElement.value.toLowerCase()) > -1) {
-                    mathLanguages.push(item);
+                    matchLanguages.push(item);
 
                 }
             });
             let html = "";
             // sort
-            mathLanguages.sort((a, b) => {
+            let matchInput = false;
+            matchLanguages.sort((a, b) => {
                 if (a.startsWith(inputElement.value.toLowerCase()) && b.startsWith(inputElement.value.toLowerCase())) {
                     if (a.length < b.length) {
                         return -1;
@@ -1279,8 +1280,14 @@ export class Toolbar {
                     return 0;
                 }
             }).forEach((item) => {
+                if (inputElement.value === item) {
+                    matchInput = true;
+                }
                 html += `<div class="b3-list-item">${item.replace(inputElement.value.toLowerCase(), "<b>" + inputElement.value.toLowerCase() + "</b>")}</div>`;
             });
+            if (inputElement.value.trim() && !matchInput) {
+                html = `<div class="b3-list-item"><b>${inputElement.value.replace(/`| /g, "_")}</b></div>${html}`;
+            }
             this.subElement.firstElementChild.lastElementChild.innerHTML = html;
             if (html) {
                 this.subElement.firstElementChild.lastElementChild.firstElementChild.classList.add("b3-list-item--focus");
@@ -1363,7 +1370,7 @@ export class Toolbar {
 </div>`;
             const listElement = this.subElement.querySelector(".b3-list");
             const previewElement = this.subElement.firstElementChild.lastElementChild;
-            let previewPath = listElement.firstElementChild.getAttribute("data-value")
+            let previewPath = listElement.firstElementChild.getAttribute("data-value");
             previewTemplate(previewPath, previewElement, protyle.block.parentID);
             listElement.addEventListener("mouseover", (event) => {
                 const target = event.target as HTMLElement;
@@ -1371,11 +1378,11 @@ export class Toolbar {
                 if (!hoverItemElement) {
                     return;
                 }
-                const currentPath = hoverItemElement.getAttribute("data-value")
+                const currentPath = hoverItemElement.getAttribute("data-value");
                 if (previewPath === currentPath) {
                     return;
                 }
-                previewPath = currentPath
+                previewPath = currentPath;
                 previewTemplate(previewPath, previewElement, protyle.block.parentID);
             });
             const inputElement = this.subElement.querySelector("input");
@@ -1388,11 +1395,11 @@ export class Toolbar {
                 if (!isEmpty) {
                     const currentElement = upDownHint(listElement, event);
                     if (currentElement) {
-                        const currentPath = currentElement.getAttribute("data-value")
+                        const currentPath = currentElement.getAttribute("data-value");
                         if (previewPath === currentPath) {
                             return;
                         }
-                        previewPath = currentPath
+                        previewPath = currentPath;
                         previewTemplate(previewPath, previewElement, protyle.block.parentID);
                     }
                 }
@@ -1419,11 +1426,11 @@ export class Toolbar {
                         searchHTML += `<div data-value="${item.path}" class="b3-list-item${index === 0 ? " b3-list-item--focus" : ""}">${item.content}</div>`;
                     });
                     listElement.innerHTML = searchHTML || `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
-                    const currentPath = response.data.blocks[0]?.path
+                    const currentPath = response.data.blocks[0]?.path;
                     if (previewPath === currentPath) {
                         return;
                     }
-                    previewPath = currentPath
+                    previewPath = currentPath;
                     previewTemplate(previewPath, previewElement, protyle.block.parentID);
                 });
             });
@@ -1453,11 +1460,11 @@ export class Toolbar {
                                 if (iconElement.parentElement.classList.contains("b3-list-item--focus")) {
                                     const sideElement = iconElement.parentElement.previousElementSibling || iconElement.parentElement.nextElementSibling;
                                     sideElement.classList.add("b3-list-item--focus");
-                                    const currentPath = sideElement.getAttribute("data-value")
+                                    const currentPath = sideElement.getAttribute("data-value");
                                     if (previewPath === currentPath) {
                                         return;
                                     }
-                                    previewPath = currentPath
+                                    previewPath = currentPath;
                                     previewTemplate(previewPath, previewElement, protyle.block.parentID);
                                 }
                                 iconElement.parentElement.remove();

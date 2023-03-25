@@ -17,7 +17,7 @@ docmap = {
 }
 
 
-def generate_msg_from_repo(repo_name, tag_name):
+def generate_msg_from_repo(repo_name, tag_name, lastestRelease, thisRelease):
     """Generate changelog messages from repository and tag name.
 
     Envs:
@@ -34,7 +34,7 @@ def generate_msg_from_repo(repo_name, tag_name):
 
     gh = github.Github(token, base_url=f"https://{hostname}")
     repo = gh.get_repo(repo_name)
-    milestone = find_milestone(repo, tag_name)
+    milestone = find_milestone(repo, tag_name, lastestRelease, thisRelease)
 
     for issue in repo.get_issues(state="closed", milestone=milestone):
         # REF https://pygithub.readthedocs.io/en/latest/github_objects/Issue.html#github.Issue.Issue
@@ -44,7 +44,7 @@ def generate_msg_from_repo(repo_name, tag_name):
     generate_msg(desc_mapping)
 
 
-def find_milestone(repo, title):
+def find_milestone(repo, title, lastestRelease, thisRelease):
     """Find the milestone in a repository that is similar to milestone title
 
     Args:
@@ -59,8 +59,14 @@ def find_milestone(repo, title):
     if not pat:
         return None
     version = ".".join(pat.group(1).split(".")[:2])
-    print('''
+    print(f'''
 ---
+<p align="center">
+<a href="https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml"><img src="https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml/badge.svg" style="cursor:pointer;height: 30px;margin: 3px auto;"/></a>
+<a ref=""><img src="https://img.shields.io/github/downloads/Hi-Windom/Sillot/{thisRelease}/total?logo=github" style="cursor:pointer;height: 30px;margin: 3px auto;"/></a>
+<img alt="GitHub commits difference between two branches/tags/commits" src="https://img.shields.io/github/commits-difference/Hi-Windom/Sillot?base={lastestRelease}&head={thisRelease}&logo=git" style="cursor:pointer;height: 30px;margin: 3px auto;"/>
+</p>
+
 ⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
 ❤️ 欢迎共建汐洛 694357845@qq.com
 🚧 [Sillot is currently in active development](https://github.com/orgs/Hi-Windom/projects/2/views/2)
@@ -68,7 +74,7 @@ def find_milestone(repo, title):
 🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)  📱 [Android application package](https://github.com/Hi-Windom/Sillot-android/releases)
 <span>
 <img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 11+-black?logo=android" title=""/>
-</span>[![CI](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml/badge.svg)](https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml)
+</span>
 --
 🌏 与绛亽新时代智慧彖乄一同见证全球开源力量
 --
@@ -122,9 +128,11 @@ if __name__ == "__main__":
     )
     parser.add_argument("-t", "--tag", help="the tag to filter issues.")
     parser.add_argument("repo", help="The repository name")
+    parser.add_argument("-b", "--lastestRelease", help="lastest Release")
+    parser.add_argument("-a", "--thisRelease", help="this Release")
     args = parser.parse_args()
 
     try:
-        generate_msg_from_repo(args.repo, args.tag)
+        generate_msg_from_repo(args.repo, args.tag, args.lastestRelease, args.thisRelease)
     except AssertionError:
         print(args.tag)
