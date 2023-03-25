@@ -45,14 +45,15 @@ jobs:
       - name: Gather Sillot Release Information
         id: release_info
         # https://github.com/Hi-Windom/Sillot/issues/373
-        # 注意：创建或更新环境变量的步骤无权访问新值，需要定义步骤 id 才能稍后检索输出值
+        # 注意：创建或更新环境变量的步骤无权访问新值；$GITHUB_OUTPUT 需要定义步骤 id 才能稍后检索输出值，$GITHUB_ENV 则不需要
+        # 以下转换不再需要：
+        #   changelog="${changelog//'%'/'%25'}"
+        #   changelog="${changelog//$'\n'/'%0A'}"
+        #   changelog="${changelog//$'\r'/'%0D'}"
         run: |
           echo "release_title=$(git show --format=%s --no-patch | head -1)" >> $GITHUB_OUTPUT
           echo "release_version=v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}" >> $GITHUB_OUTPUT
           changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} -b ${{ steps.thislatestR.outputs.release }} Hi-Windom/Sillot)
-          changelog="${changelog//'%'/'%25'}"
-          changelog="${changelog//$'\n'/'%0A'}"
-          changelog="${changelog//$'\r'/'%0D'}"
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "release_body_sillot<<$EOF" >> $GITHUB_ENV
           echo "$changelog" >> $GITHUB_ENV
@@ -64,9 +65,6 @@ jobs:
         id: release_info_siyuan
         run: |
           changelog=$(python scripts/parse-changelog.py -t v${{ steps.syv.outputs.value }} siyuan-note/siyuan)
-          changelog="${changelog//'%'/'%25'}"
-          changelog="${changelog//$'\n'/'%0A'}"
-          changelog="${changelog//$'\r'/'%0D'}"
           echo "release_body_siyuan=$changelog" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
