@@ -168,11 +168,6 @@ export const hintSlash = (key: string, protyle: IProtyle) => {
         value: "",
         html: "separator",
     }, {
-        filter: ["插入图片或文件", "upload", "上传", "crtphwj", "sc"],
-        value: Constants.ZWSP + 3,
-        html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconDownload"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.insertAsset}</span>
-<input class="b3-form__upload" type="file" ${protyle.options.upload.accept ? 'multiple="' + protyle.options.upload.accept + '"' : ""}></div>`,
-    }, {
         filter: ["iframe", "嵌入网址", "qianruwangzhan", "qrwz"],
         value: '<iframe sandbox="allow-forms allow-presentation allow-same-origin allow-scripts allow-modals" src="" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>',
         html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconLanguage"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.insertIframeURL}</span></div>`,
