@@ -133,7 +133,7 @@
     "sass": "^1.60.0",
     "sass-loader": "^13.2.1",
     "socket.io": "^4.6.1",
-    "sofill": "^1.0.58",
+    "sofill": "^1.0.59",
     "sout": "^1.0.6",
     "style-loader": "^3.3.2",
     "sweetalert2": "^11.7.3",

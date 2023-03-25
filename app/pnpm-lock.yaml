@@ -83,7 +83,7 @@ specifiers:
   sass: ^1.60.0
   sass-loader: ^13.2.1
   socket.io: ^4.6.1
-  sofill: ^1.0.58
+  sofill: ^1.0.59
   sout: ^1.0.6
   style-loader: ^3.3.2
   sweetalert2: ^11.7.3
@@ -179,7 +179,7 @@ devDependencies:
   sass: 1.60.0
   sass-loader: 13.2.1_sass@1.60.0+webpack@5.76.3
   socket.io: 4.6.1
-  sofill: 1.0.58_typescript@5.0.2
+  sofill: 1.0.59_typescript@5.0.2
   sout: 1.0.6
   style-loader: 3.3.2_webpack@5.76.3
   sweetalert2: 11.7.3
@@ -1248,7 +1248,7 @@ packages:
       collect-v8-coverage: 1.0.1
       exit: 0.1.2
       glob: 7.2.3
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
       istanbul-lib-coverage: 3.2.0
       istanbul-lib-instrument: 5.2.1
       istanbul-lib-report: 3.0.0
@@ -1278,7 +1278,7 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.17
       callsites: 3.1.0
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
     dev: true
 
   /@jest/test-result/29.5.0:
@@ -1296,7 +1296,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@jest/test-result': 29.5.0
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
       jest-haste-map: 29.5.0
       slash: 3.0.0
     dev: true
@@ -1312,7 +1312,7 @@ packages:
       chalk: 4.1.2
       convert-source-map: 2.0.0
       fast-json-stable-stringify: 2.1.0
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
       jest-haste-map: 29.5.0
       jest-regex-util: 29.4.3
       jest-util: 29.5.0
@@ -2551,7 +2551,7 @@ packages:
       babel-plugin-istanbul: 6.1.1
       babel-preset-jest: 29.5.0_@babel+core@7.21.3
       chalk: 4.1.2
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
       slash: 3.0.0
     transitivePeerDependencies:
       - supports-color
@@ -4653,7 +4653,7 @@ packages:
       ci-info: 3.8.0
       deepmerge: 4.3.0
       glob: 7.2.3
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
       jest-circus: 29.5.0
       jest-environment-node: 29.5.0
       jest-get-type: 29.4.3
@@ -4725,7 +4725,7 @@ packages:
       '@types/node': 18.15.9
       anymatch: 3.1.3
       fb-watchman: 2.0.2
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
       jest-regex-util: 29.4.3
       jest-util: 29.5.0
       jest-worker: 29.5.0
@@ -4809,7 +4809,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       chalk: 4.1.2
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
       jest-haste-map: 29.5.0
       jest-pnp-resolver: 1.2.3_jest-resolve@29.5.0
       jest-util: 29.5.0
@@ -4831,7 +4831,7 @@ packages:
       '@types/node': 18.15.9
       chalk: 4.1.2
       emittery: 0.13.1
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
       jest-docblock: 29.4.3
       jest-environment-node: 29.5.0
       jest-haste-map: 29.5.0
@@ -4864,7 +4864,7 @@ packages:
       cjs-module-lexer: 1.2.2
       collect-v8-coverage: 1.0.1
       glob: 7.2.3
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
       jest-haste-map: 29.5.0
       jest-message-util: 29.5.0
       jest-mock: 29.5.0
@@ -4896,7 +4896,7 @@ packages:
       babel-preset-current-node-syntax: 1.0.1_@babel+core@7.21.3
       chalk: 4.1.2
       expect: 29.5.0
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
       jest-diff: 29.5.0
       jest-get-type: 29.4.3
       jest-matcher-utils: 29.5.0
@@ -5067,7 +5067,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
     dev: true
 
   /keyv/3.1.0:
@@ -6783,8 +6783,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /sofill/1.0.58_typescript@5.0.2:
-    resolution: {integrity: sha512-vounUSBhkWarOCg6s2VdKIqCXO9m8Q6ES/VP4to9s8FXNtPFS0r79DoWaFK1+7gbzkrwgQNQ3iq6kDYWqWhMKA==}
+  /sofill/1.0.59_typescript@5.0.2:
+    resolution: {integrity: sha512-HDt24V651UenHXHYV+gMqt8epRgmpuSrkkLMPuVG89CsrG4YP3K3dde8E41U1f3Z7MA3MXXDBj6Trtz+7pIYdw==}
     peerDependencies:
       '@sillot/bridge': ^0.0.3
       localforage: ^1.10.0
