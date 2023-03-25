@@ -35,12 +35,19 @@ jobs:
         with:
           cmd: "jq .syv app/package.json -r"
 
+      - id: thislatestR
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          owner: Hi-Windom
+          repo: Sillot
+          excludes: prerelease, draft
+
       - name: Gather Sillot Release Information
         id: release_info
         run: |
           echo "::set-output name=release_title::$(git show --format=%s --no-patch | head -1)"
           echo "::set-output name=release_version::v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}"
-          changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} Hi-Windom/Sillot)
+          changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} -a ${{ github.ref }} -b ${{ steps.keydb.outputs.release }} Hi-Windom/Sillot)
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
           changelog="${changelog//$'\r'/'%0D'}"
