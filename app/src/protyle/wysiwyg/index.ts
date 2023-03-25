@@ -1531,7 +1531,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 if (blockRefElement) {
                     refBlockId = blockRefElement.getAttribute("data-id");
                 } else if (aElement) {
-                    refBlockId = aElement.getAttribute("data-href").substring(16, 38);
+                    refBlockId = aElement.getAttribute("data-href").substring(16, 16 + 38);
                 }
 
                 fetchPost("/api/block/checkBlockFold", {id: refBlockId}, (foldResponse) => {
