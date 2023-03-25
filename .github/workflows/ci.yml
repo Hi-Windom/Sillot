@@ -55,7 +55,7 @@ jobs:
           changelog="${changelog//$'\r'/'%0D'}"
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "release_body_sillot<<$EOF" >> $GITHUB_ENV
-          echo $changelog >> $GITHUB_ENV
+          echo "$changelog" >> $GITHUB_ENV
           echo "$EOF" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
