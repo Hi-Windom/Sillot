@@ -42,7 +42,7 @@ export const initConfigSearch = (element: HTMLElement) => {
         window.siyuan.config.appearance.darkThemes.concat(window.siyuan.config.appearance.icons).concat(window.siyuan.config.appearance.lightThemes)
             .concat(Constants.SIYUAN_CONFIG_APPEARANCE_DARK_CODE)
             .concat(Constants.SIYUAN_CONFIG_APPEARANCE_LIGHT_CODE)
-            .concat(["English", "简体中文"]).concat(getLang(["language", "language1"]))
+            .concat(["English", "中文"]).concat(getLang(["language", "language1"]))
             .concat(getLang(["appearance", "appearance1", "appearance2", "appearance3", "appearance4",
                 "appearance5", "appearance6", "appearance8", "appearance9", "appearance10", "appearance11",
                 "appearance14", "appearance15", "appearance16", "appearance17",

@@ -507,6 +507,8 @@ const initAbout = () => {
     <ul id="workspaceDir" class="b3-list b3-list--background"></ul>
     <div class="fn__hr"></div>
     <button id="creatWorkspace" class="b3-button fn__block">${window.siyuan.languages.new}</button>
+    <div class="fn__hr"></div>
+    <button id="creatWorkspaceFromFolder" class="b3-button fn__block">选择文件夹创建</button>
 </div>
 <div class="b3-label">
     <div class="config-about__logo">
@@ -716,6 +718,11 @@ const initAbout = () => {
                         createWorkspaceDialog.destroy();
                     });
                 });
+                event.preventDefault();
+                event.stopPropagation();
+                break;
+            } else if (target.id === "creatWorkspaceFromFolder") {
+                alert('coming soon');
                 event.preventDefault();
                 event.stopPropagation();
                 break;
