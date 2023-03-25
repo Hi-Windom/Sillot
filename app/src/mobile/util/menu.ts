@@ -722,7 +722,7 @@ const initAbout = () => {
                 event.stopPropagation();
                 break;
             } else if (target.id === "creatWorkspaceFromFolder") {
-                alert('coming soon')
+                alert('coming soon');
                 event.preventDefault();
                 event.stopPropagation();
                 break;
