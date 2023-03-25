@@ -17,7 +17,7 @@ docmap = {
 }
 
 
-def generate_msg_from_repo(repo_name, tag_name, lastestRelease, thisRelease):
+def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
     """Generate changelog messages from repository and tag name.
 
     Envs:
@@ -34,7 +34,7 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease, thisRelease):
 
     gh = github.Github(token, base_url=f"https://{hostname}")
     repo = gh.get_repo(repo_name)
-    milestone = find_milestone(repo, tag_name, lastestRelease, thisRelease)
+    milestone = find_milestone(repo, tag_name, lastestRelease)
 
     for issue in repo.get_issues(state="closed", milestone=milestone):
         # REF https://pygithub.readthedocs.io/en/latest/github_objects/Issue.html#github.Issue.Issue
@@ -44,7 +44,7 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease, thisRelease):
     generate_msg(desc_mapping)
 
 
-def find_milestone(repo, title, lastestRelease, thisRelease):
+def find_milestone(repo, title, lastestRelease):
     """Find the milestone in a repository that is similar to milestone title
 
     Args:
@@ -55,7 +55,8 @@ def find_milestone(repo, title, lastestRelease, thisRelease):
         The milestone which title matches the given argument.
         If no milestone matches, it will return None
     """
-    pat = re.search("v([0-9.]+)", title)
+    thisRelease = title.split("/")[-1]
+    pat = re.search("v([0-9.]+)", thisRelease)
     if not pat:
         return None
     version = ".".join(pat.group(1).split(".")[:2])
@@ -127,12 +128,11 @@ if __name__ == "__main__":
         description="Automaticly generate information from issues by tag."
     )
     parser.add_argument("-t", "--tag", help="the tag to filter issues.")
-    parser.add_argument("-a", "--thisRelease", help="this Release")
     parser.add_argument("-b", "--lastestRelease", help="lastest Release")
     parser.add_argument("repo", help="The repository name")
     args = parser.parse_args()
 
     try:
-        generate_msg_from_repo(args.repo, args.tag, args.lastestRelease, args.thisRelease)
+        generate_msg_from_repo(args.repo, args.tag, args.lastestRelease)
     except AssertionError:
         print(args.tag)
