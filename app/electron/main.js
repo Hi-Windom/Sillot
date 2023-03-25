@@ -955,6 +955,8 @@ app.whenReady().then(() => {
         });
     }
 
+    const ABC = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+
     const filter = {
       urls: [
         "*://*/*.js",
@@ -970,14 +972,13 @@ app.whenReady().then(() => {
         "*://*/*.mhtml",
       ],
     };
-    const ignore = [
+    var ignore = [
         "localhost",
         "www.clarity.ms",
-        "e.clarity.ms",
-        "q.clarity.ms",
         "127.0.0.1",
         "0.0.0.0",
     ]
+    ABC.forEach(e=>{ignore.push(`${e}.clarity.ms`)})
     const trusted = [
       "Hi-Windom",
       "hi-windom",
