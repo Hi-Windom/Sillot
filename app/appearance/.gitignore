@@ -4,3 +4,8 @@ themes/*
 !themes/midnight/
 !themes/sillon/
 !themes/sillou/
+
+icons/
+!icons/ant/
+!icons/material/
+!icons/index.html
