@@ -98,7 +98,6 @@ export abstract class Constants extends SConst { // Sillot extend
     // id
     public static readonly HELP_PATH = {
         zh_CN: "20210808180117-czj9bvb",
-        zh_CHT: "20210808180117-czj9bvb",
         zh_CN_Sillot: "20230202000000-c123456", // Sillot extend
         en_US: "20210808180117-6v0mkxr",
         fr_FR: "20210808180117-6v0mkxr",

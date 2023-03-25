@@ -4,9 +4,6 @@
 [submodule "app/guide/20210808180117-6v0mkxr"]
 	path = app/guide/20210808180117-6v0mkxr
 	url = git@github.com:siyuan-note/user-guide-en_US.git
-[submodule "app/guide/20211226090932-5lcq56f"]
-	path = app/guide/20211226090932-5lcq56f
-	url = git@github.com:siyuan-note/user-guide-zh_CHT.git
 [submodule "app/guide/20230202000000-c123456"]
 	path = app/guide/20230202000000-c123456
 	url = https://github.com/Hi-Windom/user-guide-zh_CN.git
