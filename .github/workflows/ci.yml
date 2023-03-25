@@ -44,14 +44,15 @@ jobs:
 
       - name: Gather Sillot Release Information
         id: release_info
+        # https://github.com/Hi-Windom/Sillot/issues/373
         run: |
-          echo "::set-output name=release_title::$(git show --format=%s --no-patch | head -1)"
-          echo "::set-output name=release_version::v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}"
+          echo "{release_title}={$(git show --format=%s --no-patch | head -1)}" >> $GITHUB_OUTPUT
+          echo "{release_version}={v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}}" >> $GITHUB_OUTPUT
           changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} -b ${{ steps.thislatestR.outputs.release }} Hi-Windom/Sillot)
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
           changelog="${changelog//$'\r'/'%0D'}"
-          echo "::set-output name=release_body::$changelog"
+          echo "{release_body}={$changelog}" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
 
@@ -62,7 +63,7 @@ jobs:
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
           changelog="${changelog//$'\r'/'%0D'}"
-          echo "::set-output name=release_body::$changelog"
+          echo "{release_body}={$changelog}" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
 
