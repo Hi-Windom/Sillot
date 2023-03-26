@@ -71,12 +71,12 @@ func generateDocHistory() {
 
 	// 以下部分是老版本的历史数据，不再保留
 	for _, box := range Conf.GetBoxes() {
-		historyDir = filepath.Join(util.DataDir, box.ID, ".siyuan", "history")
+		historyDir = filepath.Join(util.DataDir, box.ID, ".sillot", "history")
 		os.RemoveAll(historyDir)
 	}
-	historyDir = filepath.Join(util.DataDir, "assets", ".siyuan", "history")
+	historyDir = filepath.Join(util.DataDir, "assets", ".sillot", "history")
 	os.RemoveAll(historyDir)
-	historyDir = filepath.Join(util.DataDir, ".siyuan", "history")
+	historyDir = filepath.Join(util.DataDir, ".sillot", "history")
 	os.RemoveAll(historyDir)
 }
 
@@ -108,7 +108,7 @@ func ClearWorkspaceHistory() (err error) {
 
 	for _, notebook := range notebooks {
 		boxID := notebook.ID
-		historyDir := filepath.Join(util.DataDir, boxID, ".siyuan", "history")
+		historyDir := filepath.Join(util.DataDir, boxID, ".sillot", "history")
 		if !gulu.File.IsDir(historyDir) {
 			continue
 		}
@@ -120,7 +120,7 @@ func ClearWorkspaceHistory() (err error) {
 		logging.LogInfof("removed notebook history dir [%s]", historyDir)
 	}
 
-	historyDir = filepath.Join(util.DataDir, ".siyuan", "history")
+	historyDir = filepath.Join(util.DataDir, ".sillot", "history")
 	if gulu.File.IsDir(historyDir) {
 		if err = os.RemoveAll(historyDir); nil != err {
 			logging.LogErrorf("remove data history dir [%s] failed: %s", historyDir, err)
@@ -128,7 +128,7 @@ func ClearWorkspaceHistory() (err error) {
 		}
 		logging.LogInfof("removed data history dir [%s]", historyDir)
 	}
-	historyDir = filepath.Join(util.DataDir, "assets", ".siyuan", "history")
+	historyDir = filepath.Join(util.DataDir, "assets", ".sillot", "history")
 	if gulu.File.IsDir(historyDir) {
 		if err = os.RemoveAll(historyDir); nil != err {
 			logging.LogErrorf("remove assets history dir [%s] failed: %s", historyDir, err)
@@ -404,7 +404,7 @@ func GetNotebookHistory() (ret []*History, err error) {
 		return
 	}
 
-	historyNotebookConfs, err := filepath.Glob(historyDir + "/*-delete/*/.siyuan/conf.json")
+	historyNotebookConfs, err := filepath.Glob(historyDir + "/*-delete/*/.sillot/conf.json")
 	if nil != err {
 		logging.LogErrorf("read dir [%s] failed: %s", historyDir, err)
 		return

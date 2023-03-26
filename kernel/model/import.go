@@ -212,7 +212,7 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 	sortIDs := map[string]int{}
 	var sortData []byte
 	var sortErr error
-	sortPath := filepath.Join(unzipRootPath, ".siyuan", "sort.json")
+	sortPath := filepath.Join(unzipRootPath, ".sillot", "sort.json")
 	if gulu.File.IsExist(sortPath) {
 		sortData, sortErr = filelock.ReadFile(sortPath)
 		if nil != sortErr {
@@ -223,7 +223,7 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 			logging.LogErrorf("unmarshal sort conf failed: %s", sortErr)
 		}
 
-		boxSortPath := filepath.Join(util.DataDir, boxID, ".siyuan", "sort.json")
+		boxSortPath := filepath.Join(util.DataDir, boxID, ".sillot", "sort.json")
 		if gulu.File.IsExist(boxSortPath) {
 			sortData, sortErr = filelock.ReadFile(boxSortPath)
 			if nil != sortErr {

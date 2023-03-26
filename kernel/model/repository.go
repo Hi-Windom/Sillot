@@ -1333,7 +1333,7 @@ func newRepository() (ret *dejavu.Repo, err error) {
 	}
 
 	ignoreLines := getIgnoreLines()
-	ignoreLines = append(ignoreLines, "/.siyuan/conf.json") // 忽略旧版同步配置
+	ignoreLines = append(ignoreLines, "/.sillot/conf.json") // 忽略旧版同步配置
 	ret, err = dejavu.NewRepo(util.DataDir, util.RepoDir, util.HistoryDir, util.TempDir, Conf.System.ID, Conf.Repo.Key, ignoreLines, cloudRepo)
 	if nil != err {
 		logging.LogErrorf("init data repo failed: %s", err)

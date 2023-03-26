@@ -18,7 +18,7 @@ package conf
 
 import "github.com/siyuan-note/siyuan/kernel/util"
 
-// BoxConf 维护 .siyuan/conf.json 笔记本配置。
+// BoxConf 维护 .sillot/conf.json 笔记本配置。
 type BoxConf struct {
 	Name                  string `json:"name"`                  // 笔记本名称
 	Sort                  int    `json:"sort"`                  // 排序字段

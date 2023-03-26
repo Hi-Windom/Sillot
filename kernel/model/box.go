@@ -105,7 +105,7 @@ func ListNotebooks() (ret []*Box, err error) {
 
 		boxConf := conf.NewBoxConf()
 		boxDirPath := filepath.Join(util.DataDir, dir.Name())
-		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json")
+		boxConfPath := filepath.Join(boxDirPath, ".sillot", "conf.json")
 		if !gulu.File.IsExist(boxConfPath) {
 			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
 			continue
@@ -166,7 +166,7 @@ func ListNotebooks() (ret []*Box, err error) {
 func (box *Box) GetConf() (ret *conf.BoxConf) {
 	ret = conf.NewBoxConf()
 
-	confPath := filepath.Join(util.DataDir, box.ID, ".siyuan/conf.json")
+	confPath := filepath.Join(util.DataDir, box.ID, ".sillot/conf.json")
 	if !gulu.File.IsExist(confPath) {
 		return
 	}
@@ -185,7 +185,7 @@ func (box *Box) GetConf() (ret *conf.BoxConf) {
 }
 
 func (box *Box) SaveConf(conf *conf.BoxConf) {
-	confPath := filepath.Join(util.DataDir, box.ID, ".siyuan/conf.json")
+	confPath := filepath.Join(util.DataDir, box.ID, ".sillot/conf.json")
 	newData, err := gulu.JSON.MarshalIndentJSON(conf, "", "  ")
 	if nil != err {
 		logging.LogErrorf("marshal box conf [%s] failed: %s", confPath, err)
@@ -206,8 +206,8 @@ func (box *Box) SaveConf(conf *conf.BoxConf) {
 }
 
 func (box *Box) saveConf0(data []byte) {
-	confPath := filepath.Join(util.DataDir, box.ID, ".siyuan/conf.json")
-	if err := os.MkdirAll(filepath.Join(util.DataDir, box.ID, ".siyuan"), 0755); nil != err {
+	confPath := filepath.Join(util.DataDir, box.ID, ".sillot/conf.json")
+	if err := os.MkdirAll(filepath.Join(util.DataDir, box.ID, ".sillot"), 0755); nil != err {
 		logging.LogErrorf("save box conf [%s] failed: %s", confPath, err)
 	}
 	if err := filelock.WriteFile(confPath, data); nil != err {

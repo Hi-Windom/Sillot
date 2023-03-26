@@ -528,7 +528,7 @@ func formatErrorMsg(err error) string {
 }
 
 func getIgnoreLines() (ret []string) {
-	ignore := filepath.Join(util.DataDir, ".siyuan", "syncignore")
+	ignore := filepath.Join(util.DataDir, ".sillot", "syncignore")
 	err := os.MkdirAll(filepath.Dir(ignore), 0755)
 	if nil != err {
 		return

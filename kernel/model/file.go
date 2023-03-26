@@ -1460,7 +1460,7 @@ func moveSorts(rootID, fromBox, toBox string) {
 
 	fromRootSorts := map[string]int{}
 	ids := treenode.RootChildIDs(rootID)
-	fromConfPath := filepath.Join(util.DataDir, fromBox, ".siyuan", "sort.json")
+	fromConfPath := filepath.Join(util.DataDir, fromBox, ".sillot", "sort.json")
 	fromFullSortIDs := map[string]int{}
 	if gulu.File.IsExist(fromConfPath) {
 		data, err := filelock.ReadFile(fromConfPath)
@@ -1477,7 +1477,7 @@ func moveSorts(rootID, fromBox, toBox string) {
 		fromRootSorts[id] = fromFullSortIDs[id]
 	}
 
-	toConfPath := filepath.Join(util.DataDir, toBox, ".siyuan", "sort.json")
+	toConfPath := filepath.Join(util.DataDir, toBox, ".sillot", "sort.json")
 	toFullSortIDs := map[string]int{}
 	if gulu.File.IsExist(toConfPath) {
 		data, err := filelock.ReadFile(toConfPath)
@@ -1547,7 +1547,7 @@ func ChangeFileTreeSort(boxID string, paths []string) {
 		sortFolderIDs[id] = val
 	}
 
-	confDir := filepath.Join(util.DataDir, box.ID, ".siyuan")
+	confDir := filepath.Join(util.DataDir, box.ID, ".sillot")
 	if err = os.MkdirAll(confDir, 0755); nil != err {
 		logging.LogErrorf("create conf dir failed: %s", err)
 		return
@@ -1585,7 +1585,7 @@ func ChangeFileTreeSort(boxID string, paths []string) {
 }
 
 func (box *Box) fillSort(files *[]*File) {
-	confPath := filepath.Join(util.DataDir, box.ID, ".siyuan", "sort.json")
+	confPath := filepath.Join(util.DataDir, box.ID, ".sillot", "sort.json")
 	if !gulu.File.IsExist(confPath) {
 		return
 	}
@@ -1609,7 +1609,7 @@ func (box *Box) fillSort(files *[]*File) {
 }
 
 func (box *Box) removeSort(ids []string) {
-	confPath := filepath.Join(util.DataDir, box.ID, ".siyuan", "sort.json")
+	confPath := filepath.Join(util.DataDir, box.ID, ".sillot", "sort.json")
 	if !gulu.File.IsExist(confPath) {
 		return
 	}
