@@ -418,7 +418,7 @@ func SaveBlockTree(force bool) {
 		p := filepath.Join(util.BlockTreePath, key.(string)) + ".msgpack"
 		if err = gulu.File.WriteFileSafer(p, data, 0644); nil != err {
 			logging.LogErrorf("write block tree failed: %s", err)
-			// os.Exit(logging.ExitCodeFileSysErr)
+			os.Exit(logging.ExitCodeFileSysErr)
 			return false
 		}
 
