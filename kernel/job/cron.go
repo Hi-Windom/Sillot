@@ -19,7 +19,7 @@ package job
 import (
 	"time"
 
-	"github.com/siyuan-note/logging"
+	"github.com/K-Sillot/logging"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/task"

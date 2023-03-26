@@ -21,12 +21,13 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"fmt"
-	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"strings"
 
-	"github.com/88250/lute/parse"
+	"github.com/siyuan-note/siyuan/kernel/filesys"
+
+	"github.com/K-Sillot/eventbus"
+	"github.com/K-Sillot/lute/parse"
 	"github.com/emirpasic/gods/sets/hashset"
-	"github.com/siyuan-note/eventbus"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

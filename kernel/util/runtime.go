@@ -31,10 +31,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/88250/gulu"
+	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/httpclient"
+	"github.com/K-Sillot/logging"
 	"github.com/denisbrodbeck/machineid"
-	"github.com/siyuan-note/httpclient"
-	"github.com/siyuan-note/logging"
 )
 
 const DatabaseVer = "20220501" // 修改表结构的话需要修改这里

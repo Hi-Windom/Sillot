@@ -24,8 +24,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/K-Sillot/logging"
 	goPS "github.com/mitchellh/go-ps"
-	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

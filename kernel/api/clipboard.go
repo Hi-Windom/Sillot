@@ -18,7 +18,7 @@ package api
 
 import (
 	"github.com/88250/clipboard"
-	"github.com/88250/gulu"
+	"github.com/K-Sillot/gulu"
 	"github.com/gin-gonic/gin"
 )
 

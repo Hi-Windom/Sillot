@@ -19,9 +19,9 @@
 package util
 
 import (
+	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
 	"github.com/shirou/gopsutil/v3/disk"
-	"github.com/siyuan-note/logging"
 )
 
 func NeedWarnDiskUsage(dataSize int64) bool {

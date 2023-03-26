@@ -16,7 +16,7 @@
 
 package util
 
-import "github.com/88250/lute"
+import "github.com/K-Sillot/lute"
 
 func NewLute() (ret *lute.Lute) {
 	ret = lute.New()

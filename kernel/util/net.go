@@ -21,13 +21,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/88250/gulu"
-	"github.com/88250/lute/ast"
+	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/httpclient"
+	"github.com/K-Sillot/logging"
+	"github.com/K-Sillot/lute/ast"
 	"github.com/gin-gonic/gin"
 	"github.com/imroc/req/v3"
 	"github.com/olahol/melody"
-	"github.com/siyuan-note/httpclient"
-	"github.com/siyuan-note/logging"
 )
 
 func IsOnline() (ret bool) {

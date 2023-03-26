@@ -17,8 +17,8 @@
 package cmd
 
 import (
+	"github.com/K-Sillot/logging"
 	"github.com/olahol/melody"
-	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

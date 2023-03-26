@@ -22,10 +22,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/88250/lute/ast"
+	"github.com/K-Sillot/logging"
+	"github.com/K-Sillot/lute/ast"
 	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/facette/natsort"
-	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/search"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"

@@ -19,7 +19,7 @@ package model
 import (
 	"time"
 
-	"github.com/88250/lute/ast"
+	"github.com/K-Sillot/lute/ast"
 	"github.com/emirpasic/gods/stacks/linkedliststack"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"

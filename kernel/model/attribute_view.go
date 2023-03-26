@@ -20,9 +20,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/parse"
-	"github.com/siyuan-note/logging"
+	"github.com/K-Sillot/logging"
+	"github.com/K-Sillot/lute/ast"
+	"github.com/K-Sillot/lute/parse"
 	"github.com/siyuan-note/siyuan/kernel/av"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"

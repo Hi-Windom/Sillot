@@ -25,10 +25,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/88250/gulu"
-	"github.com/88250/lute"
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/parse"
+	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/lute"
+	"github.com/K-Sillot/lute/ast"
+	"github.com/K-Sillot/lute/parse"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

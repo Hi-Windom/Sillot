@@ -16,7 +16,7 @@
 
 package av
 
-import "github.com/88250/lute/ast"
+import "github.com/K-Sillot/lute/ast"
 
 type Row struct {
 	ID    string  `json:"id"`

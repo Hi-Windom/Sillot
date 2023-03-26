@@ -18,12 +18,13 @@ package util
 
 import (
 	"context"
-	gogpt "github.com/sashabaranov/go-gpt3"
-	"github.com/siyuan-note/logging"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/K-Sillot/logging"
+	gogpt "github.com/sashabaranov/go-gpt3"
 )
 
 func ChatGPT(msg string, contextMsgs []string, c *gogpt.Client, maxTokens, timeout int) (ret string, stop bool, err error) {

@@ -17,8 +17,8 @@
 package treenode
 
 import (
-	"github.com/88250/gulu"
-	"github.com/88250/lute/lex"
+	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/lute/lex"
 )
 
 func ContainsMarker(str string) bool {

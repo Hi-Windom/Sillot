@@ -23,7 +23,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/siyuan-note/logging"
+	"github.com/K-Sillot/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

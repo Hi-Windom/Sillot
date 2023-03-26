@@ -22,7 +22,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/88250/lute/parse"
+	"github.com/K-Sillot/lute/parse"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"

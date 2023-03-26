@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	"github.com/88250/vitess-sqlparser/sqlparser"
-	"github.com/siyuan-note/logging"
+	"github.com/K-Sillot/logging"
 )
 
 type Span struct {

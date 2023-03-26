@@ -22,7 +22,7 @@ import (
 	"crypto/cipher"
 	"encoding/hex"
 
-	"github.com/siyuan-note/logging"
+	"github.com/K-Sillot/logging"
 )
 
 var SK = []byte("696D897C9AA0611B")

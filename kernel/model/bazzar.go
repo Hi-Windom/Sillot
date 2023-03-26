@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/88250/gulu"
+	"github.com/K-Sillot/gulu"
 	"github.com/siyuan-note/siyuan/kernel/util"
 
 	"github.com/siyuan-note/siyuan/kernel/bazaar"
