@@ -21,10 +21,10 @@ github.com/K-Sillot/encryption v0.0.1 h1:AiqNTMRouBR38A5DF3ZC88+8n3ouvnONj8ot+8s
 github.com/K-Sillot/encryption v0.0.1/go.mod h1:vmtrEZRHqOEdLKJcYfPDu66pE55GB+W7gNSW3j9uQ5M=
 github.com/K-Sillot/eventbus v0.0.1 h1:raQG+F6EZ3lLJE6VhL8YnasnrX86v4KintDPqD6UNT8=
 github.com/K-Sillot/eventbus v0.0.1/go.mod h1:KyOhDBeLXVENuiTHvLY63NACe8y46NkNBnJ2/E+7+0U=
-github.com/K-Sillot/filelock v0.0.1 h1:Toca1CEAlNZuzlQId5W9Jjm1lKcXiLuDh4CC0GYqleE=
-github.com/K-Sillot/filelock v0.0.1/go.mod h1:0D1Xgji9HcURE/b4B20qzM/7l7v16N0jNOg+kLjAtGc=
-github.com/K-Sillot/gulu v0.0.1 h1:pJTGAXrHfnElQ+AKQp/59KTibnSqH3zd1xHtoeWeIwY=
-github.com/K-Sillot/gulu v0.0.1/go.mod h1:ctg9oTyshqfVoDeMw0lgoRJ6HolihnMfUVRyE3PRzVY=
+github.com/K-Sillot/filelock v0.0.4 h1:k2ehB+3Gd+I23vuZf5smo7DUDWnWQZefS4rm+UHtAUA=
+github.com/K-Sillot/filelock v0.0.4/go.mod h1:v/8rtu/Ej5yNNP59t04KuzkwNkAespsgzyKRUNw39J0=
+github.com/K-Sillot/gulu v0.0.3 h1:yA7vl51Smw4WVRGa6IOfYZYaJBPs1w26PT2/LX18P+g=
+github.com/K-Sillot/gulu v0.0.3/go.mod h1:ctg9oTyshqfVoDeMw0lgoRJ6HolihnMfUVRyE3PRzVY=
 github.com/K-Sillot/httpclient v0.0.1 h1:jgEGwkcF39z5PmykI/tere7HriDefXuVqWRAnbLYeNk=
 github.com/K-Sillot/httpclient v0.0.1/go.mod h1:bpmYNgAvwSwwElk+BeHNWkeIitDCCvjQBbmdzJWLvDM=
 github.com/K-Sillot/logging v0.0.1 h1:ef411zS5kps/YFK81+/ZrvKnRLp2+mH+GII9cBUKS/o=

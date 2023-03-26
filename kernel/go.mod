@@ -57,8 +57,8 @@ require (
 require (
 	dmitri.shuralyov.com/font/woff2 v0.0.0-20180220214647-957792cbbdab // indirect
 	github.com/K-Sillot/dejavu v0.0.2
-	github.com/K-Sillot/filelock v0.0.1
-	github.com/K-Sillot/gulu v0.0.1
+	github.com/K-Sillot/filelock v0.0.4
+	github.com/K-Sillot/gulu v0.0.3
 	github.com/K-Sillot/httpclient v0.0.1
 	github.com/K-Sillot/logging v0.0.1
 	github.com/Masterminds/goutils v1.1.1 // indirect
