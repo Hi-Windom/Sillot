@@ -32,36 +32,36 @@ func GetSillotAppDataDir() string {
 	return filepath.Join(homeDir, "Library", "Application Support", "Sillot-Electron")
 }
 
-var storedConfiges = sync.Mutex{}
+var idbStoredConfiges = sync.Mutex{}
 
 func GetStoredConfiges(f string) (ret map[string]interface{}, err error) {
-	storedConfiges.Lock()
-	defer storedConfiges.Unlock()
+	idbStoredConfiges.Lock()
+	defer idbStoredConfiges.Unlock()
 	return getStoredConfiges(f)
 }
 
 func SetStoredConfiges(f string, data string) (ret map[string]interface{}, err error) {
-	storedConfiges.Lock()
-	defer storedConfiges.Unlock()
+	idbStoredConfiges.Lock()
+	defer idbStoredConfiges.Unlock()
 	return setStoredConfiges(f, data)
 }
 
 func getStoredConfiges(f string) (ret map[string]interface{}, err error) {
 	ret = map[string]interface{}{}
 	// lsPath := filepath.Join(GetSillotAppDataDir(), f)
-	dirPath := filepath.Join(util.DataDir, "storage")
+	dirPath := filepath.Join(util.DataDir, "storage", "idb.json")
 	if !gulu.File.IsExist(dirPath) {
 		return
 	}
 
 	data, err := filelock.ReadFile(dirPath)
 	if nil != err {
-		logging.LogErrorf("read storage [local] failed: %s", err)
+		logging.LogErrorf("read storage [idb.json] failed: %s from %s", err, dirPath)
 		return
 	}
 
 	if err = gulu.JSON.UnmarshalJSON(data, &ret); nil != err {
-		logging.LogErrorf("unmarshal storage [local] failed: %s", err)
+		logging.LogErrorf("unmarshal storage [idb.json] failed: %s", err)
 		return
 	}
 	return
@@ -73,7 +73,7 @@ func setStoredConfiges(f string, data string) (ret map[string]interface{}, err e
 	dirPath := filepath.Join(util.DataDir, "storage", "idb.json")
 
 	if err = filelock.WriteFile(dirPath, []byte(data)); nil != err {
-		logging.LogErrorf("write sort conf failed: %s", err)
+		logging.LogErrorf("write storage [idb.json] failed: %s", err)
 		return
 	}
 	if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
@@ -84,7 +84,7 @@ func setStoredConfiges(f string, data string) (ret map[string]interface{}, err e
 			file.Close()
 		}
 		if err = filelock.WriteFile(lsPath, []byte(data)); nil != err {
-			logging.LogErrorf("write sort conf failed: %s", err)
+			logging.LogErrorf("write storage [idb.json] failed: %s", err)
 			return
 		}
 	}
