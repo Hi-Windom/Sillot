@@ -13,10 +13,12 @@
 <p align="center">
 <br><br>
 <a href="README_zh_CN.md">思源（SiYuan）</a>&emsp;|&emsp;<a href="README_Sillot.md">汐洛（Sillot）</a>
+<br><br>
 </p>
 
 <p align="center">
-<img alt="split" src="./.github/split.png" style="margin: 131px auto;"/>
+<img alt="split" src="./.github/split.png"/>
+<br><br><br><br><br><br>
 </p>
 
 ## Contributors
