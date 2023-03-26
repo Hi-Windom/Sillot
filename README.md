@@ -13,16 +13,24 @@
 <p align="center">
 <br><br>
 <a href="README_zh_CN.md">思源（SiYuan）</a>&emsp;|&emsp;<a href="README_Sillot.md">汐洛（Sillot）</a>
-<br><br>
 </p>
 
 <p align="center">
+<br><br><br><br><br>
 <img alt="split" src="./.github/split.png"/>
-<br><br><br><br><br><br>
 </p>
 
-## Contributors
+## 🛠️ Contributors
 
 <a href="https://github.com/Hi-Windom/Sillot/graphs/contributors">
    <img src="https://contrib.rocks/image?repo=Hi-Windom/Sillot" />
 </a>
+
+<p align="center">
+<br><br><br><br><br>
+<img alt="split" src="./.github/split.png"/>
+</p>
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Hi-Windom/Sillot&type=Timeline)](https://star-history.com/#Hi-Windom/Sillot&Timeline)
