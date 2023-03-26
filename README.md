@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-<img alt="split" src="./.github/split.png"style="margin: 58px auto;"/>
+<img alt="split" src="./.github/split.png"style="margin: 131px auto;"/>
 </p>
 
 ## Contributors
