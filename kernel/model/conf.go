@@ -80,7 +80,7 @@ type AppConf struct {
 func InitConf() {
 	initLang()
 
-	windowStateConf := filepath.Join(util.ConfDir, "sillot", "windowState.json")
+	windowStateConf := filepath.Join(util.ConfDir, "windowState.json")
 	if !gulu.File.IsExist(windowStateConf) {
 		if err := gulu.File.WriteFileSafer(windowStateConf, []byte("{}"), 0644); nil != err {
 			logging.LogErrorf("create [windowState.json] failed: %s", err)
