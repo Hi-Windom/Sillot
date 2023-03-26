@@ -119,7 +119,7 @@ func Boot() {
 	go initPandoc()
 	go initTesseract()
 
-	bootBanner := figure.NewColorFigure("SiYuan", "isometric3", "green", true)
+	bootBanner := figure.NewColorFigure("Sillot", "isometric3", "green", true)
 	logging.LogInfof("\n" + bootBanner.String())
 	logBootInfo()
 }
