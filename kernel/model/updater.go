@@ -120,8 +120,12 @@ func getUpdatePkg() (downloadPkgURLs []string, checksum string, err error) {
 	}
 
 	// ver := result["ver"].(string)
-	ver := result["tag_name"].(string)
-	_ver := strings.ReplaceAll(ver, "-sillot", "")
+	ver := result["tag_name"]
+	if nil == ver {
+		return
+	}
+	logging.LogInfof("found tag_name [%s]", ver)
+	_ver := strings.ReplaceAll(ver.(string), "-sillot", "")
 	_ver = strings.ReplaceAll(_ver, "v", "")
 	if isVersionUpToDate(_ver) {
 		return
@@ -143,7 +147,7 @@ func getUpdatePkg() (downloadPkgURLs []string, checksum string, err error) {
 
 	// b3logURL := "https://release.b3log.org/siyuan/" + pkg
 	// downloadPkgURLs = append(downloadPkgURLs, b3logURL)
-	githubURL := "https://github.com/Hi-Windom/Sillot/releases/download/" + ver + pkg
+	githubURL := "https://github.com/Hi-Windom/Sillot/releases/download/" + ver.(string) + pkg
 	ghproxyURL := "https://ghproxy.com/" + githubURL
 	downloadPkgURLs = append(downloadPkgURLs, ghproxyURL)
 	downloadPkgURLs = append(downloadPkgURLs, githubURL)
