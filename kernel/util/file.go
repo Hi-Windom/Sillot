@@ -25,9 +25,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/88250/gulu"
-	"github.com/88250/lute/ast"
-	"github.com/siyuan-note/logging"
+	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/logging"
+	"github.com/K-Sillot/lute/ast"
 )
 
 func IsEmptyDir(p string) bool {

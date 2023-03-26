@@ -31,9 +31,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/88250/gulu"
+	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/logging"
 	"github.com/imroc/req/v3"
-	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

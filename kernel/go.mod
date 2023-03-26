@@ -5,12 +5,13 @@ go 1.18
 require (
 	github.com/88250/clipboard v0.1.5
 	github.com/88250/css v0.1.2
-	github.com/88250/gulu v1.2.3-0.20230321113152-38c4a3d73c37
-	github.com/88250/lute v1.7.6-0.20230320134658-c722b84ce5e7
 	github.com/88250/pdfcpu v0.3.14-0.20230224021324-e51076eb6390
 	github.com/88250/vitess-sqlparser v0.0.0-20210205111146-56a2ded2aba1
 	github.com/ClarkThan/ahocorasick v0.0.0-20230220142845-f237b6348b3e
 	github.com/ConradIrwin/font v0.0.0-20210318200717-ce8d41cc0732
+	github.com/K-Sillot/encryption v0.0.1
+	github.com/K-Sillot/eventbus v0.0.1
+	github.com/K-Sillot/lute v0.0.1
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/Xuanwo/go-locale v1.1.0
@@ -43,13 +44,6 @@ require (
 	github.com/radovskyb/watcher v1.0.7
 	github.com/sashabaranov/go-gpt3 v1.4.0
 	github.com/shirou/gopsutil/v3 v3.23.2
-	github.com/siyuan-note/dejavu v0.0.0-20230322095009-c0109a321c0c
-	github.com/siyuan-note/encryption v0.0.0-20220713091850-5ecd92177b75
-	github.com/siyuan-note/eventbus v0.0.0-20230216103454-41885eac6c2b
-	github.com/siyuan-note/filelock v0.0.0-20230321113304-79a32917cc9f
-	github.com/siyuan-note/httpclient v0.0.0-20230309131049-f703795de6bc
-	github.com/siyuan-note/logging v0.0.0-20230319012246-6224f958f554
-	github.com/siyuan-note/riff v0.0.0-20230224144841-cfbe0748ddb7
 	github.com/steambap/captcha v1.4.1
 	github.com/studio-b12/gowebdav v0.0.0-20230203202212-3282f94193f2
 	github.com/vmihailenco/msgpack/v5 v5.3.5
@@ -62,6 +56,11 @@ require (
 
 require (
 	dmitri.shuralyov.com/font/woff2 v0.0.0-20180220214647-957792cbbdab // indirect
+	github.com/K-Sillot/dejavu v0.0.2
+	github.com/K-Sillot/filelock v0.0.1
+	github.com/K-Sillot/gulu v0.0.1
+	github.com/K-Sillot/httpclient v0.0.1
+	github.com/K-Sillot/logging v0.0.1
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/alecthomas/chroma v0.10.0 // indirect
@@ -74,7 +73,7 @@ require (
 	github.com/dlclark/regexp2 v1.8.1 // indirect
 	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/go-ole/go-ole v1.2.6
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
@@ -138,6 +137,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
+require github.com/K-Sillot/riff v0.0.1
+
 replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20220714142610-fbbda1ee84f5
 
 //replace github.com/siyuan-note/dejavu => D:\88250\dejavu
@@ -148,3 +149,12 @@ replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20
 //replace github.com/88250/pdfcpu => D:\88250\pdfcpu
 //replace github.com/88250/gulu => D:\88250\gulu
 //replace github.com/mattn/go-sqlite3 => D:\88250\go-sqlite3
+
+// replace github.com/88250/gulu => github.com/K-Sillot/gulu
+// replace github.com/siyuan-note/encryption => github.com/K-Sillot/encryption
+// replace github.com/siyuan-note/eventbus => github.com/K-Sillot/eventbus
+// replace github.com/siyuan-note/filelock => github.com/K-Sillot/filelock
+// replace github.com/siyuan-note/logging => github.com/K-Sillot/logging
+// replace github.com/siyuan-note/httpclient => github.com/K-Sillot/httpclient
+// replace github.com/siyuan-note/riff => github.com/K-Sillot/riff
+// replace github.com/siyuan-note/dejavu => github.com/K-Sillot/dejavu

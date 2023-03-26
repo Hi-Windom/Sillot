@@ -27,9 +27,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/88250/gulu"
-	"github.com/siyuan-note/httpclient"
-	"github.com/siyuan-note/logging"
+	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/httpclient"
+	"github.com/K-Sillot/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )

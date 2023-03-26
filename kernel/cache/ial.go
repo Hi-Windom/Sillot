@@ -19,7 +19,7 @@ package cache
 import (
 	"strings"
 
-	"github.com/88250/lute/editor"
+	"github.com/K-Sillot/lute/editor"
 	"github.com/dgraph-io/ristretto"
 )
 

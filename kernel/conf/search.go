@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/88250/lute/ast"
+	"github.com/K-Sillot/lute/ast"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 )
 

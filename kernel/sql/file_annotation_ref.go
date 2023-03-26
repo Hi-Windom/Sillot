@@ -17,7 +17,7 @@
 package sql
 
 import (
-	"github.com/siyuan-note/logging"
+	"github.com/K-Sillot/logging"
 )
 
 type FileAnnotationRef struct {

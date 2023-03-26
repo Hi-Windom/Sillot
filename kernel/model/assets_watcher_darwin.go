@@ -22,8 +22,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/K-Sillot/logging"
 	"github.com/radovskyb/watcher"
-	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )

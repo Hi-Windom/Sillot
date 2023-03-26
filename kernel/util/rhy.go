@@ -20,8 +20,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/siyuan-note/httpclient"
-	"github.com/siyuan-note/logging"
+	"github.com/K-Sillot/httpclient"
+	"github.com/K-Sillot/logging"
 )
 
 var cachedRhyResult = map[string]interface{}{}

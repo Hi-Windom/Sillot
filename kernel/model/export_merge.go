@@ -17,8 +17,8 @@
 package model
 
 import (
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/parse"
+	"github.com/K-Sillot/lute/ast"
+	"github.com/K-Sillot/lute/parse"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 )

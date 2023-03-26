@@ -14,10 +14,10 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/editor"
-	"github.com/88250/lute/parse"
-	"github.com/88250/lute/util"
+	"github.com/K-Sillot/lute/ast"
+	"github.com/K-Sillot/lute/editor"
+	"github.com/K-Sillot/lute/parse"
+	"github.com/K-Sillot/lute/util"
 	"github.com/goccy/go-json"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 )

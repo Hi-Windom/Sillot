@@ -21,7 +21,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/88250/lute/html"
+	"github.com/K-Sillot/lute/html"
 )
 
 func EscapeHTML(s string) string {

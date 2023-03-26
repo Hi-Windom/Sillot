@@ -19,8 +19,8 @@
 package util
 
 import (
+	"github.com/K-Sillot/logging"
 	"github.com/shirou/gopsutil/v3/host"
-	"github.com/siyuan-note/logging"
 )
 
 func GetOSPlatform() (plat string) {

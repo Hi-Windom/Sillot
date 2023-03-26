@@ -21,10 +21,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/88250/gulu"
 	"github.com/ConradIrwin/font/sfnt"
+	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/logging"
 	"github.com/flopp/go-findfont"
-	"github.com/siyuan-note/logging"
 	ttc "golang.org/x/image/font/sfnt"
 	textUnicode "golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"

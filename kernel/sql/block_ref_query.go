@@ -21,10 +21,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/88250/gulu"
-	"github.com/88250/lute/parse"
+	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/logging"
+	"github.com/K-Sillot/lute/parse"
 	"github.com/emirpasic/gods/sets/hashset"
-	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/search"
 )
 
