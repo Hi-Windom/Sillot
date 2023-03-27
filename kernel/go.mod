@@ -60,7 +60,7 @@ require (
 	github.com/K-Sillot/filelock v0.0.4
 	github.com/K-Sillot/gulu v0.0.3
 	github.com/K-Sillot/httpclient v0.0.1
-	github.com/K-Sillot/logging v0.0.1
+	github.com/K-Sillot/logging v0.0.2
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/alecthomas/chroma v0.10.0 // indirect
