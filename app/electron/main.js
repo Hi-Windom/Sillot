@@ -1014,14 +1014,38 @@ app.whenReady().then(() => {
       "ci-hi",
       "ci-win",
       "ci-dom",
+      "@sillot",
     ];
+    const trustedHost = [
+        "raw.githubusercontent.com",
+        "bitbucket.org",
+        "esm.sh",
+    ]
+    const esm = [
+        "sofill",
+        "sili",
+        "sillot",
+    ]
+    const esm2 = [
+        "https://esm.sh/v113/sofill",
+        "https://esm.sh/v113/sili",
+        "https://esm.sh/v113/sillot",
+    ]
 
     session.defaultSession.webRequest.onBeforeRequest(
       filter,
       (details, callback) => {
         let host = details.url.split("/")[2].split(":")[0];
         let u = details.url.split("/")[3];
-        if (trusted.includes(u) || ignore.includes(host)) {
+        let e = u.split("@")[0];
+        let e2 = details.url.split("@")[0];
+        if (ignore.includes(host) || (
+            trustedHost.includes(host) && (
+                trusted.includes(u) // like https://raw.githubusercontent.com/siyuan-note/siyuan/master/scripts/win-build.bat or https://esm.sh/@sillot/bridge@0.0.3
+                || esm.includes(e) // like https://esm.sh/sofill@1.0.64 but not like https://esm.sh/@sillot/bridge@0.0.3
+                || esm2.includes(e2) // like https://esm.sh/v113/sofill@1.0.64
+                )
+            )) {
             callback({ cancel: false });
         } else {
             console.log( {url:details.url,res:"不受信的 js 请求将被重定向，请从本地加载 js"})
