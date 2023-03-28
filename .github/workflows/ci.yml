@@ -38,8 +38,10 @@ jobs:
       - id: thislatestR
         uses: pozetroninc/github-action-get-latest-release@master
         with:
-          owner: Hi-Windom
-          repo: Sillot
+          # owner: Hi-Windom
+          # repo: Sillot
+          repository: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           excludes: prerelease, draft
 
       - name: Gather Sillot Release Information
