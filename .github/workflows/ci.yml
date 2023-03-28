@@ -31,6 +31,8 @@ jobs:
         with:
           owner: siyuan-note
           repo: siyuan
+          # repository: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           excludes: prerelease, draft
 
       - name: Gather Release Information
