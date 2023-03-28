@@ -52,6 +52,19 @@ Sillot （汐洛）是彖乄驱动、极致优雅、开发者友好的思源笔�
 
 汐洛有自己的开发路线、技术选型与工具链体系，同时受海文东标准约束，无论是贡献开发者还是第三方扩展开发者都不会感到困惑。
 
+
+### 调试内核
+
+可以在 vscode 中直接点击【运行和调试】
+
+要想知道可视化运行关系，可以使用 [ofabry/go-callvis：使用 Graphviz 可视化 Go 程序的调用图 (github.com)](https://github.com/ofabry/go-callvis)
+
+```
+go install github.com/ofabry/go-callvis
+```
+
+然后在新终端 `go-callvis main.go`
+
 <p align="center">
 <img alt="split" src="./.github/split.png">
 </p>
