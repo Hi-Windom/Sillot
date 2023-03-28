@@ -143,6 +143,8 @@ func CheckFileSysStatus() {
 }
 
 func checkFileSysStatus() {
+	defer logging.Recover()
+
 	if IsMutexLocked(&checkFileSysStatusLock) {
 		logging.LogWarnf("check file system status is locked, skip")
 		return
@@ -323,9 +325,27 @@ func existAvailabilityStatus(workspaceAbsPath string) bool {
 		return false
 	}
 	defer shell.Release()
-	folderObj := oleutil.MustCallMethod(shell, "NameSpace", dir).ToIDispatch()
-	fileObj := oleutil.MustCallMethod(folderObj, "ParseName", file).ToIDispatch()
-	value := oleutil.MustCallMethod(folderObj, "GetDetailsOf", fileObj, 303)
+
+	result, err := oleutil.CallMethod(shell, "NameSpace", dir)
+	if nil != err {
+		logging.LogWarnf("call shell [NameSpace] failed: %s", err)
+		return false
+	}
+	folderObj := result.ToIDispatch()
+
+	result, err = oleutil.CallMethod(folderObj, "ParseName", file)
+	if nil != err {
+		logging.LogWarnf("call shell [ParseName] failed: %s", err)
+		return false
+	}
+	fileObj := result.ToIDispatch()
+
+	result, err = oleutil.CallMethod(folderObj, "GetDetailsOf", fileObj, 303)
+	if nil != err {
+		logging.LogWarnf("call shell [GetDetailsOf] failed: %s", err)
+		return false
+	}
+	value := result
 	if nil == value {
 		return false
 	}

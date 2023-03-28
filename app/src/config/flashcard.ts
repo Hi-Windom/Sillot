@@ -38,6 +38,14 @@ export const flashcard = {
         return `${responsiveHTML}
 <label class="fn__flex b3-label">
     <div class="fn__flex-1">
+        ${window.siyuan.languages.flashcardMark}
+        <div class="b3-label__text">${window.siyuan.languages.flashcardMarkTip}</div>
+    </div>
+    <span class="fn__space"></span>
+    <input class="b3-switch fn__flex-center" id="mark" type="checkbox"${window.siyuan.config.flashcard.mark ? " checked" : ""}/>
+</label>
+<label class="fn__flex b3-label">
+    <div class="fn__flex-1">
         ${window.siyuan.languages.flashcardList}
         <div class="b3-label__text">${window.siyuan.languages.flashcardListTip}</div>
     </div>
@@ -67,6 +75,7 @@ export const flashcard = {
                 fetchPost("/api/setting/setFlashcard", {
                     newCardLimit: parseInt((flashcard.element.querySelector("#newCardLimit") as HTMLInputElement).value),
                     reviewCardLimit: parseInt((flashcard.element.querySelector("#reviewCardLimit") as HTMLInputElement).value),
+                    mark: (flashcard.element.querySelector("#mark") as HTMLInputElement).checked,
                     list: (flashcard.element.querySelector("#list") as HTMLInputElement).checked,
                     superBlock: (flashcard.element.querySelector("#superBlock") as HTMLInputElement).checked,
                     deck: (flashcard.element.querySelector("#deck") as HTMLInputElement).checked,

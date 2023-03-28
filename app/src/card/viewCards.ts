@@ -141,6 +141,8 @@ export const viewCards = (deckID: string, title: string, deckType: "Tree" | "" |
                             nextElment.classList.add("b3-list-item--focus");
                             target.parentElement.remove();
                         }
+
+                        dialog.element.querySelector(".counter").textContent = (parseInt(dialog.element.querySelector(".counter").textContent) - 1).toString()
                         if (cb) {
                             cb(removeResponse);
                         }
@@ -168,6 +170,9 @@ const renderViewItem = (blocks: IBlock[], title: string, deckType: string) => {
                 hPath = getNotebookName(item.box) + getDisplayName(Lute.UnEscapeHTMLStr(item.hPath), false);
             } else {
                 hPath = getDisplayName(Lute.UnEscapeHTMLStr(item.hPath), false).replace("/" + pathArray.join("/"), "");
+                if (hPath.startsWith("/")) {
+                    hPath = hPath.substring(1);
+                }
             }
             listHTML += `<div data-type="card-item" class="b3-list-item${isFirst ? " b3-list-item--focus" : ""}${isMobile() ? "" : " b3-list-item--hide-action"}" data-id="${item.id}">
 <svg class="b3-list-item__graphic"><use xlink:href="#${getIconByType(item.type)}"></use></svg>
@@ -181,6 +186,7 @@ ${unicode2Emoji(item.ial.icon, false, "b3-list-item__graphic", true)}
 </div>`;
             isFirst = false;
         } else {
+            // 块被删除的情况
             listHTML += `<div data-type="card-item" class="b3-list-item${isMobile() ? "" : " b3-list-item--hide-action"}">
 <span class="b3-list-item__text">${item.content}</span>
 <span data-type="remove" data-id="${item.id}" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.removeDeck}">

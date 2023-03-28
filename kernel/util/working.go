@@ -218,16 +218,6 @@ func initWorkspaceDir(workspaceArg string) {
 		}
 	} else {
 		workspacePaths, _ = ReadWorkspacePaths()
-		// 启动时移除处于网盘路径下的工作空间 https://github.com/siyuan-note/siyuan/issues/7790
-		var tmp []string
-		for _, workspacePath := range workspacePaths {
-			if IsCloudDrivePath(workspacePath) {
-				logging.LogWarnf("skip the cloud drive path [%s]", workspacePath)
-				continue
-			}
-			tmp = append(tmp, workspacePath)
-		}
-		workspacePaths = tmp
 
 		if 0 < len(workspacePaths) {
 			// 取最后一个（也就是最近打开的）工作空间
