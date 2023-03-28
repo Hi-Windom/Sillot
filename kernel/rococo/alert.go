@@ -1,5 +1,3 @@
-//go:build windows
-
 package rococo
 
 import (
@@ -36,11 +34,6 @@ func abort(funcname string, err syscall.Errno) {
 	panic(funcname + " failed: " + err.Error())
 }
 
-var (
-	user32, _     = syscall.LoadLibrary("user32.dll")
-	messageBox, _ = syscall.GetProcAddress(user32, "MessageBoxW")
-)
-
 func IntPtr(n int) uintptr {
 	return uintptr(n)
 }
@@ -59,6 +52,10 @@ func MessageBox(caption, text string, style uintptr) (result int) {
 	if runtime.GOOS != "windows" {
 		return 0
 	}
+	var (
+		user32, _     = syscall.LoadLibrary("user32.dll")
+		messageBox, _ = syscall.GetProcAddress(user32, "MessageBoxW")
+	)
 	// defer syscall.FreeLibrary(user32)
 	ret, _, callErr := syscall.Syscall9(messageBox,
 		4,
@@ -79,7 +76,6 @@ func ShowMessage2(title, text string) {
 	if runtime.GOOS != "windows" {
 		return
 	}
-	// defer syscall.FreeLibrary(user32)
 	user32 := syscall.NewLazyDLL("user32.dll")
 	MessageBoxW := user32.NewProc("MessageBoxW")
 	MessageBoxW.Call(IntPtr(0), StrPtr(text), StrPtr(title), IntPtr(0))
