@@ -38,8 +38,10 @@ jobs:
       - id: thislatestR
         uses: pozetroninc/github-action-get-latest-release@master
         with:
-          owner: Hi-Windom
-          repo: Sillot
+          # owner: Hi-Windom
+          # repo: Sillot
+          repository: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           excludes: prerelease, draft
 
       - name: Gather Sillot Release Information
@@ -172,7 +174,7 @@ jobs:
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
       - name: Install Node Dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
       - name: Building UI
