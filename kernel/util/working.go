@@ -45,7 +45,7 @@ var Mode = "prod"
 const (
 	Ver       = "0.13"
 	VerC      = Ver + ".999" // 用于检查版本更新
-	VerSY     = "2.8.1"
+	VerSY     = "2.8.2"
 	IsInsider = true
 )
 

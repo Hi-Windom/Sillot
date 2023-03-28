@@ -33,6 +33,7 @@ import (
 	"github.com/K-Sillot/lute/parse"
 	"github.com/dustin/go-humanize"
 	"github.com/panjf2000/ants/v2"
+	"github.com/siyuan-note/siyuan/kernel/rococo"
 	"github.com/siyuan-note/siyuan/kernel/util"
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -325,6 +326,7 @@ func InitBlockTree(force bool) {
 	entries, err := os.ReadDir(util.BlockTreePath)
 	if nil != err {
 		logging.LogErrorf("read block tree dir failed: %s", err)
+		rococo.ShowMessage2("导致内核退出的致命错误", err.Error())
 		os.Exit(logging.ExitCodeFileSysErr)
 		return
 	}
@@ -342,6 +344,7 @@ func InitBlockTree(force bool) {
 		fh, err = os.OpenFile(p, os.O_RDWR, 0644)
 		if nil != err {
 			logging.LogErrorf("open block tree file failed: %s", err)
+			rococo.ShowMessage2("导致内核退出的致命错误", err.Error())
 			os.Exit(logging.ExitCodeFileSysErr)
 			return
 		}
@@ -351,6 +354,7 @@ func InitBlockTree(force bool) {
 		fh.Close()
 		if nil != err {
 			logging.LogErrorf("read block tree failed: %s", err)
+			rococo.ShowMessage2("导致内核退出的致命错误", err.Error())
 			os.Exit(logging.ExitCodeFileSysErr)
 			return
 		}
@@ -361,6 +365,7 @@ func InitBlockTree(force bool) {
 			if err = os.RemoveAll(util.BlockTreePath); nil != err {
 				logging.LogErrorf("removed corrupted block tree failed: %s", err)
 			}
+			rococo.ShowMessage2("导致内核退出的致命错误", err.Error())
 			os.Exit(logging.ExitCodeFileSysErr)
 			return
 		}
@@ -410,6 +415,7 @@ func SaveBlockTree(force bool) {
 		data, err := msgpack.Marshal(slice.data)
 		if nil != err {
 			logging.LogErrorf("marshal block tree failed: %s", err)
+			rococo.ShowMessage2("导致内核退出的致命错误", err.Error())
 			os.Exit(logging.ExitCodeFileSysErr)
 			return false
 		}
@@ -418,6 +424,7 @@ func SaveBlockTree(force bool) {
 		p := filepath.Join(util.BlockTreePath, key.(string)) + ".msgpack"
 		if err = gulu.File.WriteFileSafer(p, data, 0644); nil != err {
 			logging.LogErrorf("write block tree failed: %s", err)
+			rococo.ShowMessage2("导致内核退出的致命错误", err.Error())
 			os.Exit(logging.ExitCodeFileSysErr)
 			return false
 		}
