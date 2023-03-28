@@ -2,9 +2,12 @@ name: Release Docker Image
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master--DISABLE
+  # 运行预发行镜像而无需合并到主分支，例如 v0.13.3rc1
+    inputs:
+      image_tag:
+        description: '镜像标签（ 无论 tag 是什么，都会附加 latest , -sillot 会自动补全因此无需输入 ) '
+        required: true
+        default: 'v0.'
 
 jobs:
   build:
@@ -35,4 +38,4 @@ jobs:
 
       - name: Build the Docker image
         run: |
-          docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:v0.13.3rc1-sillot .
+          docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:${{ github.event.inputs.image_tag }}-sillot .
