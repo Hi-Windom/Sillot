@@ -172,7 +172,7 @@ jobs:
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
       - name: Install Node Dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
       - name: Building UI
