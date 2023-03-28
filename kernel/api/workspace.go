@@ -108,7 +108,7 @@ func removeWorkspaceDir(c *gin.Context) {
 	}
 
 	if util.WorkspaceDir == path && (util.ContainerIOS == util.Container || util.ContainerAndroid == util.Container) {
-		os.Exit(util.ExitCodeOk)
+		os.Exit(logging.ExitCodeOk)
 	}
 }
 
@@ -194,6 +194,13 @@ func setWorkspaceDir(c *gin.Context) {
 		ret.Code = -1
 		ret.Msg = model.Conf.Language(78)
 		ret.Data = map[string]interface{}{"closeTimeout": 3000}
+		return
+	}
+
+	if util.IsCloudDrivePath(path) {
+		ret.Code = -1
+		ret.Msg = model.Conf.Language(196)
+		ret.Data = map[string]interface{}{"closeTimeout": 7000}
 		return
 	}
 

@@ -45,7 +45,7 @@ export const openSearch = async (hotkey: string, key?: string, notebookId?: stri
     if (exitDialog) {
         return;
     }
-    const localData = window.siyuan.storage[Constants.LOCAL_SEARCHEDATA];
+    const localData = window.siyuan.storage[Constants.LOCAL_SEARCHDATA];
     let hPath = "";
     let idPath: string[] = [];
     if (notebookId) {
@@ -75,7 +75,7 @@ export const openSearch = async (hotkey: string, key?: string, notebookId?: stri
     const dialog = new Dialog({
         content: "",
         width: "80vw",
-        height: "80vh",
+        height: "90vh",
         destroyCallback: () => {
             if (range) {
                 focusByRange(range);
@@ -87,6 +87,7 @@ export const openSearch = async (hotkey: string, key?: string, notebookId?: stri
     });
     dialog.element.setAttribute("data-key", hotkey);
     const edit = genSearch({
+        removed: localData.removed,
         k: key || localData.k,
         r: localData.r,
         hasReplace: hotkey === window.siyuan.config.keymap.general.replace.custom,

@@ -11,7 +11,6 @@ import {confirmDialog} from "../../dialog/confirmDialog";
 import {getThemeMode, setInlineStyle} from "../../util/assets";
 import {fetchPost} from "../../util/fetch";
 import {Dialog} from "../../dialog";
-import {lockFile} from "../../dialog/processSystem";
 import {pathPosix} from "../../util/pathName";
 import {replaceLocalPath} from "../../editor/rename";
 import {setStorageVal} from "../util/compatibility";
@@ -105,8 +104,9 @@ const renderPDF = (id: string) => {
           position: fixed;
           right: 0;
           top: 0;
-          overflow: auto;
+          overflow-y: auto;
           bottom: 0;
+          overflow-x: hidden;
         }
         
         #preview {
@@ -115,12 +115,6 @@ const renderPDF = (id: string) => {
           position: absolute;
           right: 232px;
           left: 0;
-        }
-        
-        #preview > .code-block,
-        #preview > [data-type="NodeMathBlock"] {
-           margin-left: auto;
-           margin-right: auto;
         }
         
         #preview.exporting {
@@ -136,11 +130,7 @@ const renderPDF = (id: string) => {
           width: 0;
           height: 0;
         }
-        pre code {
-          max-height: none !important;
-          word-break: break-all !important;
-          white-space: pre-wrap !important;
-        }
+        
         .protyle-wysiwyg {
           height: 100%;
           overflow: auto;
@@ -237,35 +227,52 @@ const renderPDF = (id: string) => {
     let pdfLeft = 0;
     let pdfTop = 0;
     const previewElement = document.getElementById('preview');
-    const setLineNumberWidth = (element) => {
+    const fixBlockWidth = () => {
+        const isLandscape = document.querySelector("#landscape").checked;
         let width = 800
-        switch (element.value) {
+        switch (document.querySelector("#action #pageSize").value) {
             case "A3":
-              width = 842
+              width = isLandscape ? 1587.84 : 1122.24 
               break;
             case "A4":
-              width = 595
+              width = isLandscape ? 1122.24 : 793.92
               break;
             case "A5":
-              width = 420
+              width = isLandscape ? 793.92 : 559.68
               break;
             case "Legal":
+              width = isLandscape ? 1344: 816 
+              break;
             case "Letter":
-              width = 612
+              width = isLandscape ? 1056 : 816
               break;
             case "Tabloid":
-              width = 792
+              width = isLandscape ? 1632 : 1056
               break;
         }
-        previewElement.querySelectorAll('.hljs.protyle-linenumber').forEach((item) => {
-            item.parentElement.style.width = width + "px";
+        previewElement.style.width = width + "px";
+        width = width - parseFloat(previewElement.style.paddingLeft) * 96 * 2;
+        // 为保持代码块宽度一致，全部都进行宽度设定 https://github.com/siyuan-note/siyuan/issues/7692 
+        previewElement.querySelectorAll('.hljs').forEach((item) => {
+            // 强制换行 https://ld246.com/article/1679228783553
+            item.parentElement.setAttribute("linewrap", "true");
+            item.parentElement.style.width = "";
+            item.parentElement.style.width = Math.min(item.parentElement.clientWidth, width) + "px";
             item.removeAttribute('data-render');
         })
+        Protyle.highlightRender(previewElement, "${servePath}/stage/protyle");
         previewElement.querySelectorAll('[data-type="NodeMathBlock"]').forEach((item) => {
-            item.style.width = width + "px";
+            item.style.width = "";
+            item.style.width = Math.min(item.clientWidth, width) + "px";
+            item.removeAttribute('data-render');
         })
         Protyle.mathRender(previewElement, "${servePath}/stage/protyle", true);
-        Protyle.highlightRender(previewElement, "${servePath}/stage/protyle");
+        previewElement.querySelectorAll("table").forEach(item => {
+            if (item.clientWidth > item.parentElement.clientWidth) {
+                item.style.zoom = (item.parentElement.clientWidth / item.clientWidth).toFixed(2) - 0.01;
+                item.parentElement.style.overflow = "hidden";
+            }
+        })
     }
     const setPadding = () => {
         const isLandscape = document.querySelector("#landscape").checked;
@@ -300,12 +307,7 @@ const renderPDF = (id: string) => {
         }
         document.getElementById('preview').style.padding = pdfTop + "in " + pdfLeft + "in";
         setTimeout(() => {
-            previewElement.querySelectorAll("table").forEach(item => {
-                if (item.clientWidth > item.parentElement.clientWidth) {
-                    item.style.zoom = (item.parentElement.clientWidth / item.clientWidth).toFixed(2) - 0.01;
-                    item.parentElement.style.overflow = "hidden";
-                }
-            })
+            fixBlockWidth();
         }, 300);
     }
     const fetchPost = (url, data, cb) => {
@@ -327,10 +329,6 @@ const renderPDF = (id: string) => {
         Protyle.mindmapRender(previewElement, "${servePath}/stage/protyle");
         Protyle.abcRender(previewElement, "${servePath}/stage/protyle");
         Protyle.plantumlRender(previewElement, "${servePath}/stage/protyle");
-        Protyle.highlightRender(previewElement, "${servePath}/stage/protyle");
-        setTimeout(() => {
-            setLineNumberWidth(document.querySelector("#action #pageSize"));
-        }, 600);
     }
     fetchPost("/api/export/exportPreviewHTML", {
         id: "${id}",
@@ -405,9 +403,8 @@ const renderPDF = (id: string) => {
         actionElement.querySelector("#scale").addEventListener("input", () => {
             actionElement.querySelector("#scaleTip").innerText = actionElement.querySelector("#scale").value;
         })
-        const pageSizeElement = actionElement.querySelector("#pageSize")
-        pageSizeElement.addEventListener('change', () => {
-            setLineNumberWidth(pageSizeElement);
+        actionElement.querySelector("#pageSize").addEventListener('change', () => {
+            fixBlockWidth();
         });
         actionElement.querySelector("#marginsType").addEventListener('change', () => {
             setPadding();
@@ -444,10 +441,11 @@ const renderPDF = (id: string) => {
               rootId: "${id}",
               rootTitle: response.data.name,
             })
-            actionElement.remove();
             previewElement.classList.add("exporting");
             previewElement.style.paddingTop = "6px";
             previewElement.style.paddingBottom = "0";
+            fixBlockWidth();
+            actionElement.remove();
         });
         setPadding();
         renderPreview(response.data.content);
@@ -482,11 +480,6 @@ const getExportPath = (option: { type: string, id: string }, removeAssets?: bool
     fetchPost("/api/block/getBlockInfo", {
         id: option.id
     }, (response) => {
-        if (response.code === 2) {
-            // 文件被锁定
-            lockFile(response.data);
-            return;
-        }
         if (response.code === 3) {
             showMessage(response.msg);
             return;

@@ -7,7 +7,6 @@ import {disabledProtyle, onGet} from "../protyle/util/onGet";
 import {addLoading} from "../protyle/ui/initUI";
 import {focusBlock} from "../protyle/util/selection";
 import {scrollCenter} from "../util/highlightById";
-import {lockFile} from "../dialog/processSystem";
 import {hasClosestByAttribute} from "../protyle/util/hasClosest";
 import {setEditMode} from "../protyle/util/setEditMode";
 import {hideElements} from "../protyle/ui/hideElements";
@@ -40,11 +39,6 @@ export const openMobileFileById = (id: string, action = [Constants.CB_GET_HL]) =
     }
 
     fetchPost("/api/block/getBlockInfo", {id}, (data) => {
-        if (data.code === 2) {
-            // 文件被锁定
-            lockFile(data.data);
-            return;
-        }
         if (data.code === 3) {
             showMessage(data.msg);
             return;
@@ -59,14 +53,6 @@ export const openMobileFileById = (id: string, action = [Constants.CB_GET_HL]) =
             }, getResponse => {
                 onGet(getResponse, window.siyuan.mobile.editor.protyle, action);
                 window.siyuan.mobile.editor.protyle.breadcrumb?.render(window.siyuan.mobile.editor.protyle);
-                const exitFocusElement = window.siyuan.mobile.editor.protyle.breadcrumb.element.parentElement.querySelector('[data-type="exit-focus"]');
-                if (action.includes(Constants.CB_GET_ALL)) {
-                    exitFocusElement.classList.remove("fn__none");
-                    exitFocusElement.nextElementSibling.classList.remove("fn__none");
-                } else {
-                    exitFocusElement.classList.add("fn__none");
-                    exitFocusElement.nextElementSibling.classList.add("fn__none");
-                }
             });
             window.siyuan.mobile.editor.protyle.undo.clear();
         } else {

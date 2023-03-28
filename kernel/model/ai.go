@@ -57,7 +57,10 @@ func chatGPT(msg string, cloud bool) (ret string) {
 }
 
 func chatGPTWithAction(msg string, action string, cloud bool) (ret string) {
-	msg = action + ":\n\n" + msg
+	action = strings.TrimSpace(action)
+	if "" != action {
+		msg = action + ":\n\n" + msg
+	}
 	ret, _, err := chatGPTContinueWrite(msg, nil, cloud)
 	if nil != err {
 		return
@@ -77,7 +80,7 @@ func chatGPTContinueWrite(msg string, contextMsgs []string, cloud bool) (ret str
 	if cloud {
 		gpt = &CloudGPT{}
 	} else {
-		gpt = &OpenAIGPT{c: util.NewOpenAIClient()}
+		gpt = &OpenAIGPT{c: util.NewOpenAIClient(Conf.AI.OpenAI.APIKey, Conf.AI.OpenAI.APIProxy, Conf.AI.OpenAI.APIBaseURL)}
 	}
 
 	buf := &bytes.Buffer{}
@@ -99,7 +102,7 @@ func chatGPTContinueWrite(msg string, contextMsgs []string, cloud bool) (ret str
 }
 
 func isOpenAIAPIEnabled() bool {
-	if "" == util.OpenAIAPIKey {
+	if "" == Conf.AI.OpenAI.APIKey {
 		util.PushMsg(Conf.Language(193), 5000)
 		return false
 	}
@@ -155,7 +158,7 @@ type OpenAIGPT struct {
 }
 
 func (gpt *OpenAIGPT) chat(msg string, contextMsgs []string) (partRet string, stop bool, err error) {
-	return util.ChatGPT(msg, contextMsgs, gpt.c)
+	return util.ChatGPT(msg, contextMsgs, gpt.c, Conf.AI.OpenAI.APIMaxTokens, Conf.AI.OpenAI.APITimeout)
 }
 
 type CloudGPT struct {

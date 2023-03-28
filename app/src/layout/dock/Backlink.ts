@@ -92,7 +92,7 @@ export class Backlink extends Model {
     <span data-type="sort" data-sort="3" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.sort}"><svg><use xlink:href='#iconSort'></use></svg></span>
     <span class="fn__space"></span>
     <span data-type="expand" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.expand} ${updateHotkeyTip(window.siyuan.config.keymap.editor.general.expand.custom)}">
-        <svg><use xlink:href="#iconFullscreen"></use></svg>
+        <svg><use xlink:href="#iconExpand"></use></svg>
     </span>
     <span class="fn__space"></span>
     <span data-type="collapse" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.collapse} ${updateHotkeyTip(window.siyuan.config.keymap.editor.general.collapse.custom)}">
@@ -117,7 +117,7 @@ export class Backlink extends Model {
     <span data-type="mSort" data-sort="3" class="block__icon b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.sort}"><svg><use xlink:href='#iconSort'></use></svg></span>
     <span class="fn__space"></span>
     <span data-type="mExpand" class="block__icon b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.expand}">
-        <svg><use xlink:href="#iconFullscreen"></use></svg>
+        <svg><use xlink:href="#iconExpand"></use></svg>
     </span>
     <span class="fn__space"></span>
     <span data-type="mCollapse" class="block__icon b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.collapse}">
@@ -574,15 +574,20 @@ export class Backlink extends Model {
             if (data.mentionsCount === 0) {
                 this.status[this.blockId].backlinkMStatus = 3;
             } else {
-                Array.from({length: window.siyuan.config.editor.backlinkExpandCount}).forEach((item, index) => {
+                Array.from({length: window.siyuan.config.editor.backmentionExpandCount}).forEach((item, index) => {
                     if (data.backmentions[index]) {
                         this.status[this.blockId].backlinkMOpenIds.push(data.backmentions[index].id);
                     }
                 });
-                if (data.linkRefsCount === 0) {
-                    this.status[this.blockId].backlinkMStatus = 0;
+                if (window.siyuan.config.editor.backmentionExpandCount === 0) {
+                    // 设置为 0 时需折叠
+                    this.status[this.blockId].backlinkMStatus = 3;
                 } else {
-                    this.status[this.blockId].backlinkMStatus = 1;
+                    if (data.linkRefsCount === 0) {
+                        this.status[this.blockId].backlinkMStatus = 0;
+                    } else {
+                        this.status[this.blockId].backlinkMStatus = 1;
+                    }
                 }
             }
             if (data.linkRefsCount > 0) {

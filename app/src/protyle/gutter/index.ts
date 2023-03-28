@@ -208,16 +208,16 @@ export class Gutter {
                 openAttr(protyle.wysiwyg.element.querySelector(`[data-node-id="${id}"]`), protyle);
             } else {
                 this.renderMenu(protyle, buttonElement);
-                if (isMobile()) {
-                    window.siyuan.menus.menu.fullscreen();
-                } else {
-                    window.siyuan.menus.menu.popup({x: event.clientX - 16, y: event.clientY - 16}, true);
-                }
                 // https://ld246.com/article/1648433751993
                 if (!protyle.toolbar.range) {
                     protyle.toolbar.range = getEditorRange(protyle.wysiwyg.element.firstElementChild);
                 }
-                focusByRange(protyle.toolbar.range);
+                if (isMobile()) {
+                    window.siyuan.menus.menu.fullscreen();
+                } else {
+                    window.siyuan.menus.menu.popup({x: event.clientX - 16, y: event.clientY - 16}, true);
+                    focusByRange(protyle.toolbar.range);
+                }
             }
         });
         this.element.addEventListener("contextmenu", (event: MouseEvent & { target: HTMLInputElement }) => {
@@ -668,7 +668,9 @@ export class Gutter {
             submenu: this.genCardStyle(selectsElement, protyle).concat(this.genFontStyle(selectsElement, protyle)).concat(this.genBGStyle(selectsElement, protyle))
         }).element;
         window.siyuan.menus.menu.append(appearanceElement);
-        appearanceElement.lastElementChild.classList.add("b3-menu__submenu--row");
+        if (!isMobile()) {
+            appearanceElement.lastElementChild.classList.add("b3-menu__submenu--row");
+        }
         this.genAlign(selectsElement, protyle);
         this.genWidths(selectsElement, protyle);
         window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
@@ -681,20 +683,22 @@ export class Gutter {
                 quickMakeCard(selectsElement);
             }
         }).element);
-        window.siyuan.menus.menu.append(new MenuItem({
-            label: window.siyuan.languages.addToDeck,
-            icon: "iconRiffCard",
-            click() {
-                const ids: string[] = [];
-                selectsElement.forEach(item => {
-                    if (item.getAttribute("data-type") === "NodeThematicBreak") {
-                        return;
-                    }
-                    ids.push(item.getAttribute("data-node-id"));
-                });
-                makeCard(ids);
-            }
-        }).element);
+        if (window.siyuan.config.flashcard.deck) {
+            window.siyuan.menus.menu.append(new MenuItem({
+                label: window.siyuan.languages.addToDeck,
+                icon: "iconRiffCard",
+                click() {
+                    const ids: string[] = [];
+                    selectsElement.forEach(item => {
+                        if (item.getAttribute("data-type") === "NodeThematicBreak") {
+                            return;
+                        }
+                        ids.push(item.getAttribute("data-node-id"));
+                    });
+                    makeCard(ids);
+                }
+            }).element);
+        }
         return window.siyuan.menus.menu;
     }
 
@@ -1439,7 +1443,9 @@ export class Gutter {
                 submenu: this.genCardStyle([nodeElement], protyle).concat(this.genFontStyle([nodeElement], protyle)).concat(this.genBGStyle([nodeElement], protyle))
             }).element;
             window.siyuan.menus.menu.append(appearanceElement);
-            appearanceElement.lastElementChild.classList.add("b3-menu__submenu--row");
+            if (!isMobile()) {
+                appearanceElement.lastElementChild.classList.add("b3-menu__submenu--row");
+            }
             this.genAlign([nodeElement], protyle);
             this.genWidths([nodeElement], protyle);
         }
@@ -1465,13 +1471,15 @@ export class Gutter {
                     quickMakeCard([nodeElement]);
                 }
             }).element);
-            window.siyuan.menus.menu.append(new MenuItem({
-                label: window.siyuan.languages.addToDeck,
-                icon: "iconRiffCard",
-                click() {
-                    makeCard([nodeElement.getAttribute("data-node-id")]);
-                }
-            }).element);
+            if (window.siyuan.config.flashcard.deck) {
+                window.siyuan.menus.menu.append(new MenuItem({
+                    label: window.siyuan.languages.addToDeck,
+                    icon: "iconRiffCard",
+                    click() {
+                        makeCard([nodeElement.getAttribute("data-node-id")]);
+                    }
+                }).element);
+            }
             window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
         }
         let updateHTML = nodeElement.getAttribute("updated") || "";
@@ -1588,12 +1596,14 @@ export class Gutter {
 
     private genBGStyle(nodeElements: Element[], protyle: IProtyle) {
         const styles: IMenu[] = [];
+        const isM = isMobile();
         ["var(--b3-font-background1)", "var(--b3-font-background2)", "var(--b3-font-background3)", "var(--b3-font-background4)",
             "var(--b3-font-background5)", "var(--b3-font-background6)", "var(--b3-font-background7)", "var(--b3-font-background8)",
             "var(--b3-font-background9)", "var(--b3-font-background10)", "var(--b3-font-background11)", "var(--b3-font-background12)",
             "var(--b3-font-background13)"].forEach((item, index) => {
             styles.push({
-                label: `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages.colorPrimary} ${index + 1}">
+                iconHTML: isM ? `<span style="background-color:${item};" class="color__square fn__flex-center"></span>` : Constants.ZWSP,
+                label: isM ? `${window.siyuan.languages.colorPrimary} ${index + 1}` : `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages.colorPrimary} ${index + 1}">
     <span style="background-color:${item};" class="color__square fn__flex-center"></span>
 </div>`,
                 click: () => {
@@ -1607,7 +1617,8 @@ export class Gutter {
             type: "separator"
         });
         styles.push({
-            label: `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages.clearFontStyle}">
+            iconHTML: isM ? '<span class="color__square fn__flex-center">A</span>' : Constants.ZWSP,
+            label: isM ? window.siyuan.languages.clearFontStyle : `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages.clearFontStyle}">
     <span class="color__square fn__flex-center">A</span>
 </div>`,
             click: () => {
@@ -1703,12 +1714,14 @@ export class Gutter {
 
     private genFontStyle(nodeElements: Element[], protyle: IProtyle) {
         const styles: IMenu[] = [];
+        const isM = isMobile();
         ["var(--b3-font-color1)", "var(--b3-font-color2)", "var(--b3-font-color3)", "var(--b3-font-color4)",
             "var(--b3-font-color5)", "var(--b3-font-color6)", "var(--b3-font-color7)", "var(--b3-font-color8)",
             "var(--b3-font-color9)", "var(--b3-font-color10)", "var(--b3-font-color11)", "var(--b3-font-color12)",
             "var(--b3-font-color13)"].forEach((item, index) => {
             styles.push({
-                label: `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages.colorFont} ${index + 1}">
+                iconHTML: isM ? `<span style="color:${item};" class="color__square fn__flex-center">A</span>` : Constants.ZWSP,
+                label: isM ? `${window.siyuan.languages.colorFont} ${index + 1}` : `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages.colorFont} ${index + 1}">
     <span style="color:${item};" class="color__square fn__flex-center">A</span>
 </div>`,
                 click: () => {
@@ -1726,9 +1739,11 @@ export class Gutter {
 
     private genCardStyle(nodeElements: Element[], protyle: IProtyle) {
         const styles: IMenu[] = [];
+        const isM = isMobile();
         ["error", "warning", "info", "success"].forEach((item) => {
             styles.push({
-                label: `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages[item + "Style"]}">
+                iconHTML: isM ? `<span style="color: var(--b3-card-${item}-color);background-color: var(--b3-card-${item}-background);" class="color__square fn__flex-center">A</span>` : Constants.ZWSP,
+                label: isM ? window.siyuan.languages[item + "Style"] : `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages[item + "Style"]}">
     <span style="color: var(--b3-card-${item}-color);background-color: var(--b3-card-${item}-background);" class="color__square fn__flex-center">A</span>    
 </div>`,
                 click: () => {
@@ -1743,7 +1758,8 @@ export class Gutter {
             type: "separator"
         });
         return styles.concat([{
-            label: `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages.hollow}">
+            iconHTML: isM ? '<span style="-webkit-text-stroke: 0.2px var(--b3-theme-on-background);-webkit-text-fill-color : transparent;" class="color__square fn__flex-center">A</span>' : Constants.ZWSP,
+            label: isM ? window.siyuan.languages.hollow : `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages.hollow}">
     <span style="-webkit-text-stroke: 0.2px var(--b3-theme-on-background);-webkit-text-fill-color : transparent;" class="color__square fn__flex-center">A</span>
 </div>`,
             click: () => {
@@ -1753,7 +1769,8 @@ export class Gutter {
                 });
             }
         }, {
-            label: `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages.shadow}">
+            iconHTML: isM ? ' <span style="text-shadow: 1px 1px var(--b3-theme-surface-lighter), 2px 2px var(--b3-theme-surface-lighter), 3px 3px var(--b3-theme-surface-lighter), 4px 4px var(--b3-theme-surface-lighter)" class="color__square fn__flex-center">A</span>' : Constants.ZWSP,
+            label: isM ? window.siyuan.languages.shadow : `<div class="fn__flex" data-type="a" aria-label="${window.siyuan.languages.shadow}">
     <span style="text-shadow: 1px 1px var(--b3-theme-surface-lighter), 2px 2px var(--b3-theme-surface-lighter), 3px 3px var(--b3-theme-surface-lighter), 4px 4px var(--b3-theme-surface-lighter)" class="color__square fn__flex-center">A</span>
 </div>`,
             click: () => {

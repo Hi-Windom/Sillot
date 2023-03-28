@@ -174,7 +174,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
         // https://github.com/siyuan-note/siyuan/issues/5083
         if (this.splitChar === "/" || this.splitChar === "、") {
             clearTimeout(this.timeId);
-            if (this.enableSlash) {
+            if (this.enableSlash && !isMobile()) {
                 this.genHTML(hintSlash(key, protyle), protyle);
             }
             return;
@@ -201,7 +201,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
         }
     }
 
-    public bindUploadEvent (protyle:IProtyle, element:HTMLElement) {
+    public bindUploadEvent(protyle: IProtyle, element: HTMLElement) {
         const uploadElement = element.querySelector('input[type="file"]');
         if (uploadElement) {
             uploadElement.addEventListener("change", (event: InputEvent & { target: HTMLInputElement }) => {

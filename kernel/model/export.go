@@ -174,11 +174,20 @@ func ExportSystemLog() (zipPath string) {
 			logging.LogErrorf("copy app log from [%s] to [%s] failed: %s", err, appLog, to)
 		}
 	}
-	kernelLog := filepath.Join(util.TempDir, "siyuan.log")
+
+	kernelLog := filepath.Join(util.HomeDir, ".config", "siyuan", "kernel.log")
 	if gulu.File.IsExist(kernelLog) {
-		to := filepath.Join(exportFolder, "siyuan.log")
+		to := filepath.Join(exportFolder, "kernel.log")
 		if err := gulu.File.CopyFile(kernelLog, to); nil != err {
 			logging.LogErrorf("copy kernel log from [%s] to [%s] failed: %s", err, kernelLog, to)
+		}
+	}
+
+	siyuanLog := filepath.Join(util.TempDir, "siyuan.log")
+	if gulu.File.IsExist(siyuanLog) {
+		to := filepath.Join(exportFolder, "siyuan.log")
+		if err := gulu.File.CopyFile(siyuanLog, to); nil != err {
+			logging.LogErrorf("copy kernel log from [%s] to [%s] failed: %s", err, siyuanLog, to)
 		}
 	}
 
@@ -1077,7 +1086,6 @@ func exportMarkdownZip(boxID, baseFolderName string, docPaths []string) (zipPath
 
 		id := docIAL["id"]
 		hPath, md := exportMarkdownContent(id)
-		md = yfm(docIAL) + md
 		dir, name = path.Split(hPath)
 		dir = util.FilterFilePath(dir) // 导出文档时未移除不支持的文件名符号 https://github.com/siyuan-note/siyuan/issues/4590
 		name = util.FilterFileName(name)
@@ -1165,6 +1173,10 @@ func exportMarkdownZip(boxID, baseFolderName string, docPaths []string) (zipPath
 
 func yfm(docIAL map[string]string) string {
 	// 导出 Markdown 文件时开头附上一些元数据 https://github.com/siyuan-note/siyuan/issues/6880
+	// 导出 Markdown 时在文档头添加 YFM 开关https://github.com/siyuan-note/siyuan/issues/7727
+	if !Conf.Export.MarkdownYFM {
+		return ""
+	}
 
 	buf := bytes.Buffer{}
 	buf.WriteString("---\n")
@@ -1437,6 +1449,8 @@ func exportMarkdownContent(id string) (hPath, exportedMd string) {
 		Conf.Export.TagOpenMarker, Conf.Export.TagCloseMarker,
 		Conf.Export.BlockRefTextLeft, Conf.Export.BlockRefTextRight,
 		Conf.Export.AddTitle)
+	docIAL := parse.IAL2Map(tree.Root.KramdownIAL)
+	exportedMd = yfm(docIAL) + exportedMd
 	return
 }
 
@@ -1556,6 +1570,7 @@ func exportTree(tree *parse.Tree, wysiwyg, expandKaTexMacros, keepFold bool,
 		var defMd string
 		stmt := n.ChildByType(ast.NodeBlockQueryEmbedScript).TokensStr()
 		stmt = html.UnescapeString(stmt)
+		stmt = strings.ReplaceAll(stmt, editor.IALValEscNewLine, "\n")
 		embedBlocks := searchEmbedBlock(n.ID, stmt, nil, 0, false)
 		if 1 > len(embedBlocks) {
 			return ast.WalkContinue
@@ -1655,6 +1670,7 @@ func exportTree(tree *parse.Tree, wysiwyg, expandKaTexMacros, keepFold bool,
 		if "" == linkText {
 			linkText = sql.GetRefText(defID)
 		}
+		linkText = html.UnescapeHTMLStr(linkText) // 块引锚文本导出时 `&` 变为实体 `&amp;` https://github.com/siyuan-note/siyuan/issues/7659
 		if Conf.Editor.BlockRefDynamicAnchorTextMaxLen < utf8.RuneCountInString(linkText) {
 			linkText = gulu.Str.SubStr(linkText, Conf.Editor.BlockRefDynamicAnchorTextMaxLen) + "..."
 		}
@@ -1779,6 +1795,8 @@ func exportTree(tree *parse.Tree, wysiwyg, expandKaTexMacros, keepFold bool,
 			exportMdVal := n.IALAttr("data-export-md")
 			exportMdVal = html.UnescapeString(exportMdVal) // 导出 `data-export-md` 时未解析代码块与行内代码内的转义字符 https://github.com/siyuan-note/siyuan/issues/4180
 			if "" != exportMdVal {
+				luteEngine0 := util.NewLute()
+				luteEngine0.SetYamlFrontMatter(true) // 挂件导出属性 `data-export-md` 支持 YFM https://github.com/siyuan-note/siyuan/issues/7752
 				exportMdTree := parse.Parse("", []byte(exportMdVal), luteEngine.ParseOptions)
 				var insertNodes []*ast.Node
 				for c := exportMdTree.Root.FirstChild; nil != c; c = c.Next {
@@ -1867,6 +1885,7 @@ func resolveFootnotesDefs(refFootnotes *[]*refAsFootnotes, rootID string, blockR
 				} else if ast.NodeBlockQueryEmbed == n.Type {
 					stmt := n.ChildByType(ast.NodeBlockQueryEmbedScript).TokensStr()
 					stmt = html.UnescapeString(stmt)
+					stmt = strings.ReplaceAll(stmt, editor.IALValEscNewLine, "\n")
 					sqlBlocks := sql.SelectBlocksRawStmt(stmt, Conf.Search.Limit)
 					for _, b := range sqlBlocks {
 						subNodes := renderBlockMarkdownR0(b.ID, &rendered)

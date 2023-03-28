@@ -26,7 +26,7 @@ export const genCardItem = (item: ICardPackage) => {
 <span data-type="remove" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.removeDeck}">
     <svg><use xlink:href="#iconMin"></use></svg>
 </span>
-<span data-type="add" style="display: block" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.addDeck}">
+<span data-type="add" style="display: flex" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.addDeck}">
     <svg><use xlink:href="#iconAdd"></use></svg>
 </span>
 <span class="b3-list-item__meta${isMobile() ? " fn__none" : ""}">${item.updated}</span>
@@ -124,7 +124,7 @@ export const makeCard = (ids: string[]) => {
                     event.preventDefault();
                     break;
                 } else if (type === "view") {
-                    viewCards(target.parentElement.getAttribute("data-id"), escapeHtml(target.parentElement.getAttribute("data-name")),"", (removeResponse) => {
+                    viewCards(target.parentElement.getAttribute("data-id"), target.parentElement.getAttribute("data-name"), "", (removeResponse) => {
                         target.parentElement.outerHTML = genCardItem(removeResponse.data);
                     });
                     event.stopPropagation();

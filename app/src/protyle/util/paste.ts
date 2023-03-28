@@ -78,7 +78,7 @@ export const pasteText = (protyle: IProtyle, textPlain: string, nodeElement: Ele
     processRender(protyle.wysiwyg.element);
     highlightRender(protyle.wysiwyg.element);
     filterClipboardHint(protyle, textPlain);
-    scrollCenter(protyle);
+    scrollCenter(protyle, undefined, false, "smooth");
 };
 
 export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEvent) & { target: HTMLElement }) => {
@@ -178,6 +178,7 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
         tempElement.querySelectorAll("[data-node-id]").forEach((e) => {
             const newId = Lute.NewNodeID();
             e.setAttribute("data-node-id", newId);
+            e.removeAttribute("custom-riff-decks");
             e.classList.remove("protyle-wysiwyg--select", "protyle-wysiwyg--hl");
             e.setAttribute("updated", newId.split("-")[0]);
             isBlock = true;
@@ -262,7 +263,7 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
                 processRender(protyle.wysiwyg.element);
                 highlightRender(protyle.wysiwyg.element);
                 filterClipboardHint(protyle, response.data);
-                scrollCenter(protyle);
+                scrollCenter(protyle, undefined, false, "smooth");
             });
             return;
         } else if (files && files.length > 0) {
@@ -285,5 +286,5 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
         processRender(protyle.wysiwyg.element);
         highlightRender(protyle.wysiwyg.element);
     }
-    scrollCenter(protyle);
+    scrollCenter(protyle, undefined, false, "smooth");
 };

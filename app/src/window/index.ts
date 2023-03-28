@@ -9,7 +9,6 @@ import {fetchGet, fetchPost} from "../util/fetch";
 import {addBaseURL, setNoteBook} from "../util/pathName";
 import {openFileById} from "../editor/util";
 import {
-    downloadProgress,
     processSync, progressBackgroundTask,
     progressLoading,
     progressStatus,
@@ -90,11 +89,8 @@ class App {
                             case "statusbar":
                                 progressStatus(data);
                                 break;
-                            case "downloadProgress":
-                                downloadProgress(data.data);
-                                break;
                             case "txerr":
-                                transactionError(data);
+                                transactionError();
                                 break;
                             case "syncing":
                                 processSync(data);

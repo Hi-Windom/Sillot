@@ -29,14 +29,17 @@ win:
 nsis:
   oneClick: false
   perMachine: false
-  allowToChangeInstallationDirectory: false
+  allowToChangeInstallationDirectory: true
   allowElevation: true
   deleteAppDataOnUninstall: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: "SiYuan"
   license: "../LICENSE"
-  include: "installer.nsh"
+  include: "nsis/installer.nsh"
+  warningsAsErrors: false
+  installerSidebar: "nsis/installerSidebar.bmp"
+  uninstallerSidebar: "nsis/uninstallerSidebar.bmp"
 
 extraResources:
   - from: "appearance/boot"

@@ -14,15 +14,17 @@ import {focusBlock, focusByRange} from "../protyle/util/selection";
 import {onGet} from "../protyle/util/onGet";
 /// #if !BROWSER
 import {shell} from "electron";
+import {BrowserWindow} from "@electron/remote";
 /// #endif
 import {pushBack} from "../util/backForward";
 import {Asset} from "../asset";
 import {Layout} from "../layout";
 import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName,} from "../protyle/util/hasClosest";
-import {lockFile, setTitle} from "../dialog/processSystem";
+import {setTitle} from "../dialog/processSystem";
 import {zoomOut} from "../menus/protyle";
 import {countBlockWord, countSelectWord} from "../layout/status";
 import {showMessage} from "../dialog/message";
+import {getSearch} from "../util/functions";
 
 export const openFileById = (options: {
     id: string,
@@ -34,11 +36,6 @@ export const openFileById = (options: {
     removeCurrentTab?: boolean
 }) => {
     fetchPost("/api/block/getBlockInfo", {id: options.id}, (data) => {
-        if (data.code === 2) {
-            // 文件被锁定
-            lockFile(data.data);
-            return;
-        }
         if (data.code === 3) {
             showMessage(data.msg);
             return;
@@ -115,6 +112,26 @@ const openFile = (options: IOpenFileOptions) => {
         if (hasEditor) {
             return;
         }
+    }
+
+    let hasOpen = false;
+    /// #if !BROWSER
+    // https://github.com/siyuan-note/siyuan/issues/7491
+    BrowserWindow.getAllWindows().find((item) => {
+        const json = getSearch("json", new URL(item.webContents.getURL()).search);
+        if (json) {
+            const jsonObj = JSON.parse(json);
+            if ((jsonObj.children.rootId && jsonObj.children.rootId === options.rootID) ||
+                (jsonObj.children.path && jsonObj.children.path === options.assetPath)) {
+                item.focus();
+                hasOpen = true;
+                return true;
+            }
+        }
+    });
+    /// #endif
+    if (hasOpen) {
+        return;
     }
 
     let wnd: Wnd = undefined;

@@ -56,6 +56,11 @@ interface Window {
     openFileByURL(URL: string): boolean
 }
 
+interface ISaveLayout {
+    name: string,
+    layout: IObject
+}
+
 interface IWorkspace {
     path: string
     closed: boolean
@@ -76,6 +81,7 @@ interface ICard {
 }
 
 interface ISearchOption {
+    removed?: boolean  // 移除后需记录搜索内容 https://github.com/siyuan-note/siyuan/issues/7745
     name?: string
     sort: number,  //  0：按块类型（默认），1：按创建时间升序，2：按创建时间降序，3：按更新时间升序，4：按更新时间降序，5：按内容顺序（仅在按文档分组时），6：按相关度升序，7：按相关度降序
     group: number,  // 0：不分组，1：按文档分组
@@ -301,6 +307,7 @@ declare interface IExport {
     paragraphBeginningSpace: boolean;
     addTitle: boolean;
     addFooter: boolean;
+    markdownYFM: boolean;
 }
 
 declare interface IEditor {
@@ -330,6 +337,7 @@ declare interface IEditor {
     virtualBlockRefInclude: string;
     blockRefDynamicAnchorTextMaxLen: number;
     backlinkExpandCount: number;
+    backmentionExpandCount: number;
 
     emoji: string[];
 }
@@ -386,6 +394,23 @@ declare interface IConfig {
     repo: {
         key: string
     },
+    flashcard: {
+        newCardLimit: number
+        reviewCardLimit: number
+        mark: boolean
+        list: boolean
+        superBlock: boolean
+        deck: boolean
+    }
+    ai: {
+        openAI: {
+            apiBaseURL: string
+            apiKey: string
+            apiMaxTokens: number
+            apiProxy: string
+            apiTimeout: number
+        },
+    }
     sync: {
         generateConflictDoc: boolean
         enabled: boolean
@@ -487,7 +512,6 @@ declare interface IConfig {
         virtualRefAlias: boolean
         virtualRefAnchor: boolean
         virtualRefDoc: boolean
-        virtualRefKeywordsLimit: boolean
     },
     stat: {
         treeCount: number
@@ -585,6 +609,7 @@ declare interface IBlockTree {
 }
 
 declare interface IBlock {
+    riffCardReps? :number   // 闪卡复习次数
     depth?: number,
     box?: string;
     path?: string;

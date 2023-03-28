@@ -35,9 +35,12 @@
     * [Execute SQL query](#Execute-SQL-query)
 * [Templates](#Templates)
     * [Render a template](#Render-a-template)
+    * [Render Sprig](#Render-Sprig)
 * [File](#File)
     * [Get file](#Get-file)
     * [Put file](#Put-file)
+    * [Remove file](#Remove-file)
+    * [List files](#List-files)
 * [Export](#Export)
     * [Export Markdown](#Export-Markdown)
 * [Notification](#Notification)
@@ -439,7 +442,7 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
   }
   ```
 
-    * `id`：Block ID
+    * `id`: Block ID
 * Return value
 
   ```json
@@ -829,6 +832,27 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
   }
   ```
 
+### 渲染 Sprig
+
+* `/api/template/renderSprig`
+* Parameters
+
+  ```json
+  {
+    "template": "/daily note/{{now | date \"2006/01\"}}/{{now | date \"2006-01-02\"}}"
+  }
+  ```
+  * `template`: template content
+* Return value
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": "/daily note/2023/03/2023-03-24"
+  }
+  ```
+
 ## File
 
 ### Get file
@@ -854,7 +878,7 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
     * `isDir`: whether to create a folder, when `true` only create a folder, ignore `file`
     * `modTime`: last access and modification time, Unix time
     * `file`: the uploaded file
-* return value
+* Return value
 
    ```json
    {
@@ -863,6 +887,57 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
      "data": null
    }
    ```
+
+### Remove file
+
+* `/api/file/removeFile`
+* Parameters
+
+  ```json
+  {
+    "path": "/data/20210808180117-6v0mkxr/20200923234011-ieuun1p.sy"
+  }
+  ```
+  * `path`: the file path under the workspace path
+* Return value
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": null
+  }
+  ```
+
+### List files
+
+* `/api/file/readDir`
+* Parameters
+
+  ```json
+  {
+    "path": "/data/20210808180117-6v0mkxr/20200923234011-ieuun1p.sy"
+  }
+  ```
+  * `path`: the file path under the workspace path
+* Return value
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": [
+        {
+            "isDir": true,
+            "name": "20210808180320-abz7w6k"
+        },
+        {
+            "isDir": false,
+            "name": "20210808180320-abz7w6k.sy"
+        }
+    ]
+  }
+  ```
 
 ## Export
 
@@ -946,7 +1021,7 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
     }
   }
   ```
-    * `id`：Message ID
+    * `id`: Message ID
 
 ## System
 

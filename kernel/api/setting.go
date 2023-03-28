@@ -29,6 +29,86 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
+func setAI(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	param, err := gulu.JSON.MarshalJSON(arg)
+	if nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	ai := &conf.AI{}
+	if err = gulu.JSON.UnmarshalJSON(param, ai); nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	if 5 > ai.OpenAI.APITimeout {
+		ai.OpenAI.APITimeout = 5
+	}
+	if 600 < ai.OpenAI.APITimeout {
+		ai.OpenAI.APITimeout = 600
+	}
+
+	if 0 > ai.OpenAI.APIMaxTokens {
+		ai.OpenAI.APIMaxTokens = 0
+	}
+	if 4096 < ai.OpenAI.APIMaxTokens {
+		ai.OpenAI.APIMaxTokens = 4096
+	}
+
+	model.Conf.AI = ai
+	model.Conf.Save()
+
+	ret.Data = ai
+}
+
+func setFlashcard(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	param, err := gulu.JSON.MarshalJSON(arg)
+	if nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	flashcard := &conf.Flashcard{}
+	if err = gulu.JSON.UnmarshalJSON(param, flashcard); nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	if 1 > flashcard.NewCardLimit {
+		flashcard.NewCardLimit = 1
+	}
+
+	if 1 > flashcard.ReviewCardLimit {
+		flashcard.ReviewCardLimit = 1
+	}
+
+	model.Conf.Flashcard = flashcard
+	model.Conf.Save()
+
+	ret.Data = flashcard
+}
+
 func setAccount(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -234,7 +314,6 @@ func setSearch(c *gin.Context) {
 	oldVirtualRefAlias := model.Conf.Search.VirtualRefAlias
 	oldVirtualRefAnchor := model.Conf.Search.VirtualRefAnchor
 	oldVirtualRefDoc := model.Conf.Search.VirtualRefDoc
-	oldVirtualRefKeywordsLimit := model.Conf.Search.VirtualRefKeywordsLimit
 
 	model.Conf.Search = s
 	model.Conf.Save()
@@ -246,8 +325,7 @@ func setSearch(c *gin.Context) {
 	if oldVirtualRefName != s.VirtualRefName ||
 		oldVirtualRefAlias != s.VirtualRefAlias ||
 		oldVirtualRefAnchor != s.VirtualRefAnchor ||
-		oldVirtualRefDoc != s.VirtualRefDoc ||
-		oldVirtualRefKeywordsLimit != s.VirtualRefKeywordsLimit {
+		oldVirtualRefDoc != s.VirtualRefDoc {
 		model.ResetVirtualBlockRefCache()
 	}
 	ret.Data = s

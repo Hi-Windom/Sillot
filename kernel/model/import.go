@@ -38,6 +38,7 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
+	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
@@ -111,9 +112,14 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 	}
 	if 1 != len(unzipRootPaths) {
 		logging.LogErrorf("invalid .sy.zip")
-		return errors.New("invalid .sy.zip")
+		return errors.New(Conf.Language(199))
 	}
 	unzipRootPath := unzipRootPaths[0]
+	name := filepath.Base(unzipRootPath)
+	if strings.HasPrefix(name, "data-20") && len("data-20230321175442") == len(name) {
+		return errors.New(Conf.Language(199))
+	}
+
 	luteEngine := util.NewLute()
 	blockIDs := map[string]string{}
 	trees := map[string]*parse.Tree{}
@@ -421,7 +427,7 @@ func ImportData(zipPath string) (err error) {
 		return errors.New("check data.zip failed")
 	}
 	if 0 < len(files) {
-		return errors.New("invalid data.zip")
+		return errors.New(Conf.Language(198))
 	}
 	dirs, err := os.ReadDir(unzipPath)
 	if nil != err {
@@ -429,7 +435,7 @@ func ImportData(zipPath string) (err error) {
 		return errors.New("check data.zip failed")
 	}
 	if 1 != len(dirs) {
-		return errors.New("invalid data.zip")
+		return errors.New(Conf.Language(198))
 	}
 
 	tmpDataPath := filepath.Join(unzipPath, dirs[0].Name())
@@ -702,6 +708,23 @@ func ImportFromLocalPath(boxID, localPath string, toPath string) (err error) {
 	IncSync()
 	util.ReloadUI()
 	debug.FreeOSMemory()
+	return
+}
+
+func parseStdMd(markdown []byte) (ret *parse.Tree) {
+	luteEngine := lute.New()
+	luteEngine.SetFootnotes(false)
+	luteEngine.SetToC(false)
+	luteEngine.SetIndentCodeBlock(false)
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetHeadingID(false)
+	luteEngine.SetSetext(false)
+	luteEngine.SetYamlFrontMatter(false)
+	luteEngine.SetLinkRef(false)
+	luteEngine.SetGFMAutoLink(false) // 导入 Markdown 时不自动转换超链接 https://github.com/siyuan-note/siyuan/issues/7682
+	luteEngine.SetImgPathAllowSpace(true)
+	ret = parse.Parse("", markdown, luteEngine.ParseOptions)
+	genTreeID(ret)
 	return
 }
 

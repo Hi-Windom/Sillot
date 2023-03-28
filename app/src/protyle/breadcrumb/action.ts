@@ -60,7 +60,7 @@ export const fullscreen = (element: Element, btnElement?: Element) => {
         if (isFullscreen) {
             btnElement.querySelector("use").setAttribute("xlink:href", "#iconFullscreen");
         } else {
-            btnElement.querySelector("use").setAttribute("xlink:href", "#iconContract");
+            btnElement.querySelector("use").setAttribute("xlink:href", "#iconFullscreenExit");
         }
         const dockLayoutElement = hasClosestByClassName(element, "layout--float");
         if (dockLayoutElement) {

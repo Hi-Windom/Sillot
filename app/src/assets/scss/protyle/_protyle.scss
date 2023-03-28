@@ -1,6 +1,7 @@
 @import "content";
 @import "toolbar";
 @import "wysiwyg";
+@import "attr";
 
 .protyle-scroll {
   --b3-dynamicscroll-width: 200px;
@@ -8,7 +9,6 @@
   right: 0;
   top: 30px;
   width: 16px;
-  padding: 0 8px;
   bottom: 9px; // 下图标 hover 时，需要留出一定的空间
 
   svg {
@@ -47,7 +47,7 @@
 
   &__bar {
     position: absolute;
-    right: calc(11px - var(--b3-dynamicscroll-width) / 2);
+    right: calc(4px - var(--b3-dynamicscroll-width) / 2);
     top: calc(50% - 8px);
     transform: rotate(90deg);
     z-index: 1;
@@ -56,63 +56,6 @@
       width: var(--b3-dynamicscroll-width);
       display: block;
     }
-  }
-}
-
-.protyle-attr {
-  display: flex;
-  position: absolute;
-  right: 0;
-  top: -9px;
-  opacity: 0;
-  font-size: 12px;
-  font-weight: normal;
-
-  & > div.protyle-attr--bookmark {
-    flex: 1;
-  }
-
-  & > div:not(.protyle-attr--refcount) {
-    margin: 0 4px;
-    line-height: 16px;
-    color: var(--b3-theme-on-surface);
-    min-width: 12px;
-
-    &:hover {
-      color: var(--b3-theme-on-background);
-    }
-
-    svg {
-      height: 12px;
-      width: 12px;
-      margin: 2px 2px 0 0;
-      float: left;
-    }
-  }
-
-  &--refcount {
-    right: -16px;
-    top: 18px;
-    position: absolute;
-    line-height: 16px;
-    padding: 0 4px;
-    color: var(--b3-theme-on-surface);
-    border-radius: 2px;
-    font-size: 12px;
-    user-select: none;
-    cursor: pointer;
-    height: 16px;
-    background-color: var(--b3-theme-surface);
-    z-index: 1; // 防止被 protyle-scroll 遮挡
-
-    &:hover {
-      color: var(--b3-theme-on-background);
-      background-color: var(--b3-theme-surface-lighter);
-    }
-  }
-
-  &:empty {
-    display: none;
   }
 }
 
@@ -306,7 +249,7 @@
     width: 80px;
     transition: var(--b3-transition);
     cursor: pointer;
-    font-size: 80px;
+    font-size: 68px; // 🔪显示不完整
     line-height: 80px;
     text-align: center;
     font-family: var(--b3-font-family-emoji);
@@ -317,6 +260,10 @@
       width: 80px;
       float: left;
       border-radius: 4px;
+    }
+
+    &:not(.fn__none) + .protyle-icons {
+      margin-top: 57px;
     }
   }
 
@@ -413,11 +360,9 @@
     bottom: 0;
     display: flex;
     position: absolute;
-    height: 80px;
 
     .protyle-icons {
       position: initial;
-      margin-top: 40px;
     }
   }
 }

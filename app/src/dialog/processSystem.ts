@@ -1,7 +1,6 @@
 import {Constants} from "../constants";
 import {fetchPost} from "../util/fetch";
 /// #if !MOBILE
-import {getAllModels} from "../layout/getAll";
 import {exportLayout} from "../layout/util";
 /// #endif
 /// #if !BROWSER
@@ -18,7 +17,7 @@ import {needSubscribe} from "../util/needSubscribe";
 
 export const lockScreen = () => {
     if (window.siyuan.config.readonly) {
-        return
+        return;
     }
     /// #if BROWSER
     fetchPost("/api/system/logoutAuth", {}, () => {
@@ -27,47 +26,6 @@ export const lockScreen = () => {
     /// #else
     ipcRenderer.send(Constants.SIYUAN_SEND_WINDOWS, {cmd: "lockscreen"});
     /// #endif
-};
-
-export const lockFile = (id: string) => {
-    const html = `<div class="b3-dialog__scrim"></div>
-<div class="b3-dialog__container">
-    <div class="b3-dialog__header" onselectstart="return false;">🔒 ${window.siyuan.languages.lockFile0} <small>v${Constants.SIYUAN_VERSION}</small></div>
-    <div class="b3-dialog__content">
-        <p>${window.siyuan.languages.lockFile1}</p>
-        <p>${window.siyuan.languages.lockFile2}</p>
-    </div>
-    <div class="b3-dialog__action">
-        <button class="b3-button b3-button--cancel">${window.siyuan.languages.closeTab}</button>
-        <div class="fn__space"></div>
-        <button class="b3-button b3-button--text">${window.siyuan.languages.retry}</button>
-    </div>
-</div>`;
-    let logElement = document.getElementById("errorLog");
-    if (logElement) {
-        logElement.innerHTML = html;
-    } else {
-        document.body.insertAdjacentHTML("beforeend", `<div id="errorLog" class="b3-dialog b3-dialog--open">${html}</div>`);
-        logElement = document.getElementById("errorLog");
-    }
-    logElement.querySelector(".b3-button--cancel").addEventListener("click", () => {
-        /// #if !MOBILE
-        getAllModels().editor.find((item) => {
-            if (item.editor.protyle.block.rootID === id) {
-                item.parent.parent.removeTab(item.parent.id, false, false);
-                return true;
-            }
-        });
-        logElement.remove();
-        /// #endif
-    });
-    logElement.querySelector(".b3-button--text").addEventListener("click", () => {
-        fetchPost("/api/filetree/lockFile", {id}, (response) => {
-            if (response.code === 0) {
-                window.location.reload();
-            }
-        });
-    });
 };
 
 export const kernelError = () => {
@@ -111,7 +69,7 @@ export const exitSiYuan = () => {
                 buttonElement.addEventListener("click", () => {
                     fetchPost("/api/system/exit", {force: true}, () => {
                         /// #if !BROWSER
-                        ipcRenderer.send(Constants.SIYUAN_QUIT, getCurrentWindow().id);
+                        ipcRenderer.send(Constants.SIYUAN_QUIT, location.port);
                         /// #else
                         if (["ios", "android"].includes(window.siyuan.config.system.container) && (window.webkit?.messageHandlers || window.JSAndroid)) {
                             window.location.href = "siyuan://api/system/exit";
@@ -135,7 +93,7 @@ export const exitSiYuan = () => {
                     }, 2000);
                     // 然后等待一段时间后再退出，避免界面主进程退出以后内核子进程被杀死
                     setTimeout(() => {
-                        ipcRenderer.send(Constants.SIYUAN_QUIT, getCurrentWindow().id);
+                        ipcRenderer.send(Constants.SIYUAN_QUIT, location.port);
                     }, 4000);
                     /// #endif
                 });
@@ -145,13 +103,13 @@ export const exitSiYuan = () => {
                     execInstallPkg: 1 //  0：默认检查新版本，1：不执行新版本安装，2：执行新版本安装
                 }, () => {
                     /// #if !BROWSER
-                    ipcRenderer.send(Constants.SIYUAN_QUIT, getCurrentWindow().id);
+                    ipcRenderer.send(Constants.SIYUAN_QUIT, location.port);
                     /// #endif
                 });
             });
         } else { // 正常退出
             /// #if !BROWSER
-            ipcRenderer.send(Constants.SIYUAN_QUIT, getCurrentWindow().id);
+            ipcRenderer.send(Constants.SIYUAN_QUIT, location.port);
             /// #else
             if (["ios", "android"].includes(window.siyuan.config.system.container) && (window.webkit?.messageHandlers || window.JSAndroid)) {
                 window.location.href = "siyuan://api/system/exit";
@@ -161,11 +119,7 @@ export const exitSiYuan = () => {
     });
 };
 
-export const transactionError = (data: { code: number, data: string }) => {
-    if (data.code === 1) {
-        lockFile(data.data);
-        return;
-    }
+export const transactionError = () => {
     if (document.getElementById("transactionError")) {
         return;
     }
@@ -187,7 +141,7 @@ export const transactionError = (data: { code: number, data: string }) => {
         /// #else
         exportLayout(false, () => {
             exitSiYuan();
-        });
+        }, false, true);
         /// #endif
     });
     btnsElement[1].addEventListener("click", () => {
@@ -319,11 +273,14 @@ export const setTitle = (title: string) => {
 };
 
 export const downloadProgress = (data: { id: string, percent: number }) => {
-    const bazzarElement = document.getElementById("configBazaarReadme");
-    if (!bazzarElement) {
+    const bazzarSideElement = document.querySelector("#configBazaarReadme .item__side");
+    if (!bazzarSideElement) {
         return;
     }
-    const btnElement = bazzarElement.querySelector('[data-type="install"]') as HTMLElement;
+    if (data.id !== JSON.parse(bazzarSideElement.getAttribute("data-obj")).repoURL) {
+        return;
+    }
+    const btnElement = bazzarSideElement.querySelector('[data-type="install"]') as HTMLElement;
     if (btnElement) {
         if (data.percent >= 1) {
             btnElement.parentElement.classList.add("fn__none");

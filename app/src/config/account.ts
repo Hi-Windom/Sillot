@@ -45,9 +45,9 @@ ${window.siyuan.languages.account2}
         if (window.siyuan.user) {
             let userTitlesHTML = "";
             if (window.siyuan.user.userTitles.length > 0) {
-                userTitlesHTML = '<div class="fn__hr--b"></div><div class="fn__flex" style="position: absolute"><span class="fn__space"></span>';
+                userTitlesHTML = '<div class="b3-chips" style="position: absolute">';
                 window.siyuan.user.userTitles.forEach((item) => {
-                    userTitlesHTML += `<div class="b3-chip">${item.icon} ${item.name}</div><span class="fn__space"></span>`;
+                    userTitlesHTML += `<div class="b3-chip b3-chip--middle">${item.icon} ${item.name}</div>`;
                 });
                 userTitlesHTML += "</div>";
             }
@@ -56,7 +56,7 @@ ${window.siyuan.languages.account2}
 <div class="b3-form__icon fn__block">
    <svg class="ft__secondary b3-form__icon-icon"><use xlink:href="#iconVIP"></use></svg>
    <input class="b3-text-field fn__block b3-form__icon-input" style="padding-right: 44px;" placeholder="${window.siyuan.languages.activationCodePlaceholder}">
-   <button id="activationCode" class="b3-button b3-button--white" style="position: absolute;right: 1px;top: 1px;height: 25px;">${window.siyuan.languages.confirm}</button>
+   <button id="activationCode" class="b3-button b3-button--text" style="position: absolute;right: 0;top: 0;">${window.siyuan.languages.confirm}</button>
 </div>`;
             if (window.siyuan.user.userSiYuanProExpireTime === -1) {
                 activeSubscriptionHTML = "";

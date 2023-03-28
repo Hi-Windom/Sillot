@@ -32,7 +32,7 @@ import (
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/Xuanwo/go-locale"
-	humanize "github.com/dustin/go-humanize"
+	"github.com/dustin/go-humanize"
 	"github.com/getsentry/sentry-go"
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
@@ -58,7 +58,7 @@ type AppConf struct {
 	Editor         *conf.Editor     `json:"editor"`         // 编辑器配置
 	Export         *conf.Export     `json:"export"`         // 导出配置
 	Graph          *conf.Graph      `json:"graph"`          // 关系图配置
-	UILayout       *conf.UILayout   `json:"uiLayout"`       // 界面布局
+	UILayout       *conf.UILayout   `json:"uiLayout"`       // 界面布局，v2.8.0 后这个字段不再使用
 	UserData       string           `json:"userData"`       // 社区用户信息，对 User 加密存储
 	User           *conf.User       `json:"-"`              // 社区用户内存结构，不持久化
 	Account        *conf.Account    `json:"account"`        // 帐号配置
@@ -69,6 +69,8 @@ type AppConf struct {
 	Keymap         *conf.Keymap     `json:"keymap"`         // 快捷键配置
 	Sync           *conf.Sync       `json:"sync"`           // 同步配置
 	Search         *conf.Search     `json:"search"`         // 搜索配置
+	Flashcard      *conf.Flashcard  `json:"flashcard"`      // 闪卡配置
+	AI             *conf.AI         `json:"ai"`             // 人工智能配置
 	Stat           *conf.Stat       `json:"stat"`           // 统计
 	Api            *conf.API        `json:"api"`            // API
 	Repo           *conf.Repo       `json:"repo"`           // 数据仓库
@@ -217,7 +219,7 @@ func InitConf() {
 	} else {
 		if 0 < semver.Compare("v"+util.Ver, "v"+Conf.System.KernelVersion) {
 			logging.LogInfof("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.Ver)
-		} else {
+		} else if 0 > semver.Compare("v"+util.Ver, "v"+Conf.System.KernelVersion) {
 			logging.LogInfof("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.Ver)
 		}
 
@@ -246,7 +248,7 @@ func InitConf() {
 		logging.LogInfof("using Microsoft Store edition")
 	}
 	Conf.System.OS = runtime.GOOS
-	Conf.System.OSPlatform, _ = util.GetOSPlatform()
+	Conf.System.OSPlatform = util.GetOSPlatform()
 
 	if "" != Conf.UserData {
 		Conf.User = loadUserFromConf()
@@ -295,6 +297,9 @@ func InitConf() {
 	if 0 > Conf.Editor.BacklinkExpandCount {
 		Conf.Editor.BacklinkExpandCount = 0
 	}
+	if 0> Conf.Editor.BackmentionExpandCount {
+		Conf.Editor.BackmentionExpandCount = 0
+	}
 
 	if nil == Conf.Search {
 		Conf.Search = conf.NewSearch()
@@ -308,15 +313,36 @@ func InitConf() {
 	if 1 > Conf.Search.BacklinkMentionKeywordsLimit {
 		Conf.Search.BacklinkMentionKeywordsLimit = 512
 	}
-	if 1 > Conf.Search.VirtualRefKeywordsLimit {
-		Conf.Search.VirtualRefKeywordsLimit = 512
-	}
 
 	if nil == Conf.Stat {
 		Conf.Stat = conf.NewStat()
 	}
 
+	if nil == Conf.Flashcard {
+		Conf.Flashcard = conf.NewFlashcard()
+	}
+	if 1 > Conf.Flashcard.NewCardLimit {
+		Conf.Flashcard.NewCardLimit = 20
+	}
+	if 1 > Conf.Flashcard.ReviewCardLimit {
+		Conf.Flashcard.ReviewCardLimit = 200
+	}
+
+	if nil == Conf.AI {
+		Conf.AI = conf.NewAI()
+	}
+
+	if "" != Conf.AI.OpenAI.APIKey {
+		logging.LogInfof("OpenAI API enabled\n"+
+			"    baseURL=%s\n"+
+			"    timeout=%ds\n"+
+			"    proxy=%s\n"+
+			"    maxTokens=%d",
+			Conf.AI.OpenAI.APIBaseURL, Conf.AI.OpenAI.APITimeout, Conf.AI.OpenAI.APIProxy, Conf.AI.OpenAI.APIMaxTokens)
+	}
+
 	Conf.ReadOnly = util.ReadOnly
+
 	if "" != util.AccessAuthCode {
 		Conf.AccessAuthCode = util.AccessAuthCode
 	}
@@ -346,13 +372,17 @@ func initLang() {
 	p := filepath.Join(util.WorkingDir, "appearance", "langs")
 	dir, err := os.Open(p)
 	if nil != err {
-		logging.LogFatalf("open language configuration folder [%s] failed: %s", p, err)
+		logging.LogErrorf("open language configuration folder [%s] failed: %s", p, err)
+		util.ReportFileSysFatalError(err)
+		return
 	}
 	defer dir.Close()
 
 	langNames, err := dir.Readdirnames(-1)
 	if nil != err {
-		logging.LogFatalf("list language configuration folder [%s] failed: %s", p, err)
+		logging.LogErrorf("list language configuration folder [%s] failed: %s", p, err)
+		util.ReportFileSysFatalError(err)
+		return
 	}
 
 	for _, langName := range langNames {
@@ -462,7 +492,7 @@ func Close(force bool, execInstallPkg int) (exitCode int) {
 		}
 		logging.LogInfof("exited kernel")
 		util.WebSocketServer.Close()
-		os.Exit(util.ExitCodeOk)
+		os.Exit(logging.ExitCodeOk)
 	}()
 	return
 }
@@ -513,7 +543,9 @@ func (conf *AppConf) Save() {
 func (conf *AppConf) save0(data []byte) {
 	confPath := filepath.Join(util.ConfDir, "conf.json")
 	if err := filelock.WriteFile(confPath, data); nil != err {
-		logging.LogFatalf("write conf [%s] failed: %s", confPath, err)
+		logging.LogErrorf("write conf [%s] failed: %s", confPath, err)
+		util.ReportFileSysFatalError(err)
+		return
 	}
 }
 

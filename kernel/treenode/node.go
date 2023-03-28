@@ -118,7 +118,7 @@ func FormatNode(node *ast.Node, luteEngine *lute.Lute) string {
 	markdown, err := lute.FormatNodeSync(node, luteEngine.ParseOptions, luteEngine.RenderOptions)
 	if nil != err {
 		root := TreeRoot(node)
-		logging.LogFatalf("format node [%s] in tree [%s] failed: %s", node.ID, root.ID, err)
+		logging.LogFatalf(logging.ExitCodeFatal, "format node [%s] in tree [%s] failed: %s", node.ID, root.ID, err)
 	}
 	return markdown
 }
@@ -127,7 +127,7 @@ func ExportNodeStdMd(node *ast.Node, luteEngine *lute.Lute) string {
 	markdown, err := lute.ProtyleExportMdNodeSync(node, luteEngine.ParseOptions, luteEngine.RenderOptions)
 	if nil != err {
 		root := TreeRoot(node)
-		logging.LogFatalf("export markdown for node [%s] in tree [%s] failed: %s", node.ID, root.ID, err)
+		logging.LogFatalf(logging.ExitCodeFatal, "export markdown for node [%s] in tree [%s] failed: %s", node.ID, root.ID, err)
 	}
 	return markdown
 }
@@ -162,6 +162,11 @@ func NodeStaticContent(node *ast.Node, excludeTypes []string, includeTextMarkATi
 		}
 
 		switch n.Type {
+		case ast.NodeTableCell:
+			// 表格块写入数据库表时在单元格之间添加空格 https://github.com/siyuan-note/siyuan/issues/7654
+			if 0 < buf.Len() && ' ' != buf.Bytes()[buf.Len()-1] {
+				buf.WriteByte(' ')
+			}
 		case ast.NodeImage:
 			linkDest := n.ChildByType(ast.NodeLinkDest)
 			var linkDestStr, ocrText string

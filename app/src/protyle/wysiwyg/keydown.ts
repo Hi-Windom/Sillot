@@ -10,7 +10,7 @@ import {
 } from "../util/selection";
 import {
     hasClosestBlock,
-    hasClosestByAttribute, hasClosestByClassName,
+    hasClosestByAttribute,
     hasClosestByMatchTag,
     hasTopClosestByAttribute
 } from "../util/hasClosest";
@@ -458,18 +458,20 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             return;
         }
 
-        if (!event.altKey && !isCtrl(event) && (event.key === "Home" || event.key === "End") && isMac()) {
-            const editElement = getContenteditableElement(nodeElement);
-            if (editElement && editElement.tagName !== "TABLE") {
-                if (!event.shiftKey) {
-                    range.selectNodeContents(editElement);
-                    range.collapse(event.key === "Home");
+        if ((event.shiftKey && !event.altKey && !isCtrl(event) && (event.key === "Home" || event.key === "End") && isMac()) ||
+            (event.shiftKey && !event.altKey && isCtrl(event) && (event.key === "Home" || event.key === "End") && !isMac())) {
+            const topElement = hasTopClosestByAttribute(nodeElement, "data-node-id", null);
+            if (topElement) {
+                topElement.classList.add("protyle-wysiwyg--select");
+                let nextElement = event.key === "Home" ? topElement.previousElementSibling : topElement.nextElementSibling;
+                while (nextElement) {
+                    nextElement.classList.add("protyle-wysiwyg--select");
+                    nextElement = event.key === "Home" ? nextElement.previousElementSibling : nextElement.nextElementSibling;
+                }
+                if (event.key === "Home") {
+                    protyle.wysiwyg.element.firstElementChild.scrollIntoView();
                 } else {
-                    if (event.key === "Home" && editElement.firstChild) {
-                        range.setStartBefore(editElement.firstChild);
-                    } else {
-                        range.setEndAfter(editElement.lastChild);
-                    }
+                    protyle.wysiwyg.element.lastElementChild.scrollIntoView(false);
                 }
             }
             event.stopPropagation();
@@ -525,7 +527,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             const selectElements = Array.from(protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select"));
             if (selectElements.length === 0) {
                 const inlineElement = hasClosestByAttribute(range.startContainer, "data-type", null);
-                if (inlineElement) {
+                if (inlineElement && inlineElement.tagName === "SPAN") {
                     const types = inlineElement.getAttribute("data-type").split(" ");
                     if (types.length > 0) {
                         protyle.toolbar.range = range;
@@ -1001,12 +1003,12 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
 
         if (matchHotKey(window.siyuan.config.keymap.editor.general.quickMakeCard.custom, event)) {
             const selectElement: Element[] = [];
-            if (!hasClosestByClassName(nodeElement, "protyle-wysiwyg--select")) {
-                nodeElement.classList.add("protyle-wysiwyg--select");
-            }
             protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select").forEach(item => {
                 selectElement.push(item);
             });
+            if (selectElement.length === 0) {
+                selectElement.push(nodeElement);
+            }
             quickMakeCard(selectElement);
             event.preventDefault();
             event.stopPropagation();
@@ -1292,7 +1294,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             return;
         }
 
-        if (!nodeElement.classList.contains("code-block")) {
+        if (!nodeElement.classList.contains("code-block") && !event.repeat) {
             const findToolbar = protyle.options.toolbar.find((menuItem: IMenuItem) => {
                 if (!menuItem.hotkey) {
                     return false;
@@ -1446,7 +1448,8 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     selectsElement.push(nodeElement);
                 }
                 selectsElement.forEach(item => {
-                    item.querySelectorAll('[contenteditable="true"]').forEach(editItem => {
+                    // 不能使用 [contenteditable="true"], 否则嵌入块无法复制
+                    item.querySelectorAll("[spellcheck]").forEach(editItem => {
                         const cloneNode = editItem.cloneNode(true) as HTMLElement;
                         cloneNode.querySelectorAll('[data-type="backslash"]').forEach(slashItem => {
                             slashItem.firstElementChild.remove();
@@ -1497,7 +1500,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             return;
         }
 
-        if (matchHotKey(window.siyuan.config.keymap.editor.general.duplicate.custom, event)) {
+        if (!event.repeat && matchHotKey(window.siyuan.config.keymap.editor.general.duplicate.custom, event)) {
             event.preventDefault();
             event.stopPropagation();
             let selectsElement: HTMLElement[] = Array.from(protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select"));

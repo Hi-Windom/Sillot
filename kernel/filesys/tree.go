@@ -121,10 +121,6 @@ func WriteTreeWithoutChangeTime(tree *parse.Tree) (err error) {
 	}
 
 	if err = filelock.WriteFileWithoutChangeTime(filePath, data); nil != err {
-		if errors.Is(err, filelock.ErrUnableAccessFile) {
-			return
-		}
-
 		msg := fmt.Sprintf("write data [%s] failed: %s", filePath, err)
 		logging.LogErrorf(msg)
 		return errors.New(msg)
@@ -141,10 +137,6 @@ func WriteTree(tree *parse.Tree) (err error) {
 	}
 
 	if err = filelock.WriteFile(filePath, data); nil != err {
-		if errors.Is(err, filelock.ErrUnableAccessFile) {
-			return
-		}
-
 		msg := fmt.Sprintf("write data [%s] failed: %s", filePath, err)
 		logging.LogErrorf(msg)
 		return errors.New(msg)

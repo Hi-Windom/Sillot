@@ -24,7 +24,6 @@ import (
 	"github.com/88250/gulu"
 	"github.com/88250/lute/html"
 	"github.com/gin-gonic/gin"
-	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -195,11 +194,6 @@ func checkBlockExist(c *gin.Context) {
 
 	id := arg["id"].(string)
 	b, err := model.GetBlock(id, nil)
-	if errors.Is(err, filelock.ErrUnableAccessFile) {
-		ret.Code = 2
-		ret.Data = id
-		return
-	}
 	if errors.Is(err, model.ErrIndexing) {
 		ret.Code = 0
 		ret.Data = false
@@ -405,11 +399,6 @@ func getBlockInfo(c *gin.Context) {
 	id := arg["id"].(string)
 
 	tree, err := model.LoadTreeByID(id)
-	if errors.Is(err, filelock.ErrUnableAccessFile) {
-		ret.Code = 2
-		ret.Data = id
-		return
-	}
 	if errors.Is(err, model.ErrIndexing) {
 		ret.Code = 3
 		ret.Msg = model.Conf.Language(56)
@@ -438,11 +427,6 @@ func getBlockInfo(c *gin.Context) {
 	}
 
 	root, err := model.GetBlock(block.RootID, tree)
-	if errors.Is(err, filelock.ErrUnableAccessFile) {
-		ret.Code = 2
-		ret.Data = id
-		return
-	}
 	if errors.Is(err, model.ErrIndexing) {
 		ret.Code = 3
 		ret.Data = model.Conf.Language(56)

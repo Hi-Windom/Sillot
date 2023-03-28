@@ -41,6 +41,7 @@ import {InlineMemo} from "./InlineMemo";
 import {mathRender} from "../markdown/mathRender";
 import {linkMenu} from "../../menus/protyle";
 import {addScript} from "../util/addScript";
+import {confirmDialog} from "../../dialog/confirmDialog";
 
 export class Toolbar {
     public element: HTMLElement;
@@ -957,6 +958,20 @@ export class Toolbar {
         });
         const exportImg = () => {
             const msgId = showMessage(window.siyuan.languages.exporting, 0);
+            if (renderElement.getAttribute("data-subtype") === "plantuml") {
+                fetch(renderElement.querySelector("img").getAttribute("src")).then(function (response) {
+                    return response.blob();
+                }).then(function (blob) {
+                    const formData = new FormData();
+                    formData.append("file", blob);
+                    formData.append("type", "image/png");
+                    fetchPost("/api/export/exportAsFile", formData, (response) => {
+                        openByMobile(response.data.file);
+                        hideMessage(msgId);
+                    });
+                });
+                return;
+            }
             setTimeout(() => {
                 addScript("stage/protyle/js/html2canvas.min.js?v=1.4.1", "protyleHtml2canvas").then(() => {
                     window.html2canvas(renderElement).then((canvas) => {
@@ -1237,16 +1252,17 @@ export class Toolbar {
             }
         });
         inputElement.addEventListener("input", (event) => {
-            const mathLanguages: string[] = [];
+            const matchLanguages: string[] = [];
             Constants.CODE_LANGUAGES.forEach((item) => {
                 if (item.indexOf(inputElement.value.toLowerCase()) > -1) {
-                    mathLanguages.push(item);
+                    matchLanguages.push(item);
 
                 }
             });
             let html = "";
             // sort
-            mathLanguages.sort((a, b) => {
+            let matchInput = false;
+            matchLanguages.sort((a, b) => {
                 if (a.startsWith(inputElement.value.toLowerCase()) && b.startsWith(inputElement.value.toLowerCase())) {
                     if (a.length < b.length) {
                         return -1;
@@ -1263,8 +1279,14 @@ export class Toolbar {
                     return 0;
                 }
             }).forEach((item) => {
+                if (inputElement.value === item) {
+                    matchInput = true;
+                }
                 html += `<div class="b3-list-item">${item.replace(inputElement.value.toLowerCase(), "<b>" + inputElement.value.toLowerCase() + "</b>")}</div>`;
             });
+            if (inputElement.value.trim() && !matchInput) {
+                html = `<div class="b3-list-item"><b>${inputElement.value.replace(/`| /g, "_")}</b></div>${html}`;
+            }
             this.subElement.firstElementChild.lastElementChild.innerHTML = html;
             if (html) {
                 this.subElement.firstElementChild.lastElementChild.firstElementChild.classList.add("b3-list-item--focus");
@@ -1319,12 +1341,13 @@ export class Toolbar {
                 html += `<div data-value="${item.path}" class="b3-list-item--hide-action b3-list-item${index === 0 ? " b3-list-item--focus" : ""}">
 <span class="b3-list-item__text">${item.content}</span>`;
                 /// #if !BROWSER
-                html += `<span class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.showInFolder}">
+                html += `<span data-type="open" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.showInFolder}">
     <svg><use xlink:href="#iconFolder"></use></svg>
-</span></div>`;
-                /// #else
-                html += "</div>";
+</span>`;
                 /// #endif
+                html += `<span data-type="remove" class="b3-list-item__action b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.remove}">
+    <svg><use xlink:href="#iconTrashcan"></use></svg>
+</span></div>`;
             });
             if (html === "") {
                 html = `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
@@ -1346,14 +1369,20 @@ export class Toolbar {
 </div>`;
             const listElement = this.subElement.querySelector(".b3-list");
             const previewElement = this.subElement.firstElementChild.lastElementChild;
-            previewTemplate(listElement.firstElementChild.getAttribute("data-value"), previewElement, protyle.block.parentID);
+            let previewPath = listElement.firstElementChild.getAttribute("data-value");
+            previewTemplate(previewPath, previewElement, protyle.block.parentID);
             listElement.addEventListener("mouseover", (event) => {
                 const target = event.target as HTMLElement;
                 const hoverItemElement = hasClosestByClassName(target, "b3-list-item");
                 if (!hoverItemElement) {
                     return;
                 }
-                previewTemplate(hoverItemElement.getAttribute("data-value"), previewElement, protyle.block.parentID);
+                const currentPath = hoverItemElement.getAttribute("data-value");
+                if (previewPath === currentPath) {
+                    return;
+                }
+                previewPath = currentPath;
+                previewTemplate(previewPath, previewElement, protyle.block.parentID);
             });
             const inputElement = this.subElement.querySelector("input");
             inputElement.addEventListener("keydown", (event: KeyboardEvent) => {
@@ -1365,7 +1394,12 @@ export class Toolbar {
                 if (!isEmpty) {
                     const currentElement = upDownHint(listElement, event);
                     if (currentElement) {
-                        previewTemplate(currentElement.getAttribute("data-value"), previewElement, protyle.block.parentID);
+                        const currentPath = currentElement.getAttribute("data-value");
+                        if (previewPath === currentPath) {
+                            return;
+                        }
+                        previewPath = currentPath;
+                        previewTemplate(previewPath, previewElement, protyle.block.parentID);
                     }
                 }
                 if (event.key === "Enter") {
@@ -1391,7 +1425,12 @@ export class Toolbar {
                         searchHTML += `<div data-value="${item.path}" class="b3-list-item${index === 0 ? " b3-list-item--focus" : ""}">${item.content}</div>`;
                     });
                     listElement.innerHTML = searchHTML || `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
-                    previewTemplate(response.data.blocks[0]?.path, previewElement, protyle.block.parentID);
+                    const currentPath = response.data.blocks[0]?.path;
+                    if (previewPath === currentPath) {
+                        return;
+                    }
+                    previewPath = currentPath;
+                    previewTemplate(previewPath, previewElement, protyle.block.parentID);
                 });
             });
             this.subElement.lastElementChild.addEventListener("click", (event) => {
@@ -1402,14 +1441,38 @@ export class Toolbar {
                     event.stopPropagation();
                     return;
                 }
-                /// #if !BROWSER
                 const iconElement = hasClosestByClassName(target, "b3-list-item__action");
-                if (iconElement) {
+                /// #if !BROWSER
+                if (iconElement && iconElement.getAttribute("data-type") === "open") {
                     openBy(iconElement.parentElement.getAttribute("data-value"), "folder");
                     event.stopPropagation();
                     return;
                 }
                 /// #endif
+                if (iconElement && iconElement.getAttribute("data-type") === "remove") {
+                    confirmDialog(window.siyuan.languages.remove, window.siyuan.languages.confirmDelete + "?", () => {
+                        fetchPost("/api/search/removeTemplate", {path: iconElement.parentElement.getAttribute("data-value")}, () => {
+                            if (iconElement.parentElement.parentElement.childElementCount === 1) {
+                                iconElement.parentElement.parentElement.innerHTML = `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
+                                previewTemplate("", previewElement, protyle.block.parentID);
+                            } else {
+                                if (iconElement.parentElement.classList.contains("b3-list-item--focus")) {
+                                    const sideElement = iconElement.parentElement.previousElementSibling || iconElement.parentElement.nextElementSibling;
+                                    sideElement.classList.add("b3-list-item--focus");
+                                    const currentPath = sideElement.getAttribute("data-value");
+                                    if (previewPath === currentPath) {
+                                        return;
+                                    }
+                                    previewPath = currentPath;
+                                    previewTemplate(previewPath, previewElement, protyle.block.parentID);
+                                }
+                                iconElement.parentElement.remove();
+                            }
+                        });
+                    });
+                    event.stopPropagation();
+                    return;
+                }
                 const previousElement = hasClosestByAttribute(target, "data-type", "previous");
                 if (previousElement) {
                     inputElement.dispatchEvent(new KeyboardEvent("keydown", {key: "ArrowUp"}));
@@ -1432,6 +1495,7 @@ export class Toolbar {
             this.subElement.classList.remove("fn__none");
             this.subElementCloseCB = undefined;
             setPosition(this.subElement, rangePosition.left, rangePosition.top + 18, Constants.SIZE_TOOLBAR_HEIGHT);
+            (this.subElement.firstElementChild as HTMLElement).style.maxHeight = (window.innerHeight - this.subElement.getBoundingClientRect().top - 16) + "px";
             this.element.classList.add("fn__none");
             inputElement.select();
         });

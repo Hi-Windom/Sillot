@@ -46,7 +46,7 @@ export abstract class Constants {
     public static readonly SIZE_ZOOM = [0.25, 0.33, 0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3];
 
     // ws callback
-    public static readonly CB_MOUNT_HELP = "cb-mount-help";
+    public static readonly CB_MOVE_NOLIST = "cb-move-nolist";
     public static readonly CB_MOUNT_REMOVE = "cb-mount-remove";
     public static readonly CB_GET_APPEND = "cb-get-append"; // 向下滚动加载
     public static readonly CB_GET_BEFORE = "cb-get-before"; // 向上滚动加载
@@ -65,10 +65,10 @@ export abstract class Constants {
 
     // localstorage
     public static readonly LOCAL_ZOOM = "local-zoom";
-    public static readonly LOCAL_SEARCHEDATA = "local-searchedata";
-    public static readonly LOCAL_SEARCHEKEYS = "local-searchekeys";
+    public static readonly LOCAL_SEARCHDATA = "local-searchdata";
+    public static readonly LOCAL_SEARCHKEYS = "local-searchkeys";
+    public static readonly LOCAL_SEARCHKEY = "local-searchkey"; // only mobile
     public static readonly LOCAL_DOCINFO = "local-docinfo"; // only mobile
-    public static readonly LOCAL_SEARCHEKEY = "local-searchkey"; // only mobile
     public static readonly LOCAL_DAILYNOTEID = "local-dailynoteid"; // string
     public static readonly LOCAL_HISTORYNOTEID = "local-historynoteid"; // string
     public static readonly LOCAL_CODELANG = "local-codelang"; // string
@@ -78,6 +78,8 @@ export abstract class Constants {
     public static readonly LOCAL_EXPORTIMG = "local-exportimg";
     public static readonly LOCAL_BAZAAR = "local-bazaar";
     public static readonly LOCAL_PDFTHEME = "local-pdftheme";
+    public static readonly LOCAL_LAYOUTS = "local-layouts";
+    public static readonly LOCAL_AI = "local-ai";
 
     // timeout
     public static readonly TIMEOUT_DBLCLICK = 190;

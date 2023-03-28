@@ -14,13 +14,13 @@ export class MobileTags {
 
     constructor() {
         this.element = document.querySelector('#sidebar [data-type="sidebar-tag"]');
-        this.element.innerHTML = `<div class="toolbar">
+        this.element.innerHTML = `<div class="toolbar toolbar--border toolbar--dark">
     <div class="fn__space"></div>
     <div class="toolbar__text">
         ${window.siyuan.languages.tag}
     </div>
     <span class="fn__space"></span>
-    <svg data-type="expand" class="toolbar__icon"><use xlink:href="#iconFullscreen"></use></svg>
+    <svg data-type="expand" class="toolbar__icon"><use xlink:href="#iconExpand"></use></svg>
     <span class="fn__space"></span>
     <svg data-type="collapse" class="toolbar__icon"><use xlink:href="#iconContract"></use></svg>
     <span class="fn__space${window.siyuan.config.readonly ? " fn__none" : ""}"></span>
@@ -65,9 +65,7 @@ export class MobileTags {
                         });
                     }
                 } else {
-                    const modelElement = document.getElementById("model");
-                    const modelMainElement = document.getElementById("modelMain");
-                    popSearch(modelElement, modelMainElement);
+                    popSearch();
                     (document.getElementById("toolbarSearch") as HTMLInputElement).value = `#${element.getAttribute("data-label")}#`;
                     toolbarSearchEvent();
                 }

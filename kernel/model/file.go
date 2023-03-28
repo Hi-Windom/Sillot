@@ -414,7 +414,7 @@ func StatTree(id string) (ret *util.BlockStatResult) {
 	}
 }
 
-func GetDoc(startID, endID, id string, index int, keyword string, mode int, size int, isBacklink bool) (blockCount, childBlockCount int, dom, parentID, parent2ID, rootID, typ string, eof bool, boxID, docPath string, isBacklinkExpand bool, err error) {
+func GetDoc(startID, endID, id string, index int, keyword string, mode int, size int, isBacklink bool) (blockCount int, dom, parentID, parent2ID, rootID, typ string, eof, scroll bool, boxID, docPath string, isBacklinkExpand bool, err error) {
 	//os.MkdirAll("pprof", 0755)
 	//cpuProfile, _ := os.Create("pprof/GetDoc")
 	//pprof.StartCPUProfile(cpuProfile)
@@ -540,7 +540,6 @@ func GetDoc(startID, endID, id string, index int, keyword string, mode int, size
 	}
 
 	blockCount = tree.DocBlockCount()
-	childBlockCount = treenode.CountBlockNodes(tree.Root)
 	if ast.NodeDocument == node.Type {
 		parentID = node.ID
 		parent2ID = parentID
@@ -560,6 +559,26 @@ func GetDoc(startID, endID, id string, index int, keyword string, mode int, size
 	if !isDoc {
 		typ = node.Type.String()
 	}
+
+	// 判断是否需要显示动态加载滚动条 https://github.com/siyuan-note/siyuan/issues/7693
+	childCount := 0
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if 1 > childCount {
+			childCount = 1
+		} else {
+			childCount += treenode.CountBlockNodes(n)
+		}
+
+		if childCount > Conf.Editor.DynamicLoadBlocks {
+			scroll = true
+			return ast.WalkStop
+		}
+		return ast.WalkContinue
+	})
 
 	var nodes []*ast.Node
 	if isBacklink {
@@ -877,10 +896,7 @@ func DuplicateDoc(tree *parse.Tree) {
 
 func createTreeTx(tree *parse.Tree) {
 	transaction := &Transaction{DoOperations: []*Operation{{Action: "create", Data: tree}}}
-	err := PerformTransactions(&[]*Transaction{transaction})
-	if nil != err {
-		logging.LogFatalf("transaction failed: %s", err)
-	}
+	PerformTransactions(&[]*Transaction{transaction})
 }
 
 func CreateDocByMd(boxID, p, title, md string, sorts []string) (tree *parse.Tree, err error) {
@@ -973,7 +989,7 @@ func GetFullHPathByID(id string) (hPath string, err error) {
 	return
 }
 
-func MoveDocs(fromPaths []string, toBoxID, toPath string) (err error) {
+func MoveDocs(fromPaths []string, toBoxID, toPath string, callback interface{}) (err error) {
 	toBox := Conf.Box(toBoxID)
 	if nil == toBox {
 		err = errors.New(Conf.Language(0))
@@ -1004,7 +1020,7 @@ func MoveDocs(fromPaths []string, toBoxID, toPath string) (err error) {
 	WaitForWritingFiles()
 	luteEngine := util.NewLute()
 	for fromPath, fromBox := range pathsBoxes {
-		_, err = moveDoc(fromBox, fromPath, toBox, toPath, luteEngine)
+		_, err = moveDoc(fromBox, fromPath, toBox, toPath, luteEngine, callback)
 		if nil != err {
 			return
 		}
@@ -1020,7 +1036,7 @@ func MoveDocs(fromPaths []string, toBoxID, toPath string) (err error) {
 	return
 }
 
-func moveDoc(fromBox *Box, fromPath string, toBox *Box, toPath string, luteEngine *lute.Lute) (newPath string, err error) {
+func moveDoc(fromBox *Box, fromPath string, toBox *Box, toPath string, luteEngine *lute.Lute, callback interface{}) (newPath string, err error) {
 	isSameBox := fromBox.ID == toBox.ID
 
 	if isSameBox {
@@ -1134,6 +1150,7 @@ func moveDoc(fromBox *Box, fromPath string, toBox *Box, toPath string, luteEngin
 		"toPath":       toPath,
 		"newPath":      newPath,
 	}
+	evt.Callback = callback
 	util.PushEvent(evt)
 	return
 }
@@ -1431,11 +1448,7 @@ func createDoc(boxID, p, title, dom string) (tree *parse.Tree, err error) {
 	}
 
 	transaction := &Transaction{DoOperations: []*Operation{{Action: "create", Data: tree}}}
-	err = PerformTransactions(&[]*Transaction{transaction})
-	if nil != err {
-		logging.LogFatalf("transaction failed: %s", err)
-		return
-	}
+	PerformTransactions(&[]*Transaction{transaction})
 	WaitForWritingFiles()
 	return
 }

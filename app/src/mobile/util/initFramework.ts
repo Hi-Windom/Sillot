@@ -23,13 +23,14 @@ export const initFramework = () => {
     setInlineStyle();
     renderSnippet();
     initKeyboardToolbar();
-    const scrimElement = document.querySelector(".scrim");
     const sidebarElement = document.getElementById("sidebar");
     let outline: MobileOutline;
     let backlink: MobileBacklinks;
     let bookmark: MobileBookmarks;
     let tag: MobileTags;
-    sidebarElement.querySelector(".toolbar--border").addEventListener(getEventName(), (event: Event & {
+    // 不能使用 getEventName，否则点击返回会展开右侧栏
+    const firstToolbarElement = sidebarElement.querySelector(".toolbar--border");
+    firstToolbarElement.addEventListener("click", (event: Event & {
         target: Element
     }) => {
         const svgElement = hasTopClosestByTag(event.target, "svg");
@@ -37,8 +38,15 @@ export const initFramework = () => {
             return;
         }
         const type = svgElement.getAttribute("data-type");
-        sidebarElement.querySelectorAll(".toolbar--border svg").forEach(item => {
+        if (!type) {
+            closePanel();
+            return;
+        }
+        firstToolbarElement.querySelectorAll(".toolbar__icon").forEach(item => {
             const itemType = item.getAttribute("data-type");
+            if (!itemType) {
+                return;
+            }
             if (itemType === type) {
                 if (type === "sidebar-outline-tab") {
                     if (!outline) {
@@ -53,13 +61,13 @@ export const initFramework = () => {
                         backlink.update();
                     }
                 } else if (type === "sidebar-bookmark-tab") {
-                    if (!backlink) {
+                    if (!bookmark) {
                         bookmark = new MobileBookmarks();
                     } else {
                         backlink.update();
                     }
                 } else if (type === "sidebar-tag-tab") {
-                    if (!backlink) {
+                    if (!tag) {
                         tag = new MobileTags();
                     } else {
                         tag.update();
@@ -78,7 +86,6 @@ export const initFramework = () => {
         hideKeyboardToolbar();
         activeBlur();
         sidebarElement.style.left = "0";
-        document.querySelector(".scrim").classList.remove("fn__none");
         const type = sidebarElement.querySelector(".toolbar--border .toolbar__icon--active").getAttribute("data-type");
         if (type === "sidebar-outline-tab") {
             outline.update();
@@ -123,19 +130,13 @@ export const initFramework = () => {
             }, Constants.TIMEOUT_INPUT);
         }, Constants.TIMEOUT_INPUT);
     }
-
-    scrimElement.addEventListener(getEventName(), () => {
-        closePanel();
-    });
-    document.getElementById("modelClose").addEventListener(getEventName(), () => {
-        closePanel();
+    document.getElementById("modelClose").addEventListener("click", () => {
+        document.getElementById("model").style.top = "-200vh";
     });
     initEditorName();
     if (getOpenNotebookCount() > 0) {
-        if (window.JSAndroid) {
-            if (window.openFileByURL(window.JSAndroid.getBlockURL())) {
-                return;
-            }
+        if (window.JSAndroid && window.openFileByURL(window.JSAndroid.getBlockURL())) {
+            return;
         }
         const openId = getSearch("id");
         if (openId) {

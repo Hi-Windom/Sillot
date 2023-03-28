@@ -361,11 +361,8 @@ export const globalShortcut = () => {
                 const currentType = currentLiElement.getAttribute("data-type") as TDockType;
                 if (currentType) {
                     getDockByType(currentType).toggleModel(currentType, true);
-                    const target = event.target as HTMLElement;
-                    if (target.classList.contains("protyle-wysiwyg") ||
-                        target.classList.contains("protyle-title__input") ||
-                        target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-                        target.blur();
+                    if (document.activeElement) {
+                        (document.activeElement as HTMLElement).blur();
                     }
                 } else {
                     const currentId = currentLiElement.getAttribute("data-id");
@@ -387,10 +384,10 @@ export const globalShortcut = () => {
         if (document.getElementById("errorLog") || event.isComposing) {
             return;
         }
-
+        const target = event.target as HTMLElement;
         if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey &&
-            !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName) &&
-            ["1", "2", "3", "4", "j", "k", "l", ";", "s", " ", "p"].includes(event.key.toLowerCase())) {
+            !["INPUT", "TEXTAREA"].includes(target.tagName) &&
+            ["0", "1", "2", "3", "4", "j", "k", "l", ";", "s", " ", "p"].includes(event.key.toLowerCase())) {
             const openCardDialog = window.siyuan.dialogs.find(item => {
                 if (item.element.getAttribute("data-key") === window.siyuan.config.keymap.general.riffCard.custom) {
                     return true;
@@ -540,12 +537,14 @@ export const globalShortcut = () => {
             return;
         }
         /// #if !BROWSER
-        if (matchHotKey("⌘=", event)) {
+        if (matchHotKey("⌘=", event) && !hasClosestByClassName(target, "pdf__outer")) {
             Constants.SIZE_ZOOM.find((item, index) => {
                 if (item === window.siyuan.storage[Constants.LOCAL_ZOOM]) {
                     window.siyuan.storage[Constants.LOCAL_ZOOM] = Constants.SIZE_ZOOM[index + 1] || 3;
                     webFrame.setZoomFactor(window.siyuan.storage[Constants.LOCAL_ZOOM]);
-                    setStorageVal(Constants.LOCAL_ZOOM, window.siyuan.storage[Constants.LOCAL_ZOOM]);
+                    if (!isTabWindow) {
+                        setStorageVal(Constants.LOCAL_ZOOM, window.siyuan.storage[Constants.LOCAL_ZOOM]);
+                    }
                     return true;
                 }
             });
@@ -555,16 +554,20 @@ export const globalShortcut = () => {
         if (matchHotKey("⌘0", event)) {
             webFrame.setZoomFactor(1);
             window.siyuan.storage[Constants.LOCAL_ZOOM] = 1;
-            setStorageVal(Constants.LOCAL_ZOOM, 1);
+            if (!isTabWindow) {
+                setStorageVal(Constants.LOCAL_ZOOM, 1);
+            }
             event.preventDefault();
             return;
         }
-        if (matchHotKey("⌘-", event)) {
+        if (matchHotKey("⌘-", event) && !hasClosestByClassName(target, "pdf__outer")) {
             Constants.SIZE_ZOOM.find((item, index) => {
                 if (item === window.siyuan.storage[Constants.LOCAL_ZOOM]) {
                     window.siyuan.storage[Constants.LOCAL_ZOOM] = Constants.SIZE_ZOOM[index - 1] || 0.25;
                     webFrame.setZoomFactor(window.siyuan.storage[Constants.LOCAL_ZOOM]);
-                    setStorageVal(Constants.LOCAL_ZOOM, window.siyuan.storage[Constants.LOCAL_ZOOM]);
+                    if (!isTabWindow) {
+                        setStorageVal(Constants.LOCAL_ZOOM, window.siyuan.storage[Constants.LOCAL_ZOOM]);
+                    }
                     return true;
                 }
             });
@@ -600,7 +603,6 @@ export const globalShortcut = () => {
             event.preventDefault();
             return;
         }
-        const target = event.target as HTMLElement;
         if (matchHotKey("⌘A", event) && target.tagName !== "INPUT" && target.tagName !== "TEXTAREA") {
             event.preventDefault();
             return;
@@ -608,10 +610,8 @@ export const globalShortcut = () => {
         const matchDock = getAllDocks().find(item => {
             if (matchHotKey(window.siyuan.config.keymap.general[item.hotkeyLangId].custom, event)) {
                 getDockByType(item.type).toggleModel(item.type);
-                if (target.classList.contains("protyle-wysiwyg") ||
-                    target.classList.contains("protyle-title__input") ||
-                    target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-                    target.blur();
+                if (document.activeElement) {
+                    (document.activeElement as HTMLElement).blur();
                 }
                 event.preventDefault();
                 return true;
@@ -622,23 +622,18 @@ export const globalShortcut = () => {
         }
         if (matchHotKey(window.siyuan.config.keymap.general.riffCard.custom, event)) {
             openCard();
-            if (target.classList.contains("protyle-wysiwyg") ||
-                target.tagName === "TABLE" ||
-                target.classList.contains("protyle-title__input") ||
-                target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-                target.blur();
+            if (document.activeElement) {
+                (document.activeElement as HTMLElement).blur();
             }
             event.preventDefault();
             return;
         }
         if (!isTabWindow && matchHotKey(window.siyuan.config.keymap.general.dailyNote.custom, event)) {
             newDailyNote();
-            if (target.classList.contains("protyle-wysiwyg") ||
-                target.tagName === "TABLE" ||
-                target.classList.contains("protyle-title__input") ||
-                target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-                target.blur();
+            if (document.activeElement) {
+                (document.activeElement as HTMLElement).blur();
             }
+            event.stopPropagation();
             event.preventDefault();
             return;
         }

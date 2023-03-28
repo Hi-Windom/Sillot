@@ -15,13 +15,12 @@
   }
 
   &__action {
-    padding: 8px 16px;
+    padding: 8px 4px;
 
     .b3-button {
-      padding: 8px;
+      padding: 8px 0;
       display: block;
-      margin: 0 auto;
-      width: 90%;
+      width: 100%;
 
       & > div {
         font-size: 32px;
@@ -33,13 +32,18 @@
 
     & > div {
       flex: 1;
+      margin: 0 4px;
 
       & > span {
-        display: block;
+        display: flex;
         color: var(--b3-theme-on-surface);
         text-align: center;
         font-size: 12px;
         margin-bottom: 8px;
+        height: 28px;
+        line-height: 14px;
+        justify-content: center;
+        align-items: center;
       }
     }
   }
@@ -49,19 +53,17 @@
       box-shadow: none;
     }
 
-    &--hide {
-      .protyle-wysiwyg > .sb > div:nth-of-type(n+2):not(.protyle-attr) {
-        display: none;
-      }
+    &--hidemark span[data-type~=mark] {
+      transition: var(--b3-transition);
+      color: transparent !important;
+    }
 
-      .li > .list {
-        display: none;
-      }
+    &--hideli .li > .list {
+      display: none;
+    }
 
-      span[data-type~=mark] {
-        transition: var(--b3-transition);
-        color: transparent !important;
-      }
+    &--hidesb .protyle-wysiwyg > .sb > div:nth-of-type(n+2):not(.protyle-attr) {
+      display: none;
     }
   }
 }
