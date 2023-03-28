@@ -361,11 +361,8 @@ export const globalShortcut = () => {
                 const currentType = currentLiElement.getAttribute("data-type") as TDockType;
                 if (currentType) {
                     getDockByType(currentType).toggleModel(currentType, true);
-                    const target = event.target as HTMLElement;
-                    if (target.classList.contains("protyle-wysiwyg") ||
-                        target.classList.contains("protyle-title__input") ||
-                        target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-                        target.blur();
+                    if (document.activeElement) {
+                        (document.activeElement as HTMLElement).blur();
                     }
                 } else {
                     const currentId = currentLiElement.getAttribute("data-id");
@@ -390,7 +387,7 @@ export const globalShortcut = () => {
         const target = event.target as HTMLElement;
         if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey &&
             !["INPUT", "TEXTAREA"].includes(target.tagName) &&
-            ["1", "2", "3", "4", "j", "k", "l", ";", "s", " ", "p"].includes(event.key.toLowerCase())) {
+            ["0", "1", "2", "3", "4", "j", "k", "l", ";", "s", " ", "p"].includes(event.key.toLowerCase())) {
             const openCardDialog = window.siyuan.dialogs.find(item => {
                 if (item.element.getAttribute("data-key") === window.siyuan.config.keymap.general.riffCard.custom) {
                     return true;
@@ -613,10 +610,8 @@ export const globalShortcut = () => {
         const matchDock = getAllDocks().find(item => {
             if (matchHotKey(window.siyuan.config.keymap.general[item.hotkeyLangId].custom, event)) {
                 getDockByType(item.type).toggleModel(item.type);
-                if (target.classList.contains("protyle-wysiwyg") ||
-                    target.classList.contains("protyle-title__input") ||
-                    target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-                    target.blur();
+                if (document.activeElement) {
+                    (document.activeElement as HTMLElement).blur();
                 }
                 event.preventDefault();
                 return true;
@@ -627,23 +622,18 @@ export const globalShortcut = () => {
         }
         if (matchHotKey(window.siyuan.config.keymap.general.riffCard.custom, event)) {
             openCard();
-            if (target.classList.contains("protyle-wysiwyg") ||
-                target.tagName === "TABLE" ||
-                target.classList.contains("protyle-title__input") ||
-                target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-                target.blur();
+            if (document.activeElement) {
+                (document.activeElement as HTMLElement).blur();
             }
             event.preventDefault();
             return;
         }
         if (!isTabWindow && matchHotKey(window.siyuan.config.keymap.general.dailyNote.custom, event)) {
             newDailyNote();
-            if (target.classList.contains("protyle-wysiwyg") ||
-                target.tagName === "TABLE" ||
-                target.classList.contains("protyle-title__input") ||
-                target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-                target.blur();
+            if (document.activeElement) {
+                (document.activeElement as HTMLElement).blur();
             }
+            event.stopPropagation();
             event.preventDefault();
             return;
         }

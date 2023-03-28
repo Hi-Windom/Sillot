@@ -40,7 +40,6 @@ yarn.lock
 
 # Sillot extend
 /.history
-/.vscode
 /app/jestCD
 /app/out
 /app/dist-electron

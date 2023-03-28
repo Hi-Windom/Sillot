@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.12.10",
+  "version": "0.13.1",
   "syv": "2.8.1",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
@@ -133,7 +133,7 @@
     "sass": "^1.60.0",
     "sass-loader": "^13.2.1",
     "socket.io": "^4.6.1",
-    "sofill": "^1.0.61",
+    "sofill": "^1.0.64",
     "sout": "^1.0.6",
     "style-loader": "^3.3.2",
     "sweetalert2": "^11.7.3",

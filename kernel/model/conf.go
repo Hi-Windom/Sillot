@@ -47,7 +47,7 @@ import (
 
 var Conf *AppConf
 
-// AppConf 维护应用元数据，保存在 ~/.siyuan/conf.json。
+// AppConf 维护应用元数据，保存在 ~/.sillot/conf.json。
 type AppConf struct {
 	LogLevel       string           `json:"logLevel"`       // 日志级别：Off, Trace, Debug, Info, Warn, Error, Fatal
 	Appearance     *conf.Appearance `json:"appearance"`     // 外观
@@ -750,7 +750,7 @@ func clearCorruptedNotebooks() {
 		}
 
 		boxDirPath := filepath.Join(util.DataDir, dir.Name())
-		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json")
+		boxConfPath := filepath.Join(boxDirPath, ".sillot", "conf.json")
 		if !gulu.File.IsExist(boxConfPath) {
 			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
 			continue
@@ -797,7 +797,7 @@ func clearWorkspaceTemp() {
 		}
 	}
 
-	tmps, err = filepath.Glob(filepath.Join(util.DataDir, ".siyuan", "*.tmp"))
+	tmps, err = filepath.Glob(filepath.Join(util.DataDir, ".sillot", "*.tmp"))
 	if nil != err {
 		logging.LogErrorf("glob temp files failed: %s", err)
 	}
@@ -810,8 +810,8 @@ func clearWorkspaceTemp() {
 	}
 
 	// 老版本遗留文件清理
-	os.RemoveAll(filepath.Join(util.DataDir, "assets", ".siyuan", "assets.json"))
-	os.RemoveAll(filepath.Join(util.DataDir, ".siyuan", "history"))
+	os.RemoveAll(filepath.Join(util.DataDir, "assets", ".sillot", "assets.json"))
+	os.RemoveAll(filepath.Join(util.DataDir, ".sillot", "history"))
 	os.RemoveAll(filepath.Join(util.WorkspaceDir, "backup"))
 	os.RemoveAll(filepath.Join(util.WorkspaceDir, "sync"))
 
@@ -835,7 +835,7 @@ func upgradeUserGuide() {
 		boxID := dir.Name()
 		boxDirPath := filepath.Join(util.DataDir, boxID)
 		boxConf := conf.NewBoxConf()
-		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json")
+		boxConfPath := filepath.Join(boxDirPath, ".sillot", "conf.json")
 		if !gulu.File.IsExist(boxConfPath) {
 			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
 			continue

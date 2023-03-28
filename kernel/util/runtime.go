@@ -143,6 +143,8 @@ func CheckFileSysStatus() {
 }
 
 func checkFileSysStatus() {
+	defer logging.Recover()
+
 	if IsMutexLocked(&checkFileSysStatusLock) {
 		logging.LogWarnf("check file system status is locked, skip")
 		return
@@ -151,7 +153,7 @@ func checkFileSysStatus() {
 	checkFileSysStatusLock.Lock()
 	defer checkFileSysStatusLock.Unlock()
 
-	const fileSysStatusCheckFile = ".siyuan/filesys_status_check"
+	const fileSysStatusCheckFile = ".sillot/filesys_status_check"
 	if IsCloudDrivePath(WorkspaceDir) {
 		ReportFileSysFatalError(fmt.Errorf("workspace dir [%s] is in third party sync dir", WorkspaceDir))
 		return
@@ -244,12 +246,11 @@ func checkFileSysStatus() {
 }
 
 func IsCloudDrivePath(workspaceAbsPath string) bool {
-	absPathLower := strings.ToLower(workspaceAbsPath)
-	if isICloudPath(absPathLower) {
+	if isICloudPath(workspaceAbsPath) {
 		return true
 	}
 
-	if isKnownCloudDrivePath(absPathLower) {
+	if isKnownCloudDrivePath(workspaceAbsPath) {
 		return true
 	}
 
@@ -260,16 +261,19 @@ func IsCloudDrivePath(workspaceAbsPath string) bool {
 	return false
 }
 
-func isKnownCloudDrivePath(workspaceAbsPathLower string) bool {
+func isKnownCloudDrivePath(workspaceAbsPath string) bool {
+	workspaceAbsPathLower := strings.ToLower(workspaceAbsPath)
 	return strings.Contains(workspaceAbsPathLower, "onedrive") || strings.Contains(workspaceAbsPathLower, "dropbox") ||
 		strings.Contains(workspaceAbsPathLower, "google drive") || strings.Contains(workspaceAbsPathLower, "pcloud") ||
 		strings.Contains(workspaceAbsPathLower, "坚果云")
 }
 
-func isICloudPath(workspaceAbsPathLower string) (ret bool) {
+func isICloudPath(workspaceAbsPath string) (ret bool) {
 	if !gulu.OS.IsDarwin() {
 		return false
 	}
+
+	workspaceAbsPathLower := strings.ToLower(workspaceAbsPath)
 
 	// macOS 端对工作空间放置在 iCloud 路径下做检查 https://github.com/siyuan-note/siyuan/issues/7747
 	iCloudRoot := filepath.Join(HomeDir, "Library", "Mobile Documents")
@@ -292,6 +296,10 @@ func existAvailabilityStatus(workspaceAbsPath string) bool {
 		return false
 	}
 
+	if !gulu.File.IsExist(workspaceAbsPath) {
+		return false
+	}
+
 	// 改进 Windows 端第三方同步盘检测 https://github.com/siyuan-note/siyuan/issues/7777
 
 	defer logging.Recover()
@@ -300,6 +308,11 @@ func existAvailabilityStatus(workspaceAbsPath string) bool {
 
 	dataAbsPath := filepath.Join(workspaceAbsPath, "data")
 	dir, file := filepath.Split(dataAbsPath)
+
+	if !gulu.File.IsExist(dataAbsPath) {
+		dataAbsPath = workspaceAbsPath
+		return false
+	}
 
 	unknown, err := oleutil.CreateObject("Shell.Application")
 	if nil != err {
@@ -312,17 +325,39 @@ func existAvailabilityStatus(workspaceAbsPath string) bool {
 		return false
 	}
 	defer shell.Release()
-	folderObj := oleutil.MustCallMethod(shell, "NameSpace", dir).ToIDispatch()
-	fileObj := oleutil.MustCallMethod(folderObj, "ParseName", file).ToIDispatch()
-	value := oleutil.MustCallMethod(folderObj, "GetDetailsOf", fileObj, 303)
+
+	result, err := oleutil.CallMethod(shell, "NameSpace", dir)
+	if nil != err {
+		logging.LogWarnf("call shell [NameSpace] failed: %s", err)
+		return false
+	}
+	folderObj := result.ToIDispatch()
+
+	result, err = oleutil.CallMethod(folderObj, "ParseName", file)
+	if nil != err {
+		logging.LogWarnf("call shell [ParseName] failed: %s", err)
+		return false
+	}
+	fileObj := result.ToIDispatch()
+
+	result, err = oleutil.CallMethod(folderObj, "GetDetailsOf", fileObj, 303)
+	if nil != err {
+		logging.LogWarnf("call shell [GetDetailsOf] failed: %s", err)
+		return false
+	}
+	value := result
 	if nil == value {
 		return false
 	}
-	status := value.Value().(string)
+	status := strings.ToLower(value.ToString())
+	if "" == status || "availability status" == status || "可用性状态" == status {
+		return false
+	}
 
 	if strings.Contains(status, "sync") || strings.Contains(status, "同步") ||
-		strings.Contains(status, "available") || strings.Contains(status, "可用") {
-		logging.LogErrorf("data [%s] third party sync status [%s]", dataAbsPath, status)
+		strings.Contains(status, "available on this device") || strings.Contains(status, "在此设备上可用") ||
+		strings.Contains(status, "available when online") || strings.Contains(status, "联机时可用") {
+		logging.LogErrorf("[%s] third party sync status [%s]", dataAbsPath, status)
 		return true
 	}
 	return false

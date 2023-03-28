@@ -174,11 +174,20 @@ func ExportSystemLog() (zipPath string) {
 			logging.LogErrorf("copy app log from [%s] to [%s] failed: %s", err, appLog, to)
 		}
 	}
-	kernelLog := filepath.Join(util.TempDir, "sillot.siyuan.log")
+
+	kernelLog := filepath.Join(util.HomeDir, ".config", "sillot", "kernel.log")
 	if gulu.File.IsExist(kernelLog) {
-		to := filepath.Join(exportFolder, "sillot.siyuan.log")
+		to := filepath.Join(exportFolder, "kernel.log")
 		if err := gulu.File.CopyFile(kernelLog, to); nil != err {
 			logging.LogErrorf("copy kernel log from [%s] to [%s] failed: %s", err, kernelLog, to)
+		}
+	}
+
+	siyuanLog := filepath.Join(util.TempDir, "siyuan.log")
+	if gulu.File.IsExist(siyuanLog) {
+		to := filepath.Join(exportFolder, "siyuan.log")
+		if err := gulu.File.CopyFile(siyuanLog, to); nil != err {
+			logging.LogErrorf("copy kernel log from [%s] to [%s] failed: %s", err, siyuanLog, to)
 		}
 	}
 
@@ -1361,7 +1370,7 @@ func exportSYZip(boxID, rootDirPath, baseFolderName string, docPaths []string) (
 	}
 
 	// 导出自定义排序
-	sortPath := filepath.Join(util.DataDir, box.ID, ".siyuan", "sort.json")
+	sortPath := filepath.Join(util.DataDir, box.ID, ".sillot", "sort.json")
 	fullSortIDs := map[string]int{}
 	sortIDs := map[string]int{}
 	var sortData []byte
@@ -1390,7 +1399,7 @@ func exportSYZip(boxID, rootDirPath, baseFolderName string, docPaths []string) (
 				logging.LogErrorf("marshal sort conf failed: %s", sortErr)
 			}
 			if 0 < len(sortData) {
-				confDir := filepath.Join(exportFolder, ".siyuan")
+				confDir := filepath.Join(exportFolder, ".sillot")
 				if mkdirErr := os.MkdirAll(confDir, 0755); nil != mkdirErr {
 					logging.LogErrorf("create export conf folder [%s] failed: %s", confDir, mkdirErr)
 				} else {
