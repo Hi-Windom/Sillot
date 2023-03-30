@@ -22,6 +22,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/K-Sillot/gulu"
+
+	"github.com/88250/lute/lex"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
@@ -86,8 +89,17 @@ func EncloseHighlighting(text string, keywords []string, openMark, closeMark str
 	}
 	re := ic + "("
 	for i, k := range keywords {
+		wordBoundary := lex.IsASCIILetterNums(gulu.Str.ToBytes(k)) // Improve virtual reference split words https://github.com/siyuan-note/siyuan/issues/7833
 		k = regexp.QuoteMeta(k)
-		re += "(" + k + ")"
+		re += "("
+		if wordBoundary {
+			re += "\\b"
+		}
+		re += k
+		if wordBoundary {
+			re += "\\b"
+		}
+		re += ")"
 		if i < len(keywords)-1 {
 			re += "|"
 		}

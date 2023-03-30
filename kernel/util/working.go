@@ -43,9 +43,9 @@ import (
 var Mode = "prod"
 
 const (
-	Ver       = "0.13"
+	Ver       = "0.14"
 	VerC      = Ver + ".999" // 用于检查版本更新
-	VerSY     = "2.8.2"
+	VerSY     = "2.8.3"
 	IsInsider = true
 )
 
@@ -384,6 +384,9 @@ func initMime() {
 	mime.AddExtensionType(".dxf", "image/x-dxf")
 	mime.AddExtensionType(".dwf", "drawing/x-dwf")
 	mime.AddExtensionType(".pdf", "application/pdf")
+
+	// 文档数据文件
+	mime.AddExtensionType(".sy", "application/json")
 }
 
 func initPandoc() {

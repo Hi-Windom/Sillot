@@ -11,7 +11,6 @@ require (
 	github.com/ConradIrwin/font v0.0.0-20210318200717-ce8d41cc0732
 	github.com/K-Sillot/encryption v0.0.1
 	github.com/K-Sillot/eventbus v0.0.1
-	github.com/K-Sillot/lute v0.0.2
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/Xuanwo/go-locale v1.1.0
@@ -60,7 +59,7 @@ require (
 	github.com/K-Sillot/filelock v0.0.4
 	github.com/K-Sillot/gulu v0.0.3
 	github.com/K-Sillot/httpclient v0.0.1
-	github.com/K-Sillot/logging v0.0.2
+	github.com/K-Sillot/logging v0.0.3
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/alecthomas/chroma v0.10.0 // indirect
@@ -137,7 +136,10 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-require github.com/K-Sillot/riff v0.0.1
+require (
+	github.com/88250/lute v1.7.6-0.20230330013439-8760e9c073db
+	github.com/K-Sillot/riff v0.0.1
+)
 
 replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20220714142610-fbbda1ee84f5
 
@@ -150,7 +152,6 @@ replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20
 //replace github.com/88250/gulu => D:\88250\gulu
 //replace github.com/mattn/go-sqlite3 => D:\88250\go-sqlite3
 
-// replace github.com/88250/gulu => github.com/K-Sillot/gulu
 // replace github.com/siyuan-note/encryption => github.com/K-Sillot/encryption
 // replace github.com/siyuan-note/eventbus => github.com/K-Sillot/eventbus
 // replace github.com/siyuan-note/filelock => github.com/K-Sillot/filelock

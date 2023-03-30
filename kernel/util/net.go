@@ -22,10 +22,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/88250/lute/ast"
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
-	"github.com/K-Sillot/lute/ast"
 	"github.com/gin-gonic/gin"
 	"github.com/imroc/req/v3"
 	"github.com/olahol/melody"
@@ -59,7 +59,7 @@ func IsOnline(checkURL string) bool {
 
 func isOnline(checkURL string) bool {
 	c := req.C().SetTimeout(1 * time.Second)
-	_, err := c.R().Head("https://www.baidu.com")
+	_, err := c.R().Head(checkURL)
 	return nil == err
 }
 

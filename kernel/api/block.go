@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/88250/lute/html"
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
-	"github.com/K-Sillot/lute/html"
 	"github.com/gin-gonic/gin"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"

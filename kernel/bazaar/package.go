@@ -25,11 +25,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/88250/lute"
 	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
-	"github.com/K-Sillot/lute"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/araddon/dateparse"
 	"github.com/imroc/req/v3"

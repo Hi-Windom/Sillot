@@ -30,12 +30,12 @@ import (
 
 	"github.com/siyuan-note/siyuan/kernel/task"
 
+	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
+	"github.com/88250/lute/parse"
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
-	"github.com/K-Sillot/lute"
-	"github.com/K-Sillot/lute/ast"
-	"github.com/K-Sillot/lute/lex"
-	"github.com/K-Sillot/lute/parse"
 	"github.com/jinzhu/copier"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/search"

@@ -28,17 +28,16 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
+	"github.com/88250/lute/parse"
+	util2 "github.com/88250/lute/util"
 	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
-	"github.com/K-Sillot/lute"
-	"github.com/K-Sillot/lute/ast"
-	"github.com/K-Sillot/lute/html"
-	"github.com/K-Sillot/lute/parse"
-	util2 "github.com/K-Sillot/lute/util"
 	"github.com/dustin/go-humanize"
 	"github.com/facette/natsort"
-	"github.com/gin-gonic/gin"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/search"
@@ -1640,10 +1639,4 @@ func (box *Box) removeSort(ids []string) {
 		logging.LogErrorf("write sort conf failed: %s", err)
 		return
 	}
-}
-
-func ServeFile(c *gin.Context, filePath string) (err error) {
-	WaitForWritingFiles()
-	c.File(filePath)
-	return
 }
