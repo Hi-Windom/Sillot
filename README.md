@@ -20,6 +20,15 @@
 <img alt="split" src="./.github/split.png"/>
 </p>
 
+## 浏览器兼容性
+
+<img src="screenshots/sillot/es2022.png"/>
+
+<p align="center">
+<br><br><br><br><br>
+<img alt="split" src="./.github/split.png"/>
+</p>
+
 ## 🛠️ Contributors
 
 <a href="https://github.com/Hi-Windom/Sillot/graphs/contributors">

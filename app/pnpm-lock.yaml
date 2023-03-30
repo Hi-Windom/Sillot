@@ -6,7 +6,7 @@ overrides:
 dependencies:
   '@electron/remote':
     specifier: ^2.0.9
-    version: registry.npmmirror.com/@electron/remote@2.0.9(electron@24.0.0-beta.5)
+    version: registry.npmmirror.com/@electron/remote@2.0.9(electron@24.0.0-beta.6)
   '@monaco-editor/loader':
     specifier: ^1.3.2
     version: registry.npmmirror.com/@monaco-editor/loader@1.3.2(monaco-editor@0.36.1)
@@ -130,8 +130,8 @@ devDependencies:
     specifier: ^2.29.3
     version: 2.29.3
   electron:
-    specifier: 24.0.0-beta.5
-    version: 24.0.0-beta.5
+    specifier: 24.0.0-beta.6
+    version: 24.0.0-beta.6
   electron-builder:
     specifier: ^23.6.0
     version: registry.npmmirror.com/electron-builder@23.6.0
@@ -245,7 +245,7 @@ devDependencies:
     version: 4.6.1
   sofill:
     specifier: ^1.0.64
-    version: 1.0.64(@sillot/bridge@0.0.3)(typescript@5.0.2)
+    version: 1.0.64(typescript@5.0.2)
   sout:
     specifier: ^1.0.6
     version: 1.0.6
@@ -1865,10 +1865,6 @@ packages:
     dev: true
     optional: true
 
-  /@sillot/bridge@0.0.3:
-    resolution: {integrity: sha512-HxZLzdgRvdaslwVHdzGONiOEYYJ/8iA2JBF1aprWgKX+CTOnd+gDOnQcFmw4Dhemno5k2wAWbFsl6yZ1Ozgpfw==}
-    dev: true
-
   /@sinclair/typebox@0.25.22:
     resolution: {integrity: sha512-6U6r2L7rnM7EG8G1tWzIjdB3QlsHF4slgcqXNN/SF0xJOAr0nDmT2GedlkyO3mrv8mDTJ24UuOMWR3diBrCvQQ==}
     dev: true
@@ -2490,10 +2486,8 @@ packages:
     hasBin: true
     dev: true
 
-  /ajv-formats@2.1.1(ajv@8.12.0):
+  /ajv-formats@2.1.1:
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
-    peerDependencies:
-      ajv: ^8.0.0
     peerDependenciesMeta:
       ajv:
         optional: true
@@ -2534,7 +2528,6 @@ packages:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
       uri-js: 4.4.1
-    dev: true
 
   /ansi-align@3.0.1:
     resolution: {integrity: sha512-IOfwwBF5iczOjp/WeY4YxyjqAFMQoZufdQWDd19SEExbVLNXqvpzSJ/M7Za4/sCPmQ0+GRquoA7bGcINcxew6w==}
@@ -3568,8 +3561,8 @@ packages:
     resolution: {integrity: sha512-dJZurgxDeaqn90VmS23Xz+QPQQl84BxnlAfwCDFNjfEhqO2yLMDkeaDoJ1yPXAbmiqTi+hd5TpB5zi1N4hwBuQ==}
     dev: true
 
-  /electron@24.0.0-beta.5:
-    resolution: {integrity: sha512-x+HDKFWDNX7pqKNItrHVmcnvI7pbrM3K0sDAOzCI+pTao/0ax/sJU8po22+U6+2JGd6V3qDdEg0kngkcsdRCEw==}
+  /electron@24.0.0-beta.6:
+    resolution: {integrity: sha512-Du9JJdRDEqlh8SdGfsE4RHPqYbkGvg4YkJogN+7+dhu0omAPgs0aqAv7u2cd+fXw+Q6OYIw/VTO+R86dKUVEdQ==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
     requiresBuild: true
@@ -6769,7 +6762,7 @@ packages:
     dependencies:
       '@types/json-schema': 7.0.11
       ajv: 8.12.0
-      ajv-formats: 2.1.1(ajv@8.12.0)
+      ajv-formats: 2.1.1
       ajv-keywords: 5.1.0(ajv@8.12.0)
     dev: true
 
@@ -6906,7 +6899,7 @@ packages:
       - utf-8-validate
     dev: true
 
-  /sofill@1.0.64(@sillot/bridge@0.0.3)(typescript@5.0.2):
+  /sofill@1.0.64(typescript@5.0.2):
     resolution: {integrity: sha512-pRgPz4abx2u/0eGoowE2iI/4arznVxYGSyFkdlHfkd2wa4w6tdSZr+CnaQ9hj5aKy78o0hrdllOOAjZ4VHIEpA==}
     peerDependencies:
       '@sillot/bridge': ^0.0.3
@@ -6916,7 +6909,6 @@ packages:
       localforage:
         optional: true
     dependencies:
-      '@sillot/bridge': 0.0.3
       typescript: 5.0.2
     dev: true
 
@@ -9107,7 +9099,7 @@ packages:
     engines: {node: '>=10.0.0'}
     dev: true
 
-  registry.npmmirror.com/@electron/remote@2.0.9(electron@24.0.0-beta.5):
+  registry.npmmirror.com/@electron/remote@2.0.9(electron@24.0.0-beta.6):
     resolution: {integrity: sha512-LR0W0ID6WAKHaSs0x5LX9aiG+5pFBNAJL6eQAJfGkCuZPUa6nZz+czZLdlTDETG45CgF/0raSvCtYOYUpr6c+A==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://registry.npmmirror.com/@electron/remote/-/remote-2.0.9.tgz}
     id: registry.npmmirror.com/@electron/remote/2.0.9
     name: '@electron/remote'
@@ -9115,7 +9107,7 @@ packages:
     peerDependencies:
       electron: '>= 13.0.0'
     dependencies:
-      electron: 24.0.0-beta.5
+      electron: 24.0.0-beta.6
     dev: false
 
   registry.npmmirror.com/@electron/universal@1.2.1:
@@ -9346,18 +9338,15 @@ packages:
       - supports-color
     dev: true
 
-  registry.npmmirror.com/ajv-formats@2.1.1(ajv@8.12.0):
+  registry.npmmirror.com/ajv-formats@2.1.1:
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://registry.npmmirror.com/ajv-formats/-/ajv-formats-2.1.1.tgz}
-    id: registry.npmmirror.com/ajv-formats/2.1.1
     name: ajv-formats
     version: 2.1.1
-    peerDependencies:
-      ajv: ^8.0.0
     peerDependenciesMeta:
       ajv:
         optional: true
     dependencies:
-      ajv: registry.npmmirror.com/ajv@8.12.0
+      ajv: 8.12.0
 
   registry.npmmirror.com/ajv-keywords@3.5.2(ajv@6.12.6):
     resolution: {integrity: sha512-5p6WTN0DdTGVQk6VjcEju19IgaHudalcfabD7yhDGeA6bcQnmL+CpveLJq/3hvfwd1aof6L386Ougkx6RfyMIQ==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://registry.npmmirror.com/ajv-keywords/-/ajv-keywords-3.5.2.tgz}
@@ -9928,7 +9917,7 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       ajv: registry.npmmirror.com/ajv@8.12.0
-      ajv-formats: registry.npmmirror.com/ajv-formats@2.1.1(ajv@8.12.0)
+      ajv-formats: registry.npmmirror.com/ajv-formats@2.1.1
       atomically: registry.npmmirror.com/atomically@1.7.0
       debounce-fn: registry.npmmirror.com/debounce-fn@4.0.0
       dot-prop: registry.npmmirror.com/dot-prop@6.0.1
@@ -12055,7 +12044,7 @@ packages:
     dependencies:
       '@types/json-schema': registry.npmmirror.com/@types/json-schema@7.0.11
       ajv: registry.npmmirror.com/ajv@8.12.0
-      ajv-formats: registry.npmmirror.com/ajv-formats@2.1.1(ajv@8.12.0)
+      ajv-formats: registry.npmmirror.com/ajv-formats@2.1.1
       ajv-keywords: registry.npmmirror.com/ajv-keywords@5.1.0(ajv@8.12.0)
     dev: true
 
