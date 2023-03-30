@@ -11,7 +11,7 @@ require (
 	github.com/ConradIrwin/font v0.0.0-20210318200717-ce8d41cc0732
 	github.com/K-Sillot/encryption v0.0.1
 	github.com/K-Sillot/eventbus v0.0.1
-	github.com/K-Sillot/lute v0.0.1
+	github.com/K-Sillot/lute v0.0.2
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/Xuanwo/go-locale v1.1.0

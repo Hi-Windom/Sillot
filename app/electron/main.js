@@ -996,7 +996,7 @@ app.whenReady().then(() => {
         "*://*/*.mhtml",
       ],
     };
-    var ignore = [
+    const ignore = [
         "localhost",
         "www.clarity.ms",
         "127.0.0.1",
@@ -1014,14 +1014,42 @@ app.whenReady().then(() => {
       "ci-hi",
       "ci-win",
       "ci-dom",
+      "@sillot",
     ];
+    const trustedHost = [
+        "raw.githubusercontent.com",
+        "bitbucket.org",
+        "esm.sh",
+    ]
+    const esm = [
+        "sofill",
+        "sili",
+        "sillot",
+    ]
+    const esm2 = [
+        "https://esm.sh/v113/sofill",
+        "https://esm.sh/v113/sili",
+    ]
+    const esm3 = [
+        "https://esm.sh/v113/",
+    ]
 
     session.defaultSession.webRequest.onBeforeRequest(
       filter,
       (details, callback) => {
-        let host = details.url.split("/")[2].split(":")[0];
-        let u = details.url.split("/")[3];
-        if (trusted.includes(u) || ignore.includes(host)) {
+        const host = details.url.split("/")[2].split(":")[0];
+        const u = details.url.split("/")[3];
+        const e = u.split("@")[0];
+        const e2 = details.url.split("@")[0];
+        const e3 = details.url.split("@sillot")[0];
+        if (ignore.includes(host) || (
+            trustedHost.includes(host) && (
+                trusted.includes(u) // like https://raw.githubusercontent.com/siyuan-note/siyuan/master/scripts/win-build.bat or https://esm.sh/@sillot/bridge@0.0.3
+                || esm.includes(e) // like https://esm.sh/sofill@1.0.64 but not like https://esm.sh/@sillot/bridge@0.0.3
+                || esm2.includes(e2) // like https://esm.sh/v113/sofill@1.0.64
+                || esm3.includes(e3) // like https://esm.sh/v113/@sillot/bridge@0.0.3
+                )
+            )) {
             callback({ cancel: false });
         } else {
             console.log( {url:details.url,res:"不受信的 js 请求将被重定向，请从本地加载 js"})
@@ -1173,23 +1201,10 @@ powerMonitor.on("suspend", () => {
 powerMonitor.on("resume", async () => {
     // 桌面端系统休眠唤醒后判断网络连通性后再执行数据同步 https://github.com/siyuan-note/siyuan/issues/6687
     writeLog("system resume");
+
+    const eNet = require("electron").net
     const isOnline = async () => {
-        try {
-            const result = await fetch("https://www.baidu.com", {timeout: 1000});
-            return 200 === result.status;
-        } catch (e) {
-            try {
-                const result = await fetch("https://icanhazip.com", {timeout: 1000});
-                return 200 === result.status;
-            } catch (e) {
-                try {
-                    const result = await fetch("https://api.ipify.org", {timeout: 1000});
-                    return 200 === result.status;
-                } catch (e) {
-                    return false;
-                }
-            }
-        }
+        return eNet.isOnline()
     };
     let online = false;
     for (let i = 0; i < 7; i++) {

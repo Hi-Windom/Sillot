@@ -153,7 +153,7 @@ func checkFileSysStatus() {
 	checkFileSysStatusLock.Lock()
 	defer checkFileSysStatusLock.Unlock()
 
-	const fileSysStatusCheckFile = ".sillot/filesys_status_check"
+	const fileSysStatusCheckFile = ".siyuan/filesys_status_check" // 这个不要改为 .sillot
 	if IsCloudDrivePath(WorkspaceDir) {
 		ReportFileSysFatalError(fmt.Errorf("workspace dir [%s] is in third party sync dir", WorkspaceDir))
 		return

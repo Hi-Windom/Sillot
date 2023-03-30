@@ -21,7 +21,7 @@
         "noAsyncPromiseExecutor": "off"
       },
       "performance": { "noDelete": "warn" },
-      "style": { "useTemplate": "warn" },
+      "style": { "useTemplate": "warn","useConst":"warn","noVar":"warn" },
       "complexity": { "useSimplifiedLogicExpression": "warn" },
       "correctness": { "noUnreachable": "warn" }
     }

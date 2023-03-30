@@ -29,8 +29,8 @@ github.com/K-Sillot/httpclient v0.0.1 h1:jgEGwkcF39z5PmykI/tere7HriDefXuVqWRAnbL
 github.com/K-Sillot/httpclient v0.0.1/go.mod h1:bpmYNgAvwSwwElk+BeHNWkeIitDCCvjQBbmdzJWLvDM=
 github.com/K-Sillot/logging v0.0.2 h1:LyKMKEbAyujZWeLj6qTGlg7kixobuCyUzN6qBJc5MvM=
 github.com/K-Sillot/logging v0.0.2/go.mod h1:c/bk7qF2hMGa8fykVogSDrOSjgCHQ0CUUx2WGyofXjU=
-github.com/K-Sillot/lute v0.0.1 h1:bSB6oOuSyJdT5xQLyaZeKg/RgUnrGwW9WHokVbvcV24=
-github.com/K-Sillot/lute v0.0.1/go.mod h1:/6jAuarcUVnpRrb6jZ9jaK5wobJ+xQUjw4PyW+CVY3U=
+github.com/K-Sillot/lute v0.0.2 h1:fe4N+VGmb2qz+aU6Bqx4GTh1GPqq6nRG4aMJlOaX/Fo=
+github.com/K-Sillot/lute v0.0.2/go.mod h1:/6jAuarcUVnpRrb6jZ9jaK5wobJ+xQUjw4PyW+CVY3U=
 github.com/K-Sillot/riff v0.0.1 h1:QSd3ggS9TjRf2UzEHJHH93zb3X7ERjB94P7xFWPT66o=
 github.com/K-Sillot/riff v0.0.1/go.mod h1:Ovo1SvRTpEtpTVtxFgVsm/K7Gak48uYGHF4/wQY35Qs=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=

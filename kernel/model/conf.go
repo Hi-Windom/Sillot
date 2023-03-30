@@ -355,7 +355,7 @@ func InitConf() {
 	if Conf.System.UploadErrLog {
 		logging.LogInfof("user has enabled [Automatically upload error messages and diagnostic data]")
 		sentry.Init(sentry.ClientOptions{
-			Dsn:         "https://bdff135f14654ae58a054adeceb2c308@o1173696.ingest.sentry.io/6269178",
+			Dsn:         "https://a8172f7df6ca41a69835ec5d621a5555@o4504894929829888.ingest.sentry.io/4504894929829888",
 			Release:     util.Ver,
 			Environment: util.Mode,
 		})
@@ -750,7 +750,7 @@ func clearCorruptedNotebooks() {
 		}
 
 		boxDirPath := filepath.Join(util.DataDir, dir.Name())
-		boxConfPath := filepath.Join(boxDirPath, ".sillot", "conf.json")
+		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json") // 这个不要改为 .sillot
 		if !gulu.File.IsExist(boxConfPath) {
 			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
 			continue
@@ -797,7 +797,7 @@ func clearWorkspaceTemp() {
 		}
 	}
 
-	tmps, err = filepath.Glob(filepath.Join(util.DataDir, ".sillot", "*.tmp"))
+	tmps, err = filepath.Glob(filepath.Join(util.DataDir, ".siyuan", "*.tmp")) // 这个不要改为 .sillot
 	if nil != err {
 		logging.LogErrorf("glob temp files failed: %s", err)
 	}
@@ -810,8 +810,8 @@ func clearWorkspaceTemp() {
 	}
 
 	// 老版本遗留文件清理
-	os.RemoveAll(filepath.Join(util.DataDir, "assets", ".sillot", "assets.json"))
-	os.RemoveAll(filepath.Join(util.DataDir, ".sillot", "history"))
+	os.RemoveAll(filepath.Join(util.DataDir, "assets", ".siyuan", "assets.json")) // 这个不要改为 .sillot
+	os.RemoveAll(filepath.Join(util.DataDir, ".siyuan", "history"))               // 这个不要改为 .sillot
 	os.RemoveAll(filepath.Join(util.WorkspaceDir, "backup"))
 	os.RemoveAll(filepath.Join(util.WorkspaceDir, "sync"))
 
@@ -835,7 +835,7 @@ func upgradeUserGuide() {
 		boxID := dir.Name()
 		boxDirPath := filepath.Join(util.DataDir, boxID)
 		boxConf := conf.NewBoxConf()
-		boxConfPath := filepath.Join(boxDirPath, ".sillot", "conf.json")
+		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json") // 这个不要改为 .sillot
 		if !gulu.File.IsExist(boxConfPath) {
 			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
 			continue

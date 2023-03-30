@@ -208,7 +208,7 @@ func Mount(boxID string) (alreadyMount bool, err error) {
 					"20210808180117-czj9bvb": "20200812220555-lj3enxa",
 					"20211226090932-5lcq56f": "20211226115423-d5z1joq",
 					"20210808180117-6v0mkxr": "20200923234011-ieuun1p",
-					"20230202000000-c123456": "20230202000000-123456c",
+					"20230202000000-c123456": "20230202153732-20az8kv",
 				}
 				startID = guideStartID[boxID]
 				if nil != treenode.GetBlockTree(startID) {
