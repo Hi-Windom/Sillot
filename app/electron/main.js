@@ -1029,7 +1029,9 @@ app.whenReady().then(() => {
     const esm2 = [
         "https://esm.sh/v113/sofill",
         "https://esm.sh/v113/sili",
-        "https://esm.sh/v113/@sillot",
+    ]
+    const esm3 = [
+        "https://esm.sh/v113/",
     ]
 
     session.defaultSession.webRequest.onBeforeRequest(
@@ -1039,11 +1041,13 @@ app.whenReady().then(() => {
         const u = details.url.split("/")[3];
         const e = u.split("@")[0];
         const e2 = details.url.split("@")[0];
+        const e3 = details.url.split("@sillot")[0];
         if (ignore.includes(host) || (
             trustedHost.includes(host) && (
                 trusted.includes(u) // like https://raw.githubusercontent.com/siyuan-note/siyuan/master/scripts/win-build.bat or https://esm.sh/@sillot/bridge@0.0.3
                 || esm.includes(e) // like https://esm.sh/sofill@1.0.64 but not like https://esm.sh/@sillot/bridge@0.0.3
                 || esm2.includes(e2) // like https://esm.sh/v113/sofill@1.0.64
+                || esm3.includes(e3) // like https://esm.sh/v113/@sillot/bridge@0.0.3
                 )
             )) {
             callback({ cancel: false });
