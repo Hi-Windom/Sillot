@@ -83,10 +83,13 @@ export const mountHelp = () => {
     fetchPost("/api/notebook/removeNotebook", {notebook: notebookId, callback: Constants.CB_MOUNT_REMOVE}, () => {
         fetchPost("/api/notebook/openNotebook", {
             notebook: notebookId
-        });
-        fetchPost("/api/notebook/openNotebook", {
-            callback: Constants.CB_MOUNT_HELP, // 根据 .siyuan/conf.json 解析笔记本名和图标
-            notebook: Constants.HELP_PATH.zh_CN_Sillot
+        }, () => {
+            fetchPost("/api/notebook/removeNotebook", {notebook: Constants.HELP_PATH.zh_CN_Sillot, callback: Constants.CB_MOUNT_REMOVE}, () => {
+                fetchPost("/api/notebook/openNotebook", {
+                    notebook: Constants.HELP_PATH.zh_CN_Sillot
+                    // 已知问题：需要手动刷新界面
+                });
+            });
         });
     });
 };
