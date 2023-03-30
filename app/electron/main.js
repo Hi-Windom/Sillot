@@ -996,7 +996,7 @@ app.whenReady().then(() => {
         "*://*/*.mhtml",
       ],
     };
-    var ignore = [
+    const ignore = [
         "localhost",
         "www.clarity.ms",
         "127.0.0.1",
@@ -1029,16 +1029,16 @@ app.whenReady().then(() => {
     const esm2 = [
         "https://esm.sh/v113/sofill",
         "https://esm.sh/v113/sili",
-        "https://esm.sh/v113/sillot",
+        "https://esm.sh/v113/@sillot",
     ]
 
     session.defaultSession.webRequest.onBeforeRequest(
       filter,
       (details, callback) => {
-        let host = details.url.split("/")[2].split(":")[0];
-        let u = details.url.split("/")[3];
-        let e = u.split("@")[0];
-        let e2 = details.url.split("@")[0];
+        const host = details.url.split("/")[2].split(":")[0];
+        const u = details.url.split("/")[3];
+        const e = u.split("@")[0];
+        const e2 = details.url.split("@")[0];
         if (ignore.includes(host) || (
             trustedHost.includes(host) && (
                 trusted.includes(u) // like https://raw.githubusercontent.com/siyuan-note/siyuan/master/scripts/win-build.bat or https://esm.sh/@sillot/bridge@0.0.3
