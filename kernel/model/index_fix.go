@@ -116,7 +116,7 @@ func resetDuplicateBlocksOnFileSys() {
 	needRefreshUI := false
 	for _, box := range boxes {
 		// 校验索引阶段自动删除历史遗留的笔记本 history 文件夹
-		legacyHistory := filepath.Join(util.DataDir, box.ID, ".sillot", "history")
+		legacyHistory := filepath.Join(util.DataDir, box.ID, ".siyuan", "history") // 这个不要改为 .sillot
 		if gulu.File.IsDir(legacyHistory) {
 			if removeErr := os.RemoveAll(legacyHistory); nil != removeErr {
 				logging.LogErrorf("remove legacy history failed: %s", removeErr)

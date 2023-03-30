@@ -797,7 +797,7 @@ func clearWorkspaceTemp() {
 		}
 	}
 
-	tmps, err = filepath.Glob(filepath.Join(util.DataDir, ".sillot", "*.tmp"))
+	tmps, err = filepath.Glob(filepath.Join(util.DataDir, ".siyuan", "*.tmp")) // 这个不要改为 .sillot
 	if nil != err {
 		logging.LogErrorf("glob temp files failed: %s", err)
 	}
@@ -810,8 +810,8 @@ func clearWorkspaceTemp() {
 	}
 
 	// 老版本遗留文件清理
-	os.RemoveAll(filepath.Join(util.DataDir, "assets", ".sillot", "assets.json"))
-	os.RemoveAll(filepath.Join(util.DataDir, ".sillot", "history"))
+	os.RemoveAll(filepath.Join(util.DataDir, "assets", ".siyuan", "assets.json")) // 这个不要改为 .sillot
+	os.RemoveAll(filepath.Join(util.DataDir, ".siyuan", "history"))               // 这个不要改为 .sillot
 	os.RemoveAll(filepath.Join(util.WorkspaceDir, "backup"))
 	os.RemoveAll(filepath.Join(util.WorkspaceDir, "sync"))
 

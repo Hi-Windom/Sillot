@@ -1370,7 +1370,7 @@ func exportSYZip(boxID, rootDirPath, baseFolderName string, docPaths []string) (
 	}
 
 	// 导出自定义排序
-	sortPath := filepath.Join(util.DataDir, box.ID, ".sillot", "sort.json")
+	sortPath := filepath.Join(util.DataDir, box.ID, ".siyuan", "sort.json") // 这个不要改为 .sillot
 	fullSortIDs := map[string]int{}
 	sortIDs := map[string]int{}
 	var sortData []byte
@@ -1399,7 +1399,7 @@ func exportSYZip(boxID, rootDirPath, baseFolderName string, docPaths []string) (
 				logging.LogErrorf("marshal sort conf failed: %s", sortErr)
 			}
 			if 0 < len(sortData) {
-				confDir := filepath.Join(exportFolder, ".sillot")
+				confDir := filepath.Join(exportFolder, ".siyuan") // 这个不要改为 .sillot
 				if mkdirErr := os.MkdirAll(confDir, 0755); nil != mkdirErr {
 					logging.LogErrorf("create export conf folder [%s] failed: %s", confDir, mkdirErr)
 				} else {
