@@ -404,7 +404,7 @@ func GetNotebookHistory() (ret []*History, err error) {
 		return
 	}
 
-	historyNotebookConfs, err := filepath.Glob(historyDir + "/*-delete/*/.sillot/conf.json")
+	historyNotebookConfs, err := filepath.Glob(historyDir + "/*-delete/*/.siyuan/conf.json") // 这个不要改为 .sillot
 	if nil != err {
 		logging.LogErrorf("read dir [%s] failed: %s", historyDir, err)
 		return

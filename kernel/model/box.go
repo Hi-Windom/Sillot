@@ -166,7 +166,7 @@ func ListNotebooks() (ret []*Box, err error) {
 func (box *Box) GetConf() (ret *conf.BoxConf) {
 	ret = conf.NewBoxConf()
 
-	confPath := filepath.Join(util.DataDir, box.ID, ".sillot/conf.json")
+	confPath := filepath.Join(util.DataDir, box.ID, ".siyuan/conf.json") // 这个不要改为 .sillot
 	if !gulu.File.IsExist(confPath) {
 		return
 	}
@@ -185,7 +185,7 @@ func (box *Box) GetConf() (ret *conf.BoxConf) {
 }
 
 func (box *Box) SaveConf(conf *conf.BoxConf) {
-	confPath := filepath.Join(util.DataDir, box.ID, ".sillot/conf.json")
+	confPath := filepath.Join(util.DataDir, box.ID, ".siyuan/conf.json") // 这个不要改为 .sillot
 	newData, err := gulu.JSON.MarshalIndentJSON(conf, "", "  ")
 	if nil != err {
 		logging.LogErrorf("marshal box conf [%s] failed: %s", confPath, err)
@@ -206,8 +206,8 @@ func (box *Box) SaveConf(conf *conf.BoxConf) {
 }
 
 func (box *Box) saveConf0(data []byte) {
-	confPath := filepath.Join(util.DataDir, box.ID, ".sillot/conf.json")
-	if err := os.MkdirAll(filepath.Join(util.DataDir, box.ID, ".sillot"), 0755); nil != err {
+	confPath := filepath.Join(util.DataDir, box.ID, ".siyuan/conf.json")                      // 这个不要改为 .sillot
+	if err := os.MkdirAll(filepath.Join(util.DataDir, box.ID, ".siyuan"), 0755); nil != err { // 这个不要改为 .sillot
 		logging.LogErrorf("save box conf [%s] failed: %s", confPath, err)
 	}
 	if err := filelock.WriteFile(confPath, data); nil != err {
