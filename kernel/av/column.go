@@ -16,7 +16,7 @@
 
 package av
 
-import "github.com/K-Sillot/lute/ast"
+import "github.com/88250/lute/ast"
 
 type ColumnType string
 

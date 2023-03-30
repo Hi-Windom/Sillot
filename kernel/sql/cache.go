@@ -19,9 +19,9 @@ package sql
 import (
 	"time"
 
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/parse"
 	"github.com/K-Sillot/logging"
-	"github.com/K-Sillot/lute/ast"
-	"github.com/K-Sillot/lute/parse"
 	"github.com/dgraph-io/ristretto"
 	"github.com/jinzhu/copier"
 	gcache "github.com/patrickmn/go-cache"

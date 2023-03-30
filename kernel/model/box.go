@@ -29,11 +29,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/parse"
 	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
-	"github.com/K-Sillot/lute/ast"
-	"github.com/K-Sillot/lute/parse"
 	"github.com/dustin/go-humanize"
 	"github.com/facette/natsort"
 	"github.com/siyuan-note/siyuan/kernel/conf"

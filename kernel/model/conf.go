@@ -28,11 +28,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
 	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
-	"github.com/K-Sillot/lute"
-	"github.com/K-Sillot/lute/ast"
 	"github.com/Xuanwo/go-locale"
 	"github.com/dustin/go-humanize"
 	"github.com/getsentry/sentry-go"
