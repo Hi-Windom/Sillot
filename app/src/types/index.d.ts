@@ -31,8 +31,6 @@ type TBazaarType = "templates" | "icons" | "widgets" | "themes"
 declare module "blueimp-md5"
 
 interface Window {
-    __localStorage__removeItem: (key: string) => void
-    __localStorage__setItem: (key: string, value: string) => void
     dataLayer: any[]
     siyuan: ISiyuan
     webkit: any
@@ -48,6 +46,12 @@ interface Window {
         // Sillot extend
         requestPermission(id: string): boolean
     }
+
+    newWindow: {
+        positionPDF(pathStr: string, page: string | number): void
+    }
+
+    Protyle: import("../protyle/method").default
 
     goBack(): void
 
@@ -611,7 +615,7 @@ declare interface IBlockTree {
 }
 
 declare interface IBlock {
-    riffCardReps? :number   // 闪卡复习次数
+    riffCardReps?: number   // 闪卡复习次数
     depth?: number,
     box?: string;
     path?: string;
