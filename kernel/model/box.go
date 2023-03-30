@@ -105,7 +105,7 @@ func ListNotebooks() (ret []*Box, err error) {
 
 		boxConf := conf.NewBoxConf()
 		boxDirPath := filepath.Join(util.DataDir, dir.Name())
-		boxConfPath := filepath.Join(boxDirPath, ".sillot", "conf.json")
+		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json") // 这个不要改为 .sillot
 		if !gulu.File.IsExist(boxConfPath) {
 			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
 			continue

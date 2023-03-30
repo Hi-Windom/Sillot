@@ -750,7 +750,7 @@ func clearCorruptedNotebooks() {
 		}
 
 		boxDirPath := filepath.Join(util.DataDir, dir.Name())
-		boxConfPath := filepath.Join(boxDirPath, ".sillot", "conf.json")
+		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json") // 这个不要改为 .sillot
 		if !gulu.File.IsExist(boxConfPath) {
 			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
 			continue
@@ -835,7 +835,7 @@ func upgradeUserGuide() {
 		boxID := dir.Name()
 		boxDirPath := filepath.Join(util.DataDir, boxID)
 		boxConf := conf.NewBoxConf()
-		boxConfPath := filepath.Join(boxDirPath, ".sillot", "conf.json")
+		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json") // 这个不要改为 .sillot
 		if !gulu.File.IsExist(boxConfPath) {
 			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
 			continue
