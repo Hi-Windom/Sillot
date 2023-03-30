@@ -355,7 +355,7 @@ func InitConf() {
 	if Conf.System.UploadErrLog {
 		logging.LogInfof("user has enabled [Automatically upload error messages and diagnostic data]")
 		sentry.Init(sentry.ClientOptions{
-			Dsn:         "https://bdff135f14654ae58a054adeceb2c308@o1173696.ingest.sentry.io/6269178",
+			Dsn:         "https://a8172f7df6ca41a69835ec5d621a5555@o4504894929829888.ingest.sentry.io/4504894929829888",
 			Release:     util.Ver,
 			Environment: util.Mode,
 		})
