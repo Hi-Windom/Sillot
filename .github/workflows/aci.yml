@@ -38,7 +38,7 @@ jobs:
             data = JSON.stringify(data);
             data.assets.forEach(e=>{
             console.log(e.browser_download_url);
-            github.request(e.browser_download_url).then(console.log(result));
+            github.request(e.browser_download_url).then(r=>{console.log(r)});
             });
             return data.assets
       continue-on-error: false
