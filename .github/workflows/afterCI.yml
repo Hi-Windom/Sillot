@@ -8,17 +8,59 @@ on:
   release:
     types: [released]
     # https://docs.github.com/zh/actions/using-workflows/events-that-trigger-workflows#release
+
+env:
+  # 哈希值的类型，可以是 md5 或 sha256
+  HASH_TYPE: sha256
+
 jobs:
-  genHASH:
-    name: Create hash for release
+  download-and-calculate-hash:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: MCJack123/ghaction-generate-release-hashes@v3
-        with:
-          hash-type: md5
-          file-name: hashes.txt
-          get-assets: false # This is useful if previous jobs in a workflow upload assets, as GitHub's list will not include them
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Asset Hashes
-          path: hashes.txt
+    - uses: actions/checkout@v3
+
+    - name: Install Required Packages
+      run: |
+          sudo apt-get update && sudo apt-get install -y openssl
+          curl -Lo shasum https://raw.githubusercontent.com/apple/darwin-tools/master/shasum
+          chmod +x shasum
+
+    - name: Get Latest Release
+      id: latest_release
+      uses: actions/github-script@v4
+      with:
+          script: |
+            const { data } = await github.repos.getLatestRelease({
+              owner: Hi-Windom,
+              repo: Sillot
+            });
+            console.log(JSON.stringify(data));
+            return data
+
+    - name: Download Assets
+      id: download_assets
+      run: |
+          cd ${{ github.workspace }}
+          curl -sSL ${{ steps.latest_release.outputs.zipball_url }} -o assets.zip
+          unzip -q assets.zip -d assets
+          rm assets.zip
+      continue-on-error: false
+
+    - name: Generate Hash for Assets
+      id: generate_hash
+      run: |
+          cd ${{ github.workspace }}/assets
+          for file in $(find . -type f -not -path '*/\.*'); do
+            sha=$(../shasum -a 256 $file | awk '{print $1}')
+            echo "$sha  $file" >> assets_hash.txt
+          done
+      continue-on-error: false
+
+    - name: Upload Hash File to Release Asset
+      uses: actions/upload-release-asset@v1
+      with:
+          upload_url: ${{ steps.latest_release.outputs.upload_url }}
+          asset_path: ./assets/assets_hash.txt
+          asset_name: assets_hash.txt
+          asset_content_type: text/plain
