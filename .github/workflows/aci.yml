@@ -38,8 +38,7 @@ jobs:
             data = JSON.stringify(data);
             data.assets.forEach(e=>{
             console.log(e.browser_download_url);
-            const result = await github.request(e.browser_download_url);
-            console.log(result);
+            github.request(e.browser_download_url).then(console.log(result));
             });
             return data.assets
       continue-on-error: false
