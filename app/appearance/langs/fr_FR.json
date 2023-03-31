@@ -957,7 +957,7 @@
     "7": "La suppression du carnet de notes [%s] path [%s] a échoué : %s",
     "8": "La vérification de la mise à jour a échoué",
     "9": "Une nouvelle version est disponible, veuillez consulter l'annonce de la version %s",
-    "10": "C'est la dernière version",
+    "10": "C'est la dernière version %s",
     "11": "\uD83D\uDCE2 Annonce système : <a target='_blank' href='%s'>%s</a>",
     "12": "Échec de la requête asset [%s]",
     "13": "Impossible de créer un fichier commençant par .",

@@ -957,7 +957,7 @@
     "7": "Eliminar libreta [%s] ruta [%s] falló: %s",
     "8": "Comprobar la actualización falló",
     "9": "Una nueva versión está disponible, por favor, busque el anuncio de lanzamiento %s",
-    "10": "Es la última versión",
+    "10": "Es la última versión %s",
     "11": "\uD83D\uDCE2 Anuncio del sistema: <a target='_blank' href='%s'>%s</a>",
     "12": "Fallo en la consulta de activos [%s]",
     "13": "No se puede crear un archivo que empiece por .",
