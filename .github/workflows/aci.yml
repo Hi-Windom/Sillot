@@ -1,4 +1,4 @@
-name: after ci
+name: afterCI
 
 on:
   # workflow_run:
