@@ -9,9 +9,6 @@ on:
     types: [released]
     # https://docs.github.com/zh/actions/using-workflows/events-that-trigger-workflows#release
 
-env:
-  # 哈希值的类型，可以是 md5 或 sha256
-  HASH_TYPE: sha256
 
 jobs:
   download-and-calculate-hash:
