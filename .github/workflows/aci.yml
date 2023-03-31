@@ -5,6 +5,7 @@ on:
   #     workflows: ["Sillot CI/CD"]
   #     types:
   #       - completed
+  workflow_dispatch:
   release:
     types: [released]
     # https://docs.github.com/zh/actions/using-workflows/events-that-trigger-workflows#release
