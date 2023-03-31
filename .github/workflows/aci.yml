@@ -33,7 +33,7 @@ jobs:
             // const d = JSON.stringify(data);
             // console.log(d)
             data.assets.forEach(async (e) => { console.log(e.browser_download_url); const r = await github.request(e.browser_download_url); console.log(r); })
-            return data
+            return data.upload_url
       continue-on-error: false
 
     - name: Install Required Packages
@@ -54,8 +54,10 @@ jobs:
 
     - name: Upload Hash File to Release Asset
       uses: actions/upload-release-asset@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          upload_url: ${{ steps.latest_release.outputs.upload_url }}
+          upload_url: ${{ steps.latest_release.outputs.result }}
           asset_path: ./assets_hash.txt
           asset_name: assets_hash.txt
           asset_content_type: text/plain
