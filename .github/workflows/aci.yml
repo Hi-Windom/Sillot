@@ -33,7 +33,7 @@ jobs:
             // const d = JSON.stringify(data);
             // console.log(d)
             data.assets.forEach(async (e) => { console.log(e.browser_download_url); const r = await github.request(e.browser_download_url); console.log(r); })
-            return data.assets
+            return data
       continue-on-error: false
 
     - name: Install Required Packages
@@ -47,7 +47,7 @@ jobs:
       run: |
           ls
           for file in $(find . -type f -not -path '*/\.*'); do
-            sha=$(../shasum -a 256 $file | awk '{print $1}')
+            sha=$(./shasum -a 256 $file | awk '{print $1}')
             echo "$sha  $file" >> assets_hash.txt
           done
       continue-on-error: false
@@ -56,6 +56,6 @@ jobs:
       uses: actions/upload-release-asset@v1
       with:
           upload_url: ${{ steps.latest_release.outputs.upload_url }}
-          asset_path: ./assets/assets_hash.txt
+          asset_path: ./assets_hash.txt
           asset_name: assets_hash.txt
           asset_content_type: text/plain
