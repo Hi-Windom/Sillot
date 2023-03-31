@@ -16,17 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Install Required Packages
-      run: |
-          sudo apt-get update && sudo apt-get install -y openssl
-          curl -Lo shasum https://raw.githubusercontent.com/apple/darwin-tools/master/shasum
-          chmod +x shasum
-
     - name: Get Latest Release Assets
       id: latest_release
-      uses: actions/github-script@v6
+      uses: actions/github-script@v5
       with:
           result-encoding: string
           retries: 3
@@ -36,6 +28,14 @@ jobs:
             data.assets.forEach(async (e) => { console.log(e.browser_download_url); const r = await github.request(e.browser_download_url); console.log(r); })
             return data.assets
       continue-on-error: false
+
+    # - uses: actions/checkout@v3
+
+    - name: Install Required Packages
+      run: |
+          sudo apt-get update && sudo apt-get install -y openssl
+          curl -Lo shasum https://raw.githubusercontent.com/apple/darwin-tools/master/shasum
+          chmod +x shasum
 
     - name: Generate Hash for Assets
       id: generate_hash
