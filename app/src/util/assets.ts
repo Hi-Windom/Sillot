@@ -96,6 +96,7 @@ export const loadAssets = (data: IAppearance) => {
         addScript(themeScriptAddress, "themeScript", "module");
     }
 
+    /// #if !MOBILE
     setTimeout(() => {
         const pluginScriptElement = document.getElementById("pluginScript");
         const pluginScriptAddress = "/appearance/plugin/main.js?v=" + new Date().getTime();
@@ -108,6 +109,7 @@ export const loadAssets = (data: IAppearance) => {
             addScript(pluginScriptAddress, "pluginScript");
         }
     }, 1000)
+    /// #endif
 
     const iconDefaultScriptElement = document.getElementById("iconDefaultScript");
     // 不能使用 data.iconVer，因为其他主题也需要加载默认图标，此时 data.iconVer 为其他图标的版本号
