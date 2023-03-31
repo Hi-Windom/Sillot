@@ -31,16 +31,9 @@ jobs:
           result-encoding: string
           retries: 3
           script: |
-            const { data } = await github.repos.getLatestRelease({
-              owner: 'Hi-Windom',
-              repo: 'Sillot'
-            });
+            const { data } = await github.repos.getLatestRelease({owner: 'Hi-Windom',repo: 'Sillot'});
             data = JSON.stringify(data);
-            data.assets.forEach(async (e) => {
-            console.log(e.browser_download_url);
-            const r = await github.request(e.browser_download_url);
-            console.log(r);
-            });
+            data.assets.forEach(async (e) => { console.log(e.browser_download_url); const r = await github.request(e.browser_download_url); console.log(r); })
             return data.assets
       continue-on-error: false
 
