@@ -22,6 +22,7 @@ jobs:
       with:
           result-encoding: string
           retries: 3
+          debug: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { data } = await github.repos.getLatestRelease({owner: 'Hi-Windom',repo: 'Sillot'});
