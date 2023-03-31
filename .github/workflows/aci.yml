@@ -47,9 +47,7 @@ jobs:
       id: generate_hash
       run: |
           ls
-          sudo apt-get update
-          sudo apt-get install -y shasum
-          shasum Sillot* > Assets_hash.txt
+          find . -type f -name 'Sillot-*' -exec md5sum {} + > Assets_hash.txt
       continue-on-error: false
 
     - name: Upload Hash File to Release Asset
@@ -58,6 +56,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.latest_release.outputs.result }}
-          asset_path: ./assets_hash.txt
-          asset_name: assets_hash.txt
+          asset_path: ./Assets_hash.txt
+          asset_name: Assets_hash.txt
           asset_content_type: text/plain
