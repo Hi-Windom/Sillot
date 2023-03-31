@@ -37,17 +37,11 @@ jobs:
             return data.upload_url
       continue-on-error: false
 
-    # - name: Install Required Packages
-    #   run: |
-    #       sudo apt-get update && sudo apt-get install -y openssl
-    #       curl -Lo shasum https://raw.githubusercontent.com/apple/darwin-tools/master/shasum
-    #       chmod +x shasum
-
     - name: Generate Hash for Assets
       id: generate_hash
       run: |
           ls
-          find . -type f -name 'Sillot-*' -exec md5sum {} + > Assets_hash.txt
+          find . -type f -name 'Sillot-*' -exec md5sum {} + > Assets_MD5_Sum.txt
       continue-on-error: false
 
     - name: Upload Hash File to Release Asset
@@ -56,6 +50,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.latest_release.outputs.result }}
-          asset_path: ./Assets_hash.txt
-          asset_name: Assets_hash.txt
+          asset_path: ./Assets_MD5_Sum.txt
+          asset_name: Assets_MD5_Sum.txt
           asset_content_type: text/plain
