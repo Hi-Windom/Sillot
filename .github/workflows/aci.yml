@@ -37,20 +37,18 @@ jobs:
             return data.upload_url
       continue-on-error: false
 
-    - name: Install Required Packages
-      run: |
-          sudo apt-get update && sudo apt-get install -y openssl
-          curl -Lo shasum https://raw.githubusercontent.com/apple/darwin-tools/master/shasum
-          chmod +x shasum
+    # - name: Install Required Packages
+    #   run: |
+    #       sudo apt-get update && sudo apt-get install -y openssl
+    #       curl -Lo shasum https://raw.githubusercontent.com/apple/darwin-tools/master/shasum
+    #       chmod +x shasum
 
     - name: Generate Hash for Assets
       id: generate_hash
       run: |
           ls
-          for file in $(find . -type f -not -path '*/\.*'); do
-            sha=$(./shasum -a 256 $file | awk '{print $1}')
-            echo "$sha  $file" >> assets_hash.txt
-          done
+          sudo apt-get install -y shasum
+          shasum Sillot* > Assets_hash.txt
       continue-on-error: false
 
     - name: Upload Hash File to Release Asset
