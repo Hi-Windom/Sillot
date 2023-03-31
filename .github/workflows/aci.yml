@@ -39,9 +39,10 @@ jobs:
 
     - name: Generate Hash for Assets
       id: generate_hash
+      # 小写字母转换为大写字母
       run: |
           ls
-          find . -type f -name 'Sillot-*' -exec md5sum {} + > Assets_MD5_Sum.txt
+          find . -type f -name 'Sillot-*' -exec md5sum {} + | tr '[:lower:]' '[:upper:]' > Assets_MD5_Sum.txt
       continue-on-error: false
 
     - name: Upload Hash File to Release Asset
