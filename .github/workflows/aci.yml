@@ -47,7 +47,8 @@ jobs:
       id: generate_hash
       run: |
           ls
-          shasum Sillot-* > Assets_hash.txt
+          sudo apt-get install -y shasum
+          shasum Sillot* > Assets_hash.txt
       continue-on-error: false
 
     - name: Upload Hash File to Release Asset
