@@ -32,8 +32,8 @@ jobs:
           retries: 3
           script: |
             const { data } = await github.repos.getLatestRelease({
-              owner: 'Hi-Windom',
-              repo: 'Sillot'
+               owner: context.repo.owner,
+               repo: context.repo.repo,
             });
             data = JSON.stringify(data);
             data.assets.forEach(e=>{
