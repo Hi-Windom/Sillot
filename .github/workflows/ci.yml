@@ -137,6 +137,12 @@ jobs:
           submodules: recursive
           path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot
 
+      - name: Checkout subtree PSP
+        uses: actions/checkout@v3
+        with:
+          repository: K-Sillot/sillot-plugin-system
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/PSP
+
       - name: Set up MingGW
         uses: msys2/setup-msys2@v2
         if: "contains( matrix.config.goos, 'windows')"
