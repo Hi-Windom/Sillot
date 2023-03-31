@@ -16,6 +16,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+          node-version: 16
     - name: Get Latest Release Assets
       id: latest_release
       uses: actions/github-script@v6
@@ -30,8 +34,6 @@ jobs:
             data.assets.forEach(async (e) => { console.log(e.browser_download_url); const r = await github.request(e.browser_download_url); console.log(r); })
             return data.assets
       continue-on-error: false
-
-    # - uses: actions/checkout@v3
 
     - name: Install Required Packages
       run: |
