@@ -312,7 +312,6 @@ declare interface IExport {
     pandocBin: string
     paragraphBeginningSpace: boolean;
     addTitle: boolean;
-    addFooter: boolean;
     markdownYFM: boolean;
 }
 
