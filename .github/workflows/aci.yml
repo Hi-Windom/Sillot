@@ -29,10 +29,10 @@ jobs:
           debug: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            let { data } = await github.rest.repos.getLatestRelease({owner: 'Hi-Windom',repo: 'Sillot'});
-            data = JSON.stringify(data);
-            console.log(data)
-            data.assets.forEach(async (e) => { console.log(e.browser_download_url); const r = await github.request(e.browser_download_url); console.log(r); })
+            const { data } = await github.rest.repos.getLatestRelease({owner: 'Hi-Windom',repo: 'Sillot'});
+            const d = JSON.stringify(data);
+            console.log(d)
+            d['assets'].forEach(async (e) => { console.log(e.browser_download_url); const r = await github.request(e.browser_download_url); console.log(r); })
             return data.assets
       continue-on-error: false
 
