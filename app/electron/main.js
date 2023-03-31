@@ -991,9 +991,7 @@ app.whenReady().then(() => {
         "*://*/*.vbs",
         "*://*/*.cmd",
         "*://*/*.exe",
-        "*://*/*.html",
-        "*://*/*.htm",
-        "*://*/*.mhtml",
+        "*://*/*.pyc",
       ],
     };
     const ignore = [
