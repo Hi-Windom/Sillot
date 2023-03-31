@@ -32,7 +32,7 @@ jobs:
             const { data } = await github.rest.repos.getLatestRelease({owner: 'Hi-Windom',repo: 'Sillot'});
             const d = JSON.stringify(data);
             console.log(d)
-            d['assets'].forEach(async (e) => { console.log(e.browser_download_url); const r = await github.request(e.browser_download_url); console.log(r); })
+            data.assets.forEach(async (e) => { console.log(e.browser_download_url); const r = await github.request(e.browser_download_url); console.log(r); })
             return data.assets
       continue-on-error: false
 
