@@ -30,8 +30,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { data } = await github.rest.repos.getLatestRelease({owner: 'Hi-Windom',repo: 'Sillot'});
-            const d = JSON.stringify(data);
-            console.log(d)
+            // const d = JSON.stringify(data);
+            // console.log(d)
             data.assets.forEach(async (e) => { console.log(e.browser_download_url); const r = await github.request(e.browser_download_url); console.log(r); })
             return data.assets
       continue-on-error: false
@@ -45,7 +45,7 @@ jobs:
     - name: Generate Hash for Assets
       id: generate_hash
       run: |
-          cd ${{ github.workspace }}/assets
+          ls
           for file in $(find . -type f -not -path '*/\.*'); do
             sha=$(../shasum -a 256 $file | awk '{print $1}')
             echo "$sha  $file" >> assets_hash.txt
