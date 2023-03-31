@@ -18,10 +18,11 @@ jobs:
     steps:
     - name: Get Latest Release Assets
       id: latest_release
-      uses: actions/github-script@v5
+      uses: actions/github-script@v6
       with:
           result-encoding: string
           retries: 3
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { data } = await github.repos.getLatestRelease({owner: 'Hi-Windom',repo: 'Sillot'});
             data = JSON.stringify(data);
