@@ -313,6 +313,7 @@ declare interface IExport {
     paragraphBeginningSpace: boolean;
     addTitle: boolean;
     markdownYFM: boolean;
+    pdfFooter: string;
 }
 
 declare interface IEditor {
