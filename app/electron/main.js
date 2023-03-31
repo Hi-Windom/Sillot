@@ -1013,6 +1013,7 @@ app.whenReady().then(() => {
       "ci-win",
       "ci-dom",
       "@sillot",
+      "K-Sillot",
     ];
     const trustedHost = [
         "raw.githubusercontent.com",
