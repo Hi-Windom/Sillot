@@ -40,3 +40,11 @@ jobs:
       - name: Build the Docker image
         run: |
           docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:${{ github.event.inputs.image_tag }}-sillot .
+
+      - name: Update Docker Hub Description
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_PWD }}
+          repository: soltus/sillot
+          readme-filepath: ./README_Sillot_Docker.md
