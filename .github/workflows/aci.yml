@@ -24,25 +24,24 @@ jobs:
           curl -Lo shasum https://raw.githubusercontent.com/apple/darwin-tools/master/shasum
           chmod +x shasum
 
-    - name: Get Latest Release
+    - name: Get Latest Release Assets
       id: latest_release
-      uses: actions/github-script@v4
+      uses: actions/github-script@v6
       with:
+          result-encoding: string
+          retries: 3
           script: |
             const { data } = await github.repos.getLatestRelease({
               owner: 'Hi-Windom',
               repo: 'Sillot'
             });
-            console.log(JSON.stringify(data));
-            return data
-
-    - name: Download Assets
-      id: download_assets
-      run: |
-          cd ${{ github.workspace }}
-          curl -sSL ${{ steps.latest_release.outputs.zipball_url }} -o assets.zip
-          unzip -q assets.zip -d assets
-          rm assets.zip
+            data = JSON.stringify(data);
+            data.assets.forEach(e=>{
+            console.log(e.browser_download_url);
+            const result = await github.request(e.browser_download_url);
+            console.log(result);
+            });
+            return data.assets
       continue-on-error: false
 
     - name: Generate Hash for Assets
