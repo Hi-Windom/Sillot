@@ -11,7 +11,7 @@ on:
 
 
 jobs:
-  download-and-calculate-hash:
+  test:
     runs-on: ubuntu-latest
 
     steps:
