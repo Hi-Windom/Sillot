@@ -47,6 +47,7 @@ jobs:
       id: generate_hash
       run: |
           ls
+          sudo apt-get update
           sudo apt-get install -y shasum
           shasum Sillot* > Assets_hash.txt
       continue-on-error: false
