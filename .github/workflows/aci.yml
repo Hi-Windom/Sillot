@@ -32,13 +32,14 @@ jobs:
           retries: 3
           script: |
             const { data } = await github.repos.getLatestRelease({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
+              owner: 'Hi-Windom',
+              repo: 'Sillot'
             });
             data = JSON.stringify(data);
-            data.assets.forEach(e=>{
+            data.assets.forEach(async (e) => {
             console.log(e.browser_download_url);
-            github.request(e.browser_download_url).then(r=>{console.log(r)});
+            const r = await github.request(e.browser_download_url);
+            console.log(r);
             });
             return data.assets
       continue-on-error: false
