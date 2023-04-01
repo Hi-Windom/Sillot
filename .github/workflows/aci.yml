@@ -43,9 +43,10 @@ jobs:
       run: |
           ls
           find . -type f -name 'Sillot-*' -exec md5sum {} + | tr '[:lower:]' '[:upper:]' > Assets_MD5_Sum.txt
+          find . -type f -name 'Sillot-*' -exec sha256sum {} + | tr '[:lower:]' '[:upper:]' > Assets_SHA256_Sum.txt
       continue-on-error: false
 
-    - name: Upload Hash File to Release Asset
+    - name: Upload Assets_MD5_Sum.txt File to Release Asset
       uses: actions/upload-release-asset@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,4 +54,14 @@ jobs:
           upload_url: ${{ steps.latest_release.outputs.result }}
           asset_path: ./Assets_MD5_Sum.txt
           asset_name: Assets_MD5_Sum.txt
+          asset_content_type: text/plain
+
+    - name: Upload Assets_SHA256_Sum.txt File to Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.latest_release.outputs.result }}
+          asset_path: ./Assets_SHA256_Sum.txt
+          asset_name: Assets_SHA256_Sum.txt
           asset_content_type: text/plain
