@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/Masterminds/sprig/v3"
 	"net/http"
 	"net/url"
 	"os"
@@ -45,6 +44,7 @@ import (
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
+	"github.com/Masterminds/sprig/v3"
 	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/emirpasic/gods/stacks/linkedliststack"
 	"github.com/imroc/req/v3"
@@ -994,11 +994,10 @@ func processPDFFooter(pdfCtx *pdfcpu.Context) {
 	}
 	footer := buf.String()
 
-	fontName := "Times-Roman"
+	fontName := util.InstallPDFFonts()
+
 	pos := "bc"
-	dx := 10
-	fillCol := "#000000"
-	desc := fmt.Sprintf("font:%s, points:12, sc:1 abs, pos:%s, off:%d 10, fillcol:%s, rot:0", fontName, pos, dx, fillCol)
+	desc := fmt.Sprintf("font:%s, points:8, sc:1 abs, pos:%s, off:10 10, fillc: 0.5 0.5 0.5, rot:0", fontName, pos)
 	footer = strings.ReplaceAll(footer, "%pages", strconv.Itoa(pdfCtx.PageCount))
 	m := map[int]*pdfcpu.Watermark{}
 	for i := 1; i <= pdfCtx.PageCount; i++ {
