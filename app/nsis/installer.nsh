@@ -12,7 +12,7 @@ Caption "${PRODUCT_NAME} ${VERSION}"
     MessageBox mb_iconStop "抱歉，Windows 10 以下系统不受支持"
     Quit
     ${EndIf}
-    MessageBox MB_ICONEXCLAMATION|MB_OKCANCEL "数据无价，请勿在生产环节使用汐洛分支！安装前应当先备份重要文件！是否继续？$\n$\n" IDOK yes2 IDCANCEL no2
+    MessageBox MB_ICONEXCLAMATION|MB_OKCANCEL "数据无价，请勿在生产环节使用汐洛！安装前应当先备份重要文件！是否继续？$\n$\n" IDOK yes2 IDCANCEL no2
     no2:
         Quit
     yes2:
