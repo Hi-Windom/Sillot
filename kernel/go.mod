@@ -139,11 +139,7 @@ require (
 require (
 	github.com/88250/lute v1.7.6-0.20230330013439-8760e9c073db
 	github.com/K-Sillot/riff v0.0.1
-	github.com/adrg/strutil v0.3.0
-	github.com/adrg/sysfont v0.1.2
 )
-
-require github.com/adrg/xdg v0.3.0 // indirect
 
 replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20220714142610-fbbda1ee84f5
 

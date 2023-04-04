@@ -20,7 +20,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -28,18 +30,18 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/siyuan-note/siyuan/kernel/task"
-
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
+	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/jinzhu/copier"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/search"
 	"github.com/siyuan-note/siyuan/kernel/sql"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 	"github.com/xrash/smetrics"
@@ -216,16 +218,65 @@ func FindReplace(keyword, replacement string, ids []string, method int) (err err
 	ids = gulu.Str.RemoveDuplicatedElem(ids)
 	var renameRoots []*ast.Node
 	renameRootTitles := map[string]string{}
+	cachedTrees := map[string]*parse.Tree{}
+
+	historyDir, err := getHistoryDir(HistoryOpReplace, time.Now())
+	if nil != err {
+		logging.LogErrorf("get history dir failed: %s", err)
+		return
+	}
+
 	for _, id := range ids {
-		var tree *parse.Tree
-		tree, err = loadTreeByBlockID(id)
-		if nil != err {
+		bt := treenode.GetBlockTree(id)
+		if nil == bt {
+			continue
+		}
+
+		tree := cachedTrees[bt.RootID]
+		if nil != tree {
+			continue
+		}
+
+		tree, _ = loadTreeByBlockID(id)
+		if nil == tree {
+			continue
+		}
+
+		historyPath := filepath.Join(historyDir, tree.Box, tree.Path)
+		if err = os.MkdirAll(filepath.Dir(historyPath), 0755); nil != err {
+			logging.LogErrorf("generate history failed: %s", err)
 			return
+		}
+
+		var data []byte
+		if data, err = filelock.ReadFile(filepath.Join(util.DataDir, tree.Box, tree.Path)); err != nil {
+			logging.LogErrorf("generate history failed: %s", err)
+			return
+		}
+
+		if err = gulu.File.WriteFileSafer(historyPath, data, 0644); err != nil {
+			logging.LogErrorf("generate history failed: %s", err)
+			return
+		}
+
+		cachedTrees[bt.RootID] = tree
+	}
+	indexHistoryDir(filepath.Base(historyDir), util.NewLute())
+
+	for _, id := range ids {
+		bt := treenode.GetBlockTree(id)
+		if nil == bt {
+			continue
+		}
+
+		tree := cachedTrees[bt.RootID]
+		if nil == tree {
+			continue
 		}
 
 		node := treenode.GetNodeInTree(tree, id)
 		if nil == node {
-			return
+			continue
 		}
 
 		ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -348,7 +399,7 @@ func FullTextSearchBlock(query string, boxes, paths []string, types map[string]b
 	query = strings.TrimSpace(query)
 	beforeLen := 36
 	var blocks []*Block
-	orderByClause := buildOrderBy(orderBy)
+	orderByClause := buildOrderBy(method, orderBy)
 	switch method {
 	case 1: // 查询语法
 		filter := buildTypeFilter(types)
@@ -486,7 +537,7 @@ func buildPathsFilter(paths []string) string {
 	return builder.String()
 }
 
-func buildOrderBy(orderBy int) string {
+func buildOrderBy(method, orderBy int) string {
 	switch orderBy {
 	case 1:
 		return "ORDER BY created ASC"
@@ -497,8 +548,15 @@ func buildOrderBy(orderBy int) string {
 	case 4:
 		return "ORDER BY updated DESC"
 	case 6:
+		if 0 != method && 1 != method {
+			// 只有关键字搜索和查询语法搜索才支持按相关度升序 https://github.com/siyuan-note/siyuan/issues/7861
+			return "ORDER BY sort DESC"
+		}
 		return "ORDER BY rank DESC" // 默认是按相关度降序，所以按相关度升序要反过来使用 DESC
 	case 7:
+		if 0 != method && 1 != method {
+			return "ORDER BY sort ASC"
+		}
 		return "ORDER BY rank" // 默认是按相关度降序
 	default:
 		return "ORDER BY sort ASC"

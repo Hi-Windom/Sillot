@@ -32,7 +32,6 @@ export const openMobileFileById = (id: string, action = [Constants.CB_GET_HL]) =
         });
         if (blockElement) {
             pushBack();
-            focusBlock(blockElement);
             scrollCenter(window.siyuan.mobile.editor.protyle, blockElement, true);
             closePanel();
             return;
@@ -45,7 +44,9 @@ export const openMobileFileById = (id: string, action = [Constants.CB_GET_HL]) =
             return;
         }
         if (window.siyuan.mobile.editor) {
-            saveScroll(window.siyuan.mobile.editor.protyle);
+            if (document.getElementById("empty").classList.contains("fn__none")) {
+                saveScroll(window.siyuan.mobile.editor.protyle);
+            }
             pushBack();
             addLoading(window.siyuan.mobile.editor.protyle);
             fetchPost("/api/filetree/getDoc", {
