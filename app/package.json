@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.15.4",
+  "version": "0.16.1",
   "syv": "2.8.4",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
@@ -70,13 +70,13 @@
     "@babel/runtime": "^7.21.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
-    "@mui/icons-material": "^5.11.11",
+    "@mui/icons-material": "^5.11.16",
     "@mui/joy": "5.0.0-alpha.73",
-    "@mui/material": "^5.11.15",
+    "@mui/material": "^5.11.16",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-sucrase": "^5.0.1",
     "@rollup/plugin-terser": "^0.4.0",
     "@simonwep/pickr": "^1.8.2",
@@ -152,7 +152,7 @@
     "@monaco-editor/loader": "^1.3.3",
     "electron-fetch": "^1.9.1",
     "electron-store": "^8.1.0",
-    "monaco-editor": "^0.36.1",
+    "monaco-editor": "^0.37.0",
     "monaco-editor-nls": "^3.0.0"
   },
   "resolutions": {
