@@ -20,6 +20,7 @@ import {getLocalStorage} from "../protyle/util/compatibility";
 import {openMobileFileById} from "./editor";
 import {getSearch} from "../util/functions";
 import {initRightMenu} from "./menu";
+import {openChangelog} from "../boot/openChangelog";
 import { SillotEnv } from "../sillot";
 
 class App {
@@ -67,6 +68,7 @@ class App {
                             window.siyuan.emojis = emojiResponse.data as IEmoji[];
                             initFramework();
                             initRightMenu();
+                            openChangelog();
                         });
                     });
                     addGA();
