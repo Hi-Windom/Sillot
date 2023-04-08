@@ -18,6 +18,7 @@ import {MobileTags} from "./MobileTags";
 import {activeBlur, hideKeyboardToolbar, initKeyboardToolbar} from "./keyboardToolbar";
 import {getSearch} from "../../util/functions";
 import {syncGuide} from "../../sync/syncGuide";
+import {openCard} from "../../card/openCard";
 
 export const initFramework = () => {
     setInlineStyle();
@@ -100,6 +101,9 @@ export const initFramework = () => {
     // 用 touchstart 会导致键盘不收起
     document.getElementById("toolbarMore").addEventListener("click", () => {
         popMenu();
+    });
+    document.getElementById("toolbarRiffCard").addEventListener("click", () => {
+        openCard();
     });
     const editElement = document.getElementById("toolbarEdit");
     if (window.siyuan.config.readonly) {

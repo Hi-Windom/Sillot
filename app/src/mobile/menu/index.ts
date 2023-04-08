@@ -26,12 +26,12 @@ export const initRightMenu = () => {
     const menuElement = document.getElementById("menu");
     let accountHTML = "";
     if (window.siyuan.user && !window.siyuan.config.readonly) {
-        accountHTML = `<div class="b3-menu__item" id="menuAccount">
+        accountHTML = `<div class="b3-menu__item b3s-mobile-height-menu__item" id="menuAccount">
     <img class="b3-menu__icon" src="${window.siyuan.user.userAvatarURL}"/>
     <span class="b3-menu__label">${window.siyuan.user.userName}</span>
 </div>`;
     } else if (!window.siyuan.config.readonly) {
-        accountHTML = `<div class="b3-menu__item" id="menuAccount">
+        accountHTML = `<div class="b3-menu__item b3s-mobile-height-menu__item" id="menuAccount">
     <svg class="b3-menu__icon"><use xlink:href="#iconAccount"></use></svg><span class="b3-menu__label">${window.siyuan.languages.login}</span>
 </div>`;
     }
@@ -39,63 +39,56 @@ export const initRightMenu = () => {
     <svg class="b3-menu__icon"><use xlink:href="#iconLeft"></use></svg>
     <span class="b3-menu__label">${window.siyuan.languages.back}</span>
 </div>
-<div class="b3-menu__separator"></div>
 ${accountHTML}
-<div id="menuRecent" class="b3-menu__item">
+<div id="menuRecent" class="b3-menu__item b3s-mobile-height-menu__item">
     <svg class="b3-menu__icon"><use xlink:href="#iconList"></use></svg><span class="b3-menu__label">${window.siyuan.languages.recentDocs}</span>
 </div>
-<div id="menuSearch" class="b3-menu__item">
+<div id="menuSearch" class="b3-menu__item b3s-mobile-height-menu__item">
     <svg class="b3-menu__icon"><use xlink:href="#iconSearch"></use></svg><span class="b3-menu__label">${window.siyuan.languages.search}</span>
 </div>
-<div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuSyncNow">
+<div class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuSyncNow">
     <svg class="b3-menu__icon"><use xlink:href="#iconCloudSucc"></use></svg><span class="b3-menu__label">${window.siyuan.languages.syncNow}</span>
 </div>
-<div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuNewNotebook">
+<div class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : " fn__none"}" id="menuNewNotebook">
     <svg class="b3-menu__icon"><use xlink:href="#iconFilesRoot"></use></svg><span class="b3-menu__label">${window.siyuan.languages.newNotebook}</span>
 </div>
-<div class="b3-menu__separator"></div>
-<div id="menuNewDaily" class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}">
+<div id="menuNewDaily" class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : " fn__none"}">
     <svg class="b3-menu__icon"><use xlink:href="#iconCalendar"></use></svg><span class="b3-menu__label">${window.siyuan.languages.dailyNote}</span>
 </div>
-<div id="menuCard" class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}">
+<div id="menuCard" class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : " fn__none"}">
     <svg class="b3-menu__icon" style="color: var(--b3-theme-secondary)"><use xlink:href="#iconRiffCard"></use></svg><span class="b3-menu__label">${window.siyuan.languages.riffCard}</span>
 </div>
-<div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuLock">
+<div class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuLock">
     <svg class="b3-menu__icon"><use xlink:href="#iconLock"></use></svg><span class="b3-menu__label">${window.siyuan.languages.lockScreen}</span>
 </div>
-<div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuHistory">
+<div class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuHistory">
     <svg class="b3-menu__icon"><use xlink:href="#iconHistory"></use></svg><span class="b3-menu__label">${window.siyuan.languages.dataHistory}</span>
 </div>
-<div class="b3-menu__item${(window.webkit?.messageHandlers || window.JSAndroid) ? " fn__none" : " fn__none"}" id="menuSafeQuit">
+<div class="b3-menu__item b3s-mobile-height-menu__item${(window.webkit?.messageHandlers || window.JSAndroid) ? " fn__none" : " fn__none"}" id="menuSafeQuit">
     <svg class="b3-menu__icon"><use xlink:href="#iconQuit"></use></svg><span class="b3-menu__label">${window.siyuan.languages.safeQuit}</span>
 </div>
-<div class="b3-menu__separator"></div>
-<div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuEditor">
+<div class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuEditor">
     <svg class="b3-menu__icon"><use xlink:href="#iconEdit"></use></svg><span class="b3-menu__label">${window.siyuan.languages.editor}</span>
 </div>
-<div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuRiffCard">
+<div class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuRiffCard">
     <svg class="b3-menu__icon"><use xlink:href="#iconRiffCard"></use></svg><span class="b3-menu__label">${window.siyuan.languages.riffCard}</span>
 </div>
-<div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuAI">
+<div class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuAI">
     <svg class="b3-menu__icon"><use xlink:href="#iconSparkles"></use></svg><span class="b3-menu__label">AI</span>
 </div>
-<div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuAppearance">
+<div class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuAppearance">
     <svg class="b3-menu__icon"><use xlink:href="#iconTheme"></use></svg><span class="b3-menu__label">${window.siyuan.languages.appearance}</span>
 </div>
-<div id="menuSync" class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}">
+<div id="menuSync" class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}">
     <svg class="b3-menu__icon"><use xlink:href="#iconCloud"></use></svg><span class="b3-menu__label">${window.siyuan.languages.cloud}</span>
 </div>
-<div class="b3-menu__item" id="menuAbout">
+<div class="b3-menu__item b3s-mobile-height-menu__item" id="menuAbout">
     <svg class="b3-menu__icon"><use xlink:href="#iconInfo"></use></svg><span class="b3-menu__label">${window.siyuan.languages.about}</span>
 </div>
-<div class="b3-menu__separator"></div>
-<div class="b3-menu__item" id="menuHelp">
+<div class="b3-menu__item b3s-mobile-height-menu__item" id="menuHelp">
     <svg class="b3-menu__icon"><use xlink:href="#iconHelp"></use></svg><span class="b3-menu__label">${window.siyuan.languages.help}</span>
 </div>
-<a class="b3-menu__item" href="${"zh_CN" === window.siyuan.config.lang ? "https://ld246.com/article/1649901726096" : "https://github.com/siyuan-note/siyuan/issues"}" target="_blank">
-    <svg class="b3-menu__icon"><use xlink:href="#iconHeart"></use></svg>
-    <span class="b3-menu__label">${window.siyuan.languages.feedback}</span>
-</a>`;
+`;
     processSync();
     // 只能用 click，否则无法上下滚动 https://github.com/siyuan-note/siyuan/issues/6628
     menuElement.addEventListener("click", (event) => {
