@@ -14,11 +14,12 @@ import {login, showAccountInfo} from "../settings/account";
 import {openModel} from "./model";
 import {initAbout} from "../settings/about";
 import {getRecentDocs} from "./getRecentDocs";
+import {initEditor} from "../settings/editor";
 
 export const popMenu = () => {
     activeBlur();
     hideKeyboardToolbar();
-    document.getElementById("menu").style.right = "0";
+    document.getElementById("menu").style.transform = "translateX(0px)";
 };
 
 export const initRightMenu = () => {
@@ -65,7 +66,13 @@ ${accountHTML}
 <div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuHistory">
     <svg class="b3-menu__icon"><use xlink:href="#iconHistory"></use></svg><span class="b3-menu__label">${window.siyuan.languages.dataHistory}</span>
 </div>
+<div class="b3-menu__item${(window.webkit?.messageHandlers || window.JSAndroid) ? "" : " fn__none"}" id="menuSafeQuit">
+    <svg class="b3-menu__icon"><use xlink:href="#iconQuit"></use></svg><span class="b3-menu__label">${window.siyuan.languages.safeQuit}</span>
+</div>
 <div class="b3-menu__separator"></div>
+<div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuEditor">
+    <svg class="b3-menu__icon"><use xlink:href="#iconEdit"></use></svg><span class="b3-menu__label">${window.siyuan.languages.editor}</span>
+</div>
 <div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuRiffCard">
     <svg class="b3-menu__icon"><use xlink:href="#iconRiffCard"></use></svg><span class="b3-menu__label">${window.siyuan.languages.riffCard}</span>
 </div>
@@ -88,11 +95,7 @@ ${accountHTML}
 <a class="b3-menu__item" href="${"zh_CN" === window.siyuan.config.lang ? "https://ld246.com/article/1649901726096" : "https://github.com/siyuan-note/siyuan/issues"}" target="_blank">
     <svg class="b3-menu__icon"><use xlink:href="#iconHeart"></use></svg>
     <span class="b3-menu__label">${window.siyuan.languages.feedback}</span>
-</a>
-<div class="b3-menu__separator${(window.webkit?.messageHandlers || window.JSAndroid) ? "" : " fn__none"}"></div>
-<div class="b3-menu__item${(window.webkit?.messageHandlers || window.JSAndroid) ? "" : " fn__none"}" id="menuSafeQuit">
-    <svg class="b3-menu__icon"><use xlink:href="#iconQuit"></use></svg><span class="b3-menu__label">${window.siyuan.languages.safeQuit}</span>
-</div>`;
+</a>`;
     processSync();
     // 只能用 click，否则无法上下滚动 https://github.com/siyuan-note/siyuan/issues/6628
     menuElement.addEventListener("click", (event) => {
@@ -125,6 +128,11 @@ ${accountHTML}
                 break;
             } else if (target.id === "menuRiffCard") {
                 initRiffCard();
+                event.preventDefault();
+                event.stopPropagation();
+                break;
+            } else if (target.id === "menuEditor") {
+                initEditor();
                 event.preventDefault();
                 event.stopPropagation();
                 break;

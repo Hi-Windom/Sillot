@@ -17,7 +17,7 @@ const popSide = (render = true) => {
     } else {
         hideKeyboardToolbar();
         activeBlur();
-        document.getElementById("sidebar").style.left = "0";
+        document.getElementById("sidebar").style.transform = "translateX(0px)";
     }
 };
 
@@ -31,6 +31,7 @@ export const handleTouchEnd = (event: TouchEvent) => {
 
     const target = event.target as HTMLElement;
     if (!clientX || !clientY || typeof yDiff === "undefined" ||
+        target.tagName === "AUDIO" ||
         hasClosestByClassName(target, "b3-dialog") ||
         hasClosestByClassName(target, "keyboard") ||
         hasClosestByAttribute(target, "id", "commonMenu") ||
@@ -39,13 +40,20 @@ export const handleTouchEnd = (event: TouchEvent) => {
         return;
     }
 
+    window.siyuan.mobile.editor.protyle.contentElement.style.overflow = "";
+
     // 有些事件不经过 touchstart 和 touchmove，因此需设置为 null 不再继续执行
     clientX = null;
     // 有些事件不经过 touchmove
 
-    let scrollElement = hasClosestByAttribute(target, "data-type", "NodeCodeBlock") || hasClosestByAttribute(target, "data-type", "NodeTable");
+    let scrollElement = hasClosestByAttribute(target, "data-type", "NodeCodeBlock") ||
+        hasClosestByAttribute(target, "data-type", "NodeTable");
     if (scrollElement) {
-        scrollElement = scrollElement.classList.contains("table") ? (scrollElement.firstElementChild as HTMLElement) : (scrollElement.firstElementChild.nextElementSibling as HTMLElement);
+        if (scrollElement.classList.contains("table")) {
+            scrollElement = scrollElement.firstElementChild as HTMLElement;
+        } else if (scrollElement.classList.contains("code-block")) {
+            scrollElement = scrollElement.firstElementChild.nextElementSibling as HTMLElement;
+        }
         if ((xDiff <= 0 && scrollElement.scrollLeft > 0) ||
             (xDiff >= 0 && scrollElement.clientWidth + scrollElement.scrollLeft < scrollElement.scrollWidth)) {
             // 左滑拉出菜单后右滑至代码块右侧有空间时，需关闭菜单
@@ -147,6 +155,7 @@ let previousClientX: number;
 export const handleTouchMove = (event: TouchEvent) => {
     const target = event.target as HTMLElement;
     if (!clientX || !clientY ||
+        target.tagName === "AUDIO" ||
         hasClosestByClassName(target, "b3-dialog") ||
         hasClosestByClassName(target, "keyboard") ||
         hasClosestByAttribute(target, "id", "commonMenu") ||
@@ -183,9 +192,14 @@ export const handleTouchMove = (event: TouchEvent) => {
     }
     previousClientX = event.touches[0].clientX;
     if (Math.abs(xDiff) > Math.abs(yDiff)) {
-        let scrollElement = hasClosestByAttribute(target, "data-type", "NodeCodeBlock") || hasClosestByAttribute(target, "data-type", "NodeTable");
+        let scrollElement = hasClosestByAttribute(target, "data-type", "NodeCodeBlock") ||
+            hasClosestByAttribute(target, "data-type", "NodeTable");
         if (scrollElement) {
-            scrollElement = scrollElement.classList.contains("table") ? (scrollElement.firstElementChild as HTMLElement) : (scrollElement.firstElementChild.nextElementSibling as HTMLElement);
+            if (scrollElement.classList.contains("table")) {
+                scrollElement = scrollElement.firstElementChild as HTMLElement;
+            } else if (scrollElement.classList.contains("code-block")) {
+                scrollElement = scrollElement.firstElementChild.nextElementSibling as HTMLElement;
+            }
             if ((xDiff < 0 && scrollElement.scrollLeft > 0) ||
                 (xDiff > 0 && scrollElement.clientWidth + scrollElement.scrollLeft < scrollElement.scrollWidth)) {
                 return;
@@ -196,10 +210,10 @@ export const handleTouchMove = (event: TouchEvent) => {
         const menuElement = hasClosestByAttribute(target, "id", "menu");
         if (menuElement) {
             if (xDiff < 0) {
-                menuElement.style.right = xDiff + "px";
+                menuElement.style.transform = `translateX(${-xDiff}px)`;
                 transformMask(-xDiff / windowWidth);
             } else {
-                menuElement.style.right = "0px";
+                menuElement.style.transform = "translateX(0px)";
                 transformMask(0);
             }
             return;
@@ -207,21 +221,24 @@ export const handleTouchMove = (event: TouchEvent) => {
         const sideElement = hasClosestByAttribute(target, "id", "sidebar");
         if (sideElement) {
             if (xDiff > 0) {
-                sideElement.style.left = -xDiff + "px";
+                sideElement.style.transform = `translateX(${-xDiff}px)`;
                 transformMask(xDiff / windowWidth);
             } else {
-                sideElement.style.left = "0px";
+                sideElement.style.transform = "translateX(0px)";
                 transformMask(0);
             }
             return;
         }
         if (firstDirection === "toRight") {
-            document.getElementById("sidebar").style.left = -windowWidth - xDiff + "px";
+            document.getElementById("sidebar").style.transform = `translateX(${-xDiff - windowWidth}px)`;
             transformMask((windowWidth + xDiff) / windowWidth);
         } else {
-            document.getElementById("menu").style.right = -windowWidth + xDiff + "px";
+            document.getElementById("menu").style.transform = `translateX(${windowWidth - xDiff}px)`;
             transformMask((windowWidth - xDiff) / windowWidth);
         }
+        activeBlur();
+        hideKeyboardToolbar();
+        window.siyuan.mobile.editor.protyle.contentElement.style.overflow = "hidden";
     }
 };
 

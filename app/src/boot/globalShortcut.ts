@@ -8,7 +8,7 @@ import {
     hasTopClosestByClassName,
     hasTopClosestByTag,
 } from "../protyle/util/hasClosest";
-import {newFile} from "./newFile";
+import {newFile} from "../util/newFile";
 import {Constants} from "../constants";
 import {openSetting} from "../config";
 import {getDockByType, getInstanceById} from "../layout/util";
@@ -17,12 +17,12 @@ import {Editor} from "../editor";
 import {setEditMode} from "../protyle/util/setEditMode";
 import {rename} from "../editor/rename";
 import {Files} from "../layout/dock/Files";
-import {newDailyNote} from "./mount";
+import {newDailyNote} from "../util/mount";
 import {hideAllElements, hideElements} from "../protyle/ui/hideElements";
-import {fetchPost} from "./fetch";
-import {goBack, goForward} from "./backForward";
+import {fetchPost} from "../util/fetch";
+import {goBack, goForward} from "../util/backForward";
 import {onGet} from "../protyle/util/onGet";
-import {getDisplayName, getNotebookName, getTopPaths, movePathTo, moveToPath} from "./pathName";
+import {getDisplayName, getNotebookName, getTopPaths, movePathTo, moveToPath} from "../util/pathName";
 import {openFileById} from "../editor/util";
 import {getAllDocks, getAllModels, getAllTabs} from "../layout/getAll";
 import {openGlobalSearch} from "../search/util";
@@ -34,7 +34,7 @@ import {showMessage} from "../dialog/message";
 import {Dialog} from "../dialog";
 import {unicode2Emoji} from "../emoji";
 import {deleteFiles} from "../editor/deleteFile";
-import {escapeHtml} from "./escape";
+import {escapeHtml} from "../util/escape";
 import {syncGuide} from "../sync/syncGuide";
 import {showPopover} from "../block/popover";
 import {getStartEndElement} from "../protyle/wysiwyg/commonHotkey";
@@ -48,7 +48,7 @@ import {webFrame} from "electron";
 import {openHistory} from "../history/history";
 import {openCard} from "../card/openCard";
 import {lockScreen} from "../dialog/processSystem";
-import {isWindow} from "./functions";
+import {isWindow} from "../util/functions";
 import {reloadProtyle} from "../protyle/util/reload";
 import {fullscreen} from "../protyle/breadcrumb/action";
 import {setPadding} from "../protyle/ui/initUI";
@@ -69,9 +69,13 @@ const switchDialogEvent = (event: MouseEvent, switchDialog: Dialog) => {
     let target = event.target as HTMLElement;
     while (!target.isSameNode(switchDialog.element)) {
         if (target.classList.contains("b3-list-item")) {
-            const currentType = target.getAttribute("data-type") as TDockType;
+            const currentType = target.getAttribute("data-type");
             if (currentType) {
-                getDockByType(currentType).toggleModel(currentType, true);
+                if (currentType === "riffCard") {
+                    openCard();
+                } else {
+                    getDockByType(currentType as TDockType).toggleModel(currentType as TDockType, true);
+                }
             } else {
                 const currentId = target.getAttribute("data-id");
                 getAllTabs().find(item => {
@@ -358,9 +362,13 @@ export const globalShortcut = () => {
                     currentLiElement.removeAttribute("data-original");
                     currentLiElement = switchDialog.element.querySelector(".b3-list-item--focus");
                 }
-                const currentType = currentLiElement.getAttribute("data-type") as TDockType;
+                const currentType = currentLiElement.getAttribute("data-type");
                 if (currentType) {
-                    getDockByType(currentType).toggleModel(currentType, true);
+                    if (currentType === "riffCard") {
+                        openCard();
+                    } else {
+                        getDockByType(currentType as TDockType).toggleModel(currentType as TDockType, true);
+                    }
                     if (document.activeElement) {
                         (document.activeElement as HTMLElement).blur();
                     }
@@ -465,9 +473,14 @@ export const globalShortcut = () => {
             }
             let dockHtml = "";
             if (!isTabWindow) {
-                dockHtml = '<ul class="b3-list b3-list--background" style="max-height: calc(70vh - 35px);overflow: auto">';
+                dockHtml = `<ul class="b3-list b3-list--background" style="max-height: calc(70vh - 35px);overflow: auto">
+<li data-type="riffCard" data-index="0" class="b3-list-item${!tabHtml ? " b3-list-item--focus" : ""}">
+    <svg class="b3-list-item__graphic"><use xlink:href="#iconRiffCard"></use></svg>
+    <span class="b3-list-item__text">${window.siyuan.languages.riffCard}</span>
+    <span class="b3-list-item__meta">${updateHotkeyTip(window.siyuan.config.keymap.general.riffCard.custom)}</span>
+</li>`;
                 getAllDocks().forEach((item, index) => {
-                    dockHtml += `<li data-type="${item.type}" data-index="${index}" class="b3-list-item${(!tabHtml && !dockHtml) ? " b3-list-item--focus" : ""}">
+                    dockHtml += `<li data-type="${item.type}" data-index="${index + 1}" class="b3-list-item">
     <svg class="b3-list-item__graphic"><use xlink:href="#${item.icon}"></use></svg>
     <span class="b3-list-item__text">${window.siyuan.languages[item.hotkeyLangId]}</span>
     <span class="b3-list-item__meta">${updateHotkeyTip(window.siyuan.config.keymap.general[item.hotkeyLangId].custom)}</span>
@@ -915,9 +928,13 @@ const dialogArrow = (element: HTMLElement, event: KeyboardEvent) => {
                 (sideElement.querySelector(`[data-index="${currentLiElement.getAttribute("data-index")}"]`) || sideElement.lastElementChild).classList.add("b3-list-item--focus");
             }
         } else if (event.key === "Enter") {
-            const currentType = currentLiElement.getAttribute("data-type") as TDockType;
+            const currentType = currentLiElement.getAttribute("data-type");
             if (currentType) {
-                getDockByType(currentType).toggleModel(currentType, true);
+                if (currentType === "riffCard") {
+                    openCard();
+                } else {
+                    getDockByType(currentType as TDockType).toggleModel(currentType as TDockType, true);
+                }
             } else {
                 openFileById({
                     id: currentLiElement.getAttribute("data-node-id"),
@@ -963,9 +980,14 @@ ${unicode2Emoji(item.icon || Constants.SIYUAN_IMAGE_FILE, false, "b3-list-item__
         });
         let dockHtml = "";
         if (!isWindow()) {
-            dockHtml = '<ul class="b3-list b3-list--background" style="max-height: calc(70vh - 35px);overflow: auto">';
+            dockHtml = `<ul class="b3-list b3-list--background" style="max-height: calc(70vh - 35px);overflow: auto">
+<li data-type="riffCard" data-index="0" class="b3-list-item${!tabHtml ? " b3-list-item--focus" : ""}">
+    <svg class="b3-list-item__graphic"><use xlink:href="#iconRiffCard"></use></svg>
+    <span class="b3-list-item__text">${window.siyuan.languages.riffCard}</span>
+    <span class="b3-list-item__meta">${updateHotkeyTip(window.siyuan.config.keymap.general.riffCard.custom)}</span>
+</li>`;
             getAllDocks().forEach((item, index) => {
-                dockHtml += `<li data-type="${item.type}" data-index="${index}" class="b3-list-item${(!tabHtml && !dockHtml) ? " b3-list-item--focus" : ""}">
+                dockHtml += `<li data-type="${item.type}" data-index="${index + 1}" class="b3-list-item">
     <svg class="b3-list-item__graphic"><use xlink:href="#${item.icon}"></use></svg>
     <span class="b3-list-item__text">${window.siyuan.languages[item.hotkeyLangId]}</span>
     <span class="b3-list-item__meta">${updateHotkeyTip(window.siyuan.config.keymap.general[item.hotkeyLangId].custom)}</span>

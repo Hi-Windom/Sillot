@@ -14,6 +14,7 @@ RUN apk add --no-cache gcc musl-dev git && \
     mv /go/src/github.com/Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
     mv /go/src/github.com/Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
     mv /go/src/github.com/Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
+    mv /go/src/github.com/Hi-Windom/Sillot/app/changelogs/ /opt/siyuan/ && \
     mv /go/src/github.com/Hi-Windom/Sillot/kernel/kernel /opt/Sillot/ && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 

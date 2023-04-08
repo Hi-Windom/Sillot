@@ -62,7 +62,7 @@ func SyncDataDownload() {
 	if nil == err {
 		synced += Conf.Sync.Stat
 	} else {
-		synced += fmt.Sprintf(Conf.Language(80), formatErrorMsg(err))
+		synced += fmt.Sprintf(Conf.Language(80), formatRepoErrorMsg(err))
 	}
 	msg := fmt.Sprintf(Conf.Language(82), synced)
 	Conf.Sync.Stat = msg
@@ -98,7 +98,7 @@ func SyncDataUpload() {
 	if nil == err {
 		synced += Conf.Sync.Stat
 	} else {
-		synced += fmt.Sprintf(Conf.Language(80), formatErrorMsg(err))
+		synced += fmt.Sprintf(Conf.Language(80), formatRepoErrorMsg(err))
 	}
 	msg := fmt.Sprintf(Conf.Language(82), synced)
 	Conf.Sync.Stat = msg
@@ -157,7 +157,7 @@ func BootSyncData() {
 	if nil == err {
 		synced += Conf.Sync.Stat
 	} else {
-		synced += fmt.Sprintf(Conf.Language(80), formatErrorMsg(err))
+		synced += fmt.Sprintf(Conf.Language(80), formatRepoErrorMsg(err))
 	}
 	msg := fmt.Sprintf(Conf.Language(82), synced)
 	Conf.Sync.Stat = msg
@@ -204,7 +204,7 @@ func syncData(exit, byHand bool) {
 	if nil == err {
 		synced += Conf.Sync.Stat
 	} else {
-		synced += fmt.Sprintf(Conf.Language(80), formatErrorMsg(err))
+		synced += fmt.Sprintf(Conf.Language(80), formatRepoErrorMsg(err))
 	}
 	msg := fmt.Sprintf(Conf.Language(82), synced)
 	Conf.Sync.Stat = msg
@@ -406,7 +406,7 @@ func CreateCloudSyncDir(name string) (err error) {
 
 	err = repo.CreateCloudRepo(name)
 	if nil != err {
-		err = errors.New(formatErrorMsg(err))
+		err = errors.New(formatRepoErrorMsg(err))
 		return
 	}
 	return
@@ -431,7 +431,7 @@ func RemoveCloudSyncDir(name string) (err error) {
 
 	err = repo.RemoveCloudRepo(name)
 	if nil != err {
-		err = errors.New(formatErrorMsg(err))
+		err = errors.New(formatRepoErrorMsg(err))
 		return
 	}
 
@@ -457,7 +457,7 @@ func ListCloudSyncDir() (syncDirs []*Sync, hSize string, err error) {
 
 	dirs, size, err = repo.GetCloudRepos()
 	if nil != err {
-		err = errors.New(formatErrorMsg(err))
+		err = errors.New(formatRepoErrorMsg(err))
 		return
 	}
 	if 1 > len(dirs) {
@@ -488,7 +488,7 @@ func ListCloudSyncDir() (syncDirs []*Sync, hSize string, err error) {
 	return
 }
 
-func formatErrorMsg(err error) string {
+func formatRepoErrorMsg(err error) string {
 	msg := err.Error()
 	if errors.Is(err, cloud.ErrCloudAuthFailed) {
 		msg = Conf.Language(31)
@@ -518,7 +518,7 @@ func formatErrorMsg(err error) string {
 			msg = Conf.Language(28)
 		}
 	}
-	msg = msg + " v" + util.Ver
+	msg += " (Provider: " + conf.ProviderToStr(Conf.Sync.Provider) + ")"
 	return msg
 }
 
@@ -564,18 +564,21 @@ func planSyncAfter(d time.Duration) {
 
 func isProviderOnline() (ret bool) {
 	checkURL := util.SiYuanSyncServer
+	skipTlsVerify := false
 	switch Conf.Sync.Provider {
 	case conf.ProviderSiYuan:
 	case conf.ProviderS3:
 		checkURL = Conf.Sync.S3.Endpoint
+		skipTlsVerify = Conf.Sync.S3.SkipTlsVerify
 	case conf.ProviderWebDAV:
 		checkURL = Conf.Sync.WebDAV.Endpoint
+		skipTlsVerify = Conf.Sync.WebDAV.SkipTlsVerify
 	default:
 		logging.LogWarnf("unknown provider: %d", Conf.Sync.Provider)
 		return false
 	}
 
-	if ret = util.IsOnline(checkURL); !ret {
+	if ret = util.IsOnline(checkURL, skipTlsVerify); !ret {
 		util.PushErrMsg(Conf.Language(76), 5000)
 	}
 	return

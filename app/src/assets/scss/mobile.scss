@@ -27,6 +27,7 @@
 
 // sillot extend start
 @import "sillot/logic";
+@import "sillot/mobile_slider";
 // sillot extend end
 
 .block__popover {
@@ -117,15 +118,14 @@
     flex-shrink: 0;
     margin: 6px 4px;
     color: var(--b3-theme-on-surface);
+    border-radius: 4px;
 
     &[disabled] {
       opacity: 0.38;
     }
 
     &--active {
-      background-color: var(--b3-theme-primary);
-      border-radius: 4px;
-      color: var(--b3-theme-on-primary);
+      background-color: var(--b3-list-hover);
     }
   }
 
@@ -153,20 +153,16 @@
 }
 
 .side-panel {
-  top: 0;
-  left: -110vw;
-  right: auto;
   position: fixed;
   background-color: var(--b3-theme-surface);
   height: 100vh;
   width: 100vw;
   z-index: 220;
-  transition: top .15s cubic-bezier(0, 0, .2, 1) 0ms, left .15s cubic-bezier(0, 0, .2, 1) 0ms;
+  transform: translateX(-100vw);
+  transition: transform 0.15s cubic-bezier(0, 0, 0.2, 1) 0ms;
 
   &--all {
-    left: 0;
-    right: 0;
-    top: -200vh;
+    transform: translateY(-200vh);
   }
 }
 
@@ -250,10 +246,9 @@
 }
 
 #menu {
-  transition: right 0.15s cubic-bezier(0, 0, 0.2, 1) 0ms;
+  transition: transform 0.15s cubic-bezier(0, 0, 0.2, 1) 0ms;
   z-index: 220;
-  right: -110vw;
-  left: auto;
+  transform: translateX(100vw);
 }
 
 .keyboard {
@@ -263,7 +258,7 @@
   box-sizing: border-box;
   height: 42px;
   background: var(--b3-theme-background);
-  z-index: 222;
+  z-index: 306;
   display: flex;
   border-top: 1px solid var(--b3-theme-surface-lighter);
   overflow: hidden;
@@ -306,20 +301,23 @@
       opacity: 0.38;
     }
 
-    &.protyle-toolbar__item--current {
-      color: var(--b3-theme-primary);
+    &.protyle-toolbar__item--current svg {
+      background-color: var(--b3-list-hover);
     }
 
     svg {
       height: 16px;
       width: 16px;
       float: left;
-      padding: 12px;
+      padding: 6px;
+      margin: 6px;
+      border-radius: 4px;
 
       &.keyboard__svg--big {
         width: 30px;
-        padding: 4px;
+        padding: 2px 6px;
         height: 32px;
+        margin: 2px 6px;
       }
     }
   }

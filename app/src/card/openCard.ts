@@ -45,9 +45,11 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
         <span class="fn__flex-1 fn__flex-center">${window.siyuan.languages.riffCard}</span>
         ${html}
         <div class="fn__space"></div>
-        <div data-type="fullscreen" class="b3-tooltips b3-tooltips__sw block__icon block__icon--show" aria-label="${window.siyuan.languages.fullscreen}">
+        ${isMobile() ? `<div data-type="close" class="block__icon block__icon--show">
+            <svg><use xlink:href="#iconCloseRound"></use></svg>
+        </div>` : `<div data-type="fullscreen" class="b3-tooltips b3-tooltips__sw block__icon block__icon--show" aria-label="${window.siyuan.languages.fullscreen}">
             <svg><use xlink:href="#iconFullscreen"></use></svg>
-        </div>
+        </div>`}
     </div>
     <div class="card__block fn__flex-1${blocks.length === 0 ? " fn__none" : ""}${window.siyuan.config.flashcard.mark ? " card__block--hidemark" : ""}${window.siyuan.config.flashcard.superBlock ? " card__block--hidesb" : ""}${window.siyuan.config.flashcard.list ? " card__block--hideli" : ""}" data-type="render"></div>
     <div class="card__empty${blocks.length === 0 ? "" : " fn__none"}" data-type="empty">
@@ -100,8 +102,8 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
         </div>
     </div>
 </div>`,
-        width: isMobile() ? "98vw" : "80vw",
-        height: isMobile() ? "80vh" : "70vh",
+        width: isMobile() ? "100vw" : "80vw",
+        height: isMobile() ? "100vh" : "70vh",
     });
     (dialog.element.querySelector(".b3-dialog__scrim") as HTMLElement).style.backgroundColor = "var(--b3-theme-background)";
     (dialog.element.querySelector(".b3-dialog__container") as HTMLElement).style.maxWidth = "1024px";
@@ -133,12 +135,18 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
     const countElement = dialog.element.querySelector('[data-type="count"]');
     const actionElements = dialog.element.querySelectorAll(".card__action");
     const selectElement = dialog.element.querySelector("select");
-    const titleElement = countElement.previousElementSibling;
     dialog.element.addEventListener("click", (event) => {
         const fullscreenElement = hasClosestByAttribute(event.target as HTMLElement, "data-type", "fullscreen");
         if (fullscreenElement) {
             fullscreen(dialog.element.querySelector(".card__main"),
                 dialog.element.querySelector('[data-type="fullscreen"]'));
+            event.stopPropagation();
+            event.preventDefault();
+            return;
+        }
+        const closeElement = hasClosestByAttribute(event.target as HTMLElement, "data-type", "close");
+        if (closeElement) {
+            dialog.destroy();
             event.stopPropagation();
             event.preventDefault();
             return;
@@ -219,6 +227,7 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
                 /// #endif
                 index++;
                 if (index > blocks.length - 1) {
+                    const titleElement = countElement.previousElementSibling;
                     fetchPost(selectElement ? "/api/riff/getRiffDueCards" :
                         (titleElement.getAttribute("data-id") ? "/api/riff/getTreeRiffDueCards" : "/api/riff/getNotebookRiffDueCards"), {
                         rootID: titleElement.getAttribute("data-id"),

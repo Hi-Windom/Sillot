@@ -9,6 +9,7 @@ import {blockRender} from "../../protyle/markdown/blockRender";
 import {disabledForeverProtyle, disabledProtyle, enableProtyle} from "../../protyle/util/onGet";
 import {setStorageVal} from "../../protyle/util/compatibility";
 import {closePanel} from "./closePanel";
+import {showMessage} from "../../dialog/message";
 
 const forwardStack: IBackStack[] = [];
 
@@ -102,9 +103,9 @@ export const goForward = () => {
         !window.siyuan.menus.menu.element.classList.contains("fn__none")) {
         window.siyuan.menus.menu.element.dispatchEvent(new CustomEvent("click", {detail: "back"}));
         return;
-    } else if (document.getElementById("model").style.top === "0px" ||
-        document.getElementById("menu").style.right === "0px" ||
-        document.getElementById("sidebar").style.left === "0px") {
+    } else if (document.getElementById("model").style.transform === "translateY(0px)" ||
+        document.getElementById("menu").style.transform === "translateX(0px)" ||
+        document.getElementById("sidebar").style.transform === "translateX(0px)") {
         closePanel();
         return;
     }
@@ -124,16 +125,20 @@ export const goBack = () => {
         !window.siyuan.menus.menu.element.classList.contains("fn__none")) {
         window.siyuan.menus.menu.element.dispatchEvent(new CustomEvent("click", {detail: "back"}));
         return;
-    } else if (document.getElementById("model").style.top === "0px") {
-        document.getElementById("model").style.top = "-200vh";
+    } else if (document.getElementById("model").style.transform === "translateY(0px)") {
+        document.getElementById("model").style.transform = "";
         return;
-    } else if (document.getElementById("menu").style.right === "0px" ||
-        document.getElementById("sidebar").style.left === "0px") {
+    } else if (document.getElementById("menu").style.transform === "translateX(0px)" ||
+        document.getElementById("sidebar").style.transform === "translateX(0px)") {
         closePanel();
         return;
     }
     if (window.JSAndroid && window.siyuan.backStack.length < 1) {
-        window.JSAndroid.returnDesktop();
+        if (document.querySelector('#message [data-id="exitTip"]')) {
+            window.JSAndroid.returnDesktop();
+        } else {
+            showMessage(window.siyuan.languages.returnDesktop, 3000, "info", "exitTip");
+        }
         return;
     }
     if (window.siyuan.backStack.length < 1) {

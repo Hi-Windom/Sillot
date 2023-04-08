@@ -24,6 +24,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
@@ -37,6 +38,9 @@ type Widget struct {
 
 func Widgets() (widgets []*Widget) {
 	widgets = []*Widget{}
+	widgetsBlacklist := []string{
+		"zuoez02/siyuan-plugin-system-widget",
+	}
 
 	pkgIndex, err := getPkgIndex("widgets")
 	if nil != err {
@@ -81,9 +85,11 @@ func Widgets() (widgets []*Widget) {
 		if nil != pkg {
 			widget.Downloads = pkg.Downloads
 		}
-		lock.Lock()
-		widgets = append(widgets, widget)
-		lock.Unlock()
+		if !gulu.Str.Contains(repoURLHash[0], widgetsBlacklist) {
+			lock.Lock()
+			widgets = append(widgets, widget)
+			lock.Unlock()
+		}
 	})
 	for _, repo := range repos {
 		waitGroup.Add(1)

@@ -9,11 +9,14 @@ import {openFileById} from "../editor/util";
 import {fetchPost} from "./fetch";
 import {getDisplayName, getOpenNotebookCount, pathPosix} from "./pathName";
 import {Constants} from "../constants";
-import {validateName} from "../editor/rename";
+import {replaceFileName, validateName} from "../editor/rename";
+import {hideElements} from "../protyle/ui/hideElements";
+import {isMobile} from "./functions";
+import {openMobileFileById} from "../mobile/editor";
 
 export const getNewFilePath = (useSavePath: boolean) => {
-    let notebookId = ""
-    let currentPath = ""
+    let notebookId = "";
+    let currentPath = "";
     /// #if !MOBILE
     getAllModels().editor.find((item) => {
         const currentElement = item.parent.headElement;
@@ -57,8 +60,8 @@ export const getNewFilePath = (useSavePath: boolean) => {
             }
         });
     }
-    return {notebookId, currentPath}
-}
+    return {notebookId, currentPath};
+};
 
 export const newFile = (notebookId?: string, currentPath?: string, paths?: string[], useSavePath = false) => {
     if (getOpenNotebookCount() === 0) {
@@ -66,7 +69,7 @@ export const newFile = (notebookId?: string, currentPath?: string, paths?: strin
         return;
     }
     if (!notebookId) {
-        const resultData = getNewFilePath(useSavePath)
+        const resultData = getNewFilePath(useSavePath);
         notebookId = resultData.notebookId;
         currentPath = resultData.currentPath;
     }
@@ -147,5 +150,26 @@ export const getSavePath = (pathString: string, notebookId: string, cb: (p: stri
                 cb(getDisplayName(response.data, false, true));
             });
         }
+    });
+};
+
+export const newFileByName = (value: string) => {
+    const newData = getNewFilePath(true);
+    fetchPost("/api/filetree/getHPathByPath", {
+        notebook: newData.notebookId,
+        path: newData.currentPath,
+    }, (responsePath) => {
+        fetchPost("/api/filetree/createDocWithMd", {
+            notebook: newData.notebookId,
+            path: pathPosix().join(responsePath.data, replaceFileName(value.trim()) || "Untitled"),
+            markdown: ""
+        }, response => {
+            hideElements(["dialog"]);
+            if (isMobile()) {
+                openMobileFileById(response.data, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
+            } else {
+                openFileById({id: response.data, action: [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]});
+            }
+        });
     });
 };

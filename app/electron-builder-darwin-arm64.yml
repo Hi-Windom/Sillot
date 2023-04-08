@@ -29,9 +29,8 @@ mac:
       arch: "arm64"
 
 extraResources:
-  - from: "appearance/boot"
-    to: "appearance/boot"
-    filter: "!**/{.DS_Store}"
+  - from: "changelogs"
+    to: "changelogs"
   - from: "stage"
     to: "stage"
   - from: "guide"
@@ -39,6 +38,9 @@ extraResources:
     filter: "!**/{.DS_Store,.git,.gitignore,.idea,20211226090932-5lcq56f}"
   - from: "PSP/out"
     to: "appearance/plugin"
+  - from: "appearance/boot"
+    to: "appearance/boot"
+    filter: "!**/{.DS_Store}"
   - from: "appearance/icons"
     to: "appearance/icons"
     filter: "!**/{.DS_Store}"
