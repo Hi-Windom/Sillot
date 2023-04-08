@@ -1,7 +1,7 @@
 {
   "name": "sillot",
-  "version": "0.16.6",
-  "syv": "2.8.4",
+  "version": "0.17.1",
+  "syv": "2.8.5",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
