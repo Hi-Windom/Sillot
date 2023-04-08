@@ -22,6 +22,7 @@ import {getSearch} from "../util/functions";
 import {initRightMenu} from "./menu";
 import {openChangelog} from "../boot/openChangelog";
 import { SillotEnv } from "../sillot";
+import VConsole from 'vconsole';
 
 class App {
     constructor() {
@@ -96,3 +97,23 @@ window.openFileByURL = (openURL) => {
     }
     return false;
 };
+
+
+const vConsole = new VConsole({ theme: 'dark' });
+vConsole.hideSwitch();
+
+// 接下来即可照常使用 `console` 等方法
+console.log(vConsole.version);
+const toolbarConsole = document.querySelector("#toolbarConsole");
+toolbarConsole?.addEventListener("click", () => {
+  if (toolbarConsole.getAttribute("data-mode") === "0") {
+    vConsole.showSwitch();
+    toolbarConsole.setAttribute("data-mode", "1");
+  } else {
+    vConsole.hideSwitch();
+    toolbarConsole.setAttribute("data-mode", "0");
+  }
+});
+
+// 结束调试后，可移除掉
+// vConsole.destroy();

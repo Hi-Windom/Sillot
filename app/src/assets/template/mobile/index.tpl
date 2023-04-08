@@ -20,6 +20,9 @@
     <svg id="toolbarSync" class="toolbar__icon fn__none">
         <use xlink:href="#iconCloudSucc"></use>
     </svg>
+    <svg id="toolbarConsole" class="toolbar__icon" data-mode="0">
+        <use xlink:href="#iconBug"></use>
+    </svg>
     <svg id="toolbarEdit" class="toolbar__icon fn__hidden">
         <use xlink:href="#iconEdit"></use>
     </svg>
