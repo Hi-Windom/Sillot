@@ -364,8 +364,8 @@ export const initAbout = () => {
             networkServeElement.addEventListener("change", () => {
                 fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
                     if(networkServeElement.checked){
-                        const _r = window.JSAndroid.requestPermission("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS")
-                        console.warn(_r)
+                        const _r = window.JSAndroid.requestPermission("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
+                        console.warn(_r);
                     } else {
                         exitSiYuan();
                     }
