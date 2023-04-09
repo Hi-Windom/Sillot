@@ -120,6 +120,10 @@ export const initFramework = () => {
     }
     editElement.addEventListener(getEventName(), () => {
         window.siyuan.config.editor.readOnly = editIconElement.getAttribute("xlink:href") === "#iconEdit";
+        const toolbarName = document.querySelector("#toolbarName") as HTMLElement;
+        if (toolbarName) {
+            toolbarName.style.filter = window.siyuan.config.editor.readOnly ? "brightness(0.58) opacity(0.58)" : "";
+        }
         fetchPost("/api/setting/setEditor", window.siyuan.config.editor);
     });
     document.getElementById("toolbarSync").addEventListener(getEventName(), () => {
