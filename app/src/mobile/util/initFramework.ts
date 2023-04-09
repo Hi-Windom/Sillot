@@ -18,6 +18,7 @@ import {MobileTags} from "./MobileTags";
 import {activeBlur, hideKeyboardToolbar, initKeyboardToolbar} from "./keyboardToolbar";
 import {getSearch} from "../../util/functions";
 import {syncGuide} from "../../sync/syncGuide";
+import {openCard} from "../../card/openCard";
 
 export const initFramework = () => {
     setInlineStyle();
@@ -101,6 +102,9 @@ export const initFramework = () => {
     document.getElementById("toolbarMore").addEventListener("click", () => {
         popMenu();
     });
+    document.getElementById("toolbarRiffCard").addEventListener("click", () => {
+        openCard();
+    });
     const editElement = document.getElementById("toolbarEdit");
     if (window.siyuan.config.readonly) {
         editElement.classList.add("fn__none");
@@ -116,6 +120,10 @@ export const initFramework = () => {
     }
     editElement.addEventListener(getEventName(), () => {
         window.siyuan.config.editor.readOnly = editIconElement.getAttribute("xlink:href") === "#iconEdit";
+        const toolbarName = document.querySelector("#toolbarName") as HTMLElement;
+        if (toolbarName) {
+            toolbarName.style.filter = window.siyuan.config.editor.readOnly ? "brightness(0.58) opacity(0.58)" : "";
+        }
         fetchPost("/api/setting/setEditor", window.siyuan.config.editor);
     });
     document.getElementById("toolbarSync").addEventListener(getEventName(), () => {

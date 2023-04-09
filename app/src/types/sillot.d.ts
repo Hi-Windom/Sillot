@@ -13,6 +13,7 @@ interface Window {
   sout: ISout;
   React: any;
   ReactDOM: any;
+  vConsole: any;
 }
 
 interface ISillot {

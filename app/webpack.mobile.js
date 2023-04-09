@@ -28,9 +28,12 @@ module.exports = (env, argv) => {
       minimize: true,
       minimizer: [
         new EsbuildPlugin({
-          minify: true,
+          minify: false,
+          minifyWhitespace: true,
+          minifyIdentifiers: false,
+          minifySyntax: false,
           keepNames: true,
-          // 保留必要标识符，体积稍微增大
+          // !minifyIdentifiers + keepNames保留全部标识符，体积稍微增大
           target: ["es2022"],
         }),
       ],

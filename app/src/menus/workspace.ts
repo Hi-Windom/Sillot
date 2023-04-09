@@ -281,13 +281,20 @@ export const workspaceMenu = (rect: DOMRect) => {
         }).element);
         /// #if !BROWSER
         window.siyuan.menus.menu.append(new MenuItem({
-            label: window.siyuan.languages.debug,
+            label: "DevTools",
             icon: "iconBug",
             click: () => {
                 getCurrentWindow().webContents.openDevTools({mode: "bottom"});
             }
         }).element);
         /// #endif
+        window.siyuan.menus.menu.append(new MenuItem({
+            label: "vConsole",
+            icon: "iconBug",
+            click: () => {
+                window.vConsole.show();
+            }
+        }).element);
         window.siyuan.menus.menu.popup({x: rect.left, y: rect.bottom});
     });
 };

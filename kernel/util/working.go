@@ -45,7 +45,7 @@ var Mode = "prod"
 const (
 	Ver       = "0.17"
 	VerC      = Ver + ".999" // 用于检查版本更新
-	VerSY     = "2.8.5"
+	VerSY     = "2.8.4"
 	IsInsider = true
 )
 
@@ -67,7 +67,7 @@ func Boot() {
 	readOnly := flag.String("readonly", "false", "read-only mode")
 	accessAuthCode := flag.String("accessAuthCode", "", "access auth code")
 	ssl := flag.Bool("ssl", false, "for https and wss")
-	lang := flag.String("lang", "", "zh_CN/en_US/fr_FR/es_ES")
+	lang := flag.String("lang", "", "zh_CN/en_US")
 	mode := flag.String("mode", "prod", "dev/prod")
 	flag.Parse()
 

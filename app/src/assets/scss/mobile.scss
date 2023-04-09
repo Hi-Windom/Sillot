@@ -28,6 +28,7 @@
 // sillot extend start
 @import "sillot/logic";
 @import "sillot/mobile_slider";
+@import "sillot/mobile_menu";
 // sillot extend end
 
 .block__popover {
@@ -246,9 +247,9 @@
 }
 
 #menu {
-  transition: transform 0.15s cubic-bezier(0, 0, 0.2, 1) 0ms;
   z-index: 220;
   transform: translateX(100vw);
+  top: 0;
 }
 
 .keyboard {

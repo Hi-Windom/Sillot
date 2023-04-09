@@ -13,20 +13,21 @@
     <img style="position: absolute;width: 36vh;" src="../../icon.png">
 </div>
 <div class="toolbar toolbar--border">
-    <svg id="toolbarFile" class="toolbar__icon">
+    <svg id="toolbarFile" class="toolbar__icon fn__none">
         <use xlink:href="#iconMenu"></use>
+    </svg>
+    <svg id="toolbarEdit" class="toolbar__icon fn__hidden">
+        <use xlink:href="#iconEdit"></use>
     </svg>
     <input class="toolbar__title fn__hidden" id="toolbarName">
     <svg id="toolbarSync" class="toolbar__icon fn__none">
         <use xlink:href="#iconCloudSucc"></use>
     </svg>
+    <svg id="toolbarRiffCard" class="b3-menu__icon" style="color: var(--b3-theme-secondary)"><use xlink:href="#iconRiffCard"></use></svg>
     <svg id="toolbarConsole" class="toolbar__icon" data-mode="0">
         <use xlink:href="#iconBug"></use>
     </svg>
-    <svg id="toolbarEdit" class="toolbar__icon fn__hidden">
-        <use xlink:href="#iconEdit"></use>
-    </svg>
-    <svg id="toolbarMore" class="toolbar__icon">
+    <svg id="toolbarMore" class="toolbar__icon fn__none">
         <use xlink:href="#iconMore"></use>
     </svg>
 </div>
@@ -61,7 +62,13 @@
     </div>
     <div id="modelMain" class="fn__flex-1"></div>
 </div>
-<div id="commonMenu" class="b3-menu fn__none"></div>
+<div id="commonMenu" class="b3-menu fn__none">
+    <div class="b3-menu__title fn__none">
+        <svg class="b3-menu__icon"><use xlink:href="#iconLeft"></use></svg>
+        <span class="b3-menu__label"></span>
+    </div>
+    <div class="b3-menu__items"></div>
+</div>
 <div id="message" class="b3-snackbars"></div>
 <div id="status" class="status status--hide"></div>
 <div id="keyboardToolbar" class="keyboard fn__none"></div>
