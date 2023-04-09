@@ -366,8 +366,9 @@ export const initAbout = () => {
                     if(networkServeElement.checked){
                         const _r = window.JSAndroid.requestPermission("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS")
                         console.warn(_r)
+                    } else {
+                        exitSiYuan();
                     }
-                    // exitSiYuan();
                 });
             });
         }
