@@ -39,6 +39,7 @@ export const initRightMenu = () => {
     <svg class="b3-menu__icon"><use xlink:href="#iconLeft"></use></svg>
     <span class="b3-menu__label">${window.siyuan.languages.back}</span>
 </div>
+<div class="b3-menu__items">
 ${accountHTML}
 <div id="menuRecent" class="b3-menu__item b3s-mobile-height-menu__item">
     <svg class="b3-menu__icon"><use xlink:href="#iconList"></use></svg><span class="b3-menu__label">${window.siyuan.languages.recentDocs}</span>
@@ -87,6 +88,7 @@ ${accountHTML}
 </div>
 <div class="b3-menu__item b3s-mobile-height-menu__item" id="menuHelp">
     <svg class="b3-menu__icon"><use xlink:href="#iconHelp"></use></svg><span class="b3-menu__label">${window.siyuan.languages.help}</span>
+</div>
 </div>
 `;
     processSync();

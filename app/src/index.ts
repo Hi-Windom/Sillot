@@ -133,7 +133,6 @@ class App {
                     }
                 }
             }),
-            menus: new Menus()
         };
         new SillotEnv();
         fetchPost("/api/system/getConf", {}, response => {
@@ -163,6 +162,7 @@ class App {
             getLocalStorage(() => {
                 fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
                     window.siyuan.languages = lauguages;
+                    window.siyuan.menus = new Menus();
                     bootSync();
                     fetchPost("/api/setting/getCloudUser", {}, userResponse => {
                         window.siyuan.user = userResponse.data;
