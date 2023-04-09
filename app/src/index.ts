@@ -28,6 +28,7 @@ import { importIDB } from "./sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "./sillot";
 import {updateEditModeElement} from "./layout/topBar";
 import {getSearch} from "./util/functions";
+import VConsole from 'vconsole';
 
 class App {
     constructor() {
@@ -192,3 +193,6 @@ window.openFileByURL = (openURL) => {
     }
     return false;
 };
+
+window.vConsole = new VConsole({ theme: 'dark' });
+window.vConsole.hideSwitch();
