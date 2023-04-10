@@ -72,7 +72,7 @@ def find_milestone(repo, title, lastestRelease):
 ❤️ 欢迎共建汐洛 694357845@qq.com
 🚧 [Sillot is currently in active development](https://github.com/orgs/Hi-Windom/projects/2/views/2)
 
-🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)  📱 [Android application package](https://github.com/Hi-Windom/Sillot-android/releases)
+🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)  📱 [Android application package](https://github.com/Hi-Windom/Sillot-android/releases)  📦 [Chromium Browser Extension](https://github.com/K-Sillot/Sillot-Be/releases)
 <span>
 <img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 11+-black?logo=android" title=""/>
 </span>

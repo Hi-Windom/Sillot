@@ -128,8 +128,15 @@ export const goBack = () => {
     } else if (document.getElementById("model").style.transform === "translateY(0px)") {
         document.getElementById("model").style.transform = "";
         return;
+    } else if (window.siyuan.viewer && !window.siyuan.viewer.destroyed) {
+        window.siyuan.viewer.destroy();
+        return;
     } else if (document.getElementById("menu").style.transform === "translateX(0px)" ||
         document.getElementById("sidebar").style.transform === "translateX(0px)") {
+        closePanel();
+        return;
+    } else if (window.siyuan.mobile.editor && !window.siyuan.mobile.editor.protyle.toolbar.subElement.classList.contains("fn__none")) {
+        hideElements(["util"], window.siyuan.mobile.editor.protyle);
         closePanel();
         return;
     }

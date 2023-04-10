@@ -1,7 +1,6 @@
 /// #if !MOBILE
 import {exportLayout} from "../layout/util";
 /// #endif
-import {isWindow} from "./functions";
 import {hideMessage, showMessage} from "../dialog/message";
 
 export const processMessage = (response: IWebSocketData) => {
@@ -24,11 +23,7 @@ export const processMessage = (response: IWebSocketData) => {
         /// #if MOBILE
         window.location.reload();
         /// #else
-        if (isWindow()) {
-            window.location.reload();
-        } else {
-            exportLayout(true);
-        }
+        exportLayout(true);
         /// #endif
         return false;
     }
