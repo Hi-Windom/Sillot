@@ -211,7 +211,9 @@ func RefreshCheckJob() {
 	go refreshSubscriptionExpirationRemind()
 	go refreshUser()
 	go refreshAnnouncement()
-	go refreshCheckDownloadInstallPkg()
+	if !util.ISMicrosoftStore && util.ContainerStd == util.Container {
+		go refreshCheckDownloadInstallPkg()
+	}
 }
 
 func refreshSubscriptionExpirationRemind() {
