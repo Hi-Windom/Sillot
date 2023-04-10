@@ -43,9 +43,10 @@ import (
 var Mode = "prod"
 
 const (
-	Ver       = "0.17"
-	VerC      = Ver + ".999" // 用于检查版本更新
-	VerSY     = "2.8.4"
+	Ver   = "0.17"
+	VerC  = Ver + ".999" // 用于检查版本更新
+	VerSY = "2.8.4"      // 思源版本号
+	// CHANGELOG显示暂时用VerSY，后面考虑同时显示汐洛和思源的或者合并显示。
 	IsInsider = true
 )
 

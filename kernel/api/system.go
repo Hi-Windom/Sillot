@@ -17,13 +17,14 @@
 package api
 
 import (
-	"github.com/88250/lute"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/88250/lute"
 
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
@@ -49,9 +50,9 @@ func getChangelog(c *gin.Context) {
 		return
 	}
 
-	changelogPath := filepath.Join(changelogsDir, "v"+util.Ver+"_"+model.Conf.Lang+".md")
+	changelogPath := filepath.Join(changelogsDir, "v"+util.VerSY+"_"+model.Conf.Lang+".md")
 	if !gulu.File.IsExist(changelogPath) {
-		changelogPath = filepath.Join(changelogsDir, "v"+util.Ver+".md")
+		changelogPath = filepath.Join(changelogsDir, "v"+util.VerSY+".md")
 		if !gulu.File.IsExist(changelogPath) {
 			logging.LogErrorf("changelog not found: %s", changelogPath)
 			return
