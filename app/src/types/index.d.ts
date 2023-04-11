@@ -39,6 +39,7 @@ interface Window {
     html2canvas: (element: Element) => Promise<any>;
     JSAndroid: {
         returnDesktop(): void
+        exitSillotAndroid(): void
         openExternal(url: string): void
         changeStatusBarColor(color: string, mode: number): void
         writeClipboard(text: string): void
