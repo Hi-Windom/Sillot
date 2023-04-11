@@ -165,9 +165,6 @@ const showKeyboardToolbarUtil = (oldScrollTop: number) => {
 
 const hideKeyboardToolbarUtil = () => {
     const toolbarElement = document.getElementById("keyboardToolbar");
-    if (toolbarElement.style.height === "") {
-        return;
-    }
     toolbarElement.style.height = "";
     window.siyuan.mobile.editor.protyle.element.style.marginBottom = "42px";
     toolbarElement.querySelector('.keyboard__action[data-type="add"]').classList.remove("protyle-toolbar__item--current");
@@ -270,9 +267,9 @@ export const showKeyboardToolbar = () => {
         return;
     }
     toolbarElement.classList.remove("fn__none");
-    const searchPathElement = document.getElementById("searchPath");
-    if (searchPathElement) {
-        (searchPathElement.nextElementSibling as HTMLElement).style.marginBottom = "42px";
+    const modelElement = document.getElementById("model");
+    if (modelElement.style.transform === "translateY(0px)") {
+        modelElement.style.paddingBottom = "42px";
     }
     const range = getSelection().getRangeAt(0);
     if (!window.siyuan.mobile.editor ||
@@ -303,10 +300,10 @@ export const hideKeyboardToolbar = () => {
     const toolbarElement = document.getElementById("keyboardToolbar");
     toolbarElement.classList.add("fn__none");
     toolbarElement.style.height = "";
-    window.siyuan.mobile.editor ? window.siyuan.mobile.editor.protyle.element.style.marginBottom = "" : null;
-    const searchPathElement = document.getElementById("searchPath");
-    if (searchPathElement) {
-        (searchPathElement.nextElementSibling as HTMLElement).style.marginBottom = "";
+    window.siyuan.mobile.editor.protyle.element.style.marginBottom = "";
+    const modelElement = document.getElementById("model");
+    if (modelElement.style.transform === "translateY(0px)") {
+        modelElement.style.paddingBottom = "";
     }
 };
 
