@@ -645,7 +645,9 @@ export const openMenu = (src: string, onlyMenu: boolean, showAccelerator: boolea
         label: window.siyuan.languages.useBrowserView,
         accelerator: showAccelerator ? "Click" : "",
         click: () => {
-            openByMobile(src);
+            const uri = src.startsWith("/") ? "" : "/" + src;
+            console.log(uri);
+            openByMobile(uri);
         }
     });
     /// #endif
