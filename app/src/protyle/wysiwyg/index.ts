@@ -64,6 +64,7 @@ import {showMessage} from "../../dialog/message";
 import {getBacklinkHeadingMore, loadBreadcrumb} from "./renderBacklink";
 import {removeSearchMark} from "../toolbar/util";
 import {activeBlur, hideKeyboardToolbar} from "../../mobile/util/keyboardToolbar";
+import {commonClick} from "./commonClick";
 
 export class WYSIWYG {
     public lastHTMLs: { [key: string]: string } = {};
@@ -1721,28 +1722,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 return;
             }
 
-            const attrBookmarkElement = hasClosestByClassName(event.target, "protyle-attr--bookmark");
-            if (attrBookmarkElement) {
-                openAttr(attrBookmarkElement.parentElement.parentElement, protyle, "bookmark");
-                event.stopPropagation();
-                return;
-            }
-            const attrNameElement = hasClosestByClassName(event.target, "protyle-attr--name");
-            if (attrNameElement) {
-                openAttr(attrNameElement.parentElement.parentElement, protyle, "name");
-                event.stopPropagation();
-                return;
-            }
-            const attrAliasElement = hasClosestByClassName(event.target, "protyle-attr--alias");
-            if (attrAliasElement) {
-                openAttr(attrAliasElement.parentElement.parentElement, protyle, "alias");
-                event.stopPropagation();
-                return;
-            }
-            const attrMemoElement = hasClosestByClassName(event.target, "protyle-attr--memo");
-            if (attrMemoElement) {
-                openAttr(attrMemoElement.parentElement.parentElement, protyle, "memo");
-                event.stopPropagation();
+            if (commonClick(event, protyle)) {
                 return;
             }
 
