@@ -6,7 +6,7 @@ overrides:
 dependencies:
   '@electron/remote':
     specifier: ^2.0.9
-    version: registry.npmmirror.com/@electron/remote@2.0.9(electron@25.0.0-alpha.1)
+    version: registry.npmmirror.com/@electron/remote@2.0.9(electron@25.0.0-alpha.2)
   '@monaco-editor/loader':
     specifier: ^1.3.3
     version: 1.3.3(monaco-editor@0.37.1)
@@ -130,8 +130,8 @@ devDependencies:
     specifier: ^2.29.3
     version: 2.29.3
   electron:
-    specifier: 25.0.0-alpha.1
-    version: 25.0.0-alpha.1
+    specifier: 25.0.0-alpha.2
+    version: 25.0.0-alpha.2
   electron-builder:
     specifier: ^23.6.0
     version: registry.npmmirror.com/electron-builder@23.6.0
@@ -2137,7 +2137,7 @@ packages:
       collect-v8-coverage: 1.0.1
       exit: 0.1.2
       glob: 7.2.3
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       istanbul-lib-coverage: 3.2.0
       istanbul-lib-instrument: 5.2.1
       istanbul-lib-report: 3.0.0
@@ -2167,7 +2167,7 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.17
       callsites: 3.1.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
     dev: true
 
   /@jest/test-result@29.5.0:
@@ -2185,7 +2185,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@jest/test-result': 29.5.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jest-haste-map: 29.5.0
       slash: 3.0.0
     dev: true
@@ -2201,7 +2201,7 @@ packages:
       chalk: 4.1.2
       convert-source-map: 2.0.0
       fast-json-stable-stringify: 2.1.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jest-haste-map: 29.5.0
       jest-regex-util: 29.4.3
       jest-util: 29.5.0
@@ -3449,7 +3449,7 @@ packages:
       babel-plugin-istanbul: 6.1.1
       babel-preset-jest: 29.5.0(@babel/core@7.21.4)
       chalk: 4.1.2
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       slash: 3.0.0
     transitivePeerDependencies:
       - supports-color
@@ -4386,8 +4386,8 @@ packages:
     resolution: {integrity: sha512-dJZurgxDeaqn90VmS23Xz+QPQQl84BxnlAfwCDFNjfEhqO2yLMDkeaDoJ1yPXAbmiqTi+hd5TpB5zi1N4hwBuQ==}
     dev: true
 
-  /electron@25.0.0-alpha.1:
-    resolution: {integrity: sha512-WmTJ6fW3RUQvRKpDBD1vbKRjeNvdHn+pijmpRC+Uhp1fF0wSZO0xpOdBG09BROIovMcAovlEuAGb3Z5HXG7PHA==}
+  /electron@25.0.0-alpha.2:
+    resolution: {integrity: sha512-4r6wgFPkfl7zfvGG+/ZEFA/eqmxTOfbdA9pmF2mV6LcKtwcyASwEnRbppAHfcvjjBAQcJXQvKc1tI7QrxQ9htQ==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
     requiresBuild: true
@@ -5584,7 +5584,7 @@ packages:
       ci-info: 3.8.0
       deepmerge: 4.3.0
       glob: 7.2.3
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jest-circus: 29.5.0
       jest-environment-node: 29.5.0
       jest-get-type: 29.4.3
@@ -5656,7 +5656,7 @@ packages:
       '@types/node': 18.15.11
       anymatch: 3.1.3
       fb-watchman: 2.0.2
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jest-regex-util: 29.4.3
       jest-util: 29.5.0
       jest-worker: 29.5.0
@@ -5740,7 +5740,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       chalk: 4.1.2
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jest-haste-map: 29.5.0
       jest-pnp-resolver: 1.2.3(jest-resolve@29.5.0)
       jest-util: 29.5.0
@@ -5762,7 +5762,7 @@ packages:
       '@types/node': 18.15.11
       chalk: 4.1.2
       emittery: 0.13.1
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jest-docblock: 29.4.3
       jest-environment-node: 29.5.0
       jest-haste-map: 29.5.0
@@ -5795,7 +5795,7 @@ packages:
       cjs-module-lexer: 1.2.2
       collect-v8-coverage: 1.0.1
       glob: 7.2.3
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jest-haste-map: 29.5.0
       jest-message-util: 29.5.0
       jest-mock: 29.5.0
@@ -5827,7 +5827,7 @@ packages:
       babel-preset-current-node-syntax: 1.0.1(@babel/core@7.21.4)
       chalk: 4.1.2
       expect: 29.5.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jest-diff: 29.5.0
       jest-get-type: 29.4.3
       jest-matcher-utils: 29.5.0
@@ -5998,7 +5998,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
     dev: true
 
   /keyv@3.1.0:
@@ -8806,7 +8806,7 @@ packages:
     engines: {node: '>=10.0.0'}
     dev: true
 
-  registry.npmmirror.com/@electron/remote@2.0.9(electron@25.0.0-alpha.1):
+  registry.npmmirror.com/@electron/remote@2.0.9(electron@25.0.0-alpha.2):
     resolution: {integrity: sha512-LR0W0ID6WAKHaSs0x5LX9aiG+5pFBNAJL6eQAJfGkCuZPUa6nZz+czZLdlTDETG45CgF/0raSvCtYOYUpr6c+A==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://registry.npmmirror.com/@electron/remote/-/remote-2.0.9.tgz}
     id: registry.npmmirror.com/@electron/remote/2.0.9
     name: '@electron/remote'
@@ -8814,7 +8814,7 @@ packages:
     peerDependencies:
       electron: '>= 13.0.0'
     dependencies:
-      electron: 25.0.0-alpha.1
+      electron: 25.0.0-alpha.2
     dev: false
 
   registry.npmmirror.com/@electron/universal@1.2.1:
