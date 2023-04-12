@@ -131,11 +131,11 @@ ${accountHTML}
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            // } else if (target.id === "menuSafeQuit") {
-            //     exitSiYuan();
-            //     event.preventDefault();
-            //     event.stopPropagation();
-            //     break;
+            } else if (target.id === "menuSafeQuit") {
+                exitSiYuan();
+                event.preventDefault();
+                event.stopPropagation();
+                break;
             } else if (target.id === "menuAbout") {
                 initAbout();
                 event.preventDefault();
