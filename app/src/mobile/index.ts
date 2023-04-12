@@ -102,21 +102,21 @@ window.openFileByURL = (openURL) => {
 };
 
 
-const vConsole = new VConsole({ theme: 'dark' });
-vConsole.hideSwitch();
+window.vConsole = new VConsole({ theme: 'dark' });
+window.vConsole.hideSwitch();
 
 // 接下来即可照常使用 `console` 等方法
-console.log(vConsole.version);
+console.log(window.vConsole.version);
 const toolbarConsole = document.querySelector("#toolbarConsole");
 toolbarConsole?.addEventListener("click", () => {
   if (toolbarConsole.getAttribute("data-mode") === "0") {
-    vConsole.showSwitch();
+    window.vConsole.showSwitch();
     toolbarConsole.setAttribute("data-mode", "1");
   } else {
-    vConsole.hideSwitch();
+    window.vConsole.hideSwitch();
     toolbarConsole.setAttribute("data-mode", "0");
   }
 });
 
 // 结束调试后，可移除掉
-// vConsole.destroy();
+// window.vConsole.destroy();
