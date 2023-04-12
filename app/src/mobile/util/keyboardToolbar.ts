@@ -195,6 +195,16 @@ const renderKeyboardToolbar = () => {
             hideKeyboardToolbar();
             return;
         }
+        // 编辑器设置界面点击空白或关闭，焦点不知何故会飘移到编辑器上
+        if (document.activeElement &&
+            document.activeElement.tagName !== "INPUT" &&
+            document.activeElement.tagName !== "TEXTAREA" && (
+                document.getElementById("menu").style.transform === "translateX(0px)" ||
+                document.getElementById("model").style.transform === "translateY(0px)"
+            )) {
+            hideKeyboardToolbar();
+            return;
+        }
         if (!showUtil) {
             hideKeyboardToolbarUtil();
         }
@@ -218,7 +228,7 @@ const renderKeyboardToolbar = () => {
             dynamicElements[1].classList.add("fn__none");
         }
 
-        const protyle = window.siyuan.mobile.editor.protyle;
+        const protyle = getCurrentEditor().protyle;
         if (!dynamicElements[0].classList.contains("fn__none")) {
             if (protyle.undo.undoStack.length === 0) {
                 dynamicElements[0].querySelector('[data-type="undo"]').setAttribute("disabled", "disabled");
@@ -374,7 +384,7 @@ export const initKeyboardToolbar = () => {
     toolbarElement.addEventListener("click", (event) => {
         const target = event.target as HTMLElement;
         const slashBtnElement = hasClosestByClassName(event.target as HTMLElement, "keyboard__slash-item");
-        const protyle = window.siyuan.mobile.editor.protyle;
+        const protyle = getCurrentEditor().protyle;
         if (slashBtnElement) {
             const dataValue = decodeURIComponent(slashBtnElement.getAttribute("data-value"));
             protyle.hint.fill(dataValue, protyle, false);   // 点击后 range 会改变
@@ -405,7 +415,7 @@ export const initKeyboardToolbar = () => {
             }
             return;
         }
-        if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly || !window.siyuan.mobile.editor) {
+        if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly || !getCurrentEditor()) {
             return;
         }
         if (type === "undo") {
@@ -462,7 +472,7 @@ export const initKeyboardToolbar = () => {
             } else {
                 buttonElement.classList.add("protyle-toolbar__item--current");
                 toolbarElement.querySelector('.keyboard__action[data-type="done"] use').setAttribute("xlink:href", "#iconCloseRound");
-                const oldScrollTop = window.siyuan.mobile.editor.protyle.contentElement.scrollTop;
+                const oldScrollTop = protyle.contentElement.scrollTop;
                 renderSlashMenu(protyle, toolbarElement);
                 showKeyboardToolbarUtil(oldScrollTop);
             }
