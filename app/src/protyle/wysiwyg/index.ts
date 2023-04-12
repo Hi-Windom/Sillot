@@ -64,6 +64,7 @@ import {showMessage} from "../../dialog/message";
 import {getBacklinkHeadingMore, loadBreadcrumb} from "./renderBacklink";
 import {removeSearchMark} from "../toolbar/util";
 import {activeBlur, hideKeyboardToolbar} from "../../mobile/util/keyboardToolbar";
+import {commonClick} from "./commonClick";
 
 export class WYSIWYG {
     public lastHTMLs: { [key: string]: string } = {};
@@ -1186,7 +1187,11 @@ export class WYSIWYG {
                     focusSideBlock(embedElement);
                 }
                 protyle.gutter.renderMenu(protyle, embedElement);
+                /// #if MOBILE
+                window.siyuan.menus.menu.fullscreen();
+                /// #else
                 window.siyuan.menus.menu.popup({x, y});
+                /// #endif
                 return false;
             }
             protyle.toolbar.range = getEditorRange(protyle.element);
@@ -1253,7 +1258,11 @@ export class WYSIWYG {
                 if (protyle.gutter) {
                     protyle.gutter.renderMenu(protyle, nodeElement);
                 }
+                /// #if MOBILE
+                window.siyuan.menus.menu.fullscreen();
+                /// #else
                 window.siyuan.menus.menu.popup({x, y});
+                /// #endif
                 protyle.toolbar?.element.classList.add("fn__none");
             }
         });
@@ -1483,9 +1492,12 @@ export class WYSIWYG {
                 const breadcrumbId = backlinkBreadcrumbItemElement.getAttribute("data-id");
                 if (breadcrumbId) {
                     if (ctrlIsPressed) {
-                        openFileById({
-                            id: breadcrumbId,
-                            action: breadcrumbId === protyle.block.rootID ? [Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL]
+                        fetchPost("/api/block/checkBlockFold", {id: breadcrumbId}, (foldResponse) => {
+                            openFileById({
+                                id: breadcrumbId,
+                                action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
+                                zoomIn: foldResponse.data
+                            });
                         });
                     } else {
                         loadBreadcrumb(protyle, backlinkBreadcrumbItemElement);
@@ -1710,28 +1722,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 return;
             }
 
-            const attrBookmarkElement = hasClosestByClassName(event.target, "protyle-attr--bookmark");
-            if (attrBookmarkElement) {
-                openAttr(attrBookmarkElement.parentElement.parentElement, protyle, "bookmark");
-                event.stopPropagation();
-                return;
-            }
-            const attrNameElement = hasClosestByClassName(event.target, "protyle-attr--name");
-            if (attrNameElement) {
-                openAttr(attrNameElement.parentElement.parentElement, protyle, "name");
-                event.stopPropagation();
-                return;
-            }
-            const attrAliasElement = hasClosestByClassName(event.target, "protyle-attr--alias");
-            if (attrAliasElement) {
-                openAttr(attrAliasElement.parentElement.parentElement, protyle, "alias");
-                event.stopPropagation();
-                return;
-            }
-            const attrMemoElement = hasClosestByClassName(event.target, "protyle-attr--memo");
-            if (attrMemoElement) {
-                openAttr(attrMemoElement.parentElement.parentElement, protyle, "memo");
-                event.stopPropagation();
+            if (commonClick(event, protyle)) {
                 return;
             }
 
@@ -1763,11 +1754,15 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
             const menuElement = hasClosestByClassName(event.target, "protyle-action__menu");
             if (menuElement) {
                 protyle.gutter.renderMenu(protyle, menuElement.parentElement.parentElement);
+                /// #if MOBILE
+                window.siyuan.menus.menu.fullscreen();
+                /// #else
                 const rect = menuElement.getBoundingClientRect();
                 window.siyuan.menus.menu.popup({
                     x: rect.left,
                     y: rect.top
                 }, true);
+                /// #endif
                 event.stopPropagation();
                 event.preventDefault();
                 return;
@@ -1856,10 +1851,14 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                             updateTransaction(protyle, actionElement.parentElement.getAttribute("data-node-id"), actionElement.parentElement.outerHTML, html);
                         } else {
                             protyle.gutter.renderMenu(protyle, actionElement.parentElement);
+                            /// #if MOBILE
+                            window.siyuan.menus.menu.fullscreen();
+                            /// #else
                             window.siyuan.menus.menu.popup({
                                 x: event.clientX - 16,
                                 y: event.clientY - 16
                             }, true);
+                            /// #endif
                         }
                     }
                 }

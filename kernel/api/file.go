@@ -23,7 +23,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"time"
 
@@ -178,12 +177,6 @@ func removeFile(c *gin.Context) {
 
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
-		c.JSON(http.StatusOK, ret)
-		return
-	}
-	if runtime.GOOS == "windows" {
-		ret.Code = 418
-		ret.Msg = "https://github.com/Hi-Windom/Sillot/issues/313"
 		c.JSON(http.StatusOK, ret)
 		return
 	}

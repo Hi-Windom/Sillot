@@ -180,6 +180,8 @@
 }
 
 #model {
+  box-sizing: border-box;
+
   .config-about__logo {
     display: flex;
     align-items: center;
@@ -436,7 +438,7 @@
   display: block;
 }
 
-.protyle{
+.protyle {
   &-util {
     .color__square {
       height: 24px;

@@ -30,8 +30,8 @@ export const openCard = () => {
     });
 };
 
-export const openCardByData = (cardsData: ICard[], html = "") => {
-    let blocks = cardsData;
+export const openCardByData = (cardsData: { cards: ICard[], unreviewedCount: number }, html = "") => {
+    let blocks = cardsData.cards;
     let index = 0;
     if (blocks.length > 0) {
         html += `<div class="fn__flex" style="align-items: center" data-type="count">
@@ -104,6 +104,14 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
 </div>`,
         width: isMobile() ? "100vw" : "80vw",
         height: isMobile() ? "100vh" : "70vh",
+        destroyCallback() {
+            if (editor) {
+                editor.destroy();
+                if (window.siyuan.mobile) {
+                    window.siyuan.mobile.popEditor = null;
+                }
+            }
+        }
     });
     (dialog.element.querySelector(".b3-dialog__scrim") as HTMLElement).style.backgroundColor = "var(--b3-theme-background)";
     (dialog.element.querySelector(".b3-dialog__container") as HTMLElement).style.maxWidth = "1024px";
@@ -118,6 +126,9 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
         },
         typewriterMode: false
     });
+    if (window.siyuan.mobile) {
+        window.siyuan.mobile.popEditor = editor;
+    }
     if (window.siyuan.config.editor.readOnly) {
         disabledProtyle(editor.protyle);
     }
@@ -136,21 +147,8 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
     const actionElements = dialog.element.querySelectorAll(".card__action");
     const selectElement = dialog.element.querySelector("select");
     dialog.element.addEventListener("click", (event) => {
-        const fullscreenElement = hasClosestByAttribute(event.target as HTMLElement, "data-type", "fullscreen");
-        if (fullscreenElement) {
-            fullscreen(dialog.element.querySelector(".card__main"),
-                dialog.element.querySelector('[data-type="fullscreen"]'));
-            event.stopPropagation();
-            event.preventDefault();
-            return;
-        }
-        const closeElement = hasClosestByAttribute(event.target as HTMLElement, "data-type", "close");
-        if (closeElement) {
-            dialog.destroy();
-            event.stopPropagation();
-            event.preventDefault();
-            return;
-        }
+        const target = event.target as HTMLElement;
+        const titleElement = countElement?.previousElementSibling;
         let type = "";
         if (typeof event.detail === "string") {
             if (event.detail === "1" || event.detail === "j") {
@@ -168,9 +166,47 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
             } else if (event.detail === "0") {
                 type = "-3";
             }
+        } else {
+            const fullscreenElement = hasClosestByAttribute(target, "data-type", "fullscreen");
+            if (fullscreenElement) {
+                fullscreen(dialog.element.querySelector(".card__main"),
+                    dialog.element.querySelector('[data-type="fullscreen"]'));
+                event.stopPropagation();
+                event.preventDefault();
+                return;
+            }
+            const closeElement = hasClosestByAttribute(target, "data-type", "close");
+            if (closeElement) {
+                dialog.destroy();
+                event.stopPropagation();
+                event.preventDefault();
+                return;
+            }
+            const newroundElement = hasClosestByAttribute(target, "data-type", "newround");
+            if (newroundElement) {
+                fetchPost(selectElement ? "/api/riff/getRiffDueCards" :
+                    (titleElement.getAttribute("data-id") ? "/api/riff/getTreeRiffDueCards" : "/api/riff/getNotebookRiffDueCards"), {
+                    rootID: titleElement.getAttribute("data-id"),
+                    deckID: selectElement?.value,
+                    notebook: titleElement.getAttribute("data-notebookid"),
+                }, (treeCards) => {
+                    index = 0;
+                    blocks = treeCards.data.cards;
+                    nextCard({
+                        countElement,
+                        editor,
+                        actionElements,
+                        index,
+                        blocks
+                    });
+                });
+                event.stopPropagation();
+                event.preventDefault();
+                return;
+            }
         }
         if (!type) {
-            const buttonElement = hasClosestByClassName(event.target as HTMLElement, "b3-button");
+            const buttonElement = hasClosestByClassName(target, "b3-button");
             if (buttonElement) {
                 type = buttonElement.getAttribute("data-type");
             }
@@ -227,18 +263,21 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
                 /// #endif
                 index++;
                 if (index > blocks.length - 1) {
-                    const titleElement = countElement.previousElementSibling;
                     fetchPost(selectElement ? "/api/riff/getRiffDueCards" :
                         (titleElement.getAttribute("data-id") ? "/api/riff/getTreeRiffDueCards" : "/api/riff/getNotebookRiffDueCards"), {
                         rootID: titleElement.getAttribute("data-id"),
                         deckID: selectElement?.value,
                         notebook: titleElement.getAttribute("data-notebookid"),
                         reviewedCards: blocks
-                    }, (treeCards) => {
+                    }, (result) => {
                         index = 0;
-                        blocks = treeCards.data;
-                        if (treeCards.data.length === 0) {
-                            allDone(countElement, editor, actionElements);
+                        blocks = result.data.cards;
+                        if (blocks.length === 0) {
+                            if (result.data.unreviewedCount > 0) {
+                                newRound(countElement, editor, actionElements, result.data.unreviewedCount);
+                            } else {
+                                allDone(countElement, editor, actionElements);
+                            }
                         } else {
                             nextCard({
                                 countElement,
@@ -266,7 +305,7 @@ export const openCardByData = (cardsData: ICard[], html = "") => {
     }
     selectElement.addEventListener("change", () => {
         fetchPost("/api/riff/getRiffDueCards", {deckID: selectElement.value}, (cardsChangeResponse) => {
-            blocks = cardsChangeResponse.data;
+            blocks = cardsChangeResponse.data.cards;
             index = 0;
             if (blocks.length > 0) {
                 nextCard({
@@ -319,7 +358,22 @@ const nextCard = (options: {
 const allDone = (countElement: Element, editor: Protyle, actionElements: NodeListOf<Element>) => {
     countElement.classList.add("fn__none");
     editor.protyle.element.classList.add("fn__none");
-    editor.protyle.element.nextElementSibling.classList.remove("fn__none");
+    const emptyElement = editor.protyle.element.nextElementSibling;
+    emptyElement.innerHTML = `<div>🔮</div>${window.siyuan.languages.noDueCard}`;
+    emptyElement.classList.remove("fn__none");
+    actionElements[0].classList.add("fn__none");
+    actionElements[1].classList.add("fn__none");
+};
+
+const newRound = (countElement: Element, editor: Protyle, actionElements: NodeListOf<Element>, unreviewedCount: number) => {
+    countElement.classList.add("fn__none");
+    editor.protyle.element.classList.add("fn__none");
+    const emptyElement = editor.protyle.element.nextElementSibling;
+    emptyElement.innerHTML = `<div>♻️ </div>
+<span>${window.siyuan.languages.continueReview2.replace("${count}", unreviewedCount)}</span>
+<div class="fn__hr"></div>
+<button data-type="newround" class="b3-button">${window.siyuan.languages.continueReview1}</button>`;
+    emptyElement.classList.remove("fn__none");
     actionElements[0].classList.add("fn__none");
     actionElements[1].classList.add("fn__none");
 };

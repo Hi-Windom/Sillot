@@ -422,6 +422,13 @@ export async function deleteBlock(id) {
     return parseBody(request(url, { id }));
 }
 
+export async function moveBlock(id: string, previousID: string, parentID: string) {
+    let url = '/api/block/moveBlock';
+    return parseBody(
+        request(url, { id: id, previousID: previousID, parentID: parentID })
+    );
+}
+
 export async function getSysFonts() {
     let url = '/api/system/getSysFonts';
     return parseBody(request(url, null));
@@ -530,4 +537,9 @@ export async function setStorageVal(key: string, val: any) {
 export async function getLocalStorage() {
     const url = '/api/storage/getLocalStorage';
     return parseBody(request(url, null));
+}
+
+export async function renderSprig(template: string) {
+    let url = '/api/template/renderSprig';
+    return parseBody(request(url, template));
 }

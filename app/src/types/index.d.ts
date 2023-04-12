@@ -39,6 +39,7 @@ interface Window {
     html2canvas: (element: Element) => Promise<any>;
     JSAndroid: {
         returnDesktop(): void
+        exitSillotAndroid(): void
         openExternal(url: string): void
         changeStatusBarColor(color: string, mode: number): void
         writeClipboard(text: string): void
@@ -200,6 +201,7 @@ interface ISiyuan {
     backStack?: IBackStack[],
     mobile?: {
         editor?: import("../protyle").Protyle
+        popEditor?: import("../protyle").Protyle
         files?: import("../mobile/util/MobileFiles").MobileFiles
     },
     user?: {
@@ -347,7 +349,7 @@ declare interface IEditor {
     codeLigatures: boolean;
     codeTabSpaces: number;
     fontFamily: string;
-    virtualBlockRef: string;
+    virtualBlockRef: boolean;
     virtualBlockRefExclude: string;
     virtualBlockRefInclude: string;
     blockRefDynamicAnchorTextMaxLen: number;

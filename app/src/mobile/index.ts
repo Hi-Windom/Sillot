@@ -15,7 +15,7 @@ import {promiseTransactions} from "../protyle/wysiwyg/transaction";
 import {bootSync} from "../dialog/processSystem";
 import {initMessage} from "../dialog/message";
 import {goBack} from "./util/MobileBackFoward";
-import {hideKeyboardToolbar} from "./util/keyboardToolbar";
+import {hideKeyboardToolbar, showKeyboardToolbar} from "./util/keyboardToolbar";
 import {getLocalStorage} from "../protyle/util/compatibility";
 import {openMobileFileById} from "./editor";
 import {getSearch} from "../util/functions";
@@ -89,6 +89,7 @@ new App();
 window.goBack = goBack;
 window.showKeyboardToolbar = (height) => {
     document.getElementById("keyboardToolbar").setAttribute("data-keyboardheight", (height ? height : window.innerHeight / 2 - 42).toString());
+    showKeyboardToolbar();
 };
 window.hideKeyboardToolbar = hideKeyboardToolbar;
 window.openFileByURL = (openURL) => {
@@ -101,21 +102,21 @@ window.openFileByURL = (openURL) => {
 };
 
 
-const vConsole = new VConsole({ theme: 'dark' });
-vConsole.hideSwitch();
+window.vConsole = new VConsole({ theme: 'dark' });
+window.vConsole.hideSwitch();
 
 // 接下来即可照常使用 `console` 等方法
-console.log(vConsole.version);
+console.log(window.vConsole.version);
 const toolbarConsole = document.querySelector("#toolbarConsole");
 toolbarConsole?.addEventListener("click", () => {
   if (toolbarConsole.getAttribute("data-mode") === "0") {
-    vConsole.showSwitch();
+    window.vConsole.showSwitch();
     toolbarConsole.setAttribute("data-mode", "1");
   } else {
-    vConsole.hideSwitch();
+    window.vConsole.hideSwitch();
     toolbarConsole.setAttribute("data-mode", "0");
   }
 });
 
 // 结束调试后，可移除掉
-// vConsole.destroy();
+// window.vConsole.destroy();

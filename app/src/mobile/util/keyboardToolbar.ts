@@ -3,6 +3,7 @@ import {hasClosestBlock, hasClosestByClassName, hasClosestByMatchTag} from "../.
 import {moveToDown, moveToUp} from "../../protyle/wysiwyg/move";
 import {Constants} from "../../constants";
 import {focusByRange, getSelectionPosition} from "../../protyle/util/selection";
+import {getCurrentEditor} from "../editor";
 
 let renderKeyboardToolbarTimeout: number;
 let showUtil = false;
@@ -151,10 +152,13 @@ const showKeyboardToolbarUtil = (oldScrollTop: number) => {
     showUtil = true;
 
     const toolbarElement = document.getElementById("keyboardToolbar");
-    let keyboardHeight = toolbarElement.getAttribute("data-keyboardheight")
+    let keyboardHeight = toolbarElement.getAttribute("data-keyboardheight");
     keyboardHeight = (keyboardHeight ? (parseInt(keyboardHeight) + 42) : window.innerHeight / 2) + "px";
-    window.siyuan.mobile.editor.protyle.element.style.marginBottom = keyboardHeight;
-    window.siyuan.mobile.editor.protyle.contentElement.scrollTop = oldScrollTop;
+    const editor = getCurrentEditor();
+    if (editor) {
+        editor.protyle.element.parentElement.style.paddingBottom = keyboardHeight;
+        editor.protyle.contentElement.scrollTop = oldScrollTop;
+    }
     setTimeout(() => {
         toolbarElement.style.height = keyboardHeight;
     }, Constants.TIMEOUT_TRANSITION); // 防止抖动
@@ -166,7 +170,10 @@ const showKeyboardToolbarUtil = (oldScrollTop: number) => {
 const hideKeyboardToolbarUtil = () => {
     const toolbarElement = document.getElementById("keyboardToolbar");
     toolbarElement.style.height = "";
-    window.siyuan.mobile.editor.protyle.element.style.marginBottom = "42px";
+    const editor = getCurrentEditor();
+    if (editor) {
+        editor.protyle.element.parentElement.style.paddingBottom = "42px";
+    }
     toolbarElement.querySelector('.keyboard__action[data-type="add"]').classList.remove("protyle-toolbar__item--current");
     toolbarElement.querySelector('.keyboard__action[data-type="done"] use').setAttribute("xlink:href", "#iconKeyboardHide");
 };
@@ -174,14 +181,27 @@ const hideKeyboardToolbarUtil = () => {
 const renderKeyboardToolbar = () => {
     clearTimeout(renderKeyboardToolbarTimeout);
     renderKeyboardToolbarTimeout = window.setTimeout(() => {
-        if (getSelection().rangeCount === 0 || window.siyuan.config.editor.readOnly || window.siyuan.config.readonly ||
+        if (getSelection().rangeCount === 0 ||
+            window.siyuan.config.editor.readOnly ||
+            window.siyuan.config.readonly ||
             !document.activeElement || (
                 document.activeElement &&
                 document.activeElement.tagName !== "INPUT" &&
                 document.activeElement.tagName !== "TEXTAREA" &&
-                !document.activeElement.classList.contains("protyle-wysiwyg")
+                !document.activeElement.classList.contains("protyle-wysiwyg") &&
+                document.activeElement.getAttribute("contenteditable") !== "true"
             )) {
             console.warn("renderKeyboardToolbar flag 1")
+            hideKeyboardToolbar();
+            return;
+        }
+        // 编辑器设置界面点击空白或关闭，焦点不知何故会飘移到编辑器上
+        if (document.activeElement &&
+            document.activeElement.tagName !== "INPUT" &&
+            document.activeElement.tagName !== "TEXTAREA" && (
+                document.getElementById("menu").style.transform === "translateX(0px)" ||
+                document.getElementById("model").style.transform === "translateY(0px)"
+            )) {
             hideKeyboardToolbar();
             return;
         }
@@ -208,7 +228,7 @@ const renderKeyboardToolbar = () => {
             dynamicElements[1].classList.add("fn__none");
         }
 
-        const protyle = window.siyuan.mobile.editor.protyle;
+        const protyle = getCurrentEditor().protyle;
         if (!dynamicElements[0].classList.contains("fn__none")) {
             if (protyle.undo.undoStack.length === 0) {
                 dynamicElements[0].querySelector('[data-type="undo"]').setAttribute("disabled", "disabled");
@@ -254,36 +274,38 @@ const renderKeyboardToolbar = () => {
     }, 620); // 需等待 range 更新
 };
 
-const showKeyboardToolbar = () => {
+export const showKeyboardToolbar = () => {
+    if (!showUtil) {
+        hideKeyboardToolbarUtil();
+    }
     const toolbarElement = document.getElementById("keyboardToolbar");
     if (!toolbarElement.classList.contains("fn__none")) {
         // already show
         return;
     }
     toolbarElement.classList.remove("fn__none");
-    const searchPathElement = document.getElementById("searchPath");
-    if (searchPathElement) {
-        (searchPathElement.nextElementSibling as HTMLElement).style.marginBottom = "42px";
+    const modelElement = document.getElementById("model");
+    if (modelElement.style.transform === "translateY(0px)") {
+        modelElement.style.paddingBottom = "42px";
     }
     const range = getSelection().getRangeAt(0);
-    if (!window.siyuan.mobile.editor ||
-        !window.siyuan.mobile.editor.protyle.wysiwyg.element.contains(range.startContainer)) {
-            console.warn("showKeyboardToolbar flag 03")
-        return;
+    const editor = getCurrentEditor();
+    if (editor?.protyle.wysiwyg.element.contains(range.startContainer)) {
+        editor.protyle.element.parentElement.style.paddingBottom = "42px";
     }
-    window.siyuan.mobile.editor.protyle.element.style.marginBottom = "42px";
     setTimeout(() => {
-        const contentElement = window.siyuan.mobile.editor.protyle.contentElement;
-        const cursorTop = getSelectionPosition(contentElement).top - contentElement.getBoundingClientRect().top;
-        if (cursorTop < window.innerHeight - 96) {
-            console.warn("showKeyboardToolbar flag 04")
-            return;
+        const contentElement = hasClosestByClassName(range.startContainer, "protyle-content", true);
+        if (contentElement) {
+            const cursorTop = getSelectionPosition(contentElement).top - contentElement.getBoundingClientRect().top;
+            if (cursorTop < window.innerHeight - 96) {
+                return;
+            }
+            contentElement.scroll({
+                top: contentElement.scrollTop + cursorTop - ((window.outerHeight - 65) / 2 - 30),
+                left: contentElement.scrollLeft,
+                behavior: "smooth"
+            });
         }
-        contentElement.scroll({
-            top: contentElement.scrollTop + cursorTop - ((window.outerHeight - 65) / 2 - 30),
-            left: contentElement.scrollLeft,
-            behavior: "smooth"
-        });
     }, Constants.TIMEOUT_TRANSITION);
 };
 
@@ -294,10 +316,13 @@ export const hideKeyboardToolbar = () => {
     const toolbarElement = document.getElementById("keyboardToolbar");
     toolbarElement.classList.add("fn__none");
     toolbarElement.style.height = "";
-    window.siyuan.mobile.editor ? window.siyuan.mobile.editor.protyle.element.style.marginBottom = "" : null;
-    const searchPathElement = document.getElementById("searchPath");
-    if (searchPathElement) {
-        (searchPathElement.nextElementSibling as HTMLElement).style.marginBottom = "";
+    const editor = getCurrentEditor();
+    if (editor) {
+        editor.protyle.element.parentElement.style.paddingBottom = "";
+    }
+    const modelElement = document.getElementById("model");
+    if (modelElement.style.transform === "translateY(0px)") {
+        modelElement.style.paddingBottom = "";
     }
 };
 
@@ -359,7 +384,7 @@ export const initKeyboardToolbar = () => {
     toolbarElement.addEventListener("click", (event) => {
         const target = event.target as HTMLElement;
         const slashBtnElement = hasClosestByClassName(event.target as HTMLElement, "keyboard__slash-item");
-        const protyle = window.siyuan.mobile.editor.protyle;
+        const protyle = getCurrentEditor().protyle;
         if (slashBtnElement) {
             const dataValue = decodeURIComponent(slashBtnElement.getAttribute("data-value"));
             protyle.hint.fill(dataValue, protyle, false);   // 点击后 range 会改变
@@ -382,6 +407,7 @@ export const initKeyboardToolbar = () => {
         const type = buttonElement.getAttribute("data-type");
         if (type === "done") {
             if (toolbarElement.clientHeight > 100) {
+                hideKeyboardToolbarUtil();
                 focusByRange(range);
             } else {
                 activeBlur();
@@ -389,7 +415,7 @@ export const initKeyboardToolbar = () => {
             }
             return;
         }
-        if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly || !window.siyuan.mobile.editor) {
+        if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly || !getCurrentEditor()) {
             return;
         }
         if (type === "undo") {
@@ -441,11 +467,12 @@ export const initKeyboardToolbar = () => {
             return;
         } else if (type === "add") {
             if (buttonElement.classList.contains("protyle-toolbar__item--current")) {
+                hideKeyboardToolbarUtil();
                 focusByRange(range);
             } else {
                 buttonElement.classList.add("protyle-toolbar__item--current");
                 toolbarElement.querySelector('.keyboard__action[data-type="done"] use').setAttribute("xlink:href", "#iconCloseRound");
-                const oldScrollTop = window.siyuan.mobile.editor.protyle.contentElement.scrollTop;
+                const oldScrollTop = protyle.contentElement.scrollTop;
                 renderSlashMenu(protyle, toolbarElement);
                 showKeyboardToolbarUtil(oldScrollTop);
             }
