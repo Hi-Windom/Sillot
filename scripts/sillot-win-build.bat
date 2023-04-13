@@ -1,19 +1,19 @@
 @echo off
 echo 'use ".\scripts\sillot-win-build.bat" instead of "sillot-win-build.bat"'
 
-echo ' ===== Building UI ===== '
+echo ===== Building UI =====
 cd app
 call pnpm install
-echo ' ===== Building Mobile has been disabled ===== '
+echo ===== Building Mobile has been disabled =====
 call pnpm run build
 cd ..
 
-echo ' ===== Cleaning Builds ===== '
+echo ===== Cleaning Builds =====
 call python ./scripts/sillot-win-dev.py
 del /S /Q /F app\build 1>nul
 del /S /Q /F app\kernel 1>nul
 
-echo ' ===== Building Kernel ===== '
+echo ===== Building Kernel =====
 echo 'for  C compiler "gcc" https://sourceforge.net/projects/mingw-w64/files/mingw-w64/'
 go version
 set GO111MODULE=on
@@ -35,13 +35,13 @@ go build --tags fts5 -v -o "../app/kernel/SiYuan-Sillot-Kernel.exe" -ldflags "-s
 
 cd ..
 
-echo ' ===== Building Electron ===== '
+echo ===== Building Electron =====
 echo 'for first run, maybe you need to run `pnpm config set electron_mirror "https://npm.taobao.org/mirrors/electron/"`'
 cd app
 call pnpm run dist
 
 cd ..
 
-echo ' ===== Building Appx has been disabled ===== '
+echo ===== Building Appx has been disabled =====
 @REM cd . > app\build\win-unpacked\resources\ms-store
 @REM electron-windows-store --input-directory app\build\win-unpacked --output-directory app\build\ --package-version 1.0.0.0 --package-name SiYuan --manifest app\appx\AppxManifest.xml --assets app\appx\assets\ --make-pri true
