@@ -52,7 +52,7 @@ export const openCardByData = (cardsData: { cards: ICard[], unreviewedCount: num
         </div>`}
     </div>
     <div class="card__block fn__flex-1${blocks.length === 0 ? " fn__none" : ""}${window.siyuan.config.flashcard.mark ? " card__block--hidemark" : ""}${window.siyuan.config.flashcard.superBlock ? " card__block--hidesb" : ""}${window.siyuan.config.flashcard.list ? " card__block--hideli" : ""}" data-type="render"></div>
-    <div class="card__empty${blocks.length === 0 ? "" : " fn__none"}" data-type="empty">
+    <div class="card__empty card__empty--space${blocks.length === 0 ? "" : " fn__none"}" data-type="empty">
         <div>🔮</div>
         ${window.siyuan.languages.noDueCard}
     </div>
@@ -66,7 +66,7 @@ export const openCardByData = (cardsData: { cards: ICard[], unreviewedCount: num
     </div>
     <div class="fn__flex card__action fn__none">
         <div>
-            <span>${window.siyuan.languages.reboot}</span>
+            <span>${window.siyuan.languages.nextRound}</span>
             <button data-type="-3" aria-label="0" class="b3-button b3-button--cancel b3-tooltips__s b3-tooltips">
                 <div>💤</div>
                 ${window.siyuan.languages.skip} (0)
@@ -372,7 +372,7 @@ const newRound = (countElement: Element, editor: Protyle, actionElements: NodeLi
     emptyElement.innerHTML = `<div>♻️ </div>
 <span>${window.siyuan.languages.continueReview2.replace("${count}", unreviewedCount)}</span>
 <div class="fn__hr"></div>
-<button data-type="newround" class="b3-button">${window.siyuan.languages.continueReview1}</button>`;
+<button data-type="newround" class="b3-button fn__size200">${window.siyuan.languages.continueReview1}</button>`;
     emptyElement.classList.remove("fn__none");
     actionElements[0].classList.add("fn__none");
     actionElements[1].classList.add("fn__none");

@@ -902,14 +902,15 @@ export class Toolbar {
                 }
                 return;
             }
-            if (this.subElement.clientHeight <= window.innerHeight - nodeRect.bottom || this.subElement.clientHeight <= nodeRect.top) {
+            const bottom = nodeRect.bottom === nodeRect.top ? nodeRect.bottom + 26 : nodeRect.bottom;
+            if (this.subElement.clientHeight <= window.innerHeight - bottom || this.subElement.clientHeight <= nodeRect.top) {
                 if (types.includes("inline-math") || isInlineMemo) {
-                    setPosition(this.subElement, nodeRect.left, nodeRect.bottom, nodeRect.height);
+                    setPosition(this.subElement, nodeRect.left, bottom, nodeRect.height || 26);
                 } else {
-                    setPosition(this.subElement, nodeRect.left + (nodeRect.width - this.subElement.clientWidth) / 2, nodeRect.bottom, nodeRect.height);
+                    setPosition(this.subElement, nodeRect.left + (nodeRect.width - this.subElement.clientWidth) / 2, bottom, nodeRect.height || 26);
                 }
             } else {
-                setPosition(this.subElement, nodeRect.right, nodeRect.bottom);
+                setPosition(this.subElement, nodeRect.right, bottom);
             }
         };
         const headerElement = this.subElement.querySelector(".block__icons");
@@ -1148,6 +1149,7 @@ export class Toolbar {
                     processRender(renderElement);
                 } else {
                     inlineLastNode = renderElement;
+                    // esc 后需要 focus range，但点击空白处不能 focus range，否则光标无法留在点击位置
                     renderElement.outerHTML = "<wbr>";
                 }
             } else {
@@ -1180,6 +1182,9 @@ export class Toolbar {
                     focusBlock(renderElement);
                     renderElement.classList.add("protyle-wysiwyg--select");
                 }
+            } else {
+                // ctrl+M 后点击空白会留下 wbr
+                nodeElement.querySelector("wbr")?.remove();
             }
 
             nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
