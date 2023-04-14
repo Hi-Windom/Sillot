@@ -41,7 +41,7 @@ const appVer = app.getVersion();
 // const branchVer = app.getVersion();
 try { require("electron-reloader")(module); } catch {}
 
-var pkg = {};
+let pkg = {};
 if (isDevEnv) {
   pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json")).toString());
 } else {
@@ -52,7 +52,7 @@ const confDir = path.join(app.getPath("home"), ".config", "sillot");
 const windowStatePath = path.join(confDir, "windowState.json");
 let bootWindow;
 let firstOpen = false;
-let workspaces = []; // workspaceDir, id, browserWindow, tray
+const workspaces = []; // workspaceDir, id, browserWindow, tray
 let kernelPort = 58131;
 let resetWindowStateOnRestart = false;
 require("@electron/remote/main").initialize();
@@ -186,7 +186,7 @@ const writeLog = (out) => {
     try {
         if (fs.existsSync(logFile)) {
             log = fs.readFileSync(logFile).toString();
-            let lines = log.split("\n");
+            const lines = log.split("\n");
             if (maxLogLines < lines.length) {
                 log = lines.slice(maxLogLines / 2, maxLogLines).join("\n") + "\n";
             }
@@ -296,7 +296,7 @@ const boot = () => {
             return;
         }
 
-        for (let key in details.requestHeaders) {
+        for (const key in details.requestHeaders) {
             if ("referer" === key.toLowerCase()) {
                 delete details.requestHeaders[key];
             }
@@ -304,7 +304,7 @@ const boot = () => {
         cb({requestHeaders: details.requestHeaders});
     });
     currentWindow.webContents.session.webRequest.onHeadersReceived((details, cb) => {
-        for (let key in details.responseHeaders) {
+        for (const key in details.responseHeaders) {
             if ("x-frame-options" === key.toLowerCase()) {
                 delete details.responseHeaders[key];
             } else if ("content-security-policy" === key.toLowerCase()) {
@@ -487,7 +487,7 @@ const initKernel = (workspace, port, lang) => {
         if (lang && "" !== lang) {
             cmds.push("--lang", lang);
         }
-        let cmd = `ui version [${appVer}], booting kernel [${kernelPath} ${cmds.join(" ")}]`;
+        const cmd = `ui version [${appVer}], booting kernel [${kernelPath} ${cmds.join(" ")}]`;
         writeLog(cmd);
         if (!isDevEnv || workspaces.length > 0) {
             const cp = require("child_process");
@@ -634,6 +634,7 @@ setProtocol("siyuan");
 setProtocol("sillot");
 setProtocol("sisi");
 
+app.commandLine.appendSwitch('ignore-certificate-errors') // 忽略证书相关错误
 app.commandLine.appendSwitch("disable-web-security");
 app.commandLine.appendSwitch("auto-detect", "false");
 app.commandLine.appendSwitch("no-proxy-server"); // 不使用任何代理，强制直连，该参数会覆盖任何代理设置
@@ -664,7 +665,7 @@ app.whenReady().then(() => {
       }
     });
   };
-  let ReactDeveloperToolsRoot = path.join(app.getPath("userData"), "extensions", "ReactDeveloperTools");
+  const ReactDeveloperToolsRoot = path.join(app.getPath("userData"), "extensions", "ReactDeveloperTools");
   loadExtension(ReactDeveloperToolsRoot);
     const resetTrayMenu = (tray, lang, mainWindow) => {
         const trayMenuTemplate = [{
@@ -919,8 +920,8 @@ app.whenReady().then(() => {
         }
 
         // 改进桌面端初始化时使用的外观语言 https://github.com/siyuan-note/siyuan/issues/6803
-        let languages = app.getPreferredSystemLanguages();
-        let language = languages && 0 < languages.length && "zh-Hans-CN" === languages[0] ? "zh_CN" : "en_US";
+        const languages = app.getPreferredSystemLanguages();
+        const language = languages && 0 < languages.length && "zh-Hans-CN" === languages[0] ? "zh_CN" : "en_US";
         firstOpenWindow.loadFile(initHTMLPath, {
             query: {
                 lang: language,
@@ -1192,6 +1193,16 @@ app.on("web-contents-created", (webContentsCreatedEvent, contents) => {
         return {action: "deny"};
     });
 });
+
+/**
+ * 兼容https非可信域
+*/
+app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+    log('certificate-error');
+    //允许私有证书
+    event.preventDefault()
+    callback(true)
+  });
 
 app.on("before-quit", (event) => {
     workspaces.forEach(item => {

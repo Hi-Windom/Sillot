@@ -61,7 +61,7 @@ jobs:
           echo "$changelog" >> $GITHUB_ENV
           echo "$EOF" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Gather SiYuan Release Information
         id: release_info_siyuan
@@ -72,13 +72,13 @@ jobs:
           echo "$changelog" >> $GITHUB_ENV
           echo "$EOF" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_name: ${{ steps.release_info.outputs.release_version }}
           tag_name: ${{ github.ref }}
@@ -106,20 +106,21 @@ jobs:
             goos: "linux"
             goarch: "amd64"
             suffix: "linux.tar.gz"
-          - os: macos-latest
-            kernel_path: "../app/kernel-darwin/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
-            electron_args: "dist-darwin"
-            goos: "darwin"
-            goarch: "amd64"
-            suffix: "mac.dmg"
-          - os: macos-latest
-            kernel_path: "../app/kernel-darwin-arm64/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
-            electron_args: "dist-darwin-arm64"
-            goos: "darwin"
-            goarch: "arm64"
-            suffix: "mac-arm64.dmg"
+          # https://github.com/Hi-Windom/Sillot/issues/518 暂时禁用
+          # - os: macos-latest
+          #   kernel_path: "../app/kernel-darwin/SiYuan-Sillot-Kernel"
+          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+          #   electron_args: "dist-darwin"
+          #   goos: "darwin"
+          #   goarch: "amd64"
+          #   suffix: "mac.dmg"
+          # - os: macos-latest
+          #   kernel_path: "../app/kernel-darwin-arm64/SiYuan-Sillot-Kernel"
+          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+          #   electron_args: "dist-darwin-arm64"
+          #   goos: "darwin"
+          #   goarch: "arm64"
+          #   suffix: "mac-arm64.dmg"
           - os: windows-latest
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
             build_args: "-s -w -H=windowsgui -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"

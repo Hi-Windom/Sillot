@@ -7,7 +7,7 @@ call pnpm install
 call pnpm run build
 cd ..
 
-@REM echo ===== Building Kernel =====
+echo ===== Building Kernel =====
 cd kernel
 @REM $env:GOPROXY="https://mirrors.aliyun.com/goproxy/,direct"
 @REM go install golang.org/x/mobile/cmd/gomobile@latest
