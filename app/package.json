@@ -1,12 +1,12 @@
 {
   "name": "sillot",
-  "version": "0.20.2",
+  "version": "0.20.3",
   "syv": "2.8.5",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
   "repository": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
-  "packageManager": "pnpm@7.27.0",
+  "packageManager": "pnpm@8.2.0",
   "scripts": {
     "lint": "eslint . --fix --cache",
     "dev": "webpack --mode development",
@@ -33,10 +33,10 @@
     "ABA": "NODE_ENV=production webpack --mode production --config webpack.ABA.js",
     "start": "NODE_ENV=development electron ./electron/main.js",
     "dist-appx": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --config electron-appx-builder.yml",
-    "dist": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --config electron-builder.yml",
-    "dist-darwin": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --mac --config electron-builder-darwin.yml",
-    "dist-darwin-arm64": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --arm64 --mac --config electron-builder-darwin-arm64.yml",
-    "dist-linux": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --linux --config electron-builder-linux.yml"
+    "dist": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --config electron-builder.yml --publish=never",
+    "dist-darwin": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --mac --config electron-builder-darwin.yml --publish=never",
+    "dist-darwin-arm64": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --arm64 --mac --config electron-builder-darwin-arm64.yml --publish=never",
+    "dist-linux": "ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ electron-builder --linux --config electron-builder-linux.yml --publish=never"
   },
   "keywords": [
     "markdown",

@@ -92,20 +92,20 @@ jobs:
     strategy:
       matrix:
         config:
-          - os: ubuntu-20.04
-            kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
-            electron_args: "dist-linux"
-            goos: "linux"
-            goarch: "amd64"
-            suffix: "linux.AppImage"
-          - os: ubuntu-20.04
-            kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
-            electron_args: "dist-linux"
-            goos: "linux"
-            goarch: "amd64"
-            suffix: "linux.tar.gz"
+          # - os: ubuntu-20.04
+          #   kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
+          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+          #   electron_args: "dist-linux"
+          #   goos: "linux"
+          #   goarch: "amd64"
+          #   suffix: "linux.AppImage"
+          # - os: ubuntu-20.04
+          #   kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
+          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+          #   electron_args: "dist-linux"
+          #   goos: "linux"
+          #   goarch: "amd64"
+          #   suffix: "linux.tar.gz"
           # https://github.com/Hi-Windom/Sillot/issues/518 暂时禁用
           # - os: macos-latest
           #   kernel_path: "../app/kernel-darwin/SiYuan-Sillot-Kernel"
