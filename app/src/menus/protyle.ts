@@ -599,7 +599,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
                 fetchPost("/api/asset/getImageOCRText", {
                     path: imgElement.getAttribute("src"),
                     force: true
-                })
+                });
             }
         }, {
             iconHTML: Constants.ZWSP,
@@ -609,8 +609,8 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
                     path: imgElement.getAttribute("src"),
                     force: false
                 }, (response) => {
-                    element.querySelector("textarea").value = response.data.text
-                })
+                    element.querySelector("textarea").value = response.data.text;
+                });
             }
         }],
     }).element);
@@ -709,7 +709,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
     const textElements = window.siyuan.menus.menu.element.querySelectorAll("textarea");
     textElements[0].focus();
     window.siyuan.menus.menu.removeCB = () => {
-        const ocrElemennt = window.siyuan.menus.menu.element.querySelector('[data-type="ocr"]') as HTMLTextAreaElement
+        const ocrElemennt = window.siyuan.menus.menu.element.querySelector('[data-type="ocr"]') as HTMLTextAreaElement;
         if (ocrElemennt) {
             fetchPost("/api/asset/setImageOCRText", {
                 path: imgElement.getAttribute("src"),

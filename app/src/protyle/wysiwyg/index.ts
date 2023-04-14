@@ -186,6 +186,12 @@ export class WYSIWYG {
         /// #endif
     }
 
+    private emojiToMd(element:HTMLElement) {
+        element.querySelectorAll(".emoji").forEach((item: HTMLElement) => {
+            item.outerHTML = `:${item.getAttribute("alt")}:`;
+        });
+    }
+
     private bindCommonEvent(protyle: IProtyle) {
         this.element.addEventListener("copy", (event: ClipboardEvent & { target: HTMLElement }) => {
             window.siyuan.ctrlIsPressed = false; // https://github.com/siyuan-note/siyuan/issues/6373
@@ -258,9 +264,11 @@ export class WYSIWYG {
                     } else if (!["DIV", "TD", "TH", "TR"].includes(range.startContainer.parentElement.tagName)) {
                         // 复制行内元素 https://github.com/siyuan-note/insider/issues/191
                         tempElement.append(range.startContainer.parentElement.cloneNode(true));
+                        this.emojiToMd(tempElement);
                     } else {
                         // 直接复制块 https://github.com/siyuan-note/insider/issues/318
                         tempElement.append(range.cloneContents());
+                        this.emojiToMd(tempElement);
                     }
                     html = tempElement.innerHTML;
                 } else if (selectImgElement) {
@@ -282,6 +290,7 @@ export class WYSIWYG {
                     html = spanElement.outerHTML;
                 } else {
                     tempElement.append(range.cloneContents());
+                    this.emojiToMd(tempElement);
                     const inlineMathElement = hasClosestByAttribute(range.commonAncestorContainer, "data-type", "inline-math");
                     if (inlineMathElement) {
                         // 表格内复制数学公式 https://ld246.com/article/1631708573504
@@ -1141,6 +1150,7 @@ export class WYSIWYG {
                         }
                     }
                 }
+                this.emojiToMd(tempElement);
                 html = tempElement.innerHTML;
                 // https://github.com/siyuan-note/siyuan/issues/4321
                 if (!nodeElement.classList.contains("table")) {
