@@ -4,6 +4,7 @@
   "syv": "2.8.5",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://github.com/Hi-Windom/Sillot",
+  "repository": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
   "packageManager": "pnpm@7.27.0",
   "scripts": {
