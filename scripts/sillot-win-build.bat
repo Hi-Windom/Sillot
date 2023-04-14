@@ -4,7 +4,6 @@ echo 'use ".\scripts\sillot-win-build.bat" instead of "sillot-win-build.bat"'
 echo ===== Building UI =====
 cd app
 call pnpm install
-echo ===== Building Mobile has been disabled =====
 call pnpm run build
 cd ..
 
