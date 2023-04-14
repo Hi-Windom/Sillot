@@ -129,6 +129,9 @@ devDependencies:
   date-fns:
     specifier: ^2.29.3
     version: 2.29.3
+  ejs:
+    specifier: ^3.1.9
+    version: 3.1.9
   electron:
     specifier: 25.0.0-alpha.2
     version: 25.0.0-alpha.2
@@ -3433,6 +3436,10 @@ packages:
     dev: true
     optional: true
 
+  /async@3.2.4:
+    resolution: {integrity: sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==}
+    dev: true
+
   /babel-jest@29.5.0(@babel/core@7.21.4):
     resolution: {integrity: sha512-mA4eCDh5mSo2EcA9xQjVTpmbbNk32Zb3Q3QFQsNhaK56Q+yoXowzFodLux30HRgyOho5rsQ6B0P9QpMkvvnJ0Q==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
@@ -4378,6 +4385,14 @@ packages:
     resolution: {integrity: sha512-1A8za6ws41LQgv9HrE/66jyC5yuSjQ3L/KOpFtoBilsAK2iA2wuS5rTt1OCzIvtS2V7nVmedsUU+DGRcjBmOYA==}
     dev: true
 
+  /ejs@3.1.9:
+    resolution: {integrity: sha512-rC+QVNMJWv+MtPgkt0y+0rVEIdbtxVADApW9JXrUVlzHetgcyczP/E7DJmWJ4fJCZF2cPcBk0laWO9ZHMG3DmQ==}
+    engines: {node: '>=0.10.0'}
+    hasBin: true
+    dependencies:
+      jake: 10.8.5
+    dev: true
+
   /electron-to-chromium@1.4.298:
     resolution: {integrity: sha512-dJZurgxDeaqn90VmS23Xz+QPQQl84BxnlAfwCDFNjfEhqO2yLMDkeaDoJ1yPXAbmiqTi+hd5TpB5zi1N4hwBuQ==}
     dev: true
@@ -4776,6 +4791,12 @@ packages:
     engines: {node: ^10.12.0 || >=12.0.0}
     dependencies:
       flat-cache: 3.0.4
+    dev: true
+
+  /filelist@1.0.4:
+    resolution: {integrity: sha512-w1cEuf3S+DrLCQL7ET6kz+gmlJdbq9J7yXCSjK/OZCPA+qEN1WyF4ZAf0YYJa4/shHJra2t/d/r8SV4Ji+x+8Q==}
+    dependencies:
+      minimatch: 5.1.6
     dev: true
 
   /fill-range@7.0.1:
@@ -5493,6 +5514,17 @@ packages:
     dependencies:
       html-escaper: 2.0.2
       istanbul-lib-report: 3.0.0
+    dev: true
+
+  /jake@10.8.5:
+    resolution: {integrity: sha512-sVpxYeuAhWt0OTWITwT98oyV0GsXyMlXCF+3L1SuafBVUIr/uILGRB+NqwkzhgXKvoJpDIpQvqkUALgdmQsQxw==}
+    engines: {node: '>=10'}
+    hasBin: true
+    dependencies:
+      async: 3.2.4
+      chalk: 4.1.2
+      filelist: 1.0.4
+      minimatch: 3.1.2
     dev: true
 
   /jest-changed-files@29.5.0:
@@ -9092,7 +9124,7 @@ packages:
       builder-util-runtime: registry.npmmirror.com/builder-util-runtime@9.1.1
       chromium-pickle-js: registry.npmmirror.com/chromium-pickle-js@0.2.0
       debug: registry.npmmirror.com/debug@4.3.4
-      ejs: registry.npmmirror.com/ejs@3.1.8
+      ejs: 3.1.9
       electron-osx-sign: registry.npmmirror.com/electron-osx-sign@0.6.0
       electron-publish: registry.npmmirror.com/electron-publish@23.6.0
       form-data: registry.npmmirror.com/form-data@4.0.0
@@ -9177,12 +9209,6 @@ packages:
     name: async-exit-hook
     version: 2.0.1
     engines: {node: '>=0.12.0'}
-    dev: true
-
-  registry.npmmirror.com/async@3.2.4:
-    resolution: {integrity: sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://registry.npmmirror.com/async/-/async-3.2.4.tgz}
-    name: async
-    version: 3.2.4
     dev: true
 
   registry.npmmirror.com/asynckit@0.4.0:
@@ -9798,16 +9824,6 @@ packages:
     version: 0.1.2
     dev: true
 
-  registry.npmmirror.com/ejs@3.1.8:
-    resolution: {integrity: sha512-/sXZeMlhS0ArkfX2Aw780gJzXSMPnKjtspYZv+f3NiKLlubezAHDU5+9xz6gd3/NhG3txQCo6xlglmTS+oTGEQ==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://registry.npmmirror.com/ejs/-/ejs-3.1.8.tgz}
-    name: ejs
-    version: 3.1.8
-    engines: {node: '>=0.10.0'}
-    hasBin: true
-    dependencies:
-      jake: registry.npmmirror.com/jake@10.8.5
-    dev: true
-
   registry.npmmirror.com/electron-builder@23.6.0:
     resolution: {integrity: sha512-y8D4zO+HXGCNxFBV/JlyhFnoQ0Y0K7/sFH+XwIbj47pqaW8S6PGYQbjoObolKBR1ddQFPt4rwp4CnwMJrW3HAw==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://registry.npmmirror.com/electron-builder/-/electron-builder-23.6.0.tgz}
     name: electron-builder
@@ -10103,14 +10119,6 @@ packages:
       loader-utils: registry.npmmirror.com/loader-utils@2.0.4
       schema-utils: registry.npmmirror.com/schema-utils@3.1.1
       webpack: 5.79.0(esbuild@0.17.16)(webpack-cli@5.0.1)
-    dev: true
-
-  registry.npmmirror.com/filelist@1.0.4:
-    resolution: {integrity: sha512-w1cEuf3S+DrLCQL7ET6kz+gmlJdbq9J7yXCSjK/OZCPA+qEN1WyF4ZAf0YYJa4/shHJra2t/d/r8SV4Ji+x+8Q==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://registry.npmmirror.com/filelist/-/filelist-1.0.4.tgz}
-    name: filelist
-    version: 1.0.4
-    dependencies:
-      minimatch: 5.1.6
     dev: true
 
   registry.npmmirror.com/find-cache-dir@3.3.2:
@@ -10648,19 +10656,6 @@ packages:
     name: isobject
     version: 3.0.1
     engines: {node: '>=0.10.0'}
-    dev: true
-
-  registry.npmmirror.com/jake@10.8.5:
-    resolution: {integrity: sha512-sVpxYeuAhWt0OTWITwT98oyV0GsXyMlXCF+3L1SuafBVUIr/uILGRB+NqwkzhgXKvoJpDIpQvqkUALgdmQsQxw==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://registry.npmmirror.com/jake/-/jake-10.8.5.tgz}
-    name: jake
-    version: 10.8.5
-    engines: {node: '>=10'}
-    hasBin: true
-    dependencies:
-      async: registry.npmmirror.com/async@3.2.4
-      chalk: 4.1.2
-      filelist: registry.npmmirror.com/filelist@1.0.4
-      minimatch: 3.1.2
     dev: true
 
   registry.npmmirror.com/js-tokens@4.0.0:

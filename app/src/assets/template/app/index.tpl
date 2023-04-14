@@ -8,7 +8,6 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self'"/>-->
     <style id="editorFontSize" type="text/css"></style>
     <style id="editorAttr" type="text/css"></style>
-    <!--<script src="../../sillot/petite-vue.iife.js" defer init></script>-->
 </head>
 <body class="branch--Sillot body--app fn__flex-column">
 <div id="loading" class="b3-dialog b3-dialog--open">
