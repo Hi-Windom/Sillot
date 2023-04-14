@@ -1,7 +1,7 @@
 import shutil
 import os
 cwd = os.getcwd()
-temp = 'C:\\tmpSillotA'
+temp = 'C:\\tmpSillotA' # 非必要不建议更改层级，可以修改 tmpSillotA 文件夹名
 name_zip = 'app.zip'
 name_aar = 'kernel.aar'
 android_baseRoot = ["SillotAndroid",
