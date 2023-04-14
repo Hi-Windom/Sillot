@@ -6,7 +6,7 @@
   "homepage": "https://github.com/Hi-Windom/Sillot",
   "repository": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
-  "packageManager": "pnpm@7.27.0",
+  "packageManager": "pnpm@8.2.0",
   "scripts": {
     "lint": "eslint . --fix --cache",
     "dev": "webpack --mode development",
