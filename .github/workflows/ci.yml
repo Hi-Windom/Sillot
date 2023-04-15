@@ -300,16 +300,15 @@ jobs:
         run: |
             cd ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot
             .\scripts\sillot-android-build-action.bat
+            set SENTRY_ORG=hi-windom
+            set SENTRY_PROJECT=sillot-android
+            set SENTRY_LOG_LEVEL=debug
         continue-on-error: false
 
       - name: Build with Gradle
         if: "contains( matrix.config.goos, 'windows')"
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
-        run: |
-            set SENTRY_ORG=hi-windom
-            set SENTRY_PROJECT=sillot-android
-            set SENTRY_LOG_LEVEL=debug
-            ./gradlew assembleRelease --stacktrace
+        run: ./gradlew assembleRelease --quiet
         continue-on-error: false
       # if use assembleDebug , replace path `app/release` with `app/debug`
       - name: Upload APK to release
