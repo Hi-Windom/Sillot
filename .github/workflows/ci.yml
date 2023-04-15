@@ -144,49 +144,49 @@ jobs:
           repository: K-Sillot/sillot-plugin-system
           path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/PSP
 
-      - name: Set up MingGW
-        uses: msys2/setup-msys2@v2
-        if: "contains( matrix.config.goos, 'windows')"
-        with:
-          install: p7zip mingw-w64-x86_64-lua
+      # - name: Set up MingGW
+      #   uses: msys2/setup-msys2@v2
+      #   if: "contains( matrix.config.goos, 'windows')"
+      #   with:
+      #     install: p7zip mingw-w64-x86_64-lua
 
-      - name: Set up TDM-GCC
-        run: msys2 -c "bash go/src/github.com/Hi-Windom/Sillot/scripts/get-tdm-gcc.sh tdm https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm-1/tdm-gcc-10.3.0.exe" && echo "CC=${{ github.workspace }}/tdm/bin/gcc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-        if: "contains( matrix.config.goarch, '386')"
-        working-directory: ${{ github.workspace }}
+      # - name: Set up TDM-GCC
+      #   run: msys2 -c "bash go/src/github.com/Hi-Windom/Sillot/scripts/get-tdm-gcc.sh tdm https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm-1/tdm-gcc-10.3.0.exe" && echo "CC=${{ github.workspace }}/tdm/bin/gcc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      #   if: "contains( matrix.config.goarch, '386')"
+      #   working-directory: ${{ github.workspace }}
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.19
+      # - name: Set up Go
+      #   uses: actions/setup-go@v3
+      #   with:
+      #     go-version: 1.19
 
-      - name: Set up goversioninfo
-        run: go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo && go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
-        if: "contains( matrix.config.goos, 'windows')"
-        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/kernel
-        env:
-          GO111MODULE: on
-          CGO_ENABLED: 1
-          GOOS: ${{ matrix.config.goos }}
-          GOPATH: ${{ github.workspace }}/go
-          GOARCH: ${{ matrix.config.goarch }}
+      # - name: Set up goversioninfo
+      #   run: go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo && go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
+      #   if: "contains( matrix.config.goos, 'windows')"
+      #   working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/kernel
+      #   env:
+      #     GO111MODULE: on
+      #     CGO_ENABLED: 1
+      #     GOOS: ${{ matrix.config.goos }}
+      #     GOPATH: ${{ github.workspace }}/go
+      #     GOARCH: ${{ matrix.config.goarch }}
 
-      - name: Set up Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+      # - name: Set up Node
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 18
 
-      - name: Install Node pnpm
-        run: npm install -g pnpm
-        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
+      # - name: Install Node pnpm
+      #   run: npm install -g pnpm
+      #   working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
-      - name: Install Node Dependencies
-        run: pnpm install --no-frozen-lockfile
-        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
+      # - name: Install Node Dependencies
+      #   run: pnpm install --no-frozen-lockfile
+      #   working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
-      - name: Building UI
-        run: pnpm run build
-        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
+      # - name: Building UI
+      #   run: pnpm run build
+      #   working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
       # - name: Remove Build Directory
       #   uses: JesseTG/rm@v1.0.2
