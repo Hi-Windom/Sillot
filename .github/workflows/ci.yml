@@ -266,7 +266,7 @@ jobs:
       #     asset_content_type: application/octet-stream
 
 
-      # Manual setup is required when the built-in version does not meet the requirements in windows2022
+      # Manual setup is required when the built-in version does not work correctly in windows2022
       - name: Setup JDK 11
         uses: actions/setup-java@v3
         if: "contains( matrix.config.goos, 'windows')"
@@ -305,7 +305,10 @@ jobs:
       - name: Build with Gradle
         if: "contains( matrix.config.goos, 'windows')"
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
-        run: ./gradlew assembleRelease --stacktrace
+        run: |
+            set SENTRY_ORG=hi-windom
+            ./gradlew assembleRelease --stacktrace
+        continue-on-error: false
       # if use assembleDebug , replace path `app/release` with `app/debug`
       - name: Upload APK to release
         uses: actions/upload-release-asset@v1
