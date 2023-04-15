@@ -267,21 +267,21 @@ jobs:
 
 
       # Manual setup is required when the built-in version does not meet the requirements in windows2022
-      # - name: Setup JDK 11
-      #   uses: actions/setup-java@v3
-      #   if: "contains( matrix.config.goos, 'windows')"
-      #   continue-on-error: true
-      #   with:
-      #     java-version: '11'
-      #     distribution: 'zulu'
-      #     overwrite-settings: true
-      # - name: Setup Android SDK
-      #   uses: android-actions/setup-android@v2
-      # - name: Install Android NDK
-      #   uses: nttld/setup-ndk@v1
-      #   with:
-      #     ndk-version: r25b
-      #     add-to-path: true
+      - name: Setup JDK 11
+        uses: actions/setup-java@v3
+        if: "contains( matrix.config.goos, 'windows')"
+        continue-on-error: true
+        with:
+          java-version: '11'
+          distribution: 'zulu'
+          overwrite-settings: true
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+      - name: Install Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25b
+          add-to-path: true
       - name: Remove android Directory
         uses: JesseTG/rm@v1.0.2
         if: "contains( matrix.config.goos, 'windows')"
