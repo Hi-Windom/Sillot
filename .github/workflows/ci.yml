@@ -308,7 +308,7 @@ jobs:
       - name: Build with Gradle
         if: "contains( matrix.config.goos, 'windows')"
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
-        run: ./gradlew assembleRelease --quiet
+        run: ./gradlew assembleDebug --quiet --stacktrace
         continue-on-error: false
       # if use assembleDebug , replace path `app/release` with `app/debug`
       - name: Upload APK to release
@@ -319,5 +319,5 @@ jobs:
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_name: Sillot-${{ needs.create_release.outputs.release_version }}.apk
-          asset_path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid/app/release/Sillot-${{ needs.create_release.outputs.release_version }}.apk
+          asset_path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid/app/build/outputs/apk/debug/Sillot-${{ needs.create_release.outputs.release_version }}.apk
           asset_content_type: application/octet-stream
