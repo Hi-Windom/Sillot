@@ -89,7 +89,7 @@ jobs:
 
   build:
     runs-on: ${{ matrix.config.os }}
-    # needs: create_release
+    needs: create_release
     strategy:
       matrix:
         config:
@@ -304,7 +304,9 @@ jobs:
 
       - name: Build with Gradle
         if: "contains( matrix.config.goos, 'windows')"
-        run: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid/gradlew assembleRelease --stacktrace
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
+        run: ./gradlew assembleRelease
+      # if use assembleDebug , replace path `app/release` with `app/debug`
       - name: Upload APK to release
         uses: actions/upload-release-asset@v1
         if: "contains( matrix.config.goos, 'windows')"
@@ -313,5 +315,5 @@ jobs:
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_name: Sillot-${{ needs.create_release.outputs.release_version }}.apk
-          asset_path: Sillot-${{ needs.create_release.outputs.release_version }}.apk
+          asset_path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid/app/release/Sillot-${{ needs.create_release.outputs.release_version }}.apk
           asset_content_type: application/octet-stream
