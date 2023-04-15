@@ -306,8 +306,9 @@ jobs:
         if: "contains( matrix.config.goos, 'windows')"
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
         run: |
-            export SENTRY_ORG=hi-windom
-            export SENTRY_LOG_LEVEL=debug
+            set SENTRY_ORG=hi-windom
+            set SENTRY_PROJECT=sillot-android
+            set SENTRY_LOG_LEVEL=debug
             ./gradlew assembleRelease --stacktrace
         continue-on-error: false
       # if use assembleDebug , replace path `app/release` with `app/debug`
