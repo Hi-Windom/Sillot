@@ -276,9 +276,9 @@ jobs:
         with:
           sdkVersion: '33'
       - name: Install Android NDK
-        uses: androidndk/setup-ndk@v2.1.0
+        uses: nttld/setup-ndk@v1
         with:
-          version: r25b
+          version: '25.2.9519653'
           add-to-path: true
 
       - name: Remove android Directory
