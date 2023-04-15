@@ -279,7 +279,7 @@ jobs:
       - name: Install Android NDK
         uses: nttld/setup-ndk@v1
         with:
-          version: '25.2.9519653'
+          ndk-version: '25.2.9519653'
           add-to-path: true
 
       - name: Remove android Directory
