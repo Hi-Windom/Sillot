@@ -269,7 +269,7 @@ jobs:
         if: "contains( matrix.config.goos, 'windows')"
         with:
           java-version: '11'
-          distribution: 'microsoft'
+          distribution: 'corretto'
           cache: 'gradle'
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
