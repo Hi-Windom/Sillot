@@ -6,89 +6,89 @@ on:
       - "v*"
 
 jobs:
-  create_release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      release_version: ${{ steps.release_info.outputs.release_version }}
-      version: ${{ steps.version.outputs.value }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  # create_release:
+  #   name: Create Release
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #     release_version: ${{ steps.release_info.outputs.release_version }}
+  #     version: ${{ steps.version.outputs.value }}
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.10"
-      - run: pip install PyGithub
+  #     - name: Setup Python
+  #       uses: actions/setup-python@v3
+  #       with:
+  #         python-version: "3.10"
+  #     - run: pip install PyGithub
 
-      - name: Extract Sillot version from package.json
-        uses: sergeysova/jq-action@v2
-        id: version
-        with:
-          cmd: "jq .version app/package.json -r"
+  #     - name: Extract Sillot version from package.json
+  #       uses: sergeysova/jq-action@v2
+  #       id: version
+  #       with:
+  #         cmd: "jq .version app/package.json -r"
 
-      - name: Extract SiYuan version from package.json
-        uses: sergeysova/jq-action@v2
-        id: syv
-        with:
-          cmd: "jq .syv app/package.json -r"
+  #     - name: Extract SiYuan version from package.json
+  #       uses: sergeysova/jq-action@v2
+  #       id: syv
+  #       with:
+  #         cmd: "jq .syv app/package.json -r"
 
-      - id: thislatestR
-        uses: pozetroninc/github-action-get-latest-release@master
-        with:
-          # owner: Hi-Windom
-          # repo: Sillot
-          repository: ${{ github.repository }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          excludes: prerelease, draft
+  #     - id: thislatestR
+  #       uses: pozetroninc/github-action-get-latest-release@master
+  #       with:
+  #         # owner: Hi-Windom
+  #         # repo: Sillot
+  #         repository: ${{ github.repository }}
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         excludes: prerelease, draft
 
-      - name: Gather Sillot Release Information
-        id: release_info
-        # https://github.com/Hi-Windom/Sillot/issues/373
-        # 注意：创建或更新环境变量的步骤无权访问新值；$GITHUB_OUTPUT 需要定义步骤 id 才能稍后检索输出值，$GITHUB_ENV 则不需要
-        # 以下转换不再需要：
-        #   changelog="${changelog//'%'/'%25'}"
-        #   changelog="${changelog//$'\n'/'%0A'}"
-        #   changelog="${changelog//$'\r'/'%0D'}"
-        run: |
-          echo "release_title=$(git show --format=%s --no-patch | head -1)" >> $GITHUB_OUTPUT
-          echo "release_version=v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}" >> $GITHUB_OUTPUT
-          changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} -b ${{ steps.thislatestR.outputs.release }} Hi-Windom/Sillot)
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "release_body_sillot<<$EOF" >> $GITHUB_ENV
-          echo "$changelog" >> $GITHUB_ENV
-          echo "$EOF" >> $GITHUB_ENV
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Gather Sillot Release Information
+  #       id: release_info
+  #       # https://github.com/Hi-Windom/Sillot/issues/373
+  #       # 注意：创建或更新环境变量的步骤无权访问新值；$GITHUB_OUTPUT 需要定义步骤 id 才能稍后检索输出值，$GITHUB_ENV 则不需要
+  #       # 以下转换不再需要：
+  #       #   changelog="${changelog//'%'/'%25'}"
+  #       #   changelog="${changelog//$'\n'/'%0A'}"
+  #       #   changelog="${changelog//$'\r'/'%0D'}"
+  #       run: |
+  #         echo "release_title=$(git show --format=%s --no-patch | head -1)" >> $GITHUB_OUTPUT
+  #         echo "release_version=v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}" >> $GITHUB_OUTPUT
+  #         changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} -b ${{ steps.thislatestR.outputs.release }} Hi-Windom/Sillot)
+  #         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+  #         echo "release_body_sillot<<$EOF" >> $GITHUB_ENV
+  #         echo "$changelog" >> $GITHUB_ENV
+  #         echo "$EOF" >> $GITHUB_ENV
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Gather SiYuan Release Information
-        id: release_info_siyuan
-        run: |
-          changelog=$(python scripts/parse-changelog.py -t v${{ steps.syv.outputs.value }} siyuan-note/siyuan)
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "release_body_siyuan<<$EOF" >> $GITHUB_ENV
-          echo "$changelog" >> $GITHUB_ENV
-          echo "$EOF" >> $GITHUB_ENV
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Gather SiYuan Release Information
+  #       id: release_info_siyuan
+  #       run: |
+  #         changelog=$(python scripts/parse-changelog.py -t v${{ steps.syv.outputs.value }} siyuan-note/siyuan)
+  #         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+  #         echo "release_body_siyuan<<$EOF" >> $GITHUB_ENV
+  #         echo "$changelog" >> $GITHUB_ENV
+  #         echo "$EOF" >> $GITHUB_ENV
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_name: ${{ steps.release_info.outputs.release_version }}
-          tag_name: ${{ github.ref }}
-          body: "${{ env.release_body_sillot }}\n---\n${{ env.release_body_siyuan }}"
-          draft: false
-          prerelease: true
+  #     - name: Create Release
+  #       id: create_release
+  #       uses: actions/create-release@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         release_name: ${{ steps.release_info.outputs.release_version }}
+  #         tag_name: ${{ github.ref }}
+  #         body: "${{ env.release_body_sillot }}\n---\n${{ env.release_body_siyuan }}"
+  #         draft: false
+  #         prerelease: true
 
   build:
     runs-on: ${{ matrix.config.os }}
-    needs: create_release
+    # needs: create_release
     strategy:
       matrix:
         config:
