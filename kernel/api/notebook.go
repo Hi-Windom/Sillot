@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -310,9 +311,11 @@ func lsNotebooks(c *gin.Context) {
 
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
+		logging.LogDebugf("lsNotebooks util.JsonArg(c, ret) failed")
 		return
 	}
 
+	logging.LogDebugf("lsNotebooks invoked")
 	flashcard := false
 	if arg["flashcard"] != nil {
 		flashcard = arg["flashcard"].(bool)
@@ -325,6 +328,7 @@ func lsNotebooks(c *gin.Context) {
 		var err error
 		notebooks, err = model.ListNotebooks()
 		if nil != err {
+			logging.LogDebugf("lsNotebooks model.ListNotebooks() failed")
 			return
 		}
 	}
