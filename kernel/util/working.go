@@ -172,7 +172,7 @@ var (
 	HistoryDir     string        // 数据历史目录路径
 	TempDir        string        // 临时目录路径
 	LogPath        string        // 配置目录下的日志文件 sillot.siyuan.log 路径
-	DBName         = "sillot.db" // SQLite 数据库文件名
+	DBName         = "siyuan.db" // SQLite 数据库文件名
 	DBPath         string        // SQLite 数据库文件路径
 	HistoryDBPath  string        // SQLite 历史数据库文件路径
 	BlockTreePath  string        // 区块树文件路径
