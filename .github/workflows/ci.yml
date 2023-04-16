@@ -300,9 +300,6 @@ jobs:
         run: |
             cd ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot
             .\scripts\sillot-android-build-action.bat
-            set SENTRY_ORG=hi-windom
-            set SENTRY_PROJECT=sillot-android
-            set SENTRY_LOG_LEVEL=debug
         continue-on-error: false
 
       - name: Build with Gradle
@@ -318,6 +315,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_name: Sillot-${{ needs.create_release.outputs.release_version }}.apk
+          asset_name: Sillot-${{ needs.create_release.outputs.release_version }}-debug.apk
           asset_path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid/app/build/outputs/apk/debug/Sillot-${{ needs.create_release.outputs.release_version }}.apk
           asset_content_type: application/octet-stream
