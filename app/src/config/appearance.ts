@@ -8,7 +8,6 @@ import {isBrowser} from "../util/functions";
 import {fetchPost} from "../util/fetch";
 import {genOptions} from "../util/genOptions";
 import {openSnippets} from "./util/snippets";
-import {openColorPicker} from "./util/colorPicker";
 import {loadAssets} from "../util/assets";
 import {resetFloatDockSize} from "../layout/dock/util";
 import {isAppMode} from "sofill/env"
@@ -128,22 +127,6 @@ ${isAppMode() ? `<label class="b3-label fn__flex config__item">
     <svg><use xlink:href="#iconSettings"></use></svg>${window.siyuan.languages.config}
 </button>
 </label>` : ""}
-<label class="b3-label fn__flex config__item">
-    <div class="fn__flex-1 fn__flex-center">
-        ${window.siyuan.languages.theme13} 
-    </div>
-    <span class="fn__space"></span>
-    <button class="b3-button b3-button--outline fn__size200" id="appearanceCustomSetting">
-        <svg><use xlink:href="#iconFormat"></use></svg>${window.siyuan.languages.custom}
-    </button> 
-</label>
-<label class="b3-label fn__flex">
-    <div class="fn__flex-1 fn__flex-center">
-        ${window.siyuan.languages.theme14}
-    </div>
-    <span class="fn__space"></span>
-    <input class="b3-switch fn__flex-center" id="appearanceCustom" type="checkbox"${window.siyuan.config.appearance.customCSS ? " checked" : ""}>
-</label>
 <label class="fn__flex b3-label">
     <div class="fn__flex-1">
         ${window.siyuan.languages.appearance14}
@@ -187,7 +170,6 @@ ${
             lightThemes: window.siyuan.config.appearance.lightThemes,
             icons: window.siyuan.config.appearance.icons,
             lang: (appearance.element.querySelector("#lang") as HTMLSelectElement).value,
-            customCSS: (appearance.element.querySelector("#appearanceCustom") as HTMLInputElement).checked,
             closeButtonBehavior: isAppMode() ? (appearance.element.querySelector("#closeButtonBehavior") as HTMLInputElement).checked ? 1 : 0 : 0,
             nativeEmoji: (appearance.element.querySelector("#nativeEmoji") as HTMLInputElement).checked,
             hideStatusBar: (appearance.element.querySelector("#hideStatusBar") as HTMLInputElement).checked,
@@ -222,9 +204,6 @@ ${
         isAppMode() ? appearance.element.querySelector("#codeSnippet").addEventListener("click", () => {
             openSnippets();
         }) : null;
-        appearance.element.querySelector("#appearanceCustomSetting").addEventListener("click", () => {
-            openColorPicker();
-        });
         appearance.element.querySelector("#resetLayout").addEventListener("click", () => {
             resetLayout();
         });
