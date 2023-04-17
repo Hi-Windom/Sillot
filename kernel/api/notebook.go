@@ -309,16 +309,15 @@ func lsNotebooks(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
-	arg, ok := util.JsonArg(c, ret)
-	if !ok {
-		logging.LogDebugf("lsNotebooks util.JsonArg(c, ret) failed")
-		return
-	}
-
 	logging.LogDebugf("lsNotebooks invoked")
 	flashcard := false
-	if arg["flashcard"] != nil {
-		flashcard = arg["flashcard"].(bool)
+
+	// 兼容旧版接口，不能直接使用 util.JsonArg()
+	arg := map[string]interface{}{}
+	if err := c.ShouldBindJSON(&arg); nil == err {
+		if arg["flashcard"] != nil {
+			flashcard = arg["flashcard"].(bool)
+		}
 	}
 
 	var notebooks []*model.Box
