@@ -197,25 +197,14 @@ func serveAppearance(ginServer *gin.Engine) {
 		location.RawQuery = queryParams.Encode()
 
 		if strings.Contains(userAgentHeader, "Electron") {
-			location.Path = "/stage/build/app/?b=Sillot"
+			location.Path = "/stage/build/app/"
 		} else if user_agent.New(userAgentHeader).Mobile() {
-			location.Path = "/stage/build/mobile/?b=Sillot"
+			location.Path = "/stage/build/mobile/"
 		} else if util.ContainerDocker == util.Container {
-			location.Path = "/stage/build/docker/?b=Sillot"
+			location.Path = "/stage/build/docker/"
 		} else {
-			location.Path = "/stage/build/desktop/?b=Sillot"
+			location.Path = "/stage/build/desktop/"
 		}
-
-		// ua := user_agent.New(userAgentHeader)
-		// if ua.Mobile() {
-		// 	c.Redirect(302, "/stage/build/mobile/?b=Sillot&r="+gulu.Rand.String(7))
-		// 	return
-		// }
-
-		// if util.ContainerDocker == util.Container {
-		// 	c.Redirect(302, "/stage/build/docker/?b=Sillot&r="+gulu.Rand.String(7))
-		// 	return
-		// }
 
 		c.Redirect(302, location.String())
 	})
