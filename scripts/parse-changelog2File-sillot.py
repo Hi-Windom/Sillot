@@ -1,4 +1,4 @@
-# usage example: python scripts/parse-changelog2File-sillot.py -t v0.19 -v v2.8.5
+# usage example: python scripts/parse-changelog2File-sillot.py -t v0.19 -v v2.8.5 -w local_zh
 import os
 import re
 from argparse import ArgumentParser
@@ -11,6 +11,8 @@ outputOptions = {'mode': 'a', 'encoding': 'utf8'}
 outputDst = ""
 AT = ""
 docmap = {}
+changelogsDir = os.path.join(os.path.dirname(
+    os.path.dirname(__file__)), 'app', 'changelogs')
 
 # ensure the milestone is open before run this
 docmap_sillot = {
@@ -31,6 +33,14 @@ docmap_siyuan = {
     "Abolishment": "Abolishment",
     "Development": "Development",
 }
+
+
+def generate_msg_from_local(filename):
+    with open(outputDst, **outputOptions) as file:
+        file.write(AT)
+    with open(os.path.join(changelogsDir, filename), 'r', encoding='utf8') as f:
+        with open(outputDst, **outputOptions) as file:
+            file.write(f.read())
 
 
 def generate_msg_from_repo(repo_name, tag_name):
@@ -76,7 +86,7 @@ def find_milestone(repo, title):
     print(f"start find_milestone({repo}, {title})")
     version = ""
     thisRelease = title.split("/")[-1]
-    if len(thisRelease.split("."))==2:
+    if len(thisRelease.split(".")) == 2:
         pat = re.search("v([0-9.]+)", thisRelease)
         if not pat:
             return None
@@ -139,6 +149,8 @@ if __name__ == "__main__":
     )
     parser.add_argument("-t", "--tag", help="the tag to filter issues.")
     parser.add_argument("-v", "--syv", help="siyuan version to filter issues.")
+    parser.add_argument(
+        "-w", "--where", help="where to find siyuan changelog.")
     args = parser.parse_args()
     work = None
     try:
@@ -153,10 +165,21 @@ if __name__ == "__main__":
         print(work, outputDst)
         generate_msg_from_repo("Hi-Windom/Sillot", args.tag)
         AT = '## [@SiYuan](https://github.com/siyuan-note/siyuan)\n\n'
-        docmap = docmap_siyuan
-        work = "gen from siyuan-note/siyuan -> "
-        print(work, outputDst)
-        generate_msg_from_repo("siyuan-note/siyuan", args.syv)
+        if (args.where == "local_zh"):
+            _f = f"{args.syv}_zh_CN.md"
+            work = f"gen from {_f} -> "
+            print(work, outputDst)
+            generate_msg_from_local(_f)
+        elif (args.where == "local"):
+            _f = f"{args.syv}.md"
+            work = f"gen from {_f} -> "
+            print(work, outputDst)
+            generate_msg_from_local(_f)
+        else:
+            docmap = docmap_siyuan
+            work = "gen from siyuan-note/siyuan -> "
+            print(work, outputDst)
+            generate_msg_from_repo("siyuan-note/siyuan", args.syv)
         print("parse-changelog2File-sillot done")
     except AssertionError as e:
         print(work, e)
