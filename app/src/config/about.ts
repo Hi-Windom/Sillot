@@ -109,7 +109,7 @@ ${
         <svg><use xlink:href="#iconTrashcan"></use></svg>${window.siyuan.languages.resetRepo}
     </button>
 </div>
-</div>` : ""
+</div>` : `<div class="fn__none"></div>`
 }
 <label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
