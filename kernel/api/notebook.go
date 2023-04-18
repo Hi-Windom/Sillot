@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -308,14 +309,15 @@ func lsNotebooks(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
-	arg, ok := util.JsonArg(c, ret)
-	if !ok {
-		return
-	}
-
+	logging.LogDebugf("lsNotebooks invoked")
 	flashcard := false
-	if arg["flashcard"] != nil {
-		flashcard = arg["flashcard"].(bool)
+
+	// 兼容旧版接口，不能直接使用 util.JsonArg()
+	arg := map[string]interface{}{}
+	if err := c.ShouldBindJSON(&arg); nil == err {
+		if arg["flashcard"] != nil {
+			flashcard = arg["flashcard"].(bool)
+		}
 	}
 
 	var notebooks []*model.Box
@@ -325,6 +327,7 @@ func lsNotebooks(c *gin.Context) {
 		var err error
 		notebooks, err = model.ListNotebooks()
 		if nil != err {
+			logging.LogDebugf("lsNotebooks model.ListNotebooks() failed")
 			return
 		}
 	}

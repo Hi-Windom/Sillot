@@ -37,7 +37,7 @@ export const loadAssets = (data: IAppearance) => {
     }
 
     const defaultStyleElement = document.getElementById("themeDefaultStyle");
-    let defaultThemeAddress = `/appearance/themes/${data.mode === 1 ? Constants.Themes.DefaultThemeDark : Constants.Themes.DefaultThemeLight}/${data.customCSS ? "custom" : "theme"}.css?v=${data.customCSS ? new Date().getTime() : Constants.SIYUAN_VERSION}`;
+    let defaultThemeAddress = `/appearance/themes/${data.mode === 1 ? Constants.Themes.DefaultThemeDark : Constants.Themes.DefaultThemeLight}/theme.css?v=${Constants.SIYUAN_VERSION}`;
     if ((data.mode === 1 && data.themeDark !== Constants.Themes.DefaultThemeDark) || (data.mode === 0 && data.themeLight !== Constants.Themes.DefaultThemeLight)) {
         defaultThemeAddress = `/appearance/themes/${data.mode === 1 ? Constants.Themes.DefaultThemeDark : Constants.Themes.DefaultThemeLight}/theme.css?v=${Constants.SIYUAN_VERSION}`;
     }
@@ -51,7 +51,7 @@ export const loadAssets = (data: IAppearance) => {
     }
     const styleElement = document.getElementById("themeStyle");
     if ((data.mode === 1 && data.themeDark !== Constants.Themes.DefaultThemeDark) || (data.mode === 0 && data.themeLight !== Constants.Themes.DefaultThemeLight)) {
-        const themeAddress = `/appearance/themes/${data.mode === 1 ? data.themeDark : data.themeLight}/${data.customCSS ? "custom" : "theme"}.css?v=${data.customCSS ? new Date().getTime() : data.themeVer}`;
+        const themeAddress = `/appearance/themes/${data.mode === 1 ? data.themeDark : data.themeLight}/theme.css?v=${data.themeVer}`;
         if (styleElement) {
             if (!styleElement.getAttribute("href").startsWith(themeAddress)) {
                 styleElement.remove();

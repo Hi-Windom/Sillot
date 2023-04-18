@@ -119,7 +119,7 @@ export const initFramework = () => {
         editIconElement.setAttribute("xlink:href", "#iconEdit");
     }
     editElement.addEventListener(getEventName(), () => {
-        window.siyuan.config.editor.readOnly = editIconElement.getAttribute("xlink:href") === "#iconEdit";
+        window.siyuan.config.editor.readOnly = !window.siyuan.config.editor.readOnly;
         const toolbarName = document.querySelector("#toolbarName") as HTMLElement;
         if (toolbarName) {
             toolbarName.style.filter = window.siyuan.config.editor.readOnly ? "brightness(0.58) opacity(0.58)" : "";

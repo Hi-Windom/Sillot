@@ -8,6 +8,10 @@ import fs from "fs";
 import path from "path";
 const shell = (await import("shelljs")).default;
 const iconv = (await import("iconv-lite")).default;
+import pkg from "./package.json" assert { type: "json" };
+let V = pkg.version.split(".");
+V = `v${V.at(0)}.${V.at(1)}`;
+const SYV = `v${pkg.syv}`;
 
 if (!shell.which("go")) {
   shell.echo("Sorry, this script requires go");
@@ -16,10 +20,10 @@ if (!shell.which("go")) {
 
 const spinner = ora("正在执行, 请稍后...\n");
 const works = {
-  a: { a01: "构建 build", a02: "检查 check", a03: "开发 dev（暂不支持）" },
+  a: { a01: "构建 build", a02: "检查 check", a03: "开发 dev" },
   a01: { a0101: "Win App 构建", a0102: "安卓构建" },
   a02: { a0201: "升级 npm 包", a0202: "eslint（暂不支持）" },
-  a03: {},
+  a03: { a0301: "生成本地版本 changelog" },
 };
 inquirer
   .prompt([
@@ -40,8 +44,7 @@ inquirer
         doit(works.a02);
         break;
       case works.a.a03:
-        console.warn("敬请期待");
-        // doit(works.a03);
+        doit(works.a03);
         break;
     }
   })
@@ -108,6 +111,46 @@ function doit(obj) {
           break;
         case works.a02.a0202:
           console.warn("敬请期待");
+          break;
+        case works.a03.a0301:
+          inquirer
+            .prompt([
+              {
+                name: "b",
+                type: "list",
+                message: "从何处获取思源更新",
+                choices: [
+                  { name: "Github milestone" },
+                  { name: "local changelog zh_CN" },
+                  { name: "local changelog" },
+                ],
+              },
+            ])
+            .then((answers) => {
+              switch (answers.b) {
+                case "Github milestone":
+                  exeHandler(
+                    `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w github`,
+                    true
+                  );
+                  break;
+                case "local changelog":
+                  exeHandler(
+                    `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w local`,
+                    true
+                  );
+                  break;
+                default:
+                  exeHandler(
+                    `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w local_zh`,
+                    true
+                  );
+                  break;
+              }
+            })
+            .catch((e) => {
+              eCatcher(e);
+            });
           break;
       }
     })

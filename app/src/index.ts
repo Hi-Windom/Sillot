@@ -28,6 +28,7 @@ import { importIDB } from "./sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "./sillot";
 import {updateEditModeElement} from "./layout/topBar";
 import {getSearch} from "./util/functions";
+import {hideAllElements} from "./protyle/ui/hideElements";
 import VConsole from 'vconsole';
 
 class App {
@@ -53,6 +54,7 @@ class App {
                             case "readonly":
                                 window.siyuan.config.editor.readOnly = data.data;
                                 updateEditModeElement();
+                                hideAllElements(["util"]);
                                 break;
                             case "progress":
                                 progressLoading(data);
@@ -115,9 +117,6 @@ class App {
                                 progressBackgroundTask(data.data.tasks);
                                 break;
                             case "refreshtheme":
-                                if (!window.siyuan.config.appearance.customCSS && data.data.theme.indexOf("custom.css") > -1) {
-                                    return;
-                                }
                                 if ((window.siyuan.config.appearance.mode === 1 && window.siyuan.config.appearance.themeDark !== Constants.Themes.DefaultThemeDark) || (window.siyuan.config.appearance.mode === 0 && window.siyuan.config.appearance.themeLight !== Constants.Themes.DefaultThemeLight)) {
                                     (document.getElementById("themeStyle") as HTMLLinkElement).href = data.data.theme;
                                 } else {

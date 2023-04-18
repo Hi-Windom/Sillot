@@ -18,7 +18,6 @@ import {getCurrentWindow} from "@electron/remote";
 import {Constants} from "../../constants";
 import {matchHotKey} from "../util/hotKey";
 import {readText, updateHotkeyTip, writeText} from "../util/compatibility";
-import {escapeHtml} from "../../util/escape";
 // import * as dayjs from "dayjs";
 import {format,parse} from "date-fns";
 import {setPanelFocus} from "../../layout/util";

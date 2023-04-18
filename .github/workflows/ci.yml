@@ -1,4 +1,5 @@
 name: Sillot CI/CD
+# https://github.com/actions/runner-images/blob/main/images/
 
 on:
   push:
@@ -262,4 +263,72 @@ jobs:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_name: Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
           asset_path: Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
+          asset_content_type: application/octet-stream
+
+
+      # Manual setup is required when the built-in version does not work correctly in windows2022
+      - name: Setup JDK 11
+        uses: actions/setup-java@v3
+        if: "contains( matrix.config.goos, 'windows')"
+        continue-on-error: true
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          overwrite-settings: true
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+      - name: Install Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25b
+          add-to-path: true
+      - name: Remove android Directory
+        uses: JesseTG/rm@v1.0.2
+        if: "contains( matrix.config.goos, 'windows')"
+        with:
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
+
+      - name: Checkout android repo
+        uses: actions/checkout@v3
+        if: "contains( matrix.config.goos, 'windows')"
+        with:
+          repository: Hi-Windom/Sillot-android
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
+
+      - name: Before android build
+        if: "contains( matrix.config.goos, 'windows')"
+        run: |
+            cd ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot
+            .\scripts\sillot-android-build-action.bat
+        continue-on-error: false
+
+      - name: Build with Gradle
+        if: "contains( matrix.config.goos, 'windows')"
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
+        run: ./gradlew assembleAction --quiet --stacktrace
+        continue-on-error: false
+
+      - uses: r0adkll/sign-android-release@v1
+        if: "contains( matrix.config.goos, 'windows')"
+        name: Sign APK
+        id: sign_app
+        with:
+          releaseDirectory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid/app/build/outputs/apk/action
+          signingKeyBase64: ${{ secrets.APK_SIGN_KEY_JKS_BASE64 }}
+          alias: ${{ secrets.APK_SIGN_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.APK_SIGN_KEY_JKS_PW }}
+          keyPassword: ${{ secrets.APK_SIGN_KEY_PW }}
+        # env:
+        #   # override default build-tools version (29.0.3) -- optional
+        #   BUILD_TOOLS_VERSION: "30.0.3"
+
+      - name: Upload APK to release
+        uses: actions/upload-release-asset@v1
+        if: "contains( matrix.config.goos, 'windows')"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_name: Sillot-${{ needs.create_release.outputs.release_version }}-debug.apk
+          asset_path: ${{steps.sign_app.outputs.signedReleaseFile}}
           asset_content_type: application/octet-stream
