@@ -272,7 +272,7 @@ jobs:
         if: "contains( matrix.config.goos, 'windows')"
         continue-on-error: true
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'zulu'
           overwrite-settings: true
       - name: Setup Android SDK
