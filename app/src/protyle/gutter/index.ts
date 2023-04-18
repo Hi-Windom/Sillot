@@ -26,6 +26,7 @@ import {cancelSB, insertEmptyBlock, jumpToParentNext} from "../../block/util";
 import {countBlockWord} from "../../layout/status";
 /// #if !MOBILE
 import {openFileById} from "../../editor/util";
+import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
 /// #endif
 import {Constants} from "../../constants";
 import {openMobileFileById} from "../../mobile/editor";
@@ -37,7 +38,6 @@ import {makeCard, quickMakeCard} from "../../card/makeCard";
 import {transferBlockRef} from "../../menus/block";
 import {isMobile} from "../../util/functions";
 import {HiJoy} from "../../sillot/joyUI/com_/hi";
-import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
 import {AIActions} from "../../ai/actions";
 import {activeBlur} from "../../mobile/util/keyboardToolbar";
 
@@ -756,13 +756,7 @@ export class Gutter {
         nodeElement.classList.add("protyle-wysiwyg--select");
         countBlockWord([id], protyle.block.rootID);
         const SillotExtSubmennu: IMenu[] = [];
-        // SillotExtSubmennu.push({
-        //     label: "MD 源码编辑",
-        //     click() {
-        //         window.sout.log("MD 源码编辑");
-        //         new HiJoy({id:"app5"});
-        //     }
-        // });
+        /// #if !MOBILE
         SillotExtSubmennu.push({
             label: "KMD 源码编辑",
             click() {
@@ -779,6 +773,7 @@ export class Gutter {
                 });
             }
         });
+        /// #endif
         window.siyuan.menus.menu.append(new MenuItem({
             label: "汐洛扩展菜单",
             icon: "iconMore",
