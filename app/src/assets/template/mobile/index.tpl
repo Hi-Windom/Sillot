@@ -5,6 +5,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate" />
     <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="/manifest.webmanifest">
     <style id="editorFontSize" type="text/css"></style>
 </head>
 <body class="branch--Sillot body--mobile fn__flex-column">

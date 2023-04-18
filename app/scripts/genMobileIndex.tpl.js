@@ -10,6 +10,7 @@ const T = `<!DOCTYPE html>
 <head>
     <%- head.metaBase %>
     <%- head.metaViewportMobile %>
+    <%- head.webmanifest %>
     <%- styles.editorFontSize %>
 </head>
 <body class="<%- classes.body.${platform} %>">

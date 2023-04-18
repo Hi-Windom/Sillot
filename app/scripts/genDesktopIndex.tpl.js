@@ -11,6 +11,7 @@ const T = `<!DOCTYPE html>
     <%- head.metaBase %>
     <%- head.metaViewport %>
     <%- head.metaDesktop %>
+    <%- head.webmanifest %>
     <%- head.icon %>
     <%- styles.editorFontSize %>
     <%- styles.editorAttr %>
