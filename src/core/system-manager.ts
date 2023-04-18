@@ -44,6 +44,7 @@ export class SystemManager implements ISystemManager {
     }
 
     delayAutoUpgrade() {
+        return false;
         setTimeout(() => {
             const autoUpdate = this.storageMangager.get(PLUGIN_SYSTEM_AUTO_UPDATE);
             if (!autoUpdate) {
