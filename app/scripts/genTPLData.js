@@ -22,6 +22,7 @@ exports.default = {
       metaViewportMobile: /*html*/ `<meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">`,
       metaApp: /*html*/ `<!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag
     <meta http-equiv="Content-Security-Policy" content="script-src 'self'"/>-->`,
+      webmanifest: /*html*/ `<link rel="manifest" href="/manifest.webmanifest">`,
     },
     ndom: {
       SiYuan: {
