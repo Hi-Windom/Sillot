@@ -28,6 +28,7 @@ import { importIDB } from "./sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "./sillot";
 import {updateEditModeElement} from "./layout/topBar";
 import {getSearch} from "./util/functions";
+import {hideAllElements} from "./protyle/ui/hideElements";
 import VConsole from 'vconsole';
 
 class App {
@@ -53,6 +54,7 @@ class App {
                             case "readonly":
                                 window.siyuan.config.editor.readOnly = data.data;
                                 updateEditModeElement();
+                                hideAllElements(["util"]);
                                 break;
                             case "progress":
                                 progressLoading(data);
