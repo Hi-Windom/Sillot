@@ -87,7 +87,6 @@ export const mountHelp = () => {
             fetchPost("/api/notebook/removeNotebook", {notebook: Constants.HELP_PATH.zh_CN_Sillot, callback: Constants.CB_MOUNT_REMOVE}, () => {
                 fetchPost("/api/notebook/openNotebook", {
                     notebook: Constants.HELP_PATH.zh_CN_Sillot
-                    // 已知问题：需要手动刷新界面
                 });
             });
         });
