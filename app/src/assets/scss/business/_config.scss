@@ -15,7 +15,7 @@
   &__panel {
     & > .b3-tab-bar {
       user-select: none;
-      width: 148px;
+      width: 200px;
       overflow: auto;
       padding: 8px 0;
       box-sizing: border-box;
@@ -183,7 +183,7 @@
 
   &-bazaar__readme {
     position: absolute;
-    transition: var(--b3-transition);
+    transition: transform .2s cubic-bezier(0, 0, .2, 1) 0ms, opacity .3s cubic-bezier(0, 0, .2, 1) 0ms;
     right: -100%;
     top: 0;
     width: 100%;
@@ -192,6 +192,12 @@
     display: flex;
     padding: 16px;
     box-sizing: border-box;
+    opacity: 0;
+
+    &--show {
+      opacity: 1;
+      transform: translateX(-100%);
+    }
 
     .item {
       &__side {
