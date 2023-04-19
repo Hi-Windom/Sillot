@@ -72,8 +72,11 @@ class App {
                         fetchPost("/api/system/getEmojiConf", {}, emojiResponse => {
                             window.siyuan.emojis = emojiResponse.data as IEmoji[];
                             initFramework();
+                            console.log("initFramework() invoked");
                             initRightMenu();
+                            console.log("initRightMenu() invoked");
                             openChangelog();
+                            console.log("openChangelog() invoked");
                         });
                     });
                     addGA();
