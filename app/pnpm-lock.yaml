@@ -256,8 +256,8 @@ devDependencies:
     specifier: ^4.6.1
     version: 4.6.1
   sofill:
-    specifier: ^1.0.75
-    version: 1.0.75(@sillot/bridge@0.0.3)(typescript@5.0.4)
+    specifier: ^1.0.76
+    version: 1.0.76(@sillot/bridge@0.0.3)(typescript@5.0.4)
   sout:
     specifier: ^1.1.0
     version: 1.1.0
@@ -8153,8 +8153,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /sofill@1.0.75(@sillot/bridge@0.0.3)(typescript@5.0.4):
-    resolution: {integrity: sha512-vz+cwrY++SbSgnEQ+haeZW8yhZkeMXxePJ7qlwjofRw9tOoOV6jKxoW7TEUgHxXSHXPLgJ/BhBWYeYPL5bDvPg==}
+  /sofill@1.0.76(@sillot/bridge@0.0.3)(typescript@5.0.4):
+    resolution: {integrity: sha512-eHkhkP7UIuBz839ESfHmw17W2B4Bj4YsvuHtlKZv+fgvqmULBTTDvgmralStxJ7wvGD5kzqVWxnTmwBCQrHC6g==}
     peerDependencies:
       '@sillot/bridge': ^0.0.3
       localforage: ^1.10.0

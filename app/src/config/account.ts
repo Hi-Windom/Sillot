@@ -1,5 +1,5 @@
 // import * as md5 from "blueimp-md5";
-import {Md5} from 'ts-md5';
+import {Md5} from 'sofill/mid';
 import {hideMessage, showMessage} from "../dialog/message";
 import {Constants} from "../constants";
 import {fetchPost} from "../util/fetch";

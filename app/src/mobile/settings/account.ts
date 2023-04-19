@@ -6,7 +6,7 @@ import {processSync} from "../../dialog/processSystem";
 import {confirmDialog} from "../../dialog/confirmDialog";
 import {showMessage} from "../../dialog/message";
 // import md5 from "blueimp-md5";
-import {Md5} from 'ts-md5';
+import {Md5} from 'sofill/mid';
 
 export const showAccountInfo = () => {
     let userTitlesHTML = "";
