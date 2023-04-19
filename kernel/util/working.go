@@ -48,6 +48,7 @@ const (
 	VerC      = Ver + ".999" // 用于检查版本更新
 	VerSY     = "2.8.6"      // 思源版本号
 	IsInsider = true
+	VerDeno   = "1.32.5"
 )
 
 var (
@@ -434,15 +435,15 @@ func initDeno() {
 		return
 	}
 
-	denoDir := filepath.Join(TempDir, "deno")
+	denoDir := filepath.Join(WorkspaceDir, "bin")
 	if gulu.OS.IsWindows() {
 		DenoBinPath = filepath.Join(denoDir, "deno.exe")
 	} else if gulu.OS.IsDarwin() || gulu.OS.IsLinux() {
 		DenoBinPath = filepath.Join(denoDir, "deno")
 	}
 	denoVer := getDenoVer(DenoBinPath)
-	if "" != denoVer {
-		logging.LogInfof("built-in deno [ver=%s, bin=%s]", denoVer, DenoBinPath)
+	if strings.HasPrefix(denoVer, VerDeno+" (") { // 版本匹配
+		logging.LogInfof("exist built-in deno [ver=%s, bin=%s]", denoVer, DenoBinPath)
 		return
 	}
 
