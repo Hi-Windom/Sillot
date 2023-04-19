@@ -23,6 +23,7 @@ docmap_sillot = {
     "Document": "文档相关 | Document",
     "Refactor": "开发重构 | Refactor",
     "Abolishment": "移除废止 | Abolishment",
+    "Shinning": "闪亮之名 | Shinning",
 }
 docmap_siyuan = {
     "Feature": "Feature",
