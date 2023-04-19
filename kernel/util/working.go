@@ -26,6 +26,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -429,7 +430,7 @@ func initPandoc() {
 }
 
 func initDeno() {
-	if ContainerStd != Container || !gulu.OS.IsWindows() { // deno 支持跨平台，暂不集成非 win 平台的原因是缺少额外开发者维护
+	if ContainerStd != Container {
 		return
 	}
 
@@ -448,11 +449,16 @@ func initDeno() {
 	denoZip := filepath.Join(WorkingDir, "deno.zip")
 	if "dev" == Mode || !gulu.File.IsExist(denoZip) {
 		if gulu.OS.IsWindows() {
-			denoZip = filepath.Join(WorkingDir, "apps/deno/deno-x86_64-pc-windows-msvc.zip")
-		} else if gulu.OS.IsDarwin() {
-			denoZip = filepath.Join(WorkingDir, "")
+			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-x86_64-pc-windows-msvc.zip")
+		} else if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" { // Apple M series chip
+			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-aarch64-apple-darwin.zip")
+		} else if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
+			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-x86_64-apple-darwin.zip")
 		} else if gulu.OS.IsLinux() {
-			denoZip = filepath.Join(WorkingDir, "")
+			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-x86_64-unknown-linux-gnu.zip")
+		} else {
+			logging.LogErrorf("initDeno failed, not in support platform")
+			return
 		}
 	}
 	if err := gulu.Zip.Unzip(denoZip, denoDir); nil != err {
