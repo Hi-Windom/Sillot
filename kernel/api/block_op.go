@@ -22,6 +22,7 @@ import (
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/K-Sillot/gulu"
+	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/model"
@@ -37,9 +38,11 @@ func moveBlock(c *gin.Context) {
 	if !ok {
 		return
 	}
+	logging.LogDebugf("moveBlock invoked")
 
 	id := arg["id"].(string)
 	if util.InvalidIDPattern(id, ret) {
+		logging.LogDebugf("moveBlock !util.InvalidIDPattern(id, ret) failed")
 		return
 	}
 
@@ -47,12 +50,14 @@ func moveBlock(c *gin.Context) {
 	if nil != arg["parentID"] {
 		parentID = arg["parentID"].(string)
 		if util.InvalidIDPattern(parentID, ret) {
+			logging.LogDebugf("moveBlock !util.InvalidIDPattern(id, ret) failed")
 			return
 		}
 	}
 	if nil != arg["previousID"] {
 		previousID = arg["previousID"].(string)
 		if util.InvalidIDPattern(previousID, ret) {
+			logging.LogDebugf("moveBlock !util.InvalidIDPattern(id, ret) failed")
 			return
 		}
 

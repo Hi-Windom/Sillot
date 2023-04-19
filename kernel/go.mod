@@ -30,7 +30,7 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/goccy/go-json v0.10.1
 	github.com/gofrs/flock v0.8.1
-	github.com/imroc/req/v3 v3.33.1
+	github.com/imroc/req/v3 v3.33.2
 	github.com/jinzhu/copier v0.3.5
 	github.com/json-iterator/go v1.1.12
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
@@ -38,7 +38,7 @@ require (
 	github.com/mssola/user_agent v0.6.0
 	github.com/olahol/melody v1.1.3
 	github.com/open-spaced-repetition/go-fsrs v0.1.0
-	github.com/panjf2000/ants/v2 v2.7.1
+	github.com/panjf2000/ants/v2 v2.7.3
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/radovskyb/watcher v1.0.7
 	github.com/sashabaranov/go-gpt3 v1.4.0
@@ -49,13 +49,12 @@ require (
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673
 	golang.org/x/image v0.6.0
 	golang.org/x/mobile v0.0.0-20220722155234-aaac322e2105
-	golang.org/x/mod v0.9.0
+	golang.org/x/mod v0.10.0
 	golang.org/x/text v0.8.0
 )
 
 require (
 	dmitri.shuralyov.com/font/woff2 v0.0.0-20180220214647-957792cbbdab // indirect
-	github.com/K-Sillot/dejavu v0.0.2
 	github.com/K-Sillot/filelock v0.0.5
 	github.com/K-Sillot/gulu v0.0.3
 	github.com/K-Sillot/httpclient v0.0.1
@@ -141,6 +140,16 @@ require (
 	github.com/K-Sillot/riff v0.0.1
 )
 
+require (
+	github.com/88250/gulu v1.2.3-0.20230321113152-38c4a3d73c37 // indirect
+	github.com/siyuan-note/dejavu v0.0.0-20230419110639-dc62c252b60b
+	github.com/siyuan-note/encryption v0.0.0-20220713091850-5ecd92177b75 // indirect
+	github.com/siyuan-note/eventbus v0.0.0-20230216103454-41885eac6c2b // indirect
+	github.com/siyuan-note/filelock v0.0.0-20230321113304-79a32917cc9f // indirect
+	github.com/siyuan-note/httpclient v0.0.0-20230309131049-f703795de6bc // indirect
+	github.com/siyuan-note/logging v0.0.0-20230319012246-6224f958f554 // indirect
+)
+
 replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20220714142610-fbbda1ee84f5
 
 //replace github.com/siyuan-note/dejavu => D:\88250\dejavu
@@ -158,4 +167,3 @@ replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20
 // replace github.com/siyuan-note/logging => github.com/K-Sillot/logging
 // replace github.com/siyuan-note/httpclient => github.com/K-Sillot/httpclient
 // replace github.com/siyuan-note/riff => github.com/K-Sillot/riff
-// replace github.com/siyuan-note/dejavu => github.com/K-Sillot/dejavu

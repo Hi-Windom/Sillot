@@ -28,11 +28,11 @@ import (
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
-	util2 "github.com/K-Sillot/dejavu/util"
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
 	"github.com/panjf2000/ants/v2"
+	util2 "github.com/siyuan-note/dejavu/util"
 	"github.com/siyuan-note/siyuan/kernel/rococo"
 	"github.com/siyuan-note/siyuan/kernel/util"
 	"github.com/vmihailenco/msgpack/v5"

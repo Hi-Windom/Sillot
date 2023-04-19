@@ -6,7 +6,7 @@ import {hasClosestByAttribute} from "../protyle/util/hasClosest";
 import {Model} from "../layout/Model";
 import "../assets/scss/mobile.scss";
 import {Menus} from "../menus";
-import {addBaseURL, setNoteBook} from "../util/pathName";
+import {addBaseURL, getIdFromSYProtocol, isSYProtocol, setNoteBook} from "../util/pathName";
 import {handleTouchEnd, handleTouchMove, handleTouchStart} from "./util/touch";
 import {fetchGet, fetchPost} from "../util/fetch";
 import {initFramework} from "./util/initFramework";
@@ -18,14 +18,18 @@ import {goBack} from "./util/MobileBackFoward";
 import {hideKeyboardToolbar, showKeyboardToolbar} from "./util/keyboardToolbar";
 import {getLocalStorage} from "../protyle/util/compatibility";
 import {openMobileFileById} from "./editor";
-import {getSearch, isSiyuanUrl, getIdFromSiyuanUrl} from "../util/functions";
+import {getSearch} from "../util/functions";
 import {initRightMenu} from "./menu";
 import {openChangelog} from "../boot/openChangelog";
+import {registerServiceWorker} from "../util/serviceWorker";
 import { SillotEnv } from "../sillot";
 import VConsole from 'vconsole';
 
 class App {
     constructor() {
+        if (!window.webkit?.messageHandlers && !window.JSAndroid) {
+            registerServiceWorker(`${Constants.SERVICE_WORKER_PATH}?v=${Constants.SIYUAN_VERSION}`);
+        }
         addScriptSync(`${Constants.PROTYLE_CDN}/js/lute/lute.min.js?v=${Constants.SIYUAN_VERSION}`, "protyleLuteScript");
         addScript(`${Constants.PROTYLE_CDN}/js/protyle-html.js?v=${Constants.SIYUAN_VERSION}`, "protyleWcHtmlScript");
         addBaseURL();
@@ -68,8 +72,11 @@ class App {
                         fetchPost("/api/system/getEmojiConf", {}, emojiResponse => {
                             window.siyuan.emojis = emojiResponse.data as IEmoji[];
                             initFramework();
+                            console.log("initFramework() invoked");
                             initRightMenu();
+                            console.log("initRightMenu() invoked");
                             openChangelog();
+                            console.log("openChangelog() invoked");
                         });
                     });
                     addGA();
@@ -93,8 +100,8 @@ window.showKeyboardToolbar = (height) => {
 };
 window.hideKeyboardToolbar = hideKeyboardToolbar;
 window.openFileByURL = (openURL) => {
-    if (openURL && isSiyuanUrl(openURL)) {
-        openMobileFileById(getIdFromSiyuanUrl(openURL),
+    if (openURL && isSYProtocol(openURL)) {
+        openMobileFileById(getIdFromSYProtocol(openURL),
             getSearch("focus", openURL) === "1" ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]);
         return true;
     }

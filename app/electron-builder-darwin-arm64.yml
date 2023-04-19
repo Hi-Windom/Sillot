@@ -64,3 +64,5 @@ extraResources:
     filter: "!**/{.DS_Store,custom.css}"
   - from: "pandoc/pandoc-darwin-amd64.zip"
     to: "pandoc.zip"
+  - from: "apps/deno/deno-aarch64-apple-darwin.zip"
+    to: "deno.zip"

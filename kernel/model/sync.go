@@ -26,11 +26,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/K-Sillot/dejavu"
-	"github.com/K-Sillot/dejavu/cloud"
 	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
+	"github.com/siyuan-note/dejavu"
+	"github.com/siyuan-note/dejavu/cloud"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
@@ -579,7 +579,7 @@ func isProviderOnline() (ret bool) {
 	}
 
 	if ret = util.IsOnline(checkURL, skipTlsVerify); !ret {
-		util.PushErrMsg(Conf.Language(76) + " (Provider: " + conf.ProviderToStr(Conf.Sync.Provider) + ")", 5000)
+		util.PushErrMsg(Conf.Language(76)+" (Provider: "+conf.ProviderToStr(Conf.Sync.Provider)+")", 5000)
 	}
 	return
 }

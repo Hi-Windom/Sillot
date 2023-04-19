@@ -30,7 +30,7 @@ type TOperation =
     | "addFlashcards"
     | "removeFlashcards"
 type TBazaarType = "templates" | "icons" | "widgets" | "themes"
-declare module "blueimp-md5"
+// declare module "blueimp-md5"
 
 interface Window {
     dataLayer: any[]

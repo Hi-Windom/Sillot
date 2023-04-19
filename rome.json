@@ -1,5 +1,8 @@
 {
   "$schema": "./app/node_modules/rome/configuration_schema.json",
+  "files": {
+    "ignore": ["./out/*", "./PSP/*", "./stage/*", "./build/*", "./src/asset/pdf/*", "./appearance/*"]
+  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -20,9 +23,9 @@
         "noExplicitAny": "off",
         "noAsyncPromiseExecutor": "off"
       },
-      "performance": { "noDelete": "warn" },
-      "style": { "useTemplate": "warn","useConst":"warn","noVar":"warn" },
-      "complexity": { "useSimplifiedLogicExpression": "warn" },
+      "performance": { "noDelete": "off" },
+      "style": { "useTemplate": "off","useConst":"warn","noVar":"warn","useDefaultParameterLast":"off" },
+      "complexity": { "useSimplifiedLogicExpression": "off" },
       "correctness": { "noUnreachable": "warn" }
     }
   }

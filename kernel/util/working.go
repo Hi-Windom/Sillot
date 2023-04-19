@@ -26,6 +26,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -47,6 +48,7 @@ const (
 	VerC      = Ver + ".999" // 用于检查版本更新
 	VerSY     = "2.8.6"      // 思源版本号
 	IsInsider = true
+	VerDeno   = "1.32.5"
 )
 
 var (
@@ -429,30 +431,35 @@ func initPandoc() {
 }
 
 func initDeno() {
-	if ContainerStd != Container || !gulu.OS.IsWindows() { // deno 支持跨平台，暂不集成非 win 平台的原因是缺少额外开发者维护
+	if ContainerStd != Container {
 		return
 	}
 
-	denoDir := filepath.Join(TempDir, "deno")
+	denoDir := filepath.Join(WorkspaceDir, "bin")
 	if gulu.OS.IsWindows() {
 		DenoBinPath = filepath.Join(denoDir, "deno.exe")
 	} else if gulu.OS.IsDarwin() || gulu.OS.IsLinux() {
 		DenoBinPath = filepath.Join(denoDir, "deno")
 	}
 	denoVer := getDenoVer(DenoBinPath)
-	if "" != denoVer {
-		logging.LogInfof("built-in deno [ver=%s, bin=%s]", denoVer, DenoBinPath)
+	if strings.HasPrefix(denoVer, VerDeno+" (") { // 版本匹配
+		logging.LogInfof("exist built-in deno [ver=%s, bin=%s]", denoVer, DenoBinPath)
 		return
 	}
 
 	denoZip := filepath.Join(WorkingDir, "deno.zip")
 	if "dev" == Mode || !gulu.File.IsExist(denoZip) {
 		if gulu.OS.IsWindows() {
-			denoZip = filepath.Join(WorkingDir, "apps/deno/deno-x86_64-pc-windows-msvc.zip")
-		} else if gulu.OS.IsDarwin() {
-			denoZip = filepath.Join(WorkingDir, "")
+			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-x86_64-pc-windows-msvc.zip")
+		} else if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" { // Apple M series chip
+			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-aarch64-apple-darwin.zip")
+		} else if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
+			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-x86_64-apple-darwin.zip")
 		} else if gulu.OS.IsLinux() {
-			denoZip = filepath.Join(WorkingDir, "")
+			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-x86_64-unknown-linux-gnu.zip")
+		} else {
+			logging.LogErrorf("initDeno failed, not in support platform")
+			return
 		}
 	}
 	if err := gulu.Zip.Unzip(denoZip, denoDir); nil != err {

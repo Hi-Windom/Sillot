@@ -8,7 +8,7 @@ import { account } from "./config/account";
 import { addScript, addScriptSync } from "./protyle/util/addScript";
 import { genUUID } from "./util/genID";
 import { fetchGet, fetchPost } from "./util/fetch";
-import { addBaseURL, setNoteBook } from "./util/pathName";
+import { addBaseURL, getIdFromSYProtocol, isSYProtocol, setNoteBook } from "./util/pathName";
 import {registerServiceWorker} from "./util/serviceWorker";
 import { openFileById } from "./editor/util";
 import {
@@ -29,7 +29,7 @@ import { getLocalStorage } from "./protyle/util/compatibility";
 import { importIDB } from "./sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "./sillot";
 import {updateEditModeElement} from "./layout/topBar";
-import {getIdFromSiyuanUrl, getSearch, isSiyuanUrl} from "./util/functions";
+import {getSearch} from "./util/functions";
 import {hideAllElements} from "./protyle/ui/hideElements";
 import VConsole from 'vconsole';
 
@@ -38,10 +38,6 @@ class App {
         /// #if BROWSER
         registerServiceWorker(`${Constants.SERVICE_WORKER_PATH}?v=${Constants.SIYUAN_VERSION}`);
         /// #endif
-        /// #if MOBILE
-        registerServiceWorker(`${Constants.SERVICE_WORKER_PATH}?v=${Constants.SIYUAN_VERSION}`);
-        /// #endif
-
         addScriptSync(`${Constants.PROTYLE_CDN}/js/lute/lute.min.js?v=${Constants.SIYUAN_VERSION}`, "protyleLuteScript");
         addScript(`${Constants.PROTYLE_CDN}/js/protyle-html.js?v=${Constants.SIYUAN_VERSION}`, "protyleWcHtmlScript");
         addBaseURL();
@@ -191,11 +187,14 @@ class App {
 }
 
 new App();
+
 window.openFileByURL = (openURL) => {
-    if (openURL && isSiyuanUrl(openURL)) {
+    if (openURL && isSYProtocol(openURL)) {
+        const isZoomIn = getSearch("focus", openURL) === "1";
         openFileById({
-            id: getIdFromSiyuanUrl(openURL),
-            action: getSearch("focus", openURL) === "1" ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
+            id: getIdFromSYProtocol(openURL),
+            action: isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
+            zoomIn: isZoomIn
         });
         return true;
     }

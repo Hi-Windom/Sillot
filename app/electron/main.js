@@ -649,9 +649,9 @@ app.whenReady().then(() => {
     fs.readdir(P,function(err,files) {
       if (!err) {
         files.forEach(function(filename) {
-          var filedir = path.join(P, filename);
+          const filedir = path.join(P, filename);
           fs.stat(filedir,function(eror, stats) {
-            var isDir = stats.isDirectory();
+            const isDir = stats.isDirectory();
             if(isDir) {
               session.defaultSession.loadExtension(
                 filedir,

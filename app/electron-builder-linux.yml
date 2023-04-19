@@ -60,3 +60,5 @@ extraResources:
     filter: "!**/{.DS_Store,custom.css}"
   - from: "pandoc/pandoc-linux-amd64.zip"
     to: "pandoc.zip"
+  - from: "apps/deno/deno-x86_64-unknown-linux-gnu.zip"
+    to: "deno.zip"
