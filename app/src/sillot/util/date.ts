@@ -11,6 +11,6 @@ export function parseNumber2FormatString(dateString: string, f: string) {
   const dateObject = new Date(
     year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second
   );
-  let result = format(dateObject, f);
+  const result = format(dateObject, f);
   return result;
 }

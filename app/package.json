@@ -10,6 +10,7 @@
   "scripts": {
     "cli": "node ./package.cli.mjs",
     "lint": "eslint . --fix --cache",
+    "lint2": "rome check ./ --config-path ../ --files-max-size 5242880 --apply-unsafe",
     "dev": "webpack --mode development",
     "dev:mobile": "webpack --mode development --config webpack.mobile.js",
     "dev:desktop": "webpack --mode development --config webpack.desktop.js",
