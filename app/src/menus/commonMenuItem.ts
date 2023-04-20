@@ -48,7 +48,7 @@ export const openWechatNotify = (nodeElement: Element) => {
         reminderFormat = format(new Date(~~reminder), 'yyyy-MM-ddTHH:mm');
     }
     const dialog = new Dialog({
-        width: isMobile() ? "80vw" : "50vw",
+        width: isMobile() ? "92vw" : "50vw",
         title: window.siyuan.languages.wechatReminder,
         content: `<div class="b3-dialog__content custom-attr">
     <div class="fn__flex">
@@ -113,7 +113,7 @@ export const openFileWechatNotify = (protyle: IProtyle) => {
             reminderFormat = format(new Date(~~reminder), 'yyyy-MM-ddTHH:mm');
         }
         const dialog = new Dialog({
-            width: isMobile() ? "80vw" : "50vw",
+            width: isMobile() ? "92vw" : "50vw",
             title: window.siyuan.languages.wechatReminder,
             content: `<div class="b3-dialog__content custom-attr">
     <div class="fn__flex">
@@ -184,7 +184,7 @@ const genAttr = (attrs: IObject, focusName = "bookmark", cb: (dialog: Dialog, rm
         }
     });
     const dialog = new Dialog({
-        width: isMobile() ? "94vw" : "50vw",
+        width: isMobile() ? "92vw" : "50vw",
         title: window.siyuan.languages.attr,
         content: `<div class="custom-attr" style="max-height: calc(100vh - 166px);overflow: auto;">
     <label class="b3-label b3-label--noborder">

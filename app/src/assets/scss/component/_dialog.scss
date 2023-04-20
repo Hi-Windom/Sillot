@@ -61,7 +61,7 @@
   }
 
   &__header {
-    padding: 16px 24px;
+    padding: 9px 24px;
     line-height: 24px;
     font-size: 16px;
     font-weight: 500;
@@ -74,7 +74,7 @@
   }
 
   &__action {
-    padding: 8px 24px;
+    padding: 7px 24px;
     border-top: 1px solid var(--b3-theme-surface-lighter);
     display: flex;
     flex-shrink: 0;
@@ -88,12 +88,13 @@
   &__close {
     position: absolute;
     cursor: pointer;
-    top: 10px;
-    right: -32px;
+    top: -2px;
+    right: -36px;
     height: 18px;
     width: 18px;
     opacity: .68;
     color: var(--b3-theme-on-surface);
+    padding: 8px;
 
     &:hover {
       opacity: 1;
