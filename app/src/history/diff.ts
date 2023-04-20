@@ -7,6 +7,7 @@ import {hasClosestByClassName} from "../protyle/util/hasClosest";
 import {escapeHtml} from "../util/escape";
 // import * as dayjs from "dayjs";
 import {format} from "date-fns";
+import {isMobile} from "../util/functions";
 
 const genItem = (data: [], data2?: { title: string, fileID: string }[]) => {
     if (!data || data.length === 0) {
@@ -112,8 +113,8 @@ export const showDiff = (data: { id: string, time: string }[]) => {
     fetchPost("/api/repo/diffRepoSnapshots", {left, right}, (response) => {
         const dialog = new Dialog({
             title: window.siyuan.languages.compare,
-            content: `<div class="fn__flex" style="height: 100%">
-    <div class="history__diff">
+            content: `<div class="fn__flex" style="height: 100%;${isMobile() ? "flex-direction: column;" : ""}">
+    <div class="history__diff"${isMobile() ? 'style="flex:1;width:auto"' : ""}>
         <ul class="b3-list b3-list--background">
             <li class="b3-list-item">
                 <span class="b3-list-item__toggle b3-list-item__toggle--hl">
@@ -155,7 +156,7 @@ export const showDiff = (data: { id: string, time: string }[]) => {
         </div>
     </div>
 </div>`,
-            width: "80vw",
+            width: isMobile() ? "92vw" : "80vw",
             height: "80vh",
             destroyCallback() {
                 leftEditor = undefined;
