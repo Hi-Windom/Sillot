@@ -177,6 +177,31 @@ func getRepoSnapshots(c *gin.Context) {
 	}
 }
 
+func getCloudRepoSnapshots(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	page := int(arg["page"].(float64))
+
+	snapshots, pageCount, totalCount, err := model.GetCloudRepoSnapshots(page)
+	if nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	ret.Data = map[string]interface{}{
+		"snapshots":  snapshots,
+		"pageCount":  pageCount,
+		"totalCount": totalCount,
+	}
+}
+
 func getCloudRepoTagSnapshots(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)

@@ -588,7 +588,14 @@ func DownloadCloudSnapshot(tag, id string) (err error) {
 	}
 
 	defer util.PushClearProgress()
-	downloadFileCount, downloadChunkCount, downloadBytes, err := repo.DownloadTagIndex(tag, id, map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBarAndProgress})
+
+	var downloadFileCount, downloadChunkCount int
+	var downloadBytes int64
+	if "" == tag {
+		downloadFileCount, downloadChunkCount, downloadBytes, err = repo.DownloadIndex(id, map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBarAndProgress})
+	} else {
+		downloadFileCount, downloadChunkCount, downloadBytes, err = repo.DownloadTagIndex(tag, id, map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBarAndProgress})
+	}
 	if nil != err {
 		return
 	}
@@ -662,6 +669,29 @@ func GetCloudRepoTagSnapshots() (ret []*dejavu.Log, err error) {
 	}
 
 	logs, err := repo.GetCloudRepoTagLogs(map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBar})
+	if nil != err {
+		return
+	}
+	ret = logs
+	if 1 > len(ret) {
+		ret = []*dejavu.Log{}
+	}
+	return
+}
+
+func GetCloudRepoSnapshots(page int) (ret []*dejavu.Log, pageCount, totalCount int, err error) {
+	ret = []*dejavu.Log{}
+	if 1 > len(Conf.Repo.Key) {
+		err = errors.New(Conf.Language(26))
+		return
+	}
+
+	repo, err := newRepository()
+	if nil != err {
+		return
+	}
+
+	logs, pageCount, totalCount, err := repo.GetCloudRepoLogs(page)
 	if nil != err {
 		return
 	}
