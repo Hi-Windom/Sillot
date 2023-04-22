@@ -327,8 +327,7 @@ ${
         }
         about.element.querySelector("#purgeRepo").addEventListener("click", () => {
             confirmDialog("♻️ " + window.siyuan.languages.dataRepoPurge, window.siyuan.languages.dataRepoPurgeConfirm, () => {
-                fetchPost("/api/repo/purgeRepo", {}, () => {
-                });
+                fetchPost("/api/repo/purgeRepo");
             });
         });
         const networkServeElement = about.element.querySelector("#networkServe") as HTMLInputElement;

@@ -64,7 +64,6 @@ import {BlockPanel} from "../../block/Panel";
 import {format} from "date-fns";
 import {highlightRender} from "../markdown/highlightRender";
 import {countBlockWord} from "../../layout/status";
-import {openMobileFileById} from "../../mobile/editor";
 import {moveToDown, moveToUp} from "./move";
 import {pasteAsPlainText} from "../util/paste";
 import {preventScroll} from "../scroll/preventScroll";

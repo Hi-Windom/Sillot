@@ -203,7 +203,7 @@ interface ISiyuan {
     mobile?: {
         editor?: import("../protyle").Protyle
         popEditor?: import("../protyle").Protyle
-        files?: import("../mobile/util/MobileFiles").MobileFiles
+        files?: import("../mobile/dock/MobileFiles").MobileFiles
     },
     user?: {
         userId: string
@@ -335,6 +335,7 @@ declare interface IEditor {
     readOnly: boolean;
     listLogicalOutdent: boolean;
     spellcheck: boolean;
+    onlySearchForDoc: boolean;
     katexMacros: string;
     fullWidth: boolean;
     floatWindowMode: number;
