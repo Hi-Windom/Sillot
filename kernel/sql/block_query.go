@@ -417,7 +417,7 @@ func SelectBlocksRawStmtNoParse(stmt string, limit int) (ret []*Block) {
 	return selectBlocksRawStmt(stmt, limit)
 }
 
-func SelectBlocksRawStmt(stmt string, limit int) (ret []*Block) {
+func SelectBlocksRawStmt(stmt string, page, limit int) (ret []*Block) {
 	parsedStmt, err := sqlparser.Parse(stmt)
 	if nil != err {
 		return selectBlocksRawStmt(stmt, limit)
@@ -432,6 +432,26 @@ func SelectBlocksRawStmt(stmt string, limit int) (ret []*Block) {
 					Type: sqlparser.IntVal,
 					Val:  []byte(strconv.Itoa(limit)),
 				},
+			}
+			slct.Limit.Offset = &sqlparser.SQLVal{
+				Type: sqlparser.IntVal,
+				Val:  []byte(strconv.Itoa((page - 1) * limit)),
+			}
+		} else {
+			if nil != slct.Limit.Rowcount && 0 < len(slct.Limit.Rowcount.(*sqlparser.SQLVal).Val) {
+				limit, _ = strconv.Atoi(string(slct.Limit.Rowcount.(*sqlparser.SQLVal).Val))
+				if 0 >= limit {
+					limit = 32
+				}
+			}
+
+			slct.Limit.Rowcount = &sqlparser.SQLVal{
+				Type: sqlparser.IntVal,
+				Val:  []byte(strconv.Itoa(limit)),
+			}
+			slct.Limit.Offset = &sqlparser.SQLVal{
+				Type: sqlparser.IntVal,
+				Val:  []byte(strconv.Itoa((page - 1) * limit)),
 			}
 		}
 

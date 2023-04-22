@@ -21,7 +21,7 @@ import {readText, updateHotkeyTip, writeText} from "../util/compatibility";
 // import * as dayjs from "dayjs";
 import {format,parse} from "date-fns";
 import {setPanelFocus} from "../../layout/util";
-import {updatePanelByEditor} from "../../editor/util";
+import {openFileById, updatePanelByEditor} from "../../editor/util";
 import {openBacklink, openGraph, openOutline} from "../../layout/dock/util";
 import {setTitle} from "../../dialog/processSystem";
 import {getNoContainerElement} from "../wysiwyg/getBlock";
@@ -87,7 +87,18 @@ export class Title {
             if (commonHotkey(protyle, event)) {
                 return true;
             }
-
+            if (matchHotKey(window.siyuan.config.keymap.general.enterBack.custom, event)) {
+                const ids = protyle.path.split("/");
+                if (ids.length > 2) {
+                    openFileById({
+                        id: ids[ids.length - 2],
+                        action: [Constants.CB_GET_FOCUS, Constants.CB_GET_SCROLL]
+                    });
+                }
+                event.preventDefault();
+                event.stopPropagation();
+                return;
+            }
             /// #if !BROWSER
             if (matchHotKey(window.siyuan.config.keymap.editor.general.undo.custom, event)) {
                 getCurrentWindow().webContents.undo();
@@ -144,7 +155,9 @@ export class Title {
                 event.preventDefault();
                 event.stopPropagation();
             } else if (matchHotKey(window.siyuan.config.keymap.editor.general.copyBlockRef.custom, event)) {
-                writeText(`((${protyle.block.rootID} '${this.editElement.textContent.replace(/'/g, "&#39;")}'))`);
+                fetchPost("/api/block/getRefText", {id: protyle.block.rootID}, (response) => {
+                    writeText(`((${protyle.block.rootID} '${response.data}'))`);
+                });
                 event.preventDefault();
                 event.stopPropagation();
             } else if (matchHotKey(window.siyuan.config.keymap.editor.general.copyID.custom, event)) {

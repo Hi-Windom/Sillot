@@ -64,7 +64,6 @@ import {BlockPanel} from "../../block/Panel";
 import {format} from "date-fns";
 import {highlightRender} from "../markdown/highlightRender";
 import {countBlockWord} from "../../layout/status";
-import {openMobileFileById} from "../../mobile/editor";
 import {moveToDown, moveToUp} from "./move";
 import {pasteAsPlainText} from "../util/paste";
 import {preventScroll} from "../scroll/preventScroll";
@@ -442,14 +441,10 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             if (!protyle.block.showAll) {
                 const ids = protyle.path.split("/");
                 if (ids.length > 2) {
-                    /// #if MOBILE
-                    openMobileFileById(ids[ids.length - 2], [Constants.CB_GET_FOCUS, Constants.CB_GET_SCROLL]);
-                    /// #else
                     openFileById({
                         id: ids[ids.length - 2],
                         action: [Constants.CB_GET_FOCUS, Constants.CB_GET_SCROLL]
                     });
-                    /// #endif
                 }
             } else {
                 zoomOut(protyle, protyle.block.parent2ID, nodeElement.getAttribute("data-node-id"));
@@ -516,7 +511,8 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             return;
         }
         // hint: 上下、回车选择
-        if (!event.altKey && !event.shiftKey && !isCtrl(event) && (event.key.indexOf("Arrow") > -1 || event.key === "Enter") &&
+        if (!event.altKey && !event.shiftKey &&
+            ((event.key.indexOf("Arrow") > -1 && !isCtrl(event)) || event.key === "Enter") &&
             !protyle.hint.element.classList.contains("fn__none") && protyle.hint.select(event, protyle)) {
             event.stopPropagation();
             event.preventDefault();

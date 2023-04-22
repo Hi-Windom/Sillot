@@ -336,7 +336,6 @@
   top: 36px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  max-width: 220px;
   max-height: 60vh;
 }
 
@@ -624,7 +623,7 @@ a:focus > .thumbnail > .thumbnailSelectionRing,
   padding: 8px;
   box-shadow: var(--b3-dialog-shadow);
   border: 1px solid var(--b3-theme-surface-lighter);
-  background-color: var(--b3-menu-background);
+  background-color: var(--b3-theme-surface);
   border-radius: 4px;
   width: 520px;
   position: absolute;

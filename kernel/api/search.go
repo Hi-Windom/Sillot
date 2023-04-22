@@ -191,16 +191,16 @@ func searchRefBlock(c *gin.Context) {
 		return
 	}
 
-	onlyDoc := false
-	if nil != arg["onlyDoc"] {
-		onlyDoc = arg["onlyDoc"].(bool)
+	isSquareBrackets := false
+	if isSquareBracketsArg := arg["isSquareBrackets"]; nil != isSquareBracketsArg {
+		isSquareBrackets = isSquareBracketsArg.(bool)
 	}
 
 	rootID := arg["rootID"].(string)
 	id := arg["id"].(string)
 	keyword := arg["k"].(string)
 	beforeLen := int(arg["beforeLen"].(float64))
-	blocks, newDoc := model.SearchRefBlock(id, rootID, keyword, beforeLen, onlyDoc)
+	blocks, newDoc := model.SearchRefBlock(id, rootID, keyword, beforeLen, isSquareBrackets)
 	ret.Data = map[string]interface{}{
 		"blocks": blocks,
 		"newDoc": newDoc,
@@ -216,6 +216,14 @@ func fullTextSearchBlock(c *gin.Context) {
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
 		return
+	}
+
+	page := 1
+	if nil != arg["page"] {
+		page = int(arg["page"].(float64))
+	}
+	if 0 >= page {
+		page = 1
 	}
 
 	query := arg["query"].(string)
@@ -259,10 +267,11 @@ func fullTextSearchBlock(c *gin.Context) {
 	if nil != groupByArg {
 		groupBy = int(groupByArg.(float64))
 	}
-	blocks, matchedBlockCount, matchedRootCount := model.FullTextSearchBlock(query, boxes, paths, types, method, orderBy, groupBy)
+	blocks, matchedBlockCount, matchedRootCount, pageCount := model.FullTextSearchBlock(query, boxes, paths, types, method, orderBy, groupBy, page)
 	ret.Data = map[string]interface{}{
 		"blocks":            blocks,
 		"matchedBlockCount": matchedBlockCount,
 		"matchedRootCount":  matchedRootCount,
+		"pageCount":         pageCount,
 	}
 }

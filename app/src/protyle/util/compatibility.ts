@@ -74,7 +74,7 @@ export const getEventName = () => {
 };
 
 // 区别 mac 上的 ctrl 和 meta
-export const isCtrl = (event: KeyboardEvent) => {
+export const isCtrl = (event: KeyboardEvent | MouseEvent) => {
     if (isMac()) {
         // mac
         if (event.metaKey && !event.ctrlKey) {
@@ -185,6 +185,7 @@ export const getLocalStorage = (cb: () => void) => {
         };
         defaultStorage[Constants.LOCAL_FONTSTYLES] = [];
         defaultStorage[Constants.LOCAL_SEARCHDATA] = {
+            page: 1,
             sort: 0,
             group: 0,
             hasReplace: false,

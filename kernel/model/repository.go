@@ -392,12 +392,7 @@ func ImportRepoKey(base64Key string) (err error) {
 		return
 	}
 
-	time.Sleep(1 * time.Second)
-	util.PushMsg(Conf.Language(138), 3000)
-	time.Sleep(1 * time.Second)
-	if initErr := IndexRepo("[Init] Init data repo"); nil != initErr {
-		util.PushErrMsg(fmt.Sprintf(Conf.Language(140), initErr), 0)
-	}
+	initDataRepo()
 	return
 }
 
@@ -420,6 +415,29 @@ func ResetRepo() (err error) {
 		time.Sleep(2 * time.Second)
 		util.ReloadUI()
 	}()
+	return
+}
+
+func PurgeRepo() (err error) {
+	msg := Conf.Language(202)
+	util.PushEndlessProgress(msg)
+	defer util.PushClearProgress()
+
+	repo, err := newRepository()
+	if nil != err {
+		return
+	}
+
+	stat, err := repo.Purge()
+	if nil != err {
+		return
+	}
+
+	deletedIndexes := stat.Indexes
+	deletedObjects := stat.Objects
+	deletedSize := humanize.Bytes(uint64(stat.Size))
+	msg = fmt.Sprintf(Conf.Language(203), deletedIndexes, deletedObjects, deletedSize)
+	util.PushMsg(msg, 5000)
 	return
 }
 
@@ -456,12 +474,7 @@ func InitRepoKeyFromPassphrase(passphrase string) (err error) {
 	Conf.Repo.Key = key
 	Conf.Save()
 
-	time.Sleep(1 * time.Second)
-	util.PushMsg(Conf.Language(138), 3000)
-	time.Sleep(1 * time.Second)
-	if initErr := IndexRepo("[Init] Init data repo"); nil != initErr {
-		util.PushErrMsg(fmt.Sprintf(Conf.Language(140), initErr), 0)
-	}
+	initDataRepo()
 	return
 }
 
@@ -497,13 +510,17 @@ func InitRepoKey() (err error) {
 	Conf.Repo.Key = key
 	Conf.Save()
 
+	initDataRepo()
+	return
+}
+
+func initDataRepo() {
 	time.Sleep(1 * time.Second)
 	util.PushMsg(Conf.Language(138), 3000)
 	time.Sleep(1 * time.Second)
-	if initErr := IndexRepo("[Init] Init data repo"); nil != initErr {
+	if initErr := IndexRepo("[Init] Init local data repo"); nil != initErr {
 		util.PushErrMsg(fmt.Sprintf(Conf.Language(140), initErr), 0)
 	}
-	return
 }
 
 func CheckoutRepo(id string) {
@@ -565,7 +582,14 @@ func DownloadCloudSnapshot(tag, id string) (err error) {
 	}
 
 	defer util.PushClearProgress()
-	downloadFileCount, downloadChunkCount, downloadBytes, err := repo.DownloadTagIndex(tag, id, map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBarAndProgress})
+
+	var downloadFileCount, downloadChunkCount int
+	var downloadBytes int64
+	if "" == tag {
+		downloadFileCount, downloadChunkCount, downloadBytes, err = repo.DownloadIndex(id, map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBarAndProgress})
+	} else {
+		downloadFileCount, downloadChunkCount, downloadBytes, err = repo.DownloadTagIndex(tag, id, map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBarAndProgress})
+	}
 	if nil != err {
 		return
 	}
@@ -639,6 +663,33 @@ func GetCloudRepoTagSnapshots() (ret []*dejavu.Log, err error) {
 	}
 
 	logs, err := repo.GetCloudRepoTagLogs(map[string]interface{}{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBar})
+	if nil != err {
+		return
+	}
+	ret = logs
+	if 1 > len(ret) {
+		ret = []*dejavu.Log{}
+	}
+	return
+}
+
+func GetCloudRepoSnapshots(page int) (ret []*dejavu.Log, pageCount, totalCount int, err error) {
+	ret = []*dejavu.Log{}
+	if 1 > len(Conf.Repo.Key) {
+		err = errors.New(Conf.Language(26))
+		return
+	}
+
+	repo, err := newRepository()
+	if nil != err {
+		return
+	}
+
+	if 1 > page {
+		page = 1
+	}
+
+	logs, pageCount, totalCount, err := repo.GetCloudRepoLogs(page)
 	if nil != err {
 		return
 	}
