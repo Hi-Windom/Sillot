@@ -47,6 +47,7 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly SIYUAN_AUTO_LAUNCH: string = "siyuan-auto-launch";
 
     // size
+    public static readonly SIZE_LINK_TEXT_MAX: number = 24;
     public static readonly SIZE_TOOLBAR_HEIGHT: number = isMobile() ? 0 : 32;
     public static readonly SIZE_GET_MAX = 102400;
     public static readonly SIZE_UNDO = 64;
@@ -189,6 +190,7 @@ export abstract class Constants extends SConst { // Sillot extend
                 outline: {default: "⌥O", custom: "⌥O"},
                 backlinks: {default: "⌥B", custom: "⌥B"},
                 graphView: {default: "⌥G", custom: "⌥G"},
+                spaceRepetition: {default: "⌥F", custom: "⌥F"},
                 fullscreen: {default: "⌥Y", custom: "⌥Y"},
                 alignLeft: {default: "⌥L", custom: "⌥L"},
                 alignCenter: {default: "⌥C", custom: "⌥C"},

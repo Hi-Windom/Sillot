@@ -105,7 +105,7 @@ export const showDiff = (data: { id: string, time: string }[]) => {
     }
     let left: string;
     let right: string;
-    if (data[0].time < data[1].time) {
+    if (data[0].time > data[1].time) {
         left = data[1].id;
         right = data[0].id;
     } else {
@@ -172,7 +172,7 @@ const genHTML = (left: string, right: string, dialog: Dialog, direct:string) => 
     ${isPhone ? "" : '<span class="fn__space"></span>'}
     ${dayjs(response.data.left.created).format("YYYY-MM-DD HH:mm")}
     <span class="fn__space"></span>
-    <span class="block__icon block__icon--show" data-direct="${direct}"><svg><use xlink:href="#iconForward"></use></svg></span>
+    <span class="block__icon block__icon--show b3-tooltips b3-tooltips__s" aria-label="${window.siyuan.languages.switchDirect}" data-direct="${direct}"><svg><use xlink:href="#iconForward"></use></svg></span>
     <span class="fn__space"></span>
     <code class="fn__code${isPhone ? " fn__none" : ""}">${right.substring(0, 7)}</code>
     ${isPhone ? "" : '<span class="fn__space"></span>'}
