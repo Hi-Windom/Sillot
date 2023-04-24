@@ -902,7 +902,7 @@ func syncRepoDownload() (err error) {
 	Conf.Sync.Synced = util.CurrentTimeMillis()
 	msg := fmt.Sprintf(Conf.Language(150), trafficStat.UploadFileCount, trafficStat.DownloadFileCount, trafficStat.UploadChunkCount, trafficStat.DownloadChunkCount, humanize.Bytes(uint64(trafficStat.UploadBytes)), humanize.Bytes(uint64(trafficStat.DownloadBytes)))
 	Conf.Sync.Stat = msg
-	syncDownloadErrCount = 0
+	autoSyncErrCount = 0
 	logging.LogInfof("synced data repo download [provider=%d, ufc=%d, dfc=%d, ucc=%d, dcc=%d, ub=%s, db=%s] in [%.2fs]",
 		Conf.Sync.Provider, trafficStat.UploadFileCount, trafficStat.DownloadFileCount, trafficStat.UploadChunkCount, trafficStat.DownloadChunkCount, humanize.Bytes(uint64(trafficStat.UploadBytes)), humanize.Bytes(uint64(trafficStat.DownloadBytes)), elapsed.Seconds())
 
@@ -969,6 +969,7 @@ func syncRepoUpload() (err error) {
 	Conf.Sync.Synced = util.CurrentTimeMillis()
 	msg := fmt.Sprintf(Conf.Language(150), trafficStat.UploadFileCount, trafficStat.DownloadFileCount, trafficStat.UploadChunkCount, trafficStat.DownloadChunkCount, humanize.Bytes(uint64(trafficStat.UploadBytes)), humanize.Bytes(uint64(trafficStat.DownloadBytes)))
 	Conf.Sync.Stat = msg
+	autoSyncErrCount = 0
 	logging.LogInfof("synced data repo upload [provider=%d, ufc=%d, dfc=%d, ucc=%d, dcc=%d, ub=%s, db=%s] in [%.2fs]",
 		Conf.Sync.Provider, trafficStat.UploadFileCount, trafficStat.DownloadFileCount, trafficStat.UploadChunkCount, trafficStat.DownloadChunkCount, humanize.Bytes(uint64(trafficStat.UploadBytes)), humanize.Bytes(uint64(trafficStat.DownloadBytes)), elapsed.Seconds())
 	return
@@ -976,7 +977,7 @@ func syncRepoUpload() (err error) {
 
 func bootSyncRepo() (err error) {
 	if 1 > len(Conf.Repo.Key) {
-		syncDownloadErrCount++
+		autoSyncErrCount++
 		planSyncAfter(fixSyncInterval)
 
 		msg := Conf.Language(26)
@@ -988,7 +989,7 @@ func bootSyncRepo() (err error) {
 
 	repo, err := newRepository()
 	if nil != err {
-		syncDownloadErrCount++
+		autoSyncErrCount++
 		planSyncAfter(fixSyncInterval)
 
 		msg := fmt.Sprintf("sync repo failed: %s", err)
@@ -1001,7 +1002,7 @@ func bootSyncRepo() (err error) {
 	start := time.Now()
 	err = indexRepoBeforeCloudSync(repo)
 	if nil != err {
-		syncDownloadErrCount++
+		autoSyncErrCount++
 		planSyncAfter(fixSyncInterval)
 		return
 	}
@@ -1032,7 +1033,7 @@ func bootSyncRepo() (err error) {
 	elapsed := time.Since(start)
 	logging.LogInfof("boot get sync cloud files elapsed [%.2fs]", elapsed.Seconds())
 	if nil != err {
-		syncDownloadErrCount++
+		autoSyncErrCount++
 		planSyncAfter(fixSyncInterval)
 
 		logging.LogErrorf("sync data repo failed: %s", err)
@@ -1067,7 +1068,7 @@ func bootSyncRepo() (err error) {
 
 func syncRepo(exit, byHand bool) (err error) {
 	if 1 > len(Conf.Repo.Key) {
-		syncDownloadErrCount++
+		autoSyncErrCount++
 		planSyncAfter(fixSyncInterval)
 
 		msg := Conf.Language(26)
@@ -1079,7 +1080,7 @@ func syncRepo(exit, byHand bool) (err error) {
 
 	repo, err := newRepository()
 	if nil != err {
-		syncDownloadErrCount++
+		autoSyncErrCount++
 		planSyncAfter(fixSyncInterval)
 
 		msg := fmt.Sprintf("sync repo failed: %s", err)
@@ -1092,7 +1093,7 @@ func syncRepo(exit, byHand bool) (err error) {
 	start := time.Now()
 	err = indexRepoBeforeCloudSync(repo)
 	if nil != err {
-		syncDownloadErrCount++
+		autoSyncErrCount++
 		planSyncAfter(fixSyncInterval)
 		return
 	}
@@ -1107,7 +1108,7 @@ func syncRepo(exit, byHand bool) (err error) {
 	}
 	elapsed := time.Since(start)
 	if nil != err {
-		syncDownloadErrCount++
+		autoSyncErrCount++
 		planSyncAfter(fixSyncInterval)
 
 		logging.LogErrorf("sync data repo failed: %s", err)
@@ -1120,7 +1121,9 @@ func syncRepo(exit, byHand bool) (err error) {
 		}
 		Conf.Sync.Stat = msg
 		util.PushStatusBar(msg)
-		util.PushErrMsg(msg, 0)
+		if 1 > autoSyncErrCount || byHand {
+			util.PushErrMsg(msg, 0)
+		}
 		if exit {
 			ExitSyncSucc = 1
 		}
@@ -1131,7 +1134,7 @@ func syncRepo(exit, byHand bool) (err error) {
 	Conf.Sync.Synced = util.CurrentTimeMillis()
 	msg := fmt.Sprintf(Conf.Language(150), trafficStat.UploadFileCount, trafficStat.DownloadFileCount, trafficStat.UploadChunkCount, trafficStat.DownloadChunkCount, humanize.Bytes(uint64(trafficStat.UploadBytes)), humanize.Bytes(uint64(trafficStat.DownloadBytes)))
 	Conf.Sync.Stat = msg
-	syncDownloadErrCount = 0
+	autoSyncErrCount = 0
 	logging.LogInfof("synced data repo [provider=%d, ufc=%d, dfc=%d, ucc=%d, dcc=%d, ub=%s, db=%s] in [%.2fs]",
 		Conf.Sync.Provider, trafficStat.UploadFileCount, trafficStat.DownloadFileCount, trafficStat.UploadChunkCount, trafficStat.DownloadChunkCount, humanize.Bytes(uint64(trafficStat.UploadBytes)), humanize.Bytes(uint64(trafficStat.DownloadBytes)), elapsed.Seconds())
 
@@ -1401,7 +1404,7 @@ func newRepository() (ret *dejavu.Repo, err error) {
 
 	ignoreLines := getIgnoreLines()
 	ignoreLines = append(ignoreLines, "/.siyuan/conf.json") // 忽略旧版同步配置  // 这个不要改为 .sillot
-	ret, err = dejavu.NewRepo(util.DataDir, util.RepoDir, util.HistoryDir, util.TempDir, Conf.System.ID, Conf.Repo.Key, ignoreLines, cloudRepo)
+	ret, err = dejavu.NewRepo(util.DataDir, util.RepoDir, util.HistoryDir, util.TempDir, Conf.System.ID, Conf.System.Name, Conf.System.OS, Conf.Repo.Key, ignoreLines, cloudRepo)
 	if nil != err {
 		logging.LogErrorf("init data repo failed: %s", err)
 		return
