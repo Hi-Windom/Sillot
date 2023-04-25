@@ -6,16 +6,14 @@ import {writeText} from "./compatibility";
 import {clipboard} from "electron";
 /// #endif
 import {hasClosestBlock} from "./hasClosest";
-import {focusByWbr, getEditorRange} from "./selection";
+import {getEditorRange} from "./selection";
 import {blockRender} from "../markdown/blockRender";
 import {highlightRender} from "../markdown/highlightRender";
-import {updateTransaction} from "../wysiwyg/transaction";
 import {fetchPost, fetchSyncPost} from "../../util/fetch";
 import {isDynamicRef, isFileAnnotation} from "../../util/functions";
 import {insertHTML} from "./insertHTML";
 import {scrollCenter} from "../../util/highlightById";
 import {hideElements} from "../ui/hideElements";
-import {hasNextSibling, hasPreviousSibling} from "../wysiwyg/getBlock";
 
 const filterClipboardHint = (protyle: IProtyle, textPlain: string) => {
     let needRender = true;
@@ -169,7 +167,8 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
     });
     const code = processPasteCode(textHTML, textPlain);
     const range = getEditorRange(protyle.wysiwyg.element);
-    if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
+    if (nodeElement.getAttribute("data-type") === "NodeCodeBlock" ||
+        protyle.toolbar.getCurrentType(range).includes("code")) {
         // 粘贴在代码位置
         insertHTML(textPlain, protyle);
         return;
@@ -201,25 +200,8 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
         highlightRender(protyle.wysiwyg.element);
     } else if (code) {
         if (!code.startsWith('<div data-type="NodeCodeBlock" class="code-block" data-node-id="')) {
-            const wbrElement = document.createElement("wbr");
-            range.insertNode(wbrElement);
-            const html = nodeElement.outerHTML;
-            wbrElement.remove();
-            range.deleteContents();
-            const tempElement = document.createElement("span");
-            tempElement.setAttribute("data-type", "code");
-            tempElement.textContent = Constants.ZWSP + code;
-            range.insertNode(tempElement);
-            if (!hasPreviousSibling(tempElement)) {
-                tempElement.insertAdjacentHTML("beforebegin", Constants.ZWSP);
-            }
-            if (hasNextSibling(tempElement)) {
-                tempElement.insertAdjacentHTML("afterend", "<wbr>");
-            } else {
-                tempElement.insertAdjacentHTML("afterend", Constants.ZWSP + "<wbr>");
-            }
-            updateTransaction(protyle, nodeElement.getAttribute("data-node-id"), nodeElement.outerHTML, html);
-            focusByWbr(protyle.wysiwyg.element, range);
+            // 原有代码在行内元素中粘贴会嵌套
+            insertHTML(code, protyle);
         } else {
             // 粘贴内容转代码块 代码块编辑增强 #85
             const x: Array<any> = window._.words(code, /[^, ,=,"]+/g);
