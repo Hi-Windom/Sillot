@@ -1,0 +1,25 @@
+{
+  "name": "@affine/env",
+  "private": true,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "devDependencies": {
+    "@blocksuite/global": "0.0.0-20230426054154-cbe3dbce-nightly",
+    "next": "=13.2.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zod": "^3.21.4"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./constant": "./src/constant.ts",
+    "./blocksuite": "./src/blocksuite.ts"
+  },
+  "peerDependencies": {
+    "@blocksuite/global": "0.0.0-20230409084303-221991d4-nightly"
+  },
+  "dependencies": {
+    "lit": "^2.7.2"
+  },
+  "version": "0.5.4-canary.12"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@affine/templates",
+  "private": true,
+  "sideEffect": false,
+  "exports": {
+    "./*.md": "./src/*.md"
+  },
+  "version": "0.5.4-canary.12"
+}
