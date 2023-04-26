@@ -40,13 +40,9 @@
 <img alt="split" src="./.github/split.png"/>
 </p>
 
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=Hi-Windom/Sillot&type=Timeline)](https://star-history.com/#Hi-Windom/Sillot&Timeline)
+## 🔭 Roadmap
 
 <p align="center">
-<br><br><br><br><br>
-<img alt="split" src="./.github/split.png"/>
 <h2><a href="https://github.com/orgs/Hi-Windom/projects/2/views/2">汐洛路线图（Sillot Roadmap）</a></h2>
 <h2><a href="https://github.com/orgs/Hi-Windom/projects/3/views/2">汐洛安卓路线图（Sillot Android Roadmap）</a></h2>
 <h2><a href="https://github.com/orgs/Hi-Windom/projects/4/views/2">汐洛社区路线图（Sillot Community Roadmap）</a></h2>
