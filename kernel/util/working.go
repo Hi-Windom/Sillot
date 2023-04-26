@@ -32,8 +32,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/88250/gulu"
 	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
 	figure "github.com/common-nighthawk/go-figure"

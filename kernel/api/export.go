@@ -24,7 +24,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/K-Sillot/gulu"
+	"github.com/88250/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/siyuan-note/siyuan/kernel/model"

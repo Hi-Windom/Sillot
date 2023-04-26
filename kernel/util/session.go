@@ -17,7 +17,7 @@
 package util
 
 import (
-	"github.com/K-Sillot/gulu"
+	"github.com/88250/gulu"
 	ginSessions "github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )

@@ -26,8 +26,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/88250/gulu"
 	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"

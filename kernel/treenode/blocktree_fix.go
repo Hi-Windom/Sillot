@@ -19,7 +19,7 @@ package treenode
 import (
 	"time"
 
-	"github.com/K-Sillot/gulu"
+	"github.com/88250/gulu"
 )
 
 func ClearRedundantBlockTrees(boxID string, paths []string) {

@@ -31,7 +31,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/K-Sillot/gulu"
+	"github.com/88250/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/sessions"

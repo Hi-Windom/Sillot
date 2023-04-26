@@ -32,6 +32,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
@@ -40,7 +41,6 @@ import (
 	"github.com/88250/pdfcpu/pkg/api"
 	"github.com/88250/pdfcpu/pkg/pdfcpu"
 	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
 	"github.com/emirpasic/gods/sets/hashset"

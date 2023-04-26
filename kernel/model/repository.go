@@ -33,13 +33,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/88250/gulu"
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/K-Sillot/encryption"
 	"github.com/K-Sillot/eventbus"
-	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
@@ -1059,8 +1059,6 @@ func bootSyncRepo() (err error) {
 				logging.LogErrorf("boot background sync repo failed: %s", syncErr)
 				return
 			}
-			syncingFiles = sync.Map{}
-			syncingStorages = false
 		}()
 	}
 	return
@@ -1231,6 +1229,9 @@ func processSyncMergeResult(exit, byHand bool, start time.Time, mergeResult *dej
 	if needReloadOcrTexts {
 		LoadAssetsTexts()
 	}
+
+	syncingFiles = sync.Map{}
+	syncingStorages = false
 
 	cache.ClearDocsIAL()              // 同步后文档树文档图标没有更新 https://github.com/siyuan-note/siyuan/issues/4939
 	if needFullReindex(upsertTrees) { // 改进同步后全量重建索引判断 https://github.com/siyuan-note/siyuan/issues/5764
