@@ -28,11 +28,11 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
 	sprig "github.com/Masterminds/sprig/v3"
 	"github.com/araddon/dateparse"

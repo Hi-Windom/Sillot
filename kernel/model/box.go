@@ -29,10 +29,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
 	"github.com/facette/natsort"
@@ -476,10 +476,6 @@ func genTreeID(tree *parse.Tree) {
 	})
 	tree.Root.KramdownIAL = parse.Tokens2IAL(tree.Root.LastChild.Tokens)
 	return
-}
-
-func ReloadUI() {
-	task.AppendTask(task.ReloadUI, util.ReloadUI)
 }
 
 func FullReindex() {

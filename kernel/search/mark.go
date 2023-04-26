@@ -22,7 +22,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/K-Sillot/gulu"
+	"github.com/88250/gulu"
 
 	"github.com/88250/lute/lex"
 	"github.com/siyuan-note/siyuan/kernel/util"

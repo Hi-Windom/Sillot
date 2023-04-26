@@ -5,6 +5,8 @@ go 1.18
 require (
 	github.com/88250/clipboard v0.1.5
 	github.com/88250/css v0.1.2
+	github.com/88250/gulu v1.2.3-0.20230321113152-38c4a3d73c37
+	github.com/88250/lute v1.7.6-0.20230426013259-afae190c74ff
 	github.com/88250/pdfcpu v0.3.14-0.20230401044135-c7369a99720c
 	github.com/88250/vitess-sqlparser v0.0.0-20210205111146-56a2ded2aba1
 	github.com/ClarkThan/ahocorasick v0.0.0-20230220142845-f237b6348b3e
@@ -47,8 +49,8 @@ require (
 	github.com/siyuan-note/encryption v0.0.0-20220713091850-5ecd92177b75 // indirect
 	github.com/siyuan-note/eventbus v0.0.0-20230216103454-41885eac6c2b // indirect
 	github.com/siyuan-note/filelock v0.0.0-20230417044524-125ee78b5cc9 // indirect
-	github.com/siyuan-note/httpclient v0.0.0-20230420113830-aaaf2c3bc514 // indirect
-	github.com/siyuan-note/logging v0.0.0-20230327073243-ebe83aec1493 // indirect
+	github.com/siyuan-note/httpclient v0.0.0-20230420113830-aaaf2c3bc514
+	github.com/siyuan-note/logging v0.0.0-20230327073243-ebe83aec1493
 	github.com/steambap/captcha v1.4.1
 	github.com/studio-b12/gowebdav v0.0.0-20230203202212-3282f94193f2
 	github.com/vmihailenco/msgpack/v5 v5.3.5
@@ -62,9 +64,9 @@ require (
 require (
 	dmitri.shuralyov.com/font/woff2 v0.0.0-20180220214647-957792cbbdab // indirect
 	github.com/K-Sillot/filelock v0.0.5
-	github.com/K-Sillot/gulu v0.0.3
 	github.com/K-Sillot/httpclient v0.0.1
 	github.com/K-Sillot/logging v0.0.3
+	github.com/K-Sillot/riff v0.0.1
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/alecthomas/chroma v0.10.0 // indirect
@@ -141,12 +143,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-require (
-	github.com/88250/lute v1.7.6-0.20230330013439-8760e9c073db
-	github.com/K-Sillot/riff v0.0.1
-)
-
-require github.com/88250/gulu v1.2.3-0.20230321113152-38c4a3d73c37 // indirect
+require github.com/K-Sillot/gulu v0.0.3 // indirect
 
 replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20220714142610-fbbda1ee84f5
 

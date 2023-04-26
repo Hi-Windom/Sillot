@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# check lockfile is up to date
+yarn install
+
+# lint staged files
+yarn exec lint-staged

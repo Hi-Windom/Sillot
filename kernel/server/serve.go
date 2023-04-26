@@ -31,7 +31,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/K-Sillot/gulu"
+	"github.com/88250/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/sessions"
@@ -128,6 +128,8 @@ func Serve(fastMode bool) {
 			// 反代服务器启动失败不影响核心服务器启动
 		}
 	}()
+
+	go util.HookUILoaded()
 
 	if err = http.Serve(ln, ginServer); nil != err {
 		if !fastMode {

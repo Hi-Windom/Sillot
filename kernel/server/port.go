@@ -26,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/K-Sillot/gulu"
+	"github.com/88250/gulu"
 	"github.com/K-Sillot/logging"
 	goPS "github.com/mitchellh/go-ps"
 	"github.com/siyuan-note/siyuan/kernel/util"

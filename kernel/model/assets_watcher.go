@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/K-Sillot/gulu"
+	"github.com/88250/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/fsnotify/fsnotify"
 	"github.com/siyuan-note/siyuan/kernel/cache"

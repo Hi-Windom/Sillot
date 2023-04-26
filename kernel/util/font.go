@@ -21,8 +21,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/88250/gulu"
 	"github.com/ConradIrwin/font/sfnt"
-	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/flopp/go-findfont"
 	ttc "golang.org/x/image/font/sfnt"

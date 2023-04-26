@@ -33,13 +33,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/88250/gulu"
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/K-Sillot/encryption"
 	"github.com/K-Sillot/eventbus"
-	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
@@ -49,6 +49,7 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
+	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -1053,14 +1054,11 @@ func bootSyncRepo() (err error) {
 
 	if 0 < len(fetchedFiles) {
 		go func() {
-			time.Sleep(7 * time.Second) // 等待一段时间后前端完成界面初始化后再同步
 			syncErr := syncRepo(false, false)
 			if nil != err {
 				logging.LogErrorf("boot background sync repo failed: %s", syncErr)
 				return
 			}
-			syncingFiles = sync.Map{}
-			syncingStorages = false
 		}()
 	}
 	return
@@ -1232,39 +1230,52 @@ func processSyncMergeResult(exit, byHand bool, start time.Time, mergeResult *dej
 		LoadAssetsTexts()
 	}
 
+	syncingFiles = sync.Map{}
+	syncingStorages = false
+
 	cache.ClearDocsIAL()              // 同步后文档树文档图标没有更新 https://github.com/siyuan-note/siyuan/issues/4939
 	if needFullReindex(upsertTrees) { // 改进同步后全量重建索引判断 https://github.com/siyuan-note/siyuan/issues/5764
 		FullReindex()
 		return
 	}
 
-	incReindex(upserts, removes)
-	if !exit {
-		ReloadUI()
+	if exit { // 退出时同步不用推送事件
+		return
 	}
 
+	upsertRootIDs, removeRootIDs := incReindex(upserts, removes)
 	elapsed := time.Since(start)
-	if !exit {
-		go func() {
-			time.Sleep(2 * time.Second)
-			util.PushStatusBar(fmt.Sprintf(Conf.Language(149), elapsed.Seconds()))
+	go func() {
+		sql.WaitForWritingDatabase()
+		util.WaitForUILoaded()
 
-			if 0 < len(mergeResult.Conflicts) {
-				syConflict := false
-				for _, file := range mergeResult.Conflicts {
-					if strings.HasSuffix(file.Path, ".sy") {
-						syConflict = true
-						break
-					}
-				}
+		if util.ContainerAndroid == util.Container || util.ContainerIOS == util.Container {
+			// 移动端不推送差异详情
+			upsertRootIDs = []string{}
+			removeRootIDs = []string{}
+		}
 
-				if syConflict {
-					// 数据同步发生冲突时在界面上进行提醒 https://github.com/siyuan-note/siyuan/issues/7332
-					util.PushMsg(Conf.Language(108), 7000)
+		util.BroadcastByType("main", "syncMergeResult", 0, "",
+			map[string]interface{}{"upsertRootIDs": upsertRootIDs, "removeRootIDs": removeRootIDs})
+
+		time.Sleep(2 * time.Second)
+		util.PushStatusBar(fmt.Sprintf(Conf.Language(149), elapsed.Seconds()))
+
+		if 0 < len(mergeResult.Conflicts) {
+			syConflict := false
+			for _, file := range mergeResult.Conflicts {
+				if strings.HasSuffix(file.Path, ".sy") {
+					syConflict = true
+					break
 				}
 			}
-		}()
-	}
+
+			if syConflict {
+				// 数据同步发生冲突时在界面上进行提醒 https://github.com/siyuan-note/siyuan/issues/7332
+				util.PushMsg(Conf.Language(108), 7000)
+			}
+		}
+	}()
 }
 
 func logSyncMergeResult(mergeResult *dejavu.MergeResult) {

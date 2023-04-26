@@ -25,9 +25,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/88250/gulu"
 	"github.com/88250/lute"
 	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
 	"github.com/PuerkitoBio/goquery"
@@ -64,6 +64,28 @@ type Package struct {
 	HInstallDate string `json:"hInstallDate"`
 	HUpdated     string `json:"hUpdated"`
 	Downloads    int    `json:"downloads"`
+}
+
+func PluginJSON(pluginDirName string) (ret map[string]interface{}, err error) {
+	p := filepath.Join(util.DataDir, "plugins", pluginDirName, "plugin.json")
+	if !gulu.File.IsExist(p) {
+		err = os.ErrNotExist
+		return
+	}
+	data, err := os.ReadFile(p)
+	if nil != err {
+		logging.LogErrorf("read plugin.json [%s] failed: %s", p, err)
+		return
+	}
+	if err = gulu.JSON.UnmarshalJSON(data, &ret); nil != err {
+		logging.LogErrorf("parse plugin.json [%s] failed: %s", p, err)
+		return
+	}
+	if 4 > len(ret) {
+		logging.LogWarnf("invalid plugin.json [%s]", p)
+		return nil, errors.New("invalid plugin.json")
+	}
+	return
 }
 
 func WidgetJSON(widgetDirName string) (ret map[string]interface{}, err error) {
@@ -210,6 +232,26 @@ func isOutdatedIcon(icon *Icon, bazaarIcons []*Icon) bool {
 	for _, pkg := range bazaarIcons {
 		if icon.URL == pkg.URL && icon.Name == pkg.Name && icon.Author == pkg.Author && icon.Version < pkg.Version {
 			icon.RepoHash = pkg.RepoHash
+			return true
+		}
+	}
+	return false
+}
+
+func isOutdatedPlugin(plugin *Plugin, bazaarPlugins []*Plugin) bool {
+	if !strings.HasPrefix(plugin.URL, "https://github.com/") {
+		return false
+	}
+
+	repo := strings.TrimPrefix(plugin.URL, "https://github.com/")
+	parts := strings.Split(repo, "/")
+	if 2 != len(parts) || "" == strings.TrimSpace(parts[1]) {
+		return false
+	}
+
+	for _, pkg := range bazaarPlugins {
+		if plugin.URL == pkg.URL && plugin.Name == pkg.Name && plugin.Author == pkg.Author && plugin.Version < pkg.Version {
+			plugin.RepoHash = pkg.RepoHash
 			return true
 		}
 	}

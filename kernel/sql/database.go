@@ -32,11 +32,11 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
 	"github.com/K-Sillot/eventbus"
-	"github.com/K-Sillot/gulu"
 	"github.com/K-Sillot/logging"
 	"github.com/mattn/go-sqlite3"
 	_ "github.com/mattn/go-sqlite3"

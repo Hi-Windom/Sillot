@@ -20,8 +20,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/88250/gulu"
 	"github.com/K-Sillot/eventbus"
-	"github.com/K-Sillot/gulu"
 	"github.com/olahol/melody"
 )
 

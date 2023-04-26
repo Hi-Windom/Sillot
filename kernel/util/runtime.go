@@ -30,7 +30,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/K-Sillot/gulu"
+	"github.com/88250/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
 	"github.com/denisbrodbeck/machineid"
@@ -39,6 +39,25 @@ import (
 )
 
 const DatabaseVer = "20220501" // 修改表结构的话需要修改这里
+
+// IsUILoaded 是否已经加载了 UI。
+var IsUILoaded = false
+
+func WaitForUILoaded() {
+	for !IsUILoaded {
+		time.Sleep(200 * time.Millisecond)
+	}
+}
+
+func HookUILoaded() {
+	for !IsUILoaded {
+		if 0 < len(SessionsByType("main")) {
+			IsUILoaded = true
+			return
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+}
 
 // IsExiting 是否正在退出程序。
 var IsExiting = false

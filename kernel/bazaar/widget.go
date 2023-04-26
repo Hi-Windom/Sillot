@@ -24,7 +24,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/K-Sillot/gulu"
+	"github.com/88250/gulu"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
