@@ -11,6 +11,7 @@ import {setStorageVal} from "../../protyle/util/compatibility";
 import {closePanel} from "./closePanel";
 import {showMessage} from "../../dialog/message";
 import {getCurrentEditor} from "../editor";
+import { isPadAppMode } from "sofill/env";
 
 const forwardStack: IBackStack[] = [];
 
@@ -146,7 +147,7 @@ export const goBack = () => {
         closePanel();
         return;
     }
-    if (window.JSAndroid && window.siyuan.backStack.length < 1) {
+    if (window.JSAndroid && (isPadAppMode() || window.siyuan.backStack.length < 1)) {
         if (document.querySelector('#message [data-id="exitTip"]')) {
             window.JSAndroid.exitSillotAndroid();
         } else {
