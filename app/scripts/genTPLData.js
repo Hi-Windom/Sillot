@@ -47,7 +47,7 @@ exports.default = {
     </svg>
 </div>`,
           editor: /*html*/ `<div id="editor" class="fn__none fn__flex-1"></div>`,
-          empty: /*html*/ `<div id="empty"></div>`,
+          empty: /*html*/ `<div id="empty" class="b3-list--mobile"></div>`,
           sidebar: /*html*/ `<div id="sidebar" class="side-panel fn__flex-column">
     <div class="toolbar toolbar--border">
         <svg data-type="sidebar-file-tab" class="toolbar__icon toolbar__icon--active"><use xlink:href="#iconFiles"></use></svg>
