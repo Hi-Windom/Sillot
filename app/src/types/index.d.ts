@@ -30,6 +30,7 @@ type TOperation =
     | "addFlashcards"
     | "removeFlashcards"
 type TBazaarType = "templates" | "icons" | "widgets" | "themes"
+type TCardType = "doc" | "notebook" | "all"
 // declare module "blueimp-md5"
 
 interface Window {
@@ -660,6 +661,7 @@ declare interface IModels {
     tag: import("../layout/dock/Tag").Tag[]
     asset: import("../asset").Asset[]
     search: import("../search").Search[]
+    custom: import("../layout/dock/Custom").Custom[]
 }
 
 declare interface IMenu {

@@ -187,7 +187,7 @@ ${accountHTML}
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuHistory" && !window.siyuan.config.readonly) {
+            } else if (target.id === "menuHistory") {
                 openHistory();
                 event.preventDefault();
                 event.stopPropagation();
