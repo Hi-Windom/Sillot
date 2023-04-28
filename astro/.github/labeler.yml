@@ -1,0 +1,37 @@
+# See https://github.com/actions/labeler
+
+example:
+- examples/**/*
+
+'🚨 action':
+- .github/workflows/**
+
+core:
+- packages/astro/**
+
+create-astro:
+- packages/create-astro/**
+
+markdown:
+- packages/markdown/**
+
+integration:
+- packages/integrations/**
+
+framework-lit:
+- packages/integrations/lit/**
+
+framework-preact:
+- packages/integrations/preact/**
+
+framework-react:
+- packages/integrations/react/**
+
+framework-solid:
+- packages/integrations/solid/**
+
+framework-svelte:
+- packages/integrations/svelte/**
+
+framework-vue:
+- packages/integrations/vue/**
