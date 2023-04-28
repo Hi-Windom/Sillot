@@ -1,1 +1,6 @@
-app/stage/protyle/** linguist-vendored
+# https://github.com/github/linguist/blob/master/docs/overrides.md
+app/stage/** linguist-vendored
+app/src/asset/pdf/** linguist-vendored
+*.yml linguist-language=shell
+*.bat linguist-language=shell
+*.json linguist-language=shell
