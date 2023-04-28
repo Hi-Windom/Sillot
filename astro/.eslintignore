@@ -1,0 +1,9 @@
+**/*.d.ts
+packages/**/dist/**/*
+packages/**/fixtures/**/*
+packages/webapi/**/*
+packages/astro/vendor/vite/**/*
+examples/**/*
+scripts/**/*
+.github
+.changeset
