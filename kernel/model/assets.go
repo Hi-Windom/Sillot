@@ -33,12 +33,13 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
 	"github.com/gabriel-vasile/mimetype"
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/search"
@@ -354,7 +355,7 @@ func uploadAssets2Cloud(sqlAssets []*sql.Asset, bizType string) (err error) {
 			continue
 		}
 
-		msg := fmt.Sprintf(Conf.Language(27), absAsset)
+		msg := fmt.Sprintf(Conf.Language(27), html.EscapeString(absAsset))
 		util.PushStatusBar(msg)
 		util.PushUpdateMsg(msgId, msg, 3000)
 
@@ -726,6 +727,10 @@ func assetsLinkDestsInTree(tree *parse.Tree) (ret []string) {
 			ret = append(ret, dest)
 		} else if n.IsTextMarkType("file-annotation-ref") {
 			if !isRelativePath(gulu.Str.ToBytes(n.TextMarkFileAnnotationRefID)) {
+				return ast.WalkContinue
+			}
+
+			if !strings.Contains(n.TextMarkFileAnnotationRefID, "/") {
 				return ast.WalkContinue
 			}
 

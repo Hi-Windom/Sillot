@@ -29,6 +29,35 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
+func setBazaar(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	param, err := gulu.JSON.MarshalJSON(arg)
+	if nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	bazaar := &conf.Bazaar{}
+	if err = gulu.JSON.UnmarshalJSON(param, bazaar); nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	model.Conf.Bazaar = bazaar
+	model.Conf.Save()
+
+	ret.Data = bazaar
+}
+
 func setAI(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -265,6 +294,9 @@ func setFiletree(c *gin.Context) {
 	}
 
 	fileTree.DocCreateSavePath = strings.TrimSpace(fileTree.DocCreateSavePath)
+	if "../" == fileTree.DocCreateSavePath {
+		fileTree.DocCreateSavePath = "../Untitled"
+	}
 	for strings.HasSuffix(fileTree.DocCreateSavePath, "/") {
 		fileTree.DocCreateSavePath = strings.TrimSuffix(fileTree.DocCreateSavePath, "/")
 		fileTree.DocCreateSavePath = strings.TrimSpace(fileTree.DocCreateSavePath)
@@ -310,6 +342,8 @@ func setSearch(c *gin.Context) {
 	}
 
 	oldCaseSensitive := model.Conf.Search.CaseSensitive
+	oldIndexAssetPath := model.Conf.Search.IndexAssetPath
+
 	oldVirtualRefName := model.Conf.Search.VirtualRefName
 	oldVirtualRefAlias := model.Conf.Search.VirtualRefAlias
 	oldVirtualRefAnchor := model.Conf.Search.VirtualRefAnchor
@@ -317,8 +351,11 @@ func setSearch(c *gin.Context) {
 
 	model.Conf.Search = s
 	model.Conf.Save()
+
 	sql.SetCaseSensitive(s.CaseSensitive)
-	if s.CaseSensitive != oldCaseSensitive {
+	sql.SetIndexAssetPath(s.IndexAssetPath)
+
+	if needFullReindex := s.CaseSensitive != oldCaseSensitive || s.IndexAssetPath != oldIndexAssetPath; needFullReindex {
 		model.FullReindex()
 	}
 

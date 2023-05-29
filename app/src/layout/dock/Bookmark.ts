@@ -8,14 +8,16 @@ import {openFileById} from "../../editor/util";
 import {Constants} from "../../constants";
 import {hasClosestByClassName} from "../../protyle/util/hasClosest";
 import {openBookmarkMenu} from "../../menus/bookmark";
+import {App} from "../../index";
 
 export class Bookmark extends Model {
     private openNodes: string[];
     public tree: Tree;
     private element: Element;
 
-    constructor(tab: Tab) {
+    constructor(app: App, tab: Tab) {
         super({
+            app,
             id: tab.id,
             msgCallback(data) {
                 if (data) {
@@ -73,14 +75,19 @@ export class Bookmark extends Model {
         this.tree = new Tree({
             element: this.element.lastElementChild as HTMLElement,
             data: null,
-            click:(element: HTMLElement, event: MouseEvent)=> {
-                const actionElement = hasClosestByClassName(event.target as HTMLElement, "b3-list-item__action");
-                if (actionElement) {
-                    openBookmarkMenu(actionElement.parentElement, event, this);
-                } else {
-                    const id = element.getAttribute("data-node-id");
+            click: (element: HTMLElement, event?: MouseEvent) => {
+                if (event) {
+                    const actionElement = hasClosestByClassName(event.target as HTMLElement, "b3-list-item__action");
+                    if (actionElement) {
+                        openBookmarkMenu(actionElement.parentElement, event, this);
+                        return;
+                    }
+                }
+                const id = element.getAttribute("data-node-id");
+                if (id) {
                     fetchPost("/api/block/checkBlockFold", {id}, (foldResponse) => {
                         openFileById({
+                            app,
                             id,
                             action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
                             zoomIn: foldResponse.data
@@ -93,6 +100,7 @@ export class Bookmark extends Model {
             },
             ctrlClick(element: HTMLElement) {
                 openFileById({
+                    app,
                     id: element.getAttribute("data-node-id"),
                     keepCursor: true,
                     action: [Constants.CB_GET_CONTEXT]
@@ -100,6 +108,7 @@ export class Bookmark extends Model {
             },
             altClick(element: HTMLElement) {
                 openFileById({
+                    app,
                     id: element.getAttribute("data-node-id"),
                     position: "right",
                     action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
@@ -107,6 +116,7 @@ export class Bookmark extends Model {
             },
             shiftClick(element: HTMLElement) {
                 openFileById({
+                    app,
                     id: element.getAttribute("data-node-id"),
                     position: "bottom",
                     action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
@@ -142,7 +152,6 @@ export class Bookmark extends Model {
         });
 
         this.update();
-        setPanelFocus(this.element);
     }
 
     public update() {

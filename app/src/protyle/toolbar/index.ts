@@ -26,6 +26,9 @@ import {blockRender} from "../markdown/blockRender";
 /// #if !BROWSER
 import {openBy} from "../../editor/util";
 /// #endif
+/// #if !MOBILE
+import {moveResize} from "../../dialog/moveResize";
+/// #endif
 import {fetchPost} from "../../util/fetch";
 import {isArrayEqual, isMobile} from "../../util/functions";
 // import * as dayjs from "dayjs";
@@ -43,6 +46,7 @@ import {mathRender} from "../markdown/mathRender";
 import {linkMenu} from "../../menus/protyle";
 import {addScript} from "../util/addScript";
 import {confirmDialog} from "../../dialog/confirmDialog";
+import {App} from "../../index";
 
 export class Toolbar {
     public element: HTMLElement;
@@ -50,10 +54,11 @@ export class Toolbar {
     public subElementCloseCB: () => void;
     public range: Range;
     private toolbarHeight: number;
+    private app: App;
 
-    constructor(protyle: IProtyle) {
+    constructor(app: App, protyle: IProtyle) {
         const options = protyle.options;
-
+        this.app = app;
         const element = document.createElement("div");
         element.className = "protyle-toolbar fn__none";
         this.element = element;
@@ -225,7 +230,7 @@ export class Toolbar {
                 menuItemObj = new Font(protyle, menuItem);
                 break;
             case "a":
-                menuItemObj = new Link(protyle, menuItem);
+                menuItemObj = new Link(this.app, protyle, menuItem);
                 break;
         }
         if (!menuItemObj) {
@@ -498,18 +503,26 @@ export class Toolbar {
                                     return true;
                                 }
                             });
-                        } else if (type === "block-ref" && types.includes("a")) {
-                            // 虚拟引用和链接不能同时存在
+                        } else if (type === "block-ref" && (types.includes("a") || types.includes("file-annotation-ref"))) {
+                            // 虚拟引用和链接/标注不能同时存在
                             types.find((item, index) => {
-                                if (item === "a") {
+                                if (item === "a" || item === "file-annotation-ref") {
                                     types.splice(index, 1);
                                     return true;
                                 }
                             });
-                        } else if (type === "a" && types.includes("block-ref")) {
-                            // 链接和引用不能同时存在
+                        } else if (type === "a" && (types.includes("block-ref") || types.includes("file-annotation-ref"))) {
+                            // 链接和引用/标注不能同时存在
                             types.find((item, index) => {
-                                if (item === "block-ref") {
+                                if (item === "block-ref" || item === "file-annotation-ref") {
+                                    types.splice(index, 1);
+                                    return true;
+                                }
+                            });
+                        } else if (type === "file-annotation-ref" && (types.includes("block-ref") || types.includes("a"))) {
+                            // 引用和链接/标注不能同时存在
+                            types.find((item, index) => {
+                                if (item === "block-ref" || item === "a") {
                                     types.splice(index, 1);
                                     return true;
                                 }
@@ -721,7 +734,7 @@ export class Toolbar {
             const aElement = newNodes[0] as HTMLElement;
             if (aElement.textContent.replace(Constants.ZWSP, "") === "" || !aElement.getAttribute("data-href")) {
                 needFocus = false;
-                linkMenu(protyle, aElement, aElement.getAttribute("data-href") ? true : false);
+                linkMenu(this.app, protyle, aElement, aElement.getAttribute("data-href") ? true : false);
             } else {
                 this.range.collapse(false);
             }
@@ -798,9 +811,13 @@ export class Toolbar {
                     refElement.innerHTML = "*";
                 }
                 this.range.setStartAfter(refElement);
-                focusByRange(this.range);
+                if (getSelection().rangeCount === 0) {
+                    focusByRange(this.range);
+                }
             } else {
-                focusByWbr(nodeElement, this.range);
+                if (getSelection().rangeCount === 0) {
+                    focusByWbr(nodeElement, this.range);
+                }
             }
             nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
             updateTransaction(protyle, id, nodeElement.outerHTML, html);
@@ -875,22 +892,24 @@ export class Toolbar {
             this.subElement.style.width = "";
             this.subElement.style.padding = "0";
         }
-        this.subElement.innerHTML = `<div ${(isPin && this.subElement.firstElementChild.getAttribute("data-drag") === "true") ? 'data-drag="true"' : ""} class="block__popover--move"><div class="block__icons block__icons--menu fn__flex">
-    ${title}
-    <span class="fn__flex-1"></span>
-    <button data-type="refresh" class="block__icon b3-tooltips b3-tooltips__nw${(isPin && !this.subElement.querySelector('[data-type="refresh"]').classList.contains("block__icon--active")) ? "" : " block__icon--active"}${types.includes("NodeBlockQueryEmbed") ? " fn__none" : ""}" aria-label="${window.siyuan.languages.refresh}"><svg><use xlink:href="#iconRefresh"></use></svg></button>
+        this.subElement.innerHTML = `<div ${(isPin && this.subElement.firstElementChild.getAttribute("data-drag") === "true") ? 'data-drag="true"' : ""}><div class="block__icons block__icons--menu fn__flex">
+    <span class="fn__flex-1 resize__move">
+        ${title}
+    </span>
     <span class="fn__space"></span>
-    <button data-type="before" class="block__icon b3-tooltips b3-tooltips__nw${protyle.disabled ? " fn__none" : ""}" aria-label="${window.siyuan.languages["insert-before"]}"><svg><use xlink:href="#iconBefore"></use></svg></button>
+    <button data-type="refresh" class="block__icon block__icon--show b3-tooltips b3-tooltips__nw${(isPin && !this.subElement.querySelector('[data-type="refresh"]').classList.contains("block__icon--active")) ? "" : " block__icon--active"}${types.includes("NodeBlockQueryEmbed") ? " fn__none" : ""}" aria-label="${window.siyuan.languages.refresh}"><svg><use xlink:href="#iconRefresh"></use></svg></button>
+    <span class="fn__space"></span>
+    <button data-type="before" class="block__icon block__icon--show b3-tooltips b3-tooltips__nw${protyle.disabled ? " fn__none" : ""}" aria-label="${window.siyuan.languages["insert-before"]}"><svg><use xlink:href="#iconBefore"></use></svg></button>
     <span class="fn__space${protyle.disabled ? " fn__none" : ""}"></span>
-    <button data-type="after" class="block__icon b3-tooltips b3-tooltips__nw${protyle.disabled ? " fn__none" : ""}" aria-label="${window.siyuan.languages["insert-after"]}"><svg><use xlink:href="#iconAfter"></use></svg></button>
+    <button data-type="after" class="block__icon block__icon--show b3-tooltips b3-tooltips__nw${protyle.disabled ? " fn__none" : ""}" aria-label="${window.siyuan.languages["insert-after"]}"><svg><use xlink:href="#iconAfter"></use></svg></button>
     <span class="fn__space${protyle.disabled ? " fn__none" : ""}"></span>
-    <button data-type="export" class="block__icon b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.export} ${window.siyuan.languages.image}"><svg><use xlink:href="#iconImage"></use></svg></button>
+    <button data-type="export" class="block__icon block__icon--show b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.export} ${window.siyuan.languages.image}"><svg><use xlink:href="#iconImage"></use></svg></button>
     <span class="fn__space"></span>
-    <button data-type="pin" class="block__icon b3-tooltips b3-tooltips__nw${isPin ? " block__icon--active" : ""}" aria-label="${window.siyuan.languages.pin}"><svg><use xlink:href="#iconPin"></use></svg></button>
+    <button data-type="pin" class="block__icon block__icon--show b3-tooltips b3-tooltips__nw${isPin ? " block__icon--active" : ""}" aria-label="${window.siyuan.languages.pin}"><svg><use xlink:href="#iconPin"></use></svg></button>
     <span class="fn__space"></span>
-    <button data-type="close" class="block__icon b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.close}"><svg style="width: 10px"><use xlink:href="#iconClose"></use></svg></button>
+    <button data-type="close" class="block__icon block__icon--show b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.close}"><svg style="width: 10px"><use xlink:href="#iconClose"></use></svg></button>
 </div>
-<textarea ${protyle.disabled ? " readonly" : ""} spellcheck="false" class="b3-text-field b3-text-field--text fn__block" placeholder="${placeholder}" style="${isMobile() ? "" : "width:" + Math.max(480, renderElement.clientWidth * 0.7) + "px"};max-height:50vh"></textarea></div>`;
+<textarea ${protyle.disabled ? " readonly" : ""} spellcheck="false" class="b3-text-field b3-text-field--text fn__block" placeholder="${placeholder}" style="${isMobile() ? "" : "width:" + Math.max(480, renderElement.clientWidth * 0.7) + "px"};max-height:50vh;min-height: 48px;min-width: 268px"></textarea></div>`;
         const autoHeight = () => {
             textElement.style.height = textElement.scrollHeight + "px";
             if (isMobile()) {
@@ -981,7 +1000,7 @@ export class Toolbar {
             }
             setTimeout(() => {
                 addScript("stage/protyle/js/html2canvas.min.js?v=1.4.1", "protyleHtml2canvas").then(() => {
-                    window.html2canvas(renderElement).then((canvas) => {
+                    window.html2canvas(renderElement, {useCORS: true}).then((canvas) => {
                         canvas.toBlob((blob: Blob) => {
                             const formData = new FormData();
                             formData.append("file", blob);
@@ -993,43 +1012,16 @@ export class Toolbar {
                         });
                     });
                 });
-            }, Constants.TIMEOUT_TRANSITION);
+            }, Constants.TIMEOUT_LOAD);
         };
-        headerElement.addEventListener("mousedown", (event: MouseEvent) => {
-            if (hasClosestByClassName(event.target as HTMLElement, "block__icon")) {
-                return;
-            }
-            event.stopPropagation();
-            const documentSelf = document;
-            this.subElement.style.userSelect = "none";
-            const x = event.clientX - parseInt(this.subElement.style.left);
-            const y = event.clientY - parseInt(this.subElement.style.top);
-            documentSelf.onmousemove = (moveEvent: MouseEvent) => {
-                let positionX = moveEvent.clientX - x;
-                let positionY = moveEvent.clientY - y;
-                if (positionX > window.innerWidth - this.subElement.clientWidth) {
-                    positionX = window.innerWidth - this.subElement.clientWidth;
-                }
-                if (positionY > window.innerHeight - this.subElement.clientHeight) {
-                    positionY = window.innerHeight - this.subElement.clientHeight;
-                }
-                this.subElement.style.left = Math.max(positionX, 0) + "px";
-                this.subElement.style.top = Math.max(positionY, Constants.SIZE_TOOLBAR_HEIGHT) + "px";
-                this.subElement.firstElementChild.setAttribute("data-drag", "true");
-            };
-            documentSelf.onmouseup = () => {
-                const pinElement = headerElement.querySelector('[data-type="pin"]');
-                pinElement.classList.add("block__icon--active");
-                pinElement.setAttribute("aria-label", window.siyuan.languages.unpin);
-                this.subElement.style.userSelect = "auto";
-                documentSelf.onmousemove = null;
-                documentSelf.onmouseup = null;
-                documentSelf.ondragstart = null;
-                documentSelf.onselectstart = null;
-                documentSelf.onselect = null;
-            };
-            return;
+        /// #if !MOBILE
+        moveResize(this.subElement, () => {
+            const pinElement = headerElement.querySelector('[data-type="pin"]');
+            pinElement.classList.add("block__icon--active");
+            pinElement.setAttribute("aria-label", window.siyuan.languages.unpin);
+            this.subElement.firstElementChild.setAttribute("data-drag", "true");
         });
+        /// #endif
         const textElement = this.subElement.querySelector(".b3-text-field") as HTMLTextAreaElement;
         if (types.includes("NodeHTMLBlock")) {
             textElement.value = Lute.UnEscapeHTMLStr(renderElement.querySelector("protyle-html").getAttribute("data-content") || "");
@@ -1208,6 +1200,12 @@ export class Toolbar {
         if (!protyle.disabled) {
             textElement.select();
         }
+        this.app.plugins.forEach(item => {
+            item.eventBus.emit("open-noneditableblock", {
+                protyle,
+                toolbar: this
+            });
+        });
     }
 
     public showCodeLanguage(protyle: IProtyle, languageElement: HTMLElement) {
@@ -1488,11 +1486,6 @@ export class Toolbar {
         });
         this.subElement.classList.remove("fn__none");
         this.subElementCloseCB = undefined;
-        /// #if !MOBILE
-        const rangePosition = getSelectionPosition(nodeElement, range);
-        setPosition(this.subElement, rangePosition.left, rangePosition.top + 18, Constants.SIZE_TOOLBAR_HEIGHT);
-        (this.subElement.firstElementChild as HTMLElement).style.maxHeight = Math.min(window.innerHeight * 0.8, window.innerHeight - this.subElement.getBoundingClientRect().top) - 16 + "px";
-        /// #endif
         this.element.classList.add("fn__none");
         inputElement.select();
         fetchPost("/api/search/searchTemplate", {
@@ -1515,6 +1508,11 @@ export class Toolbar {
                 html = `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
             }
             this.subElement.querySelector(".b3-list--background").innerHTML = html;
+            /// #if !MOBILE
+            const rangePosition = getSelectionPosition(nodeElement, range);
+            setPosition(this.subElement, rangePosition.left, rangePosition.top + 18, Constants.SIZE_TOOLBAR_HEIGHT);
+            (this.subElement.firstElementChild as HTMLElement).style.maxHeight = Math.min(window.innerHeight * 0.8, window.innerHeight - this.subElement.getBoundingClientRect().top) - 16 + "px";
+            /// #endif
         });
     }
 
@@ -1566,10 +1564,6 @@ export class Toolbar {
         });
         this.subElement.classList.remove("fn__none");
         this.subElementCloseCB = undefined;
-        /// #if !MOBILE
-        const rangePosition = getSelectionPosition(nodeElement, range);
-        setPosition(this.subElement, rangePosition.left, rangePosition.top + 18, Constants.SIZE_TOOLBAR_HEIGHT);
-        /// #endif
         this.element.classList.add("fn__none");
         inputElement.select();
         fetchPost("/api/search/searchWidget", {
@@ -1580,6 +1574,10 @@ export class Toolbar {
                 html += `<div class="b3-list-item${index === 0 ? " b3-list-item--focus" : ""}">${item.content}</div>`;
             });
             this.subElement.querySelector(".b3-list--background").innerHTML = html;
+            /// #if !MOBILE
+            const rangePosition = getSelectionPosition(nodeElement, range);
+            setPosition(this.subElement, rangePosition.left, rangePosition.top + 18, Constants.SIZE_TOOLBAR_HEIGHT);
+            /// #endif
         });
     }
 

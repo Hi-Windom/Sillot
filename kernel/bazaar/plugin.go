@@ -20,6 +20,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -32,26 +33,26 @@ import (
 )
 
 type Plugin struct {
-	Package
+	*Package
+	Enabled bool `json:"enabled"`
 }
 
-func Plugins() (plugins []*Plugin) {
+func Plugins(frontend string) (plugins []*Plugin) {
 	plugins = []*Plugin{}
 
-	pkgIndex, err := getPkgIndex("plugins")
+	stageIndex, err := getStageIndex("plugins")
 	if nil != err {
 		return
 	}
 	bazaarIndex := getBazaarIndex()
 
-	repos := pkgIndex["repos"].([]interface{})
 	waitGroup := &sync.WaitGroup{}
 	lock := &sync.Mutex{}
 	p, _ := ants.NewPoolWithFunc(8, func(arg interface{}) {
 		defer waitGroup.Done()
 
-		repo := arg.(map[string]interface{})
-		repoURL := repo["url"].(string)
+		repo := arg.(*StageRepo)
+		repoURL := repo.URL
 
 		plugin := &Plugin{}
 		innerU := util.BazaarOSSServer + "/package/" + repoURL + "/plugin.json"
@@ -64,17 +65,28 @@ func Plugins() (plugins []*Plugin) {
 			logging.LogErrorf("get bazaar package [%s] failed: %d", innerU, innerResp.StatusCode)
 			return
 		}
-		plugin.URL = strings.TrimSuffix(plugin.URL, "/")
 
+		if disallowDisplayBazaarPackage(plugin.Package) {
+			return
+		}
+
+		plugin.Incompatible = isIncompatiblePlugin(plugin, frontend)
+
+		plugin.URL = strings.TrimSuffix(plugin.URL, "/")
 		repoURLHash := strings.Split(repoURL, "@")
 		plugin.RepoURL = "https://github.com/" + repoURLHash[0]
 		plugin.RepoHash = repoURLHash[1]
 		plugin.PreviewURL = util.BazaarOSSServer + "/package/" + repoURL + "/preview.png?imageslim"
 		plugin.PreviewURLThumb = util.BazaarOSSServer + "/package/" + repoURL + "/preview.png?imageView2/2/w/436/h/232"
-		plugin.Updated = repo["updated"].(string)
-		plugin.Stars = int(repo["stars"].(float64))
-		plugin.OpenIssues = int(repo["openIssues"].(float64))
-		plugin.Size = int64(repo["size"].(float64))
+		plugin.IconURL = util.BazaarOSSServer + "/package/" + repoURL + "/icon.png"
+		plugin.Funding = repo.Package.Funding
+		plugin.PreferredFunding = getPreferredFunding(plugin.Funding)
+		plugin.PreferredName = getPreferredName(plugin.Package)
+		plugin.PreferredDesc = getPreferredDesc(plugin.Description)
+		plugin.Updated = repo.Updated
+		plugin.Stars = repo.Stars
+		plugin.OpenIssues = repo.OpenIssues
+		plugin.Size = repo.Size
 		plugin.HSize = humanize.Bytes(uint64(plugin.Size))
 		plugin.HUpdated = formatUpdated(plugin.Updated)
 		pkg := bazaarIndex[strings.Split(repoURL, "@")[0]]
@@ -85,7 +97,7 @@ func Plugins() (plugins []*Plugin) {
 		plugins = append(plugins, plugin)
 		lock.Unlock()
 	})
-	for _, repo := range repos {
+	for _, repo := range stageIndex.Repos {
 		waitGroup.Add(1)
 		p.Invoke(repo)
 	}
@@ -96,39 +108,42 @@ func Plugins() (plugins []*Plugin) {
 	return
 }
 
-func InstalledPlugins() (ret []*Plugin) {
+func InstalledPlugins(frontend string) (ret []*Plugin) {
 	ret = []*Plugin{}
-	pluginDirs, err := os.ReadDir(filepath.Join(util.DataDir, "plugins"))
+
+	pluginsPath := filepath.Join(util.DataDir, "plugins")
+	if !util.IsPathRegularDirOrSymlinkDir(pluginsPath) {
+		return
+	}
+
+	pluginDirs, err := os.ReadDir(pluginsPath)
 	if nil != err {
 		logging.LogWarnf("read plugins folder failed: %s", err)
 		return
 	}
 
-	bazaarPlugins := Plugins()
+	bazaarPlugins := Plugins(frontend)
 
 	for _, pluginDir := range pluginDirs {
-		if !pluginDir.IsDir() {
+		if !util.IsDirRegularOrSymlink(pluginDir) {
 			continue
 		}
 		dirName := pluginDir.Name()
 
-		pluginConf, parseErr := PluginJSON(dirName)
-		if nil != parseErr || nil == pluginConf {
+		plugin, parseErr := PluginJSON(dirName)
+		if nil != parseErr || nil == plugin {
 			continue
 		}
 
 		installPath := filepath.Join(util.DataDir, "plugins", dirName)
-
-		plugin := &Plugin{}
 		plugin.Installed = true
-		plugin.Name = pluginConf["name"].(string)
-		plugin.Author = pluginConf["author"].(string)
-		plugin.URL = pluginConf["url"].(string)
-		plugin.URL = strings.TrimSuffix(plugin.URL, "/")
-		plugin.Version = pluginConf["version"].(string)
 		plugin.RepoURL = plugin.URL
 		plugin.PreviewURL = "/plugins/" + dirName + "/preview.png"
 		plugin.PreviewURLThumb = "/plugins/" + dirName + "/preview.png"
+		plugin.IconURL = "/plugins/" + dirName + "/icon.png"
+		plugin.PreferredFunding = getPreferredFunding(plugin.Funding)
+		plugin.PreferredName = getPreferredName(plugin.Package)
+		plugin.PreferredDesc = getPreferredDesc(plugin.Description)
 		info, statErr := os.Stat(filepath.Join(installPath, "README.md"))
 		if nil != statErr {
 			logging.LogWarnf("stat install theme README.md failed: %s", statErr)
@@ -138,13 +153,16 @@ func InstalledPlugins() (ret []*Plugin) {
 		installSize, _ := util.SizeOfDirectory(installPath)
 		plugin.InstallSize = installSize
 		plugin.HInstallSize = humanize.Bytes(uint64(installSize))
-		readme, readErr := os.ReadFile(filepath.Join(installPath, "README.md"))
+		readmeFilename := getPreferredReadme(plugin.Readme)
+		readme, readErr := os.ReadFile(filepath.Join(installPath, readmeFilename))
 		if nil != readErr {
-			logging.LogWarnf("read install plugin README.md failed: %s", readErr)
+			logging.LogWarnf("read installed README.md failed: %s", readErr)
 			continue
 		}
-		plugin.README, _ = renderREADME(plugin.URL, readme)
+
+		plugin.PreferredReadme, _ = renderREADME(plugin.URL, readme)
 		plugin.Outdated = isOutdatedPlugin(plugin, bazaarPlugins)
+		plugin.Incompatible = isIncompatiblePlugin(plugin, frontend)
 		ret = append(ret, plugin)
 	}
 	return
@@ -166,4 +184,40 @@ func UninstallPlugin(installPath string) error {
 	}
 	//logging.Logger.Infof("uninstalled plugin [%s]", installPath)
 	return nil
+}
+
+func isIncompatiblePlugin(plugin *Plugin, currentFrontend string) bool {
+	if 1 > len(plugin.Backends) {
+		return false
+	}
+
+	backendOk := false
+	for _, backend := range plugin.Backends {
+		if backend == getCurrentBackend() || "all" == backend {
+			backendOk = true
+			break
+		}
+	}
+
+	frontendOk := false
+	for _, frontend := range plugin.Frontends {
+		if frontend == currentFrontend || "all" == frontend {
+			frontendOk = true
+			break
+		}
+	}
+	return !backendOk || !frontendOk
+}
+
+func getCurrentBackend() string {
+	switch util.Container {
+	case util.ContainerDocker:
+		return "docker"
+	case util.ContainerIOS:
+		return "ios"
+	case util.ContainerAndroid:
+		return "android"
+	default:
+		return runtime.GOOS
+	}
 }

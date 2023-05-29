@@ -1,8 +1,11 @@
 import {genUUID} from "../util/genID";
+/// #if !MOBILE
+import {moveResize} from "./moveResize";
+/// #endif
 import {isMobile} from "../util/functions";
 
 export class Dialog {
-    private destroyCallback: () => void;
+    private destroyCallback: (options?: IObject) => void;
     public element: HTMLElement;
     private id: string;
     private disableClose: boolean;
@@ -13,7 +16,7 @@ export class Dialog {
         content: string,
         width?: string
         height?: string,
-        destroyCallback?: () => void
+        destroyCallback?: (options?: IObject) => void
         disableClose?: boolean
         disableAnimation?: boolean
     }) {
@@ -25,10 +28,11 @@ export class Dialog {
 
         this.element.innerHTML = `<div class="b3-dialog">
 <div class="b3-dialog__scrim"${options.transparent ? 'style="background-color:transparent"' : ""}></div>
-<div class="b3-dialog__container" style="width:${options.width || "auto"}">
+<div class="b3-dialog__container" style="width:${options.width || "auto"};height:${options.height || "auto"}">
   <svg ${(isMobile() && options.title) ? 'style="top:0;right:0;"' : ""} class="b3-dialog__close${this.disableClose ? " fn__none" : ""}"><use xlink:href="#iconCloseRound"></use></svg>
-  <div class="b3-dialog__header${options.title ? "" : " fn__none"}" onselectstart="return false;">${options.title || ""}</div>
-  <div style="height:${options.height || "auto"}">${options.content}</div>
+  <div class="resize__move b3-dialog__header${options.title ? "" : " fn__none"}" onselectstart="return false;">${options.title || ""}</div>
+  <div class="b3-dialog__body">${options.content}</div>
+  <div class="resize__rd"></div><div class="resize__ld"></div><div class="resize__lt"></div><div class="resize__rt"></div><div class="resize__r"></div><div class="resize__d"></div><div class="resize__t"></div><div class="resize__l"></div>
 </div></div>`;
 
         this.element.querySelector(".b3-dialog__scrim").addEventListener("click", (event) => {
@@ -55,16 +59,17 @@ export class Dialog {
                 this.element.classList.add("b3-dialog--open");
             });
         }
-        // https://github.com/siyuan-note/siyuan/issues/6783
-        window.siyuan.menus.menu.remove();
+        /// #if !MOBILE
+        moveResize(this.element.querySelector(".b3-dialog__container"));
+        /// #endif
     }
 
-    public destroy() {
+    public destroy(options?: IObject) {
         this.element.remove();
         // https://github.com/siyuan-note/siyuan/issues/6783
         window.siyuan.menus.menu.remove();
         if (this.destroyCallback) {
-            this.destroyCallback();
+            this.destroyCallback(options);
         }
         window.siyuan.dialogs.find((item, index) => {
             if (item.id === this.id) {
@@ -93,5 +98,4 @@ export class Dialog {
             }
         });
     }
-
 }

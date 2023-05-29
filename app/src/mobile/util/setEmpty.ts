@@ -4,8 +4,9 @@ import {getOpenNotebookCount} from "../../util/pathName";
 import {popSearch} from "../menu/search";
 import {getRecentDocs} from "../menu/getRecentDocs";
 import {openHistory} from "../../history/history";
+import {App} from "../../index";
 
-export const setEmpty = () => {
+export const setEmpty = (app: App) => {
     document.getElementById("toolbarName").classList.add("fn__hidden");
     document.getElementById("toolbarEdit").classList.add("fn__hidden");
     document.getElementById("editor").classList.add("fn__none");
@@ -14,8 +15,7 @@ export const setEmpty = () => {
     if (emptyElement.innerHTML !== "") {
         return;
     }
-    emptyElement.innerHTML = `<h1 style="width: 200px">${window.siyuan.languages.noOpenFile}</h1>
-<div class="fn__hr--b"></div>
+    emptyElement.innerHTML = `
 <div id="emptySearch" class="b3-list-item">
     <svg class="b3-list-item__graphic"><use xlink:href="#iconSearch"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.search}</span>
 </div>
@@ -38,43 +38,43 @@ export const setEmpty = () => {
         let target = event.target as HTMLElement;
         while (target && !target.isEqualNode(emptyElement)) {
             if (target.id === "emptySearch") {
-                popSearch();
+                popSearch(app);
                 event.stopPropagation();
-                event.preventDefault()
+                event.preventDefault();
                 break;
             } else if (target.id === "emptyRecent") {
-                getRecentDocs();
+                getRecentDocs(app);
                 event.stopPropagation();
-                event.preventDefault()
+                event.preventDefault();
                 break;
             } else if (target.id === "emptyHistory") {
-                openHistory();
+                openHistory(app);
                 event.stopPropagation();
-                event.preventDefault()
+                event.preventDefault();
                 break;
             } else if (target.id === "emptyNewFile") {
                 if (window.siyuan.mobile.editor) {
-                    newFile(window.siyuan.mobile.editor.protyle.notebookId, window.siyuan.mobile.editor.protyle.path, undefined, true);
+                    newFile(app, window.siyuan.mobile.editor.protyle.notebookId, window.siyuan.mobile.editor.protyle.path, undefined, true);
                 } else {
                     window.siyuan.notebooks.find(item => {
                         if (!item.closed) {
-                            newFile(item.id, "/", undefined, true);
+                            newFile(app, item.id, "/", undefined, true);
                             return true;
                         }
                     });
                 }
                 event.stopPropagation();
-                event.preventDefault()
+                event.preventDefault();
                 break;
             } else if (target.id === "emptyNewNotebook") {
                 newNotebook();
                 event.stopPropagation();
-                event.preventDefault()
+                event.preventDefault();
                 break;
             } else if (target.id === "emptyHelp") {
                 mountHelp();
                 event.stopPropagation();
-                event.preventDefault()
+                event.preventDefault();
                 break;
             }
             target = target.parentElement;

@@ -11,9 +11,11 @@ import {fullscreen} from "../protyle/breadcrumb/action";
 import {MenuItem} from "../menus/Menu";
 import {escapeHtml} from "../util/escape";
 /// #if !MOBILE
-import {newCardTab} from "./newCardTab";
+import {openFile} from "../editor/util";
+import {newCardModel} from "./newCardTab";
 /// #endif
 import {getDisplayName, movePathTo} from "../util/pathName";
+import {App} from "../index";
 
 export const genCardHTML = (options: {
     id: string,
@@ -21,9 +23,9 @@ export const genCardHTML = (options: {
     blocks: ICard[],
     isTab: boolean
 }) => {
-    let iconsHTML:string
+    let iconsHTML: string;
     /// #if MOBILE
-    iconsHTML=`<div class="toolbar toolbar--border">
+    iconsHTML = `<div class="toolbar toolbar--border">
     <svg class="toolbar__icon"><use xlink:href="#iconRiffCard"></use></svg>
     <span class="fn__flex-1 fn__flex-center toolbar__text">${window.siyuan.languages.riffCard}</span>
     <div data-type="count" class="${options.blocks.length === 0 ? "fn__none" : ""}">1/${options.blocks.length}</span></div>
@@ -31,12 +33,12 @@ export const genCardHTML = (options: {
     <svg class="toolbar__icon" data-type="close"><use xlink:href="#iconCloseRound"></use></svg>
 </div>`;
     /// #else
-    iconsHTML=`<div class="block__icons">
+    iconsHTML = `<div class="block__icons">
         ${options.isTab ? '<div class="fn__flex-1"></div>' : `<div class="block__icon block__icon--show">
             <svg><use xlink:href="#iconRiffCard"></use></svg>
         </div>
         <span class="fn__space"></span>
-        <span class="fn__flex-1 fn__flex-center">${window.siyuan.languages.riffCard}</span>`}
+        <span class="fn__flex-1 fn__flex-center resize__move">${window.siyuan.languages.riffCard}</span>`}
         <span class="fn__space"></span>
         <div data-type="count" class="ft__on-surface ft__smaller fn__flex-center${options.blocks.length === 0 ? " fn__none" : ""}">1/${options.blocks.length}</span></div>
         <div class="fn__space"></div>
@@ -109,6 +111,7 @@ export const genCardHTML = (options: {
 };
 
 export const bindCardEvent = (options: {
+    app: App,
     element: Element,
     title?: string,
     blocks: ICard[],
@@ -117,7 +120,7 @@ export const bindCardEvent = (options: {
     dialog?: Dialog,
 }) => {
     let index = 0;
-    const editor = new Protyle(options.element.querySelector("[data-type='render']") as HTMLElement, {
+    const editor = new Protyle(options.app, options.element.querySelector("[data-type='render']") as HTMLElement, {
         blockId: "",
         action: [Constants.CB_GET_ALL],
         render: {
@@ -203,10 +206,19 @@ export const bindCardEvent = (options: {
             /// #if !MOBILE
             const sticktabElement = hasClosestByAttribute(target, "data-type", "sticktab");
             if (sticktabElement) {
-                newCardTab({
-                    cardType: filterElement.getAttribute("data-cardtype") as TCardType,
-                    id: filterElement.getAttribute("data-id"),
-                    title: options.title
+                openFile({
+                    app: options.app,
+                    position: "right",
+                    custom: {
+                        icon: "iconRiffCard",
+                        title: window.siyuan.languages.spaceRepetition,
+                        data: {
+                            cardType: filterElement.getAttribute("data-cardtype") as TCardType,
+                            id: filterElement.getAttribute("data-id"),
+                            title: options.title
+                        },
+                        fn: newCardModel
+                    },
                 });
                 if (options.dialog) {
                     options.dialog.destroy();
@@ -390,13 +402,13 @@ export const bindCardEvent = (options: {
     return editor;
 };
 
-export const openCard = () => {
+export const openCard = (app: App) => {
     fetchPost("/api/riff/getRiffDueCards", {deckID: ""}, (cardsResponse) => {
-        openCardByData(cardsResponse.data, "all");
+        openCardByData(app, cardsResponse.data, "all");
     });
 };
 
-export const openCardByData = (cardsData: {
+export const openCardByData = (app: App, cardsData: {
     cards: ICard[],
     unreviewedCount: number
 }, cardType: TCardType, id?: string, title?: string) => {
@@ -426,6 +438,7 @@ export const openCardByData = (cardsData: {
     (dialog.element.querySelector(".b3-dialog__scrim") as HTMLElement).style.backgroundColor = "var(--b3-theme-background)";
     (dialog.element.querySelector(".b3-dialog__container") as HTMLElement).style.maxWidth = "1024px";
     const editor = bindCardEvent({
+        app,
         element: dialog.element,
         blocks: cardsData.cards,
         title,

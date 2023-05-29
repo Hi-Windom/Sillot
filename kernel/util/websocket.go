@@ -120,9 +120,12 @@ func ClosePushChan(id string) {
 	})
 }
 
+func ReloadUIResetScroll() {
+	BroadcastByType("main", "reloadui", 0, "", map[string]interface{}{"resetScroll": true})
+}
+
 func ReloadUI() {
-	evt := NewCmdResult("reloadui", 0, PushModeBroadcast)
-	PushEvent(evt)
+	BroadcastByType("main", "reloadui", 0, "", nil)
 }
 
 func PushTxErr(msg string, code int, data interface{}) {
@@ -209,6 +212,14 @@ func PushClearMsg(msgId string) {
 // PushClearProgress 取消进度遮罩。
 func PushClearProgress() {
 	BroadcastByType("main", "cprogress", 0, "", nil)
+}
+
+func PushProtyleReload(rootID string) {
+	BroadcastByType("protyle", "reload", 0, "", rootID)
+}
+
+func PushProtyleLoading(rootID, msg string) {
+	BroadcastByType("protyle", "addLoading", 0, msg, rootID)
 }
 
 func PushDownloadProgress(id string, percent float32) {

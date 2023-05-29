@@ -37,20 +37,24 @@ import {makeCard, quickMakeCard} from "../../card/makeCard";
 import {viewCards} from "../../card/viewCards";
 import {getNotebookName, pathPosix} from "../../util/pathName";
 import {commonClick} from "../wysiwyg/commonClick";
+import {App} from "../../index";
 
 export class Title {
     public element: HTMLElement;
     public editElement: HTMLElement;
     private timeout: number;
+    private app: App;
 
-    constructor(protyle: IProtyle) {
+    constructor(app: App, protyle: IProtyle) {
+        this.app = app;
         this.element = document.createElement("div");
         this.element.className = "protyle-title";
         if (window.siyuan.config.editor.displayBookmarkIcon) {
             this.element.classList.add("protyle-wysiwyg--attr");
         }
+        // 标题内需要一个空格，避免首次加载出现`请输入文档名`干扰
         this.element.innerHTML = `<span aria-label="${window.siyuan.languages.gutterTip2}" class="protyle-title__icon" data-type="a" data-position="right"><svg><use xlink:href="#iconFile"></use></svg></span>
-<div contenteditable="true" data-position="center" spellcheck="${window.siyuan.config.editor.spellcheck}" class="protyle-title__input" data-tip="${window.siyuan.languages._kernel[16]}"></div><div class="protyle-attr"></div>`;
+<div contenteditable="true" data-position="center" spellcheck="${window.siyuan.config.editor.spellcheck}" class="protyle-title__input" data-tip="${window.siyuan.languages._kernel[16]}"> </div><div class="protyle-attr"></div>`;
         this.editElement = this.element.querySelector(".protyle-title__input");
         this.editElement.addEventListener("paste", (event: ClipboardEvent) => {
             event.stopPropagation();
@@ -61,7 +65,13 @@ export class Title {
         this.editElement.addEventListener("click", () => {
             if (protyle.model) {
                 setPanelFocus(protyle.model.element.parentElement.parentElement);
-                updatePanelByEditor(protyle, false);
+                updatePanelByEditor({
+                    protyle: protyle,
+                    focus: false,
+                    pushBackStack: false,
+                    reload: false,
+                    resize: false,
+                });
             }
             protyle.toolbar?.element.classList.add("fn__none");
         });
@@ -84,13 +94,14 @@ export class Title {
                 return;
             }
 
-            if (commonHotkey(protyle, event)) {
+            if (commonHotkey(app, protyle, event)) {
                 return true;
             }
             if (matchHotKey(window.siyuan.config.keymap.general.enterBack.custom, event)) {
                 const ids = protyle.path.split("/");
                 if (ids.length > 2) {
                     openFileById({
+                        app,
                         id: ids[ids.length - 2],
                         action: [Constants.CB_GET_FOCUS, Constants.CB_GET_SCROLL]
                     });
@@ -258,7 +269,7 @@ export class Title {
             fetchPost("/api/block/getDocInfo", {
                 id: protyle.block.rootID
             }, (response) => {
-                commonClick(event, protyle, response.data.ial);
+                commonClick(app, event, protyle, response.data.ial);
             });
         });
     }
@@ -324,7 +335,7 @@ export class Title {
                 label: window.siyuan.languages.outline,
                 accelerator: window.siyuan.config.keymap.editor.general.outline.custom,
                 click: () => {
-                    openOutline(protyle);
+                    openOutline(this.app, protyle);
                 }
             }).element);
             window.siyuan.menus.menu.append(new MenuItem({
@@ -332,7 +343,7 @@ export class Title {
                 label: window.siyuan.languages.backlinks,
                 accelerator: window.siyuan.config.keymap.editor.general.backlinks.custom,
                 click: () => {
-                    openBacklink(protyle);
+                    openBacklink(this.app, protyle);
                 }
             }).element);
             window.siyuan.menus.menu.append(new MenuItem({
@@ -340,7 +351,7 @@ export class Title {
                 label: window.siyuan.languages.graphView,
                 accelerator: window.siyuan.config.keymap.editor.general.graphView.custom,
                 click: () => {
-                    openGraph(protyle);
+                    openGraph(this.app, protyle);
                 }
             }).element);
             window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
@@ -357,7 +368,7 @@ export class Title {
                 accelerator: window.siyuan.config.keymap.editor.general.spaceRepetition.custom,
                 click: () => {
                     fetchPost("/api/riff/getTreeRiffDueCards", {rootID: protyle.block.rootID}, (response) => {
-                        openCardByData(response.data, "doc", protyle.block.rootID, this.editElement.textContent);
+                        openCardByData(this.app, response.data, "doc", protyle.block.rootID, this.editElement.textContent || "Untitled");
                     });
                 }
             }, {
@@ -367,7 +378,7 @@ export class Title {
                     fetchPost("/api/filetree/getHPathByID", {
                         id: protyle.block.rootID
                     }, (response) => {
-                        viewCards(protyle.block.rootID, pathPosix().join(getNotebookName(protyle.notebookId), (response.data)), "Tree");
+                        viewCards(this.app, protyle.block.rootID, pathPosix().join(getNotebookName(protyle.notebookId), (response.data)), "Tree");
                     });
                 }
             }, {
@@ -383,7 +394,7 @@ export class Title {
                     iconHTML: Constants.ZWSP,
                     label: window.siyuan.languages.addToDeck,
                     click: () => {
-                        makeCard([protyle.block.rootID]);
+                        makeCard(this.app, [protyle.block.rootID]);
                     }
                 });
             }
@@ -401,6 +412,13 @@ export class Title {
 ${window.siyuan.languages.createdAt} ${format(new Date(~~response.data.ial.id.subtring(0, 14)), 'yyyy-MM-dd HH:mm:ss')}`
             }).element);
             window.siyuan.menus.menu.popup(position);
+            this.app?.plugins?.forEach((plugin) => {
+                plugin.eventBus.emit("click-editortitleicon", {
+                    protyle,
+                    menu: window.siyuan.menus.menu,
+                    data: response.data,
+                });
+            });
         });
     }
 
@@ -410,8 +428,8 @@ ${window.siyuan.languages.createdAt} ${format(new Date(~~response.data.ial.id.su
         }
     }
 
-    public render(protyle: IProtyle, response: IWebSocketData, refresh = false) {
-        if (this.editElement.getAttribute("data-render") === "true" && !refresh) {
+    public render(protyle: IProtyle, response: IWebSocketData) {
+        if (this.editElement.getAttribute("data-render") === "true") {
             return false;
         }
         this.element.setAttribute("data-node-id", protyle.block.rootID);

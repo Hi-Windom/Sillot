@@ -97,7 +97,7 @@ export const initStatus = (isWindow = false) => {
                 }).element);
                 window.siyuan.menus.menu.append(new MenuItem({
                     label: window.siyuan.languages.feedback,
-                    icon: "iconHeart",
+                    icon: "iconFeedback",
                     click: () => {
                         if ("zh_CN" === window.siyuan.config.lang) {
                             window.open("https://ld246.com/article/1649901726096");
@@ -134,7 +134,7 @@ export const initStatus = (isWindow = false) => {
                 event.stopPropagation();
                 break;
             } else if (target.classList.contains("b3-menu__item")) {
-                const type = target.getAttribute("data-type") as TDockType;
+                const type = target.getAttribute("data-type");
                 getDockByType(type).toggleModel(type);
                 if (type === "file" && getSelection().rangeCount > 0) {
                     const range = getSelection().getRangeAt(0);

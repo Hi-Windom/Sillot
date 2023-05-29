@@ -96,7 +96,7 @@ func heading2Doc(c *gin.Context) {
 
 	name := path.Base(targetPath)
 	box := model.Conf.Box(targetNotebook)
-	files, _, _ := model.ListDocTree(targetNotebook, path.Dir(targetPath), model.Conf.FileTree.Sort, false, model.Conf.FileTree.MaxListCount)
+	files, _, _ := model.ListDocTree(targetNotebook, path.Dir(targetPath), util.SortModeUnassigned, false, model.Conf.FileTree.MaxListCount)
 	evt := util.NewCmdResult("heading2doc", 0, util.PushModeBroadcast)
 	evt.Data = map[string]interface{}{
 		"box":            box,
@@ -141,7 +141,7 @@ func li2Doc(c *gin.Context) {
 
 	name := path.Base(targetPath)
 	box := model.Conf.Box(targetNotebook)
-	files, _, _ := model.ListDocTree(targetNotebook, path.Dir(targetPath), model.Conf.FileTree.Sort, false, model.Conf.FileTree.MaxListCount)
+	files, _, _ := model.ListDocTree(targetNotebook, path.Dir(targetPath), util.SortModeUnassigned, false, model.Conf.FileTree.MaxListCount)
 	evt := util.NewCmdResult("li2doc", 0, util.PushModeBroadcast)
 	evt.Data = map[string]interface{}{
 		"box":            box,
@@ -449,7 +449,7 @@ func createDailyNote(c *gin.Context) {
 	evt.AppId = app
 
 	name := path.Base(p)
-	files, _, _ := model.ListDocTree(box.ID, path.Dir(p), model.Conf.FileTree.Sort, false, model.Conf.FileTree.MaxListCount)
+	files, _, _ := model.ListDocTree(box.ID, path.Dir(p), util.SortModeUnassigned, false, model.Conf.FileTree.MaxListCount)
 	evt.Data = map[string]interface{}{
 		"box":   box,
 		"path":  p,
@@ -475,6 +475,12 @@ func createDocWithMd(c *gin.Context) {
 		return
 	}
 
+	var parentID string
+	parentIDArg := arg["parentID"]
+	if nil != parentIDArg {
+		parentID = parentIDArg.(string)
+	}
+
 	hPath := arg["path"].(string)
 	markdown := arg["markdown"].(string)
 
@@ -490,7 +496,7 @@ func createDocWithMd(c *gin.Context) {
 		hPath = "/" + hPath
 	}
 
-	id, err := model.CreateWithMarkdown(notebook, hPath, markdown)
+	id, err := model.CreateWithMarkdown(notebook, hPath, markdown, parentID)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -521,6 +527,14 @@ func getDocCreateSavePath(c *gin.Context) {
 	}
 	if "" == docCreateSavePathTpl {
 		docCreateSavePathTpl = model.Conf.FileTree.DocCreateSavePath
+	}
+	docCreateSavePathTpl = strings.TrimSpace(docCreateSavePathTpl)
+	if "../" == docCreateSavePathTpl {
+		docCreateSavePathTpl = "../Untitled"
+	}
+	for strings.HasSuffix(docCreateSavePathTpl, "/") {
+		docCreateSavePathTpl = strings.TrimSuffix(docCreateSavePathTpl, "/")
+		docCreateSavePathTpl = strings.TrimSpace(docCreateSavePathTpl)
 	}
 
 	p, err := model.RenderGoTemplate(docCreateSavePathTpl)
@@ -612,7 +626,7 @@ func listDocsByPath(c *gin.Context) {
 	notebook := arg["notebook"].(string)
 	p := arg["path"].(string)
 	sortParam := arg["sort"]
-	sortMode := model.Conf.FileTree.Sort
+	sortMode := util.SortModeUnassigned
 	if nil != sortParam {
 		sortMode = int(sortParam.(float64))
 	}
@@ -661,11 +675,24 @@ func getDoc(c *gin.Context) {
 	if nil != idx {
 		index = int(idx.(float64))
 	}
-	k := arg["k"]
-	var keyword string
-	if nil != k {
-		keyword = k.(string)
+
+	var query string
+	if queryArg := arg["query"]; nil != queryArg {
+		query = queryArg.(string)
 	}
+	var queryMethod int
+	if queryMethodArg := arg["queryMethod"]; nil != queryMethodArg {
+		queryMethod = int(queryMethodArg.(float64))
+	}
+	var queryTypes map[string]bool
+	if queryTypesArg := arg["queryTypes"]; nil != queryTypesArg {
+		typesArg := queryTypesArg.(map[string]interface{})
+		queryTypes = map[string]bool{}
+		for t, b := range typesArg {
+			queryTypes[t] = b.(bool)
+		}
+	}
+
 	m := arg["mode"] // 0: 仅当前 ID，1：向上 2：向下，3：上下都加载，4：加载末尾
 	mode := 0
 	if nil != m {
@@ -683,7 +710,7 @@ func getDoc(c *gin.Context) {
 	if nil != startIDArg && nil != endIDArg {
 		startID = startIDArg.(string)
 		endID = endIDArg.(string)
-		size = 36
+		size = model.Conf.Editor.DynamicLoadBlocks
 	}
 	isBacklinkArg := arg["isBacklink"]
 	isBacklink := false
@@ -691,7 +718,7 @@ func getDoc(c *gin.Context) {
 		isBacklink = isBacklinkArg.(bool)
 	}
 
-	blockCount, content, parentID, parent2ID, rootID, typ, eof, scroll, boxID, docPath, isBacklinkExpand, err := model.GetDoc(startID, endID, id, index, keyword, mode, size, isBacklink)
+	blockCount, content, parentID, parent2ID, rootID, typ, eof, scroll, boxID, docPath, isBacklinkExpand, err := model.GetDoc(startID, endID, id, index, query, queryTypes, queryMethod, mode, size, isBacklink)
 	if model.ErrBlockNotFound == err {
 		ret.Code = 3
 		return
@@ -727,7 +754,7 @@ func getDoc(c *gin.Context) {
 func pushCreate(box *model.Box, p, treeID string, arg map[string]interface{}) {
 	evt := util.NewCmdResult("create", 0, util.PushModeBroadcast)
 	name := path.Base(p)
-	files, _, _ := model.ListDocTree(box.ID, path.Dir(p), model.Conf.FileTree.Sort, false, model.Conf.FileTree.MaxListCount)
+	files, _, _ := model.ListDocTree(box.ID, path.Dir(p), util.SortModeUnassigned, false, model.Conf.FileTree.MaxListCount)
 	evt.Data = map[string]interface{}{
 		"box":   box,
 		"path":  p,

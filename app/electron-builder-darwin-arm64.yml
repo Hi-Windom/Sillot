@@ -36,8 +36,6 @@ extraResources:
   - from: "guide"
     to: "guide"
     filter: "!**/{.DS_Store,.git,.gitignore,.idea,20211226090932-5lcq56f}"
-  - from: "PSP/out"
-    to: "appearance/plugin"
   - from: "appearance/boot"
     to: "appearance/boot"
     filter: "!**/{.DS_Store}"

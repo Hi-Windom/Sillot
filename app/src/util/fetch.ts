@@ -28,14 +28,36 @@ export const fetchPost = (url: string, data?: any, cb?: (response: IWebSocketDat
         init.headers = headers;
     }
     fetch(url, init).then((response) => {
-        return response.json();
+        if (response.status === 404) {
+            return {
+                data: null,
+                msg: response.statusText,
+                code: response.status,
+            };
+        } else {
+            if (response.headers.get("content-type")?.indexOf("application/json") > -1) {
+                return response.json();
+            } else {
+                return response.text();
+            }
+        }
     }).then((response: IWebSocketData) => {
+        if (typeof response === "string") {
+            if (cb) {
+                cb(response);
+            }
+            return;
+        }
         if (["/api/search/searchRefBlock", "/api/graph/getGraph", "/api/graph/getLocalGraph"].includes(url)) {
             if (response.data.reqId && window.siyuan.reqIds[url] && window.siyuan.reqIds[url] > response.data.reqId) {
                 return;
             }
         }
-        if (processMessage(response) && cb) {
+        if (typeof response === "object" && typeof response.msg === "string" && typeof response.code === "number") {
+            if (processMessage(response) && cb) {
+                cb(response);
+            }
+        } else if (cb) {
             cb(response);
         }
     }).catch((e) => {

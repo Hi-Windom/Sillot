@@ -132,7 +132,7 @@ func ExportNodeStdMd(node *ast.Node, luteEngine *lute.Lute) string {
 	return markdown
 }
 
-func NodeStaticContent(node *ast.Node, excludeTypes []string, includeTextMarkATitleURL bool) string {
+func NodeStaticContent(node *ast.Node, excludeTypes []string, includeTextMarkATitleURL, includeAssetPath bool) string {
 	if nil == node {
 		return ""
 	}
@@ -185,8 +185,7 @@ func NodeStaticContent(node *ast.Node, excludeTypes []string, includeTextMarkATi
 				buf.WriteByte(' ')
 			}
 			if nil != linkDest {
-				if !bytes.HasPrefix(linkDest.Tokens, []byte("assets/")) {
-					// Assets hyperlinks are no longer included in the search index https://github.com/siyuan-note/siyuan/issues/8076
+				if !bytes.HasPrefix(linkDest.Tokens, []byte("assets/")) || includeAssetPath {
 					buf.Write(linkDest.Tokens)
 					buf.WriteByte(' ')
 				}
@@ -229,12 +228,11 @@ func NodeStaticContent(node *ast.Node, excludeTypes []string, includeTextMarkATi
 			if n.IsTextMarkType("a") && includeTextMarkATitleURL {
 				// 搜索不到超链接元素的 URL 和标题 https://github.com/siyuan-note/siyuan/issues/7352
 				if "" != n.TextMarkATitle {
-					buf.WriteString(" " + n.TextMarkATitle)
+					buf.WriteString(" " + html.UnescapeHTMLStr(n.TextMarkATitle))
 				}
 
-				if !strings.HasPrefix(n.TextMarkAHref, "assets/") {
-					// Assets hyperlinks are no longer included in the search index https://github.com/siyuan-note/siyuan/issues/8076
-					buf.WriteString(" " + n.TextMarkAHref)
+				if !strings.HasPrefix(n.TextMarkAHref, "assets/") || includeAssetPath {
+					buf.WriteString(" " + html.UnescapeHTMLStr(n.TextMarkAHref))
 				}
 			}
 		case ast.NodeBackslash:

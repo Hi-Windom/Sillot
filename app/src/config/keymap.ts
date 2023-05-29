@@ -151,7 +151,7 @@ export const keymap = {
             if (keymapString === "" || (liElement.querySelector(".b3-text-field") as HTMLInputElement).value.indexOf(updateHotkeyTip(keymapString)) > -1) {
                 matchedKeymap = true;
             }
-            if ((item.textContent.toLowerCase().indexOf(value.toLowerCase()) > -1 || value === "") && matchedKeymap) {
+            if ((item.textContent.toLowerCase().indexOf(value.toLowerCase()) > -1 || value.toLowerCase().indexOf(item.textContent.toLowerCase()) > -1 || value === "") && matchedKeymap) {
                 liElement.classList.remove("fn__none");
                 liElement.parentElement.classList.remove("fn__none");
                 liElement.parentElement.parentElement.classList.remove("fn__none");
@@ -196,7 +196,11 @@ export const keymap = {
     },
     bindEvent() {
         keymap.element.querySelector("#keymapRefreshBtn").addEventListener("click", () => {
-            exportLayout(true);
+            exportLayout({
+                reload: true,
+                onlyData: false,
+                errorExit: false,
+            });
         });
         const searchElement = keymap.element.querySelector("#keymapInput") as HTMLInputElement;
         const searchKeymapElement = keymap.element.querySelector("#searchByKey") as HTMLInputElement;

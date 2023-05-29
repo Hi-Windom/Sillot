@@ -15,6 +15,7 @@ import {openModel} from "./model";
 import {initAbout} from "../settings/about";
 import {getRecentDocs} from "./getRecentDocs";
 import {initEditor} from "../settings/editor";
+import {App} from "../../index";
 
 export const popMenu = () => {
     activeBlur();
@@ -22,7 +23,7 @@ export const popMenu = () => {
     document.getElementById("menu").style.transform = "translateX(0px)";
 };
 
-export const initRightMenu = () => {
+export const initRightMenu = (app: App) => {
     const menuElement = document.getElementById("menu");
     let accountHTML = "";
     if (window.siyuan.user && !window.siyuan.config.readonly) {
@@ -35,6 +36,18 @@ export const initRightMenu = () => {
     <svg class="b3-menu__icon"><use xlink:href="#iconAccount"></use></svg><span class="b3-menu__label">${window.siyuan.languages.login}</span>
 </div>`;
     }
+
+    let aiHTML = `<div class="b3-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuAI">
+        <svg class="b3-menu__icon"><use xlink:href="#iconSparkles"></use></svg><span class="b3-menu__label">AI</span>
+    </div>`;
+    const isHuawei = () => {
+        return 0 < window.siyuan.config.system.osPlatform.toLowerCase().indexOf("huawei");
+    };
+    if (isHuawei()) {
+        // Access to the OpenAI API is no longer supported on Huawei devices https://github.com/siyuan-note/siyuan/issues/8192
+        aiHTML = "";
+    }
+
     menuElement.innerHTML = `<div class="b3-menu__title">
     <svg class="b3-menu__icon"><use xlink:href="#iconLeft"></use></svg>
     <span class="b3-menu__label">${window.siyuan.languages.back}</span>
@@ -102,12 +115,12 @@ ${accountHTML}
                 event.stopPropagation();
                 break;
             } else if (target.id === "menuSearch") {
-                popSearch();
+                popSearch(app);
                 event.preventDefault();
                 event.stopPropagation();
                 break;
             } else if (target.id === "menuRecent") {
-                getRecentDocs();
+                getRecentDocs(app);
                 event.preventDefault();
                 event.stopPropagation();
                 break;
@@ -148,7 +161,7 @@ ${accountHTML}
                 event.stopPropagation();
                 break;
             } else if (target.id === "menuCard") {
-                openCard();
+                openCard(app);
                 closePanel();
                 event.preventDefault();
                 event.stopPropagation();
@@ -188,7 +201,7 @@ ${accountHTML}
                 event.stopPropagation();
                 break;
             } else if (target.id === "menuHistory") {
-                openHistory();
+                openHistory(app);
                 event.preventDefault();
                 event.stopPropagation();
                 break;

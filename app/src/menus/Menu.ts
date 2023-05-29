@@ -82,6 +82,16 @@ export class Menu {
         }
     }
 
+    public addSeparator(index?: number) {
+        this.addItem({type: "separator", index});
+    }
+
+    public addItem(option: IMenu) {
+        const menuItem = new MenuItem(option);
+        this.append(menuItem.element, option.index);
+        return menuItem.element;
+    }
+
     public remove() {
         if (window.siyuan.menus.menu.removeCB) {
             window.siyuan.menus.menu.removeCB();
@@ -101,9 +111,16 @@ export class Menu {
         window.siyuan.menus.menu.element.removeAttribute("data-name");    // 标识再次点击不消失
     }
 
-    public append(element?: HTMLElement) {
+    public append(element?: HTMLElement, index?: number) {
         if (!element) {
             return;
+        }
+        if (typeof index === "number") {
+            const insertElement = this.element.querySelectorAll(".b3-menu__items > .b3-menu__separator")[index];
+            if (insertElement) {
+                insertElement.before(element);
+                return;
+            }
         }
         this.element.lastElementChild.append(element);
     }
@@ -166,20 +183,10 @@ export class MenuItem {
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 event.stopPropagation();
-                window.siyuan.menus.menu.remove();
+                if (this.element.parentElement) {
+                    window.siyuan.menus.menu.remove();
+                }
             });
-        }
-        let html = `<span class="b3-menu__label">${options.label}</span>`;
-        if (options.iconHTML) {
-            html = options.iconHTML + html;
-        } else {
-            html = `<svg class="b3-menu__icon${["HTML (SiYuan)", window.siyuan.languages.template].includes(options.label) ? " ft__error" : ""}" style="${options.icon === "iconClose" ? "height:10px;" : ""}"><use xlink:href="#${options.icon || ""}"></use></svg>${html}`;
-        }
-        if (options.accelerator) {
-            html += `<span class="b3-menu__accelerator">${updateHotkeyTip(options.accelerator)}</span>`;
-        }
-        if (options.action) {
-            html += `<svg class="b3-menu__action"><use xlink:href="#${options.action}"></use></svg>`;
         }
         if (options.id) {
             this.element.setAttribute("data-id", options.id);
@@ -187,12 +194,31 @@ export class MenuItem {
         if (options.type === "readonly") {
             this.element.classList.add("b3-menu__item--readonly");
         }
-        this.element.innerHTML = html;
+
+        if (options.element) {
+            this.element.append(options.element);
+        } else {
+            let html = `<span class="b3-menu__label">${options.label}</span>`;
+            if (typeof options.iconHTML === "string") {
+                html = options.iconHTML + html;
+            } else {
+                html = `<svg class="b3-menu__icon${["HTML (SiYuan)", window.siyuan.languages.template].includes(options.label) ? " ft__error" : ""}" style="${options.icon === "iconClose" ? "height:10px;" : ""}"><use xlink:href="#${options.icon || ""}"></use></svg>${html}`;
+            }
+            if (options.accelerator) {
+                html += `<span class="b3-menu__accelerator">${updateHotkeyTip(options.accelerator)}</span>`;
+            }
+            if (options.action) {
+                html += `<svg class="b3-menu__action"><use xlink:href="#${options.action}"></use></svg>`;
+            }
+            this.element.innerHTML = html;
+        }
+
         if (options.bind) {
             // 主题 rem craft 需要使用 b3-menu__item--custom 来区分自定义菜单 by 281261361
             this.element.classList.add("b3-menu__item--custom");
             options.bind(this.element);
         }
+
         if (options.submenu) {
             const submenuElement = document.createElement("div");
             submenuElement.classList.add("b3-menu__submenu");

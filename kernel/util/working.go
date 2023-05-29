@@ -33,11 +33,11 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/httpclient"
 	"github.com/K-Sillot/logging"
 	figure "github.com/common-nighthawk/go-figure"
 	"github.com/gofrs/flock"
+	"github.com/siyuan-note/filelock"
 )
 
 // var Mode = "dev"
@@ -46,7 +46,7 @@ var Mode = "prod"
 const (
 	Ver       = "0.26"
 	VerC      = Ver + ".999" // 用于检查版本更新
-	VerSY     = "2.8.7"      // 思源版本号
+	VerSY     = "2.8.10"     // 思源版本号
 	IsInsider = true
 	VerDeno   = "1.32.5"
 )
@@ -178,7 +178,6 @@ var (
 	DBPath         string        // SQLite 数据库文件路径
 	HistoryDBPath  string        // SQLite 历史数据库文件路径
 	BlockTreePath  string        // 区块树文件路径
-	PandocBinPath  string        // Pandoc 可执行文件路径
 	DenoBinPath    string        // Deno 可执行文件路径
 	AppearancePath string        // 配置目录下的外观目录 appearance/ 路径
 	ThemesPath     string        // 配置目录下的外观目录下的 themes/ 路径
@@ -361,6 +360,11 @@ func initPathDir() {
 		logging.LogFatalf(logging.ExitCodeInitWorkspaceErr, "create data widgets folder [%s] failed: %s", widgets, err)
 	}
 
+	plugins := filepath.Join(DataDir, "plugins")
+	if err := os.MkdirAll(plugins, 0755); nil != err && !os.IsExist(err) {
+		logging.LogFatalf(logging.ExitCodeInitWorkspaceErr, "create data plugins folder [%s] failed: %s", widgets, err)
+	}
+
 	emojis := filepath.Join(DataDir, "emojis")
 	if err := os.MkdirAll(emojis, 0755); nil != err && !os.IsExist(err) {
 		logging.LogFatalf(logging.ExitCodeInitWorkspaceErr, "create data emojis folder [%s] failed: %s", widgets, err)
@@ -389,45 +393,6 @@ func initMime() {
 
 	// 文档数据文件
 	mime.AddExtensionType(".sy", "application/json")
-}
-
-func initPandoc() {
-	if ContainerStd != Container {
-		return
-	}
-
-	pandocDir := filepath.Join(TempDir, "pandoc")
-	if gulu.OS.IsWindows() {
-		PandocBinPath = filepath.Join(pandocDir, "bin", "pandoc.exe")
-	} else if gulu.OS.IsDarwin() || gulu.OS.IsLinux() {
-		PandocBinPath = filepath.Join(pandocDir, "bin", "pandoc")
-	}
-	pandocVer := getPandocVer(PandocBinPath)
-	if "" != pandocVer {
-		logging.LogInfof("built-in pandoc [ver=%s, bin=%s]", pandocVer, PandocBinPath)
-		return
-	}
-
-	pandocZip := filepath.Join(WorkingDir, "pandoc.zip")
-	if "dev" == Mode || !gulu.File.IsExist(pandocZip) {
-		if gulu.OS.IsWindows() {
-			pandocZip = filepath.Join(WorkingDir, "pandoc/pandoc-windows-amd64.zip")
-		} else if gulu.OS.IsDarwin() {
-			pandocZip = filepath.Join(WorkingDir, "pandoc/pandoc-darwin-amd64.zip")
-		} else if gulu.OS.IsLinux() {
-			pandocZip = filepath.Join(WorkingDir, "pandoc/pandoc-linux-amd64.zip")
-		}
-	}
-	if err := gulu.Zip.Unzip(pandocZip, pandocDir); nil != err {
-		logging.LogErrorf("unzip pandoc failed: %s", err)
-		return
-	}
-
-	if gulu.OS.IsDarwin() || gulu.OS.IsLinux() {
-		exec.Command("chmod", "+x", PandocBinPath).CombinedOutput()
-	}
-	pandocVer = getPandocVer(PandocBinPath)
-	logging.LogInfof("initialized built-in pandoc [ver=%s, bin=%s]", pandocVer, PandocBinPath)
 }
 
 func initDeno() {
@@ -474,26 +439,6 @@ func initDeno() {
 	logging.LogInfof("initialized built-in deno [ver=%s, bin=%s]", denoVer, DenoBinPath)
 }
 
-func getPandocVer(binPath string) (ret string) {
-	if "" == binPath {
-		return
-	}
-
-	cmd := exec.Command(binPath, "--version")
-	gulu.CmdAttr(cmd)
-	data, err := cmd.CombinedOutput()
-	if nil == err && strings.HasPrefix(string(data), "pandoc") {
-		parts := bytes.Split(data, []byte("\n"))
-		if 0 < len(parts) {
-			ret = strings.TrimPrefix(string(parts[0]), "pandoc")
-			ret = strings.ReplaceAll(ret, ".exe", "")
-			ret = strings.TrimSpace(ret)
-		}
-		return
-	}
-	return
-}
-
 func getDenoVer(binPath string) (ret string) {
 	if "" == binPath {
 		return
@@ -512,20 +457,6 @@ func getDenoVer(binPath string) (ret string) {
 		return
 	}
 	return
-}
-
-func IsValidPandocBin(binPath string) bool {
-	if "" == binPath {
-		return false
-	}
-
-	cmd := exec.Command(binPath, "--version")
-	gulu.CmdAttr(cmd)
-	data, err := cmd.CombinedOutput()
-	if nil == err && strings.HasPrefix(string(data), "pandoc") {
-		return true
-	}
-	return false
 }
 
 func GetDataAssetsAbsPath() (ret string) {

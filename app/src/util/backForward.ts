@@ -2,24 +2,25 @@ import {hasClosestBlock, hasClosestByAttribute} from "../protyle/util/hasClosest
 import {getContenteditableElement} from "../protyle/wysiwyg/getBlock";
 import {focusByOffset, focusByRange, getSelectionOffset} from "../protyle/util/selection";
 import {hideElements} from "../protyle/ui/hideElements";
-import {fetchPost, fetchSyncPost} from "./fetch";
+import {fetchSyncPost} from "./fetch";
 import {Constants} from "../constants";
 import {Wnd} from "../layout/Wnd";
 import {getInstanceById, getWndByLayout} from "../layout/util";
 import {Tab} from "../layout/Tab";
 import {Editor} from "../editor";
-import {onGet} from "../protyle/util/onGet";
 import {scrollCenter} from "./highlightById";
 import {zoomOut} from "../menus/protyle";
 import {showMessage} from "../dialog/message";
 import {saveScroll} from "../protyle/scroll/saveScroll";
+import {getAllModels} from "../layout/getAll";
+import {App} from "../index";
 
 let forwardStack: IBackStack[] = [];
 let previousIsBack = false;
 
-const focusStack = async (stack: IBackStack) => {
+const focusStack = async (app: App, stack: IBackStack) => {
     hideElements(["gutter", "toolbar", "hint", "util", "dialog"], stack.protyle);
-    let blockElement: Element;
+    let blockElement: HTMLElement;
     if (!document.contains(stack.protyle.element)) {
         const response = await fetchSyncPost("/api/block/checkBlockExist", {id: stack.protyle.block.rootID});
         if (!response.data) {
@@ -47,14 +48,16 @@ const focusStack = async (stack: IBackStack) => {
                 docIcon: info.data.rootIcon,
                 callback(tab) {
                     const scrollAttr = saveScroll(stack.protyle, true);
+                    scrollAttr.rootId = stack.protyle.block.rootID;
                     scrollAttr.focusId = stack.id;
                     scrollAttr.focusStart = stack.position.start;
                     scrollAttr.focusEnd = stack.position.end;
                     const editor = new Editor({
+                        app: app,
                         tab,
                         scrollAttr,
-                        blockId: stack.isZoom ? stack.id : stack.protyle.block.rootID,
-                        action: stack.isZoom ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS]
+                        blockId: stack.zoomId || stack.protyle.block.rootID,
+                        action: stack.zoomId ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS]
                     });
                     tab.addModel(editor);
                 }
@@ -91,7 +94,7 @@ const focusStack = async (stack: IBackStack) => {
             if (info.data.rootID === stack.id) {
                 focusByOffset(protyle.title.editElement, stack.position.start, stack.position.end);
             } else {
-                Array.from(protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${stack.id}"]`)).find(item => {
+                Array.from(protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${stack.id}"]`)).find((item: HTMLElement) => {
                     if (!hasClosestByAttribute(item, "data-type", "NodeBlockQueryEmbed")) {
                         blockElement = item;
                         return true;
@@ -110,51 +113,36 @@ const focusStack = async (stack: IBackStack) => {
         if (stack.protyle.title.editElement.getBoundingClientRect().height === 0) {
             // 切换 tab
             stack.protyle.model.parent.parent.switchTab(stack.protyle.model.parent.headElement);
+            // 需要更新 range，否则 resize 中 `保持光标位置不变` 会导致光标跳动
+            stack.protyle.toolbar.range = undefined;
         }
         focusByOffset(stack.protyle.title.editElement, stack.position.start, stack.position.end);
         return true;
     }
-    Array.from(stack.protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${stack.id}"]`)).find(item => {
+    Array.from(stack.protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${stack.id}"]`)).find((item: HTMLElement) => {
         if (!hasClosestByAttribute(item, "data-type", "NodeBlockQueryEmbed")) {
             blockElement = item;
             return true;
         }
     });
-    if (blockElement) {
+    if (blockElement &&
+        // 即使块存在，折叠的情况需要也需要 zoomOut，否则折叠块内的光标无法定位
+        (!stack.zoomId || (stack.zoomId && stack.zoomId === stack.protyle.block.id))
+    ) {
         if (blockElement.getBoundingClientRect().height === 0) {
             // 切换 tab
             stack.protyle.model.parent.parent.switchTab(stack.protyle.model.parent.headElement);
         }
-        if (stack.isZoom) {
-            zoomOut(stack.protyle, stack.id, undefined, false);
-            return true;
-        }
-        if (blockElement && !stack.protyle.block.showAll) {
-            focusByOffset(getContenteditableElement(blockElement), stack.position.start, stack.position.end);
-            scrollCenter(stack.protyle, blockElement, true);
-            return true;
-        }
-        // 缩放不一致
-        fetchPost("/api/filetree/getDoc", {
-            id: stack.id,
-            mode: stack.isZoom ? 0 : 3,
-            size: stack.isZoom ? Constants.SIZE_GET_MAX : window.siyuan.config.editor.dynamicLoadBlocks,
-        }, getResponse => {
-            onGet(getResponse, stack.protyle, [Constants.CB_GET_HTML]);
-            Array.from(stack.protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${stack.id}"]`)).find(item => {
-                if (!hasClosestByAttribute(item, "data-type", "NodeBlockQueryEmbed")) {
-                    blockElement = item;
-                    return true;
-                }
-            });
-            focusByOffset(getContenteditableElement(blockElement), stack.position.start, stack.position.end);
-            setTimeout(() => {
-                // 图片、视频等加载完成后再定位
-                scrollCenter(stack.protyle, blockElement, true);
-            }, Constants.TIMEOUT_BLOCKLOAD);
+        focusByOffset(getContenteditableElement(blockElement), stack.position.start, stack.position.end);
+        scrollCenter(stack.protyle, blockElement, true);
+        getAllModels().outline.forEach(item => {
+            if (item.blockId === stack.protyle.block.rootID) {
+                item.setCurrent(blockElement);
+            }
         });
         return true;
     }
+    // 缩放
     if (stack.protyle.element.parentElement) {
         const response = await fetchSyncPost("/api/block/checkBlockExist", {id: stack.id});
         if (!response.data) {
@@ -164,31 +152,32 @@ const focusStack = async (stack: IBackStack) => {
             }
             return false;
         }
-        fetchPost("/api/filetree/getDoc", {
-            id: stack.id,
-            mode: stack.isZoom ? 0 : 3,
-            size: stack.isZoom ? Constants.SIZE_GET_MAX : window.siyuan.config.editor.dynamicLoadBlocks,
-        }, getResponse => {
-            onGet(getResponse, stack.protyle, stack.isZoom ? [Constants.CB_GET_HTML, Constants.CB_GET_ALL] : [Constants.CB_GET_HTML]);
-            Array.from(stack.protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${stack.id}"]`)).find(item => {
+        zoomOut(stack.protyle, stack.zoomId || stack.protyle.block.rootID, undefined, false, () => {
+            Array.from(stack.protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${stack.id}"]`)).find((item: HTMLElement) => {
                 if (!hasClosestByAttribute(item, "data-type", "NodeBlockQueryEmbed")) {
                     blockElement = item;
                     return true;
                 }
             });
+            if (!blockElement) {
+                return;
+            }
+            getAllModels().outline.forEach(item => {
+                if (item.blockId === stack.protyle.block.rootID) {
+                    item.setCurrent(blockElement);
+                }
+            });
             focusByOffset(getContenteditableElement(blockElement), stack.position.start, stack.position.end);
-            setTimeout(() => {
-                scrollCenter(stack.protyle, blockElement);
-            }, Constants.TIMEOUT_INPUT);
+            scrollCenter(stack.protyle, blockElement, true);
         });
         return true;
     }
 };
 
-export const goBack = async () => {
+export const goBack = async (app: App) => {
     if (window.siyuan.backStack.length === 0) {
         if (forwardStack.length > 0) {
-            await focusStack(forwardStack[forwardStack.length - 1]);
+            await focusStack(app, forwardStack[forwardStack.length - 1]);
         }
         return;
     }
@@ -200,7 +189,7 @@ export const goBack = async () => {
     }
     let stack = window.siyuan.backStack.pop();
     while (stack) {
-        const isFocus = await focusStack(stack);
+        const isFocus = await focusStack(app, stack);
         if (isFocus) {
             forwardStack.push(stack);
             break;
@@ -214,10 +203,10 @@ export const goBack = async () => {
     }
 };
 
-export const goForward = async () => {
+export const goForward = async (app: App) => {
     if (forwardStack.length === 0) {
         if (window.siyuan.backStack.length > 0) {
-            await focusStack(window.siyuan.backStack[window.siyuan.backStack.length - 1]);
+            await focusStack(app, window.siyuan.backStack[window.siyuan.backStack.length - 1]);
         }
         return;
     }
@@ -228,7 +217,7 @@ export const goForward = async () => {
 
     let stack = forwardStack.pop();
     while (stack) {
-        const isFocus = await focusStack(stack);
+        const isFocus = await focusStack(app, stack);
         if (isFocus) {
             window.siyuan.backStack.push(stack);
             break;
@@ -262,8 +251,9 @@ export const pushBack = (protyle: IProtyle, range?: Range, blockElement?: Elemen
         const position = getSelectionOffset(editElement, undefined, range);
         const id = blockElement.getAttribute("data-node-id") || protyle.block.rootID;
         const lastStack = window.siyuan.backStack[window.siyuan.backStack.length - 1];
-        const isZoom = protyle.block.showAll;
-        if (lastStack && lastStack.id === id && lastStack.isZoom === isZoom) {
+        if (lastStack && lastStack.id === id && (
+            (protyle.block.showAll && lastStack.zoomId === protyle.block.id) || (!lastStack.zoomId && !protyle.block.showAll)
+        )) {
             lastStack.position = position;
         } else {
             if (forwardStack.length > 0) {
@@ -277,7 +267,7 @@ export const pushBack = (protyle: IProtyle, range?: Range, blockElement?: Elemen
                 position,
                 id,
                 protyle,
-                isZoom
+                zoomId: protyle.block.showAll ? protyle.block.id : undefined,
             });
             if (window.siyuan.backStack.length > Constants.SIZE_UNDO) {
                 window.siyuan.backStack.shift();

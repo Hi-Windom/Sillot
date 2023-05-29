@@ -22,6 +22,7 @@ import {viewCards} from "../card/viewCards";
 import {Dialog} from "../dialog";
 import {hasClosestByClassName} from "../protyle/util/hasClosest";
 import {confirmDialog} from "../dialog/confirmDialog";
+import {App} from "../index";
 
 const togglePinDock = (dock: Dock, icon: string) => {
     return {
@@ -34,7 +35,7 @@ const togglePinDock = (dock: Dock, icon: string) => {
     };
 };
 
-export const workspaceMenu = (rect: DOMRect) => {
+export const workspaceMenu = (app:App, rect: DOMRect) => {
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
         window.siyuan.menus.menu.element.getAttribute("data-name") === "barWorkspace") {
         window.siyuan.menus.menu.remove();
@@ -49,7 +50,7 @@ export const workspaceMenu = (rect: DOMRect) => {
                 icon: "iconSettings",
                 accelerator: window.siyuan.config.keymap.general.config.custom,
                 click: () => {
-                    openSetting();
+                    openSetting(app);
                 }
             }).element);
         }
@@ -57,8 +58,8 @@ export const workspaceMenu = (rect: DOMRect) => {
         getAllDocks().forEach(item => {
             dockMenu.push({
                 icon: item.icon,
-                accelerator: window.siyuan.config.keymap.general[item.hotkeyLangId].custom,
-                label: window.siyuan.languages[item.hotkeyLangId],
+                accelerator: item.hotkey,
+                label: item.title,
                 click() {
                     getDockByType(item.type).toggleModel(item.type);
                 }
@@ -136,7 +137,11 @@ export const workspaceMenu = (rect: DOMRect) => {
                         if (item.name === value) {
                             saveDialog.destroy();
                             confirmDialog(window.siyuan.languages.save, window.siyuan.languages.exportTplTip, () => {
-                                item.layout = exportLayout(false, undefined, true);
+                                item.layout = exportLayout({
+                                    reload: false,
+                                    onlyData: true,
+                                    errorExit: false,
+                                });
                                 setStorageVal(Constants.LOCAL_LAYOUTS, window.siyuan.storage[Constants.LOCAL_LAYOUTS]);
                             });
                             return true;
@@ -147,7 +152,11 @@ export const workspaceMenu = (rect: DOMRect) => {
                     }
                     window.siyuan.storage[Constants.LOCAL_LAYOUTS].push({
                         name: value,
-                        layout: exportLayout(false, undefined, true)
+                        layout: exportLayout({
+                            reload: false,
+                            onlyData: true,
+                            errorExit: false,
+                        })
                     });
                     setStorageVal(Constants.LOCAL_LAYOUTS, window.siyuan.storage[Constants.LOCAL_LAYOUTS]);
                     saveDialog.destroy();
@@ -233,13 +242,13 @@ export const workspaceMenu = (rect: DOMRect) => {
                     label: window.siyuan.languages.spaceRepetition,
                     accelerator: window.siyuan.config.keymap.general.riffCard.custom,
                     click: () => {
-                        openCard();
+                        openCard(app);
                     }
                 }, {
                     iconHTML: Constants.ZWSP,
                     label: window.siyuan.languages.mgmt,
                     click: () => {
-                        viewCards("", window.siyuan.languages.all, "");
+                        viewCards(app, "", window.siyuan.languages.all, "");
                     }
                 }],
             }).element);
@@ -256,7 +265,7 @@ export const workspaceMenu = (rect: DOMRect) => {
                 icon: "iconHistory",
                 accelerator: window.siyuan.config.keymap.general.dataHistory.custom,
                 click: () => {
-                    openHistory();
+                    openHistory(app);
                 }
             }).element);
             window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
@@ -270,7 +279,7 @@ export const workspaceMenu = (rect: DOMRect) => {
         }).element);
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.feedback,
-            icon: "iconHeart",
+            icon: "iconFeedback",
             click: () => {
                 if ("zh_CN" === window.siyuan.config.lang) {
                     window.open("https://ld246.com/article/1649901726096");

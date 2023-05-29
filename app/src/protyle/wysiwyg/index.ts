@@ -67,14 +67,17 @@ import {getBacklinkHeadingMore, loadBreadcrumb} from "./renderBacklink";
 import {removeSearchMark} from "../toolbar/util";
 import {activeBlur, hideKeyboardToolbar} from "../../mobile/util/keyboardToolbar";
 import {commonClick} from "./commonClick";
+import {App} from "../../index";
 
 export class WYSIWYG {
     public lastHTMLs: { [key: string]: string } = {};
 
     public element: HTMLDivElement;
     public preventKeyup: boolean;
+    private app: App;
 
-    constructor(protyle: IProtyle) {
+    constructor(app: App, protyle: IProtyle) {
+        this.app = app;
         this.element = document.createElement("div");
         this.element.className = "protyle-wysiwyg";
         this.element.setAttribute("spellcheck", "false");
@@ -92,7 +95,7 @@ export class WYSIWYG {
             return;
         }
         this.bindEvent(protyle);
-        keydown(protyle, this.element);
+        keydown(app, protyle, this.element);
         dropEvent(protyle, this.element);
     }
 
@@ -395,7 +398,6 @@ export class WYSIWYG {
             if (target.tagName === "TH" || target.tagName === "TD" || target.firstElementChild?.tagName === "TABLE" || target.classList.contains("table__resize") || target.classList.contains("table__select")) {
                 tableBlockElement = hasClosestBlock(target);
                 if (tableBlockElement) {
-                    tableBlockElement.querySelector("table").classList.remove("select");
                     tableBlockElement.querySelector(".table__select").removeAttribute("style");
                     window.siyuan.menus.menu.remove();
                     event.stopPropagation();
@@ -530,7 +532,6 @@ export class WYSIWYG {
                                 width = item.offsetLeft + item.clientWidth - left;
                             }
                         });
-                        tableBlockElement.querySelector("table").classList.add("select");
                         tableBlockElement.querySelector(".table__select").setAttribute("style", `left:${left - tableBlockElement.firstElementChild.scrollLeft}px;top:${top}px;height:${height}px;width:${width + 1}px;`);
                         moveCellElement = moveTarget;
                     }
@@ -750,7 +751,6 @@ export class WYSIWYG {
                                             }
                                         }
                                     });
-                                    tableBlockElement.querySelector("table").classList.remove("select");
                                     tableSelectElement.removeAttribute("style");
                                     const oldHTML = tableBlockElement.outerHTML;
                                     let cellElement = selectCellElements[0];
@@ -838,7 +838,6 @@ export class WYSIWYG {
                                             selectCellElements.push(item);
                                         }
                                     });
-                                    tableBlockElement.querySelector("table").classList.remove("select");
                                     tableSelectElement.removeAttribute("style");
                                     setTableAlign(protyle, selectCellElements, tableBlockElement, "left", getEditorRange(tableBlockElement));
                                 }
@@ -860,7 +859,6 @@ export class WYSIWYG {
                                             selectCellElements.push(item);
                                         }
                                     });
-                                    tableBlockElement.querySelector("table").classList.remove("select");
                                     tableSelectElement.removeAttribute("style");
                                     setTableAlign(protyle, selectCellElements, tableBlockElement, "center", getEditorRange(tableBlockElement));
                                 }
@@ -882,7 +880,6 @@ export class WYSIWYG {
                                             selectCellElements.push(item);
                                         }
                                     });
-                                    tableBlockElement.querySelector("table").classList.remove("select");
                                     tableSelectElement.removeAttribute("style");
                                     setTableAlign(protyle, selectCellElements, tableBlockElement, "right", getEditorRange(tableBlockElement));
                                 }
@@ -903,7 +900,6 @@ export class WYSIWYG {
                                             selectCellElements.push(item);
                                         }
                                     });
-                                    tableBlockElement.querySelector("table").classList.remove("select");
                                     tableSelectElement.removeAttribute("style");
                                     const oldHTML = tableBlockElement.outerHTML;
                                     selectCellElements.forEach(item => {
@@ -1217,7 +1213,7 @@ export class WYSIWYG {
                     removeSearchMark(target);
                 }
                 if (types.includes("block-ref") && !protyle.disabled) {
-                    refMenu(protyle, target);
+                    refMenu(this.app, protyle, target);
                     // 阻止 popover
                     target.setAttribute("prevent-popover", "true");
                     setTimeout(() => {
@@ -1228,13 +1224,13 @@ export class WYSIWYG {
                     protyle.toolbar.showFileAnnotationRef(protyle, target);
                     return false;
                 } else if (types.includes("tag") && !protyle.disabled) {
-                    tagMenu(protyle, target);
+                    tagMenu(this.app, protyle, target);
                     return false;
                 } else if (types.includes("inline-memo")) {
                     protyle.toolbar.showRender(protyle, target);
                     return false;
                 } else if (types.includes("a") && !protyle.disabled) {
-                    linkMenu(protyle, target);
+                    linkMenu(this.app, protyle, target);
                     if (window.siyuan.config.editor.floatWindowMode === 0 &&
                         target.getAttribute("data-href")?.startsWith("siyuan://blocks")) {
                         // 阻止 popover
@@ -1247,7 +1243,7 @@ export class WYSIWYG {
                 }
             }
             if (!protyle.disabled && target.tagName === "IMG" && hasClosestByClassName(target, "img")) {
-                imgMenu(protyle, protyle.toolbar.range, target.parentElement.parentElement, {
+                imgMenu(this.app, protyle, protyle.toolbar.range, target.parentElement.parentElement, {
                     clientX: x + 4,
                     clientY: y
                 });
@@ -1265,7 +1261,6 @@ export class WYSIWYG {
                     window.siyuan.menus.menu.popup({x, y: y + 13, h: 26});
                     protyle.toolbar?.element.classList.add("fn__none");
                     if (nodeElement.classList.contains("table")) {
-                        nodeElement.querySelector("table").classList.remove("select");
                         nodeElement.querySelector(".table__select").removeAttribute("style");
                     }
                 }
@@ -1298,11 +1293,10 @@ export class WYSIWYG {
             if (!preventGetTopHTML &&
                 event.deltaY < 0 && !protyle.scroll.element.classList.contains("fn__none") &&
                 protyle.contentElement.clientHeight === protyle.contentElement.scrollHeight &&
-                protyle.wysiwyg.element.firstElementChild.getAttribute("data-eof") !== "true") {
+                protyle.wysiwyg.element.firstElementChild.getAttribute("data-eof") !== "1") {
                 fetchPost("/api/filetree/getDoc", {
                     id: protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id"),
                     mode: 1,
-                    k: protyle.options.key || "",
                     size: window.siyuan.config.editor.dynamicLoadBlocks,
                 }, getResponse => {
                     preventGetTopHTML = false;
@@ -1500,6 +1494,12 @@ export class WYSIWYG {
 
         let shiftStartElement: HTMLElement;
         this.element.addEventListener("click", (event: MouseEvent & { target: HTMLElement }) => {
+            this.app.plugins.forEach(item => {
+                item.eventBus.emit("click-editorcontent", {
+                    protyle,
+                    event
+                });
+            });
             hideElements(["hint", "util"], protyle);
             const ctrlIsPressed = event.metaKey || event.ctrlKey;
             /// #if !MOBILE
@@ -1510,6 +1510,7 @@ export class WYSIWYG {
                     if (ctrlIsPressed) {
                         fetchPost("/api/block/checkBlockFold", {id: breadcrumbId}, (foldResponse) => {
                             openFileById({
+                                app: this.app,
                                 id: breadcrumbId,
                                 action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
                                 zoomIn: foldResponse.data
@@ -1533,7 +1534,6 @@ export class WYSIWYG {
             const tableElement = hasClosestByClassName(event.target, "table");
             this.element.querySelectorAll(".table").forEach(item => {
                 if (!tableElement || !item.isSameNode(tableElement)) {
-                    item.querySelector("table").classList.remove("select");
                     item.querySelector(".table__select").removeAttribute("style");
                 }
                 // rome-ignore lint/complexity/useOptionalChain: <explanation>
@@ -1570,7 +1570,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
 
                 fetchPost("/api/block/checkBlockFold", {id: refBlockId}, (foldResponse) => {
                     /// #if MOBILE
-                    openMobileFileById(refBlockId, foldResponse.data ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
+                    openMobileFileById(this.app, refBlockId, foldResponse.data ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
                     activeBlur();
                     hideKeyboardToolbar();
                     /// #else
@@ -1580,6 +1580,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     }
                     if (event.shiftKey) {
                         openFileById({
+                            app: this.app,
                             id: refBlockId,
                             position: "bottom",
                             action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
@@ -1587,6 +1588,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                         });
                     } else if (event.altKey) {
                         openFileById({
+                            app: this.app,
                             id: refBlockId,
                             position: "right",
                             action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
@@ -1594,6 +1596,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                         });
                     } else if (ctrlIsPressed) {
                         openFileById({
+                            app: this.app,
                             id: refBlockId,
                             action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT],
                             keepCursor: true,
@@ -1601,6 +1604,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                         });
                     } else {
                         openFileById({
+                            app: this.app,
                             id: refBlockId,
                             action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
                             zoomIn: foldResponse.data
@@ -1639,7 +1643,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 } else if (event.shiftKey) {
                     openBy(linkAddress, "app");
                 } else {
-                    openAsset(linkAddress, fileIds[2], "right");
+                    openAsset(this.app, linkAddress, fileIds[2], "right");
                 }
                 /// #endif
                 return;
@@ -1648,7 +1652,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
             if (aElement && !event.altKey) {
                 event.stopPropagation();
                 event.preventDefault();
-                const linkAddress = aElement.getAttribute("data-href");
+                const linkAddress = Lute.UnEscapeHTMLStr(aElement.getAttribute("data-href"));
                 /// #if MOBILE
                 openByMobile(linkAddress);
                 /// #else
@@ -1663,7 +1667,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                         } else if (event.shiftKey) {
                             openBy(linkAddress, "app");
                         } else {
-                            openAsset(linkPathname, parseInt(getSearch("page", linkAddress)), "right");
+                            openAsset(this.app, linkPathname, parseInt(getSearch("page", linkAddress)), "right");
                         }
                     } else {
                         /// #if !BROWSER
@@ -1692,11 +1696,11 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
             const tagElement = hasClosestByAttribute(event.target, "data-type", "tag");
             if (tagElement && !event.altKey) {
                 /// #if !MOBILE
-                openGlobalSearch(`#${tagElement.textContent}#`, !ctrlIsPressed);
+                openGlobalSearch(this.app, `#${tagElement.textContent}#`, !ctrlIsPressed);
                 hideElements(["dialog"]);
                 /// #else
                 const searchOption = window.siyuan.storage[Constants.LOCAL_SEARCHDATA];
-                popSearch({
+                popSearch(this.app, {
                     removed: searchOption.removed,
                     sort: searchOption.sort,
                     group: searchOption.group,
@@ -1717,12 +1721,13 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
             if (embedItemElement) {
                 const embedId = embedItemElement.getAttribute("data-id");
                 /// #if MOBILE
-                openMobileFileById(embedId, [Constants.CB_GET_ALL]);
+                openMobileFileById(this.app, embedId, [Constants.CB_GET_ALL]);
                 activeBlur();
                 hideKeyboardToolbar();
                 /// #else
                 if (event.shiftKey) {
                     openFileById({
+                        app: this.app,
                         id: embedId,
                         position: "bottom",
                         action: [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL],
@@ -1730,6 +1735,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     });
                 } else if (event.altKey) {
                     openFileById({
+                        app: this.app,
                         id: embedId,
                         position: "right",
                         action: [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL],
@@ -1737,6 +1743,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     });
                 } else if (ctrlIsPressed) {
                     openFileById({
+                        app: this.app,
                         id: embedId,
                         action: [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL],
                         keepCursor: true,
@@ -1744,7 +1751,9 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     });
                 } else if (!protyle.disabled) {
                     window.siyuan.blockPanels.push(new BlockPanel({
+                        app: this.app,
                         targetElement: embedItemElement,
+                        isBacklink: false,
                         nodeIds: [embedId],
                     }));
                 }
@@ -1753,7 +1762,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 return;
             }
 
-            if (commonClick(event, protyle)) {
+            if (commonClick(this.app, event, protyle)) {
                 return;
             }
 
@@ -1831,7 +1840,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
             if (actionElement) {
                 const type = actionElement.parentElement.parentElement.getAttribute("data-type");
                 if (type === "img" && !protyle.disabled) {
-                    imgMenu(protyle, range, actionElement.parentElement.parentElement, {
+                    imgMenu(this.app, protyle, range, actionElement.parentElement.parentElement, {
                         clientX: event.clientX + 4,
                         clientY: event.clientY
                     });

@@ -27,8 +27,8 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
-	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -196,7 +196,7 @@ func Mount(boxID string) (alreadyMount bool, err error) {
 
 	box.Index()
 	// 缓存根一级的文档树展开
-	ListDocTree(box.ID, "/", Conf.FileTree.Sort, false, Conf.FileTree.MaxListCount)
+	ListDocTree(box.ID, "/", util.SortModeUnassigned, false, Conf.FileTree.MaxListCount)
 	treenode.SaveBlockTree(false)
 	util.ClearPushProgress(100)
 

@@ -1,43 +1,13 @@
-import {Wnd} from "../layout/Wnd";
-import {getInstanceById, getWndByLayout} from "../layout/util";
 import {Tab} from "../layout/Tab";
 import {Custom} from "../layout/dock/Custom";
 import {bindCardEvent, genCardHTML} from "./openCard";
 import {fetchPost} from "../util/fetch";
 import {Protyle} from "../protyle";
-
-export const newCardTab = (options: {
-    cardType: TCardType,
-    id: string,
-    title?: string
-}) => {
-    let wnd: Wnd;
-    const element = document.querySelector(".layout__wnd--active");
-    if (element) {
-        wnd = getInstanceById(element.getAttribute("data-id")) as Wnd;
-    }
-    if (!wnd) {
-        wnd = getWndByLayout(window.siyuan.layout.centerLayout);
-    }
-
-    const tab = new Tab({
-        icon: "iconRiffCard",
-        title: window.siyuan.languages.spaceRepetition,
-        callback(tab) {
-            tab.addModel(newCardModel({
-                tab,
-                data: {
-                    cardType: options.cardType,
-                    id: options.id,
-                    title: options.title
-                }
-            }));
-        }
-    });
-    wnd.split("lr").addTab(tab);
-}
+import {setPanelFocus} from "../layout/util";
+import {App} from "../index";
 
 export const newCardModel = (options: {
+    app: App,
     tab: Tab,
     data: {
         cardType: TCardType,
@@ -46,8 +16,9 @@ export const newCardModel = (options: {
     }
 }) => {
     let editor: Protyle;
-    const custom = new Custom({
-        type: "card",
+    const customObj = new Custom({
+        app: options.app,
+        type: "siyuan-card",
         tab: options.tab,
         data: options.data,
         init() {
@@ -65,6 +36,7 @@ export const newCardModel = (options: {
                 });
 
                 editor = bindCardEvent({
+                    app: options.app,
                     element: this.element,
                     id: this.data.id,
                     title: this.data.title,
@@ -99,5 +71,8 @@ export const newCardModel = (options: {
             });
         }
     });
-    return custom
-}
+    customObj.element.addEventListener("click", () => {
+        setPanelFocus(customObj.element.parentElement.parentElement);
+    });
+    return customObj;
+};

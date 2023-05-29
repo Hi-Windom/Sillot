@@ -22,10 +22,13 @@ import {getSearch} from "../util/functions";
 import {initRightMenu} from "./menu";
 import {openChangelog} from "../boot/openChangelog";
 import {registerServiceWorker} from "../util/serviceWorker";
+import {afterLoadPlugin, loadPlugins} from "../plugin/loader";
 import { SillotEnv } from "../sillot";
 import VConsole from 'vconsole';
 
 class App {
+    public plugins: import("../plugin").Plugin[] = [];
+
     constructor() {
         if (!window.webkit?.messageHandlers && !window.JSAndroid) {
             registerServiceWorker(`${Constants.SERVICE_WORKER_PATH}?v=${Constants.SIYUAN_VERSION}`);
@@ -34,6 +37,7 @@ class App {
         addScript(`${Constants.PROTYLE_CDN}/js/protyle-html.js?v=${Constants.SIYUAN_VERSION}`, "protyleWcHtmlScript");
         addBaseURL();
         window.siyuan = {
+            notebooks: [],
             transactions: [],
             reqIds: {},
             backStack: [],
@@ -41,10 +45,14 @@ class App {
             blockPanels: [],
             mobile: {},
             ws: new Model({
+                app: this,
                 id: genUUID(),
                 type: "main",
-                msgCallback(data) {
-                    onMessage(data);
+                msgCallback: (data) => {
+                    this.plugins.forEach((plugin) => {
+                        plugin.eventBus.emit("ws-main", data);
+                    });
+                    onMessage(this, data);
                 }
             })
         };
@@ -55,13 +63,14 @@ class App {
                 window.siyuan.menus.menu.remove();
             }
         });
-        fetchPost("/api/system/getConf", {}, confResponse => {
+        fetchPost("/api/system/getConf", {}, async (confResponse) => {
             confResponse.data.conf.keymap = Constants.SIYUAN_KEYMAP;
             window.siyuan.config = confResponse.data.conf;
+            await loadPlugins(this);
             getLocalStorage(() => {
                 fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
                     window.siyuan.languages = lauguages;
-                    window.siyuan.menus = new Menus();
+                    window.siyuan.menus = new Menus(this);
                     document.title = window.siyuan.languages.siyuanNote;
                     bootSync();
                     loadAssets(confResponse.data.conf.appearance);
@@ -71,11 +80,16 @@ class App {
                         window.siyuan.user = userResponse.data;
                         fetchPost("/api/system/getEmojiConf", {}, emojiResponse => {
                             window.siyuan.emojis = emojiResponse.data as IEmoji[];
-                            initFramework();
+                            setNoteBook(() => {
+                                initFramework(this);
                             console.log("initFramework() invoked");
-                            initRightMenu();
-                            console.log("initRightMenu() invoked");
+                                initRightMenu(this);
+                                console.log("initRightMenu() invoked");
                             openChangelog();
+                                this.plugins.forEach(item => {
+                                    afterLoadPlugin(item);
+                                });
+                            });
                             console.log("openChangelog() invoked");
                         });
                     });
@@ -84,14 +98,15 @@ class App {
             });
             document.addEventListener("touchstart", handleTouchStart, false);
             document.addEventListener("touchmove", handleTouchMove, false);
-            document.addEventListener("touchend", handleTouchEnd, false);
+            document.addEventListener("touchend", (event) => {
+                handleTouchEnd(this, event);
+            }, false);
         });
-        setNoteBook();
         promiseTransactions();
     }
 }
 
-new App();
+const siyuanApp = new App();
 
 window.goBack = goBack;
 window.showKeyboardToolbar = (height) => {
@@ -101,7 +116,7 @@ window.showKeyboardToolbar = (height) => {
 window.hideKeyboardToolbar = hideKeyboardToolbar;
 window.openFileByURL = (openURL) => {
     if (openURL && isSYProtocol(openURL)) {
-        openMobileFileById(getIdFromSYProtocol(openURL),
+        openMobileFileById(siyuanApp, getIdFromSYProtocol(openURL),
             getSearch("focus", openURL) === "1" ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]);
         return true;
     }

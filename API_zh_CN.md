@@ -29,6 +29,7 @@
     * [删除块](#删除块)
     * [移动块](#移动块)
     * [获取块 kramdown 源码](#获取块-kramdown-源码)
+    * [获取子块](#获取子块)
 * [属性](#属性)
     * [设置块属性](#设置块属性)
     * [获取块属性](#获取块属性)
@@ -41,9 +42,12 @@
     * [获取文件](#获取文件)
     * [写入文件](#写入文件)
     * [删除文件](#删除文件)
+    * [重命名文件](#重命名文件)
     * [列出文件](#列出文件)
 * [导出](#导出)
     * [导出 Markdown 文本](#导出-markdown-文本)
+* [转换](#转换)
+    * [Pandoc](#Pandoc)
 * [通知](#通知)
     * [推送消息](#推送消息)
     * [推送报错消息](#推送报错消息)
@@ -328,7 +332,7 @@
   ```
 
     * `data`：创建好的文档 ID
-    * 如果使用同一个 `path` 重复调用该接口，不会覆盖已有文档，而是新建随机数结尾的文档
+    * 如果使用同一个 `path` 重复调用该接口，不会覆盖已有文档
 
 ### 重命名文档
 
@@ -493,13 +497,19 @@
   {
     "dataType": "markdown",
     "data": "foo**bar**{: style=\"color: var(--b3-font-color8);\"}baz",
-    "previousID": "20211229114650-vrek5x6"
+    "nextID": "",
+    "previousID": "20211229114650-vrek5x6",
+    "parentID": ""
   }
   ```
 
     * `dataType`：待插入数据类型，值可选择 `markdown` 或者 `dom`
     * `data`：待插入的数据
+    * `nextID`：后一个块的 ID，用于锚定插入位置
     * `previousID`：前一个块的 ID，用于锚定插入位置
+    * `parentID`：父块 ID，用于锚定插入位置
+
+  `nextID`、`previousID`、`parentID` 三个参数必须至少存在一个有值，优先级为 `nextID` > `previousID` > `parentID`
 * 返回值
 
   ```json
@@ -760,6 +770,44 @@
   }
   ```
 
+### 获取子块
+
+* `/api/block/getChildBlocks`
+* 参数
+
+  ```json
+  {
+    "id": "20230506212712-vt9ajwj"
+  }
+  ```
+
+    * `id`：父块 ID
+    * 标题下方块也算作子块
+* 返回值
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": [
+      {
+        "id": "20230512083858-mjdwkbn",
+        "type": "h",
+        "subType": "h1"
+      },
+      {
+        "id": "20230513213727-thswvfd",
+        "type": "s"
+      },
+      {
+        "id": "20230513213633-9lsj4ew",
+        "type": "l",
+        "subType": "u"
+      }
+    ]
+  }
+  ```
+
 ## 属性
 
 ### 设置块属性
@@ -948,6 +996,29 @@
   }
   ```
 
+### 重命名文件
+
+* `/api/file/renameFile`
+* 参数
+
+  ```json
+  {
+    "path": "/data/assets/image-20230523085812-k3o9t32.png",
+    "newPath": "/data/assets/test-20230523085812-k3o9t32.png"
+  }
+  ```
+  * `path`：工作空间路径下的文件路径
+  * `newPath`：新的文件路径
+* 返回值
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": null
+  }
+  ```
+
 ### 列出文件
 
 * `/api/file/readDir`
@@ -1007,6 +1078,41 @@
 
     * `hPath`：人类可读的路径
     * `content`：Markdown 内容
+
+## 转换
+
+### Pandoc
+
+* `/api/convert/pandoc`
+* 工作目录
+    * 执行调用 pandoc 命令时工作目录会被设置在 `工作空间/temp/convert/pandoc/` 下
+    * 可先通过 API [`写入文件`](#写入文件) 将待转换文件写入该目录
+    * 然后再调用该 API 进行转换，转换后的文件也会被写入该目录
+    * 最后调用 API [`获取文件`](#获取文件) 获取转换后的文件内容
+        * 或者调用 API [`通过 Markdown 创建文档`](#通过-markdown-创建文档)
+        * 或者调用内部 API `importStdMd` 将转换后的文件夹直接导入
+* 参数
+
+  ```json
+  {
+    "args": [
+      "--to", "markdown_strict-raw_html",
+      "foo.epub",
+      "-o", "foo.md"
+   ]
+  }
+  ```
+
+    * `args`：Pandoc 命令行参数
+* 返回值
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": null
+  }
+  ```
 
 ## 通知
 

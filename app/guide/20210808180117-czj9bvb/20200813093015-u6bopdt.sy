@@ -7,48 +7,9 @@
 		"id": "20200813093015-u6bopdt",
 		"title": "常见问题",
 		"type": "doc",
-		"updated": "20230415111915"
+		"updated": "20230406111909"
 	},
 	"Children": [
-		{
-			"ID": "20221031001313-rk7sd0e",
-			"Type": "NodeHeading",
-			"HeadingLevel": 2,
-			"Properties": {
-				"id": "20221031001313-rk7sd0e",
-				"updated": "20221031001313"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "听说思源笔记会通过用户电脑挖矿？"
-				}
-			]
-		},
-		{
-			"ID": "20221031001314-v5a3pa8",
-			"Type": "NodeParagraph",
-			"Properties": {
-				"id": "20221031001314-v5a3pa8",
-				"updated": "20221107103705"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "以前不会、现在不会，将来也不会。详情请看"
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "a",
-					"TextMarkAHref": "https://www.zhihu.com/question/434530733/answer/2644563326",
-					"TextMarkTextContent": "如何评价思源笔记? - 知乎"
-				},
-				{
-					"Type": "NodeText",
-					"Data": "。"
-				}
-			]
-		},
 		{
 			"ID": "20220617160928-fw4ixa3",
 			"Type": "NodeHeading",
@@ -365,7 +326,7 @@
 			"ListData": {},
 			"Properties": {
 				"id": "20210428213927-rbcfx2y",
-				"updated": "20230104134309"
+				"updated": "20230512170439"
 			},
 			"Children": [
 				{
@@ -399,7 +360,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​ 用于保存所有插入的"
+									"Data": "​​​ 用于保存所有插入的"
 								},
 								{
 									"Type": "NodeTextMark",
@@ -443,7 +404,15 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​ 用于保存自定义图标表情图片"
+									"Data": "​​ 用于保存自定义"
+								},
+								{
+									"Type": "NodeText",
+									"Data": "图标"
+								},
+								{
+									"Type": "NodeText",
+									"Data": "表情图片"
 								}
 							]
 						}
@@ -479,7 +448,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​ 用于保存代码片段"
+									"Data": "​​ 用于保存代码片段"
 								}
 							]
 						}
@@ -494,7 +463,7 @@
 					},
 					"Properties": {
 						"id": "20221202214653-s19pmcp",
-						"updated": "20230104134309"
+						"updated": "20230429085021"
 					},
 					"Children": [
 						{
@@ -502,7 +471,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20221202214653-trmmieq",
-								"updated": "20230104134309"
+								"updated": "20230429085021"
 							},
 							"Children": [
 								{
@@ -516,7 +485,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​ 用于保存命名查询和"
+									"Data": "​​ 用于保存查询条件、布局和"
 								},
 								{
 									"Type": "NodeTextMark",
@@ -563,7 +532,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​ 用于保存"
+									"Data": "​​​ 用于保存"
 								},
 								{
 									"Type": "NodeTextMark",
@@ -607,7 +576,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​ 用于保存"
+									"Data": "​​​ 用于保存"
 								},
 								{
 									"Type": "NodeTextMark",
@@ -615,6 +584,50 @@
 									"TextMarkBlockRefID": "20210824201257-cy7icrc",
 									"TextMarkBlockRefSubtype": "s",
 									"TextMarkTextContent": "挂件"
+								}
+							]
+						}
+					]
+				},
+				{
+					"ID": "20230512170429-itokqka",
+					"Type": "NodeListItem",
+					"ListData": {
+						"BulletChar": 42,
+						"Marker": "Kg=="
+					},
+					"Properties": {
+						"id": "20230512170429-itokqka",
+						"updated": "20230512170439"
+					},
+					"Children": [
+						{
+							"ID": "20230512170429-dzajfaa",
+							"Type": "NodeParagraph",
+							"Properties": {
+								"id": "20230512170429-dzajfaa",
+								"updated": "20230512170439"
+							},
+							"Children": [
+								{
+									"Type": "NodeText",
+									"Data": "​"
+								},
+								{
+									"Type": "NodeTextMark",
+									"TextMarkType": "code",
+									"TextMarkTextContent": "plugins"
+								},
+								{
+									"Type": "NodeText",
+									"Data": "​ 用于保存"
+								},
+								{
+									"Type": "NodeTextMark",
+									"TextMarkType": "block-ref",
+									"TextMarkBlockRefID": "20230506210010-houyyvy",
+									"TextMarkBlockRefSubtype": "s",
+									"TextMarkTextContent": "插件"
 								}
 							]
 						}
@@ -651,7 +664,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​ 后缀的文件用于保存文档数据，数据格式为 JSON"
+									"Data": "​​​ 后缀的文件用于保存文档数据，数据格式为 JSON"
 								}
 							]
 						}
@@ -2128,7 +2141,7 @@
 			"ListData": {},
 			"Properties": {
 				"id": "20230406111846-ph7umq6",
-				"updated": "20230406111934"
+				"updated": "20230406111909"
 			},
 			"Children": [
 				{
@@ -2156,36 +2169,6 @@
 									"TextMarkType": "a",
 									"TextMarkAHref": "https://ld246.com/sponsor",
 									"TextMarkTextContent": "靠爱发电 - 链滴"
-								}
-							]
-						}
-					]
-				},
-				{
-					"ID": "20230406111847-hszqryy",
-					"Type": "NodeListItem",
-					"ListData": {
-						"BulletChar": 42,
-						"Marker": "Kg=="
-					},
-					"Properties": {
-						"id": "20230406111847-hszqryy",
-						"updated": "20230406111934"
-					},
-					"Children": [
-						{
-							"ID": "20230406111847-qe9lvb0",
-							"Type": "NodeParagraph",
-							"Properties": {
-								"id": "20230406111847-qe9lvb0",
-								"updated": "20230406111934"
-							},
-							"Children": [
-								{
-									"Type": "NodeTextMark",
-									"TextMarkType": "a",
-									"TextMarkAHref": "https://opencollective.com/b3log",
-									"TextMarkTextContent": "B3log - Open Collective"
 								}
 							]
 						}

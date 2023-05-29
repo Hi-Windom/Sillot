@@ -28,14 +28,16 @@ import (
 	"sync"
 	"time"
 
+	"github.com/sashabaranov/go-openai"
+
 	"github.com/88250/gulu"
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
-	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/logging"
 	"github.com/Xuanwo/go-locale"
 	"github.com/dustin/go-humanize"
 	"github.com/getsentry/sentry-go"
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/task"
@@ -71,6 +73,7 @@ type AppConf struct {
 	Search         *conf.Search     `json:"search"`         // 搜索配置
 	Flashcard      *conf.Flashcard  `json:"flashcard"`      // 闪卡配置
 	AI             *conf.AI         `json:"ai"`             // 人工智能配置
+	Bazaar         *conf.Bazaar     `json:"bazaar"`         // 集市配置
 	Stat           *conf.Stat       `json:"stat"`           // 统计
 	Api            *conf.API        `json:"api"`            // API
 	Repo           *conf.Repo       `json:"repo"`           // 数据仓库
@@ -174,6 +177,9 @@ func InitConf() {
 		Conf.FileTree.MaxOpenTabCount = 32
 	}
 	Conf.FileTree.DocCreateSavePath = strings.TrimSpace(Conf.FileTree.DocCreateSavePath)
+	if "../" == Conf.FileTree.DocCreateSavePath {
+		Conf.FileTree.DocCreateSavePath = "../Untitled"
+	}
 	for strings.HasSuffix(Conf.FileTree.DocCreateSavePath, "/") {
 		Conf.FileTree.DocCreateSavePath = strings.TrimSuffix(Conf.FileTree.DocCreateSavePath, "/")
 		Conf.FileTree.DocCreateSavePath = strings.TrimSpace(Conf.FileTree.DocCreateSavePath)
@@ -284,6 +290,10 @@ func InitConf() {
 		Conf.Api = conf.NewAPI()
 	}
 
+	if nil == Conf.Bazaar {
+		Conf.Bazaar = conf.NewBazaar()
+	}
+
 	if nil == Conf.Repo {
 		Conf.Repo = conf.NewRepo()
 	}
@@ -337,14 +347,18 @@ func InitConf() {
 	if nil == Conf.AI {
 		Conf.AI = conf.NewAI()
 	}
+	if "" == Conf.AI.OpenAI.APIModel {
+		Conf.AI.OpenAI.APIModel = openai.GPT3Dot5Turbo
+	}
 
 	if "" != Conf.AI.OpenAI.APIKey {
 		logging.LogInfof("OpenAI API enabled\n"+
 			"    baseURL=%s\n"+
 			"    timeout=%ds\n"+
 			"    proxy=%s\n"+
+			"    model=%s\n"+
 			"    maxTokens=%d",
-			Conf.AI.OpenAI.APIBaseURL, Conf.AI.OpenAI.APITimeout, Conf.AI.OpenAI.APIProxy, Conf.AI.OpenAI.APIMaxTokens)
+			Conf.AI.OpenAI.APIBaseURL, Conf.AI.OpenAI.APITimeout, Conf.AI.OpenAI.APIProxy, Conf.AI.OpenAI.APIModel, Conf.AI.OpenAI.APIMaxTokens)
 	}
 
 	Conf.ReadOnly = util.ReadOnly

@@ -15,7 +15,7 @@
 
 ## 💡 简介
 
-思源笔记是一款本地优先的个人知识管理系统， 支持细粒度块级引用和 Markdown 所见即所得。
+思源笔记是一款隐私优先的个人知识管理系统，支持细粒度块级引用和 Markdown 所见即所得。
 
 ![feature0.png](https://b3logfile.com/file/2022/10/feature0-EHMFc7T.png)
 
@@ -161,9 +161,9 @@
 
 ## 🏘️ 社区
 
-* [中文讨论区](https://ld246.com/domain/siyuan) 官方支持渠道
-* [用户社区汇总](https://ld246.com/article/1640266171309) 由热心用户建立的社区
-* [Awesome SiYuan](https://github.com/siyuan-note/awesome) 由热心用户整理的资源
+* [中文讨论区](https://ld246.com/domain/siyuan)
+* [用户社区汇总](https://ld246.com/article/1640266171309)
+* [Awesome SiYuan](https://github.com/siyuan-note/awesome)
 
 ## 🛠️ 开发指南
 
@@ -196,9 +196,10 @@
 * `assets` 用于保存所有插入的资源文件
 * `emojis` 用于保存自定义图标表情图片
 * `snippets` 用于保存代码片段
-* `storage` 用于保存命名查询和闪卡数据等
+* `storage` 用于保存查询条件、布局和闪卡数据等
 * `templates` 用于保存模板片段
 * `widgets` 用于保存挂件
+* `plugins` 用于保存插件
 * 其余文件夹就是用户自己创建的笔记本文件夹，笔记本文件夹下 `.sy` 后缀的文件用于保存文档数据，数据格式为 JSON
 
 ### 支持通过第三方同步盘进行数据同步吗？
@@ -278,7 +279,6 @@
 如果你没有订阅需求但又想支持开发，欢迎进行捐赠：
 
 * [靠爱发电 - 链滴](https://ld246.com/sponsor)
-* [B3log - Open Collective](https://opencollective.com/b3log)
 
 ## 🙏 鸣谢
 

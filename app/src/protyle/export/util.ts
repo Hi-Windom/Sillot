@@ -28,7 +28,7 @@ export const afterExport = (exportPath: string, msgId: string) => {
 export const exportImage = (id: string) => {
     const exportDialog = new Dialog({
         title: window.siyuan.languages.exportAsImage,
-        content: `<div class="b3-dialog__content" style="max-height: 70vh;overflow: auto;${isMobile() ? "padding:8px;" : ""};background-color: var(--b3-theme-background)">
+        content: `<div class="b3-dialog__content" style="${isMobile() ? "padding:8px;" : ""};background-color: var(--b3-theme-background)">
     <div style="${isMobile() ? "padding: 16px;margin: 16px 0" : "padding: 48px;margin: 8px 0 24px"};border: 1px solid var(--b3-border-color);border-radius: 10px;" class="export-img protyle-wysiwyg${window.siyuan.config.editor.displayBookmarkIcon ? " protyle-wysiwyg--attr" : ""}" id="preview"></div>
     <div class="ft__smaller ft__on-surface fn__flex" style="font-size: 18.6px;color: var(--b3-theme-on-surface-light);filter: opacity(0.77);"><img style="height: 31px;margin: -3.1px 3.1px 0 31px;font-size: 18.6px;" src="stage/icon.png">Sillot</div>
     <div class="fn__hr--b"></div>
@@ -46,6 +46,7 @@ export const exportImage = (id: string) => {
 </div>
  <div class="fn__loading"><img height="128px" width="128px" src="stage/loading-pure.svg"></div>`,
         width: isMobile() ? "92vw" : "990px",
+        height: "70vh"
     });
     const btnsElement = exportDialog.element.querySelectorAll(".b3-button");
     btnsElement[0].addEventListener("click", () => {
@@ -53,11 +54,11 @@ export const exportImage = (id: string) => {
     });
     btnsElement[1].addEventListener("click", () => {
         const msgId = showMessage(window.siyuan.languages.exporting, 0);
-        previewElement.parentElement.style.maxHeight = "none";
+        (exportDialog.element.querySelector(".b3-dialog__container") as HTMLElement).style.height = "";
         setStorageVal(Constants.LOCAL_EXPORTIMG, window.siyuan.storage[Constants.LOCAL_EXPORTIMG]);
         setTimeout(() => {
             addScript("stage/protyle/js/html2canvas.min.js?v=1.4.1", "protyleHtml2canvas").then(() => {
-                window.html2canvas(previewElement.parentElement).then((canvas) => {
+                window.html2canvas(previewElement.parentElement, {useCORS: true}).then((canvas) => {
                     canvas.toBlob((blob: Blob) => {
                         const formData = new FormData();
                         formData.append("file", blob, btnsElement[1].getAttribute("data-title"));
@@ -70,7 +71,7 @@ export const exportImage = (id: string) => {
                     });
                 });
             });
-        }, Constants.TIMEOUT_TRANSITION);
+        }, Constants.TIMEOUT_LOAD);
     });
     const previewElement = exportDialog.element.querySelector("#preview") as HTMLElement;
     const foldElement = (exportDialog.element.querySelector("#keepFold") as HTMLInputElement);

@@ -3,7 +3,7 @@ import {showMessage} from "../dialog/message";
 import {isMobile} from "./functions";
 import {fetchPost} from "./fetch";
 import {Dialog} from "../dialog";
-import {getNotebookName, getOpenNotebookCount} from "./pathName";
+import {getOpenNotebookCount} from "./pathName";
 import {validateName} from "../editor/rename";
 import {setStorageVal} from "../protyle/util/compatibility";
 
@@ -36,7 +36,12 @@ export const newDailyNote = () => {
         return;
     }
     const localNotebookId = window.siyuan.storage[Constants.LOCAL_DAILYNOTEID];
-    if (localNotebookId && getNotebookName(localNotebookId) && !isMobile()) {
+    const localNotebookIsOpen = window.siyuan.notebooks.find((item) => {
+        if (item.id === localNotebookId && !item.closed) {
+            return true;
+        }
+    });
+    if (localNotebookId && localNotebookIsOpen && !isMobile()) {
         fetchPost("/api/filetree/createDailyNote", {
             notebook: localNotebookId,
             app: Constants.SIYUAN_APPID,

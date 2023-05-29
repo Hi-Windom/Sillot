@@ -36,6 +36,7 @@ import (
 	"github.com/88250/gulu"
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/K-Sillot/encryption"
@@ -567,7 +568,9 @@ func checkoutRepo(id string) {
 		return
 	}
 
-	FullReindex()
+	task.AppendTask(task.DatabaseIndexFull, fullReindex)
+	task.AppendTask(task.DatabaseIndexRef, IndexRefs)
+	task.AppendTask(task.ReloadUI, util.ReloadUIResetScroll)
 
 	if syncEnabled {
 		func() {
@@ -809,7 +812,7 @@ func IndexRepo(memo string) (err error) {
 		eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBarAndProgress,
 	})
 	if nil != err {
-		util.PushStatusBar("Index data repo failed: " + err.Error())
+		util.PushStatusBar("Index data repo failed: " + html.EscapeString(err.Error()))
 		return
 	}
 	elapsed := time.Since(start)
@@ -831,10 +834,7 @@ var syncingFiles = sync.Map{}
 var syncingStorages = false
 
 func waitForSyncingStorages() {
-	for i := 0; i < 60; i++ {
-		if syncingStorages {
-			return
-		}
+	for syncingStorages {
 		time.Sleep(time.Second)
 	}
 }
@@ -993,7 +993,7 @@ func bootSyncRepo() (err error) {
 		autoSyncErrCount++
 		planSyncAfter(fixSyncInterval)
 
-		msg := fmt.Sprintf("sync repo failed: %s", err)
+		msg := fmt.Sprintf("sync repo failed: %s", html.EscapeString(err.Error()))
 		logging.LogErrorf(msg)
 		util.PushStatusBar(msg)
 		util.PushErrMsg(msg, 0)
@@ -1196,7 +1196,7 @@ func processSyncMergeResult(exit, byHand bool, start time.Time, mergeResult *dej
 	// 有数据变更，需要重建索引
 	var upserts, removes []string
 	var upsertTrees int
-	var needReloadFlashcard, needReloadOcrTexts bool
+	var needReloadFlashcard, needReloadOcrTexts, needReloadFiletree bool
 	for _, file := range mergeResult.Upserts {
 		upserts = append(upserts, file.Path)
 		if strings.HasPrefix(file.Path, "/storage/riff/") {
@@ -1205,6 +1205,10 @@ func processSyncMergeResult(exit, byHand bool, start time.Time, mergeResult *dej
 
 		if strings.HasPrefix(file.Path, "/data/assets/ocr-texts.json") {
 			needReloadOcrTexts = true
+		}
+
+		if strings.HasSuffix(file.Path, "/.siyuan/conf.json") {
+			needReloadFiletree = true
 		}
 
 		if strings.HasSuffix(file.Path, ".sy") {
@@ -1219,6 +1223,10 @@ func processSyncMergeResult(exit, byHand bool, start time.Time, mergeResult *dej
 
 		if strings.HasPrefix(file.Path, "/data/assets/ocr-texts.json") {
 			needReloadOcrTexts = true
+		}
+
+		if strings.HasSuffix(file.Path, "/.siyuan/conf.json") {
+			needReloadFiletree = true
 		}
 	}
 
@@ -1237,6 +1245,10 @@ func processSyncMergeResult(exit, byHand bool, start time.Time, mergeResult *dej
 	if needFullReindex(upsertTrees) { // 改进同步后全量重建索引判断 https://github.com/siyuan-note/siyuan/issues/5764
 		FullReindex()
 		return
+	}
+
+	if needReloadFiletree {
+		util.BroadcastByType("filetree", "reloadFiletree", 0, "", nil)
 	}
 
 	if exit { // 退出时同步不用推送事件

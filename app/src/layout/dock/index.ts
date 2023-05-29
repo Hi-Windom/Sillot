@@ -15,16 +15,29 @@ import {Protyle} from "../../protyle";
 import {Backlink} from "./Backlink";
 import {resetFloatDockSize} from "./util";
 import {hasClosestByClassName} from "../../protyle/util/hasClosest";
+import {App} from "../../index";
+import {Plugin} from "../../plugin";
+import {Custom} from "./Custom";
+
+const TYPES = ["file", "outline", "inbox", "bookmark", "tag", "graph", "globalGraph", "backlink"];
 
 export class Dock {
     public element: HTMLElement;
     public layout: Layout;
     private position: TDockPosition;
+    private app: App;
     public resizeElement: HTMLElement;
     public pin = true;
     public data: { [key: string]: Model | boolean };
 
-    constructor(options: { data: { pin: boolean, data: IDockTab[][] }, position: TDockPosition }) {
+    constructor(options: {
+        app: App,
+        data: {
+            pin: boolean,
+            data: IDockTab[][]
+        },
+        position: TDockPosition
+    }) {
         switch (options.position) {
             case "Left":
                 this.layout = window.siyuan.layout.layout.children[0].children[0] as Layout;
@@ -45,13 +58,33 @@ export class Dock {
                 this.layout.element.insertAdjacentHTML("beforeend", "<div class=\"layout__dockresize\"></div>");
                 break;
         }
+        this.app = options.app;
         this.element = document.getElementById("dock" + options.position);
         const dockClass = options.position === "Bottom" ? ' class="fn__flex"' : "";
         this.element.innerHTML = `<div${dockClass}></div><div class="fn__flex-1"></div><div${dockClass}></div>`;
         this.position = options.position;
         this.pin = options.data.pin;
         this.data = {};
-        if (options.data.data.length === 0) {
+        let showDock = false;
+        if (options.data.data.length !== 0) {
+            if (!showDock) {
+                options.data.data[0].find(item => {
+                    if (TYPES.includes(item.type)) {
+                        showDock = true;
+                        return true;
+                    }
+                });
+            }
+            if (!showDock && options.data.data[1]) {
+                options.data.data[1].find(item => {
+                    if (TYPES.includes(item.type)) {
+                        showDock = true;
+                        return true;
+                    }
+                });
+            }
+        }
+        if (!showDock) {
             this.element.firstElementChild.innerHTML = `<span class="dock__item dock__item--pin b3-tooltips b3-tooltips__${this.getClassDirect(0)}" aria-label="${this.pin ? window.siyuan.languages.unpin : window.siyuan.languages.pin}">
     <svg><use xlink:href="#iconPin"></use></svg>
 </span>`;
@@ -77,13 +110,13 @@ export class Dock {
             this.resizeElement.classList.add("fn__none");
         } else {
             activeElements.forEach(item => {
-                this.toggleModel(item.getAttribute("data-type") as TDockType, true);
+                this.toggleModel(item.getAttribute("data-type"), true);
             });
         }
         this.element.addEventListener("click", (event) => {
             let target = event.target as HTMLElement;
             while (target && !target.isEqualNode(this.element)) {
-                const type = target.getAttribute("data-type") as TDockType;
+                const type = target.getAttribute("data-type");
                 if (type) {
                     this.toggleModel(type, false, true);
                     event.preventDefault();
@@ -256,7 +289,7 @@ export class Dock {
         this.layout.element.querySelector(".layout__tab--active")?.classList.remove("layout__tab--active");
     }
 
-    public toggleModel(type: TDockType, show = false, close = false) {
+    public toggleModel(type: string, show = false, close = false, hide = false) {
         if (!type) {
             return;
         }
@@ -266,7 +299,7 @@ export class Dock {
         }
         const index = parseInt(target.getAttribute("data-index"));
         const wnd = this.layout.children[index] as Wnd;
-        if (target.classList.contains("dock__item--active")) {
+        if (target.classList.contains("dock__item--active") || hide) {
             if (!close) {
                 let needFocus = false;
                 Array.from(wnd.element.querySelector(".layout-tab-container").children).find(item => {
@@ -316,29 +349,30 @@ export class Dock {
                 switch (type) {
                     case "file":
                         tab = new Tab({
-                            callback(tab: Tab) {
-                                tab.addModel(new Files({tab}));
+                            callback: (tab: Tab) => {
+                                tab.addModel(new Files({tab, app: this.app}));
                             }
                         });
                         break;
                     case "bookmark":
                         tab = new Tab({
-                            callback(tab: Tab) {
-                                tab.addModel(new Bookmark(tab));
+                            callback: (tab: Tab) => {
+                                tab.addModel(new Bookmark(this.app, tab));
                             }
                         });
                         break;
                     case "tag":
                         tab = new Tab({
-                            callback(tab: Tab) {
-                                tab.addModel(new Tag(tab));
+                            callback: (tab: Tab) => {
+                                tab.addModel(new Tag(this.app, tab));
                             }
                         });
                         break;
                     case "outline":
                         tab = new Tab({
-                            callback(tab: Tab) {
+                            callback: (tab: Tab) => {
                                 const outline = new Outline({
+                                    app: this.app,
                                     type: "pin",
                                     tab,
                                     blockId: editor?.protyle?.block?.rootID,
@@ -352,8 +386,9 @@ export class Dock {
                         break;
                     case "graph":
                         tab = new Tab({
-                            callback(tab: Tab) {
+                            callback: (tab: Tab) => {
                                 tab.addModel(new Graph({
+                                    app: this.app,
                                     tab,
                                     blockId: editor?.protyle?.block?.rootID,
                                     type: "pin"
@@ -363,8 +398,9 @@ export class Dock {
                         break;
                     case "globalGraph":
                         tab = new Tab({
-                            callback(tab: Tab) {
+                            callback: (tab: Tab) => {
                                 tab.addModel(new Graph({
+                                    app: this.app,
                                     tab,
                                     type: "global"
                                 }));
@@ -373,8 +409,9 @@ export class Dock {
                         break;
                     case "backlink":
                         tab = new Tab({
-                            callback(tab: Tab) {
+                            callback: (tab: Tab) => {
                                 tab.addModel(new Backlink({
+                                    app: this.app,
                                     type: "pin",
                                     tab,
                                     blockId: editor?.protyle?.block?.rootID,
@@ -384,8 +421,24 @@ export class Dock {
                         break;
                     case "inbox":
                         tab = new Tab({
-                            callback(tab: Tab) {
-                                tab.addModel(new Inbox(tab));
+                            callback: (tab: Tab) => {
+                                tab.addModel(new Inbox(this.app, tab));
+                            }
+                        });
+                        break;
+                    default:
+                        tab = new Tab({
+                            callback: (tab: Tab) => {
+                                let customModel;
+                                this.app.plugins.find((item: Plugin) => {
+                                    if (item.docks[type]) {
+                                        customModel = item.docks[type].model({tab});
+                                        return true;
+                                    }
+                                });
+                                if (customModel) {
+                                    tab.addModel(customModel);
+                                }
                             }
                         });
                         break;
@@ -393,6 +446,7 @@ export class Dock {
                 wnd.addTab(tab);
                 target.setAttribute("data-id", tab.id);
                 this.data[type] = tab.model;
+                setPanelFocus(tab.panelElement);
             } else {
                 // tab 切换
                 Array.from(wnd.element.querySelector(".layout-tab-container").children).forEach(item => {
@@ -482,7 +536,7 @@ export class Dock {
     public add(index: number, sourceElement: Element) {
         sourceElement.setAttribute("data-height", "");
         sourceElement.setAttribute("data-width", "");
-        const type = sourceElement.getAttribute("data-type") as TDockType;
+        const type = sourceElement.getAttribute("data-type");
         const sourceDock = getDockByType(type);
         if (sourceDock.element.querySelectorAll(".dock__item").length === 2) {
             sourceDock.element.classList.add("fn__none");
@@ -514,6 +568,16 @@ export class Dock {
         if (hasActive) {
             this.toggleModel(type, true);
         }
+    }
+
+    public remove(key: string) {
+        this.toggleModel(key, false, true, true);
+        this.element.querySelector(`[data-type="${key}"]`).remove();
+        const custom = this.data[key] as Custom;
+        if (custom.parent) {
+            custom.parent.parent.removeTab(custom.parent.id);
+        }
+        delete this.data[key];
     }
 
     private getClassDirect(index: number) {
@@ -566,20 +630,46 @@ export class Dock {
         return max;
     }
 
-    private genButton(data: IDockTab[], index: number) {
+    public genButton(data: IDockTab[], index: number, tabIndex?: number) {
         let html = "";
         data.forEach(item => {
-            html += `<span data-height="${item.size.height}" data-width="${item.size.width}" data-type="${item.type}" data-index="${index}" data-hotkeylangid="${item.hotkeyLangId}" class="dock__item${item.show ? " dock__item--active" : ""} b3-tooltips b3-tooltips__${this.getClassDirect(index)}" aria-label="${window.siyuan.languages[item.hotkeyLangId] + " " + updateHotkeyTip(window.siyuan.config.keymap.general[item.hotkeyLangId].custom)}${window.siyuan.languages.dockTip}">
+            if (typeof tabIndex === "undefined" && !TYPES.includes(item.type)) {
+                return;
+            }
+            html += `<span data-height="${item.size.height}" data-width="${item.size.width}" data-type="${item.type}" data-index="${index}" data-hotkey="${item.hotkey || ""}" data-hotkeyLangId="${item.hotkeyLangId || ""}" data-title="${item.title}" class="dock__item${item.show ? " dock__item--active" : ""} b3-tooltips b3-tooltips__${this.getClassDirect(index)}" aria-label="${item.title} ${item.hotkey ? updateHotkeyTip(item.hotkey) : ""}${window.siyuan.languages.dockTip}">
     <svg><use xlink:href="#${item.icon}"></use></svg>
 </span>`;
             this.data[item.type] = true;
         });
         if (index === 0) {
-            this.element.firstElementChild.innerHTML = `${html}<span class="dock__item dock__item--pin b3-tooltips b3-tooltips__${this.getClassDirect(index)}" aria-label="${this.pin ? window.siyuan.languages.unpin : window.siyuan.languages.pin}">
+            if (typeof tabIndex === "number") {
+                if (this.element.firstElementChild.children[tabIndex]) {
+                    this.element.firstElementChild.children[tabIndex].insertAdjacentHTML("beforebegin", html);
+                } else {
+                    this.element.firstElementChild.lastElementChild.insertAdjacentHTML("beforebegin", html);
+                }
+            } else {
+                this.element.firstElementChild.innerHTML = `${html}<span class="dock__item dock__item--pin b3-tooltips b3-tooltips__${this.getClassDirect(index)}" aria-label="${this.pin ? window.siyuan.languages.unpin : window.siyuan.languages.pin}">
     <svg><use xlink:href="#iconPin"></use></svg>
 </span>`;
+            }
         } else {
-            this.element.lastElementChild.innerHTML = html;
+            if (typeof tabIndex === "number") {
+                if (this.element.lastElementChild.children[tabIndex]) {
+                    this.element.lastElementChild.children[tabIndex].insertAdjacentHTML("beforebegin", html);
+                } else {
+                    this.element.lastElementChild.insertAdjacentHTML("beforeend", html);
+                }
+            } else {
+                this.element.lastElementChild.innerHTML = html;
+            }
+        }
+
+        if (typeof tabIndex === "number") {
+            this.element.classList.remove("fn__none");
+            if (data[0].show) {
+                this.toggleModel(data[0].type, true);
+            }
         }
     }
 }

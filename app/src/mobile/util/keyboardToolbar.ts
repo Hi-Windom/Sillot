@@ -33,7 +33,7 @@ const renderSlashMenu = (protyle: IProtyle, toolbarElement: Element) => {
 </div>
 <div class="keyboard__slash-block">
     ${getSlashItem(Constants.ZWSP + 2, "iconImage", window.siyuan.languages.assets)}
-    ${getSlashItem("((", "iconRef", window.siyuan.languages.blockRef, "true")}
+    ${getSlashItem("((", "iconRef", window.siyuan.languages.ref, "true")}
 </div>
 <div class="keyboard__slash-block">
     ${getSlashItem("{{", "iconSQL", window.siyuan.languages.blockEmbed, "true")}
@@ -184,6 +184,7 @@ const renderKeyboardToolbar = () => {
         if (getSelection().rangeCount === 0 ||
             window.siyuan.config.editor.readOnly ||
             window.siyuan.config.readonly ||
+            window.screen.height - window.innerHeight < 160 ||  // reloadSync 会导致 selectionchange，从而导致键盘没有弹起的情况下出现工具栏
             !document.activeElement || (
                 document.activeElement &&
                 document.activeElement.tagName !== "INPUT" &&

@@ -126,12 +126,13 @@ const promiseTransaction = () => {
                     return;
                 }
                 // 折叠标题后未触发动态加载 https://github.com/siyuan-note/siyuan/issues/4168
-                if (protyle.wysiwyg.element.lastElementChild.getAttribute("data-eof") !== "true" &&
-                    !protyle.scroll.element.classList.contains("fn__none")) {
+                if (protyle.wysiwyg.element.lastElementChild.getAttribute("data-eof") !== "2" &&
+                    !protyle.scroll.element.classList.contains("fn__none") &&
+                    protyle.contentElement.scrollHeight - protyle.contentElement.scrollTop < protyle.contentElement.clientHeight * 2    // https://github.com/siyuan-note/siyuan/issues/7785
+                ) {
                     fetchPost("/api/filetree/getDoc", {
                         id: protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id"),
                         mode: 2,
-                        k: protyle.options.key || "",
                         size: window.siyuan.config.editor.dynamicLoadBlocks,
                     }, getResponse => {
                         onGet(getResponse, protyle, [Constants.CB_GET_APPEND, Constants.CB_GET_UNCHANGEID]);
@@ -450,7 +451,11 @@ export const onTransaction = (protyle: IProtyle, operation: IOperation, focus: b
                     nodeAttrHTML += refElement.outerHTML;
                 }
                 if (data.new["custom-riff-decks"]) {
+                    protyle.title.element.style.animation = "addCard 450ms linear";
                     protyle.title.element.setAttribute("custom-riff-decks", data.new["custom-riff-decks"]);
+                    setTimeout(() => {
+                        protyle.title.element.style.animation = "";
+                    }, 450);
                 } else {
                     protyle.title.element.removeAttribute("custom-riff-decks");
                 }
@@ -473,15 +478,24 @@ export const onTransaction = (protyle: IProtyle, operation: IOperation, focus: b
             }
             return;
         }
-        protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${operation.id}"]`).forEach(item => {
+        protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${operation.id}"]`).forEach((item: HTMLElement) => {
             if (item.getAttribute("data-type") === "NodeThematicBreak") {
                 return;
             }
             Object.keys(data.old).forEach(key => {
                 item.removeAttribute(key);
             });
+            if (data.new.style && data.new["custom-riff-decks"]) {
+                data.new.style += ";animation:addCard 450ms linear";
+            }
             Object.keys(data.new).forEach(key => {
                 item.setAttribute(key, data.new[key]);
+                if (key === "custom-riff-decks") {
+                    item.style.animation = "addCard 450ms linear";
+                    setTimeout(() => {
+                        item.style.animation = "";
+                    }, 450);
+                }
             });
             const refElement = item.lastElementChild.querySelector(".protyle-attr--refcount");
             if (refElement) {
@@ -635,7 +649,7 @@ export const onTransaction = (protyle: IProtyle, operation: IOperation, focus: b
         return;
     }
     if (operation.action === "append") {
-        reloadProtyle(protyle);
+        reloadProtyle(protyle, false);
     }
 };
 

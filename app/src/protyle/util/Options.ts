@@ -145,8 +145,8 @@ export class Options {
     private mergeToolbar(toolbar: Array<string | IMenuItem>) {
         const toolbarItem: IMenuItem [] = [{
             name: "block-ref",
-            hotkey: window.siyuan.config.keymap.editor.insert.blockRef.custom,
-            lang: "blockRef",
+            hotkey: window.siyuan.config.keymap.editor.insert.ref.custom,
+            lang: "ref",
             icon: "iconRef",
             tipPosition: "ne",
         }, {
@@ -229,8 +229,8 @@ export class Options {
             tipPosition: "n",
         }, {
             name: "text",
-            lang: "font",
-            hotkey: window.siyuan.config.keymap.editor.insert.font.custom,
+            lang: "appearance",
+            hotkey: window.siyuan.config.keymap.editor.insert.appearance.custom,
             icon: "iconFont",
             tipPosition: "n",
         }, {

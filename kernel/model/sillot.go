@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

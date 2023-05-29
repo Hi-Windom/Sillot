@@ -29,8 +29,8 @@ import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/K-Sillot/logging"
-	"github.com/K-Sillot/riff"
 	"github.com/open-spaced-repetition/go-fsrs"
+	"github.com/siyuan-note/riff"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
@@ -42,48 +42,54 @@ func GetFlashcardNotebooks() (ret []*Box) {
 	if nil == deck {
 		return
 	}
-	deckBlockIDs := deck.GetBlockIDs()
 
+	deckBlockIDs := deck.GetBlockIDs()
 	boxes := Conf.GetOpenedBoxes()
 	for _, box := range boxes {
-		if isBoxContainFlashcard(box.ID, deckBlockIDs) {
+		newFlashcardCount, dueFlashcardCount, flashcardCount := countBoxFlashcard(box.ID, deck, deckBlockIDs)
+		if 0 < flashcardCount {
+			box.NewFlashcardCount = newFlashcardCount
+			box.DueFlashcardCount = dueFlashcardCount
+			box.FlashcardCount = flashcardCount
 			ret = append(ret, box)
 		}
 	}
 	return
 }
 
-func isTreeContainFlashcard(rootID string, deckBlockIDs []string) (ret bool) {
-	blockIDs := getTreeSubTreeChildBlocks(rootID)
-	for _, blockID := range deckBlockIDs {
-		if gulu.Str.Contains(blockID, blockIDs) {
-			return true
+func countTreeFlashcard(rootID string, deck *riff.Deck, deckBlockIDs []string) (newFlashcardCount, dueFlashcardCount, flashcardCount int) {
+	blockIDsMap, blockIDs := getTreeSubTreeChildBlocks(rootID)
+	for _, deckBlockID := range deckBlockIDs {
+		if blockIDsMap[deckBlockID] {
+			flashcardCount++
 		}
 	}
-	return
-}
-
-func isBoxContainFlashcard(boxID string, deckBlockIDs []string) (ret bool) {
-	entries, err := os.ReadDir(filepath.Join(util.DataDir, boxID))
-	if nil != err {
-		logging.LogErrorf("read dir failed: %s", err)
+	if 1 > flashcardCount {
 		return
 	}
 
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
+	newFlashCards := deck.GetNewCardsByBlockIDs(blockIDs)
+	newFlashcardCount = len(newFlashCards)
+	newDueFlashcards := deck.GetDueCardsByBlockIDs(blockIDs)
+	dueFlashcardCount = len(newDueFlashcards)
+	return
+}
 
-		if !strings.HasSuffix(entry.Name(), ".sy") {
-			continue
-		}
-
-		rootID := strings.TrimSuffix(entry.Name(), ".sy")
-		if isTreeContainFlashcard(rootID, deckBlockIDs) {
-			return true
+func countBoxFlashcard(boxID string, deck *riff.Deck, deckBlockIDs []string) (newFlashcardCount, dueFlashcardCount, flashcardCount int) {
+	blockIDsMap, blockIDs := getBoxBlocks(boxID)
+	for _, deckBlockID := range deckBlockIDs {
+		if blockIDsMap[deckBlockID] {
+			flashcardCount++
 		}
 	}
+	if 1 > flashcardCount {
+		return
+	}
+
+	newFlashCards := deck.GetNewCardsByBlockIDs(blockIDs)
+	newFlashcardCount = len(newFlashCards)
+	newDueFlashcards := deck.GetDueCardsByBlockIDs(blockIDs)
+	dueFlashcardCount = len(newDueFlashcards)
 	return
 }
 
@@ -116,7 +122,7 @@ func GetNotebookFlashcards(boxID string, page int) (blocks []*Block, total, page
 
 	var treeBlockIDs []string
 	for _, rootID := range rootIDs {
-		blockIDs := getTreeSubTreeChildBlocks(rootID)
+		_, blockIDs := getTreeSubTreeChildBlocks(rootID)
 		treeBlockIDs = append(treeBlockIDs, blockIDs...)
 	}
 	treeBlockIDs = gulu.Str.RemoveDuplicatedElem(treeBlockIDs)
@@ -149,9 +155,9 @@ func GetTreeFlashcards(rootID string, page int) (blocks []*Block, total, pageCou
 
 	var allBlockIDs []string
 	deckBlockIDs := deck.GetBlockIDs()
-	treeBlockIDs := getTreeSubTreeChildBlocks(rootID)
+	treeBlockIDsMap, _ := getTreeSubTreeChildBlocks(rootID)
 	for _, blockID := range deckBlockIDs {
-		if gulu.Str.Contains(blockID, treeBlockIDs) {
+		if treeBlockIDsMap[blockID] {
 			allBlockIDs = append(allBlockIDs, blockID)
 		}
 	}
@@ -346,7 +352,7 @@ func GetNotebookDueFlashcards(boxID string, reviewedCardIDs []string) (ret []*Fl
 
 	var treeBlockIDs []string
 	for _, rootID := range rootIDs {
-		blockIDs := getTreeSubTreeChildBlocks(rootID)
+		_, blockIDs := getTreeSubTreeChildBlocks(rootID)
 		treeBlockIDs = append(treeBlockIDs, blockIDs...)
 	}
 	treeBlockIDs = gulu.Str.RemoveDuplicatedElem(treeBlockIDs)
@@ -381,7 +387,7 @@ func GetTreeDueFlashcards(rootID string, reviewedCardIDs []string) (ret []*Flash
 		return
 	}
 
-	treeBlockIDs := getTreeSubTreeChildBlocks(rootID)
+	_, treeBlockIDs := getTreeSubTreeChildBlocks(rootID)
 	cards, unreviewedCnt := getDeckDueCards(deck, reviewedCardIDs, treeBlockIDs)
 	now := time.Now()
 	for _, card := range cards {
@@ -395,15 +401,27 @@ func GetTreeDueFlashcards(rootID string, reviewedCardIDs []string) (ret []*Flash
 	return
 }
 
-func getTreeSubTreeChildBlocks(rootID string) (treeBlockIDs []string) {
-	tree, err := loadTreeByBlockID(rootID)
-	if nil != err {
+func getTreeSubTreeChildBlocks(rootID string) (treeBlockIDsMap map[string]bool, treeBlockIDs []string) {
+	treeBlockIDsMap = map[string]bool{}
+	root := treenode.GetBlockTree(rootID)
+	if nil == root {
 		return
 	}
 
-	bts := treenode.GetBlockTreesByPathPrefix(strings.TrimSuffix(tree.Path, ".sy"))
+	bts := treenode.GetBlockTreesByPathPrefix(strings.TrimSuffix(root.Path, ".sy"))
 	for _, bt := range bts {
+		treeBlockIDsMap[bt.ID] = true
 		treeBlockIDs = append(treeBlockIDs, bt.ID)
+	}
+	return
+}
+
+func getBoxBlocks(boxID string) (blockIDsMap map[string]bool, blockIDs []string) {
+	blockIDsMap = map[string]bool{}
+	bts := treenode.GetBlockTreesByBoxID(boxID)
+	for _, bt := range bts {
+		blockIDsMap[bt.ID] = true
+		blockIDs = append(blockIDs, bt.ID)
 	}
 	return
 }

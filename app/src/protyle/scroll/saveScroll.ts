@@ -1,13 +1,8 @@
 import {hasClosestBlock} from "../util/hasClosest";
-import {focusByOffset, getSelectionOffset} from "../util/selection";
+import {getSelectionOffset} from "../util/selection";
 import {fetchPost} from "../../util/fetch";
-import {zoomOut} from "../../menus/protyle";
-import {preventScroll} from "./preventScroll";
-import {pushBack} from "../../util/backForward";
-import {processRender} from "../util/processCode";
-import {highlightRender} from "../markdown/highlightRender";
-import {blockRender} from "../markdown/blockRender";
-import {disabledForeverProtyle, disabledProtyle, enableProtyle} from "../util/onGet";
+import {onGet} from "../util/onGet";
+import {Constants} from "../../constants";
 
 export const saveScroll = (protyle: IProtyle, getObject = false) => {
     if (!protyle.wysiwyg.element.firstElementChild || window.siyuan.config.readonly) {
@@ -15,6 +10,7 @@ export const saveScroll = (protyle: IProtyle, getObject = false) => {
         return undefined;
     }
     const attr: IScrollAttr = {
+        rootId: protyle.block.rootID,
         startId: protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id"),
         endId: protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id"),
         scrollTop: protyle.contentElement.scrollTop || parseInt(protyle.contentElement.getAttribute("data-scrolltop")) || 0,
@@ -49,61 +45,46 @@ export const saveScroll = (protyle: IProtyle, getObject = false) => {
     window.sout.tracker(range);
 };
 
-export const restoreScroll = (protyle: IProtyle, scrollAttr: IScrollAttr) => {
-    preventScroll(protyle);
-    window.sout.tracker(protyle);
-    if (protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id") === scrollAttr.startId &&
-        protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id") === scrollAttr.endId) {
-        // 需等动画效果完毕，才能获得最大高度。否则尾部定位无法滚动到底部
-        setTimeout(() => {
-            protyle.contentElement.scrollTop = scrollAttr.scrollTop;
-        }, 256);
-        if (scrollAttr.focusId) {
-            const range = focusByOffset(protyle.wysiwyg.element.querySelector(`[data-node-id="${scrollAttr.focusId}"]`), scrollAttr.focusStart, scrollAttr.focusEnd);
-            /// #if !MOBILE
-            pushBack(protyle, range || undefined);
-            /// #endif
+export const getDocByScroll = (options: {
+    protyle: IProtyle,
+    scrollAttr: IScrollAttr,
+    mergedOptions?: IOptions,
+    cb?: () => void
+    focus?: boolean
+}) => {
+    let actions: string[] = [];
+    if (options.mergedOptions) {
+        actions = options.mergedOptions.action;
+    } else {
+        if (options.focus) {
+            actions = [Constants.CB_GET_UNUNDO, Constants.CB_GET_FOCUS];
+        } else {
+            actions = [Constants.CB_GET_UNUNDO];
         }
-    } else if (scrollAttr.zoomInId && protyle.block.id !== scrollAttr.zoomInId) {
-        fetchPost("/api/block/checkBlockExist", {id: scrollAttr.zoomInId}, existResponse => {
-            if (existResponse.data) {
-                zoomOut(protyle, scrollAttr.zoomInId, undefined, true, () => {
-                    protyle.contentElement.scrollTop = scrollAttr.scrollTop;
-                    if (scrollAttr.focusId) {
-                        focusByOffset(protyle.wysiwyg.element.querySelector(`[data-node-id="${scrollAttr.focusId}"]`), scrollAttr.focusStart, scrollAttr.focusEnd);
-                    }
-                });
-            }
-        });
-    } else if (!protyle.scroll.element.classList.contains("fn__none")) {
-        fetchPost("/api/filetree/getDoc", {
-            id: protyle.block.id,
-            startID: scrollAttr.startId,
-            endID: scrollAttr.endId,
-        }, getResponse => {
-            protyle.block.showAll = false;
-            protyle.wysiwyg.element.innerHTML = getResponse.data.content;
-            processRender(protyle.wysiwyg.element);
-            highlightRender(protyle.wysiwyg.element);
-            blockRender(protyle, protyle.wysiwyg.element);
-            if (getResponse.data.isSyncing) {
-                disabledForeverProtyle(protyle);
-            } else {
-                if (protyle.disabled) {
-                    disabledProtyle(protyle);
-                } else {
-                    enableProtyle(protyle);
-                }
-            }
-            protyle.contentElement.scrollTop = scrollAttr.scrollTop;
-            if (scrollAttr.focusId) {
-                const range = focusByOffset(protyle.wysiwyg.element.querySelector(`[data-node-id="${scrollAttr.focusId}"]`), scrollAttr.focusStart, scrollAttr.focusEnd);
-                /// #if !MOBILE
-                pushBack(protyle, range || undefined);
-                /// #endif
-            }
-        });
-    } else if (scrollAttr.scrollTop) {
-        protyle.contentElement.scrollTop = scrollAttr.scrollTop;
     }
+    if (options.scrollAttr.zoomInId) {
+        fetchPost("/api/filetree/getDoc", {
+            id: options.scrollAttr.zoomInId,
+            size: Constants.SIZE_GET_MAX,
+        }, response => {
+            actions.push(Constants.CB_GET_ALL);
+            options.protyle.breadcrumb?.toggleExit(false);
+            onGet(response, options.protyle, actions, options.scrollAttr);
+            if (options.cb) {
+                options.cb();
+            }
+        });
+        return;
+    }
+    fetchPost("/api/filetree/getDoc", {
+        id: options.scrollAttr.rootId || options.mergedOptions?.blockId || options.protyle.block?.rootID || options.scrollAttr.startId,
+        startID: options.scrollAttr.startId,
+        endID: options.scrollAttr.endId,
+    }, response => {
+        options.protyle.breadcrumb?.toggleExit(true);
+        onGet(response, options.protyle, actions, options.scrollAttr);
+        if (options.cb) {
+            options.cb();
+        }
+    });
 };

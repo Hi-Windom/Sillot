@@ -21,8 +21,9 @@ import {onGet} from "../util/onGet";
 import {Constants} from "../../constants";
 // import * as dayjs from "dayjs";
 import {format} from "date-fns";
+import {App} from "../../index";
 
-export const commonHotkey = (protyle: IProtyle, event: KeyboardEvent) => {
+export const commonHotkey = (app: App, protyle: IProtyle, event: KeyboardEvent) => {
     const target = event.target as HTMLElement;
     if (matchHotKey(window.siyuan.config.keymap.editor.general.copyHPath.custom, event)) {
         fetchPost("/api/filetree/getHPathByID", {
@@ -52,20 +53,20 @@ export const commonHotkey = (protyle: IProtyle, event: KeyboardEvent) => {
         if (matchHotKey(window.siyuan.config.keymap.editor.general.backlinks.custom, event)) {
             event.preventDefault();
             event.stopPropagation();
-            openBacklink(protyle);
+            openBacklink(app, protyle);
             return true;
         }
         if (matchHotKey(window.siyuan.config.keymap.editor.general.graphView.custom, event)) {
             event.preventDefault();
             event.stopPropagation();
-            openGraph(protyle);
+            openGraph(app, protyle);
             return true;
         }
         if (matchHotKey(window.siyuan.config.keymap.editor.general.outline.custom, event)) {
             event.preventDefault();
             event.stopPropagation();
             const offset = getSelectionOffset(target);
-            openOutline(protyle);
+            openOutline(app, protyle);
             // switchWnd 后，range会被清空，需要重新设置
             focusByOffset(target, offset.start, offset.end);
             return true;
@@ -212,7 +213,7 @@ export const duplicateBlock = (nodeElements: Element[], protyle: IProtyle) => {
 
 export const goHome = (protyle: IProtyle) => {
     if (protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-index") === "0" ||
-        protyle.wysiwyg.element.firstElementChild.getAttribute("data-eof") === "true" ||
+        protyle.wysiwyg.element.firstElementChild.getAttribute("data-eof") === "1" ||
         protyle.options.backlinkData) {
         focusBlock(protyle.wysiwyg.element.firstElementChild);
         protyle.contentElement.scrollTop = 0;
@@ -230,7 +231,7 @@ export const goHome = (protyle: IProtyle) => {
 
 export const goEnd = (protyle: IProtyle) => {
     if (!protyle.scroll.element.classList.contains("fn__none") &&
-        protyle.wysiwyg.element.lastElementChild.getAttribute("data-eof") !== "true") {
+        protyle.wysiwyg.element.lastElementChild.getAttribute("data-eof") !== "2") {
         fetchPost("/api/filetree/getDoc", {
             id: protyle.block.rootID,
             mode: 4,

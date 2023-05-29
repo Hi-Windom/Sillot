@@ -32,17 +32,20 @@ import {processRender} from "../util/processCode";
 import {AIChat} from "../../ai/chat";
 import {isMobile} from "../../util/functions";
 import {isCtrl} from "../util/compatibility";
+import {App} from "../../index";
 
 export class Hint {
     public timeId: number;
     public element: HTMLDivElement;
     public enableSlash = true;
     private enableEmoji = true;
+    private app: App;
     public enableExtend = false;
     public splitChar = "";
     public lastIndex = -1;
 
-    constructor(protyle: IProtyle) {
+    constructor(app: App, protyle: IProtyle) {
+        this.app = app;
         this.element = document.createElement("div");
         this.element.setAttribute("data-close", "false");
         // height 402 根据 .emojis max-height+8 得来
@@ -340,7 +343,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                 let iconHTML;
                 if (item.type === "NodeDocument" && item.ial.icon) {
                     iconHTML = unicode2Emoji(item.ial.icon, false, "b3-list-item__graphic popover__block", true);
-                    iconHTML = iconHTML.replace('popover__block"', `popover__block" data-id="${item.id}"`)
+                    iconHTML = iconHTML.replace('popover__block"', `popover__block" data-id="${item.id}"`);
                 } else {
                     iconHTML = `<svg class="b3-list-item__graphic popover__block" data-id="${item.id}"><use xlink:href="#${getIconByType(item.type)}"></use></svg>`;
                 }
@@ -474,6 +477,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                 fetchPost("/api/filetree/createDocWithMd", {
                     notebook: protyle.notebookId,
                     path: pathPosix().join(pathString, realFileName),
+                    parentID: protyle.block.rootID,
                     markdown: ""
                 }, response => {
                     protyle.toolbar.setInlineMark(protyle, "block-ref", "range", {
@@ -576,9 +580,10 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                 }, () => {
                     insertHTML(`<span data-type="block-ref" data-id="${newSubDocId}" data-subtype="d">Untitled</span>`, protyle);
                     /// #if MOBILE
-                    openMobileFileById(newSubDocId, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
+                    openMobileFileById(this.app, newSubDocId, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
                     /// #else
                     openFileById({
+                        app: this.app,
                         id: newSubDocId,
                         action: [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]
                     });
@@ -644,7 +649,7 @@ ${unicode2Emoji(emoji.unicode, true)}</button>`;
                         });
                     }
                     const rect = imgElement.getBoundingClientRect();
-                    imgMenu(protyle, range, imgElement, {
+                    imgMenu(this.app, protyle, range, imgElement, {
                         clientX: rect.left,
                         clientY: rect.top
                     });

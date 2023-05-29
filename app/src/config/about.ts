@@ -12,6 +12,7 @@ import {showMessage} from "../dialog/message";
 import {Dialog} from "../dialog";
 import {confirmDialog} from "../dialog/confirmDialog";
 import {setProxy} from "./util/setProxy";
+import {setKey} from "../sync/syncGuide";
 import {isAppMode} from "sofill/env"
 
 export const about = {
@@ -84,7 +85,7 @@ ${
 <div class="fn__flex-1 fn__flex-center">
     ${window.siyuan.languages.dataRepoKey}
     <div class="b3-label__text">${window.siyuan.languages.dataRepoKeyTip1}</div>
-    <div class="b3-label__text ft__error">${window.siyuan.languages.dataRepoKeyTip2}</div>
+    <div class="b3-label__text"><span class="ft__error">${window.siyuan.languages.dataRepoKeyTip2}</span></div>
 </div>
 <div class="fn__space"></div>
 <div class="fn__size200 config__item-line fn__flex-center${window.siyuan.config.repo.key ? " fn__none" : ""}">
@@ -231,100 +232,67 @@ ${
             });
         });
         /// #endif
-        if(isAppMode(true)) {
-            about.element.querySelector("#authCode").addEventListener("click", () => {
-                setAccessAuthCode();
+        if(isAppMode(true)) { about.element.querySelector("#authCode").addEventListener("click", () => {
+            setAccessAuthCode();
+        });
+        const importKeyElement = about.element.querySelector("#importKey");
+        importKeyElement.addEventListener("click", () => {
+            const passwordDialog = new Dialog({
+                title: "🔑 " + window.siyuan.languages.key,
+                content: `<div class="b3-dialog__content">
+    <textarea class="b3-text-field fn__block" placeholder="${window.siyuan.languages.keyPlaceholder}"></textarea>
+</div>
+<div class="b3-dialog__action">
+    <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
+    <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
+</div>`,
+                width: "520px",
             });
-            const importKeyElement = about.element.querySelector("#importKey");
-            importKeyElement.addEventListener("click", () => {
-                const passwordDialog = new Dialog({
-                    title: "🔑 " + window.siyuan.languages.key,
-                    content: `<div class="b3-dialog__content">
-        <textarea class="b3-text-field fn__block" placeholder="${window.siyuan.languages.keyPlaceholder}"></textarea>
-    </div>
-    <div class="b3-dialog__action">
-        <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
-        <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
-    </div>`,
-                    width: "520px",
-                });
-                const textAreaElement = passwordDialog.element.querySelector("textarea");
-                textAreaElement.focus();
-                const btnsElement = passwordDialog.element.querySelectorAll(".b3-button");
-                btnsElement[0].addEventListener("click", () => {
+            const textAreaElement = passwordDialog.element.querySelector("textarea");
+            textAreaElement.focus();
+            const btnsElement = passwordDialog.element.querySelectorAll(".b3-button");
+            btnsElement[0].addEventListener("click", () => {
+                passwordDialog.destroy();
+            });
+            btnsElement[1].addEventListener("click", () => {
+                fetchPost("/api/repo/importRepoKey", {key: textAreaElement.value}, () => {
+                    window.siyuan.config.repo.key = textAreaElement.value;
+                    importKeyElement.parentElement.classList.add("fn__none");
+                    importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
                     passwordDialog.destroy();
                 });
-                btnsElement[1].addEventListener("click", () => {
-                    fetchPost("/api/repo/importRepoKey", {key: textAreaElement.value}, () => {
-                        window.siyuan.config.repo.key = textAreaElement.value;
-                        importKeyElement.parentElement.classList.add("fn__none");
-                        importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
-                        passwordDialog.destroy();
-                    });
+            });
+        });
+        about.element.querySelector("#initKey").addEventListener("click", () => {
+            confirmDialog("🔑 " + window.siyuan.languages.genKey, window.siyuan.languages.initRepoKeyTip, () => {
+                fetchPost("/api/repo/initRepoKey", {}, (response) => {
+                    window.siyuan.config.repo.key = response.data.key;
+                    importKeyElement.parentElement.classList.add("fn__none");
+                    importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
                 });
             });
-            about.element.querySelector("#initKey").addEventListener("click", () => {
-                confirmDialog("🔑 " + window.siyuan.languages.genKey, window.siyuan.languages.initRepoKeyTip, () => {
-                    fetchPost("/api/repo/initRepoKey", {}, (response) => {
-                        window.siyuan.config.repo.key = response.data.key;
-                        importKeyElement.parentElement.classList.add("fn__none");
-                        importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
-                    });
+        });
+        about.element.querySelector("#initKeyByPW").addEventListener("click", () => {
+            setKey(false, () => {
+                importKeyElement.parentElement.classList.add("fn__none");
+                importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
+            });
+        });
+        about.element.querySelector("#copyKey").addEventListener("click", () => {
+            showMessage(window.siyuan.languages.copied);
+            writeText(window.siyuan.config.repo.key);
+        });
+        about.element.querySelector("#resetRepo").addEventListener("click", () => {
+            confirmDialog("⚠️ " + window.siyuan.languages.resetRepo, window.siyuan.languages.resetRepoTip, () => {
+                fetchPost("/api/repo/resetRepo", {}, () => {
+                    window.siyuan.config.repo.key = "";
+                    window.siyuan.config.sync.enabled = false;
+                    processSync();
+                    importKeyElement.parentElement.classList.remove("fn__none");
+                    importKeyElement.parentElement.nextElementSibling.classList.add("fn__none");
                 });
             });
-            about.element.querySelector("#initKeyByPW").addEventListener("click", () => {
-                const initDialog = new Dialog({
-                    title: "🔑 " + window.siyuan.languages.genKeyByPW,
-                    content: `<div class="b3-dialog__content">
-        <input class="b3-text-field fn__block" placeholder="${window.siyuan.languages.password}">
-    </div>
-    <div class="b3-dialog__action">
-        <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
-        <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
-    </div>`,
-                    width: "520px",
-                });
-                const inputElement = initDialog.element.querySelector(".b3-text-field") as HTMLInputElement;
-                inputElement.focus();
-                const btnsElement = initDialog.element.querySelectorAll(".b3-button");
-                initDialog.bindInput(inputElement, () => {
-                    (btnsElement[1] as HTMLButtonElement).click();
-                });
-                btnsElement[0].addEventListener("click", () => {
-                    initDialog.destroy();
-                });
-                btnsElement[1].addEventListener("click", () => {
-                    if (!inputElement.value) {
-                        showMessage(window.siyuan.languages._kernel[142]);
-                        return;
-                    }
-                    confirmDialog("🔑 " + window.siyuan.languages.genKeyByPW, window.siyuan.languages.initRepoKeyTip, () => {
-                        initDialog.destroy();
-                        fetchPost("/api/repo/initRepoKeyFromPassphrase", {pass: inputElement.value}, (response) => {
-                            window.siyuan.config.repo.key = response.data.key;
-                            importKeyElement.parentElement.classList.add("fn__none");
-                            importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
-                        });
-                    });
-                });
-            });
-
-            about.element.querySelector("#copyKey").addEventListener("click", () => {
-                showMessage(window.siyuan.languages.copied);
-                writeText(window.siyuan.config.repo.key);
-            });
-            about.element.querySelector("#resetRepo").addEventListener("click", () => {
-                confirmDialog("⚠️ " + window.siyuan.languages.resetRepo, window.siyuan.languages.resetRepoTip, () => {
-                    fetchPost("/api/repo/resetRepo", {}, () => {
-                        window.siyuan.config.repo.key = "";
-                        window.siyuan.config.sync.enabled = false;
-                        processSync();
-                        importKeyElement.parentElement.classList.remove("fn__none");
-                        importKeyElement.parentElement.nextElementSibling.classList.add("fn__none");
-                    });
-                });
-            });
-        }
+        }); } // if(isAppMode(true))
         about.element.querySelector("#purgeRepo").addEventListener("click", () => {
             confirmDialog("♻️ " + window.siyuan.languages.dataRepoPurge, window.siyuan.languages.dataRepoPurgeConfirm, () => {
                 fetchPost("/api/repo/purgeRepo");
@@ -333,23 +301,33 @@ ${
         const networkServeElement = about.element.querySelector("#networkServe") as HTMLInputElement;
         networkServeElement.addEventListener("change", () => {
             fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
-                exportLayout(false, () => {
-                    exitSiYuan();
-                }, false, true);
+                exportLayout({
+                    reload: false,
+                    onlyData: false,
+                    errorExit: true,
+                    cb: exitSiYuan
+                });
             });
         });
         const googleAnalyticsElement = about.element.querySelector("#googleAnalytics") as HTMLInputElement;
         googleAnalyticsElement.addEventListener("change", () => {
             fetchPost("/api/system/setGoogleAnalytics", {googleAnalytics: googleAnalyticsElement.checked}, () => {
-                exportLayout(true);
+                exportLayout({
+                    reload: true,
+                    onlyData: false,
+                    errorExit: false,
+                });
             });
         });
         const uploadErrLogElement = about.element.querySelector("#uploadErrLog") as HTMLInputElement;
         uploadErrLogElement.addEventListener("change", () => {
             fetchPost("/api/system/setUploadErrLog", {uploadErrLog: uploadErrLogElement.checked}, () => {
-                exportLayout(false, () => {
-                    exitSiYuan();
-                }, false, true);
+                exportLayout({
+                    reload: false,
+                    onlyData: false,
+                    errorExit: true,
+                    cb: exitSiYuan
+                });
             });
         });
         const downloadInstallPkgElement = about.element.querySelector("#downloadInstallPkg") as HTMLInputElement;

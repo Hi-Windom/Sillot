@@ -8,7 +8,7 @@ import {unicode2Emoji} from "../emoji";
 import {Constants} from "../constants";
 import {showMessage} from "../dialog/message";
 
-export  const getIdZoomInByPath = () => {
+export const getIdZoomInByPath = () => {
     const searchParams = new URLSearchParams(window.location.search);
     const PWAURL = searchParams.get("url");
     let id = "";
@@ -128,7 +128,8 @@ export const moveToPath = (fromPaths: string[], toNotebook: string, toPath: stri
     });
 };
 
-export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void, paths?: string[], range?: Range, title?: string, flashcard = false) => {
+export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void,
+                           paths?: string[], range?: Range, title?: string, flashcard = false) => {
     const exitDialog = window.siyuan.dialogs.find((item) => {
         if (item.element.querySelector("#foldList")) {
             item.destroy();
@@ -141,26 +142,27 @@ export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void,
     const dialog = new Dialog({
         title: `${title || window.siyuan.languages.move}
 <div style="max-height: 16px;overflow: auto;line-height: 14px;-webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0, #000 6px);padding-bottom: 4px;margin-bottom: -4px" class="ft__smaller ft__on-surface fn__hidescrollbar"></div>`,
-        content: `<div>
-    <div class="b3-form__icon" style="margin: 8px">
-        <svg class="b3-form__icon-icon"><use xlink:href="#iconSearch"></use></svg>
-        <input class="b3-text-field fn__block b3-form__icon-input" value="" placeholder="${window.siyuan.languages.search}">
-    </div>
-    <ul id="foldList" class="fn__none b3-list b3-list--background" style="height: 50vh;overflow: auto;position: relative"></ul>
-    <div id="foldTree" style="height: 50vh;overflow: auto;position: relative"></div>
-    <div class="fn__hr"></div>
+        content: `<div class="b3-form__icon" style="margin: 8px">
+    <svg class="b3-form__icon-icon"><use xlink:href="#iconSearch"></use></svg>
+    <input class="b3-text-field fn__block b3-form__icon-input" value="" placeholder="${window.siyuan.languages.search}">
 </div>
+<ul id="foldList" class="fn__flex-1 fn__none b3-list b3-list--background${isMobile() ? " b3-list--mobile" : ""}" style="overflow: auto;position: relative"></ul>
+<div id="foldTree" class="fn__flex-1${isMobile() ? " b3-list--mobile" : ""}" style="overflow: auto;position: relative"></div>
+<div class="fn__hr"></div>
 <div class="b3-dialog__action">
     <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
     <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
 </div>`,
         width: isMobile() ? "92vw" : "50vw",
+        height: isMobile() ? "80vh" : "70vh",
         destroyCallback() {
             if (range) {
                 focusByRange(range);
             }
         }
     });
+    // 文档树上引用数悬浮层不被遮挡，搜索指定路径不被搜索遮挡
+    dialog.element.style.zIndex = "203";
     if (paths && paths.length > 0) {
         fetchPost("/api/filetree/getHPathsByPaths", {paths}, (response) => {
             dialog.element.querySelector(".b3-dialog__header .ft__smaller").innerHTML = escapeHtml(response.data.join(" "));
@@ -172,6 +174,12 @@ export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void,
         let html = "";
         notebooks.forEach((item) => {
             if (!item.closed) {
+                let countHTML = "";
+                if (flashcard) {
+                    countHTML = `<span class="counter counter--right b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.flashcardNewCard}">${item.newFlashcardCount}</span>
+<span class="counter counter--right b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.flashcardReviewCard}">${item.dueFlashcardCount}</span>
+<span class="counter counter--right b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.flashcardCard}">${item.flashcardCount}</span>`;
+                }
                 html += `<ul class="b3-list b3-list--background">
 <li class="b3-list-item${html === "" ? " b3-list-item--focus" : ""}" data-path="/" data-box="${item.id}">
     <span class="b3-list-item__toggle b3-list-item__toggle--hl">
@@ -179,6 +187,7 @@ export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void,
     </span>
     ${unicode2Emoji(item.icon || Constants.SIYUAN_IMAGE_NOTE, false, "b3-list-item__graphic", true)}
     <span class="b3-list-item__text">${escapeHtml(item.name)}</span>
+    ${countHTML}
 </li></ul>`;
             }
         });
@@ -204,10 +213,26 @@ export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void,
             flashcard,
         }, (data) => {
             let fileHTML = "";
-            data.data.forEach((item: { boxIcon: string, box: string, hPath: string, path: string }) => {
+            data.data.forEach((item: {
+                boxIcon: string,
+                box: string,
+                hPath: string,
+                path: string,
+                newFlashcardCount: string,
+                dueFlashcardCount: string,
+                flashcardCount: string
+            }) => {
+                let countHTML = "";
+                if (flashcard) {
+                    countHTML = `<span class="fn__flex-1"></span>
+<span class="counter counter--right b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.flashcardNewCard}">${item.newFlashcardCount}</span>
+<span class="counter counter--right b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.flashcardReviewCard}">${item.dueFlashcardCount}</span>
+<span class="counter counter--right b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.flashcardCard}">${item.flashcardCount}</span>`;
+                }
                 fileHTML += `<li style="padding: 4px" class="b3-list-item${fileHTML === "" ? " b3-list-item--focus" : ""}" data-path="${item.path}" data-box="${item.box}">
     ${unicode2Emoji(item.boxIcon || Constants.SIYUAN_IMAGE_NOTE, false, "b3-list-item__graphic", true)}
     <span class="b3-list-item__showall">${escapeHtml(item.hPath)}</span>
+    ${countHTML}
 </li>`;
             });
             searchListElement.innerHTML = fileHTML;
@@ -425,6 +450,9 @@ export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void,
                     currentItemElements[0].classList.remove("b3-list-item--focus");
                     target.classList.add("b3-list-item--focus");
                 }
+                if (target.getAttribute("data-path") === "/") {
+                    getLeaf(target, flashcard);
+                }
                 event.preventDefault();
                 event.stopPropagation();
                 break;
@@ -435,7 +463,7 @@ export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void,
     });
 };
 
-const getLeaf = (liElement: HTMLElement, flashcard:boolean) => {
+const getLeaf = (liElement: HTMLElement, flashcard: boolean) => {
     const toggleElement = liElement.querySelector(".b3-list-item__arrow");
     if (toggleElement.classList.contains("b3-list-item__arrow--open")) {
         toggleElement.classList.remove("b3-list-item__arrow--open");
@@ -454,7 +482,6 @@ const getLeaf = (liElement: HTMLElement, flashcard:boolean) => {
     fetchPost("/api/filetree/listDocsByPath", {
         notebook: notebookId,
         path: liElement.getAttribute("data-path"),
-        sort: window.siyuan.config.fileTree.sort,
         flashcard,
     }, response => {
         if (response.data.path === "/" && response.data.files.length === 0) {
@@ -464,8 +491,12 @@ const getLeaf = (liElement: HTMLElement, flashcard:boolean) => {
         let fileHTML = "";
         response.data.files.forEach((item: IFile) => {
             let countHTML = "";
-            if (item.count && item.count > 0) {
-                countHTML = `<span class="popover__block counter b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.blockRef}">${item.count}</span>`;
+            if (flashcard) {
+                countHTML = `<span class="counter counter--right b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.flashcardNewCard}">${item.newFlashcardCount}</span>
+<span class="counter counter--right b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.flashcardReviewCard}">${item.dueFlashcardCount}</span>
+<span class="counter counter--right b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.flashcardCard}">${item.flashcardCount}</span>`;
+            } else if (item.count && item.count > 0) {
+                countHTML = `<span class="popover__block counter b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.ref}">${item.count}</span>`;
             }
             fileHTML += `<li title="${getDisplayName(item.name, true, true)} ${item.hSize}${item.bookmark ? "\n" + window.siyuan.languages.bookmark + " " + item.bookmark : ""}${item.name1 ? "\n" + window.siyuan.languages.name + " " + item.name1 : ""}${item.alias ? "\n" + window.siyuan.languages.alias + " " + item.alias : ""}${item.memo ? "\n" + window.siyuan.languages.memo + " " + item.memo : ""}${item.subFileCount !== 0 ? window.siyuan.languages.includeSubFile.replace("x", item.subFileCount) : ""}\n${window.siyuan.languages.modifiedAt} ${item.hMtime}\n${window.siyuan.languages.createdAt} ${item.hCtime}" 
 data-box="${notebookId}" class="b3-list-item" data-path="${item.path}">

@@ -1,4 +1,4 @@
-import {focusBlock, focusByRange} from "./selection";
+import {focusBlock, focusByRange, getRangeByPoint} from "./selection";
 import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName, hasClosestByTag} from "./hasClosest";
 import {Constants} from "../../constants";
 import {paste} from "./paste";
@@ -740,7 +740,7 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
             const gutterTypes = gutterType.replace(Constants.SIYUAN_DROP_GUTTER, "").split(Constants.ZWSP);
             const selectedIds = gutterTypes[2].split(",");
             if (event.altKey) {
-                focusByRange(document.caretRangeFromPoint(event.clientX, event.clientY));
+                focusByRange(getRangeByPoint(event.clientX, event.clientY));
                 let html = "";
                 for (let i = 0; i < selectedIds.length; i++) {
                     const response = await fetchSyncPost("/api/block/getRefText", {id: selectedIds[i]});
@@ -748,7 +748,7 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
                 }
                 insertHTML(html, protyle);
             } else if (event.shiftKey) {
-                focusByRange(document.caretRangeFromPoint(event.clientX, event.clientY));
+                focusByRange(getRangeByPoint(event.clientX, event.clientY));
                 let html = "";
                 selectedIds.forEach(item => {
                     html += `{{select * from blocks where id='${item}'}}\n`;
@@ -855,18 +855,24 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
                 onGet(getResponse, protyle);
                 /// #if !MOBILE
                 // 文档标题互转后，需更新大纲
-                updatePanelByEditor(protyle, false, false, true);
+                updatePanelByEditor({
+                    protyle,
+                    focus: false,
+                    pushBackStack: false,
+                    reload: true,
+                    resize: false,
+                });
                 /// #endif
                 // 文档标题互转后，编辑区会跳转到开头 https://github.com/siyuan-note/siyuan/issues/2939
                 setTimeout(() => {
                     protyle.contentElement.scrollTop = scrollTop;
                     protyle.scroll.lastScrollTop = scrollTop - 1;
-                }, Constants.TIMEOUT_BLOCKLOAD);
+                }, Constants.TIMEOUT_LOAD);
             });
             targetElement.classList.remove("dragover__bottom", "dragover__top");
         } else if (!window.siyuan.dragElement && (event.dataTransfer.types[0] === "Files" || event.dataTransfer.types.includes("text/html"))) {
             // 外部文件拖入编辑器中或者编辑器内选中文字拖拽
-            focusByRange(document.caretRangeFromPoint(event.clientX, event.clientY));
+            focusByRange(getRangeByPoint(event.clientX, event.clientY));
             if (event.dataTransfer.types[0] === "Files" && !isBrowser()) {
                 const files: string[] = [];
                 for (let i = 0; i < event.dataTransfer.files.length; i++) {

@@ -19,6 +19,7 @@ package sql
 import (
 	"bytes"
 	"database/sql"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -378,7 +379,31 @@ func QueryBookmarkLabels() (ret []string) {
 	return
 }
 
-func Query(stmt string) (ret []map[string]interface{}, err error) {
+func QueryNoLimit(stmt string) (ret []map[string]interface{}, err error) {
+	return queryRawStmt(stmt, math.MaxInt)
+}
+
+func Query(stmt string, limit int) (ret []map[string]interface{}, err error) {
+	parsedStmt, err := sqlparser.Parse(stmt)
+	if nil != err {
+		return queryRawStmt(stmt, limit)
+	}
+
+	switch parsedStmt.(type) {
+	case *sqlparser.Select:
+		limitClause := getLimitClause(parsedStmt, limit)
+		slct := parsedStmt.(*sqlparser.Select)
+		slct.Limit = limitClause
+		stmt = sqlparser.String(slct)
+	case *sqlparser.Union:
+		limitClause := getLimitClause(parsedStmt, limit)
+		union := parsedStmt.(*sqlparser.Union)
+		union.Limit = limitClause
+		stmt = sqlparser.String(union)
+	default:
+		return queryRawStmt(stmt, limit)
+	}
+
 	ret = []map[string]interface{}{}
 	rows, err := query(stmt)
 	if nil != err {
@@ -409,6 +434,74 @@ func Query(stmt string) (ret []map[string]interface{}, err error) {
 			m[colName] = *val
 		}
 		ret = append(ret, m)
+	}
+	return
+}
+
+func getLimitClause(parsedStmt sqlparser.Statement, limit int) (ret *sqlparser.Limit) {
+	switch parsedStmt.(type) {
+	case *sqlparser.Select:
+		slct := parsedStmt.(*sqlparser.Select)
+		if nil != slct.Limit {
+			ret = slct.Limit
+		}
+	case *sqlparser.Union:
+		union := parsedStmt.(*sqlparser.Union)
+		if nil != union.Limit {
+			ret = union.Limit
+		}
+	}
+
+	if nil == ret || nil == ret.Rowcount {
+		ret = &sqlparser.Limit{
+			Rowcount: &sqlparser.SQLVal{
+				Type: sqlparser.IntVal,
+				Val:  []byte(strconv.Itoa(limit)),
+			},
+		}
+	}
+	return
+}
+
+func queryRawStmt(stmt string, limit int) (ret []map[string]interface{}, err error) {
+	rows, err := query(stmt)
+	if nil != err {
+		if strings.Contains(err.Error(), "syntax error") {
+			return
+		}
+		return
+	}
+	defer rows.Close()
+
+	cols, err := rows.Columns()
+	if nil != err || nil == cols {
+		return
+	}
+
+	noLimit := !strings.Contains(strings.ToLower(stmt), " limit ")
+	var count, errCount int
+	for rows.Next() {
+		columns := make([]interface{}, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		if err = rows.Scan(columnPointers...); nil != err {
+			return
+		}
+
+		m := make(map[string]interface{})
+		for i, colName := range cols {
+			val := columnPointers[i].(*interface{})
+			m[colName] = *val
+		}
+
+		ret = append(ret, m)
+		count++
+		if (noLimit && limit < count) || 0 < errCount {
+			break
+		}
 	}
 	return
 }
@@ -491,7 +584,7 @@ func selectBlocksRawStmt(stmt string, limit int) (ret []*Block) {
 	}
 	defer rows.Close()
 
-	confLimit := !strings.Contains(strings.ToLower(stmt), " limit ")
+	noLimit := !strings.Contains(strings.ToLower(stmt), " limit ")
 	var count, errCount int
 	for rows.Next() {
 		count++
@@ -502,7 +595,7 @@ func selectBlocksRawStmt(stmt string, limit int) (ret []*Block) {
 			errCount++
 		}
 
-		if (confLimit && limit < count) || 0 < errCount {
+		if (noLimit && limit < count) || 0 < errCount {
 			break
 		}
 	}

@@ -38,14 +38,13 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
-	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
@@ -55,7 +54,6 @@ import (
 func HTML2Markdown(htmlStr string) (markdown string, err error) {
 	assetDirPath := filepath.Join(util.DataDir, "assets")
 	luteEngine := util.NewLute()
-	luteEngine.SetProtyleWYSIWYG(false)
 	tree := luteEngine.HTML2Tree(htmlStr)
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering || ast.NodeLinkDest != n.Type {
@@ -243,12 +241,15 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 
 		sortData, sortErr = gulu.JSON.MarshalJSON(fullSortIDs)
 		if nil != sortErr {
-			logging.LogErrorf("marshal temp full sort conf failed: %s", sortErr)
+			logging.LogErrorf("marshal box full sort conf failed: %s", sortErr)
 		} else {
-			sortErr = filelock.WriteFile(sortPath, sortData)
+			sortErr = filelock.WriteFile(boxSortPath, sortData)
 			if nil != sortErr {
-				logging.LogErrorf("write temp full sort conf failed: %s", sortErr)
+				logging.LogErrorf("write box full sort conf failed: %s", sortErr)
 			}
+		}
+		if removeErr := os.RemoveAll(sortPath); nil != removeErr {
+			logging.LogErrorf("remove temp sort conf failed: %s", removeErr)
 		}
 	}
 
@@ -710,17 +711,7 @@ func ImportFromLocalPath(boxID, localPath string, toPath string) (err error) {
 }
 
 func parseStdMd(markdown []byte) (ret *parse.Tree) {
-	luteEngine := lute.New()
-	luteEngine.SetFootnotes(false)
-	luteEngine.SetToC(false)
-	luteEngine.SetIndentCodeBlock(false)
-	luteEngine.SetAutoSpace(false)
-	luteEngine.SetHeadingID(false)
-	luteEngine.SetSetext(false)
-	luteEngine.SetYamlFrontMatter(false)
-	luteEngine.SetLinkRef(false)
-	luteEngine.SetGFMAutoLink(false) // 导入 Markdown 时不自动转换超链接 https://github.com/siyuan-note/siyuan/issues/7682
-	luteEngine.SetImgPathAllowSpace(true)
+	luteEngine := util.NewStdLute()
 	ret = parse.Parse("", markdown, luteEngine.ParseOptions)
 	if nil == ret {
 		return

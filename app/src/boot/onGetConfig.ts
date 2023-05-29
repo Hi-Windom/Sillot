@@ -1,4 +1,4 @@
-import {exportLayout, JSONToLayout, resetLayout, resizeDrag, resizeTabs} from "../layout/util";
+import {exportLayout, JSONToLayout, resetLayout, resizeTopbar, resizeTabs} from "../layout/util";
 import {hotKey2Electron, setStorageVal} from "../protyle/util/compatibility";
 /// #if !BROWSER
 import {dialog, getCurrentWindow} from "@electron/remote";
@@ -26,6 +26,7 @@ import {initBar} from "../layout/topBar";
 import {setProxy} from "../config/util/setProxy";
 import {openChangelog} from "./openChangelog";
 import {getIdFromSYProtocol, isSYProtocol} from "../util/pathName";
+import {App} from "../index";
 
 const matchKeymap = (keymap: Record<string, IKeymapItem>, key1: "general" | "editor", key2?: "general" | "insert" | "heading" | "list" | "table") => {
     if (key1 === "general") {
@@ -84,7 +85,7 @@ const hasKeymap = (keymap: Record<string, IKeymapItem>, key1: "general" | "edito
     return match;
 };
 
-export const onGetConfig = (isStart: boolean) => {
+export const onGetConfig = (isStart: boolean, app: App) => {
     const matchKeymap1 = matchKeymap(Constants.SIYUAN_KEYMAP.general, "general");
     const matchKeymap2 = matchKeymap(Constants.SIYUAN_KEYMAP.editor.general, "editor", "general");
     const matchKeymap3 = matchKeymap(Constants.SIYUAN_KEYMAP.editor.insert, "editor", "insert");
@@ -130,20 +131,20 @@ export const onGetConfig = (isStart: boolean) => {
     if (!window.siyuan.config.uiLayout || (window.siyuan.config.uiLayout && !window.siyuan.config.uiLayout.left)) {
         window.siyuan.config.uiLayout = Constants.SIYUAN_EMPTY_LAYOUT;
     }
-    globalShortcut();
+    globalShortcut(app);
     fetchPost("/api/system/getEmojiConf", {}, response => {
         window.siyuan.emojis = response.data as IEmoji[];
         try {
-            JSONToLayout(isStart);
+            JSONToLayout(app, isStart);
             openChangelog();
         } catch (e) {
             resetLayout();
         }
     });
-    initBar();
+    initBar(app);
     setProxy();
     initStatus();
-    initWindow();
+    initWindow(app);
     appearance.onSetappearance(window.siyuan.config.appearance);
     initAssets();
     renderSnippet();
@@ -153,13 +154,13 @@ export const onGetConfig = (isStart: boolean) => {
         window.clearTimeout(resizeTimeout);
         resizeTimeout = window.setTimeout(() => {
             resizeTabs();
-            resizeDrag();
+            resizeTopbar();
         }, 200);
     });
     addGA();
 };
 
-export const initWindow = () => {
+export const initWindow = (app: App) => {
     /// #if !BROWSER
     const winOnFocus = () => {
         if (getSelection().rangeCount > 0) {
@@ -171,7 +172,11 @@ export const initWindow = () => {
                 focusByRange(getSelection().getRangeAt(0));
             }
         }
-        exportLayout(false);
+        exportLayout({
+            reload: false,
+            onlyData: false,
+            errorExit: false
+        });
         window.siyuan.altIsPressed = false;
         window.siyuan.ctrlIsPressed = false;
         window.siyuan.shiftIsPressed = false;
@@ -183,26 +188,31 @@ export const initWindow = () => {
     };
 
     const winOnClose = (currentWindow: Electron.BrowserWindow, close = false) => {
-        exportLayout(false, () => {
-            if (window.siyuan.config.appearance.closeButtonBehavior === 1 && !close) {
-                // 最小化
-                if ("windows" === window.siyuan.config.system.os) {
-                    ipcRenderer.send(Constants.SIYUAN_CONFIG_TRAY, {
-                        id: getCurrentWindow().id,
-                        languages: window.siyuan.languages["_trayMenu"],
-                    });
-                } else {
-                    if (currentWindow.isFullScreen()) {
-                        currentWindow.once("leave-full-screen", () => currentWindow.hide());
-                        currentWindow.setFullScreen(false);
+        exportLayout({
+            reload: false,
+            cb() {
+                if (window.siyuan.config.appearance.closeButtonBehavior === 1 && !close) {
+                    // 最小化
+                    if ("windows" === window.siyuan.config.system.os) {
+                        ipcRenderer.send(Constants.SIYUAN_CONFIG_TRAY, {
+                            id: getCurrentWindow().id,
+                            languages: window.siyuan.languages["_trayMenu"],
+                        });
                     } else {
-                        currentWindow.hide();
+                        if (currentWindow.isFullScreen()) {
+                            currentWindow.once("leave-full-screen", () => currentWindow.hide());
+                            currentWindow.setFullScreen(false);
+                        } else {
+                            currentWindow.hide();
+                        }
                     }
+                } else {
+                    exitSiYuan();
                 }
-            } else {
-                exitSiYuan();
-            }
-        }, false, true);
+            },
+            onlyData: false,
+            errorExit: true
+        });
     };
 
     const winOnMaxRestore = () => {
@@ -246,6 +256,7 @@ export const initWindow = () => {
             fetchPost("/api/block/checkBlockExist", {id}, existResponse => {
                 if (existResponse.data) {
                     openFileById({
+                        app,
                         id,
                         action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
                         zoomIn: getSearch("focus", url) === "1"
@@ -482,10 +493,18 @@ ${response.data.replace("%pages", "<span class=totalPages></span>").replace("%pa
         document.querySelector(".toolbar").classList.add("toolbar--browser");
     }
     window.addEventListener("beforeunload", () => {
-        exportLayout(false);
+        exportLayout({
+            reload: false,
+            onlyData: false,
+            errorExit: false
+        });
     }, false);
     window.addEventListener("pagehide", () => {
-        exportLayout(false);
+        exportLayout({
+            reload: false,
+            onlyData: false,
+            errorExit: false
+        });
     }, false);
     /// #endif
 };

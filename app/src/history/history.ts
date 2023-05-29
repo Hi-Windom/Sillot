@@ -14,6 +14,7 @@ import {showDiff} from "./diff";
 import {setStorageVal} from "../protyle/util/compatibility";
 import {openModel} from "../mobile/menu/model";
 import {closeModel} from "../mobile/util/closePanel";
+import {App} from "../index";
 
 let historyEditor: Protyle;
 
@@ -289,7 +290,7 @@ const renderRmNotebook = (element: HTMLElement) => {
     });
 };
 
-export const openHistory = () => {
+export const openHistory = (app: App) => {
     if (window.siyuan.config.readonly) {
         return;
     }
@@ -404,7 +405,7 @@ export const openHistory = () => {
             icon: "iconHistory",
             title: window.siyuan.languages.dataHistory,
             bindEvent(element) {
-                bindEvent(element.firstElementChild);
+                bindEvent(app, element.firstElementChild);
             }
         });
     } else {
@@ -416,11 +417,11 @@ export const openHistory = () => {
                 historyEditor = undefined;
             }
         });
-        bindEvent(dialog.element, dialog);
+        bindEvent(app, dialog.element, dialog);
     }
 };
 
-const bindEvent = (element: Element, dialog?: Dialog) => {
+const bindEvent = (app: App, element: Element, dialog?: Dialog) => {
     const firstPanelElement = element.querySelector("#historyContainer [data-type=doc]") as HTMLElement;
     firstPanelElement.querySelectorAll(".b3-select").forEach((itemElement) => {
         itemElement.addEventListener("change", () => {
@@ -440,7 +441,7 @@ const bindEvent = (element: Element, dialog?: Dialog) => {
     const assetElement = firstPanelElement.querySelector('.history__text[data-type="assetPanel"]');
     const mdElement = firstPanelElement.querySelector('.history__text[data-type="mdPanel"]') as HTMLTextAreaElement;
     renderDoc(firstPanelElement, 1);
-    historyEditor = new Protyle(docElement, {
+    historyEditor = new Protyle(app, docElement, {
         blockId: "",
         action: [Constants.CB_GET_HISTORY],
         render: {
@@ -751,7 +752,7 @@ const bindEvent = (element: Element, dialog?: Dialog) => {
                 event.preventDefault();
                 break;
             } else if (type === "compare" && !target.getAttribute("disabled")) {
-                showDiff(JSON.parse(target.getAttribute("data-ids") || "[]"));
+                showDiff(app, JSON.parse(target.getAttribute("data-ids") || "[]"));
                 event.stopPropagation();
                 event.preventDefault();
                 break;

@@ -13,6 +13,7 @@ import {popSearch} from "../../mobile/menu/search";
 import {getEventName} from "../util/compatibility";
 import {Dialog} from "../../dialog";
 import {Constants} from "../../constants";
+import {App} from "../../index";
 
 export class Background {
     public element: HTMLElement;
@@ -22,11 +23,11 @@ export class Background {
     private tagsElement: HTMLElement;
     private transparentData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
-    constructor(protyle: IProtyle) {
+    constructor(app: App, protyle: IProtyle) {
         this.element = document.createElement("div");
         this.element.className = "protyle-background";
         this.element.innerHTML = `<div class="protyle-background__img">
-    <img class="fn__none" style="isMobile()? "200px" : "30vh"">
+    <img class="fn__none">
     <div class="protyle-icons">
         <span class="protyle-icon protyle-icon--first b3-tooltips b3-tooltips__sw" style="position: relative" aria-label="${window.siyuan.languages.upload}"><input type="file" style="position: absolute;width: 22px;height: 100%;top: 0;left: 0;opacity: .001;overflow: hidden;cursor: pointer;"><svg><use xlink:href="#iconUpload"></use></svg></span>
         <span class="protyle-icon b3-tooltips b3-tooltips__sw" data-type="link" aria-label="${window.siyuan.languages.link}"><svg><use xlink:href="#iconLink"></use></svg></span>
@@ -331,10 +332,10 @@ export class Background {
                     break;
                 } else if (type === "open-search") {
                     /// #if !MOBILE
-                    openGlobalSearch(`#${target.textContent}#`, !window.siyuan.ctrlIsPressed);
+                    openGlobalSearch(app, `#${target.textContent}#`, !window.siyuan.ctrlIsPressed);
                     /// #else
                     const searchOption = window.siyuan.storage[Constants.LOCAL_SEARCHDATA];
-                    popSearch({
+                    popSearch(app, {
                         removed: searchOption.removed,
                         sort: searchOption.sort,
                         group: searchOption.group,

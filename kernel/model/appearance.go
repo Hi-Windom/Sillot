@@ -25,9 +25,9 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/logging"
 	"github.com/fsnotify/fsnotify"
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/siyuan/kernel/bazaar"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -78,7 +78,7 @@ func closeThemeWatchers() {
 }
 
 func unloadThemes() {
-	if !gulu.File.IsDir(util.ThemesPath) {
+	if !util.IsPathRegularDirOrSymlinkDir(util.ThemesPath) {
 		return
 	}
 
@@ -89,7 +89,7 @@ func unloadThemes() {
 	}
 
 	for _, themeDir := range themeDirs {
-		if !themeDir.IsDir() {
+		if !util.IsDirRegularOrSymlink(themeDir) {
 			continue
 		}
 		unwatchTheme(filepath.Join(util.ThemesPath, themeDir.Name()))
@@ -107,7 +107,7 @@ func loadThemes() {
 	Conf.Appearance.DarkThemes = nil
 	Conf.Appearance.LightThemes = nil
 	for _, themeDir := range themeDirs {
-		if !themeDir.IsDir() {
+		if !util.IsDirRegularOrSymlink(themeDir) {
 			continue
 		}
 		name := themeDir.Name()
@@ -116,7 +116,7 @@ func loadThemes() {
 			continue
 		}
 
-		modes := themeConf["modes"].([]interface{})
+		modes := themeConf.Modes
 		for _, mode := range modes {
 			if "dark" == mode {
 				Conf.Appearance.DarkThemes = append(Conf.Appearance.DarkThemes, name)
@@ -127,12 +127,12 @@ func loadThemes() {
 
 		if 0 == Conf.Appearance.Mode {
 			if Conf.Appearance.ThemeLight == name {
-				Conf.Appearance.ThemeVer = themeConf["version"].(string)
+				Conf.Appearance.ThemeVer = themeConf.Version
 				Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, name, "____", "__js__.js"))
 			}
 		} else {
 			if Conf.Appearance.ThemeDark == name {
-				Conf.Appearance.ThemeVer = themeConf["version"].(string)
+				Conf.Appearance.ThemeVer = themeConf.Version
 				Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, name, "____", "__js__.js"))
 			}
 		}
@@ -151,7 +151,7 @@ func loadIcons() {
 
 	Conf.Appearance.Icons = nil
 	for _, iconDir := range iconDirs {
-		if !iconDir.IsDir() {
+		if !util.IsDirRegularOrSymlink(iconDir) {
 			continue
 		}
 		name := iconDir.Name()
@@ -161,7 +161,7 @@ func loadIcons() {
 		}
 		Conf.Appearance.Icons = append(Conf.Appearance.Icons, name)
 		if Conf.Appearance.Icon == name {
-			Conf.Appearance.IconVer = iconConf["version"].(string)
+			Conf.Appearance.IconVer = iconConf.Version
 		}
 	}
 }

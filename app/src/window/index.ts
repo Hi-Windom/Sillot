@@ -20,11 +20,14 @@ import {initMessage} from "../dialog/message";
 import {getAllTabs} from "../layout/getAll";
 import {getLocalStorage} from "../protyle/util/compatibility";
 import {init} from "../window/init";
-import {positionPDF} from "./global/positionPDF";
+import {positionPDF, switchTabById} from "./global/function";
+import {loadPlugins} from "../plugin/loader";
 import { importIDB } from "../sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "../sillot";
 
 class App {
+    public plugins: import("../plugin").Plugin[] = [];
+
     constructor() {
         addScriptSync(`${Constants.PROTYLE_CDN}/js/lute/lute.min.js?v=${Constants.SIYUAN_VERSION}`, "protyleLuteScript");
         addScript(`${Constants.PROTYLE_CDN}/js/protyle-html.js?v=${Constants.SIYUAN_VERSION}`, "protyleWcHtmlScript");
@@ -39,13 +42,17 @@ class App {
             ctrlIsPressed: false,
             altIsPressed: false,
             ws: new Model({
+                app: this,
                 id: genUUID(),
                 type: "main",
                 msgCallback: (data) => {
+                    this.plugins.forEach((plugin) => {
+                        plugin.eventBus.emit("ws-main", data);
+                    });
                     if (data) {
                         switch (data.cmd) {
                             case "syncMergeResult":
-                                reloadSync(data.data);
+                                reloadSync(this, data.data);
                                 break;
                             case "progress":
                                 progressLoading(data);
@@ -59,7 +66,7 @@ class App {
                                         const initTab = tab.headElement.getAttribute("data-initdata");
                                         if (initTab) {
                                             const initTabData = JSON.parse(initTab);
-                                            if (initTabData.rootId === data.data.id) {
+                                            if (initTabData.instance === "Editor" && initTabData.rootId === data.data.id) {
                                                 tab.updateTitle(data.data.title);
                                             }
                                         }
@@ -72,7 +79,7 @@ class App {
                                         const initTab = tab.headElement.getAttribute("data-initdata");
                                         if (initTab) {
                                             const initTabData = JSON.parse(initTab);
-                                            if (data.data.box === initTabData.notebookId) {
+                                            if (initTabData.instance === "Editor" && data.data.box === initTabData.notebookId) {
                                                 tab.parent.removeTab(tab.id);
                                             }
                                         }
@@ -85,7 +92,7 @@ class App {
                                         const initTab = tab.headElement.getAttribute("data-initdata");
                                         if (initTab) {
                                             const initTabData = JSON.parse(initTab);
-                                            if (data.data.ids.includes(initTabData.rootId)) {
+                                            if (initTabData.instance === "Editor" && data.data.ids.includes(initTabData.rootId)) {
                                                 tab.parent.removeTab(tab.id);
                                             }
                                         }
@@ -112,10 +119,10 @@ class App {
                                 }
                                 break;
                             case "createdailynote":
-                                openFileById({id: data.data.id, action: [Constants.CB_GET_FOCUS]});
+                                openFileById({app: this, id: data.data.id, action: [Constants.CB_GET_FOCUS]});
                                 break;
                             case "openFileById":
-                                openFileById({id: data.data.id, action: [Constants.CB_GET_FOCUS]});
+                                openFileById({app: this, id: data.data.id, action: [Constants.CB_GET_FOCUS]});
                                 break;
                         }
                     }
@@ -123,7 +130,7 @@ class App {
             }),
         };
         new SillotEnv();
-        fetchPost("/api/system/getConf", {}, response => {
+        fetchPost("/api/system/getConf", {}, async (response) => {
             window.siyuan.config = response.data.conf;
             console.warn("window.index 新开窗口 隔离环境");
             const workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1);
@@ -132,20 +139,21 @@ class App {
                 importIDB(r.data).then(() => {
                     window.Sillot.status.IDBloaded = true;
                 });
-                getLocalStorage(() => {
+                await loadPlugins(this);
+            getLocalStorage(() => {
                     fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
                         window.siyuan.languages = lauguages;
-                        window.siyuan.menus = new Menus();
+                        window.siyuan.menus = new Menus(this);
                     fetchPost("/api/setting/getCloudUser", {}, userResponse => {
                             window.siyuan.user = userResponse.data;
-                            init();
+                            init(this);
                             setTitle(window.siyuan.languages.siyuanNote);
                             initMessage();
                         });
                     });
                 });
                 setNoteBook();
-                initBlockPopover();
+                initBlockPopover(this);
                 promiseTransactions();
             });
         });
@@ -156,5 +164,6 @@ new App();
 
 // 再次点击新窗口已打开的 PDF 时，需进行定位
 window.newWindow = {
-    positionPDF: positionPDF
+    positionPDF: positionPDF,
+    switchTabById: switchTabById
 };

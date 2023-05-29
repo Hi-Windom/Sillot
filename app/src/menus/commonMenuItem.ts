@@ -3,7 +3,7 @@ import {shell} from "electron";
 /// #endif
 import {getDockByType} from "../layout/util";
 import {confirmDialog} from "../dialog/confirmDialog";
-import {getSearch, isMobile} from "../util/functions";
+import {getSearch, isMobile, isValidAttrName} from "../util/functions";
 import {isLocalPath, movePathTo, moveToPath, pathPosix} from "../util/pathName";
 import {MenuItem} from "./Menu";
 import {hasClosestByClassName} from "../protyle/util/hasClosest";
@@ -25,6 +25,7 @@ import {matchHotKey} from "../protyle/util/hotKey";
 import {format} from "date-fns";
 import {Constants} from "../constants";
 import {exportImage} from "../protyle/export/util";
+import {App} from "../index";
 
 const bindAttrInput = (inputElement: HTMLInputElement, confirmElement: Element) => {
     inputElement.addEventListener("keydown", (event) => {
@@ -193,22 +194,22 @@ const genAttr = (attrs: IObject, focusName = "bookmark", cb: (dialog: Dialog, rm
             <span data-action="bookmark" class="block__icon block__icon--show"><svg><use xlink:href="#iconDown"></use></svg></span>
         </div>
         <div class="fn__hr"></div>
-        <input class="b3-text-field fn__block" data-name="bookmark">
+        <input class="b3-text-field fn__block" placeholder="${window.siyuan.languages.attrBookmarkTip}" data-name="bookmark">
     </label>
     <label class="b3-label b3-label--noborder">
         ${window.siyuan.languages.name}
         <div class="fn__hr"></div>
-        <input class="b3-text-field fn__block" data-name="name">
+        <input class="b3-text-field fn__block" placeholder="${window.siyuan.languages.attrNameTip}" data-name="name">
     </label>
     <label class="b3-label b3-label--noborder">
         ${window.siyuan.languages.alias}
         <div class="fn__hr"></div>
-        <input class="b3-text-field b3s-textarea-vlarge fn__block" data-name="alias">
+        <input class="b3-text-field b3s-textarea-vlarge fn__block" placeholder="${window.siyuan.languages.attrAliasTip}" data-name="alias">
     </label>
     <label class="b3-label b3-label--noborder">
         ${window.siyuan.languages.memo}
         <div class="fn__hr"></div>
-        <textarea class="b3-text-field fn__block" rows="2" data-name="memo">${attrs.memo || ""}</textarea>
+        <textarea class="b3-text-field fn__block" placeholder="${window.siyuan.languages.attrMemoTip}" rows="2" data-name="memo">${attrs.memo || ""}</textarea>
     </label>
     ${notifyHTML}
     ${customHTML}
@@ -311,8 +312,8 @@ export const openFileAttr = (attrs: IObject, id: string, focusName = "bookmark")
                 name = "custom-" + (item.parentElement.querySelector(".b3-text-field") as HTMLInputElement).value;
             }
             if (item.value.trim()) {
-                if (!/^[0-9a-zA-Z\-]*$/.test(name.replace("custom-", "")) || name === "custom-") {
-                    errorTip += name.replace("custom-", "") + ", ";
+                if (!isValidAttrName(name)) {
+                    errorTip += name.replace(/^custom-/, "") + ", ";
                     return;
                 }
                 attrsResult[name] = item.value;
@@ -382,8 +383,8 @@ export const openAttr = (nodeElement: Element, protyle: IProtyle, focusName = "b
                     name = "custom-" + (item.parentElement.querySelector(".b3-text-field") as HTMLInputElement).value;
                 }
                 if (item.value.trim()) {
-                    if (!/^[0-9a-zA-Z\-]*$/.test(name.replace("custom-", "")) || name === "custom-") {
-                        errorTip += name.replace("custom-", "") + ", ";
+                    if (!isValidAttrName(name)) {
+                        errorTip += name.replace(/^custom-/, "") + ", ";
                         return;
                     }
                     if (removeAttrs.includes(name)) {
@@ -474,7 +475,7 @@ export const copySubMenu = (id: string, accelerator = true, focusElement?: Eleme
         label: window.siyuan.languages.copyProtocolInMd,
         click: () => {
             fetchPost("/api/block/getRefText", {id}, (response) => {
-                writeText(`[${response.data.substring(0, Constants.SIZE_LINK_TEXT_MAX)}](siyuan://blocks/${id})`);
+                writeText(`[${response.data}](siyuan://blocks/${id})`);
             });
             if (focusElement) {
                 focusBlock(focusElement);
@@ -527,7 +528,7 @@ export const exportMd = (id: string) => {
                 dialog.bindInput(inputElement, () => {
                     (btnsElement[1] as HTMLButtonElement).click();
                 });
-                let name =  replaceFileName(result.data);
+                let name = replaceFileName(result.data);
                 const maxNameLen = 32;
                 if (name.length > maxNameLen) {
                     name = name.substring(0, maxNameLen);
@@ -631,13 +632,118 @@ export const exportMd = (id: string) => {
                 click: () => {
                     saveExport({type: "word", id});
                 }
+            }, {
+                label: window.siyuan.languages.more,
+                icon: "iconMore",
+                type: "submenu",
+                submenu: [{
+                    label: "reStructuredText",
+                    click: () => {
+                        const msgId = showMessage(window.siyuan.languages.exporting, -1);
+                        fetchPost("/api/export/exportReStructuredText", {
+                            id,
+                        }, response => {
+                            hideMessage(msgId);
+                            openByMobile(response.data.zip);
+                        });
+                    }
+                }, {
+                    label: "AsciiDoc",
+                    click: () => {
+                        const msgId = showMessage(window.siyuan.languages.exporting, -1);
+                        fetchPost("/api/export/exportAsciiDoc", {
+                            id,
+                        }, response => {
+                            hideMessage(msgId);
+                            openByMobile(response.data.zip);
+                        });
+                    }
+                }, {
+                    label: "Textile",
+                    click: () => {
+                        const msgId = showMessage(window.siyuan.languages.exporting, -1);
+                        fetchPost("/api/export/exportTextile", {
+                            id,
+                        }, response => {
+                            hideMessage(msgId);
+                            openByMobile(response.data.zip);
+                        });
+                    }
+                }, {
+                    label: "OPML",
+                    click: () => {
+                        const msgId = showMessage(window.siyuan.languages.exporting, -1);
+                        fetchPost("/api/export/exportOPML", {
+                            id,
+                        }, response => {
+                            hideMessage(msgId);
+                            openByMobile(response.data.zip);
+                        });
+                    }
+                }, {
+                    label: "Org-Mode",
+                    click: () => {
+                        const msgId = showMessage(window.siyuan.languages.exporting, -1);
+                        fetchPost("/api/export/exportOrgMode", {
+                            id,
+                        }, response => {
+                            hideMessage(msgId);
+                            openByMobile(response.data.zip);
+                        });
+                    }
+                }, {
+                    label: "MediaWiki",
+                    click: () => {
+                        const msgId = showMessage(window.siyuan.languages.exporting, -1);
+                        fetchPost("/api/export/exportMediaWiki", {
+                            id,
+                        }, response => {
+                            hideMessage(msgId);
+                            openByMobile(response.data.zip);
+                        });
+                    }
+                }, {
+                    label: "ODT",
+                    click: () => {
+                        const msgId = showMessage(window.siyuan.languages.exporting, -1);
+                        fetchPost("/api/export/exportODT", {
+                            id,
+                        }, response => {
+                            hideMessage(msgId);
+                            openByMobile(response.data.zip);
+                        });
+                    }
+                }, {
+                    label: "RTF",
+                    click: () => {
+                        const msgId = showMessage(window.siyuan.languages.exporting, -1);
+                        fetchPost("/api/export/exportRTF", {
+                            id,
+                        }, response => {
+                            hideMessage(msgId);
+                            openByMobile(response.data.zip);
+                        });
+                    }
+                }, {
+                    label: "EPUB",
+                    click: () => {
+                        const msgId = showMessage(window.siyuan.languages.exporting, -1);
+                        fetchPost("/api/export/exportEPUB", {
+                            id,
+                        }, response => {
+                            hideMessage(msgId);
+                            openByMobile(response.data.zip);
+                        });
+                    }
+                },
+                ]
             }
             /// #endif
         ]
     }).element;
 };
 
-export const openMenu = (src: string, onlyMenu: boolean, showAccelerator: boolean) => {
+export const openMenu = (app: App, src: string, onlyMenu: boolean, showAccelerator: boolean) => {
     const submenu = [];
     if (isLocalPath(src)) {
         if (Constants.SIYUAN_ASSETS_EXTS.includes(pathPosix().extname(src)) &&
@@ -649,7 +755,7 @@ export const openMenu = (src: string, onlyMenu: boolean, showAccelerator: boolea
                 label: window.siyuan.languages.insertRight,
                 accelerator: showAccelerator ? "Click" : "",
                 click() {
-                    openAsset(src.trim(), parseInt(getSearch("page", src)), "right");
+                    openAsset(app, src.trim(), parseInt(getSearch("page", src)), "right");
                 }
             });
             /// #endif

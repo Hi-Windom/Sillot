@@ -29,6 +29,7 @@
     * [Delete a block](#Delete-a-block)
     * [Move a block](#Move-a-block)
     * [Get a block kramdown](#Get-a-block-kramdown)
+    * [Get child blocks](#get-child-blocks)
 * [Attributes](#Attributes)
     * [Set block attributes](#Set-block-attributes)
     * [Get block attributes](#Get-block-attributes)
@@ -41,9 +42,12 @@
     * [Get file](#Get-file)
     * [Put file](#Put-file)
     * [Remove file](#Remove-file)
+    * [Rename file](#Rename-file)
     * [List files](#List-files)
 * [Export](#Export)
     * [Export Markdown](#Export-Markdown)
+* [Conversion](#Conversion)
+    * [Pandoc](#Pandoc)
 * [Notification](#Notification)
     * [Push message](#Push-message)
     * [Push error message](#Push-error-message)
@@ -330,8 +334,7 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
   ```
 
     * `data`: Created document ID
-    * If you use the same `path` to call this interface repeatedly, the existing document will not be overwritten, but a
-      new document ending with a random number will be created
+    * If you use the same `path` to call this interface repeatedly, the existing document will not be overwritten
 
 ### Rename a document
 
@@ -499,13 +502,20 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
   {
     "dataType": "markdown",
     "data": "foo**bar**{: style=\"color: var(--b3-font-color8);\"}baz",
-    "previousID": "20211229114650-vrek5x6"
+    "nextID": "",
+    "previousID": "20211229114650-vrek5x6",
+    "parentID": ""
   }
   ```
 
     * `dataType`: The data type to be inserted, the value can be `markdown` or `dom`
     * `data`: Data to be inserted
+    * `nextID`: The ID of the next block, used to anchor the insertion position
     * `previousID`: The ID of the previous block, used to anchor the insertion position
+    * `parentID`: The ID of the parent block, used to anchor the insertion position
+
+  `nextID`, `previousID`, and `parentID` must have at least one value, using
+  priority: `nextID` > `previousID` > `parentID`
 * Return value
 
   ```json
@@ -710,9 +720,10 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
   }
   ```
 
-  * `id`: Block ID to move
-  * `previousID`: The ID of the previous block, used to anchor the insertion position
-  * `parentID`: The ID of the parent block, used to anchor the insertion position, `previousID` and `parentID` cannot be empty at the same time, if they exist at the same time, `previousID` will be used first
+    * `id`: Block ID to move
+    * `previousID`: The ID of the previous block, used to anchor the insertion position
+    * `parentID`: The ID of the parent block, used to anchor the insertion position, `previousID` and `parentID` cannot
+      be empty at the same time, if they exist at the same time, `previousID` will be used first
 * Return value
 
   ```json
@@ -763,6 +774,44 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
       "id": "20201225220954-dlgzk1o",
       "kramdown": "* {: id=\"20201225220954-e913snx\"}Create a new notebook, create a new document under the notebook\n  {: id=\"20210131161940-kfs31q6\"}\n* {: id=\"20201225220954-ygz217h\"}Enter <kbd>/</kbd> in the editor to trigger the function menu\n  {: id=\"20210131161940-eo0riwq\"}\n* {: id=\"20201225220954-875yybt\"}((20200924101200-gss5vee \"Navigate in the content block\")) and ((20200924100906-0u4zfq3 \"Window and tab\"))\n  {: id=\"20210131161940-b5uow2h\"}"
     }
+  }
+  ```
+
+### Get child blocks
+
+* `/api/block/getChildBlocks`
+* Parameters
+
+  ```json
+  {
+    "id": "20230506212712-vt9ajwj"
+  }
+  ```
+
+    * `id`: Parent block ID
+    * The blocks below a heading are also counted as child blocks
+* Return value
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": [
+      {
+        "id": "20230512083858-mjdwkbn",
+        "type": "h",
+        "subType": "h1"
+      },
+      {
+        "id": "20230513213727-thswvfd",
+        "type": "s"
+      },
+      {
+        "id": "20230513213633-9lsj4ew",
+        "type": "l",
+        "subType": "u"
+      }
+    ]
   }
   ```
 
@@ -877,7 +926,7 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
   }
   ```
 
-### 渲染 Sprig
+### Render Sprig
 
 * `/api/template/renderSprig`
 * Parameters
@@ -954,6 +1003,29 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
   }
   ```
 
+### Rename file
+
+* `/api/file/renameFile`
+* Parameters
+
+  ```json
+  {
+    "path": "/data/assets/image-20230523085812-k3o9t32.png",
+    "newPath": "/data/assets/test-20230523085812-k3o9t32.png"
+  }
+  ```
+  * `path`: the file path under the workspace path
+  * `newPath`: the new file path under the workspace path
+* Return value
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": null
+  }
+  ```
+
 ### List files
 
 * `/api/file/readDir`
@@ -1013,6 +1085,41 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
 
     * `hPath`: human-readable path
     * `content`: Markdown content
+
+## Conversion
+
+### Pandoc
+
+* `/api/convert/pandoc`
+* Working directory
+    * Executing the pandoc command will set the working directory to `workspace/temp/convert/pandoc/`
+    * API [`Put file`](#put-file) can be used to write the file to be converted to this directory first
+    * Then call the API for conversion, and the converted file will also be written to this directory
+    * Finally, call the API [`Get file`](#get-file) to get the converted file
+        * Or call the API [Create a document with Markdown](#Create-a-document-with-Markdown)
+        * Or call the internal API `importStdMd` to import the converted folder directly
+* Parameters
+
+  ```json
+  {
+    "args": [
+      "--to", "markdown_strict-raw_html",
+      "foo.epub",
+      "-o", "foo.md"
+   ]
+  }
+  ```
+
+    * `args`: Pandoc command line parameters
+* Return value
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": null
+  }
+  ```
 
 ## Notification
 

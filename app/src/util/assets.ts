@@ -96,20 +96,21 @@ export const loadAssets = (data: IAppearance) => {
         addScript(themeScriptAddress, "themeScript", "module");
     }
 
-    /// #if !MOBILE
-    setTimeout(() => {
-        const pluginScriptElement = document.getElementById("pluginScript");
-        const pluginScriptAddress = "/appearance/plugin/main.js?v=" + new Date().getTime();
-        if (pluginScriptElement) {
-            if (!pluginScriptElement.getAttribute("src").startsWith(pluginScriptAddress)) {
-                pluginScriptElement.remove();
-                addScript(pluginScriptAddress, "pluginScript");
-            }
-        } else {
-            addScript(pluginScriptAddress, "pluginScript");
-        }
-    }, 1000)
-    /// #endif
+    // 历史遗留代码
+    // /// #if !MOBILE
+    // setTimeout(() => {
+    //     const pluginScriptElement = document.getElementById("pluginScript");
+    //     const pluginScriptAddress = "/appearance/plugin/main.js?v=" + new Date().getTime();
+    //     if (pluginScriptElement) {
+    //         if (!pluginScriptElement.getAttribute("src").startsWith(pluginScriptAddress)) {
+    //             pluginScriptElement.remove();
+    //             addScript(pluginScriptAddress, "pluginScript");
+    //         }
+    //     } else {
+    //         addScript(pluginScriptAddress, "pluginScript");
+    //     }
+    // }, 1000)
+    // /// #endif
 
     const iconDefaultScriptElement = document.getElementById("iconDefaultScript");
     // 不能使用 data.iconVer，因为其他主题也需要加载默认图标，此时 data.iconVer 为其他图标的版本号
@@ -160,7 +161,11 @@ export const initAssets = () => {
         }, response => {
             if (window.siyuan.config.appearance.themeJS) {
                 /// #if !MOBILE
-                exportLayout(true);
+                exportLayout({
+                    reload: true,
+                    onlyData: false,
+                    errorExit: false,
+                });
                 /// #else
                 window.location.reload();
                 /// #endif
@@ -223,6 +228,7 @@ export const setInlineStyle = (set = true) => {
 .protyle-wysiwyg [data-node-id].li > .protyle-action ~ .h1, .protyle-wysiwyg [data-node-id].li > .protyle-action ~ .h2, .protyle-wysiwyg [data-node-id].li > .protyle-action ~ .h3, .protyle-wysiwyg [data-node-id].li > .protyle-action ~ .h4, .protyle-wysiwyg [data-node-id].li > .protyle-action ~ .h5, .protyle-wysiwyg [data-node-id].li > .protyle-action ~ .h6 {line-height:${height + 8}px;}
 .protyle-wysiwyg [data-node-id].li > .protyle-action:after {height: ${window.siyuan.config.editor.fontSize}px;width: ${window.siyuan.config.editor.fontSize}px;margin:-${window.siyuan.config.editor.fontSize / 2}px 0 0 -${window.siyuan.config.editor.fontSize / 2}px}
 .protyle-wysiwyg [data-node-id].li > .protyle-action svg {height: ${Math.max(14, window.siyuan.config.editor.fontSize - 8)}px}
+.protyle-wysiwyg [data-node-id].li:before {height: calc(100% - ${height + 8}px);top:${(height + 8)}px}
 .protyle-wysiwyg [data-node-id] [spellcheck] {min-height:${height}px;}
 .protyle-wysiwyg [data-node-id] {${window.siyuan.config.editor.rtl ? " direction: rtl;" : ""}${window.siyuan.config.editor.justify ? " text-align: justify;" : ""}}
 .protyle-wysiwyg .li {min-height:${height + 8}px}
@@ -235,7 +241,7 @@ export const setInlineStyle = (set = true) => {
 .protyle-wysiwyg .h5 img.emoji, .b3-typography h5 img.emoji {width:${Math.floor(window.siyuan.config.editor.fontSize * 1.13 * 1.25)}px}
 .protyle-wysiwyg .h6 img.emoji, .b3-typography h6 img.emoji {width:${Math.floor(window.siyuan.config.editor.fontSize * 1.25)}px}`;
     if (window.siyuan.config.editor.fontFamily) {
-        style += `.b3-typography:not(.b3-typography--default), .protyle-wysiwyg, .protyle-title, .protyle-title__input{font-family: "${window.siyuan.config.editor.fontFamily}", "quote", "Helvetica Neue", "Luxi Sans", "DejaVu Sans", "Hiragino Sans GB", "Microsoft Yahei", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", "EmojiSymbols" !important;}`;
+        style += `.b3-typography:not(.b3-typography--default), .protyle-wysiwyg, .protyle-title, .protyle-title__input{font-family: "${window.siyuan.config.editor.fontFamily}", "Helvetica Neue", "Luxi Sans", "DejaVu Sans", "Hiragino Sans GB", "Microsoft Yahei", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", "EmojiSymbols" !important;}`;
     }
     if (set) {
         document.getElementById("editorFontSize").innerHTML = style;
@@ -278,14 +284,22 @@ export const setMode = (modeElementValue: number) => {
                 window.siyuan.config.appearance.themeLight !== response.data.themeLight ||
                 window.siyuan.config.appearance.themeDark !== response.data.themeDark
             )) {
-                exportLayout(true);
+                exportLayout({
+                    reload: true,
+                    onlyData: false,
+                    errorExit: false,
+                });
                 return;
             }
             const OSTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
             if (response.data.modeOS && (
                 (response.data.mode === 1 && OSTheme === "light") || (response.data.mode === 0 && OSTheme === "dark")
             )) {
-                exportLayout(true);
+                exportLayout({
+                    reload: true,
+                    onlyData: false,
+                    errorExit: false,
+                });
                 return;
             }
         }

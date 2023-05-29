@@ -19,8 +19,9 @@ import {activeBlur, hideKeyboardToolbar, initKeyboardToolbar} from "./keyboardTo
 import {syncGuide} from "../../sync/syncGuide";
 import {openCard} from "../../card/openCard";
 import {Inbox} from "../../layout/dock/Inbox";
+import {App} from "../../index";
 
-export const initFramework = () => {
+export const initFramework = (app: App) => {
     setInlineStyle();
     renderSnippet();
     initKeyboardToolbar();
@@ -52,30 +53,30 @@ export const initFramework = () => {
             if (itemType === type) {
                 if (type === "sidebar-outline-tab") {
                     if (!outline) {
-                        outline = new MobileOutline();
+                        outline = new MobileOutline(app);
                     } else {
                         outline.update();
                     }
                 } else if (type === "sidebar-backlink-tab") {
                     if (!backlink) {
-                        backlink = new MobileBacklinks();
+                        backlink = new MobileBacklinks(app);
                     } else {
                         backlink.update();
                     }
                 } else if (type === "sidebar-bookmark-tab") {
                     if (!bookmark) {
-                        bookmark = new MobileBookmarks();
+                        bookmark = new MobileBookmarks(app);
                     } else {
-                        backlink.update();
+                        bookmark.update();
                     }
                 } else if (type === "sidebar-tag-tab") {
                     if (!tag) {
-                        tag = new MobileTags();
+                        tag = new MobileTags(app);
                     } else {
                         tag.update();
                     }
                 } else if (type === "sidebar-inbox-tab" && !inbox) {
-                    inbox = new Inbox(document.querySelector('#sidebar [data-type="sidebar-inbox"]'));
+                    inbox = new Inbox(app, document.querySelector('#sidebar [data-type="sidebar-inbox"]'));
                 }
                 svgElement.classList.add("toolbar__icon--active");
                 sidebarElement.lastElementChild.querySelector(`[data-type="${itemType.replace("-tab", "")}"]`).classList.remove("fn__none");
@@ -85,7 +86,7 @@ export const initFramework = () => {
             }
         });
     });
-    window.siyuan.mobile.files = new MobileFiles();
+    window.siyuan.mobile.files = new MobileFiles(app);
     document.getElementById("toolbarFile").addEventListener("click", () => {
         hideKeyboardToolbar();
         activeBlur();
@@ -130,7 +131,7 @@ export const initFramework = () => {
         fetchPost("/api/setting/setEditor", window.siyuan.config.editor);
     });
     document.getElementById("toolbarSync").addEventListener(getEventName(), () => {
-        syncGuide();
+        syncGuide(app);
     });
     if (navigator.userAgent.indexOf("iPhone") > -1 && !window.siyuan.config.readonly && !window.siyuan.config.editor.readOnly) {
         // 不知道为什么 iPhone 中如果是编辑状态，点击文档后无法点击标题
@@ -151,27 +152,27 @@ export const initFramework = () => {
         }
         const idZoomIn = getIdZoomInByPath();
         if (idZoomIn.id) {
-            openMobileFileById(idZoomIn.id,
+            openMobileFileById(app, idZoomIn.id,
                 idZoomIn.isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]);
             return;
         }
         const localDoc = window.siyuan.storage[Constants.LOCAL_DOCINFO];
         fetchPost("/api/block/checkBlockExist", {id: localDoc.id}, existResponse => {
             if (existResponse.data) {
-                openMobileFileById(localDoc.id, localDoc.action);
+                openMobileFileById(app, localDoc.id, localDoc.action);
             } else {
                 fetchPost("/api/block/getRecentUpdatedBlocks", {}, (response) => {
                     if (response.data.length !== 0) {
-                        openMobileFileById(response.data[0].id, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
+                        openMobileFileById(app, response.data[0].id, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
                     } else {
-                        setEmpty();
+                        setEmpty(app);
                     }
                 });
             }
         });
         return;
     }
-    setEmpty();
+    setEmpty(app);
 };
 
 const initEditorName = () => {

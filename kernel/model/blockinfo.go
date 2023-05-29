@@ -36,6 +36,7 @@ import (
 
 type BlockInfo struct {
 	ID           string            `json:"id"`
+	RootID       string            `json:"rootID"`
 	Name         string            `json:"name"`
 	RefCount     int               `json:"refCount"`
 	SubFileCount int               `json:"subFileCount"`
@@ -44,19 +45,44 @@ type BlockInfo struct {
 	Icon         string            `json:"icon"`
 }
 
-func GetDocInfo(rootID string) (ret *BlockInfo) {
+func GetDocInfo(blockID string) (ret *BlockInfo) {
 	WaitForWritingFiles()
 
-	tree, err := loadTreeByBlockID(rootID)
+	tree, err := loadTreeByBlockID(blockID)
 	if nil != err {
-		logging.LogErrorf("load tree by root id [%s] failed: %s", rootID, err)
+		logging.LogErrorf("load tree by root id [%s] failed: %s", blockID, err)
 		return
 	}
 
 	title := tree.Root.IALAttr("title")
-	ret = &BlockInfo{ID: rootID, Name: title}
+	ret = &BlockInfo{ID: blockID, RootID: tree.Root.ID, Name: title}
 	ret.IAL = parse.IAL2Map(tree.Root.KramdownIAL)
-	ret.RefIDs, _ = sql.QueryRefIDsByDefID(rootID, false)
+	scrollData := ret.IAL["scroll"]
+	if 0 < len(scrollData) {
+		scroll := map[string]interface{}{}
+		if parseErr := gulu.JSON.UnmarshalJSON([]byte(scrollData), &scroll); nil != parseErr {
+			logging.LogWarnf("parse scroll data [%s] failed: %s", scrollData, parseErr)
+			delete(ret.IAL, "scroll")
+		} else {
+			if zoomInId := scroll["zoomInId"]; nil != zoomInId {
+				if nil == treenode.GetBlockTree(zoomInId.(string)) {
+					delete(ret.IAL, "scroll")
+				}
+			} else {
+				if startId := scroll["startId"]; nil != startId {
+					if nil == treenode.GetBlockTree(startId.(string)) {
+						delete(ret.IAL, "scroll")
+					}
+				}
+				if endId := scroll["endId"]; nil != endId {
+					if nil == treenode.GetBlockTree(endId.(string)) {
+						delete(ret.IAL, "scroll")
+					}
+				}
+			}
+		}
+	}
+	ret.RefIDs, _ = sql.QueryRefIDsByDefID(blockID, false)
 	ret.RefCount = len(ret.RefIDs)
 
 	var subFileCount int

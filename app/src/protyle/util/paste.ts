@@ -50,9 +50,9 @@ export const pasteAsPlainText = async (protyle: IProtyle) => {
     }
     /// #endif
     if (localFiles.length === 0) {
-        // https://github.com/siyuan-note/siyuan/issues/8010
+        // Inline-level elements support pasted as plain text https://github.com/siyuan-note/siyuan/issues/8010
         navigator.clipboard.readText().then(textPlain => {
-            insertHTML(protyle.lute.BlockDOM2Content(protyle.lute.Md2BlockDOM(textPlain)), protyle);
+            insertHTML(protyle.lute.BlockDOM2EscapeMarkerContent(protyle.lute.Md2BlockDOM(textPlain)), protyle);
         });
     }
 };
@@ -259,11 +259,24 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
         } else if (textPlain.trim() !== "" && files && files.length === 0) {
             if (range.toString() !== "") {
                 if (isDynamicRef(textPlain)) {
-                    textPlain = textPlain.replace(/'.*'\)\)$/, ` "${Lute.EscapeHTMLStr(range.toString())}"))`);
+                    protyle.toolbar.setInlineMark(protyle, "block-ref", "range", {
+                        type: "id",
+                        // range 不能 escape，否则 https://github.com/siyuan-note/siyuan/issues/8359
+                        color: `${textPlain.substring(2, 22 + 2)}${Constants.ZWSP}s${Constants.ZWSP}${range.toString()}`
+                    });
+                    return;
                 } else if (isFileAnnotation(textPlain)) {
-                    textPlain = textPlain.replace(/".+">>$/, `"${Lute.EscapeHTMLStr(range.toString())}">>`);
+                    protyle.toolbar.setInlineMark(protyle, "file-annotation-ref", "range", {
+                        type: "file-annotation-ref",
+                        color: textPlain.substring(2).replace(/ ".+">>$/, "") + Constants.ZWSP + range.toString()
+                    });
+                    return;
                 } else if (protyle.lute.IsValidLinkDest(textPlain)) {
-                    textPlain = `[${range.toString()}](${textPlain})`;
+                    protyle.toolbar.setInlineMark(protyle, "a", "range", {
+                        type: "a",
+                        color: textPlain + Constants.ZWSP + range.toString()
+                    });
+                    return;
                 }
             }
             const textPlainDom = protyle.lute.Md2BlockDOM(textPlain);

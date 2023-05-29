@@ -4,7 +4,7 @@ import {Tree} from "../../util/Tree";
 import {getDockByType, setPanelFocus} from "../util";
 import {fetchPost} from "../../util/fetch";
 import {getAllModels} from "../getAll";
-import {hasClosestByClassName} from "../../protyle/util/hasClosest";
+import {hasClosestBlock, hasClosestByClassName} from "../../protyle/util/hasClosest";
 import {updateHotkeyTip} from "../../protyle/util/compatibility";
 import {openFileById} from "../../editor/util";
 import {Constants} from "../../constants";
@@ -12,6 +12,7 @@ import {escapeHtml} from "../../util/escape";
 import {unicode2Emoji} from "../../emoji";
 import {onGet} from "../../protyle/util/onGet";
 import {getPreviousBlock} from "../../protyle/wysiwyg/getBlock";
+import {App} from "../../index";
 
 export class Outline extends Model {
     public tree: Tree;
@@ -22,11 +23,13 @@ export class Outline extends Model {
     private openNodes: { [key: string]: string[] } = {};
 
     constructor(options: {
+        app: App,
         tab: Tab,
         blockId: string,
         type: "pin" | "local"
     }) {
         super({
+            app: options.app,
             id: options.tab.id,
             callback() {
                 if (this.type === "local") {
@@ -101,6 +104,7 @@ export class Outline extends Model {
                 const id = element.getAttribute("data-node-id");
                 fetchPost("/api/attr/getBlockAttrs", {id}, (attrResponse) => {
                     openFileById({
+                        app: options.app,
                         id,
                         action: attrResponse.data["heading-fold"] === "1" ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL, Constants.CB_GET_HTML] : [Constants.CB_GET_FOCUS, Constants.CB_GET_SETID, Constants.CB_GET_CONTEXT, Constants.CB_GET_HTML],
                     });
@@ -169,10 +173,6 @@ export class Outline extends Model {
         }, response => {
             this.update(response);
         });
-
-        if (this.type === "pin") {
-            setPanelFocus(options.tab.panelElement);
-        }
     }
 
     public updateDocTitle(ial?: IObject) {
@@ -217,11 +217,21 @@ export class Outline extends Model {
                 id: this.blockId,
             }, response => {
                 this.update(response);
+                // https://github.com/siyuan-note/siyuan/issues/8372
+                if (getSelection().rangeCount > 0) {
+                    const blockElement = hasClosestBlock(getSelection().getRangeAt(0).startContainer);
+                    if (blockElement && blockElement.getAttribute("data-type") === "NodeHeading") {
+                        this.setCurrent(blockElement);
+                    }
+                }
             });
         }
     }
 
     public setCurrent(nodeElement: HTMLElement) {
+        if (!nodeElement) {
+            return;
+        }
         if (nodeElement.getAttribute("data-type") === "NodeHeading") {
             this.setCurrentById(nodeElement.getAttribute("data-node-id"));
         } else {

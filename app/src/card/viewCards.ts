@@ -9,8 +9,9 @@ import {unicode2Emoji} from "../emoji";
 import {addLoading} from "../protyle/ui/initUI";
 import {Constants} from "../constants";
 import {disabledProtyle, onGet} from "../protyle/util/onGet";
+import {App} from "../index";
 
-export const viewCards = (deckID: string, title: string, deckType: "Tree" | "" | "Notebook", cb?: (response: IWebSocketData) => void) => {
+export const viewCards = (app: App, deckID: string, title: string, deckType: "Tree" | "" | "Notebook", cb?: (response: IWebSocketData) => void) => {
     let pageIndex = 1;
     let edit: Protyle;
     fetchPost(`/api/riff/get${deckType}RiffCards`, {
@@ -20,8 +21,7 @@ export const viewCards = (deckID: string, title: string, deckType: "Tree" | "" |
         const dialog = new Dialog({
             content: `<div class="fn__flex-column" style="height: 100%">
     <div class="block__icons">
-        <span class="fn__flex-center">${escapeHtml(title)}</span>
-        <div class="fn__flex-1"></div>
+        <span class="fn__flex-1 fn__flex-center resize__move">${escapeHtml(title)}</span>
         <span class="fn__space"></span>
         <span data-type="previous" class="block__icon block__icon--show b3-tooltips b3-tooltips__ne" disabled="disabled" aria-label="${window.siyuan.languages.previousLabel}"><svg><use xlink:href='#iconLeft'></use></svg></span>
         <span class="fn__space"></span>
@@ -55,7 +55,7 @@ export const viewCards = (deckID: string, title: string, deckType: "Tree" | "" |
             }
         });
         if (response.data.blocks.length > 0) {
-            edit = new Protyle(dialog.element.querySelector("#cardPreview") as HTMLElement, {
+            edit = new Protyle(app, dialog.element.querySelector("#cardPreview") as HTMLElement, {
                 blockId: "",
                 render: {
                     gutter: true,

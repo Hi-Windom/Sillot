@@ -31,11 +31,12 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
 	"github.com/facette/natsort"
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
@@ -52,6 +53,10 @@ type Box struct {
 	Sort     int    `json:"sort"`
 	SortMode int    `json:"sortMode"`
 	Closed   bool   `json:"closed"`
+
+	NewFlashcardCount int `json:"newFlashcardCount"`
+	DueFlashcardCount int `json:"dueFlashcardCount"`
+	FlashcardCount    int `json:"flashcardCount"`
 
 	historyGenerated int64 // 最近一次历史生成时间
 }
@@ -399,7 +404,7 @@ func (box *Box) moveTrees0(files []*FileInfo) {
 
 		treenode.SetBlockTreePath(subTree)
 		sql.RenameSubTreeQueue(subTree)
-		msg := fmt.Sprintf(Conf.Language(107), subTree.HPath)
+		msg := fmt.Sprintf(Conf.Language(107), html.EscapeString(subTree.HPath))
 		util.PushStatusBar(msg)
 	}
 }

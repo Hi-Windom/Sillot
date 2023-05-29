@@ -255,6 +255,16 @@
   z-index: 220;
   transform: translateX(100vw);
   top: 0;
+
+  // for plugin
+  .b3-menu__item > svg:not(.b3-menu__icon) {
+    height: 17px;
+    width: 17px;
+    margin: 0 16px 0 8px;
+    border-radius: 4px;
+    align-self: center;
+    color: var(--b3-theme-on-surface);
+  }
 }
 
 .keyboard {
@@ -434,13 +444,6 @@
   @extend .fn__ellipsis;
 }
 
-// iPhone 右上角属性中对不齐
-.protyle-wysiwyg--attr .protyle-attr > div:not(.protyle-attr--memo):not(.protyle-attr--refcount) {
-  max-width: 26vw;
-  white-space: nowrap;
-  display: block;
-}
-
 .protyle {
   &-util {
     .color__square {
@@ -452,7 +455,30 @@
   &-font {
     font-size: 14px;
   }
+
+  // iPhone 右上角属性中对不齐
+  &-wysiwyg--attr .protyle-attr > div:not(.protyle-attr--memo):not(.protyle-attr--refcount) {
+    max-width: 26vw;
+    white-space: nowrap;
+    display: block;
+  }
+
+  // 移动端键盘弹起和点击加号需保持滚动高度一致
+  &-background__img img {
+    height: 200px;
+  }
 }
+
+html .protyle-wysiwyg [spellcheck][contenteditable="true"]:empty:before {
+  content: "Enter text";
+  color: var(--b3-theme-on-surface-light);
+}
+
+html[lang="zh_CN"] .protyle-wysiwyg [spellcheck][contenteditable="true"]:empty:before {
+  content: "键入文字";
+  color: var(--b3-theme-on-surface-light);
+}
+
 
 @media (max-width: 620px) {
   .protyle-wysiwyg [data-node-id].sb[data-sb-layout="col"] {

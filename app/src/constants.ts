@@ -92,10 +92,9 @@ export abstract class Constants extends SConst { // Sillot extend
 
     // timeout
     public static readonly TIMEOUT_DBLCLICK = 190;
-    public static readonly TIMEOUT_SEARCH = 300;
     public static readonly TIMEOUT_INPUT = 256;
-    public static readonly TIMEOUT_BLOCKLOAD = 300;
-    public static readonly TIMEOUT_TRANSITION = 150;
+    public static readonly TIMEOUT_LOAD = 300;
+    public static readonly TIMEOUT_TRANSITION = 300;
 
     // id
     public static readonly HELP_PATH = {
@@ -204,9 +203,9 @@ export abstract class Constants extends SConst { // Sillot extend
                 moveToDown: {default: "⇧⌘↓", custom: "⇧⌘↓"},
             },
             insert: {
-                font: {default: "⌥⌘X", custom: "⌥⌘X"},
+                appearance: {default: "⌥⌘X", custom: "⌥⌘X"},
                 lastUsed: {default: "⌥X", custom: "⌥X"},
-                blockRef: {default: "⌥[", custom: "⌥["},
+                ref: {default: "⌥[", custom: "⌥["},
                 kbd: {default: "⌘'", custom: "⌘'"},
                 sup: {default: "⌘H", custom: "⌘H"},
                 sub: {default: "⌘J", custom: "⌘J"},
@@ -396,7 +395,7 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly SIYUAN_IMAGE_FOLDER: string = "1f4d1";
 
     // assets
-    public static readonly SIYUAN_ASSETS_IMAGE: string[] = [".apng", ".ico", ".cur", ".jpg", ".jpe", ".jpeg", ".jfif", ".pjp", ".pjpeg", ".png", ".gif", ".webp", ".bmp", ".svg"];
+    public static readonly SIYUAN_ASSETS_IMAGE: string[] = [".apng", ".ico", ".cur", ".jpg", ".jpe", ".jpeg", ".jfif", ".pjp", ".pjpeg", ".png", ".gif", ".webp", ".bmp", ".svg", ".avif"];
     public static readonly SIYUAN_ASSETS_AUDIO: string[] = [".mp3", ".wav", ".ogg", ".m4a"];
     public static readonly SIYUAN_ASSETS_VIDEO: string[] = [".mov", ".weba", ".mkv", ".mp4", ".webm"];
     public static readonly SIYUAN_ASSETS_EXTS: string[] = [".pdf"].concat(Constants.SIYUAN_ASSETS_IMAGE).concat(Constants.SIYUAN_ASSETS_AUDIO).concat(Constants.SIYUAN_ASSETS_VIDEO);

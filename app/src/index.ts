@@ -23,7 +23,6 @@ import {
 } from "./dialog/processSystem";
 import { promiseTransactions } from "./protyle/wysiwyg/transaction";
 import { initMessage } from "./dialog/message";
-import { resizeDrag } from "./layout/util";
 import { getAllTabs } from "./layout/getAll";
 import { getLocalStorage } from "./protyle/util/compatibility";
 import { importIDB } from "./sillot/util/sillot-idb-backup-and-restore";
@@ -32,8 +31,11 @@ import {updateEditModeElement} from "./layout/topBar";
 import {getSearch} from "./util/functions";
 import {hideAllElements} from "./protyle/ui/hideElements";
 import VConsole from 'vconsole';
+import {loadPlugins} from "./plugin/loader";
 
-class App {
+export class App {
+    public plugins: import("./plugin").Plugin[] = [];
+
     constructor() {
         /// #if BROWSER
         registerServiceWorker(`${Constants.SERVICE_WORKER_PATH}?v=${Constants.SIYUAN_VERSION}`);
@@ -51,13 +53,17 @@ class App {
             ctrlIsPressed: false,
             altIsPressed: false,
             ws: new Model({
+                app: this,
                 id: genUUID(),
                 type: "main",
                 msgCallback: (data) => {
+                    this.plugins.forEach((plugin) => {
+                        plugin.eventBus.emit("ws-main", data);
+                    });
                     if (data) {
                         switch (data.cmd) {
                             case "syncMergeResult":
-                                reloadSync(data.data);
+                                reloadSync(this, data.data);
                                 break;
                             case "readonly":
                                 window.siyuan.config.editor.readOnly = data.data;
@@ -76,7 +82,7 @@ class App {
                                         const initTab = tab.headElement.getAttribute("data-initdata");
                                         if (initTab) {
                                             const initTabData = JSON.parse(initTab);
-                                            if (initTabData.rootId === data.data.id) {
+                                            if (initTabData.instance === "Editor" && initTabData.rootId === data.data.id) {
                                                 tab.updateTitle(data.data.title);
                                             }
                                         }
@@ -89,7 +95,7 @@ class App {
                                         const initTab = tab.headElement.getAttribute("data-initdata");
                                         if (initTab) {
                                             const initTabData = JSON.parse(initTab);
-                                            if (data.data.box === initTabData.notebookId) {
+                                            if (initTabData.instance === "Editor" && data.data.box === initTabData.notebookId) {
                                                 tab.parent.removeTab(tab.id);
                                             }
                                         }
@@ -102,7 +108,7 @@ class App {
                                         const initTab = tab.headElement.getAttribute("data-initdata");
                                         if (initTab) {
                                             const initTabData = JSON.parse(initTab);
-                                            if (data.data.ids.includes(initTabData.rootId)) {
+                                            if (initTabData.instance === "Editor" && data.data.ids.includes(initTabData.rootId)) {
                                                 tab.parent.removeTab(tab.id);
                                             }
                                         }
@@ -132,10 +138,10 @@ class App {
                                 }
                                 break;
                             case "createdailynote":
-                                openFileById({ id: data.data.id, action: [Constants.CB_GET_FOCUS] });
+                                openFileById({app: this, id: data.data.id, action: [Constants.CB_GET_FOCUS]});
                                 break;
                             case "openFileById":
-                                openFileById({id: data.data.id, action: [Constants.CB_GET_FOCUS]});
+                                openFileById({app: this, id: data.data.id, action: [Constants.CB_GET_FOCUS]});
                                 break;
                         }
                     }
@@ -143,7 +149,8 @@ class App {
             }),
         };
         new SillotEnv();
-        fetchPost("/api/system/getConf", {}, response => {
+
+        fetchPost("/api/system/getConf", {}, async (response) => {
             window.siyuan.config = response.data.conf;
             const workspaceName: string = window.siyuan.config.system.workspaceDir.replaceAll("\\","/").split("/").at(-1);
             // console.log(workspaceName)
@@ -167,16 +174,16 @@ class App {
                     data: response.data.conf.uiLayout.bottom
                 };
             }
+            await loadPlugins(this);
             getLocalStorage(() => {
                 fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
                     window.siyuan.languages = lauguages;
-                    window.siyuan.menus = new Menus();
+                    window.siyuan.menus = new Menus(this);
                     bootSync();
                     fetchPost("/api/setting/getCloudUser", {}, userResponse => {
                         window.siyuan.user = userResponse.data;
-                        onGetConfig(response.data.start);
+                        onGetConfig(response.data.start, this);
                         account.onSetaccount();
-                        resizeDrag();
                         setTitle(window.siyuan.languages.siyuanNote);
                         initMessage();
                     });
@@ -184,17 +191,18 @@ class App {
             });
         });
         setNoteBook();
-        initBlockPopover();
+        initBlockPopover(this);
         promiseTransactions();
     }
 }
 
-new App();
+const siyuanApp = new App();
 
 window.openFileByURL = (openURL) => {
     if (openURL && isSYProtocol(openURL)) {
         const isZoomIn = getSearch("focus", openURL) === "1";
         openFileById({
+            app: siyuanApp,
             id: getIdFromSYProtocol(openURL),
             action: isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
             zoomIn: isZoomIn
@@ -206,3 +214,9 @@ window.openFileByURL = (openURL) => {
 
 window.vConsole = new VConsole({ theme: 'dark' });
 window.vConsole.hideSwitch();
+
+/// #if BROWSER
+window.showKeyboardToolbar = () => {
+    // 防止 Pad 端报错
+};
+/// #endif

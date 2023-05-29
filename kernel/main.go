@@ -37,6 +37,7 @@ func main() {
 	sql.InitDatabase(false)
 	sql.InitHistoryDatabase(false)
 	sql.SetCaseSensitive(model.Conf.Search.CaseSensitive)
+	sql.SetIndexAssetPath(model.Conf.Search.IndexAssetPath)
 
 	model.BootSyncData()
 	model.InitBoxes()

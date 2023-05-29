@@ -4,7 +4,11 @@ import {Model} from "../layout/Model";
 import {disabledProtyle} from "../protyle/util/onGet";
 import {setPadding} from "../protyle/ui/initUI";
 import {getAllModels} from "../layout/getAll";
+/// #if !BROWSER
+import {setModelsHash} from "../window/setHeader";
+/// #endif
 import {countBlockWord} from "../layout/status";
+import {App} from "../index";
 
 export class Editor extends Model {
     public element: HTMLElement;
@@ -12,6 +16,7 @@ export class Editor extends Model {
     public headElement: HTMLElement;
 
     constructor(options: {
+        app: App,
         tab: Tab,
         blockId: string,
         mode?: TEditorMode,
@@ -19,6 +24,7 @@ export class Editor extends Model {
         scrollAttr?: IScrollAttr
     }) {
         super({
+            app: options.app,
             id: options.tab.id,
         });
         if (window.siyuan.config.fileTree.openFilesUseCurrentTab) {
@@ -35,7 +41,7 @@ export class Editor extends Model {
         mode?: TEditorMode,
         scrollAttr?: IScrollAttr
     }) {
-        this.editor = new Protyle(this.element, {
+        this.editor = new Protyle(this.app, this.element, {
             action: options.action || [],
             blockId: options.blockId,
             mode: options.mode,
@@ -62,6 +68,9 @@ export class Editor extends Model {
                     });
                 }
                 countBlockWord([], editor.protyle.block.rootID);
+                /// #if !BROWSER
+                setModelsHash();
+                /// #endif
             },
         });
         // 需在 after 回调之前，否则不会聚焦 https://github.com/siyuan-note/siyuan/issues/5303

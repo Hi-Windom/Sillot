@@ -4,13 +4,14 @@ import {Constants} from "../../constants";
 import {hasClosestByClassName} from "../../protyle/util/hasClosest";
 import {openMobileFileById} from "../editor";
 import {openBookmarkMenu} from "../../menus/bookmark";
+import {App} from "../../index";
 
 export class MobileBookmarks {
     public element: HTMLElement;
     private tree: Tree;
     private openNodes: string[];
 
-    constructor() {
+    constructor(app: App) {
         this.element = document.querySelector('#sidebar [data-type="sidebar-bookmark"]');
         this.element.innerHTML = `<div class="toolbar toolbar--border toolbar--dark">
     <div class="fn__space"></div>
@@ -28,16 +29,18 @@ export class MobileBookmarks {
         this.tree = new Tree({
             element: this.element.querySelector(".bookmarkList") as HTMLElement,
             data: null,
-            click: (element: HTMLElement, event: MouseEvent) => {
+            click: (element: HTMLElement, event?: MouseEvent) => {
                 const id = element.getAttribute("data-node-id");
-                const actionElement = hasClosestByClassName(event.target as HTMLElement, "b3-list-item__action");
-                if (actionElement) {
-                    openBookmarkMenu(actionElement.parentElement, event, this);
-                } else {
-                    fetchPost("/api/block/checkBlockFold", {id}, (foldResponse) => {
-                        openMobileFileById(id, foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL, Constants.CB_GET_HTML] : [Constants.CB_GET_FOCUS, Constants.CB_GET_SETID, Constants.CB_GET_CONTEXT, Constants.CB_GET_HTML]);
-                    });
+                if (event) {
+                    const actionElement = hasClosestByClassName(event.target as HTMLElement, "b3-list-item__action");
+                    if (actionElement) {
+                        openBookmarkMenu(actionElement.parentElement, event, this);
+                        return;
+                    }
                 }
+                fetchPost("/api/block/checkBlockFold", {id}, (foldResponse) => {
+                    openMobileFileById(app, id, foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL, Constants.CB_GET_HTML] : [Constants.CB_GET_FOCUS, Constants.CB_GET_SETID, Constants.CB_GET_CONTEXT, Constants.CB_GET_HTML]);
+                });
             },
             blockExtHTML: '<span class="b3-list-item__action"><svg><use xlink:href="#iconMore"></use></svg></span>',
             topExtHTML: '<span class="b3-list-item__action"><svg><use xlink:href="#iconMore"></use></svg></span>'

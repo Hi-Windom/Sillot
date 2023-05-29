@@ -1,10 +1,10 @@
 import {Constants} from "../constants";
 /// #if !MOBILE
 import {Tab} from "./Tab";
-import {exportLayout} from "./util";
 /// #endif
 import {processMessage} from "../util/processMessage";
-import {kernelError} from "../dialog/processSystem";
+import {kernelError, reloadSync} from "../dialog/processSystem";
+import {App} from "../index";
 
 export class Model {
     public ws: WebSocket;
@@ -14,16 +14,28 @@ export class Model {
     /// #else
     // @ts-ignore
     public parent: any;
-
     /// #endif
+    public app: App;
 
-    constructor(options: { id: string, type?: TWS, callback?: () => void, msgCallback?: (data: IWebSocketData) => void }) {
+    constructor(options: {
+        app: App,
+        id: string,
+        type?: TWS,
+        callback?: () => void,
+        msgCallback?: (data: IWebSocketData) => void
+    }) {
+        this.app = options.app;
         if (options.msgCallback) {
             this.connect(options);
         }
     }
 
-    private connect(options: { id: string, type?: TWS, callback?: () => void, msgCallback?: (data: IWebSocketData) => void }) {
+    private connect(options: {
+        id: string,
+        type?: TWS,
+        callback?: () => void,
+        msgCallback?: (data: IWebSocketData) => void
+    }) {
         const websocketURL = `${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/ws`;
         const ws = new WebSocket(`${websocketURL}?app=${Constants.SIYUAN_APPID}&id=${options.id}${options.type ? "&type=" + options.type : ""}`);
         ws.onopen = () => {
@@ -33,11 +45,13 @@ export class Model {
             const logElement = document.getElementById("errorLog");
             if (logElement) {
                 // 内核中断后无法 catch fetch 请求错误，重连会导致无法执行 transactionsTimeout
-                /// #if MOBILE
-                window.location.reload();
-                /// #else
-                exportLayout(true);
-                /// #endif
+                reloadSync(this.app, {upsertRootIDs: [], removeRootIDs: []});
+                window.siyuan.dialogs.find(item =>{
+                    if (item.element.id === "errorLog") {
+                        item.destroy();
+                        return true;
+                    }
+                });
             }
         };
         ws.onmessage = (event) => {

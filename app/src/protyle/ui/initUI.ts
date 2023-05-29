@@ -4,6 +4,9 @@ import {scrollEvent} from "../scroll/event";
 import {isMobile} from "../../util/functions";
 import {Constants} from "../../constants";
 import {hasClosestByAttribute, hasClosestByClassName} from "../util/hasClosest";
+import {isMac} from "../util/compatibility";
+import {setInlineStyle} from "../../util/assets";
+import {fetchPost} from "../../util/fetch";
 
 
 
@@ -72,17 +75,52 @@ export const initUI = (protyle: IProtyle) => {
             embedBlockElement.firstElementChild.classList.toggle("protyle-icons--show");
         }
     });
+    let wheelTimeout: number;
+    const isMacOS = isMac();
+    protyle.contentElement.addEventListener("mousewheel", (event: WheelEvent) => {
+        if (!window.siyuan.config.editor.fontSizeScrollZoom || (isMacOS && !event.metaKey) || (!isMacOS && !event.ctrlKey) || event.deltaX !== 0) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.deltaY < 0) {
+            if (window.siyuan.config.editor.fontSize < 72) {
+                window.siyuan.config.editor.fontSize++;
+            } else {
+                return;
+            }
+        } else if (event.deltaY > 0) {
+            if (window.siyuan.config.editor.fontSize > 9) {
+                window.siyuan.config.editor.fontSize--;
+            } else {
+                return;
+            }
+        }
+        setInlineStyle();
+        clearTimeout(wheelTimeout);
+        wheelTimeout = window.setTimeout(() => {
+            fetchPost("/api/setting/setEditor", window.siyuan.config.editor);
+        }, Constants.TIMEOUT_LOAD);
+    }, {passive: false});
 };
 
-export const addLoading = (protyle: IProtyle) => {
-    protyle.element.insertAdjacentHTML("beforeend", '<div style="background-color: var(--b3-theme-background)" class="fn__loading wysiwygLoading"><img width="48px" src="/stage/loading-pure.svg"></div>');
+export const addLoading = (protyle: IProtyle, msg?: string) => {
+    protyle.element.removeAttribute("data-loading");
+    setTimeout(() => {
+        if (protyle.element.getAttribute("data-loading") !== "finished") {
+            protyle.element.insertAdjacentHTML("beforeend", `<div style="background-color: var(--b3-theme-background);flex-direction: column;" class="fn__loading wysiwygLoading">
+    <img width="48px" src="/stage/loading-pure.svg">
+    <div style="color: var(--b3-theme-on-surface);margin-top: 8px;">${msg || ""}</div>
+</div>`);
+        }
+    }, Constants.TIMEOUT_LOAD);
 };
 
 export const removeLoading = (protyle: IProtyle) => {
-    const loadingElement = protyle.element.querySelector(".wysiwygLoading");
-    if (loadingElement) {
-        loadingElement.remove();
-    }
+    protyle.element.setAttribute("data-loading", "finished");
+    protyle.element.querySelectorAll(".wysiwygLoading").forEach(item => {
+        item.remove();
+    });
 };
 
 export const setPadding = (protyle: IProtyle) => {

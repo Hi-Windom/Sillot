@@ -6,17 +6,18 @@ import {fetchPost} from "../../util/fetch";
 import {updateHotkeyTip} from "../../protyle/util/compatibility";
 import {openGlobalSearch} from "../../search/util";
 import {MenuItem} from "../../menus/Menu";
-import {confirmDialog} from "../../dialog/confirmDialog";
-import {escapeHtml} from "../../util/escape";
-import {renameTag} from "../../util/noRelyPCFunction";
+import {App} from "../../index";
+import {openTagMenu} from "../../menus/tag";
+import {hasClosestByClassName} from "../../protyle/util/hasClosest";
 
 export class Tag extends Model {
     private openNodes: string[];
     public tree: Tree;
     private element: Element;
 
-    constructor(tab: Tab) {
+    constructor(app: App, tab: Tab) {
         super({
+            app,
             id: tab.id,
             msgCallback(data) {
                 if (data) {
@@ -77,29 +78,22 @@ export class Tag extends Model {
         this.tree = new Tree({
             element: this.element.lastElementChild as HTMLElement,
             data: null,
-            click(element: HTMLElement) {
-                openGlobalSearch(`#${element.getAttribute("data-label")}#`, !window.siyuan.ctrlIsPressed);
+            click(element: HTMLElement, event?: MouseEvent) {
+                const labelName = element.getAttribute("data-label");
+                if (event) {
+                    const actionElement = hasClosestByClassName(event.target as HTMLElement, "b3-list-item__action");
+                    if (actionElement) {
+                        openTagMenu(actionElement.parentElement, event, labelName);
+                        return;
+                    }
+                }
+                openGlobalSearch(app, `#${element.getAttribute("data-label")}#`, !window.siyuan.ctrlIsPressed);
             },
             rightClick: (element: HTMLElement, event: MouseEvent) => {
-                const labelName = element.getAttribute("data-label");
-                window.siyuan.menus.menu.remove();
-                window.siyuan.menus.menu.append(new MenuItem({
-                    label: window.siyuan.languages.rename,
-                    click() {
-                        renameTag(labelName);
-                    }
-                }).element);
-                window.siyuan.menus.menu.append(new MenuItem({
-                    icon: "iconTrashcan",
-                    label: window.siyuan.languages.remove,
-                    click: () => {
-                        confirmDialog(window.siyuan.languages.deleteOpConfirm, `${window.siyuan.languages.confirmDelete} <b>${escapeHtml(labelName)}</b>?`, () => {
-                            fetchPost("/api/tag/removeTag", {label: labelName});
-                        });
-                    },
-                }).element);
-                window.siyuan.menus.menu.popup({x: event.clientX, y: event.clientY});
+                openTagMenu(element, event, element.getAttribute("data-label"));
             },
+            blockExtHTML: window.siyuan.config.readonly ? undefined : '<span class="b3-list-item__action"><svg><use xlink:href="#iconMore"></use></svg></span>',
+            topExtHTML: window.siyuan.config.readonly ? undefined : '<span class="b3-list-item__action"><svg><use xlink:href="#iconMore"></use></svg></span>'
         });
         // 为了快捷键的 dispatch
         this.element.querySelector('[data-type="collapse"]').addEventListener("click", () => {
@@ -181,7 +175,6 @@ export class Tag extends Model {
             }
         });
         this.update();
-        setPanelFocus(this.element);
     }
 
     public update() {

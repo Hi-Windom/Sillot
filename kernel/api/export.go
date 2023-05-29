@@ -31,6 +31,159 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
+func exportEPUB(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	name, zipPath := model.ExportPandocConvertZip(id, "epub", ".epub")
+	ret.Data = map[string]interface{}{
+		"name": name,
+		"zip":  zipPath,
+	}
+}
+
+func exportRTF(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	name, zipPath := model.ExportPandocConvertZip(id, "rtf", ".rtf")
+	ret.Data = map[string]interface{}{
+		"name": name,
+		"zip":  zipPath,
+	}
+}
+
+func exportODT(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	name, zipPath := model.ExportPandocConvertZip(id, "odt", ".odt")
+	ret.Data = map[string]interface{}{
+		"name": name,
+		"zip":  zipPath,
+	}
+}
+
+func exportMediaWiki(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	name, zipPath := model.ExportPandocConvertZip(id, "mediawiki", ".wiki")
+	ret.Data = map[string]interface{}{
+		"name": name,
+		"zip":  zipPath,
+	}
+}
+
+func exportOrgMode(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	name, zipPath := model.ExportPandocConvertZip(id, "org", ".org")
+	ret.Data = map[string]interface{}{
+		"name": name,
+		"zip":  zipPath,
+	}
+}
+
+func exportOPML(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	name, zipPath := model.ExportPandocConvertZip(id, "opml", ".opml")
+	ret.Data = map[string]interface{}{
+		"name": name,
+		"zip":  zipPath,
+	}
+}
+
+func exportTextile(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	name, zipPath := model.ExportPandocConvertZip(id, "textile", ".textile")
+	ret.Data = map[string]interface{}{
+		"name": name,
+		"zip":  zipPath,
+	}
+}
+
+func exportAsciiDoc(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	name, zipPath := model.ExportPandocConvertZip(id, "asciidoc", ".adoc")
+	ret.Data = map[string]interface{}{
+		"name": name,
+		"zip":  zipPath,
+	}
+}
+
+func exportReStructuredText(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	name, zipPath := model.ExportPandocConvertZip(id, "rst", ".rst")
+	ret.Data = map[string]interface{}{
+		"name": name,
+		"zip":  zipPath,
+	}
+}
+
 func export2Liandi(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -115,7 +268,7 @@ func exportMd(c *gin.Context) {
 	}
 
 	id := arg["id"].(string)
-	name, zipPath := model.ExportMarkdown(id)
+	name, zipPath := model.ExportPandocConvertZip(id, "", ".md")
 	ret.Data = map[string]interface{}{
 		"name": name,
 		"zip":  zipPath,

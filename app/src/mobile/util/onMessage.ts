@@ -1,6 +1,7 @@
 import {openMobileFileById} from "../editor";
 import {processSync, progressLoading, progressStatus, reloadSync, transactionError} from "../../dialog/processSystem";
 import {Constants} from "../../constants";
+import {App} from "../../index";
 
 const processReadonly = () => {
     const inputElement = document.getElementById("toolbarName") as HTMLInputElement;
@@ -14,11 +15,11 @@ const processReadonly = () => {
     }
 };
 
-export const onMessage = (data: IWebSocketData) => {
+export const onMessage = (app: App, data: IWebSocketData) => {
     if (data) {
         switch (data.cmd) {
             case "syncMergeResult":
-                reloadSync(data.data);
+                reloadSync(app, data.data);
                 break;
             case "readonly":
                 window.siyuan.config.editor.readOnly = data.data;
@@ -33,12 +34,11 @@ export const onMessage = (data: IWebSocketData) => {
                     document.getElementById("toolbarSync").classList.add("fn__none");
                 }
                 break;
-            case "create":
             case "createdailynote":
-                openMobileFileById(data.data.id);
+                openMobileFileById(app, data.data.id);
                 break;
             case "openFileById":
-                openMobileFileById(data.data.id, [Constants.CB_GET_FOCUS]);
+                openMobileFileById(app, data.data.id, [Constants.CB_GET_FOCUS]);
                 break;
             case"txerr":
                 transactionError();
