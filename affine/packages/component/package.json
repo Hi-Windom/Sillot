@@ -75,7 +75,7 @@
     "storybook": "^7.0.7",
     "storybook-dark-mode": "^3.0.0",
     "typescript": "^5.0.4",
-    "vite": "^4.3.1",
+    "vite": "^4.3.9",
     "wait-on": "^7.0.1",
     "yjs": "^13.6.0"
   },
