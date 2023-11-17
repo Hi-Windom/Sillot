@@ -1,8 +1,8 @@
 import {Constants} from "../constants";
 import {webFrame} from "electron";
-import {globalShortcut} from "../boot/globalShortcut";
 import {fetchPost} from "../util/fetch";
-import {getInstanceById, JSONToCenter, resizeTabs} from "../layout/util";
+import {getInstanceById, JSONToCenter} from "../layout/util";
+import {resizeTabs} from "../layout/tabUtil";
 import {initStatus} from "../layout/status";
 import {appearance} from "../config/appearance";
 import {initAssets, setInlineStyle} from "../util/assets";
@@ -12,10 +12,11 @@ import {initWindow} from "../boot/onGetConfig";
 import {App} from "../index";
 import {afterLoadPlugin} from "../plugin/loader";
 import {Tab} from "../layout/Tab";
+import {initWindowEvent} from "../boot/globalEvent/event";
 
 export const init = (app: App) => {
     webFrame.setZoomFactor(window.siyuan.storage[Constants.LOCAL_ZOOM]);
-    globalShortcut(app);
+    initWindowEvent(app);
     fetchPost("/api/system/getEmojiConf", {}, response => {
         window.siyuan.emojis = response.data as IEmoji[];
 
@@ -46,8 +47,8 @@ export const init = (app: App) => {
     initWindow(app);
     appearance.onSetappearance(window.siyuan.config.appearance);
     initAssets();
-    renderSnippet();
     setInlineStyle();
+    renderSnippet();
     let resizeTimeout = 0;
     window.addEventListener("resize", () => {
         window.clearTimeout(resizeTimeout);
@@ -57,7 +58,7 @@ export const init = (app: App) => {
     });
 };
 
-const afterLayout = (app:App) => {
+const afterLayout = (app: App) => {
     app.plugins.forEach(item => {
         afterLoadPlugin(item);
     });

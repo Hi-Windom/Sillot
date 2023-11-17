@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -79,7 +79,7 @@ func renderOutline(heading *ast.Node, luteEngine *lute.Lute) (ret string) {
 		case ast.NodeBackslashContent:
 			buf.Write(n.Tokens)
 		case ast.NodeTextMark:
-			dom := lute.RenderNodeBlockDOM(n, luteEngine.ParseOptions, luteEngine.RenderOptions)
+			dom := luteEngine.RenderNodeBlockDOM(n)
 			buf.WriteString(dom)
 			return ast.WalkSkipChildren
 		case ast.NodeImage:

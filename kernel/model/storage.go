@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,8 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/logging"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -129,7 +129,7 @@ func setRecentDocs(recentDocs []*RecentDoc) (err error) {
 func getRecentDocs() (ret []*RecentDoc, err error) {
 	tmp := []*RecentDoc{}
 	dataPath := filepath.Join(util.DataDir, "storage/recent-doc.json")
-	if !gulu.File.IsExist(dataPath) {
+	if !filelock.IsExist(dataPath) {
 		return
 	}
 
@@ -270,7 +270,7 @@ func setCriteria(criteria []*Criterion) (err error) {
 func getCriteria() (ret []*Criterion, err error) {
 	ret = []*Criterion{}
 	dataPath := filepath.Join(util.DataDir, "storage/criteria.json")
-	if !gulu.File.IsExist(dataPath) {
+	if !filelock.IsExist(dataPath) {
 		return
 	}
 
@@ -351,7 +351,7 @@ func getLocalStorage() (ret map[string]interface{}) {
 	// When local.json is corrupted, clear the file to avoid being unable to enter the main interface https://github.com/siyuan-note/siyuan/issues/7911
 	ret = map[string]interface{}{}
 	lsPath := filepath.Join(util.DataDir, "storage/local.json")
-	if !gulu.File.IsExist(lsPath) {
+	if !filelock.IsExist(lsPath) {
 		return
 	}
 

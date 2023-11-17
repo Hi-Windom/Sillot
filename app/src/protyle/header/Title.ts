@@ -7,54 +7,40 @@ import {fetchPost} from "../../util/fetch";
 import {replaceFileName, validateName} from "../../editor/rename";
 import {MenuItem} from "../../menus/Menu";
 import {
-    copySubMenu,
-    movePathToMenu,
     openFileAttr,
-    openFileWechatNotify,
 } from "../../menus/commonMenuItem";
-/// #if !BROWSER
-import {getCurrentWindow} from "@electron/remote";
-/// #endif
 import {Constants} from "../../constants";
 import {matchHotKey} from "../util/hotKey";
-import {readText, updateHotkeyTip, writeText} from "../util/compatibility";
+import {isMac, readText, writeText} from "../util/compatibility";
 // import * as dayjs from "dayjs";
 import {format,parse} from "date-fns";
 import {setPanelFocus} from "../../layout/util";
 import {openFileById, updatePanelByEditor} from "../../editor/util";
-import {openBacklink, openGraph, openOutline} from "../../layout/dock/util";
 import {setTitle} from "../../dialog/processSystem";
 import {getNoContainerElement} from "../wysiwyg/getBlock";
 import {commonHotkey} from "../wysiwyg/commonHotkey";
 import {code160to32} from "../util/code160to32";
-import {deleteFile} from "../../editor/deleteFile";
 import {genEmptyElement} from "../../block/util";
 import {transaction} from "../wysiwyg/transaction";
 import {hideTooltip} from "../../dialog/tooltip";
-import {transferBlockRef} from "../../menus/block";
-import {openCardByData} from "../../card/openCard";
-import {makeCard, quickMakeCard} from "../../card/makeCard";
-import {viewCards} from "../../card/viewCards";
-import {getNotebookName, pathPosix} from "../../util/pathName";
 import {commonClick} from "../wysiwyg/commonClick";
-import {App} from "../../index";
+import {openTitleMenu} from "./openTitleMenu";
+import {electronUndo} from "../undo";
 
 export class Title {
     public element: HTMLElement;
     public editElement: HTMLElement;
     private timeout: number;
-    private app: App;
 
-    constructor(app: App, protyle: IProtyle) {
-        this.app = app;
+    constructor(protyle: IProtyle) {
         this.element = document.createElement("div");
         this.element.className = "protyle-title";
         if (window.siyuan.config.editor.displayBookmarkIcon) {
             this.element.classList.add("protyle-wysiwyg--attr");
         }
         // 标题内需要一个空格，避免首次加载出现`请输入文档名`干扰
-        this.element.innerHTML = `<span aria-label="${window.siyuan.languages.gutterTip2}" class="protyle-title__icon" data-type="a" data-position="right"><svg><use xlink:href="#iconFile"></use></svg></span>
-<div contenteditable="true" data-position="center" spellcheck="${window.siyuan.config.editor.spellcheck}" class="protyle-title__input" data-tip="${window.siyuan.languages._kernel[16]}"> </div><div class="protyle-attr"></div>`;
+        this.element.innerHTML = `<span aria-label="${isMac() ? window.siyuan.languages.gutterTip2 : window.siyuan.languages.gutterTip2.replace("⇧", "Shift+")}" data-position="right" class="protyle-title__icon ariaLabel"><svg><use xlink:href="#iconFile"></use></svg></span>
+<div contenteditable="true" spellcheck="${window.siyuan.config.editor.spellcheck}" class="protyle-title__input" data-tip="${window.siyuan.languages._kernel[16]}"> </div><div class="protyle-attr"></div>`;
         this.editElement = this.element.querySelector(".protyle-title__input");
         this.editElement.addEventListener("paste", (event: ClipboardEvent) => {
             event.stopPropagation();
@@ -94,14 +80,14 @@ export class Title {
                 return;
             }
 
-            if (commonHotkey(app, protyle, event)) {
+            if (commonHotkey(protyle, event)) {
                 return true;
             }
             if (matchHotKey(window.siyuan.config.keymap.general.enterBack.custom, event)) {
                 const ids = protyle.path.split("/");
                 if (ids.length > 2) {
                     openFileById({
-                        app,
+                        app: protyle.app,
                         id: ids[ids.length - 2],
                         action: [Constants.CB_GET_FOCUS, Constants.CB_GET_SCROLL]
                     });
@@ -110,20 +96,9 @@ export class Title {
                 event.stopPropagation();
                 return;
             }
-            /// #if !BROWSER
-            if (matchHotKey(window.siyuan.config.keymap.editor.general.undo.custom, event)) {
-                getCurrentWindow().webContents.undo();
-                event.preventDefault();
-                event.stopPropagation();
+            if (electronUndo(event)) {
                 return;
             }
-            if (matchHotKey(window.siyuan.config.keymap.editor.general.redo.custom, event)) {
-                getCurrentWindow().webContents.redo();
-                event.preventDefault();
-                event.stopPropagation();
-                return;
-            }
-            /// #endif
             if (event.key === "ArrowDown") {
                 const noContainerElement = getNoContainerElement(protyle.wysiwyg.element.firstElementChild);
                 // https://github.com/siyuan-note/siyuan/issues/4923
@@ -152,23 +127,12 @@ export class Title {
                 fetchPost("/api/block/getDocInfo", {
                     id: protyle.block.rootID
                 }, (response) => {
-                    openFileAttr(response.data.ial, protyle.block.rootID);
+                    openFileAttr(response.data.ial, "bookmark", protyle);
                 });
                 event.preventDefault();
                 event.stopPropagation();
-            } else if (matchHotKey(window.siyuan.config.keymap.editor.general.quickMakeCard.custom, event)) {
-                quickMakeCard(protyle, [this.element]);
-                event.preventDefault();
-                event.stopPropagation();
-                return true;
             } else if (matchHotKey("⌘A", event)) {
                 getEditorRange(this.editElement).selectNodeContents(this.editElement);
-                event.preventDefault();
-                event.stopPropagation();
-            } else if (matchHotKey(window.siyuan.config.keymap.editor.general.copyBlockRef.custom, event)) {
-                fetchPost("/api/block/getRefText", {id: protyle.block.rootID}, (response) => {
-                    writeText(`((${protyle.block.rootID} '${response.data}'))`);
-                });
                 event.preventDefault();
                 event.stopPropagation();
             } else if (matchHotKey(window.siyuan.config.keymap.editor.general.copyID.custom, event)) {
@@ -191,16 +155,19 @@ export class Title {
                 fetchPost("/api/block/getDocInfo", {
                     id: protyle.block.rootID
                 }, (response) => {
-                    openFileAttr(response.data.ial, protyle.block.rootID);
+                    openFileAttr(response.data.ial, "bookmark", protyle);
                 });
             } else {
                 const iconRect = iconElement.getBoundingClientRect();
-                this.renderMenu(protyle, {x: iconRect.left, y: iconRect.top + 14});
+                openTitleMenu(protyle, {x: iconRect.left, y: iconRect.bottom});
             }
         });
         this.element.addEventListener("contextmenu", (event) => {
+            if (event.shiftKey) {
+                return;
+            }
             if (getSelection().rangeCount === 0) {
-                this.renderMenu(protyle, {x: event.clientX, y: event.clientY});
+                openTitleMenu(protyle, {x: event.clientX, y: event.clientY});
                 return;
             }
             protyle.toolbar?.element.classList.add("fn__none");
@@ -269,7 +236,7 @@ export class Title {
             fetchPost("/api/block/getDocInfo", {
                 id: protyle.block.rootID
             }, (response) => {
-                commonClick(app, event, protyle, response.data.ial);
+                commonClick(event, protyle, response.data.ial);
             });
         });
     }
@@ -296,132 +263,6 @@ export class Title {
         }, Constants.TIMEOUT_INPUT);
     }
 
-    private renderMenu(protyle: IProtyle, position: { x: number, y: number }) {
-        fetchPost("/api/block/getDocInfo", {
-            id: protyle.block.rootID
-        }, (response) => {
-            window.siyuan.menus.menu.remove();
-            window.siyuan.menus.menu.append(new MenuItem({
-                label: window.siyuan.languages.copy,
-                icon: "iconCopy",
-                type: "submenu",
-                submenu: copySubMenu(protyle.block.rootID)
-            }).element);
-            if (!protyle.disabled) {
-                window.siyuan.menus.menu.append(movePathToMenu([protyle.path]));
-                window.siyuan.menus.menu.append(new MenuItem({
-                    icon: "iconTrashcan",
-                    label: window.siyuan.languages.delete,
-                    click: () => {
-                        deleteFile(protyle.notebookId, protyle.path);
-                    }
-                }).element);
-                window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
-                const countElement = this.element.lastElementChild.querySelector(".protyle-attr--refcount");
-                if (countElement?.textContent) {
-                    transferBlockRef(protyle.block.rootID);
-                }
-                window.siyuan.menus.menu.append(new MenuItem({
-                    label: window.siyuan.languages.attr,
-                    accelerator: window.siyuan.config.keymap.editor.general.attr.custom + "/" + updateHotkeyTip("⇧Click"),
-                    click() {
-                        openFileAttr(response.data.ial, protyle.block.rootID);
-                    }
-                }).element);
-            }
-            window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
-            window.siyuan.menus.menu.append(new MenuItem({
-                icon: "iconAlignCenter",
-                label: window.siyuan.languages.outline,
-                accelerator: window.siyuan.config.keymap.editor.general.outline.custom,
-                click: () => {
-                    openOutline(this.app, protyle);
-                }
-            }).element);
-            window.siyuan.menus.menu.append(new MenuItem({
-                icon: "iconLink",
-                label: window.siyuan.languages.backlinks,
-                accelerator: window.siyuan.config.keymap.editor.general.backlinks.custom,
-                click: () => {
-                    openBacklink(this.app, protyle);
-                }
-            }).element);
-            window.siyuan.menus.menu.append(new MenuItem({
-                icon: "iconGraph",
-                label: window.siyuan.languages.graphView,
-                accelerator: window.siyuan.config.keymap.editor.general.graphView.custom,
-                click: () => {
-                    openGraph(this.app, protyle);
-                }
-            }).element);
-            window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
-            window.siyuan.menus.menu.append(new MenuItem({
-                label: window.siyuan.languages.wechatReminder,
-                icon: "iconMp",
-                click() {
-                    openFileWechatNotify(protyle);
-                }
-            }).element);
-            const riffCardMenu = [{
-                iconHTML: Constants.ZWSP,
-                label: window.siyuan.languages.spaceRepetition,
-                accelerator: window.siyuan.config.keymap.editor.general.spaceRepetition.custom,
-                click: () => {
-                    fetchPost("/api/riff/getTreeRiffDueCards", {rootID: protyle.block.rootID}, (response) => {
-                        openCardByData(this.app, response.data, "doc", protyle.block.rootID, this.editElement.textContent || "Untitled");
-                    });
-                }
-            }, {
-                iconHTML: Constants.ZWSP,
-                label: window.siyuan.languages.mgmt,
-                click: () => {
-                    fetchPost("/api/filetree/getHPathByID", {
-                        id: protyle.block.rootID
-                    }, (response) => {
-                        viewCards(this.app, protyle.block.rootID, pathPosix().join(getNotebookName(protyle.notebookId), (response.data)), "Tree");
-                    });
-                }
-            }, {
-                iconHTML: Constants.ZWSP,
-                label: window.siyuan.languages.quickMakeCard,
-                accelerator: window.siyuan.config.keymap.editor.general.quickMakeCard.custom,
-                click: () => {
-                    quickMakeCard(protyle, [this.element]);
-                }
-            }];
-            if (window.siyuan.config.flashcard.deck) {
-                riffCardMenu.push({
-                    iconHTML: Constants.ZWSP,
-                    label: window.siyuan.languages.addToDeck,
-                    click: () => {
-                        makeCard(this.app, [protyle.block.rootID]);
-                    }
-                });
-            }
-            window.siyuan.menus.menu.append(new MenuItem({
-                label: window.siyuan.languages.riffCard,
-                type: "submenu",
-                icon: "iconRiffCard",
-                submenu: riffCardMenu,
-            }).element);
-            window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
-            window.siyuan.menus.menu.append(new MenuItem({
-                iconHTML: Constants.ZWSP,
-                type: "readonly",
-                label: `${window.siyuan.languages.modifiedAt} ${format(new Date(~~response.data.ial.updated), 'yyyy-MM-dd HH:mm:ss')}<br>
-${window.siyuan.languages.createdAt} ${format(new Date(~~response.data.ial.id.subtring(0, 14)), 'yyyy-MM-dd HH:mm:ss')}`
-            }).element);
-            window.siyuan.menus.menu.popup(position);
-            this.app?.plugins?.forEach((plugin) => {
-                plugin.eventBus.emit("click-editortitleicon", {
-                    protyle,
-                    menu: window.siyuan.menus.menu,
-                    data: response.data,
-                });
-            });
-        });
-    }
-
     public setTitle(title: string) {
         if (code160to32(title) !== code160to32(this.editElement.textContent)) {
             this.editElement.textContent = title === "Untitled" ? "" : title;
@@ -433,10 +274,10 @@ ${window.siyuan.languages.createdAt} ${format(new Date(~~response.data.ial.id.su
             return false;
         }
         this.element.setAttribute("data-node-id", protyle.block.rootID);
-        if (response.data.ial["custom-riff-decks"]) {
-            this.element.setAttribute("custom-riff-decks", response.data.ial["custom-riff-decks"]);
+        if (response.data.ial[Constants.CUSTOM_RIFF_DECKS]) {
+            this.element.setAttribute(Constants.CUSTOM_RIFF_DECKS, response.data.ial[Constants.CUSTOM_RIFF_DECKS]);
         }
-        protyle.background.render(response.data.ial, protyle.block.rootID);
+        protyle.background?.render(response.data.ial, protyle.block.rootID);
         protyle.wysiwyg.renderCustom(response.data.ial);
         this.editElement.setAttribute("data-render", "true");
         this.setTitle(response.data.ial.title);
@@ -452,6 +293,9 @@ ${window.siyuan.languages.createdAt} ${format(new Date(~~response.data.ial.id.su
         }
         if (response.data.ial.memo) {
             nodeAttrHTML += `<div class="protyle-attr--memo b3-tooltips b3-tooltips__sw" aria-label="${Lute.EscapeHTMLStr(response.data.ial.memo)}"><svg><use xlink:href="#iconM"></use></svg></div>`;
+        }
+        if (response.data.ial["custom-avs"]) {
+            nodeAttrHTML += '<div class="protyle-attr--av"><svg><use xlink:href="#iconDatabase"></use></svg></div>';
         }
         this.element.querySelector(".protyle-attr").innerHTML = nodeAttrHTML;
         if (response.data.refCount !== 0) {

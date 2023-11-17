@@ -1,10 +1,14 @@
-import {hasClosestByAttribute, hasClosestByClassName} from "../../protyle/util/hasClosest";
+import {
+    hasClosestByAttribute,
+    hasClosestByClassName,
+    hasTopClosestByClassName,
+} from "../../protyle/util/hasClosest";
 import {closePanel} from "./closePanel";
 import {popMenu} from "../menu";
 import {activeBlur, hideKeyboardToolbar} from "./keyboardToolbar";
-import {getCurrentEditor} from "../editor";
-import {linkMenu, refMenu, tagMenu} from "../../menus/protyle";
+import {isIPhone} from "../../protyle/util/compatibility";
 import {App} from "../../index";
+import {globalTouchEnd, globalTouchStart} from "../../boot/globalEvent/touch";
 
 let clientX: number;
 let clientY: number;
@@ -24,37 +28,13 @@ const popSide = (render = true) => {
     }
 };
 
-export const handleTouchEnd = (app: App, event: TouchEvent) => {
-    const editor = getCurrentEditor();
-    if (editor) {
-        document.querySelectorAll(".protyle-breadcrumb__bar--hide").forEach(item => {
-            item.classList.remove("protyle-breadcrumb__bar--hide");
-        });
-        window.siyuan.hideBreadcrumb = false;
-    }
-    const target = event.target as HTMLElement;
-    if (editor && typeof yDiff === "undefined" && new Date().getTime() - time > 900 &&
-        target.tagName === "SPAN" && window.webkit?.messageHandlers &&
-        !hasClosestByAttribute(target, "data-type", "NodeBlockQueryEmbed")) {
-        // ios 长按行内元素弹出菜单
-        const types = (target.getAttribute("data-type") || "").split(" ");
-        if (types.includes("inline-memo")) {
-            editor.protyle.toolbar.showRender(editor.protyle, target);
-        }
-        if (editor.protyle.disabled) {
-            return;
-        }
-        if (types.includes("block-ref")) {
-            refMenu(app, editor.protyle, target);
-        } else if (types.includes("file-annotation-ref")) {
-            editor.protyle.toolbar.showFileAnnotationRef(editor.protyle, target);
-        } else if (types.includes("tag")) {
-            tagMenu(app, editor.protyle, target);
-        } else if (types.includes("a")) {
-            linkMenu(app, editor.protyle, target);
-        }
+export const handleTouchEnd = (event: TouchEvent, app: App) => {
+    if (isIPhone() && globalTouchEnd(event, yDiff, time, app)) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
         return;
     }
+    const target = event.target as HTMLElement;
     if (!clientX || !clientY || typeof yDiff === "undefined" ||
         target.tagName === "AUDIO" ||
         hasClosestByClassName(target, "b3-dialog", true) ||
@@ -75,12 +55,16 @@ export const handleTouchEnd = (app: App, event: TouchEvent) => {
     // 有些事件不经过 touchmove
 
     let scrollElement = hasClosestByAttribute(target, "data-type", "NodeCodeBlock") ||
-        hasClosestByAttribute(target, "data-type", "NodeTable");
+        hasClosestByAttribute(target, "data-type", "NodeAttributeView") ||
+        hasClosestByAttribute(target, "data-type", "NodeTable") ||
+        hasTopClosestByClassName(target, "list");
     if (scrollElement) {
         if (scrollElement.classList.contains("table")) {
             scrollElement = scrollElement.firstElementChild as HTMLElement;
         } else if (scrollElement.classList.contains("code-block")) {
             scrollElement = scrollElement.firstElementChild.nextElementSibling as HTMLElement;
+        } else if (scrollElement.classList.contains("av")) {
+            scrollElement = scrollElement.querySelector(".av__scroll") as HTMLElement;
         }
         if ((xDiff <= 0 && scrollElement.scrollLeft > 0) ||
             (xDiff >= 0 && scrollElement.clientWidth + scrollElement.scrollLeft < scrollElement.scrollWidth)) {
@@ -161,11 +145,14 @@ export const handleTouchEnd = (app: App, event: TouchEvent) => {
 };
 
 export const handleTouchStart = (event: TouchEvent) => {
+    if (globalTouchStart(event)) {
+        return;
+    }
     firstDirection = null;
     xDiff = undefined;
     yDiff = undefined;
     lastClientX = undefined;
-    if (navigator.userAgent.indexOf("iPhone") > -1 ||
+    if (isIPhone() ||
         (event.touches[0].clientX > 8 && event.touches[0].clientX < window.innerWidth - 8)) {
         clientX = event.touches[0].clientX;
         clientY = event.touches[0].clientY;
@@ -177,7 +164,6 @@ export const handleTouchStart = (event: TouchEvent) => {
         event.stopImmediatePropagation();
     }
 };
-
 
 let previousClientX: number;
 export const handleTouchMove = (event: TouchEvent) => {
@@ -223,12 +209,16 @@ export const handleTouchMove = (event: TouchEvent) => {
     previousClientX = event.touches[0].clientX;
     if (Math.abs(xDiff) > Math.abs(yDiff)) {
         let scrollElement = hasClosestByAttribute(target, "data-type", "NodeCodeBlock") ||
-            hasClosestByAttribute(target, "data-type", "NodeTable");
+            hasClosestByAttribute(target, "data-type", "NodeAttributeView") ||
+            hasClosestByAttribute(target, "data-type", "NodeTable") ||
+            hasTopClosestByClassName(target, "list");
         if (scrollElement) {
             if (scrollElement.classList.contains("table")) {
                 scrollElement = scrollElement.firstElementChild as HTMLElement;
             } else if (scrollElement.classList.contains("code-block")) {
                 scrollElement = scrollElement.firstElementChild.nextElementSibling as HTMLElement;
+            } else if (scrollElement.classList.contains("av")) {
+                scrollElement = scrollElement.querySelector(".av__scroll") as HTMLElement;
             }
             if ((xDiff < 0 && scrollElement.scrollLeft > 0) ||
                 (xDiff > 0 && scrollElement.clientWidth + scrollElement.scrollLeft < scrollElement.scrollWidth)) {

@@ -2,6 +2,16 @@ export const isMobile = () => {
     return document.getElementById("sidebar") ? true : false;
 };
 
+// "windows" | "linux" | "darwin" | "docker" | "android" | "ios"
+export const getBackend = () => {
+    if (["docker", "ios", "android"].includes(window.siyuan.config.system.container)) {
+        return window.siyuan.config.system.container;
+    } else {
+        return window.siyuan.config.system.os;
+    }
+};
+
+// "desktop" | "desktop-window" | "mobile" | "browser-desktop" | "browser-mobile"
 export const getFrontend = () => {
     /// #if MOBILE
     if (window.navigator.userAgent.startsWith("SiYuan/")) {
@@ -72,6 +82,7 @@ export const looseJsonParse = (text: string) => {
 
 export const objEquals = (a: any, b: any): boolean => {
     if (a === b) return true;
+    if (typeof a === "number" && isNaN(a) && typeof b === "number" && isNaN(b)) return true;
     if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime();
     if (!a || !b || (typeof a !== "object" && typeof b !== "object")) return a === b;
     if (a.prototype !== b.prototype) return false;

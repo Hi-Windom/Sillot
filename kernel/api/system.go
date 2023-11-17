@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,8 +27,8 @@ import (
 	"github.com/88250/lute"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -67,10 +67,11 @@ func getChangelog(c *gin.Context) {
 
 	model.Conf.ShowChangelog = false
 	luteEngine := lute.New()
-	htmlContent := luteEngine.Markdown("", contentData)
+	htmlContent := luteEngine.MarkdownStr("", string(contentData))
+	htmlContent = util.LinkTarget(htmlContent, "")
 
 	data["show"] = true
-	data["html"] = gulu.Str.FromBytes(htmlContent)
+	data["html"] = htmlContent
 	ret.Data = data
 }
 
@@ -124,6 +125,10 @@ func getEmojiConf(c *gin.Context) {
 					}
 
 					for _, subCustomEmoji := range subCustomEmojis {
+						if subCustomEmoji.IsDir() {
+							continue
+						}
+
 						name = subCustomEmoji.Name()
 						if strings.HasPrefix(name, ".") {
 							continue
@@ -202,20 +207,6 @@ func getConf(c *gin.Context) {
 		"conf":  maskedConf,
 		"start": !util.IsUILoaded,
 	}
-
-	if !util.IsUILoaded {
-		go func() {
-			util.WaitForUILoaded()
-
-			if model.Conf.Editor.ReadOnly {
-				// 编辑器启用只读模式时启动后提示用户 https://github.com/siyuan-note/siyuan/issues/7700
-				time.Sleep(time.Second * 3)
-				if model.Conf.Editor.ReadOnly {
-					util.PushMsg(model.Conf.Language(197), 7000)
-				}
-			}
-		}()
-	}
 }
 
 func setUILayout(c *gin.Context) {
@@ -249,6 +240,20 @@ func setUILayout(c *gin.Context) {
 	model.Conf.Save()
 }
 
+func setAPIToken(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	token := arg["token"].(string)
+	model.Conf.Api.Token = token
+	model.Conf.Save()
+}
+
 func setAccessAuthCode(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -274,6 +279,22 @@ func setAccessAuthCode(c *gin.Context) {
 		time.Sleep(200 * time.Millisecond)
 		util.ReloadUI()
 	}()
+	return
+}
+
+func setFollowSystemLockScreen(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	lockScreenMode := int(arg["lockScreenMode"].(float64))
+
+	model.Conf.System.LockScreenMode = lockScreenMode
+	model.Conf.Save()
 	return
 }
 

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,8 @@
 package cmd
 
 import (
-	"github.com/K-Sillot/logging"
 	"github.com/olahol/melody"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
@@ -54,6 +54,8 @@ func NewCommand(cmdStr string, cmdId float64, param map[string]interface{}, sess
 	switch cmdStr {
 	case "closews":
 		ret = &closews{baseCmd}
+	case "ping":
+		ret = &ping{baseCmd}
 	}
 
 	if nil == ret {

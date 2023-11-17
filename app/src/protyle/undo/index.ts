@@ -3,10 +3,8 @@ import {preventScroll} from "../scroll/preventScroll";
 import {Constants} from "../../constants";
 import {hideElements} from "../ui/hideElements";
 import {scrollCenter} from "../../util/highlightById";
-/// #if !BROWSER
-import {getCurrentWindow} from "@electron/remote";
-/// #endif
 import {matchHotKey} from "../util/hotKey";
+import { ipcRenderer } from "electron";
 
 interface IOperations {
     doOperations: IOperation[],
@@ -68,6 +66,12 @@ export class Undo {
     }
 
     public replace(doOperations: IOperation[]) {
+        // undo 引发 replace 导致 stack 错误 https://github.com/siyuan-note/siyuan/issues/9178
+        if (this.hasUndo && this.redoStack.length > 0) {
+            this.undoStack.push(this.redoStack.pop());
+            this.redoStack = [];
+            this.hasUndo = false;
+        }
         if (this.undoStack.length > 0) {
             this.undoStack[this.undoStack.length - 1].doOperations = doOperations;
         }
@@ -93,13 +97,13 @@ export class Undo {
 export const electronUndo = (event: KeyboardEvent) => {
     /// #if !BROWSER
     if (matchHotKey(window.siyuan.config.keymap.editor.general.undo.custom, event)) {
-        getCurrentWindow().webContents.undo();
+        ipcRenderer.send(Constants.SIYUAN_CMD, "undo");
         event.preventDefault();
         event.stopPropagation();
         return true;
     }
     if (matchHotKey(window.siyuan.config.keymap.editor.general.redo.custom, event)) {
-        getCurrentWindow().webContents.redo();
+        ipcRenderer.send(Constants.SIYUAN_CMD, "redo");
         event.preventDefault();
         event.stopPropagation();
         return true;

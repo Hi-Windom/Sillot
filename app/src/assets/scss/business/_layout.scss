@@ -23,12 +23,11 @@
 
   &--float {
     position: fixed;
-    z-index: 3;
     min-height: auto;
     transition: transform .2s cubic-bezier(0, 0, .2, 1) 0ms, opacity .3s cubic-bezier(0, 0, .2, 1) 0ms;
 
     &.layout__dockl {
-      border-radius: 0 8px 8px 0;
+      border-radius: 0 var(--b3-border-radius-b) var(--b3-border-radius-b) 0;
       border: 1px solid var(--b3-border-color);
       border-left: 0;
       overflow: hidden;
@@ -42,7 +41,7 @@
       border: 1px solid var(--b3-border-color);
       box-shadow: -8px 0px 24px rgb(140 149 159 / 20%);
       border-right: 0;
-      border-radius: 8px 0 0 8px;
+      border-radius: var(--b3-border-radius-b) 0 0 var(--b3-border-radius-b);
       overflow: hidden;
       top: 112px;
       bottom: 82px;
@@ -89,7 +88,7 @@
   }
 
   &__tab--active {
-    .b3-list--background .b3-list-item--focus:not(.dragover):not(.dragover__top):not(.dragover__bottom) {
+    .b3-list--background .b3-list-item--focus {
       background-color: var(--b3-theme-primary-lightest);
     }
 
@@ -267,7 +266,7 @@
           content: "";
           width: 100%;
           height: 3px;
-          border-radius: 6px;
+          border-radius: var(--b3-border-radius);
           bottom: 0;
           position: absolute;
           background-color: var(--b3-theme-background-light);
@@ -282,13 +281,14 @@
           padding: 4px 0 4px 8px;
           line-height: 22px;
           flex-shrink: 0;
+          font-family: var(--b3-font-family-emoji);
 
           & > img,
           & > svg {
             float: left;
             height: 18px;
             width: 18px;
-            border-radius: 2px;
+            border-radius: var(--b3-border-radius);
             margin-top: 1px;
           }
         }
@@ -317,7 +317,7 @@
           align-items: center;
 
           svg {
-            border-radius: 10px;
+            border-radius: var(--b3-border-radius-b);
             height: 8px;
             width: 8px;
             color: var(--b3-theme-on-surface);
@@ -343,6 +343,7 @@
   user-select: none;
   background-color: var(--b3-theme-surface);
   box-sizing: border-box;
+  -webkit-user-select: none;
 
   &:hover .dock__item--pin {
     opacity: 1;
@@ -361,8 +362,8 @@
   }
 
   svg {
-    height: 16px;
-    width: 16px;
+    height: 14px;
+    width: 14px;
   }
 
   &--vertical {
@@ -384,11 +385,11 @@
   }
 
   &__item {
-    padding: 8px;
+    padding: 6px;
     color: var(--b3-theme-on-surface-light);
     display: flex;
-    border-radius: 6px;
-    margin: 5px;
+    border-radius: var(--b3-border-radius);
+    margin: 7px;
 
     &--pin {
       opacity: 0;

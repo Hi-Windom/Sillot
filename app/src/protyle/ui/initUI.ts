@@ -1,5 +1,4 @@
 import {setEditMode} from "../util/setEditMode";
-import {lineNumberRender} from "../markdown/highlightRender";
 import {scrollEvent} from "../scroll/event";
 import {isMobile} from "../../util/functions";
 import {Constants} from "../../constants";
@@ -7,17 +6,11 @@ import {hasClosestByAttribute, hasClosestByClassName} from "../util/hasClosest";
 import {isMac} from "../util/compatibility";
 import {setInlineStyle} from "../../util/assets";
 import {fetchPost} from "../../util/fetch";
-
-
+import {lineNumberRender} from "../render/highlightRender";
 
 export const initUI = (protyle: IProtyle) => {
     protyle.contentElement = document.createElement("div");
     protyle.contentElement.className = "protyle-content";
-    if (window.siyuan.config.editor.fullWidth) {
-        protyle.contentElement.setAttribute("data-fullwidth", "true");
-    } else {
-        protyle.contentElement.removeAttribute("data-fullwidth");
-    }
     if (protyle.options.render.background) {
         protyle.contentElement.appendChild(protyle.background.element);
     }
@@ -54,27 +47,6 @@ export const initUI = (protyle: IProtyle) => {
     setEditMode(protyle, protyle.options.mode);
     document.execCommand("DefaultParagraphSeparator", false, "p");
 
-    // 触摸屏背景和嵌入块按钮显示
-    protyle.contentElement.addEventListener("touchstart", (event) => {
-        // https://github.com/siyuan-note/siyuan/issues/6328
-        if (protyle.disabled) {
-            return;
-        }
-        const target = event.target as HTMLElement;
-        if (hasClosestByClassName(target, "protyle-icons") ||
-            hasClosestByClassName(target, "item") ||
-            target.classList.contains("protyle-background__icon")) {
-            return;
-        }
-        if (hasClosestByClassName(target, "protyle-background")) {
-            protyle.background.element.classList.toggle("protyle-background--mobileshow");
-            return;
-        }
-        const embedBlockElement = hasClosestByAttribute(target, "data-type", "NodeBlockQueryEmbed");
-        if (embedBlockElement) {
-            embedBlockElement.firstElementChild.classList.toggle("protyle-icons--show");
-        }
-    });
     let wheelTimeout: number;
     const isMacOS = isMac();
     protyle.contentElement.addEventListener("mousewheel", (event: WheelEvent) => {
@@ -100,6 +72,11 @@ export const initUI = (protyle: IProtyle) => {
         clearTimeout(wheelTimeout);
         wheelTimeout = window.setTimeout(() => {
             fetchPost("/api/setting/setEditor", window.siyuan.config.editor);
+            if (window.siyuan.config.editor.codeSyntaxHighlightLineNum) {
+                protyle.wysiwyg.element.querySelectorAll(".code-block .protyle-linenumber").forEach((block: HTMLElement) => {
+                    lineNumberRender(block);
+                });
+            }
         }, Constants.TIMEOUT_LOAD);
     }, {passive: false});
 };
@@ -125,31 +102,32 @@ export const removeLoading = (protyle: IProtyle) => {
 
 export const setPadding = (protyle: IProtyle) => {
     if (protyle.options.action.includes(Constants.CB_GET_HISTORY) || window.Sillot.status.disableDocSetPadding) {
-        return;
+        return {
+            width: 0,
+            padding: 0
+        };
     }
-    let min16 = 16;
-    let min24 = 24;
+    const oldLeft = parseInt(protyle.wysiwyg.element.style.paddingLeft);
+    let left = 16;
+    let right = 24;
     if (!isMobile()) {
+        let isFullWidth = protyle.wysiwyg.element.getAttribute(Constants.CUSTOM_SY_FULLWIDTH);
+        if (!isFullWidth) {
+            isFullWidth = window.siyuan.config.editor.fullWidth ? "true" : "false";
+        }
         let padding = (protyle.element.clientWidth - Constants.SIZE_EDITOR_WIDTH) / 2;
-        if (!window.siyuan.config.editor.fullWidth && padding > 96) {
+        if (isFullWidth === "false" && padding > 96) {
             if (padding > Constants.SIZE_EDITOR_WIDTH) {
                 // 超宽屏调整 https://ld246.com/article/1668266637363
                 padding = protyle.element.clientWidth * .382 / 1.382;
             }
-            min16 = padding;
-            min24 = padding;
+            padding = Math.ceil(padding);
+            left = padding;
+            right = padding;
         } else if (protyle.element.clientWidth > Constants.SIZE_EDITOR_WIDTH) {
-            min16 = 96;
-            min24 = 96;
+            left = 96;
+            right = 96;
         }
-    }
-    if (protyle.options.render.background && protyle.options.render.title) {
-        protyle.background.element.lastElementChild.setAttribute("style", `left:${min16}px`);
-        protyle.title.element.style.margin = `16px ${min16}px 0 ${min24}px`;
-    } else if (protyle.options.render.background && !protyle.options.render.title) {
-        protyle.background.element.lastElementChild.setAttribute("style", `left:${min16}px`);
-    } else if (!protyle.options.render.background && protyle.options.render.title) {
-        protyle.title.element.style.margin = `16px ${min16}px 0 ${min24}px`;
     }
     let bottomHeight = "16px";
     if (protyle.options.typewriterMode) {
@@ -160,21 +138,28 @@ export const setPadding = (protyle: IProtyle) => {
         }
     }
     if (protyle.options.backlinkData) {
-        protyle.wysiwyg.element.style.padding = `4px ${min16}px 4px ${min24}px`;
+        protyle.wysiwyg.element.style.padding = `4px ${left}px 4px ${right}px`;
     } else {
-        protyle.wysiwyg.element.style.padding = `16px ${min16}px ${bottomHeight} ${min24}px`;
+        protyle.wysiwyg.element.style.padding = `16px ${left}px ${bottomHeight} ${right}px`;
     }
-    if (window.siyuan.config.editor.codeSyntaxHighlightLineNum) {
-        setTimeout(() => { // https://github.com/siyuan-note/siyuan/issues/5612
-            protyle.wysiwyg.element.querySelectorAll('.code-block [contenteditable="true"]').forEach((block: HTMLElement) => {
-                lineNumberRender(block);
-            });
-        }, 300);
+    if (protyle.options.render.background) {
+        protyle.background.element.lastElementChild.setAttribute("style", `left:${left}px`);
+        protyle.background.element.querySelector(".protyle-background__img .protyle-icons").setAttribute("style", `right:${left}px`);
+    }
+    if (protyle.options.render.title) {
+        protyle.title.element.style.margin = `16px ${left}px 0 ${right}px`;
     }
     if (window.siyuan.config.editor.displayBookmarkIcon) {
         const editorAttrElement = document.getElementById("editorAttr");
         if (editorAttrElement) {
-            editorAttrElement.innerHTML = `.protyle-wysiwyg--attr .b3-tooltips:after { max-width: ${protyle.wysiwyg.element.clientWidth - min16 - min24}px; }`;
+            editorAttrElement.innerHTML = `.protyle-wysiwyg--attr .b3-tooltips:after { max-width: ${protyle.wysiwyg.element.clientWidth - left - right}px; }`;
         }
     }
+    const oldWidth = protyle.wysiwyg.element.getAttribute("data-realwidth");
+    const newWidth = protyle.wysiwyg.element.clientWidth - parseInt(protyle.wysiwyg.element.style.paddingLeft) - parseInt(protyle.wysiwyg.element.style.paddingRight);
+    protyle.wysiwyg.element.setAttribute("data-realwidth", newWidth.toString());
+    return {
+        width: Math.abs(parseInt(oldWidth) - newWidth),
+        padding: Math.abs(oldLeft - parseInt(protyle.wysiwyg.element.style.paddingLeft))
+    };
 };

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,13 @@
 package conf
 
 type Bazaar struct {
-	Trust bool `json:"trust"`
+	Trust         bool `json:"trust"`
+	PetalDisabled bool `json:"petalDisabled"`
 }
 
 func NewBazaar() *Bazaar {
 	return &Bazaar{
-		Trust: false,
+		Trust:         false,
+		PetalDisabled: false,
 	}
 }

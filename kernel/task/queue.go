@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
@@ -82,18 +82,21 @@ func getCurrentActions() (ret []string) {
 }
 
 const (
-	RepoCheckout               = "task.repo.checkout"                 // 从快照中检出
-	DatabaseIndexFull          = "task.database.index.full"           // 重建索引
-	DatabaseIndex              = "task.database.index"                // 数据库索引
-	DatabaseIndexCommit        = "task.database.index.commit"         // 数据库索引提交
-	DatabaseIndexRef           = "task.database.index.ref"            // 数据库索引引用
-	DatabaseIndexFix           = "task.database.index.fix"            // 数据库索引订正
-	OCRImage                   = "task.ocr.image"                     // 图片 OCR 提取文本
-	HistoryGenerateDoc         = "task.history.generateDoc"           // 生成文件历史
-	HistoryDatabaseIndexCommit = "task.history.database.index.commit" // 历史数据库索引提交
-	DatabaseIndexEmbedBlock    = "task.database.index.embedBlock"     // 数据库索引嵌入块
-	ReloadUI                   = "task.reload.ui"                     // 重载 UI
-	UpgradeUserGuide           = "task.upgrade.userGuide"             // 升级用户指南文档笔记本
+	RepoCheckout                    = "task.repo.checkout"                 // 从快照中检出
+	DatabaseIndexFull               = "task.database.index.full"           // 重建索引
+	DatabaseIndex                   = "task.database.index"                // 数据库索引
+	DatabaseIndexCommit             = "task.database.index.commit"         // 数据库索引提交
+	DatabaseIndexRef                = "task.database.index.ref"            // 数据库索引引用
+	DatabaseIndexFix                = "task.database.index.fix"            // 数据库索引订正
+	OCRImage                        = "task.ocr.image"                     // 图片 OCR 提取文本
+	HistoryGenerateDoc              = "task.history.generateDoc"           // 生成文件历史
+	HistoryDatabaseIndexFull        = "task.history.database.index.full"   // 历史数据库重建索引
+	HistoryDatabaseIndexCommit      = "task.history.database.index.commit" // 历史数据库索引提交
+	DatabaseIndexEmbedBlock         = "task.database.index.embedBlock"     // 数据库索引嵌入块
+	ReloadUI                        = "task.reload.ui"                     // 重载 UI
+	UpgradeUserGuide                = "task.upgrade.userGuide"             // 升级用户指南文档笔记本
+	AssetContentDatabaseIndexFull   = "task.asset.database.index.full"     // 资源文件数据库重建索引
+	AssetContentDatabaseIndexCommit = "task.asset.database.index.commit"   // 资源文件数据库索引提交
 )
 
 // uniqueActions 描述了唯一的任务，即队列中只能存在一个在执行的任务。
@@ -103,8 +106,11 @@ var uniqueActions = []string{
 	DatabaseIndexCommit,
 	OCRImage,
 	HistoryGenerateDoc,
+	HistoryDatabaseIndexFull,
 	HistoryDatabaseIndexCommit,
 	DatabaseIndexEmbedBlock,
+	AssetContentDatabaseIndexFull,
+	AssetContentDatabaseIndexCommit,
 }
 
 func Contain(action string, moreActions ...string) bool {

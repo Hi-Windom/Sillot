@@ -10,6 +10,40 @@ import {Files} from "./dock/Files";
 import {Bookmark} from "./dock/Bookmark";
 import {Tag} from "./dock/Tag";
 import {Custom} from "./dock/Custom";
+import {Protyle} from "../protyle";
+import {Wnd} from "./Wnd";
+
+export const getAllEditor = () => {
+    const models = getAllModels();
+    const editors: Protyle[] = [];
+    models.editor.forEach(item => {
+        editors.push(item.editor);
+    });
+    models.search.forEach(item => {
+        editors.push(item.edit);
+    });
+    models.custom.forEach(item => {
+        if (item.data?.editor instanceof Protyle) {
+            editors.push(item.data.editor);
+        }
+    });
+    models.backlink.forEach(item => {
+        item.editors.forEach(editorItem => {
+            editors.push(editorItem);
+        });
+    });
+    window.siyuan.dialogs.forEach(item => {
+        if (item.editor) {
+            editors.push(item.editor);
+        }
+    });
+    window.siyuan.blockPanels.forEach(item => {
+        item.editors.forEach(editorItem => {
+            editors.push(editorItem);
+        });
+    });
+    return editors;
+};
 
 export const getAllModels = () => {
     const models: IModels = {
@@ -61,6 +95,17 @@ export const getAllModels = () => {
         getTabs(window.siyuan.layout.layout);
     }
     return models;
+};
+
+export const getAllWnds = (layout: Layout, wnds: Wnd[]) => {
+    for (let i = 0; i < layout.children.length; i++) {
+        const item = layout.children[i];
+        if (item instanceof Wnd) {
+            wnds.push(item);
+        } else if (item instanceof Layout) {
+            getAllWnds(item, wnds);
+        }
+    }
 };
 
 export const getAllTabs = () => {

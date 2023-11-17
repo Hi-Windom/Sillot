@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -30,8 +30,8 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/html"
-	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
+	"github.com/siyuan-note/logging"
 )
 
 var (
@@ -69,7 +69,9 @@ func GetAssetText(asset string, force bool) string {
 	AssetsTextsLock.Lock()
 	AssetsTexts[asset] = ret
 	AssetsTextsLock.Unlock()
-	AssetsTextsChanged = true
+	if "" != ret {
+		AssetsTextsChanged = true
+	}
 	return ret
 }
 
@@ -129,7 +131,7 @@ func Tesseract(imgAbsPath string) string {
 	return ret
 }
 
-func initTesseract() {
+func InitTesseract() {
 	ver := getTesseractVer()
 	if "" == ver {
 		return
@@ -146,6 +148,17 @@ func initTesseract() {
 	if "" != maxSizeVal {
 		if maxSize, parseErr := strconv.ParseUint(maxSizeVal, 10, 64); nil == parseErr {
 			TesseractMaxSize = maxSize
+		}
+	}
+
+	// Supports via environment var `SIYUAN_TESSERACT_ENABLED=false` to close OCR https://github.com/siyuan-note/siyuan/issues/9619
+	if enabled := os.Getenv("SIYUAN_TESSERACT_ENABLED"); "" != enabled {
+		if enabledBool, parseErr := strconv.ParseBool(enabled); nil == parseErr {
+			TesseractEnabled = enabledBool
+			if !enabledBool {
+				logging.LogInfof("tesseract-ocr disabled by env")
+				return
+			}
 		}
 	}
 

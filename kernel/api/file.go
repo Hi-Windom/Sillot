@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,10 +27,10 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/logging"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -84,7 +84,8 @@ func getFile(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
-		c.JSON(http.StatusOK, ret)
+		ret.Code = -1
+		c.JSON(http.StatusAccepted, ret)
 		return
 	}
 
@@ -93,21 +94,21 @@ func getFile(c *gin.Context) {
 	info, err := os.Stat(filePath)
 	if os.IsNotExist(err) {
 		ret.Code = 404
-		c.JSON(http.StatusOK, ret)
+		c.JSON(http.StatusAccepted, ret)
 		return
 	}
 	if nil != err {
 		logging.LogErrorf("stat [%s] failed: %s", filePath, err)
 		ret.Code = 500
 		ret.Msg = err.Error()
-		c.JSON(http.StatusOK, ret)
+		c.JSON(http.StatusAccepted, ret)
 		return
 	}
 	if info.IsDir() {
 		logging.LogErrorf("file [%s] is a directory", filePath)
 		ret.Code = 405
 		ret.Msg = "file is a directory"
-		c.JSON(http.StatusOK, ret)
+		c.JSON(http.StatusAccepted, ret)
 		return
 	}
 
@@ -116,7 +117,7 @@ func getFile(c *gin.Context) {
 		logging.LogErrorf("read file [%s] failed: %s", filePath, err)
 		ret.Code = 500
 		ret.Msg = err.Error()
-		c.JSON(http.StatusOK, ret)
+		c.JSON(http.StatusAccepted, ret)
 		return
 	}
 
@@ -172,9 +173,19 @@ func readDir(c *gin.Context) {
 
 	files := []map[string]interface{}{}
 	for _, entry := range entries {
+		path := filepath.Join(dirPath, entry.Name())
+		info, err = os.Stat(path)
+		if nil != err {
+			logging.LogErrorf("stat [%s] failed: %s", path, err)
+			ret.Code = 500
+			ret.Msg = err.Error()
+			return
+		}
 		files = append(files, map[string]interface{}{
-			"name":  entry.Name(),
-			"isDir": entry.IsDir(),
+			"name":      entry.Name(),
+			"isDir":     info.IsDir(),
+			"isSymlink": util.IsSymlink(entry),
+			"updated":   info.ModTime().Unix(),
 		})
 	}
 
@@ -193,22 +204,21 @@ func renameFile(c *gin.Context) {
 
 	filePath := arg["path"].(string)
 	filePath = filepath.Join(util.WorkspaceDir, filePath)
-	_, err := os.Stat(filePath)
-	if os.IsNotExist(err) {
+	if !filelock.IsExist(filePath) {
 		ret.Code = 404
-		return
-	}
-	if nil != err {
-		logging.LogErrorf("stat [%s] failed: %s", filePath, err)
-		ret.Code = 500
-		ret.Msg = err.Error()
+		ret.Msg = "the [path] file or directory does not exist"
 		return
 	}
 
 	newPath := arg["newPath"].(string)
 	newPath = filepath.Join(util.WorkspaceDir, newPath)
+	if filelock.IsExist(newPath) {
+		ret.Code = 409
+		ret.Msg = "the [newPath] file or directory already exists"
+		return
+	}
 
-	if err = filelock.Rename(filePath, newPath); nil != err {
+	if err := filelock.Rename(filePath, newPath); nil != err {
 		logging.LogErrorf("rename file [%s] to [%s] failed: %s", filePath, newPath, err)
 		ret.Code = 500
 		ret.Msg = err.Error()

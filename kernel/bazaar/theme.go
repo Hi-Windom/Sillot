@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -25,9 +25,9 @@ import (
 	"sync"
 
 	"github.com/K-Sillot/httpclient"
-	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
 	ants "github.com/panjf2000/ants/v2"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

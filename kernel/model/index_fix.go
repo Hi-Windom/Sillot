@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/task"
@@ -52,11 +52,31 @@ func FixIndexJob() {
 	task.AppendTask(task.DatabaseIndexFix, fixDatabaseIndexByBlockTree)
 	sql.WaitForWritingDatabase()
 
+	task.AppendTask(task.DatabaseIndexFix, removeDuplicateDatabaseRefs)
+
 	util.PushStatusBar(Conf.Language(185))
 	debug.FreeOSMemory()
 }
 
 var autoFixLock = sync.Mutex{}
+
+// removeDuplicateDatabaseRefs 删除重复的数据库引用关系。
+func removeDuplicateDatabaseRefs() {
+	defer logging.Recover()
+
+	autoFixLock.Lock()
+	defer autoFixLock.Unlock()
+
+	util.PushStatusBar(Conf.Language(58))
+	duplicatedRootIDs := sql.GetRefDuplicatedDefRootIDs()
+	for _, rootID := range duplicatedRootIDs {
+		refreshRefsByDefID(rootID)
+	}
+
+	for _, rootID := range duplicatedRootIDs {
+		logging.LogWarnf("exist more than one ref duplicated [%s], reindex it", rootID)
+	}
+}
 
 // removeDuplicateDatabaseIndex 删除重复的数据库索引。
 func removeDuplicateDatabaseIndex() {
@@ -78,6 +98,9 @@ func removeDuplicateDatabaseIndex() {
 	roots := sql.GetBlocks(duplicatedRootIDs)
 	rootMap := map[string]*sql.Block{}
 	for _, root := range roots {
+		if nil == root {
+			continue
+		}
 		rootMap[root.ID] = root
 	}
 

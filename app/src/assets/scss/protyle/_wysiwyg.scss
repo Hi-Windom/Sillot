@@ -1,8 +1,9 @@
 .protyle-wysiwyg {
-  padding: 34px 16px 16px 24px;
+  padding: 16px 16px 16px 24px;
   cursor: text;
-
   box-sizing: border-box;
+  user-select: auto;
+  overflow-x: clip;
 
   .protyle-breadcrumb__bar {
     font-size: 14px;
@@ -28,22 +29,38 @@
       }
     }
 
-    &.av {
-      min-height: 100px;
-      border: 1px solid var(--b3-border-color);
-      border-radius: 4px;
-    }
-
     &.hr {
       cursor: pointer;
 
       & > div {
-        border-bottom: 1px solid var(--b3-theme-background-light)
+        padding-left: 100%;
+        position: relative;
+        height: 26px;
+
+        &:after {
+          position: absolute;
+          content: " ";
+          height: 1px;
+          background-color: var(--b3-theme-background-light);
+          width: calc(100% - 1px);
+          left: 0;
+          top: 13px;
+        }
       }
     }
 
     &.list {
       padding-left: 0;
+
+      .dragover {
+        &__top:not(.av__row) {
+          box-shadow: 0 -3px 0 var(--b3-theme-primary-lighter), inset 0px 1px 0 var(--b3-theme-primary-lighter) !important;
+        }
+
+        &__bottom:not(.av__row) {
+          box-shadow: 0 3px 0 var(--b3-theme-primary-lighter), inset 0px -1px 0 var(--b3-theme-primary-lighter) !important;
+        }
+      }
     }
 
     &.li {
@@ -115,7 +132,7 @@
         }
 
         &--order:after {
-          border-radius: 4px;
+          border-radius: var(--b3-border-radius);
         }
       }
 
@@ -209,7 +226,7 @@
     }
 
     .def--mark {
-      background-color: var(--b3-protyle-inline-mark-background);
+      background-color: var(--b3-theme-secondary);
     }
 
     span[data-type~="block-ref"],
@@ -230,6 +247,9 @@
         background-color: var(--b3-theme-surface);
         border-left: 1px dashed var(--b3-theme-surface-lighter);
         max-width: 100%;
+
+        // https://github.com/siyuan-note/siyuan/issues/8715 & https://ld246.com/article/1689063197687 第一点无法进行以下设置
+        //.protyle-attr--refcount {right: 0;}
 
         & > .protyle-wysiwyg__embed {
           -webkit-user-modify: read-only;
@@ -264,8 +284,13 @@
       thead {
         position: sticky;
         top: -1px;
+        z-index: 2;
         box-shadow: 0px -1px 0px var(--b3-theme-on-surface-light) inset;
       }
+    }
+
+    &.table table {
+      display: inline-block;
     }
 
     .img {
@@ -291,12 +316,12 @@
         width: 4px;
         background: var(--b3-theme-surface);
         display: none;
-        border-radius: 4px;
+        border-radius: var(--b3-border-radius);
         cursor: col-resize;
         transition: var(--b3-transition);
         position: absolute;
-        top: 45%;
-        right: 4px;
+        top: 35%;
+        margin-left: -8px;
         box-shadow: 0 0 1px 1px var(--b3-theme-on-surface);
         box-sizing: border-box;
         z-index: 1;
@@ -328,7 +353,7 @@
         color: var(--b3-theme-primary);
         background-color: var(--b3-theme-surface-lighter);
         padding: 4px;
-        border-radius: 4px;
+        border-radius: var(--b3-border-radius);
 
         svg {
           height: 12px;
@@ -375,7 +400,7 @@
         width: 4px;
         background-color: var(--b3-theme-surface);
         display: none;
-        border-radius: 4px;
+        border-radius: var(--b3-border-radius);
         cursor: nwse-resize;
         transition: var(--b3-transition);
         position: absolute;
@@ -393,7 +418,7 @@
           position: absolute;
           bottom: 0;
           right: 0;
-          border-radius: 4px;
+          border-radius: var(--b3-border-radius);
           box-shadow: 0 0 1px 1px var(--b3-theme-on-surface);
           box-sizing: border-box;
           cursor: nwse-resize;
@@ -425,21 +450,12 @@
   }
 
   .dragover {
-    // 需要 !important，否则拖拽到闪卡无 border
-    &__top {
-      box-shadow: 0 -4px 0 var(--b3-theme-primary-lighter) !important;
+    &__top:not(.av__row) {
+      box-shadow: 0 -4px 0 0px var(--b3-theme-primary-lighter) !important;
     }
 
-    &__bottom {
-      box-shadow: 0 4px 0 var(--b3-theme-primary-lighter) !important;
-    }
-
-    &__left {
-      box-shadow: -4px 0 0 var(--b3-theme-primary-lighter) !important;
-    }
-
-    &__right {
-      box-shadow: 4px 0 0 var(--b3-theme-primary-lighter) !important;
+    &__bottom:not(.av__row) {
+      box-shadow: 0 4px 0 0px var(--b3-theme-primary-lighter) !important
     }
   }
 
@@ -450,6 +466,10 @@
       cursor: pointer;
       @include text-clamp(1);
     }
+  }
+
+  &--animate {
+    animation: scale 0.3s ease-in-out;
   }
 
   [data-type="backslash"] span {
@@ -475,7 +495,7 @@
     position: absolute;
     left: -18px !important;
     top: 50% !important;
-    border-radius: 10px;
+    border-radius: var(--b3-border-radius-b);
     margin-top: -8px;
     border-left: 0 !important;
   }
@@ -514,10 +534,6 @@
       height: 36px;
     }
 
-    &.hr {
-      height: auto;
-    }
-
     &.bq {
       height: 42px;
 
@@ -543,6 +559,24 @@
       }
     }
   }
+
+}
+
+// 只读情况下列表前的圆点需要可以点击进行缩放
+.protyle .protyle-wysiwyg {
+  .li[data-subtype="o"] > .protyle-action,
+  .li[data-subtype="u"] > .protyle-action,
+  &[contenteditable="true"] .li[data-subtype="t"] > .protyle-action {
+    cursor: pointer;
+
+    &:hover {
+      &:after {
+        background-color: var(--b3-theme-background-light);
+      }
+
+      color: var(--b3-theme-on-background);
+    }
+  }
 }
 
 // 导出 html 不需要编辑样式
@@ -553,7 +587,6 @@
   span[data-type~="file-annotation-ref"],
   .protyle-action__language,
   .img > span:nth-child(2),
-  .li > .protyle-action,
   .render-node {
     cursor: pointer;
   }
@@ -565,14 +598,6 @@
   span[data-type~="block-ref"]:hover,
   span[data-type~="file-annotation-ref"]:hover {
     opacity: 1;
-  }
-
-  .li > .protyle-action:hover {
-    &:after {
-      opacity: .68;
-    }
-
-    color: var(--b3-theme-on-background);
   }
 
   .code-block .protyle-action {
@@ -591,7 +616,8 @@
   }
 
   .img:hover .protyle-icons,
-  .render-node:hover > .protyle-icons {
+  .render-node:hover > .protyle-icons,
+  .protyle-icons--show {
     opacity: .86;
   }
 }

@@ -6,7 +6,7 @@
 		"id": "20200924100744-br924ar",
 		"title": "Assets",
 		"type": "doc",
-		"updated": "20230505084035"
+		"updated": "20231110112758"
 	},
 	"Children": [
 		{
@@ -498,13 +498,123 @@
 			},
 			"Children": [
 				{
+					"Type": "NodeText",
+					"Data": "​"
+				},
+				{
 					"Type": "NodeTextMark",
 					"TextMarkType": "tag",
 					"TextMarkTextContent": "Note"
 				},
 				{
 					"Type": "NodeText",
-					"Data": ": Using absolute paths (local or network paths) will not be included Clean up calculations."
+					"Data": "​: Using absolute paths (local or network paths) will not be included Clean up calculations."
+				}
+			]
+		},
+		{
+			"ID": "20230604120616-qjigoyt",
+			"Type": "NodeHeading",
+			"HeadingLevel": 2,
+			"Properties": {
+				"id": "20230604120616-qjigoyt",
+				"updated": "20230604120623"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "List missing assets"
+				}
+			]
+		},
+		{
+			"ID": "20230604120616-95dv931",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20230604120616-95dv931",
+				"updated": "20230604120637"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "You can view the missing resources in "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Settings"
+				},
+				{
+					"Type": "NodeText",
+					"Data": "​ - "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Assets"
+				},
+				{
+					"Type": "NodeText",
+					"Data": "​, and you can find the references in the global search after copying the path."
+				}
+			]
+		},
+		{
+			"ID": "20230604120616-tjs4mx0",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20230604120616-tjs4mx0",
+				"updated": "20230604120806"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "​"
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "tag",
+					"TextMarkTextContent": "Note"
+				},
+				{
+					"Type": "NodeText",
+					"Data": "​: To search asset paths, you need to enable "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Settings"
+				},
+				{
+					"Type": "NodeText",
+					"Data": "​ - "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Search"
+				},
+				{
+					"Type": "NodeText",
+					"Data": "​ - "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Index"
+				},
+				{
+					"Type": "NodeText",
+					"Data": "​ - "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Asset Path"
+				},
+				{
+					"Type": "NodeText",
+					"Data": "​."
 				}
 			]
 		},
@@ -699,7 +809,7 @@
 			"Type": "NodeParagraph",
 			"Properties": {
 				"id": "20230117003636-0buf00n",
-				"updated": "20230117003758"
+				"updated": "20230820185510"
 			},
 			"Children": [
 				{
@@ -708,8 +818,7 @@
 				},
 				{
 					"Type": "NodeTextMark",
-					"TextMarkType": "a",
-					"TextMarkAHref": "https://github.com/tesseract-ocr/tesseract",
+					"TextMarkType": "em",
 					"TextMarkTextContent": "Tesseract OCR"
 				},
 				{
@@ -723,7 +832,7 @@
 			"Type": "NodeParagraph",
 			"Properties": {
 				"id": "20230202231728-0z5bs0m",
-				"updated": "20230202231731"
+				"updated": "20230801231949"
 			},
 			"Children": [
 				{
@@ -733,7 +842,11 @@
 				{
 					"Type": "NodeTextMark",
 					"TextMarkType": "tag",
-					"TextMarkTextContent": "Note:"
+					"TextMarkTextContent": "Note"
+				},
+				{
+					"Type": "NodeText",
+					"Data": "​:"
 				}
 			]
 		},
@@ -743,7 +856,7 @@
 			"ListData": {},
 			"Properties": {
 				"id": "20230202231731-bdh7lab",
-				"updated": "20230211103249"
+				"updated": "20231110112758"
 			},
 			"Children": [
 				{
@@ -755,7 +868,7 @@
 					},
 					"Properties": {
 						"id": "20230202231732-n7z8jth",
-						"updated": "20230211103249"
+						"updated": "20231110112758"
 					},
 					"Children": [
 						{
@@ -763,7 +876,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20230202231732-f3jkj7p",
-								"updated": "20230211103249"
+								"updated": "20231110112758"
 							},
 							"Children": [
 								{
@@ -795,7 +908,16 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​ in the kernel boot log"
+									"Data": "​ in the kernel boot log; If you want to disable OCR, set the environment variable "
+								},
+								{
+									"Type": "NodeTextMark",
+									"TextMarkType": "code",
+									"TextMarkTextContent": "SIYUAN\\_TESSERACT\\_ENABLED=false"
+								},
+								{
+									"Type": "NodeText",
+									"Data": "​"
 								}
 							]
 						}
@@ -823,7 +945,11 @@
 							"Children": [
 								{
 									"Type": "NodeText",
-									"Data": "SiYuan does not enable all installed language packs, because too many language packs will cause OCR to be slow or even timeout and return empty results, and take up too many system resources, so by default only "
+									"Data": "SiYuan"
+								},
+								{
+									"Type": "NodeText",
+									"Data": " does not enable all installed language packs, because too many language packs will cause OCR to be slow or even timeout and return empty results, and take up too many system resources, so by default only "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -832,7 +958,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​, "
+									"Data": "​​, "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -841,7 +967,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​, "
+									"Data": "​​, "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -850,7 +976,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​, "
+									"Data": "​​, "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -859,7 +985,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​, "
+									"Data": "​​, "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -868,7 +994,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​, "
+									"Data": "​​, "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -877,7 +1003,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​ and "
+									"Data": "​​ and "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -886,7 +1012,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​ will be enabled at most, if you need more accurate language support, you can specify the language pack by configuring the environment variable "
+									"Data": "​​ will be enabled at most, if you need more accurate language support, you can specify the language pack by configuring the environment variable "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -895,7 +1021,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​, such as "
+									"Data": "​​, such as "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -904,7 +1030,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​"
+									"Data": "​​"
 								}
 							]
 						}
@@ -968,7 +1094,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​, the unit of value is bytes, for example: "
+									"Data": "​​, the unit of value is bytes, for example: "
 								},
 								{
 									"Type": "NodeTextMark",
@@ -977,7 +1103,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​ adjust the upper limit to 4MB"
+									"Data": "​​ adjust the upper limit to 4MB"
 								}
 							]
 						}

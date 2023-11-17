@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -32,13 +32,13 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/logging"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/mssola/user_agent"
+	"github.com/mssola/useragent"
 	"github.com/olahol/melody"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/api"
 	"github.com/siyuan-note/siyuan/kernel/cmd"
 	"github.com/siyuan-note/siyuan/kernel/model"
@@ -75,7 +75,14 @@ func Serve(fastMode bool) {
 	servePlugins(ginServer)
 	serveEmojis(ginServer)
 	serveTemplates(ginServer)
+	servePublic(ginServer)
+	serveRepoDiff(ginServer)
 	api.ServeAPI(ginServer)
+
+	// TODO 升级后结束旧内核进程
+	//if !fastMode && "prod" == util.Mode && util.ContainerStd == util.Container {
+	//	killRunningKernel()
+	//}
 
 	var host string
 	if model.Conf.System.NetworkServe || util.ContainerDocker == util.Container {
@@ -187,6 +194,11 @@ func serveTemplates(ginServer *gin.Engine) {
 	ginServer.Static("/templates/", filepath.Join(util.DataDir, "templates"))
 }
 
+func servePublic(ginServer *gin.Engine) {
+	// Support directly access `data/public/*` contents via URL link https://github.com/siyuan-note/siyuan/issues/8593
+	ginServer.Static("/public/", filepath.Join(util.DataDir, "public"))
+}
+
 func serveAppearance(ginServer *gin.Engine) {
 	ginServer.StaticFile("favicon.ico", filepath.Join(util.WorkingDir, "stage", "icon.png"))
 	ginServer.StaticFile("manifest.json", filepath.Join(util.WorkingDir, "stage", "manifest.webmanifest"))
@@ -205,12 +217,22 @@ func serveAppearance(ginServer *gin.Engine) {
 
 		if strings.Contains(userAgentHeader, "Electron") {
 			location.Path = "/stage/build/app/"
-		} else if user_agent.New(userAgentHeader).Mobile() {
-			location.Path = "/stage/build/mobile/"
+		} else if strings.Contains(userAgentHeader, "Pad") ||
+			(strings.ContainsAny(userAgentHeader, "Android") && !strings.Contains(userAgentHeader, "Mobile")) {
+			// Improve detecting Pad device, treat it as desktop device https://github.com/siyuan-note/siyuan/issues/8435 https://github.com/siyuan-note/siyuan/issues/8497
+			location.Path = "/stage/build/desktop/"
 		} else if util.ContainerDocker == util.Container {
 			location.Path = "/stage/build/docker/"
 		} else {
-			location.Path = "/stage/build/desktop/"
+			if idx := strings.Index(userAgentHeader, "Mozilla/"); 0 < idx {
+				userAgentHeader = userAgentHeader[idx:]
+			}
+			ua := useragent.New(userAgentHeader)
+			if ua.Mobile() {
+				location.Path = "/stage/build/mobile/"
+			} else {
+				location.Path = "/stage/build/desktop/"
+			}
 		}
 
 		c.Redirect(302, location.String())
@@ -297,19 +319,41 @@ func serveCheckAuth(c *gin.Context) {
 		return
 	}
 
+	keymapHideWindow := "⌥M"
+	if nil != (*model.Conf.Keymap)["general"] {
+		switch (*model.Conf.Keymap)["general"].(type) {
+		case map[string]interface{}:
+			keymapGeneral := (*model.Conf.Keymap)["general"].(map[string]interface{})
+			if nil != keymapGeneral["toggleWin"] {
+				switch keymapGeneral["toggleWin"].(type) {
+				case map[string]interface{}:
+					toggleWin := keymapGeneral["toggleWin"].(map[string]interface{})
+					if nil != toggleWin["custom"] {
+						keymapHideWindow = toggleWin["custom"].(string)
+					}
+				}
+			}
+		}
+		if "" == keymapHideWindow {
+			keymapHideWindow = "⌥M"
+		}
+	}
 	model := map[string]interface{}{
-		"l0":               model.Conf.Language(173),
-		"l1":               model.Conf.Language(174),
-		"l2":               template.HTML(model.Conf.Language(172)),
-		"l3":               model.Conf.Language(175),
-		"l4":               model.Conf.Language(176),
-		"l5":               model.Conf.Language(177),
-		"l6":               model.Conf.Language(178),
-		"l7":               template.HTML(model.Conf.Language(184)),
-		"appearanceMode":   model.Conf.Appearance.Mode,
-		"appearanceModeOS": model.Conf.Appearance.ModeOS,
-		"workspace":        filepath.Base(util.WorkspaceDir),
-		"workspacePath":    util.WorkspaceDir,
+		"l0":                     model.Conf.Language(173),
+		"l1":                     model.Conf.Language(174),
+		"l2":                     template.HTML(model.Conf.Language(172)),
+		"l3":                     model.Conf.Language(175),
+		"l4":                     model.Conf.Language(176),
+		"l5":                     model.Conf.Language(177),
+		"l6":                     model.Conf.Language(178),
+		"l7":                     template.HTML(model.Conf.Language(184)),
+		"appearanceMode":         model.Conf.Appearance.Mode,
+		"appearanceModeOS":       model.Conf.Appearance.ModeOS,
+		"workspace":              filepath.Base(util.WorkspaceDir),
+		"workspacePath":          util.WorkspaceDir,
+		"keymapGeneralToggleWin": keymapHideWindow,
+		"trayMenuLangs":          util.TrayMenuLangs[util.Lang],
+		"workspaceDir":           util.WorkspaceDir,
 	}
 	buf := &bytes.Buffer{}
 	if err = tpl.Execute(buf, model); nil != err {
@@ -337,6 +381,15 @@ func serveAssets(ginServer *gin.Engine) {
 	})
 	ginServer.GET("/history/*path", model.CheckAuth, func(context *gin.Context) {
 		p := filepath.Join(util.HistoryDir, context.Param("path"))
+		http.ServeFile(context.Writer, context.Request, p)
+		return
+	})
+}
+
+func serveRepoDiff(ginServer *gin.Engine) {
+	ginServer.GET("/repo/diff/*path", model.CheckAuth, func(context *gin.Context) {
+		requestPath := context.Param("path")
+		p := filepath.Join(util.TempDir, "repo", "diff", requestPath)
 		http.ServeFile(context.Writer, context.Request, p)
 		return
 	})
@@ -403,7 +456,7 @@ func serveWebSocket(ginServer *gin.Engine) {
 
 		if !authOk {
 			s.CloseWithMsg([]byte("  unauthenticated"))
-			//logging.LogWarnf("closed an unauthenticated session [%s]", util.GetRemoteAddr(s))
+			logging.LogWarnf("closed an unauthenticated session [%s]", util.GetRemoteAddr(s))
 			return
 		}
 
@@ -420,7 +473,7 @@ func serveWebSocket(ginServer *gin.Engine) {
 
 	util.WebSocketServer.HandleError(func(s *melody.Session, err error) {
 		//sessionId, _ := s.Get("id")
-		//logging.LogDebugf("ws [%s] failed: %s", sessionId, err)
+		//logging.LogWarnf("ws [%s] failed: %s", sessionId, err)
 	})
 
 	util.WebSocketServer.HandleClose(func(s *melody.Session, i int, str string) error {
@@ -501,6 +554,7 @@ func corsMiddleware() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Private-Network", "true")
 
 		if c.Request.Method == "OPTIONS" {
+			c.Header("Access-Control-Max-Age", "600")
 			c.AbortWithStatus(204)
 			return
 		}

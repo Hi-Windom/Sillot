@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -36,17 +36,18 @@ import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/eventbus"
-	"github.com/K-Sillot/logging"
 	"github.com/mattn/go-sqlite3"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/siyuan-note/eventbus"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
 var (
-	db        *sql.DB
-	historyDB *sql.DB
+	db             *sql.DB
+	historyDB      *sql.DB
+	assetContentDB *sql.DB
 )
 
 func init() {
@@ -99,7 +100,7 @@ func InitDatabase(forceRebuild bool) (err error) {
 		}
 	}
 	if gulu.File.IsExist(util.BlockTreePath) {
-		os.RemoveAll(util.BlockTreePath)
+		treenode.InitBlockTree(true)
 	}
 
 	initDBConnection()
@@ -193,7 +194,36 @@ func initDBTables() {
 	}
 }
 
+func initDBConnection() {
+	if nil != db {
+		closeDatabase()
+	}
+	dsn := util.DBPath + "?_journal_mode=WAL" +
+		"&_synchronous=OFF" +
+		"&_mmap_size=2684354560" +
+		"&_secure_delete=OFF" +
+		"&_cache_size=-20480" +
+		"&_page_size=32768" +
+		"&_busy_timeout=7000" +
+		"&_ignore_check_constraints=ON" +
+		"&_temp_store=MEMORY" +
+		"&_case_sensitive_like=OFF"
+	var err error
+	db, err = sql.Open("sqlite3_extended", dsn)
+	if nil != err {
+		logging.LogFatalf(logging.ExitCodeReadOnlyDatabase, "create database failed: %s", err)
+	}
+	db.SetMaxIdleConns(20)
+	db.SetMaxOpenConns(20)
+	db.SetConnMaxLifetime(365 * 24 * time.Hour)
+}
+
+var initHistoryDatabaseLock = sync.Mutex{}
+
 func InitHistoryDatabase(forceRebuild bool) {
+	initHistoryDatabaseLock.Lock()
+	defer initHistoryDatabaseLock.Unlock()
+
 	initHistoryDBConnection()
 
 	if !forceRebuild && gulu.File.IsExist(util.HistoryDBPath) {
@@ -228,7 +258,7 @@ func initHistoryDBConnection() {
 	var err error
 	historyDB, err = sql.Open("sqlite3_extended", dsn)
 	if nil != err {
-		logging.LogFatalf(logging.ExitCodeReadOnlyDatabase, "create database failed: %s", err)
+		logging.LogFatalf(logging.ExitCodeReadOnlyDatabase, "create history database failed: %s", err)
 	}
 	historyDB.SetMaxIdleConns(3)
 	historyDB.SetMaxOpenConns(3)
@@ -237,17 +267,40 @@ func initHistoryDBConnection() {
 
 func initHistoryDBTables() {
 	historyDB.Exec("DROP TABLE histories_fts_case_insensitive")
-	_, err := historyDB.Exec("CREATE VIRTUAL TABLE histories_fts_case_insensitive USING fts5(type UNINDEXED, op UNINDEXED, title, content, path UNINDEXED, created UNINDEXED, tokenize=\"siyuan case_insensitive\")")
+	_, err := historyDB.Exec("CREATE VIRTUAL TABLE histories_fts_case_insensitive USING fts5(id UNINDEXED, type UNINDEXED, op UNINDEXED, title, content, path UNINDEXED, created UNINDEXED, tokenize=\"siyuan case_insensitive\")")
 	if nil != err {
 		logging.LogFatalf(logging.ExitCodeReadOnlyDatabase, "create table [histories_fts_case_insensitive] failed: %s", err)
 	}
 }
 
-func initDBConnection() {
-	if nil != db {
-		closeDatabase()
+var initAssetContentDatabaseLock = sync.Mutex{}
+
+func InitAssetContentDatabase(forceRebuild bool) {
+	initAssetContentDatabaseLock.Lock()
+	defer initAssetContentDatabaseLock.Unlock()
+
+	initAssetContentDBConnection()
+
+	if !forceRebuild && gulu.File.IsExist(util.AssetContentDBPath) {
+		return
 	}
-	dsn := util.DBPath + "?_journal_mode=WAL" +
+
+	assetContentDB.Close()
+	if err := os.RemoveAll(util.AssetContentDBPath); nil != err {
+		logging.LogErrorf("remove assets database file [%s] failed: %s", util.AssetContentDBPath, err)
+		return
+	}
+
+	initAssetContentDBConnection()
+	initAssetContentDBTables()
+}
+
+func initAssetContentDBConnection() {
+	if nil != assetContentDB {
+		assetContentDB.Close()
+	}
+
+	dsn := util.AssetContentDBPath + "?_journal_mode=WAL" +
 		"&_synchronous=OFF" +
 		"&_mmap_size=2684354560" +
 		"&_secure_delete=OFF" +
@@ -258,13 +311,21 @@ func initDBConnection() {
 		"&_temp_store=MEMORY" +
 		"&_case_sensitive_like=OFF"
 	var err error
-	db, err = sql.Open("sqlite3_extended", dsn)
+	assetContentDB, err = sql.Open("sqlite3_extended", dsn)
 	if nil != err {
-		logging.LogFatalf(logging.ExitCodeReadOnlyDatabase, "create database failed: %s", err)
+		logging.LogFatalf(logging.ExitCodeReadOnlyDatabase, "create assets database failed: %s", err)
 	}
-	db.SetMaxIdleConns(20)
-	db.SetMaxOpenConns(20)
-	db.SetConnMaxLifetime(365 * 24 * time.Hour)
+	assetContentDB.SetMaxIdleConns(3)
+	assetContentDB.SetMaxOpenConns(3)
+	assetContentDB.SetConnMaxLifetime(365 * 24 * time.Hour)
+}
+
+func initAssetContentDBTables() {
+	assetContentDB.Exec("DROP TABLE asset_contents_fts_case_insensitive")
+	_, err := assetContentDB.Exec("CREATE VIRTUAL TABLE asset_contents_fts_case_insensitive USING fts5(id UNINDEXED, name, ext, path, size UNINDEXED, updated UNINDEXED, content, tokenize=\"siyuan case_insensitive\")")
+	if nil != err {
+		logging.LogFatalf(logging.ExitCodeReadOnlyDatabase, "create table [asset_contents_fts_case_insensitive] failed: %s", err)
+	}
 }
 
 var (
@@ -293,7 +354,9 @@ func refsFromTree(tree *parse.Tree) (refs []*Ref, fileAnnotationRefs []*FileAnno
 
 		if treenode.IsBlockRef(n) {
 			ref := buildRef(tree, n)
-			refs = append(refs, ref)
+			if !isRepeatedRef(refs, ref) {
+				refs = append(refs, ref)
+			}
 		} else if treenode.IsFileAnnotationRef(n) {
 			pathID := n.TextMarkFileAnnotationRefID
 			idx := strings.LastIndex(pathID, "/")
@@ -324,15 +387,32 @@ func refsFromTree(tree *parse.Tree) (refs []*Ref, fileAnnotationRefs []*FileAnno
 			fileAnnotationRefs = append(fileAnnotationRefs, ref)
 		} else if treenode.IsEmbedBlockRef(n) {
 			ref := buildEmbedRef(tree, n)
-			refs = append(refs, ref)
+			if !isRepeatedRef(refs, ref) {
+				refs = append(refs, ref)
+			}
 		}
 		return ast.WalkContinue
 	})
 	return
 }
 
+func isRepeatedRef(refs []*Ref, ref *Ref) bool {
+	// Repeated references to the same block within a block only count as one reference https://github.com/siyuan-note/siyuan/issues/9670
+	for _, r := range refs {
+		if r.DefBlockID == ref.DefBlockID && r.BlockID == ref.BlockID {
+			return true
+		}
+	}
+	return false
+}
+
 func buildRef(tree *parse.Tree, refNode *ast.Node) *Ref {
+	// 多个类型可能会导致渲染的 Markdown 不正确，所以这里只保留 block-ref 类型
+	tmpTyp := refNode.TextMarkType
+	refNode.TextMarkType = "block-ref"
 	markdown := treenode.ExportNodeStdMd(refNode, luteEngine)
+	refNode.TextMarkType = tmpTyp
+
 	defBlockID, text, _ := treenode.GetBlockRef(refNode)
 	var defBlockParentID, defBlockRootID, defBlockPath string
 	defBlock := treenode.GetBlockTree(defBlockID)
@@ -628,6 +708,16 @@ func buildSpanFromNode(n *ast.Node, tree *parse.Tree, rootID, boxID, p string) (
 			attributes = append(attributes, attrs...)
 		}
 
+		if ast.NodeInlineHTML == n.Type {
+			// 没有行级 HTML，只有块级 HTML，这里转换为块
+			b, attrs := buildBlockFromNode(n, tree)
+			b.Type = ast.NodeHTMLBlock.String()
+			blocks = append(blocks, b)
+			attributes = append(attributes, attrs...)
+			walkStatus = ast.WalkContinue
+			return
+		}
+
 		if 1 > len(nodes) {
 			walkStatus = ast.WalkContinue
 			return
@@ -710,7 +800,7 @@ func buildBlockFromNode(n *ast.Node, tree *parse.Tree) (block *Block, attributes
 		markdown = treenode.ExportNodeStdMd(n, luteEngine)
 		content = treenode.NodeStaticContent(n, nil, true, indexAssetPath)
 		fc := treenode.FirstLeafBlock(n)
-		fcontent = treenode.NodeStaticContent(fc, nil, false, false)
+		fcontent = treenode.NodeStaticContent(fc, nil, true, false)
 		parentID = n.Parent.ID
 		// 将标题块作为父节点
 		if h := heading(n); nil != h {
@@ -810,12 +900,6 @@ func heading(node *ast.Node) *ast.Node {
 	currentLevel := 16
 	if ast.NodeHeading == node.Type {
 		currentLevel = node.HeadingLevel
-	} else if ast.NodeSuperBlock == node.Type {
-		superBlockHeading := treenode.SuperBlockHeading(node)
-		if nil != superBlockHeading {
-			node = superBlockHeading
-			currentLevel = node.HeadingLevel
-		}
 	}
 
 	for prev := node.Previous; nil != prev; prev = prev.Previous {
@@ -1161,6 +1245,18 @@ func beginTx() (tx *sql.Tx, err error) {
 	return
 }
 
+func commitTx(tx *sql.Tx) (err error) {
+	if nil == tx {
+		logging.LogErrorf("tx is nil")
+		return errors.New("tx is nil")
+	}
+
+	if err = tx.Commit(); nil != err {
+		logging.LogErrorf("commit tx failed: %s\n  %s", err, logging.ShortStack())
+	}
+	return
+}
+
 func beginHistoryTx() (tx *sql.Tx, err error) {
 	if tx, err = historyDB.Begin(); nil != err {
 		logging.LogErrorf("begin history tx failed: %s\n  %s", err, logging.ShortStack())
@@ -1183,7 +1279,17 @@ func commitHistoryTx(tx *sql.Tx) (err error) {
 	return
 }
 
-func commitTx(tx *sql.Tx) (err error) {
+func beginAssetContentTx() (tx *sql.Tx, err error) {
+	if tx, err = assetContentDB.Begin(); nil != err {
+		logging.LogErrorf("begin asset content tx failed: %s\n  %s", err, logging.ShortStack())
+		if strings.Contains(err.Error(), "database is locked") {
+			os.Exit(logging.ExitCodeReadOnlyDatabase)
+		}
+	}
+	return
+}
+
+func commitAssetContentTx(tx *sql.Tx) (err error) {
 	if nil == tx {
 		logging.LogErrorf("tx is nil")
 		return errors.New("tx is nil")
@@ -1245,6 +1351,8 @@ func nSort(n *ast.Node) int {
 	case ast.NodeBlockquote:
 		return 20
 	case ast.NodeSuperBlock:
+		return 30
+	case ast.NodeAttributeView:
 		return 30
 	case ast.NodeText, ast.NodeTextMark:
 		if n.IsTextMarkType("tag") {

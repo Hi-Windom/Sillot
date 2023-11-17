@@ -2,81 +2,49 @@ import {confirmDialog} from "../dialog/confirmDialog";
 import {Plugin} from "./index";
 import {showMessage} from "../dialog/message";
 import {Dialog} from "../dialog";
-import {Menu as SiyuanMenu} from "../menus/Menu";
 import {fetchGet, fetchPost, fetchSyncPost} from "../util/fetch";
-import {isMobile} from "../util/functions";
+import {getBackend, getFrontend} from "../util/functions";
 /// #if !MOBILE
 import {openFile, openFileById} from "../editor/util";
+import {openNewWindow, openNewWindowById} from "../window/openNewWindow";
+import {Tab} from "../layout/Tab";
 /// #endif
 import {updateHotkeyTip} from "../protyle/util/compatibility";
-import {newCardModel} from "../card/newCardTab";
 import {App} from "../index";
 import {Constants} from "../constants";
-
-export class Menu {
-    private menu: SiyuanMenu;
-    private isOpen: boolean;
-
-    constructor(id?: string, closeCB?: () => void) {
-        this.menu = window.siyuan.menus.menu;
-        this.isOpen = false;
-        if (id) {
-            const dataName = this.menu.element.getAttribute("data-name");
-            if (dataName && dataName === id) {
-                this.isOpen = true;
-            }
-        }
-        this.menu.remove();
-        if (!this.isOpen) {
-            this.menu.element.setAttribute("data-name", id);
-            this.menu.removeCB = closeCB;
-        }
-    }
-
-    showSubMenu(subMenuElement: HTMLElement) {
-        this.menu.showSubMenu(subMenuElement);
-    }
-
-    addItem(option: IMenu) {
-        if (this.isOpen) {
-            return;
-        }
-        return this.menu.addItem(option);
-    }
-
-    addSeparator(index?: number) {
-        if (this.isOpen) {
-            return;
-        }
-        this.menu.addSeparator(index);
-    }
-
-    open(options: { x: number, y: number, h?: number, w?: number, isLeft: false }) {
-        if (this.isOpen) {
-            return;
-        }
-        this.menu.popup(options, options.isLeft);
-    }
-
-    fullscreen(position: "bottom" | "all" = "all") {
-        if (this.isOpen) {
-            return;
-        }
-        this.menu.fullscreen(position);
-        this.menu.element.style.zIndex = "310";
-    }
-
-    close() {
-        this.menu.remove();
-    }
-}
+import {Setting} from "./Setting";
+import {Menu} from "./Menu";
+import {Protyle} from "../protyle";
 
 let openTab;
+let openWindow;
 /// #if MOBILE
 openTab = () => {
     // TODO: Mobile
 };
+openWindow = () => {
+    // TODO: Mobile
+};
 /// #else
+openWindow = (options: {
+    position?: IPosition,
+    height?: number,
+    width?: number,
+    tab?: Tab,
+    doc?: {
+        id: string,     // 块 id
+    },
+}) => {
+    if (options.doc && options.doc.id) {
+        openNewWindowById(options.doc.id, {position: options.position, width: options.width, height: options.height});
+        return;
+    }
+    if (options.tab) {
+        openNewWindow(options.tab, {position: options.position, width: options.width, height: options.height});
+        return;
+    }
+};
+
 openTab = (options: {
     app: App,
     doc?: {
@@ -102,7 +70,7 @@ openTab = (options: {
         title: string,
         icon: string,
         data?: any
-        fn?: () => any,
+        id: string
     }
     position?: "right" | "bottom",
     keepCursor?: boolean // 是否跳转到新 tab 上
@@ -117,7 +85,10 @@ openTab = (options: {
                 options.doc.action = [Constants.CB_GET_ALL];
             }
         }
-        openFileById({
+        if (!options.doc.action) {
+            options.doc.action = [];
+        }
+        return openFileById({
             app: options.app,
             keepCursor: options.keepCursor,
             removeCurrentTab: options.removeCurrentTab,
@@ -127,10 +98,9 @@ openTab = (options: {
             action: options.doc.action,
             zoomIn: options.doc.zoomIn
         });
-        return;
     }
     if (options.asset) {
-        openFile({
+        return openFile({
             app: options.app,
             keepCursor: options.keepCursor,
             removeCurrentTab: options.removeCurrentTab,
@@ -138,10 +108,9 @@ openTab = (options: {
             afterOpen: options.afterOpen,
             assetPath: options.asset.path,
         });
-        return;
     }
     if (options.pdf) {
-        openFile({
+        return openFile({
             app: options.app,
             keepCursor: options.keepCursor,
             removeCurrentTab: options.removeCurrentTab,
@@ -150,7 +119,6 @@ openTab = (options: {
             assetPath: options.pdf.path,
             page: options.pdf.id || options.pdf.page,
         });
-        return;
     }
     if (options.search) {
         if (!options.search.idPath) {
@@ -159,7 +127,7 @@ openTab = (options: {
         if (!options.search.hPath) {
             options.search.hPath = "";
         }
-        openFile({
+        return openFile({
             app: options.app,
             keepCursor: options.keepCursor,
             removeCurrentTab: options.removeCurrentTab,
@@ -167,10 +135,9 @@ openTab = (options: {
             afterOpen: options.afterOpen,
             searchData: options.search,
         });
-        return;
     }
     if (options.card) {
-        openFile({
+        return openFile({
             app: options.app,
             keepCursor: options.keepCursor,
             removeCurrentTab: options.removeCurrentTab,
@@ -184,14 +151,12 @@ openTab = (options: {
                     id: options.card.id || "",
                     title: options.card.title,
                 },
-                fn: newCardModel
+                id: "siyuan-card"
             },
         });
-        return;
     }
     if (options.custom) {
-        openFile(options);
-        return;
+        return openFile(options);
     }
 
 };
@@ -204,9 +169,14 @@ export const API = {
     fetchPost,
     fetchSyncPost,
     fetchGet,
-    isMobile,
+    getFrontend,
+    getBackend,
     openTab,
+    openWindow,
+    Protyle,
     Plugin,
     Dialog,
     Menu,
+    Setting,
+    Constants,
 };

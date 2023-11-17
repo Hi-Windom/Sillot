@@ -18,8 +18,12 @@ export class Menus {
         this.menu = new Menu();
         /// #if !MOBILE
         window.addEventListener("contextmenu", (event) => {
+            if (event.shiftKey) {
+                return;
+            }
             let target = event.target as HTMLElement;
-            while (target && !target.parentElement.isEqualNode(document.querySelector("body"))) {
+            while (target && target.parentElement   // ⌃⇥ 后点击会为空
+            && !target.parentElement.isEqualNode(document.querySelector("body"))) {
                 event.preventDefault();
                 const dataType = target.getAttribute("data-type");
                 if (dataType === "tab-header") {
@@ -55,7 +59,10 @@ export class Menus {
                 }
 
                 if (dataType === "search-item") {
-                    initSearchMenu(target.getAttribute("data-node-id")).popup({x: event.clientX, y: event.clientY});
+                    const nodeId = target.getAttribute("data-node-id");
+                    if (nodeId) {
+                        initSearchMenu(nodeId).popup({x: event.clientX, y: event.clientY});
+                    }
                     event.stopPropagation();
                     break;
                 }

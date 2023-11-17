@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,8 +27,8 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
-	"github.com/K-Sillot/logging"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -78,7 +78,7 @@ func RemoveBox(boxID string) (err error) {
 	}
 
 	localPath := filepath.Join(util.DataDir, boxID)
-	if !gulu.File.IsExist(localPath) {
+	if !filelock.IsExist(localPath) {
 		return
 	}
 	if !gulu.File.IsDir(localPath) {
@@ -196,7 +196,7 @@ func Mount(boxID string) (alreadyMount bool, err error) {
 
 	box.Index()
 	// 缓存根一级的文档树展开
-	ListDocTree(box.ID, "/", util.SortModeUnassigned, false, Conf.FileTree.MaxListCount)
+	ListDocTree(box.ID, "/", util.SortModeUnassigned, false, false, Conf.FileTree.MaxListCount)
 	treenode.SaveBlockTree(false)
 	util.ClearPushProgress(100)
 

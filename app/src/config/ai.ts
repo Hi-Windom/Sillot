@@ -20,14 +20,17 @@ export const ai = {
         <select id="apiModel" class="b3-select">
             <option value="gpt-4" ${window.siyuan.config.ai.openAI.apiModel === "gpt-4" ? "selected" : ""}>gpt-4</option>
             <option value="gpt-4-32k" ${window.siyuan.config.ai.openAI.apiModel === "gpt-4-32k" ? "selected" : ""}>gpt-4-32k</option>
+            <option value="gpt-4-1106-preview" ${window.siyuan.config.ai.openAI.apiModel === "gpt-4-1106-preview" ? "selected" : ""}>gpt-4-1106-preview</option>
             <option value="gpt-3.5-turbo" ${window.siyuan.config.ai.openAI.apiModel === "gpt-3.5-turbo" ? "selected" : ""}>gpt-3.5-turbo</option>
+            <option value="gpt-3.5-turbo-16k" ${window.siyuan.config.ai.openAI.apiModel === "gpt-3.5-turbo-16k" ? "selected" : ""}>gpt-3.5-turbo-16k</option>
+            <option value="gpt-3.5-turbo-1106" ${window.siyuan.config.ai.openAI.apiModel === "gpt-3.5-turbo-1106" ? "selected" : ""}>gpt-3.5-turbo-1106</option>
         </select>
     </div>
 </div>
 <div class="b3-label">
     ${window.siyuan.languages.apiMaxTokens}
     <div class="fn__hr"></div>
-    <input class="b3-text-field fn__flex-center fn__block" type="number" step="1" min="0" id="apiMaxTokens" max="4096" value="${window.siyuan.config.ai.openAI.apiMaxTokens}"/>
+    <input class="b3-text-field fn__flex-center fn__block" type="number" step="1" min="0" id="apiMaxTokens" value="${window.siyuan.config.ai.openAI.apiMaxTokens}"/>
     <div class="b3-label__text">${window.siyuan.languages.apiMaxTokensTip}</div>
 </div>
 <div class="b3-label">
@@ -66,7 +69,10 @@ export const ai = {
     <select id="apiModel" class="b3-select fn__flex-center fn__size200">
         <option value="gpt-4" ${window.siyuan.config.ai.openAI.apiModel === "gpt-4" ? "selected" : ""}>gpt-4</option>
         <option value="gpt-4-32k" ${window.siyuan.config.ai.openAI.apiModel === "gpt-4-32k" ? "selected" : ""}>gpt-4-32k</option>
+        <option value="gpt-4-1106-preview" ${window.siyuan.config.ai.openAI.apiModel === "gpt-4-1106-preview" ? "selected" : ""}>gpt-4-1106-preview</option>
         <option value="gpt-3.5-turbo" ${window.siyuan.config.ai.openAI.apiModel === "gpt-3.5-turbo" ? "selected" : ""}>gpt-3.5-turbo</option>
+        <option value="gpt-3.5-turbo-16k" ${window.siyuan.config.ai.openAI.apiModel === "gpt-3.5-turbo-16k" ? "selected" : ""}>gpt-3.5-turbo-16k</option>
+        <option value="gpt-3.5-turbo-1106" ${window.siyuan.config.ai.openAI.apiModel === "gpt-3.5-turbo-1106" ? "selected" : ""}>gpt-3.5-turbo-1106</option>
     </select>
 </label>
 <label class="fn__flex b3-label">
@@ -75,7 +81,7 @@ export const ai = {
         <div class="b3-label__text">${window.siyuan.languages.apiMaxTokensTip}</div>
     </div>
     <span class="fn__space"></span>
-    <input class="b3-text-field fn__flex-center fn__size200" type="number" step="1" min="0" id="apiMaxTokens" max="4096" value="${window.siyuan.config.ai.openAI.apiMaxTokens}"/>
+    <input class="b3-text-field fn__flex-center fn__size200" type="number" step="1" min="0" id="apiMaxTokens" value="${window.siyuan.config.ai.openAI.apiMaxTokens}"/>
 </label>
 <label class="fn__flex b3-label">
     <div class="fn__flex-1">

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,8 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/eventbus"
 	"github.com/olahol/melody"
+	"github.com/siyuan-note/eventbus"
 )
 
 var (

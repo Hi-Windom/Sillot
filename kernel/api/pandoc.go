@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -33,17 +33,27 @@ func pandoc(c *gin.Context) {
 		return
 	}
 
+	dir := gulu.Rand.String(7)
+	dirArg := arg["dir"]
+	if nil != dirArg {
+		dir = dirArg.(string)
+	}
+
 	pandocArgs := arg["args"].([]interface{})
 	var args []string
 	for _, v := range pandocArgs {
 		args = append(args, v.(string))
 	}
 
-	err := util.ConvertPandoc(args...)
+	path, err := util.ConvertPandoc(dir, args...)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
 		return
+	}
+
+	ret.Data = map[string]interface{}{
+		"path": path,
 	}
 	return
 }

@@ -3,6 +3,10 @@ import {Constants} from "../constants";
 
 export const moveResize = (element: HTMLElement, afterCB?: (type: string) => void) => {
     element.addEventListener("mousedown", (event: MouseEvent & { target: HTMLElement }) => {
+        // https://github.com/siyuan-note/siyuan/issues/8746
+        if (hasClosestByClassName(event.target, "protyle-util") && !element.classList.contains("protyle-util")) {
+            return;
+        }
         let iconsElement = hasClosestByClassName(event.target, "resize__move");
         let x: number;
         let y: number;
@@ -59,6 +63,7 @@ export const moveResize = (element: HTMLElement, afterCB?: (type: string) => voi
                 if (type === "r" &&
                     moveEvent.clientX - x + width > 200 && moveEvent.clientX - x + width < window.innerWidth) {
                     element.style.width = moveEvent.clientX - x + width + "px";
+                    element.style.maxWidth = "none";
                 } else if (type === "d" &&
                     moveEvent.clientY - y + height > 160 && moveEvent.clientY - y + height < window.innerHeight - Constants.SIZE_TOOLBAR_HEIGHT) {
                     element.style.height = moveEvent.clientY - y + height + "px";
@@ -72,11 +77,13 @@ export const moveResize = (element: HTMLElement, afterCB?: (type: string) => voi
                     moveEvent.clientX > 0 && x - moveEvent.clientX + width > 200) {
                     element.style.left = moveEvent.clientX + "px";
                     element.style.width = (x - moveEvent.clientX + width) + "px";
+                    element.style.maxWidth = "none";
                 } else if (type === "rd" &&
                     moveEvent.clientX - x + width > 200 && moveEvent.clientX - x + width < window.innerWidth &&
                     moveEvent.clientY - y + height > 160 && moveEvent.clientY - y + height < window.innerHeight - Constants.SIZE_TOOLBAR_HEIGHT) {
                     element.style.height = moveEvent.clientY - y + height + "px";
                     element.style.maxHeight = "";
+                    element.style.maxWidth = "none";
                     element.style.width = moveEvent.clientX - x + width + "px";
                 } else if (type === "rt" &&
                     moveEvent.clientX - x + width > 200 && moveEvent.clientX - x + width < window.innerWidth &&
@@ -84,6 +91,7 @@ export const moveResize = (element: HTMLElement, afterCB?: (type: string) => voi
                     element.style.width = moveEvent.clientX - x + width + "px";
                     element.style.top = moveEvent.clientY + "px";
                     element.style.maxHeight = "";
+                    element.style.maxWidth = "none";
                     element.style.height = (y - moveEvent.clientY + height) + "px";
                 } else if (type === "lt" &&
                     moveEvent.clientX > 0 && x - moveEvent.clientX + width > 200 &&
@@ -92,6 +100,7 @@ export const moveResize = (element: HTMLElement, afterCB?: (type: string) => voi
                     element.style.width = (x - moveEvent.clientX + width) + "px";
                     element.style.top = moveEvent.clientY + "px";
                     element.style.maxHeight = "";
+                    element.style.maxWidth = "none";
                     element.style.height = (y - moveEvent.clientY + height) + "px";
                 } else if (type === "ld" &&
                     moveEvent.clientX > 0 && x - moveEvent.clientX + width > 200 &&
@@ -100,6 +109,7 @@ export const moveResize = (element: HTMLElement, afterCB?: (type: string) => voi
                     element.style.width = (x - moveEvent.clientX + width) + "px";
                     element.style.height = moveEvent.clientY - y + height + "px";
                     element.style.maxHeight = "";
+                    element.style.maxWidth = "none";
                 }
             }
         };

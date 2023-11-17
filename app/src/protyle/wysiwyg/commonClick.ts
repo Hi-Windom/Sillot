@@ -4,23 +4,23 @@ import {openAttr, openFileAttr} from "../../menus/commonMenuItem";
 import {openGlobalSearch} from "../../search/util";
 /// #endif
 import {isMobile} from "../../util/functions";
-import {App} from "../../index";
+import {isOnlyMeta} from "../util/compatibility";
 
-export const commonClick = (app: App, event: MouseEvent & {
+export const commonClick = (event: MouseEvent & {
     target: HTMLElement
-}, protyle: IProtyle, data?:IObject) => {
+}, protyle: IProtyle, data?: IObject) => {
     const isM = isMobile();
     const attrBookmarkElement = hasClosestByClassName(event.target, "protyle-attr--bookmark");
     if (attrBookmarkElement) {
-        if (!isM && (event.ctrlKey || event.metaKey)) {
+        if (!isM && isOnlyMeta(event)) {
             /// #if !MOBILE
-            openGlobalSearch(app, attrBookmarkElement.textContent.trim(), true);
+            openGlobalSearch(protyle.app, attrBookmarkElement.textContent.trim(), true);
             /// #endif
         } else {
             if (data) {
-                openFileAttr(data, protyle.block.rootID, "bookmark");
+                openFileAttr(data, "bookmark", protyle);
             } else {
-                openAttr(attrBookmarkElement.parentElement.parentElement, protyle, "bookmark");
+                openAttr(attrBookmarkElement.parentElement.parentElement, "bookmark", protyle);
             }
         }
         event.stopPropagation();
@@ -29,16 +29,27 @@ export const commonClick = (app: App, event: MouseEvent & {
 
     const attrNameElement = hasClosestByClassName(event.target, "protyle-attr--name");
     if (attrNameElement) {
-        if (!isM && (event.ctrlKey || event.metaKey)) {
+        if (!isM && isOnlyMeta(event)) {
             /// #if !MOBILE
-            openGlobalSearch(app, attrNameElement.textContent.trim(), true);
+            openGlobalSearch(protyle.app, attrNameElement.textContent.trim(), true);
             /// #endif
         } else {
-            if (data ) {
-                openFileAttr(data, protyle.block.rootID, "name");
+            if (data) {
+                openFileAttr(data, "name", protyle);
             } else {
-                openAttr(attrNameElement.parentElement.parentElement, protyle, "name");
+                openAttr(attrNameElement.parentElement.parentElement, "name", protyle);
             }
+        }
+        event.stopPropagation();
+        return true;
+    }
+
+    const avElement = hasClosestByClassName(event.target, "protyle-attr--av");
+    if (avElement) {
+        if (data) {
+            openFileAttr(data, "av", protyle);
+        } else {
+            openAttr(avElement.parentElement.parentElement, "av", protyle);
         }
         event.stopPropagation();
         return true;
@@ -46,15 +57,15 @@ export const commonClick = (app: App, event: MouseEvent & {
 
     const attrAliasElement = hasClosestByClassName(event.target, "protyle-attr--alias");
     if (attrAliasElement) {
-        if (!isM && (event.ctrlKey || event.metaKey)) {
+        if (!isM && isOnlyMeta(event)) {
             /// #if !MOBILE
-            openGlobalSearch(app, attrAliasElement.textContent.trim(), true);
+            openGlobalSearch(protyle.app, attrAliasElement.textContent.trim(), true);
             /// #endif
         } else {
             if (data) {
-                openFileAttr(data, protyle.block.rootID, "alias");
+                openFileAttr(data, "alias", protyle);
             } else {
-                openAttr(attrAliasElement.parentElement.parentElement, protyle, "alias");
+                openAttr(attrAliasElement.parentElement.parentElement, "alias", protyle);
             }
         }
         event.stopPropagation();
@@ -63,15 +74,15 @@ export const commonClick = (app: App, event: MouseEvent & {
 
     const attrMemoElement = hasClosestByClassName(event.target, "protyle-attr--memo");
     if (attrMemoElement) {
-        if (!isM && (event.ctrlKey || event.metaKey)) {
+        if (!isM && isOnlyMeta(event)) {
             /// #if !MOBILE
-            openGlobalSearch(app, attrMemoElement.getAttribute("aria-label").trim(), true);
+            openGlobalSearch(protyle.app, attrMemoElement.getAttribute("aria-label").trim(), true);
             /// #endif
         } else {
             if (data) {
-                openFileAttr(data, protyle.block.rootID, "memo");
+                openFileAttr(data, "memo", protyle);
             } else {
-                openAttr(attrMemoElement.parentElement.parentElement, protyle, "memo");
+                openAttr(attrMemoElement.parentElement.parentElement, "memo", protyle);
             }
         }
         event.stopPropagation();

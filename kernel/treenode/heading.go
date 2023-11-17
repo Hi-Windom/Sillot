@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -58,6 +58,10 @@ func MoveFoldHeading(updateNode, oldNode *ast.Node) {
 }
 
 func IsInFoldedHeading(node, currentHeading *ast.Node) bool {
+	if nil == node {
+		return false
+	}
+
 	heading := HeadingParent(node)
 	if nil == heading {
 		return false
@@ -96,34 +100,10 @@ func HeadingChildren(heading *ast.Node) (ret []*ast.Node) {
 			if currentLevel >= n.HeadingLevel {
 				break
 			}
-		} else if ast.NodeSuperBlock == n.Type {
-			if h := SuperBlockHeading(n); nil != h {
-				if currentLevel >= h.HeadingLevel {
-					break
-				}
-			}
-		} else if ast.NodeSuperBlockCloseMarker == n.Type {
-			continue
 		}
 		ret = append(ret, n)
 	}
 	return
-}
-
-func SuperBlockHeading(sb *ast.Node) *ast.Node {
-	c := sb.FirstChild.Next.Next
-	if nil == c {
-		return nil
-	}
-
-	if ast.NodeHeading == c.Type {
-		return c
-	}
-
-	if ast.NodeSuperBlock == c.Type {
-		return SuperBlockHeading(c)
-	}
-	return nil
 }
 
 func SuperBlockLastHeading(sb *ast.Node) *ast.Node {

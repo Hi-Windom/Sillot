@@ -1,7 +1,8 @@
 import {Tab} from "../Tab";
 import {Model} from "../Model";
 import {Tree} from "../../util/Tree";
-import {getDockByType, setPanelFocus} from "../util";
+import {setPanelFocus} from "../util";
+import {getDockByType} from "../tabUtil";
 import {fetchPost} from "../../util/fetch";
 import {updateHotkeyTip} from "../../protyle/util/compatibility";
 import {openFileById} from "../../editor/util";
@@ -89,7 +90,7 @@ export class Bookmark extends Model {
                         openFileById({
                             app,
                             id,
-                            action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
+                            action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL],
                             zoomIn: foldResponse.data
                         });
                     });
@@ -103,7 +104,7 @@ export class Bookmark extends Model {
                     app,
                     id: element.getAttribute("data-node-id"),
                     keepCursor: true,
-                    action: [Constants.CB_GET_CONTEXT]
+                    action: [Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]
                 });
             },
             altClick(element: HTMLElement) {
@@ -111,7 +112,7 @@ export class Bookmark extends Model {
                     app,
                     id: element.getAttribute("data-node-id"),
                     position: "right",
-                    action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
+                    action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]
                 });
             },
             shiftClick(element: HTMLElement) {
@@ -119,7 +120,7 @@ export class Bookmark extends Model {
                     app,
                     id: element.getAttribute("data-node-id"),
                     position: "bottom",
-                    action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
+                    action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]
                 });
             },
             blockExtHTML: '<span class="b3-list-item__action"><svg><use xlink:href="#iconMore"></use></svg></span>',

@@ -3,8 +3,7 @@ import {genUUID} from "../util/genID";
 import {
     getInstanceById,
     getWndByLayout, JSONToCenter,
-    newCenterEmptyTab, newModelByInitData, pdfIsLoading,
-    resizeTabs,
+    newModelByInitData, pdfIsLoading,
     setPanelFocus,
     switchWnd
 } from "./util";
@@ -16,7 +15,6 @@ import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName} from "../
 import {Constants} from "../constants";
 /// #if !BROWSER
 import {webFrame, ipcRenderer} from "electron";
-import {getCurrentWindow} from "@electron/remote";
 import {setModelsHash, setTabPosition} from "../window/setHeader";
 /// #endif
 import {Search} from "../search";
@@ -35,6 +33,10 @@ import {hideAllElements} from "../protyle/ui/hideElements";
 import {focusByOffset, getSelectionOffset} from "../protyle/util/selection";
 import {Custom} from "./dock/Custom";
 import {App} from "../index";
+import {unicode2Emoji} from "../emoji";
+import {closeWindow} from "../window/closeWin";
+import {setTitle} from "../dialog/processSystem";
+import {newCenterEmptyTab, resizeTabs} from "./tabUtil";
 
 export class Wnd {
     private app: App;
@@ -60,9 +62,9 @@ export class Wnd {
         <ul class="fn__flex layout-tab-bar"></ul>
         <ul class="layout-tab-bar layout-tab-bar--readonly fn__flex-1">
             <li class="item item--readonly">
-                <span data-type="new" class="block__icon block__icon--show" title="${window.siyuan.languages.newFile}"><svg><use xlink:href="#iconAdd"></use></svg></span>
+                <span data-type="new" class="block__icon block__icon--show ariaLabel" aria-label="${window.siyuan.languages.newFile}"><svg><use xlink:href="#iconAdd"></use></svg></span>
                 <span class="fn__flex-1"></span>
-                <span data-type="more" data-menu="true" class="block__icon block__icon--show" title="${window.siyuan.languages.more}"><svg><use xlink:href="#iconDown"></use></svg></span>
+                <span data-type="more" data-menu="true" class="block__icon block__icon--show ariaLabel" aria-label="${window.siyuan.languages.switchTab}"><svg><use xlink:href="#iconDown"></use></svg></span>
             </li>
         </ul>
     </div>
@@ -100,7 +102,10 @@ export class Wnd {
             while (target && !target.isEqualNode(this.headersElement)) {
                 if (target.classList.contains("block__icon") && target.getAttribute("data-type") === "new") {
                     setPanelFocus(this.headersElement.parentElement.parentElement);
-                    newFile(app, undefined, undefined, undefined, true);
+                    newFile({
+                        app,
+                        useSavePath: true
+                    });
                     break;
                 } else if (target.classList.contains("block__icon") && target.getAttribute("data-type") === "more") {
                     this.renderTabList(target);
@@ -117,17 +122,6 @@ export class Wnd {
             while (target && !target.isEqualNode(this.headersElement)) {
                 if (window.siyuan.config.fileTree.openFilesUseCurrentTab && target.getAttribute("data-type") === "tab-header") {
                     target.classList.remove("item--unupdate");
-                    break;
-                } else if (target.tagName === "SPAN" && target.className === "fn__flex-1" &&
-                    isWindow() && this.headersElement.getBoundingClientRect().top <= 0) {
-                    /// #if !BROWSER
-                    const currentWindow = getCurrentWindow();
-                    if (currentWindow.isMaximized()) {
-                        currentWindow.unmaximize();
-                    } else {
-                        currentWindow.maximize();
-                    }
-                    /// #endif
                     break;
                 }
                 target = target.parentElement;
@@ -232,7 +226,7 @@ export class Wnd {
                     ipcRenderer.send(Constants.SIYUAN_SEND_WINDOWS, {cmd: "closetab", data: tabData.id});
                     it.querySelector("li[data-clone='true']").remove();
                     wnd.switchTab(oldTab.headElement);
-                    getCurrentWindow().focus();
+                    ipcRenderer.send(Constants.SIYUAN_CMD, "focus");
                 }
             }
             /// #endif
@@ -339,7 +333,7 @@ export class Wnd {
                 JSONToCenter(app, tabData, this);
                 oldTab = this.children[this.children.length - 1];
                 ipcRenderer.send(Constants.SIYUAN_SEND_WINDOWS, {cmd: "closetab", data: tabData.id});
-                getCurrentWindow().focus();
+                ipcRenderer.send(Constants.SIYUAN_CMD, "focus");
             }
             /// #endif
             if (!oldTab) {
@@ -408,8 +402,7 @@ export class Wnd {
         }
     }
 
-    public switchTab(target: HTMLElement, pushBack = false, update = true) {
-        setPanelFocus(this.headersElement.parentElement.parentElement);
+    public switchTab(target: HTMLElement, pushBack = false, update = true, resize = true) {
         let currentTab: Tab;
         this.children.forEach((item) => {
             if (target === item.headElement) {
@@ -431,6 +424,7 @@ export class Wnd {
                 }
             }
         });
+        setPanelFocus(this.headersElement.parentElement.parentElement);
         if (currentTab?.headElement) {
             const initData = currentTab.headElement.getAttribute("data-initdata");
             if (initData) {
@@ -472,7 +466,7 @@ export class Wnd {
                     openFileById({
                         app: this.app,
                         id: keepCursorId,
-                        action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
+                        action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]
                     });
                 }
                 currentTab.headElement.removeAttribute("keep-cursor");
@@ -484,7 +478,7 @@ export class Wnd {
                     focus: true,
                     pushBackStack: pushBack,
                     reload: false,
-                    resize: true,
+                    resize,
                 });
             }
         } else {
@@ -493,7 +487,7 @@ export class Wnd {
                 focus: false,
                 pushBackStack: false,
                 reload: false,
-                resize: true,
+                resize,
             });
         }
     }
@@ -579,10 +573,23 @@ export class Wnd {
         Array.from(this.headersElement.children).forEach((item: HTMLElement) => {
             const iconElement = item.querySelector(".item__icon");
             const graphicElement = item.querySelector(".item__graphic");
+            let iconHTML = undefined;
+            if (iconElement) {
+                if (iconElement.firstElementChild?.tagName === "IMG") {
+                    // 图标为图片的文档
+                    iconHTML = `<img src="${iconElement.firstElementChild.getAttribute("src")}"  class="b3-menu__icon">`;
+                } else {
+                    // 有图标的文档
+                    iconHTML = `<span class="b3-menu__icon">${iconElement.innerHTML}</span>`;
+                }
+            } else if (!graphicElement) {
+                // 没有图标的文档
+                iconHTML = unicode2Emoji(Constants.SIYUAN_IMAGE_FILE, "b3-menu__icon", true);
+            }
             window.siyuan.menus.menu.append(new MenuItem({
                 label: escapeHtml(item.querySelector(".item__text").textContent),
                 action: "iconCloseRound",
-                iconHTML: iconElement ? `<span class="b3-menu__icon">${iconElement.innerHTML}</span>` : "",
+                iconHTML,
                 icon: graphicElement ? graphicElement.firstElementChild.getAttribute("xlink:href").substring(1) : "",
                 bind: (element) => {
                     element.addEventListener("click", (itemEvent) => {
@@ -610,7 +617,8 @@ export class Wnd {
         window.siyuan.menus.menu.popup({
             x: rect.left + rect.width,
             y: rect.top + rect.height,
-        }, true);
+            isLeft: true
+        });
     }
 
     private removeOverCounter(oldFocusIndex?: number) {
@@ -678,6 +686,11 @@ export class Wnd {
         clearCounter();
         this.children.find((item, index) => {
             if (item.id === id) {
+                if (item.model instanceof Custom) {
+                    if (item.model.beforeDestroy) {
+                        item.model.beforeDestroy();
+                    }
+                }
                 if (item.model instanceof Editor && hasSaveScroll) {
                     saveScroll(item.model.editor.protyle);
                 }
@@ -731,7 +744,8 @@ export class Wnd {
                             }
                         });
                         if (latestHeadElement && !closeAll) {
-                            this.switchTab(latestHeadElement, true);
+                            this.switchTab(latestHeadElement, true, true, false);
+                            this.showHeading();
                         }
                     }
                     if (animate) {
@@ -756,18 +770,19 @@ export class Wnd {
             if (!wnd) {
                 /// #if !BROWSER
                 if (isWindow()) {
-                    getCurrentWindow().destroy();
+                    closeWindow(this.app);
                     return;
                 }
                 /// #endif
                 const wnd = new Wnd(this.app);
                 window.siyuan.layout.centerLayout.addWnd(wnd);
                 wnd.addTab(newCenterEmptyTab(this.app));
+                setTitle(window.siyuan.languages.siyuanNote);
             }
         }
         /// #if !BROWSER
         webFrame.clearCache();
-        getCurrentWindow().webContents.session.clearCache();
+        ipcRenderer.send(Constants.SIYUAN_CMD, "clearCache");
         setTabPosition();
         /// #endif
     };
@@ -859,6 +874,9 @@ export class Wnd {
         }
         tab.parent = this;
         hideAllElements(["toolbar"]);
+        /// #if !BROWSER
+        setTabPosition();
+        /// #endif
     }
 
     public split(direction: TDirection) {

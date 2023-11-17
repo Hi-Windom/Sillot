@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -33,8 +33,9 @@ import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
-	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/eventbus"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/search"
@@ -141,6 +142,7 @@ func ClearWorkspaceHistory() (err error) {
 
 func GetDocHistoryContent(historyPath, keyword string) (id, rootID, content string, isLargeDoc bool, err error) {
 	if !gulu.File.IsExist(historyPath) {
+		logging.LogWarnf("doc history [%s] not exist", historyPath)
 		return
 	}
 
@@ -213,6 +215,7 @@ func GetDocHistoryContent(historyPath, keyword string) (id, rootID, content stri
 
 func RollbackDocHistory(boxID, historyPath string) (err error) {
 	if !gulu.File.IsExist(historyPath) {
+		logging.LogWarnf("doc history [%s] not exist", historyPath)
 		return
 	}
 
@@ -267,6 +270,7 @@ func getRollbackDockPath(boxID, historyPath string) (destPath string, err error)
 func RollbackAssetsHistory(historyPath string) (err error) {
 	historyPath = filepath.Join(util.WorkspaceDir, historyPath)
 	if !gulu.File.IsExist(historyPath) {
+		logging.LogWarnf("assets history [%s] not exist", historyPath)
 		return
 	}
 
@@ -284,6 +288,7 @@ func RollbackAssetsHistory(historyPath string) (err error) {
 
 func RollbackNotebookHistory(historyPath string) (err error) {
 	if !gulu.File.IsExist(historyPath) {
+		logging.LogWarnf("notebook history [%s] not exist", historyPath)
 		return
 	}
 
@@ -311,37 +316,21 @@ type HistoryItem struct {
 	Path  string `json:"path"`
 }
 
+const fileHistoryPageSize = 32
+
 func FullTextSearchHistory(query, box, op string, typ, page int) (ret []string, pageCount, totalCount int) {
 	query = gulu.Str.RemoveInvisible(query)
-	if "" != query {
+	if "" != query && HistoryTypeDocID != typ {
 		query = stringQuery(query)
 	}
 
-	pageSize := 32
-	offset := (page - 1) * pageSize
+	offset := (page - 1) * fileHistoryPageSize
 
 	table := "histories_fts_case_insensitive"
 	stmt := "SELECT DISTINCT created FROM " + table + " WHERE "
-	if "" != query {
-		stmt += table + " MATCH '{title content}:(" + query + ")'"
-	} else {
-		stmt += "1=1"
-	}
-
-	if HistoryTypeDocName == typ {
-		stmt = strings.ReplaceAll(stmt, "{title content}", "{title}")
-	}
-
-	if HistoryTypeDocName == typ || HistoryTypeDoc == typ {
-		if "all" != op {
-			stmt += " AND op = '" + op + "'"
-		}
-		stmt += " AND path LIKE '%/" + box + "/%' AND path LIKE '%.sy'"
-	} else if HistoryTypeAsset == typ {
-		stmt += " AND path LIKE '%/assets/%'"
-	}
+	stmt += buildSearchHistoryQueryFilter(query, op, box, table, typ)
 	countStmt := strings.ReplaceAll(stmt, "SELECT DISTINCT created", "SELECT COUNT(DISTINCT created) AS total")
-	stmt += " ORDER BY created DESC LIMIT " + strconv.Itoa(pageSize) + " OFFSET " + strconv.Itoa(offset)
+	stmt += " ORDER BY created DESC LIMIT " + strconv.Itoa(fileHistoryPageSize) + " OFFSET " + strconv.Itoa(offset)
 	result, err := sql.QueryHistory(stmt)
 	if nil != err {
 		return
@@ -360,39 +349,51 @@ func FullTextSearchHistory(query, box, op string, typ, page int) (ret []string, 
 		return
 	}
 	totalCount = int(result[0]["total"].(int64))
-	pageCount = int(math.Ceil(float64(totalCount) / float64(pageSize)))
+	pageCount = int(math.Ceil(float64(totalCount) / float64(fileHistoryPageSize)))
 	return
 }
 
 func FullTextSearchHistoryItems(created, query, box, op string, typ int) (ret []*HistoryItem) {
 	query = gulu.Str.RemoveInvisible(query)
-	if "" != query {
+	if "" != query && HistoryTypeDocID != typ {
 		query = stringQuery(query)
 	}
 
 	table := "histories_fts_case_insensitive"
 	stmt := "SELECT * FROM " + table + " WHERE "
+	stmt += buildSearchHistoryQueryFilter(query, op, box, table, typ)
+	stmt += " AND created = '" + created + "' ORDER BY created DESC LIMIT " + fmt.Sprintf("%d", fileHistoryPageSize)
+	sqlHistories := sql.SelectHistoriesRawStmt(stmt)
+	ret = fromSQLHistories(sqlHistories)
+	return
+}
+
+func buildSearchHistoryQueryFilter(query, op, box, table string, typ int) (stmt string) {
 	if "" != query {
-		stmt += table + " MATCH '{title content}:(" + query + ")'"
+		switch typ {
+		case HistoryTypeDocName:
+			stmt += table + " MATCH '{title}:(" + query + ")'"
+		case HistoryTypeDoc:
+			stmt += table + " MATCH '{title content}:(" + query + ")'"
+		case HistoryTypeDocID:
+			stmt += " id = '" + query + "'"
+		case HistoryTypeAsset:
+			stmt += table + " MATCH '{title content}:(" + query + ")'"
+		}
 	} else {
 		stmt += "1=1"
 	}
 
-	if HistoryTypeDocName == typ {
-		stmt = strings.ReplaceAll(stmt, "{title content}", "{title}")
-	}
-
-	if HistoryTypeDocName == typ || HistoryTypeDoc == typ {
+	if HistoryTypeDocName == typ || HistoryTypeDoc == typ || HistoryTypeDocID == typ {
 		if "all" != op {
 			stmt += " AND op = '" + op + "'"
 		}
-		stmt += " AND path LIKE '%/" + box + "/%' AND path LIKE '%.sy'"
+		if HistoryTypeDocName == typ || HistoryTypeDoc == typ {
+			stmt += " AND path LIKE '%/" + box + "/%' AND path LIKE '%.sy'"
+		}
 	} else if HistoryTypeAsset == typ {
 		stmt += " AND path LIKE '%/assets/%'"
 	}
-	stmt += " AND created = '" + created + "' ORDER BY created DESC LIMIT " + fmt.Sprintf("%d", Conf.Search.Limit)
-	sqlHistories := sql.SelectHistoriesRawStmt(stmt)
-	ret = fromSQLHistories(sqlHistories)
 	return
 }
 
@@ -485,6 +486,7 @@ func (box *Box) generateDocHistory0() {
 
 func clearOutdatedHistoryDir(historyDir string) {
 	if !gulu.File.IsExist(historyDir) {
+		logging.LogWarnf("history dir [%s] not exist", historyDir)
 		return
 	}
 
@@ -508,7 +510,7 @@ func clearOutdatedHistoryDir(historyDir string) {
 	}
 	for _, dir := range removes {
 		if err = os.RemoveAll(dir); nil != err {
-			logging.LogErrorf("remove history dir [%s] failed: %s", dir, err)
+			logging.LogWarnf("remove history dir [%s] failed: %s", dir, err)
 			continue
 		}
 		//logging.LogInfof("auto removed history dir [%s]", dir)
@@ -568,7 +570,12 @@ func getHistoryDir(suffix string, t time.Time) (ret string, err error) {
 	return
 }
 
-func ReindexHistory() (err error) {
+func ReindexHistory() {
+	task.AppendTask(task.HistoryDatabaseIndexFull, fullReindexHistory)
+	return
+}
+
+func fullReindexHistory() {
 	historyDirs, err := os.ReadDir(util.HistoryDir)
 	if nil != err {
 		logging.LogErrorf("read history dir [%s] failed: %s", util.HistoryDir, err)
@@ -592,9 +599,10 @@ func ReindexHistory() (err error) {
 var validOps = []string{HistoryOpClean, HistoryOpUpdate, HistoryOpDelete, HistoryOpFormat, HistoryOpSync, HistoryOpReplace}
 
 const (
-	HistoryTypeDocName = 0
-	HistoryTypeDoc     = 1
-	HistoryTypeAsset   = 2
+	HistoryTypeDocName = 0 // Search docs by doc name
+	HistoryTypeDoc     = 1 // Search docs by doc name and content
+	HistoryTypeAsset   = 2 // Search assets
+	HistoryTypeDocID   = 3 // Search docs by doc id
 )
 
 func indexHistoryDir(name string, luteEngine *lute.Lute) {
@@ -640,6 +648,7 @@ func indexHistoryDir(name string, luteEngine *lute.Lute) {
 		p := strings.TrimPrefix(doc, util.HistoryDir)
 		p = filepath.ToSlash(p[1:])
 		histories = append(histories, &sql.History{
+			ID:      tree.Root.ID,
 			Type:    HistoryTypeDoc,
 			Op:      op,
 			Title:   title,
@@ -652,7 +661,12 @@ func indexHistoryDir(name string, luteEngine *lute.Lute) {
 	for _, asset := range assets {
 		p := strings.TrimPrefix(asset, util.HistoryDir)
 		p = filepath.ToSlash(p[1:])
+		_, id := util.LastID(p)
+		if !ast.IsNodeIDPattern(id) {
+			id = ""
+		}
 		histories = append(histories, &sql.History{
+			ID:      id,
 			Type:    HistoryTypeAsset,
 			Op:      op,
 			Title:   filepath.Base(asset),
@@ -682,4 +696,14 @@ func fromSQLHistories(sqlHistories []*sql.History) (ret []*HistoryItem) {
 		ret = append(ret, item)
 	}
 	return
+}
+
+func init() {
+	subscribeSQLHistoryEvents()
+}
+
+func subscribeSQLHistoryEvents() {
+	eventbus.Subscribe(util.EvtSQLHistoryRebuild, func() {
+		ReindexHistory()
+	})
 }

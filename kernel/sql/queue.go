@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -26,9 +26,8 @@ import (
 	"time"
 
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/eventbus"
-	"github.com/K-Sillot/logging"
-	"github.com/siyuan-note/siyuan/kernel/av"
+	"github.com/siyuan-note/eventbus"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -42,17 +41,16 @@ var (
 
 type dbQueueOperation struct {
 	inQueueTime                   time.Time
-	action                        string            // upsert/delete/delete_id/rename/rename_sub_tree/delete_box/delete_box_refs/insert_refs/index/delete_ids/update_block_content/delete_assets/av_rebuild
-	indexPath                     string            // index
-	upsertTree                    *parse.Tree       // upsert/insert_refs/update_refs/delete_refs
-	removeTreeBox, removeTreePath string            // delete
-	removeTreeIDBox, removeTreeID string            // delete_id
-	removeTreeIDs                 []string          // delete_ids
-	box                           string            // delete_box/delete_box_refs/index
-	renameTree                    *parse.Tree       // rename/rename_sub_tree
-	block                         *Block            // update_block_content
-	removeAssetHashes             []string          // delete_assets
-	av                            *av.AttributeView // av_rebuild
+	action                        string      // upsert/delete/delete_id/rename/rename_sub_tree/delete_box/delete_box_refs/insert_refs/index/delete_ids/update_block_content/delete_assets
+	indexPath                     string      // index
+	upsertTree                    *parse.Tree // upsert/insert_refs/update_refs/delete_refs
+	removeTreeBox, removeTreePath string      // delete
+	removeTreeIDBox, removeTreeID string      // delete_id
+	removeTreeIDs                 []string    // delete_ids
+	box                           string      // delete_box/delete_box_refs/index
+	renameTree                    *parse.Tree // rename/rename_sub_tree
+	block                         *Block      // update_block_content
+	removeAssetHashes             []string    // delete_assets
 }
 
 func FlushTxJob() {
@@ -153,6 +151,9 @@ func FlushQueue() {
 	if 7000 < elapsed {
 		logging.LogInfof("database op tx [%dms]", elapsed)
 	}
+
+	// Push database index commit event https://github.com/siyuan-note/siyuan/issues/8814
+	util.BroadcastByType("main", "databaseIndexCommit", 0, "", nil)
 }
 
 func execOp(op *dbQueueOperation, tx *sql.Tx, context map[string]interface{}) (err error) {
@@ -189,28 +190,12 @@ func execOp(op *dbQueueOperation, tx *sql.Tx, context map[string]interface{}) (e
 		err = updateBlockContent(tx, op.block)
 	case "delete_assets":
 		err = deleteAssetsByHashes(tx, op.removeAssetHashes)
-	case "av_rebuild":
-		err = av.RebuildAttributeViewTable(tx, op.av)
 	default:
 		msg := fmt.Sprintf("unknown operation [%s]", op.action)
 		logging.LogErrorf(msg)
 		err = errors.New(msg)
 	}
 	return
-}
-
-func RebuildAttributeViewQueue(av *av.AttributeView) {
-	dbQueueLock.Lock()
-	defer dbQueueLock.Unlock()
-
-	newOp := &dbQueueOperation{av: av, inQueueTime: time.Now(), action: "av_rebuild"}
-	for i, op := range operationQueue {
-		if "av_rebuild" == op.action && op.av.ID == av.ID {
-			operationQueue[i] = newOp
-			return
-		}
-	}
-	operationQueue = append(operationQueue, newOp)
 }
 
 func BatchRemoveAssetsQueue(hashes []string) {

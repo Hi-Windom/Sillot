@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -25,17 +25,15 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/mod/semver"
-
 	"github.com/88250/gulu"
 	"github.com/88250/lute"
 	"github.com/K-Sillot/httpclient"
-	"github.com/K-Sillot/logging"
-	"github.com/PuerkitoBio/goquery"
 	"github.com/araddon/dateparse"
 	"github.com/imroc/req/v3"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
+	"golang.org/x/mod/semver"
 	textUnicode "golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -44,18 +42,21 @@ type DisplayName struct {
 	Default string `json:"default"`
 	ZhCN    string `json:"zh_CN"`
 	EnUS    string `json:"en_US"`
+	ZhCHT   string `json:"zh_CHT"`
 }
 
 type Description struct {
 	Default string `json:"default"`
 	ZhCN    string `json:"zh_CN"`
 	EnUS    string `json:"en_US"`
+	ZhCHT   string `json:"zh_CHT"`
 }
 
 type Readme struct {
 	Default string `json:"default"`
 	ZhCN    string `json:"zh_CN"`
 	EnUS    string `json:"en_US"`
+	ZhCHT   string `json:"zh_CHT"`
 }
 
 type Funding struct {
@@ -76,6 +77,7 @@ type Package struct {
 	Description   *Description `json:"description"`
 	Readme        *Readme      `json:"readme"`
 	Funding       *Funding     `json:"funding"`
+	Keywords      []string     `json:"keywords"`
 
 	PreferredFunding string `json:"preferredFunding"`
 	PreferredName    string `json:"preferredName"`
@@ -142,7 +144,9 @@ func getPreferredReadme(readme *Readme) string {
 			ret = readme.ZhCN
 		}
 	case "zh_CHT":
-		if "" != readme.ZhCN {
+		if "" != readme.ZhCHT {
+			ret = readme.ZhCHT
+		} else if "" != readme.ZhCN {
 			ret = readme.ZhCN
 		}
 	case "en_US":
@@ -169,7 +173,9 @@ func getPreferredName(pkg *Package) string {
 			ret = pkg.DisplayName.ZhCN
 		}
 	case "zh_CHT":
-		if "" != pkg.DisplayName.ZhCN {
+		if "" != pkg.DisplayName.ZhCHT {
+			ret = pkg.DisplayName.ZhCHT
+		} else if "" != pkg.DisplayName.ZhCN {
 			ret = pkg.DisplayName.ZhCN
 		}
 	case "en_US":
@@ -196,7 +202,9 @@ func getPreferredDesc(desc *Description) string {
 			ret = desc.ZhCN
 		}
 	case "zh_CHT":
-		if "" != desc.ZhCN {
+		if "" != desc.ZhCHT {
+			ret = desc.ZhCHT
+		} else if "" != desc.ZhCN {
 			ret = desc.ZhCN
 		}
 	case "en_US":
@@ -233,11 +241,11 @@ func getPreferredFunding(funding *Funding) string {
 
 func PluginJSON(pluginDirName string) (ret *Plugin, err error) {
 	p := filepath.Join(util.DataDir, "plugins", pluginDirName, "plugin.json")
-	if !gulu.File.IsExist(p) {
+	if !filelock.IsExist(p) {
 		err = os.ErrNotExist
 		return
 	}
-	data, err := os.ReadFile(p)
+	data, err := filelock.ReadFile(p)
 	if nil != err {
 		logging.LogErrorf("read plugin.json [%s] failed: %s", p, err)
 		return
@@ -253,11 +261,11 @@ func PluginJSON(pluginDirName string) (ret *Plugin, err error) {
 
 func WidgetJSON(widgetDirName string) (ret *Widget, err error) {
 	p := filepath.Join(util.DataDir, "widgets", widgetDirName, "widget.json")
-	if !gulu.File.IsExist(p) {
+	if !filelock.IsExist(p) {
 		err = os.ErrNotExist
 		return
 	}
-	data, err := os.ReadFile(p)
+	data, err := filelock.ReadFile(p)
 	if nil != err {
 		logging.LogErrorf("read widget.json [%s] failed: %s", p, err)
 		return
@@ -293,11 +301,11 @@ func IconJSON(iconDirName string) (ret *Icon, err error) {
 
 func TemplateJSON(templateDirName string) (ret *Template, err error) {
 	p := filepath.Join(util.DataDir, "templates", templateDirName, "template.json")
-	if !gulu.File.IsExist(p) {
+	if !filelock.IsExist(p) {
 		err = os.ErrNotExist
 		return
 	}
-	data, err := os.ReadFile(p)
+	data, err := filelock.ReadFile(p)
 	if nil != err {
 		logging.LogErrorf("read template.json [%s] failed: %s", p, err)
 		return
@@ -383,7 +391,7 @@ func isOutdatedTheme(theme *Theme, bazaarThemes []*Theme) bool {
 	}
 
 	for _, pkg := range bazaarThemes {
-		if theme.URL == pkg.URL && theme.Name == pkg.Name && theme.Author == pkg.Author && theme.Version < pkg.Version {
+		if theme.URL == pkg.URL && theme.Name == pkg.Name && theme.Author == pkg.Author && 0 > semver.Compare("v"+theme.Version, "v"+pkg.Version) {
 			theme.RepoHash = pkg.RepoHash
 			return true
 		}
@@ -403,7 +411,7 @@ func isOutdatedIcon(icon *Icon, bazaarIcons []*Icon) bool {
 	}
 
 	for _, pkg := range bazaarIcons {
-		if icon.URL == pkg.URL && icon.Name == pkg.Name && icon.Author == pkg.Author && icon.Version < pkg.Version {
+		if icon.URL == pkg.URL && icon.Name == pkg.Name && icon.Author == pkg.Author && 0 > semver.Compare("v"+icon.Version, "v"+pkg.Version) {
 			icon.RepoHash = pkg.RepoHash
 			return true
 		}
@@ -423,7 +431,7 @@ func isOutdatedPlugin(plugin *Plugin, bazaarPlugins []*Plugin) bool {
 	}
 
 	for _, pkg := range bazaarPlugins {
-		if plugin.URL == pkg.URL && plugin.Name == pkg.Name && plugin.Author == pkg.Author && plugin.Version < pkg.Version {
+		if plugin.URL == pkg.URL && plugin.Name == pkg.Name && plugin.Author == pkg.Author && 0 > semver.Compare("v"+plugin.Version, "v"+pkg.Version) {
 			plugin.RepoHash = pkg.RepoHash
 			return true
 		}
@@ -443,7 +451,7 @@ func isOutdatedWidget(widget *Widget, bazaarWidgets []*Widget) bool {
 	}
 
 	for _, pkg := range bazaarWidgets {
-		if widget.URL == pkg.URL && widget.Name == pkg.Name && widget.Author == pkg.Author && widget.Version < pkg.Version {
+		if widget.URL == pkg.URL && widget.Name == pkg.Name && widget.Author == pkg.Author && 0 > semver.Compare("v"+widget.Version, "v"+pkg.Version) {
 			widget.RepoHash = pkg.RepoHash
 			return true
 		}
@@ -463,7 +471,7 @@ func isOutdatedTemplate(template *Template, bazaarTemplates []*Template) bool {
 	}
 
 	for _, pkg := range bazaarTemplates {
-		if template.URL == pkg.URL && template.Name == pkg.Name && template.Author == pkg.Author && template.Version < pkg.Version {
+		if template.URL == pkg.URL && template.Name == pkg.Name && template.Author == pkg.Author && 0 > semver.Compare("v"+template.Version, "v"+pkg.Version) {
 			template.RepoHash = pkg.RepoHash
 			return true
 		}
@@ -518,19 +526,7 @@ func renderREADME(repoURL string, mdData []byte) (ret string, err error) {
 	linkBase := "https://cdn.jsdelivr.net/gh/" + strings.TrimPrefix(repoURL, "https://github.com/")
 	luteEngine.SetLinkBase(linkBase)
 	ret = luteEngine.Md2HTML(string(mdData))
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(ret))
-	if nil != err {
-		logging.LogErrorf("parse HTML failed: %s", err)
-		return
-	}
-
-	doc.Find("a").Each(func(i int, selection *goquery.Selection) {
-		if href, ok := selection.Attr("href"); ok && util.IsRelativePath(href) {
-			selection.SetAttr("href", linkBase+href)
-		}
-	})
-
-	ret, _ = doc.Find("body").Html()
+	ret = util.LinkTarget(ret, linkBase)
 	return
 }
 
@@ -549,11 +545,11 @@ func downloadPackage(repoURLHash string, pushProgress bool, systemID string) (da
 	}).Get(u)
 	if nil != err {
 		logging.LogErrorf("get bazaar package [%s] failed: %s", u, err)
-		return nil, errors.New("get bazaar package failed")
+		return nil, errors.New("get bazaar package failed, please check your network")
 	}
 	if 200 != resp.StatusCode {
 		logging.LogErrorf("get bazaar package [%s] failed: %d", u, resp.StatusCode)
-		return nil, errors.New("get bazaar package failed")
+		return nil, errors.New("get bazaar package failed: " + resp.Status)
 	}
 	data = buf.Bytes()
 
@@ -567,7 +563,7 @@ func incPackageDownloads(repoURLHash, systemID string) {
 	}
 
 	repo := strings.Split(repoURLHash, "@")[0]
-	u := util.AliyunServer + "/apis/siyuan/bazaar/addBazaarPackageDownloadCount"
+	u := util.GetCloudServer() + "/apis/siyuan/bazaar/addBazaarPackageDownloadCount"
 	httpclient.NewCloudRequest30s().SetBody(
 		map[string]interface{}{
 			"systemID": systemID,
@@ -589,7 +585,6 @@ func installPackage(data []byte, installPath string) (err error) {
 	unzipPath := filepath.Join(tmpPackage, name)
 	if err = gulu.Zip.Unzip(tmp, unzipPath); nil != err {
 		logging.LogErrorf("write file [%s] failed: %s", installPath, err)
-		err = errors.New("write file failed")
 		return
 	}
 

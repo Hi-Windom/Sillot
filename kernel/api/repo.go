@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ func openRepoSnapshotDoc(c *gin.Context) {
 	}
 
 	id := arg["id"].(string)
-	id, rootID, content, isLargeDoc, updated, err := model.OpenRepoSnapshotDoc(id)
+	content, isProtyleDoc, updated, err := model.OpenRepoSnapshotDoc(id)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -44,11 +44,9 @@ func openRepoSnapshotDoc(c *gin.Context) {
 	}
 
 	ret.Data = map[string]interface{}{
-		"id":         id,
-		"rootID":     rootID,
-		"content":    content,
-		"isLargeDoc": isLargeDoc,
-		"updated":    updated,
+		"content":      content,
+		"isProtyleDoc": isProtyleDoc,
+		"updated":      updated,
 	}
 }
 

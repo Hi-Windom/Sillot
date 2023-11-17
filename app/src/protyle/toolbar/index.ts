@@ -6,7 +6,7 @@ import {
     focusByRange,
     focusByWbr,
     getEditorRange,
-    getSelectionPosition,
+    getSelectionPosition, selectAll,
     setFirstNodeRange,
     setLastNodeRange
 } from "../util/selection";
@@ -15,14 +15,14 @@ import {Link} from "./Link";
 import {setPosition} from "../../util/setPosition";
 import {updateTransaction} from "../wysiwyg/transaction";
 import {Constants} from "../../constants";
-import {getEventName, openByMobile, setStorageVal} from "../util/compatibility";
+import {copyPlainText, openByMobile, readText, setStorageVal} from "../util/compatibility";
 import {upDownHint} from "../../util/upDownHint";
-import {highlightRender} from "../markdown/highlightRender";
+import {highlightRender} from "../render/highlightRender";
 import {getContenteditableElement, hasNextSibling, hasPreviousSibling} from "../wysiwyg/getBlock";
 import {processRender} from "../util/processCode";
 import {BlockRef} from "./BlockRef";
-import {hintRenderAssets, hintRenderTemplate, hintRenderWidget} from "../hint/extend";
-import {blockRender} from "../markdown/blockRender";
+import {hintRenderTemplate, hintRenderWidget} from "../hint/extend";
+import {blockRender} from "../render/blockRender";
 /// #if !BROWSER
 import {openBy} from "../../editor/util";
 /// #endif
@@ -36,29 +36,26 @@ import {format} from "date-fns";
 import {insertEmptyBlock} from "../../block/util";
 import {matchHotKey} from "../util/hotKey";
 import {hideElements} from "../ui/hideElements";
-import {renderAssetsPreview} from "../../asset/renderAssets";
 import {electronUndo} from "../undo";
 import {previewTemplate} from "./util";
 import {hideMessage, showMessage} from "../../dialog/message";
 import {InlineMath} from "./InlineMath";
 import {InlineMemo} from "./InlineMemo";
-import {mathRender} from "../markdown/mathRender";
+import {mathRender} from "../render/mathRender";
 import {linkMenu} from "../../menus/protyle";
 import {addScript} from "../util/addScript";
 import {confirmDialog} from "../../dialog/confirmDialog";
-import {App} from "../../index";
+import {pasteAsPlainText, pasteEscaped, pasteText} from "../util/paste";
 
 export class Toolbar {
     public element: HTMLElement;
     public subElement: HTMLElement;
     public subElementCloseCB: () => void;
     public range: Range;
-    private toolbarHeight: number;
-    private app: App;
+    public toolbarHeight: number;
 
-    constructor(app: App, protyle: IProtyle) {
+    constructor(protyle: IProtyle) {
         const options = protyle.options;
-        this.app = app;
         const element = document.createElement("div");
         element.className = "protyle-toolbar fn__none";
         this.element = element;
@@ -79,7 +76,7 @@ export class Toolbar {
     public render(protyle: IProtyle, range: Range, event?: KeyboardEvent) {
         this.range = range;
         let nodeElement = hasClosestBlock(range.startContainer);
-        if (isMobile() || !nodeElement || protyle.disabled) {
+        if (isMobile() || !nodeElement || protyle.disabled || nodeElement.classList.contains("av")) {
             this.element.classList.add("fn__none");
             return;
         }
@@ -138,6 +135,7 @@ export class Toolbar {
         }
         const rangePosition = getSelectionPosition(nodeElement, range);
         this.element.classList.remove("fn__none");
+        this.toolbarHeight = this.element.clientHeight;
         const y = rangePosition.top - this.toolbarHeight - 4;
         this.element.setAttribute("data-inity", y + Constants.ZWSP + protyle.contentElement.scrollTop.toString());
         setPosition(this.element, rangePosition.left - 52, y);
@@ -230,7 +228,7 @@ export class Toolbar {
                 menuItemObj = new Font(protyle, menuItem);
                 break;
             case "a":
-                menuItemObj = new Link(this.app, protyle, menuItem);
+                menuItemObj = new Link(protyle, menuItem);
                 break;
         }
         if (!menuItemObj) {
@@ -348,7 +346,7 @@ export class Toolbar {
                         return true;
                     }
                 });
-                if (rangeTypes.length === 0) {
+                if (rangeTypes.length === 0 || type === "clear") {
                     newNodes.push(document.createTextNode(Constants.ZWSP));
                 } else {
                     // 遇到以下类型结尾不应继承 https://github.com/siyuan-note/siyuan/issues/7200
@@ -367,8 +365,8 @@ export class Toolbar {
                 }
             }
             contents.childNodes.forEach((item: HTMLElement, index) => {
-                if (item.nodeType !== 3 && item.tagName !== "BR") {
-                    const types = item.getAttribute("data-type").split(" ");
+                if (item.nodeType !== 3 && item.tagName !== "BR" && item.tagName !== "IMG") {
+                    const types = (item.getAttribute("data-type") || "").split(" ");
                     if (type === "clear") {
                         for (let i = 0; i < types.length; i++) {
                             if (textObj && textObj.type === "text") {
@@ -397,6 +395,14 @@ export class Toolbar {
                         }
                         newNodes.push(document.createTextNode(item.textContent));
                     } else {
+                        if (selectText && type === "clear" && textObj && textObj.type === "text") {
+                            // 选中内容中没有样式需要清除时直接返回，否则清除粗体中部分内容会报错
+                            if (item.style.color === "" && item.style.webkitTextFillColor === "" && item.style.webkitTextStroke === "" && item.style.textShadow === "" && item.style.backgroundColor === "" && item.style.fontSize === "") {
+                                item.setAttribute("data-type", types.join(" "));
+                                newNodes.push(item);
+                                return true;
+                            }
+                        }
                         if (type === "clear") {
                             item.style.color = "";
                             item.style.webkitTextFillColor = "";
@@ -449,13 +455,12 @@ export class Toolbar {
                 setFontStyle(inlineElement, textObj);
                 newNodes.push(inlineElement);
             } else {
-                //  https://github.com/siyuan-note/siyuan/issues/7477
+                // https://github.com/siyuan-note/siyuan/issues/7477
+                // https://github.com/siyuan-note/siyuan/issues/8825
                 if (type === "block-ref") {
-                    contents.childNodes.forEach((item: HTMLElement, index) => {
-                        if (index !== 0) {
-                            item.remove();
-                        }
-                    });
+                    while (contents.childNodes.length > 1) {
+                        contents.childNodes[0].remove();
+                    }
                 }
                 contents.childNodes.forEach((item: HTMLElement, index) => {
                     if (item.nodeType === 3) {
@@ -556,7 +561,7 @@ export class Toolbar {
                             hasSameTextStyle(item, nextElement, textObj)) {
                             nextIndex = item.textContent.length;
                             nextElement.innerHTML = item.innerHTML + nextElement.innerHTML;
-                        } else if (item.tagName !== "BR") {
+                        } else if (item.tagName !== "BR" && item.tagName !== "IMG") {
                             if (item.getAttribute("data-type")?.indexOf("backslash") > -1 &&
                                 item.firstChild?.textContent === "\\") {
                                 item.firstChild.remove();
@@ -734,7 +739,7 @@ export class Toolbar {
             const aElement = newNodes[0] as HTMLElement;
             if (aElement.textContent.replace(Constants.ZWSP, "") === "" || !aElement.getAttribute("data-href")) {
                 needFocus = false;
-                linkMenu(this.app, protyle, aElement, aElement.getAttribute("data-href") ? true : false);
+                linkMenu(protyle, aElement, aElement.getAttribute("data-href") ? true : false);
             } else {
                 this.range.collapse(false);
             }
@@ -748,87 +753,6 @@ export class Toolbar {
         if (needFocus) {
             focusByRange(this.range);
         }
-    }
-
-    public showFileAnnotationRef(protyle: IProtyle, refElement: HTMLElement) {
-        const nodeElement = hasClosestBlock(refElement);
-        if (!nodeElement) {
-            return;
-        }
-        hideElements(["hint"], protyle);
-        window.siyuan.menus.menu.remove();
-        const id = nodeElement.getAttribute("data-node-id");
-        const html = nodeElement.outerHTML;
-        this.subElement.style.padding = "";
-        this.subElement.innerHTML = `<div class="b3-form__space--small">
-<label class="fn__flex">
-    <span class="ft__on-surface fn__flex-center" style="width: 64px">ID</span>
-    <div class="fn__space"></div>
-    <input data-type="id" value="${refElement.getAttribute("data-id") || ""}" class="b3-text-field fn__block" readonly />
-</label>
-<div class="fn__hr"></div>
-<label class="fn__flex">
-    <span class="ft__on-surface fn__flex-center" style="width: 64px">${window.siyuan.languages.anchor}</span>
-    <div class="fn__space"></div>
-    <input data-type="anchor" class="b3-text-field fn__block" placeholder="${window.siyuan.languages.anchor}" />
-</label>
-<div class="fn__hr"></div>
-<div class="fn__hr"></div>
-<div class="fn__flex"><span class="fn__flex-1"></span>
-    <button class="b3-button b3-button--cancel">${window.siyuan.languages.remove}</button>
-</div></div>`;
-        this.subElement.querySelector(".b3-button--cancel").addEventListener(getEventName(), () => {
-            refElement.outerHTML = refElement.textContent + "<wbr>";
-            hideElements(["util"], protyle);
-        });
-        const anchorElement = this.subElement.querySelector('[data-type="anchor"]') as HTMLInputElement;
-        anchorElement.value = refElement.textContent;
-        anchorElement.addEventListener("input", (event) => {
-            if (anchorElement.value) {
-                refElement.innerHTML = Lute.EscapeHTMLStr(anchorElement.value);
-            } else {
-                refElement.innerHTML = "*";
-            }
-            event.stopPropagation();
-        });
-        anchorElement.addEventListener("keydown", (event: KeyboardEvent) => {
-            event.stopPropagation();
-            if (event.isComposing) {
-                return;
-            }
-            if (event.key === "Enter" || event.key === "Escape") {
-                hideElements(["util"], protyle);
-                event.preventDefault();
-                event.stopPropagation();
-            }
-        });
-        this.subElement.classList.remove("fn__none");
-        this.subElementCloseCB = () => {
-            if (refElement.parentElement) {
-                if (anchorElement.value) {
-                    refElement.innerHTML = Lute.EscapeHTMLStr(anchorElement.value);
-                } else {
-                    refElement.innerHTML = "*";
-                }
-                this.range.setStartAfter(refElement);
-                if (getSelection().rangeCount === 0) {
-                    focusByRange(this.range);
-                }
-            } else {
-                if (getSelection().rangeCount === 0) {
-                    focusByWbr(nodeElement, this.range);
-                }
-            }
-            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
-            updateTransaction(protyle, id, nodeElement.outerHTML, html);
-        };
-        /// #if !MOBILE
-        this.subElement.style.width = Math.min(480, window.innerWidth) + "px";
-        const nodeRect = refElement.getBoundingClientRect();
-        setPosition(this.subElement, nodeRect.left, nodeRect.bottom, nodeRect.height + 4);
-        /// #endif
-        this.element.classList.add("fn__none");
-        anchorElement.select();
     }
 
     public showRender(protyle: IProtyle, renderElement: Element, updateElements?: Element[], oldHTML?: string) {
@@ -892,7 +816,7 @@ export class Toolbar {
             this.subElement.style.width = "";
             this.subElement.style.padding = "0";
         }
-        this.subElement.innerHTML = `<div ${(isPin && this.subElement.firstElementChild.getAttribute("data-drag") === "true") ? 'data-drag="true"' : ""}><div class="block__icons block__icons--menu fn__flex">
+        this.subElement.innerHTML = `<div ${(isPin && this.subElement.firstElementChild.getAttribute("data-drag") === "true") ? 'data-drag="true"' : ""}><div class="block__icons block__icons--menu fn__flex" style="border-radius: var(--b3-border-radius-b) var(--b3-border-radius-b) 0 0;">
     <span class="fn__flex-1 resize__move">
         ${title}
     </span>
@@ -909,10 +833,11 @@ export class Toolbar {
     <span class="fn__space"></span>
     <button data-type="close" class="block__icon block__icon--show b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.close}"><svg style="width: 10px"><use xlink:href="#iconClose"></use></svg></button>
 </div>
-<textarea ${protyle.disabled ? " readonly" : ""} spellcheck="false" class="b3-text-field b3-text-field--text fn__block" placeholder="${placeholder}" style="${isMobile() ? "" : "width:" + Math.max(480, renderElement.clientWidth * 0.7) + "px"};max-height:50vh;min-height: 48px;min-width: 268px"></textarea></div>`;
+<textarea ${protyle.disabled ? " readonly" : ""} spellcheck="false" class="b3-text-field b3-text-field--text fn__block" placeholder="${placeholder}" style="${isMobile() ? "" : "width:" + Math.max(480, renderElement.clientWidth * 0.7) + "px"};max-height:50vh;min-height: 48px;min-width: 268px;border-radius: 0 0 var(--b3-border-radius-b) var(--b3-border-radius-b);font-family: var(--b3-font-family-code);"></textarea></div>`;
         const autoHeight = () => {
             textElement.style.height = textElement.scrollHeight + "px";
             if (isMobile()) {
+                setPosition(this.subElement, 0, 0);
                 return;
             }
             if (this.subElement.firstElementChild.getAttribute("data-drag") === "true") {
@@ -999,7 +924,7 @@ export class Toolbar {
                 return;
             }
             setTimeout(() => {
-                addScript("stage/protyle/js/html2canvas.min.js?v=1.4.1", "protyleHtml2canvas").then(() => {
+                addScript("/stage/protyle/js/html2canvas.min.js?v=1.4.1", "protyleHtml2canvas").then(() => {
                     window.html2canvas(renderElement, {useCORS: true}).then((canvas) => {
                         canvas.toBlob((blob: Blob) => {
                             const formData = new FormData();
@@ -1127,13 +1052,13 @@ export class Toolbar {
                         }
                     } else {
                         // 行级备注自动移除换行  https://ld246.com/article/1664205917326
-                        item.setAttribute("data-inline-memo-content", Lute.EscapeHTMLStr(textElement.value.replace(/\n/g, " ")));
+                        item.setAttribute("data-inline-memo-content", Lute.EscapeHTMLStr(textElement.value));
                     }
                 });
             } else if (types.includes("inline-math")) {
                 // 行内数学公式不允许换行 https://github.com/siyuan-note/siyuan/issues/2187
                 if (textElement.value) {
-                    renderElement.setAttribute("data-content", Lute.EscapeHTMLStr(textElement.value.replace(/\n/g, "")));
+                    renderElement.setAttribute("data-content", Lute.EscapeHTMLStr(textElement.value));
                     renderElement.removeAttribute("data-render");
                     processRender(renderElement);
                 } else {
@@ -1152,7 +1077,10 @@ export class Toolbar {
             }
 
             // 光标定位
-            if (getSelection().rangeCount === 0) {  // https://ld246.com/article/1665306093005
+            if (getSelection().rangeCount === 0 ||
+                // $$ 中间输入后再 ESC 光标无法定位
+                (getSelection().rangeCount > 0 && hasClosestByClassName(getSelection().getRangeAt(0).startContainer, "protyle-util"))
+            ) {  // https://ld246.com/article/1665306093005
                 if (renderElement.tagName === "SPAN") {
                     if (inlineLastNode) {
                         if (inlineLastNode.parentElement) {
@@ -1188,6 +1116,7 @@ export class Toolbar {
             }
             updateTransaction(protyle, id, newHTML, html);
         };
+        this.subElement.style.zIndex = (++window.siyuan.zIndex).toString();
         this.subElement.classList.remove("fn__none");
         const nodeRect = renderElement.getBoundingClientRect();
         this.element.classList.add("fn__none");
@@ -1200,7 +1129,7 @@ export class Toolbar {
         if (!protyle.disabled) {
             textElement.select();
         }
-        this.app.plugins.forEach(item => {
+        protyle.app.plugins.forEach(item => {
             item.eventBus.emit("open-noneditableblock", {
                 protyle,
                 toolbar: this
@@ -1218,23 +1147,28 @@ export class Toolbar {
         this.range = getEditorRange(nodeElement);
         const id = nodeElement.getAttribute("data-node-id");
         let oldHtml = nodeElement.outerHTML;
-        let html = `<div class="b3-list-item b3-list-item--focus">${window.siyuan.languages.clear}</div>`;
-        Constants.CODE_LANGUAGES.forEach((item) => {
-            html += `<div class="b3-list-item">${item}</div>`;
+
+        let html = `<div class="b3-list-item">${window.siyuan.languages.clear}</div>`;
+        const hljsLanguages = Constants.ALIAS_CODE_LANGUAGES.concat(window.hljs?.listLanguages() ?? []).sort();
+        hljsLanguages.forEach((item, index) => {
+            html += `<div class="b3-list-item${index === 0 ? " b3-list-item--focus" : ""}">${item}</div>`;
         });
+
         this.subElement.style.width = "";
         this.subElement.style.padding = "";
-        this.subElement.innerHTML = `<div class="fn__flex-column" style="max-height:50vh"><input placeholder="${window.siyuan.languages.search}" style="margin: 4px 8px 8px 8px" class="b3-text-field"/>
-<div class="b3-list fn__flex-1 b3-list--background" style="position: relative">${html}</div>
+        this.subElement.innerHTML = `<div class="fn__flex-column" style="max-height:50vh">
+    <input placeholder="${window.siyuan.languages.search}" style="margin: 0 8px 4px 8px" class="b3-text-field"/>
+    <div class="b3-list fn__flex-1 b3-list--background" style="position: relative">${html}</div>
 </div>`;
 
+        const listElement = this.subElement.lastElementChild.lastElementChild as HTMLElement;
         const inputElement = this.subElement.querySelector("input");
         inputElement.addEventListener("keydown", (event: KeyboardEvent) => {
             event.stopPropagation();
             if (event.isComposing) {
                 return;
             }
-            upDownHint(this.subElement.lastElementChild.lastElementChild as HTMLElement, event);
+            upDownHint(listElement, event);
             if (event.key === "Enter") {
                 const activeText = this.subElement.querySelector(".b3-list-item--focus").textContent;
                 languageElement.textContent = activeText === window.siyuan.languages.clear ? "" : activeText;
@@ -1262,18 +1196,13 @@ export class Toolbar {
             }
         });
         inputElement.addEventListener("input", (event) => {
-            const matchLanguages: string[] = [];
-            Constants.CODE_LANGUAGES.forEach((item) => {
-                if (item.indexOf(inputElement.value.toLowerCase()) > -1) {
-                    matchLanguages.push(item);
-
-                }
-            });
+            const lowerCaseValue = inputElement.value.toLowerCase();
+            const matchLanguages = hljsLanguages.filter(item => item.includes(lowerCaseValue));
             let html = "";
             // sort
             let matchInput = false;
             matchLanguages.sort((a, b) => {
-                if (a.startsWith(inputElement.value.toLowerCase()) && b.startsWith(inputElement.value.toLowerCase())) {
+                if (a.startsWith(lowerCaseValue) && b.startsWith(lowerCaseValue)) {
                     if (a.length < b.length) {
                         return -1;
                     } else if (a.length === b.length) {
@@ -1281,9 +1210,9 @@ export class Toolbar {
                     } else {
                         return 1;
                     }
-                } else if (a.startsWith(inputElement.value.toLowerCase())) {
+                } else if (a.startsWith(lowerCaseValue)) {
                     return -1;
-                } else if (b.startsWith(inputElement.value.toLowerCase())) {
+                } else if (b.startsWith(lowerCaseValue)) {
                     return 1;
                 } else {
                     return 0;
@@ -1292,18 +1221,21 @@ export class Toolbar {
                 if (inputElement.value === item) {
                     matchInput = true;
                 }
-                html += `<div class="b3-list-item">${item.replace(inputElement.value.toLowerCase(), "<b>" + inputElement.value.toLowerCase() + "</b>")}</div>`;
+                html += `<div class="b3-list-item">${item.replace(lowerCaseValue, "<b>" + lowerCaseValue + "</b>")}</div>`;
             });
             if (inputElement.value.trim() && !matchInput) {
                 html = `<div class="b3-list-item"><b>${inputElement.value.replace(/`| /g, "_")}</b></div>${html}`;
             }
-            this.subElement.firstElementChild.lastElementChild.innerHTML = html;
-            if (html) {
-                this.subElement.firstElementChild.lastElementChild.firstElementChild.classList.add("b3-list-item--focus");
+            html = `<div class="b3-list-item">${window.siyuan.languages.clear}</div>` + html;
+            listElement.innerHTML = html;
+            if (listElement.firstElementChild.nextElementSibling) {
+                listElement.firstElementChild.nextElementSibling.classList.add("b3-list-item--focus");
+            } else {
+                listElement.firstElementChild.classList.add("b3-list-item--focus");
             }
             event.stopPropagation();
         });
-        this.subElement.lastElementChild.lastElementChild.addEventListener("click", (event) => {
+        listElement.addEventListener("click", (event) => {
             const target = event.target as HTMLElement;
             const listElement = hasClosestByClassName(target, "b3-list-item");
             if (!listElement) {
@@ -1331,11 +1263,14 @@ export class Toolbar {
                 focusByRange(this.range);
             }
         });
+        this.subElement.style.zIndex = (++window.siyuan.zIndex).toString();
         this.subElement.classList.remove("fn__none");
         this.subElementCloseCB = undefined;
         /// #if !MOBILE
         const nodeRect = languageElement.getBoundingClientRect();
         setPosition(this.subElement, nodeRect.left, nodeRect.bottom, nodeRect.height);
+        /// #else
+        setPosition(this.subElement, 0, 0);
         /// #endif
         this.element.classList.add("fn__none");
         inputElement.select();
@@ -1349,7 +1284,7 @@ export class Toolbar {
         this.subElement.style.padding = "";
         this.subElement.innerHTML = `<div style="max-height:50vh" class="fn__flex">
 <div class="fn__flex-column" style="${isMobile() ? "width: 100%" : "min-width: 260px;max-width:50vw"}">
-    <div class="fn__flex" style="margin: 4px 8px 8px 8px">
+    <div class="fn__flex" style="margin: 0 8px 4px 8px">
         <input class="b3-text-field fn__flex-1"/>
         <span class="fn__space"></span>
         <span data-type="previous" class="block__icon block__icon--show"><svg><use xlink:href="#iconLeft"></use></svg></span>
@@ -1484,6 +1419,7 @@ export class Toolbar {
                 event.stopPropagation();
             }
         });
+        this.subElement.style.zIndex = (++window.siyuan.zIndex).toString();
         this.subElement.classList.remove("fn__none");
         this.subElementCloseCB = undefined;
         this.element.classList.add("fn__none");
@@ -1512,6 +1448,8 @@ export class Toolbar {
             const rangePosition = getSelectionPosition(nodeElement, range);
             setPosition(this.subElement, rangePosition.left, rangePosition.top + 18, Constants.SIZE_TOOLBAR_HEIGHT);
             (this.subElement.firstElementChild as HTMLElement).style.maxHeight = Math.min(window.innerHeight * 0.8, window.innerHeight - this.subElement.getBoundingClientRect().top) - 16 + "px";
+            /// #else
+            setPosition(this.subElement, 0, 0);
             /// #endif
         });
     }
@@ -1522,17 +1460,18 @@ export class Toolbar {
         window.siyuan.menus.menu.remove();
         this.subElement.style.width = "";
         this.subElement.style.padding = "";
-        this.subElement.innerHTML = `<div class="fn__flex-column" style="max-height:50vh"><input style="margin: 4px 8px 8px 8px" class="b3-text-field"/>
-<div class="b3-list fn__flex-1 b3-list--background" style="position: relative"><img style="margin: 0 auto;display: block;width: 64px;height:64px" src="/stage/loading-pure.svg"></div>
+        this.subElement.innerHTML = `<div class="fn__flex-column" style="max-height:50vh">
+    <input style="margin: 0 8px 4px 8px" class="b3-text-field"/>
+    <div class="b3-list fn__flex-1 b3-list--background" style="position: relative"><img style="margin: 0 auto;display: block;width: 64px;height:64px" src="/stage/loading-pure.svg"></div>
 </div>`;
-
+        const listElement = this.subElement.lastElementChild.lastElementChild as HTMLElement;
         const inputElement = this.subElement.querySelector("input");
         inputElement.addEventListener("keydown", (event: KeyboardEvent) => {
             event.stopPropagation();
             if (event.isComposing) {
                 return;
             }
-            upDownHint(this.subElement.lastElementChild.lastElementChild as HTMLElement, event);
+            upDownHint(listElement, event);
             if (event.key === "Enter") {
                 hintRenderWidget(this.subElement.querySelector(".b3-list-item--focus").textContent, protyle);
                 this.subElement.classList.add("fn__none");
@@ -1551,7 +1490,7 @@ export class Toolbar {
                 response.data.blocks.forEach((item: { path: string, content: string }, index: number) => {
                     searchHTML += `<div data-value="${item.path}" class="b3-list-item${index === 0 ? " b3-list-item--focus" : ""}">${item.content}</div>`;
                 });
-                this.subElement.firstElementChild.lastElementChild.innerHTML = searchHTML;
+                listElement.innerHTML = searchHTML;
             });
         });
         this.subElement.lastElementChild.addEventListener("click", (event) => {
@@ -1562,6 +1501,7 @@ export class Toolbar {
             }
             hintRenderWidget(listElement.textContent, protyle);
         });
+        this.subElement.style.zIndex = (++window.siyuan.zIndex).toString();
         this.subElement.classList.remove("fn__none");
         this.subElementCloseCB = undefined;
         this.element.classList.add("fn__none");
@@ -1577,126 +1517,106 @@ export class Toolbar {
             /// #if !MOBILE
             const rangePosition = getSelectionPosition(nodeElement, range);
             setPosition(this.subElement, rangePosition.left, rangePosition.top + 18, Constants.SIZE_TOOLBAR_HEIGHT);
+            /// #else
+            setPosition(this.subElement, 0, 0);
             /// #endif
         });
     }
 
-    public showAssets(protyle: IProtyle, nodeElement: HTMLElement, range: Range) {
+    public showContent(protyle: IProtyle, range: Range, nodeElement: Element) {
         this.range = range;
         hideElements(["hint"], protyle);
-        window.siyuan.menus.menu.remove();
-        this.subElement.style.width = "";
-        this.subElement.style.padding = "";
-        this.subElement.innerHTML = `<div style="max-height:50vh" class="fn__flex">
-<div class="fn__flex-column" style="${isMobile() ? "width:100%" : "min-width: 260px;max-width:50vw"}">
-    <div class="fn__flex" style="margin: 4px 8px 8px 8px">
-        <input class="b3-text-field fn__flex-1"/>
-        <span class="fn__space"></span>
-        <span data-type="previous" class="block__icon block__icon--show"><svg><use xlink:href="#iconLeft"></use></svg></span>
-        <span class="fn__space"></span>
-        <span data-type="next" class="block__icon block__icon--show"><svg><use xlink:href="#iconRight"></use></svg></span>
-    </div>
-    <div class="b3-list fn__flex-1 b3-list--background" style="position: relative"><img style="margin: 0 auto;display: block;width: 64px;height: 64px" src="/stage/loading-pure.svg"></div>
-</div>
-<div style="width: 260px;display: ${isMobile() || window.outerWidth < window.outerWidth / 2 + 260 ? "none" : "flex"};padding: 8px;overflow: auto;justify-content: center;align-items: center;"></div>
-</div>`;
-        const listElement = this.subElement.querySelector(".b3-list");
-        listElement.addEventListener("mouseover", (event) => {
-            const target = event.target as HTMLElement;
-            const hoverItemElement = hasClosestByClassName(target, "b3-list-item");
-            if (!hoverItemElement) {
-                return;
-            }
-            previewElement.innerHTML = renderAssetsPreview(hoverItemElement.getAttribute("data-value"));
-        });
-        const previewElement = this.subElement.firstElementChild.lastElementChild;
-        previewElement.innerHTML = renderAssetsPreview(listElement.firstElementChild.getAttribute("data-value"));
-        const inputElement = this.subElement.querySelector("input");
-        inputElement.addEventListener("keydown", (event: KeyboardEvent) => {
-            event.stopPropagation();
-            if (event.isComposing) {
-                return;
-            }
-            const isEmpty = !this.subElement.querySelector(".b3-list-item");
-            if (!isEmpty) {
-                const currentElement = upDownHint(listElement, event);
-                if (currentElement) {
-                    previewElement.innerHTML = renderAssetsPreview(currentElement.getAttribute("data-value"));
-                }
-            }
 
-            if (event.key === "Enter") {
-                if (!isEmpty) {
-                    hintRenderAssets(this.subElement.querySelector(".b3-list-item--focus").getAttribute("data-value"), protyle);
+        this.subElement.style.width = "auto";
+        this.subElement.style.padding = "0 8px";
+        let html = "";
+        const hasCopy = range.toString() !== "" || (range.cloneContents().childNodes[0] as HTMLElement)?.classList?.contains("emoji");
+        if (hasCopy) {
+            html += "<button class=\"keyboard__action\" data-action=\"copy\"><svg><use xlink:href=\"#iconCopy\"></use></svg></button>";
+            if (!protyle.disabled) {
+                html += `<button class="keyboard__action" data-action="cut"><svg><use xlink:href="#iconCut"></use></svg></button>
+<button class="keyboard__action" data-action="delete"><svg><use xlink:href="#iconTrashcan"></use></svg></button>`;
+            }
+        }
+        if (!protyle.disabled) {
+            html += `<button class="keyboard__action" data-action="paste"><svg><use xlink:href="#iconPaste"></use></svg></button>
+<button class="keyboard__action" data-action="select"><svg><use xlink:href="#iconSelect"></use></svg></button>`;
+        }
+        if (hasCopy || !protyle.disabled) {
+            html += "<button class=\"keyboard__action\" data-action=\"more\"><svg><use xlink:href=\"#iconMore\"></use></svg></button>";
+        }
+        this.subElement.innerHTML = `<div class="fn__flex">${html}</div>`;
+        this.subElement.lastElementChild.addEventListener("click", async (event) => {
+            const btnElemen = hasClosestByClassName(event.target as HTMLElement, "keyboard__action");
+            if (!btnElemen) {
+                return;
+            }
+            const action = btnElemen.getAttribute("data-action");
+            if (action === "copy") {
+                focusByRange(getEditorRange(nodeElement));
+                document.execCommand("copy");
+                this.subElement.classList.add("fn__none");
+            } else if (action === "cut") {
+                focusByRange(getEditorRange(nodeElement));
+                document.execCommand("cut");
+                this.subElement.classList.add("fn__none");
+            } else if (action === "delete") {
+                const currentRange = getEditorRange(nodeElement);
+                currentRange.insertNode(document.createElement("wbr"));
+                const oldHTML = nodeElement.outerHTML;
+                currentRange.extractContents();
+                focusByWbr(nodeElement, currentRange);
+                focusByRange(currentRange);
+                updateTransaction(protyle, nodeElement.getAttribute("data-node-id"), nodeElement.outerHTML, oldHTML);
+                this.subElement.classList.add("fn__none");
+            } else if (action === "paste") {
+                if (document.queryCommandSupported("paste")) {
+                    document.execCommand("paste");
                 } else {
-                    focusByRange(this.range);
+                    try {
+                        const clipText = await readText();
+                        pasteText(protyle, clipText, nodeElement);
+                    } catch (e) {
+                        console.log(e);
+                    }
                 }
                 this.subElement.classList.add("fn__none");
-                // 空行处插入 mp3 会多一个空的 mp3 块
-                event.preventDefault();
-            } else if (event.key === "Escape") {
+            } else if (action === "select") {
+                selectAll(protyle, nodeElement, range);
                 this.subElement.classList.add("fn__none");
-                focusByRange(this.range);
-            }
-        });
-        inputElement.addEventListener("input", (event) => {
-            event.stopPropagation();
-            fetchPost("/api/search/searchAsset", {
-                k: inputElement.value,
-            }, (response) => {
-                let searchHTML = "";
-                response.data.forEach((item: { path: string, hName: string }, index: number) => {
-                    searchHTML += `<div data-value="${item.path}" class="b3-list-item${index === 0 ? " b3-list-item--focus" : ""}">${item.hName}</div>`;
+            } else if (action === "copyPlainText") {
+                focusByRange(getEditorRange(nodeElement));
+                const cloneContents = getSelection().getRangeAt(0).cloneContents();
+                cloneContents.querySelectorAll('[data-type="backslash"]').forEach(item => {
+                    item.firstElementChild.remove();
                 });
-                listElement.innerHTML = searchHTML || `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
-                previewElement.innerHTML = renderAssetsPreview(listElement.firstElementChild.getAttribute("data-value"));
-            });
-        });
-        this.subElement.lastElementChild.addEventListener("click", (event) => {
-            const target = event.target as HTMLElement;
-            const previousElement = hasClosestByAttribute(target, "data-type", "previous");
-            if (previousElement) {
-                inputElement.dispatchEvent(new KeyboardEvent("keydown", {key: "ArrowUp"}));
-                event.stopPropagation();
-                return;
-            }
-            const nextElement = hasClosestByAttribute(target, "data-type", "next");
-            if (nextElement) {
-                inputElement.dispatchEvent(new KeyboardEvent("keydown", {key: "ArrowDown"}));
-                event.stopPropagation();
-                return;
-            }
-            if (target.classList.contains("b3-list--empty")) {
+                copyPlainText(cloneContents.textContent);
                 this.subElement.classList.add("fn__none");
-                focusByRange(this.range);
-                event.stopPropagation();
-                return;
-            }
-            const listItemElement = hasClosestByClassName(target, "b3-list-item");
-            if (listItemElement) {
-                event.stopPropagation();
-                hintRenderAssets(listItemElement.getAttribute("data-value"), protyle);
+            } else if (action === "pasteAsPlainText") {
+                focusByRange(getEditorRange(nodeElement));
+                pasteAsPlainText(protyle);
+                this.subElement.classList.add("fn__none");
+            } else if (action === "pasteEscaped") {
+                pasteEscaped(protyle, nodeElement);
+                this.subElement.classList.add("fn__none");
+            } else if (action === "back") {
+                this.subElement.lastElementChild.innerHTML = html;
+            } else if (action === "more") {
+                this.subElement.lastElementChild.innerHTML = `<button class="keyboard__action${hasCopy ? "" : " fn__none"}" data-action="copyPlainText"><span>${window.siyuan.languages.copyPlainText}</span></button>
+<div class="keyboard__split${hasCopy ? "" : " fn__none"}"></div>
+<button class="keyboard__action${protyle.disabled ? " fn__none" : ""}" data-action="pasteAsPlainText"><span>${window.siyuan.languages.pasteAsPlainText}</span></button>
+<div class="keyboard__split${protyle.disabled ? " fn__none" : ""}"></div>
+<button class="keyboard__action${protyle.disabled ? " fn__none" : ""}" data-action="pasteEscaped"><span>${window.siyuan.languages.pasteEscaped}</span></button>
+<div class="keyboard__split${protyle.disabled ? " fn__none" : ""}"></div>
+<button class="keyboard__action" data-action="back"><svg><use xlink:href="#iconBack"></use></svg></button>`;
+                setPosition(this.subElement, rangePosition.left, rangePosition.top + 28, Constants.SIZE_TOOLBAR_HEIGHT);
             }
         });
+        this.subElement.style.zIndex = (++window.siyuan.zIndex).toString();
         this.subElement.classList.remove("fn__none");
         this.subElementCloseCB = undefined;
-        /// #if !MOBILE
-        const rangePosition = getSelectionPosition(nodeElement, range);
-        setPosition(this.subElement, rangePosition.left, rangePosition.top + 18, Constants.SIZE_TOOLBAR_HEIGHT);
-        /// #endif
         this.element.classList.add("fn__none");
-        inputElement.select();
-        fetchPost("/api/search/searchAsset", {
-            k: "",
-        }, (response) => {
-            let html = "";
-            response.data.forEach((item: { hName: string, path: string }, index: number) => {
-                html += `<div data-value="${item.path}" class="b3-list-item${index === 0 ? " b3-list-item--focus" : ""}"><div class="b3-list-item__text">${item.hName}</div></div>`;
-            });
-            if (html === "") {
-                html = `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
-            }
-            this.subElement.querySelector(".b3-list--background").innerHTML = html;
-        });
+        const rangePosition = getSelectionPosition(nodeElement, range);
+        setPosition(this.subElement, rangePosition.left, rangePosition.top - 48, Constants.SIZE_TOOLBAR_HEIGHT);
     }
 }

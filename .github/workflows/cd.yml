@@ -77,15 +77,14 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
           release_name: ${{ steps.release_info.outputs.release_version }}
           tag_name: ${{ github.ref }}
           body: "${{ env.release_body_sillot }}\n---\n${{ env.release_body_siyuan }}"
           draft: false
           prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     runs-on: ${{ matrix.config.os }}
@@ -156,9 +155,9 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
+          go-version: "1.21"
 
       - name: Set up goversioninfo
         run: go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo && go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo

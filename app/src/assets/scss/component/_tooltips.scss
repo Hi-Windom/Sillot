@@ -1,20 +1,31 @@
 .tooltip {
-  pointer-events: none;
+  user-select: none; // 同步悬浮需要点击链接，因此不能使用  pointer-events: none;
   position: fixed;
   z-index: 1000000;
   padding: 4px 8px;
   font-size: 12px;
   font-weight: normal;
   -webkit-font-smoothing: subpixel-antialiased;
-  color: #fff;
+  color: var(--b3-tooltips-color);
   word-wrap: break-word;
-  background: var(--b3-tooltips-color);
-  border-radius: 4px;
+  background-color: var(--b3-tooltips-background);
+  border-radius: var(--b3-border-radius);
   line-height: 17px;
   max-width: 320px;
   animation-duration: 150ms;
   animation-fill-mode: both;
   animation-name: zoomIn;
+  max-height: 90vh;
+  overflow: auto;
+  box-sizing: border-box;
+
+  a {
+    color: var(--b3-theme-secondary);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 
   &--error {
     background: var(--b3-theme-error);
@@ -32,25 +43,26 @@
     font-size: 12px;
     font-weight: normal;
     -webkit-font-smoothing: subpixel-antialiased;
-    color: #fff;
+    color: var(--b3-tooltips-color);
     word-wrap: break-word;
     white-space: pre;
     content: attr(aria-label);
-    background: var(--b3-tooltips-color);
-    border-radius: 4px;
+    background-color: var(--b3-tooltips-background);
+    border-radius: var(--b3-border-radius);
     line-height: 17px;
     transform: scale(0.8);
     max-width: 60vw;
     overflow: hidden;
     text-overflow: ellipsis;
     box-sizing: border-box;
+    box-shadow: var(--b3-tooltips-shadow);
+    font-family: var(--b3-font-family);
   }
 
   &::before {
     z-index: 1000001;
     width: 0;
     height: 0;
-    color: var(--b3-tooltips-color);
     content: "";
     border: 5px solid transparent;
     transform: scale(1.54);
@@ -91,7 +103,7 @@
     right: 50%;
     bottom: -5px;
     margin-right: -5px;
-    border-bottom-color: var(--b3-tooltips-color)
+    border-bottom-color: var(--b3-tooltips-background)
   }
 
   &__se::after {
@@ -119,7 +131,7 @@
     right: 50%;
     bottom: auto;
     margin-right: -5px;
-    border-top-color: var(--b3-tooltips-color)
+    border-top-color: var(--b3-tooltips-background)
   }
 
   &__ne::after {
@@ -154,7 +166,7 @@
     bottom: 50%;
     left: -5px;
     margin-top: -5px;
-    border-left-color: var(--b3-tooltips-color);
+    border-left-color: var(--b3-tooltips-background);
   }
 
   &__e::after {
@@ -175,7 +187,7 @@
     right: -5px;
     bottom: 50%;
     margin-top: -5px;
-    border-right-color: var(--b3-tooltips-color);
+    border-right-color: var(--b3-tooltips-background);
   }
 }
 

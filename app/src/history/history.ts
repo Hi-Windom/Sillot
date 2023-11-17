@@ -210,7 +210,7 @@ ${statHTML}`;
 </div>
 </li>`;
         /// #else
-        repoHTML += `<li class="b3-list-item" data-type="repoitem" data-id="${item.id}" data-tag="${item.tag}">
+        repoHTML += `<li class="b3-list-item b3-list-item--hide-action" data-type="repoitem" data-id="${item.id}" data-tag="${item.tag}">
 <div class="fn__flex-1">${infoHTML}</div>
 ${actionHTML}
 </li>`;
@@ -275,7 +275,7 @@ const renderRmNotebook = (element: HTMLElement) => {
             if (item.items.length > 0) {
                 logsHTML += `<ul class="${index === 0 ? "" : "fn__none"}">`;
                 item.items.forEach((docItem) => {
-                    logsHTML += `<li data-type="notebook" data-path="${docItem.path}" class="b3-list-item" style="padding-left: 32px">
+                    logsHTML += `<li data-type="notebook" data-path="${docItem.path}" class="b3-list-item b3-list-item--hide-action" style="padding-left: 32px">
     <span class="b3-list-item__text">${escapeHtml(docItem.title)}</span>
     <span class="fn__space"></span>
     <span class="b3-list-item__action b3-tooltips b3-tooltips__w" data-type="rollback" aria-label="${window.siyuan.languages.rollback}">
@@ -312,7 +312,7 @@ export const openHistory = (app: App) => {
     });
 
     const contentHTML = `<div class="fn__flex-column" style="height: 100%;">
-    <div class="layout-tab-bar fn__flex" style="border-radius: 4px 4px 0 0">
+    <div class="layout-tab-bar fn__flex" style="border-radius: var(--b3-border-radius-b) var(--b3-border-radius-b) 0 0">
         <div data-type="doc" class="item item--full item--focus"><span class="fn__flex-1"></span><span class="item__text">${window.siyuan.languages.fileHistory}</span><span class="fn__flex-1"></span></div>
         <div data-type="notebook" style="min-width: 160px" class="item item--full"><span class="fn__flex-1"></span><span class="item__text">${window.siyuan.languages.removedNotebook}</span><span class="fn__flex-1"></span></div>
         <div data-type="repo" class="item item--full"><span class="fn__flex-1"></span><span class="item__text">${window.siyuan.languages.dataSnapshot}</span><span class="fn__flex-1"></span></div>
@@ -544,7 +544,7 @@ const bindEvent = (app: App, element: Element, dialog?: Dialog) => {
                             iconElement.classList.add("b3-list-item__arrow--open");
                             let html = "";
                             response.data.items.forEach((docItem: { title: string, path: string }) => {
-                                html += `<li title="${escapeAttr(docItem.title)}" data-type="${typeElement.value === "2" ? "assets" : "doc"}" data-path="${docItem.path}" class="b3-list-item" style="padding-left: 40px">
+                                html += `<li title="${escapeAttr(docItem.title)}" data-type="${typeElement.value === "2" ? "assets" : "doc"}" data-path="${docItem.path}" class="b3-list-item b3-list-item--hide-action" style="padding-left: 40px">
     <span class="b3-list-item__text">${escapeHtml(docItem.title)}</span>
     <span class="fn__space"></span>
     <span class="b3-list-item__action b3-tooltips b3-tooltips__w" data-type="rollback" aria-label="${window.siyuan.languages.rollback}">
@@ -612,7 +612,11 @@ const bindEvent = (app: App, element: Element, dialog?: Dialog) => {
                         } else {
                             mdElement.classList.add("fn__none");
                             docElement.classList.remove("fn__none");
-                            onGet(response, historyEditor.protyle, [Constants.CB_GET_HISTORY, Constants.CB_GET_HTML]);
+                            onGet({
+                                data: response,
+                                protyle: historyEditor.protyle,
+                                action: [Constants.CB_GET_HISTORY, Constants.CB_GET_HTML],
+                            });
                         }
                     });
                 }

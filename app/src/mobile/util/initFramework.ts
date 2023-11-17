@@ -21,7 +21,7 @@ import {openCard} from "../../card/openCard";
 import {Inbox} from "../../layout/dock/Inbox";
 import {App} from "../../index";
 
-export const initFramework = (app: App) => {
+export const initFramework = (app: App, isStart:boolean) => {
     setInlineStyle();
     renderSnippet();
     initKeyboardToolbar();
@@ -106,42 +106,9 @@ export const initFramework = (app: App) => {
     document.getElementById("toolbarMore").addEventListener("click", () => {
         popMenu();
     });
-    document.getElementById("toolbarRiffCard").addEventListener("click", () => {
-        openCard();
-    });
-    const editElement = document.getElementById("toolbarEdit");
-    if (window.siyuan.config.readonly) {
-        editElement.classList.add("fn__none");
-    }
-    const inputElement = document.getElementById("toolbarName") as HTMLInputElement;
-    const editIconElement = editElement.querySelector("use");
-    if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly) {
-        inputElement.readOnly = true;
-        editIconElement.setAttribute("xlink:href", "#iconPreview");
-    } else {
-        inputElement.readOnly = false;
-        editIconElement.setAttribute("xlink:href", "#iconEdit");
-    }
-    editElement.addEventListener(getEventName(), () => {
-        window.siyuan.config.editor.readOnly = !window.siyuan.config.editor.readOnly;
-        const toolbarName = document.querySelector("#toolbarName") as HTMLElement;
-        if (toolbarName) {
-            toolbarName.style.filter = window.siyuan.config.editor.readOnly ? "brightness(0.58) opacity(0.58)" : "";
-        }
-        fetchPost("/api/setting/setEditor", window.siyuan.config.editor);
-    });
     document.getElementById("toolbarSync").addEventListener(getEventName(), () => {
         syncGuide(app);
     });
-    if (navigator.userAgent.indexOf("iPhone") > -1 && !window.siyuan.config.readonly && !window.siyuan.config.editor.readOnly) {
-        // 不知道为什么 iPhone 中如果是编辑状态，点击文档后无法点击标题
-        setTimeout(() => {
-            editElement.dispatchEvent(new CustomEvent(getEventName()));
-            setTimeout(() => {
-                editElement.dispatchEvent(new CustomEvent(getEventName()));
-            }, Constants.TIMEOUT_INPUT);
-        }, Constants.TIMEOUT_INPUT);
-    }
     document.getElementById("modelClose").addEventListener("click", () => {
         closeModel();
     });
@@ -153,17 +120,21 @@ export const initFramework = (app: App) => {
         const idZoomIn = getIdZoomInByPath();
         if (idZoomIn.id) {
             openMobileFileById(app, idZoomIn.id,
-                idZoomIn.isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]);
+                idZoomIn.isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
+            return;
+        }
+        if (window.siyuan.config.fileTree.closeTabsOnStart && isStart) {
+            setEmpty(app);
             return;
         }
         const localDoc = window.siyuan.storage[Constants.LOCAL_DOCINFO];
         fetchPost("/api/block/checkBlockExist", {id: localDoc.id}, existResponse => {
             if (existResponse.data) {
-                openMobileFileById(app, localDoc.id, localDoc.action);
+                openMobileFileById(app, localDoc.id, [Constants.CB_GET_SCROLL]);
             } else {
                 fetchPost("/api/block/getRecentUpdatedBlocks", {}, (response) => {
                     if (response.data.length !== 0) {
-                        openMobileFileById(app, response.data[0].id, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
+                        openMobileFileById(app, response.data[0].id, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
                     } else {
                         setEmpty(app);
                     }
@@ -179,7 +150,7 @@ const initEditorName = () => {
     const inputElement = document.getElementById("toolbarName") as HTMLInputElement;
     inputElement.setAttribute("placeholder", window.siyuan.languages._kernel[16]);
     inputElement.addEventListener("blur", () => {
-        if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly || window.siyuan.mobile.editor.protyle.disabled) {
+        if (inputElement.getAttribute("readonly") === "readonly") {
             return;
         }
         if (!validateName(inputElement.value)) {

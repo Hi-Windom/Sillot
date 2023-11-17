@@ -5,9 +5,9 @@ import {addStyle} from "../protyle/util/addStyle";
 import {getAllModels} from "../layout/getAll";
 import {exportLayout} from "../layout/util";
 /// #endif
-import {isMobile} from "./functions";
 import {fetchPost} from "./fetch";
 import {appearance} from "../config/appearance";
+import {isInAndroid, isInIOS} from "../protyle/util/compatibility";
 
 const loadThirdIcon = (iconURL: string, data: IAppearance) => {
     addScript(iconURL, "iconDefaultScript").then(() => {
@@ -121,7 +121,7 @@ export const loadAssets = (data: IAppearance) => {
         while (svgElement.tagName === "svg") {
             const currentSvgElement = svgElement;
             svgElement = svgElement.nextElementSibling;
-            if (currentSvgElement.id !== "emojiScriptSvg") {
+            if (!currentSvgElement.getAttribute("data-name")) {
                 currentSvgElement.remove();
             }
         }
@@ -132,15 +132,8 @@ export const loadAssets = (data: IAppearance) => {
 };
 
 export const initAssets = () => {
-    const emojiElement = document.getElementById("emojiScript");
     const loadingElement = document.getElementById("loading");
-    if (!((emojiElement || window.siyuan.config.appearance.nativeEmoji ) || isMobile())) {
-        addScript("/appearance/emojis/twitter-emoji.js?v=1.0.1", "emojiScript").then(() => {
-            if (loadingElement) {
-                loadingElement.remove();
-            }
-        });
-    } else if (loadingElement) {
+    if (loadingElement) {
         setTimeout(() => {
             loadingElement.remove();
         }, 160);
@@ -199,6 +192,7 @@ window.dataLayer.push(arguments);
             subscriptionStatus: -1,
             subscriptionPlan: -1,
             subscriptionType: -1,
+            oneTimePayStatus: -1,
             syncEnabled: false,
             syncProvider: -1,
             cTreeCount: window.siyuan.config.stat.cTreeCount,
@@ -211,6 +205,7 @@ window.dataLayer.push(arguments);
             para.subscriptionStatus = window.siyuan.user.userSiYuanSubscriptionStatus;
             para.subscriptionPlan = window.siyuan.user.userSiYuanSubscriptionPlan;
             para.subscriptionType = window.siyuan.user.userSiYuanSubscriptionType;
+            para.oneTimePayStatus = window.siyuan.user.userSiYuanOneTimePayStatus;
         }
         if (window.siyuan.config.sync) {
             para.syncEnabled = window.siyuan.config.sync.enabled;
@@ -241,10 +236,19 @@ export const setInlineStyle = (set = true) => {
 .protyle-wysiwyg .h5 img.emoji, .b3-typography h5 img.emoji {width:${Math.floor(window.siyuan.config.editor.fontSize * 1.13 * 1.25)}px}
 .protyle-wysiwyg .h6 img.emoji, .b3-typography h6 img.emoji {width:${Math.floor(window.siyuan.config.editor.fontSize * 1.25)}px}`;
     if (window.siyuan.config.editor.fontFamily) {
-        style += `.b3-typography:not(.b3-typography--default), .protyle-wysiwyg, .protyle-title, .protyle-title__input{font-family: "${window.siyuan.config.editor.fontFamily}", "Helvetica Neue", "Luxi Sans", "DejaVu Sans", "Hiragino Sans GB", "Microsoft Yahei", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", "EmojiSymbols" !important;}`;
+        style += `\n.b3-typography:not(.b3-typography--default), .protyle-wysiwyg, .protyle-title {font-family: "${window.siyuan.config.editor.fontFamily}", var(--b3-font-family-protyle)}`;
+    }
+    // pad 端菜单移除显示，如工作空间
+    if ("ontouchend" in document) {
+        style += "\n.b3-menu .b3-menu__action {opacity: 0.68;}";
     }
     if (set) {
-        document.getElementById("editorFontSize").innerHTML = style;
+        const siyuanStyle = document.getElementById("siyuanStyle");
+        if (siyuanStyle) {
+            siyuanStyle.innerHTML = style;
+        } else {
+            document.querySelector("#pluginsStyle").insertAdjacentHTML("beforebegin", `<style id="siyuanStyle">${style}</style>`);
+        }
     }
     return style;
 };
@@ -309,8 +313,7 @@ export const setMode = (modeElementValue: number) => {
 };
 
 const updateMobileTheme = (OSTheme: string) => {
-    if ((window.siyuan.config.system.container === "ios" && window.webkit?.messageHandlers) ||
-        (window.siyuan.config.system.container === "android" && window.JSAndroid)) {
+    if (isInIOS() || isInAndroid()) {
         setTimeout(() => {
             const backgroundColor = getComputedStyle(document.body).getPropertyValue("--b3-theme-background").trim();
             let mode = window.siyuan.config.appearance.mode;
@@ -321,9 +324,9 @@ const updateMobileTheme = (OSTheme: string) => {
                     mode = 0;
                 }
             }
-            if (window.siyuan.config.system.container === "ios" && window.webkit?.messageHandlers) {
-                window.webkit.messageHandlers.changeStatusBar.postMessage((backgroundColor || (mode === 0 ? "#fff" : "#1e1f22")) + " " + mode);
-            } else if (window.siyuan.config.system.container === "android" && window.JSAndroid) {
+            if (isInIOS()) {
+                window.webkit.messageHandlers.changeStatusBar.postMessage((backgroundColor || (mode === 0 ? "#fff" : "#1e1e1e")) + " " + mode);
+            } else if (isInAndroid()) {
                 window.JSAndroid.changeStatusBarColor(backgroundColor, mode);
             }
         }, 500); // 移动端需要加载完才可以获取到颜色

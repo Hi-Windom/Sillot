@@ -4,12 +4,13 @@ import {Wnd} from "../Wnd";
 import {Tab} from "../Tab";
 import {Files} from "./Files";
 import {Outline} from "./Outline";
-import {getAllModels} from "../getAll";
+import {getAllModels, getAllTabs} from "../getAll";
 import {Bookmark} from "./Bookmark";
 import {Tag} from "./Tag";
 import {Graph} from "./Graph";
 import {Model} from "../Model";
-import {getDockByType, resizeTabs, setPanelFocus} from "../util";
+import {setPanelFocus} from "../util";
+import {getDockByType, resizeTabs} from "../tabUtil";
 import {Inbox} from "./Inbox";
 import {Protyle} from "../../protyle";
 import {Backlink} from "./Backlink";
@@ -43,19 +44,19 @@ export class Dock {
                 this.layout = window.siyuan.layout.layout.children[0].children[0] as Layout;
                 this.resizeElement = this.layout.element.nextElementSibling as HTMLElement;
                 this.layout.element.classList.add("layout__dockl");
-                this.layout.element.insertAdjacentHTML("beforeend", "<div class=\"layout__dockresize layout__dockresize--lr\"></div>");
+                this.layout.element.insertAdjacentHTML("beforeend", '<div class="layout__dockresize layout__dockresize--lr"></div>');
                 break;
             case "Right":
                 this.layout = window.siyuan.layout.layout.children[0].children[2] as Layout;
                 this.resizeElement = this.layout.element.previousElementSibling as HTMLElement;
                 this.layout.element.classList.add("layout__dockr");
-                this.layout.element.insertAdjacentHTML("beforeend", "<div class=\"layout__dockresize layout__dockresize--lr\"></div>");
+                this.layout.element.insertAdjacentHTML("beforeend", '<div class="layout__dockresize layout__dockresize--lr"></div>');
                 break;
             case "Bottom":
                 this.layout = window.siyuan.layout.layout.children[1] as Layout;
                 this.resizeElement = this.layout.element.previousElementSibling as HTMLElement;
                 this.layout.element.classList.add("layout__dockb");
-                this.layout.element.insertAdjacentHTML("beforeend", "<div class=\"layout__dockresize\"></div>");
+                this.layout.element.insertAdjacentHTML("beforeend", '<div class="layout__dockresize"></div>');
                 break;
         }
         this.app = options.app;
@@ -188,6 +189,12 @@ export class Dock {
                 documentSelf.onselectstart = null;
                 documentSelf.onselect = null;
                 this.setSize();
+                this.element.querySelectorAll(".dock__item--active").forEach(item => {
+                    const customModel = this.data[item.getAttribute("data-type")];
+                    if (customModel && customModel instanceof Custom && customModel.resize) {
+                        customModel.resize();
+                    }
+                });
             };
         });
 
@@ -218,6 +225,7 @@ export class Dock {
         } else {
             this.layout.element.style.opacity = "";
             this.layout.element.style.transform = "";
+            this.layout.element.style.zIndex = "";
             if (hasActive) {
                 this.resizeElement.classList.remove("fn__none");
             }
@@ -252,6 +260,7 @@ export class Dock {
             this.layout.element.style.opacity = "1";
         }
         this.layout.element.style.transform = "";
+        this.layout.element.style.zIndex = (++window.siyuan.zIndex).toString();
         if (this.position === "Left") {
             this.layout.element.style.left = `${this.element.clientWidth}px`;
         } else if (this.position === "Right") {
@@ -312,6 +321,9 @@ export class Dock {
                     }
                 });
                 if (needFocus) {
+                    if (document.activeElement) {
+                        (document.activeElement as HTMLElement).blur();
+                    }
                     this.showDock();
                     return;
                 }
@@ -325,11 +337,23 @@ export class Dock {
                 } else {
                     this.layout.element.style.height = "0px";
                 }
-                if (document.querySelector("body").classList.contains("body--win32")) {
-                    document.getElementById("drag").classList.remove("fn__hidden");
-                }
                 this.resizeElement.classList.add("fn__none");
                 this.hideDock();
+            }
+            if ((type === "graph" || type === "globalGraph") && this.layout.element.querySelector(".fullscreen")) {
+                document.getElementById("drag")?.classList.remove("fn__hidden");
+            }
+            // 关闭 dock 后设置光标
+            if (!document.querySelector(".layout__center .layout__wnd--active")) {
+                const currentElement = document.querySelector(".layout__center .layout-tab-bar .item--focus");
+                if (currentElement) {
+                    getAllTabs().find(item => {
+                        if (item.id === currentElement.getAttribute("data-id")) {
+                            item.parent.switchTab(item.headElement);
+                            return true;
+                        }
+                    });
+                }
             }
         } else {
             this.element.querySelectorAll(`.dock__item--active[data-index="${index}"]`).forEach(item => {
@@ -376,6 +400,7 @@ export class Dock {
                                     type: "pin",
                                     tab,
                                     blockId: editor?.protyle?.block?.rootID,
+                                    isPreview: !editor?.protyle?.preview?.element.classList.contains("fn__none")
                                 });
                                 if (editor?.protyle?.title?.editElement) {
                                     outline.updateDocTitle(editor.protyle?.background?.ial);
@@ -464,15 +489,17 @@ export class Dock {
             } else {
                 this.layout.element.style.height = this.getMaxSize() + "px";
             }
-            if ((type === "graph" || type === "globalGraph") &&
-                document.querySelector("body").classList.contains("body--win32") && this.layout.element.querySelector(".fullscreen")) {
-                document.getElementById("drag").classList.add("fn__hidden");
+            if ((type === "graph" || type === "globalGraph") && this.layout.element.querySelector(".fullscreen")) {
+                document.getElementById("drag")?.classList.add("fn__hidden");
             }
             if (this.pin) {
                 this.layout.element.style.opacity = "";
                 setTimeout(() => {
                     this.resizeElement.classList.remove("fn__none");
                 }, 200);    // 需等待动画完毕后再出现，否则会出现滚动条 https://ld246.com/article/1676596622064
+            }
+            if (document.activeElement) {
+                (document.activeElement as HTMLElement).blur();
             }
         }
 
@@ -666,7 +693,10 @@ export class Dock {
         }
 
         if (typeof tabIndex === "number") {
-            this.element.classList.remove("fn__none");
+            // https://github.com/siyuan-note/siyuan/issues/8614
+            if (!window.siyuan.config.uiLayout.hideDock) {
+                this.element.classList.remove("fn__none");
+            }
             if (data[0].show) {
                 this.toggleModel(data[0].type, true);
             }

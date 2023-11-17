@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -30,6 +30,7 @@ type FileTree struct {
 	AllowCreateDeeper       bool   `json:"allowCreateDeeper"`       // 允许创建超过 7 层深度的子文档
 	RemoveDocWithoutConfirm bool   `json:"removeDocWithoutConfirm"` // 删除文档时是否不需要确认
 	CloseTabsOnStart        bool   `json:"closeTabsOnStart"`        // 启动时关闭所有页签
+	UseSingleLineSave       bool   `json:"useSingleLineSave"`       // 使用单行保存 .sy 文件
 
 	Sort int `json:"sort"` // 排序方式
 }
@@ -43,5 +44,6 @@ func NewFileTree() *FileTree {
 		MaxOpenTabCount:        8,
 		AllowCreateDeeper:      false,
 		CloseTabsOnStart:       false,
+		UseSingleLineSave:      util.UseSingleLineSave,
 	}
 }

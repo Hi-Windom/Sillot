@@ -14,6 +14,7 @@ import {Dialog} from "../dialog";
 import {ai} from "./ai";
 import {flashcard} from "./flashcard";
 import {App} from "../index";
+import {isHuawei} from "../protyle/util/compatibility";
 
 export const genItemPanel = (type: string, containerElement: Element, app: App) => {
     switch (type) {
@@ -48,9 +49,9 @@ export const genItemPanel = (type: string, containerElement: Element, app: App) 
             appearance.bindEvent();
             break;
         case "keymap":
-            containerElement.innerHTML = keymap.genHTML();
+            containerElement.innerHTML = keymap.genHTML(app);
             keymap.element = containerElement;
-            keymap.bindEvent();
+            keymap.bindEvent(app);
             break;
         case "bazaar":
             bazaar.element = containerElement;
@@ -111,20 +112,22 @@ export const openSetting = (app: App) => {
     <li data-name="repos" class="b3-list-item b3-list-item--big"><svg class="b3-list-item__graphic"><use xlink:href="#iconCloud"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.cloud}</span></li>
     <li data-name="about" class="b3-list-item b3-list-item--big"><svg class="b3-list-item__graphic"><use xlink:href="#iconInfo"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.about}</span></li>
   </ul>
-  <div class="config__tab-container" style="height:85vh" data-name="editor">${editor.genHTML()}</div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="filetree"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="card"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="AI"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="image"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="export"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="appearance"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="bazaar"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="search"></div>
-  <div class="config__tab-container fn__none" style="height:85vh;overflow: scroll" data-name="keymap"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="account"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="repos"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="about"></div>
+  <div class="config__tab-wrap"> 
+      <div class="config__tab-container" style="height:85vh" data-name="editor">${editor.genHTML()}</div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="filetree"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="card"></div>
+      <div class="config__tab-container config__tab-container--top fn__none" style="height:85vh" data-name="AI"></div>
+      <div class="config__tab-container config__tab-container--top fn__none" style="height:85vh" data-name="image"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="export"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="appearance"></div>
+      <div class="config__tab-container config__tab-container--top fn__none" style="height:85vh" data-name="bazaar"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="search"></div>
+      <div class="config__tab-container fn__none" style="height:85vh;overflow: scroll" data-name="keymap"></div>
+      <div class="config__tab-container config__tab-container--full fn__none" style="height:85vh" data-name="account"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="repos"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="about"></div>
 </div>
+  </div>
 </div>`,
         width: "90vw",
         height: "90vh",

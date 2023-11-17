@@ -1,4 +1,4 @@
-import {needSubscribe} from "../util/needSubscribe";
+import {needLogin, needSubscribe} from "../util/needSubscribe";
 import {showMessage} from "../dialog/message";
 import {fetchPost} from "../util/fetch";
 import {Dialog} from "../dialog";
@@ -42,7 +42,7 @@ export const addCloudName = (cloudPanelElement: Element) => {
     });
 };
 
-export const bindSyncCloudListEvent = (cloudPanelElement: Element) => {
+export const bindSyncCloudListEvent = (cloudPanelElement: Element, cb?: () => void) => {
     cloudPanelElement.addEventListener("click", (event) => {
         let target = event.target as HTMLElement;
         while (target && !target.isEqualNode(cloudPanelElement)) {
@@ -57,7 +57,7 @@ export const bindSyncCloudListEvent = (cloudPanelElement: Element) => {
                             cloudPanelElement.innerHTML = '<img style="margin: 0 auto;display: block;width: 64px;height: 100%" src="/stage/loading-pure.svg">';
                             fetchPost("/api/sync/removeCloudSyncDir", {name: target.parentElement.getAttribute("data-name")}, (response) => {
                                 window.siyuan.config.sync.cloudName = response.data;
-                                getSyncCloudList(cloudPanelElement, true);
+                                getSyncCloudList(cloudPanelElement, true, cb);
                             });
                         });
                         break;
@@ -65,7 +65,7 @@ export const bindSyncCloudListEvent = (cloudPanelElement: Element) => {
                         cloudPanelElement.innerHTML = '<img style="margin: 0 auto;display: block;width: 64px;height: 100%" src="/stage/loading-pure.svg">';
                         fetchPost("/api/sync/setCloudSyncDir", {name: target.getAttribute("data-name")}, () => {
                             window.siyuan.config.sync.cloudName = target.getAttribute("data-name");
-                            getSyncCloudList(cloudPanelElement, true);
+                            getSyncCloudList(cloudPanelElement, true, cb);
                         });
                         break;
                 }
@@ -99,12 +99,12 @@ export const getSyncCloudList = (cloudPanelElement: Element, reload = false, cb?
             response.data.syncDirs.forEach((item: { hSize: string, cloudName: string, updated: string }) => {
                 /// #if MOBILE
                 syncListHTML += `<li data-type="selectCloud" data-name="${item.cloudName}" class="b3-list-item b3-list-item--two">
-    <div class="b3-list-item__first">
+    <div class="b3-list-item__first" data-name="${item.cloudName}">
         <input type="radio" name="cloudName"${item.cloudName === response.data.checkedSyncDir ? " checked" : ""}/>
         <span class="fn__space"></span>
         <span>${item.cloudName}</span>
         <span class="fn__flex-1 fn__space"></span>
-        <span data-type="removeCloud" class="b3-tooltips b3-tooltips__w b3-list-item__action" aria-label="${window.siyuan.languages.delete}">
+        <span data-type="removeCloud" class="b3-list-item__action">
             <svg><use xlink:href="#iconTrashcan"></use></svg>
         </span>
     </div>
@@ -147,7 +147,8 @@ export const syncGuide = (app?: App) => {
         return;
     }
     /// #if MOBILE
-    if (0 === window.siyuan.config.sync.provider && needSubscribe()) {
+    if ((0 === window.siyuan.config.sync.provider && needSubscribe()) ||
+        (0 !== window.siyuan.config.sync.provider && needLogin())) {
         return;
     }
     /// #else
@@ -162,6 +163,12 @@ export const syncGuide = (app?: App) => {
             dialogSetting.element.querySelector('.b3-tab-bar [data-name="account"]').dispatchEvent(new CustomEvent("click"));
             dialogSetting.element.querySelector('.config__tab-container[data-name="account"]').setAttribute("data-action", "go-repos");
         }
+        return;
+    }
+    if (0 !== window.siyuan.config.sync.provider && needLogin("") && app) {
+        const dialogSetting = openSetting(app);
+        dialogSetting.element.querySelector('.b3-tab-bar [data-name="account"]').dispatchEvent(new CustomEvent("click"));
+        dialogSetting.element.querySelector('.config__tab-container[data-name="account"]').setAttribute("data-action", "go-repos");
         return;
     }
     /// #endif
@@ -247,8 +254,14 @@ const setSync = (key?: string, dialog?: Dialog) => {
             });
         }
         const contentElement = dialog.element.querySelector(".b3-dialog__content").lastElementChild;
-        bindSyncCloudListEvent(contentElement);
         const btnElement = dialog.element.querySelector(".b3-button");
+        bindSyncCloudListEvent(contentElement, () => {
+            if (contentElement.querySelector("input[checked]")) {
+                btnElement.removeAttribute("disabled");
+            } else {
+                btnElement.setAttribute("disabled", "disabled");
+            }
+        });
         getSyncCloudList(contentElement, false, () => {
             if (contentElement.querySelector("input[checked]")) {
                 btnElement.removeAttribute("disabled");
@@ -276,7 +289,7 @@ const setSync = (key?: string, dialog?: Dialog) => {
     }
 };
 
-export const setKey = (isSync:boolean, cb?:() => void) => {
+export const setKey = (isSync: boolean, cb?: () => void) => {
     const dialog = new Dialog({
         title: window.siyuan.languages.syncConfGuide1,
         content: `<div class="b3-dialog__content ft__center">

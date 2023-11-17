@@ -4,13 +4,14 @@ import {setEditMode} from "../../protyle/util/setEditMode";
 import {fetchPost} from "../../util/fetch";
 import {zoomOut} from "../../menus/protyle";
 import {processRender} from "../../protyle/util/processCode";
-import {highlightRender} from "../../protyle/markdown/highlightRender";
-import {blockRender} from "../../protyle/markdown/blockRender";
+import {highlightRender} from "../../protyle/render/highlightRender";
+import {blockRender} from "../../protyle/render/blockRender";
 import {disabledForeverProtyle, disabledProtyle, enableProtyle} from "../../protyle/util/onGet";
 import {setStorageVal} from "../../protyle/util/compatibility";
 import {closePanel} from "./closePanel";
 import {showMessage} from "../../dialog/message";
 import {getCurrentEditor} from "../editor";
+import {avRender} from "../../protyle/render/av/render";
 
 const forwardStack: IBackStack[] = [];
 
@@ -18,7 +19,6 @@ const focusStack = (backStack: IBackStack) => {
     const protyle = getCurrentEditor().protyle;
     window.siyuan.storage[Constants.LOCAL_DOCINFO] = {
         id: backStack.id,
-        action: backStack.callback,
     };
     setStorageVal(Constants.LOCAL_DOCINFO, window.siyuan.storage[Constants.LOCAL_DOCINFO]);
     hideElements(["toolbar", "hint", "util"], protyle);
@@ -26,9 +26,11 @@ const focusStack = (backStack: IBackStack) => {
         setEditMode(protyle, "wysiwyg");
     }
 
-    const startEndId = backStack.endId.split(Constants.ZWSP);
-    if (startEndId[0] === protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id") &&
-        startEndId[1] === protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id")) {
+    protyle.notebookId = backStack.data.notebookId;
+    protyle.path = backStack.data.path;
+
+    if (backStack.data.startId === protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id") &&
+        backStack.data.endId === protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id")) {
         protyle.contentElement.scrollTo({
             top: backStack.scrollTop,
             behavior: "smooth"
@@ -50,8 +52,13 @@ const focusStack = (backStack: IBackStack) => {
         if (backStack.zoomId !== protyle.block.id) {
             fetchPost("/api/block/checkBlockExist", {id: backStack.id}, existResponse => {
                 if (existResponse.data) {
-                    zoomOut(protyle, backStack.id, undefined, false, () => {
-                        protyle.contentElement.scrollTop = backStack.scrollTop;
+                    zoomOut({
+                        protyle,
+                        id: backStack.id,
+                        isPushBack: false,
+                        callback: () => {
+                            protyle.contentElement.scrollTop = backStack.scrollTop;
+                        }
                     });
                 }
             });
@@ -63,8 +70,8 @@ const focusStack = (backStack: IBackStack) => {
 
     fetchPost("/api/filetree/getDoc", {
         id: backStack.id,
-        startID: startEndId[0],
-        endID: startEndId[1],
+        startID: backStack.data.startId,
+        endID: backStack.data.endId,
     }, getResponse => {
         protyle.block.parentID = getResponse.data.parentID;
         protyle.block.parent2ID = getResponse.data.parent2ID;
@@ -78,30 +85,44 @@ const focusStack = (backStack: IBackStack) => {
         protyle.wysiwyg.element.innerHTML = getResponse.data.content;
         processRender(protyle.wysiwyg.element);
         highlightRender(protyle.wysiwyg.element);
+        avRender(protyle.wysiwyg.element, protyle);
         blockRender(protyle, protyle.wysiwyg.element, backStack.scrollTop);
         if (getResponse.data.isSyncing) {
             disabledForeverProtyle(protyle);
         } else {
-            if (protyle.disabled) {
+            let readOnly = window.siyuan.config.readonly ? "true" : "false";
+            if (readOnly === "false") {
+                readOnly = protyle.wysiwyg.element.getAttribute(Constants.CUSTOM_SY_READONLY);
+                if (!readOnly) {
+                    readOnly = window.siyuan.config.editor.readOnly ? "true" : "false";
+                }
+            }
+            if (readOnly === "true") {
                 disabledProtyle(protyle);
             } else {
                 enableProtyle(protyle);
             }
         }
         protyle.contentElement.scrollTop = backStack.scrollTop;
-        protyle.breadcrumb?.render(protyle);
     });
 };
 
 export const pushBack = () => {
     const protyle = getCurrentEditor().protyle;
-    window.siyuan.backStack.push({
-        id: protyle.block.showAll ? protyle.block.id : protyle.block.rootID,
-        endId: protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id") + Constants.ZWSP + protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id"),
-        scrollTop: protyle.contentElement.scrollTop,
-        callback: protyle.block.action,
-        zoomId: protyle.block.showAll ? protyle.block.id : undefined
-    });
+    if (protyle.wysiwyg.element.firstElementChild) {
+        window.siyuan.backStack.push({
+            id: protyle.block.showAll ? protyle.block.id : protyle.block.rootID,
+            data: {
+                startId: protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id"),
+                endId: protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id"),
+                notebookId: protyle.notebookId,
+                path: protyle.path,
+            },
+            scrollTop: protyle.contentElement.scrollTop,
+            callback: protyle.block.action,
+            zoomId: protyle.block.showAll ? protyle.block.id : undefined
+        });
+    }
 };
 
 export const goForward = () => {
@@ -133,7 +154,12 @@ export const goBack = () => {
         window.siyuan.menus.menu.element.dispatchEvent(new CustomEvent("click", {detail: "back"}));
         return;
     } else if (document.getElementById("model").style.transform === "translateY(0px)") {
-        document.getElementById("model").style.transform = "";
+        const searchAssetsPanelElement = document.getElementById("searchAssetsPanel");
+        if (!searchAssetsPanelElement || searchAssetsPanelElement.classList.contains("fn__none")) {
+            document.getElementById("model").style.transform = "";
+        } else {
+            searchAssetsPanelElement.classList.add("fn__none");
+        }
         return;
     } else if (window.siyuan.viewer && !window.siyuan.viewer.destroyed) {
         window.siyuan.viewer.destroy();
@@ -166,7 +192,12 @@ export const goBack = () => {
         const protyle = editor.protyle;
         forwardStack.push({
             id: protyle.block.showAll ? protyle.block.id : protyle.block.rootID,
-            endId: protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id") + Constants.ZWSP + protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id"),
+            data: {
+                startId: protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id"),
+                endId: protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id"),
+                notebookId: protyle.notebookId,
+                path: protyle.path,
+            },
             scrollTop: protyle.contentElement.scrollTop,
             callback: protyle.block.action,
             zoomId: protyle.block.showAll ? protyle.block.id : undefined

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 package model
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
@@ -30,52 +31,64 @@ import (
 
 // Petal represents a plugin's management status.
 type Petal struct {
-	Name    string `json:"name"`    // Plugin name
-	Enabled bool   `json:"enabled"` // Whether enabled
+	Name         string `json:"name"`         // Plugin name
+	DisplayName  string `json:"displayName"`  // Plugin display name
+	Enabled      bool   `json:"enabled"`      // Whether enabled
+	Incompatible bool   `json:"incompatible"` // Whether incompatible
 
 	JS   string                 `json:"js"`   // JS code
 	CSS  string                 `json:"css"`  // CSS code
 	I18n map[string]interface{} `json:"i18n"` // i18n text
 }
 
-func SetPetalEnabled(name string, enabled bool, frontend string) (ret *Petal) {
+func SetPetalEnabled(name string, enabled bool, frontend string) (ret *Petal, err error) {
 	petals := getPetals()
 
-	plugins := bazaar.InstalledPlugins(frontend)
-	var plugin *bazaar.Plugin
-	for _, p := range plugins {
-		if p.Name == name {
-			plugin = p
-			break
-		}
-	}
-	if nil == plugin {
+	found, displayName, incompatible := bazaar.ParseInstalledPlugin(name, frontend)
+	if !found {
 		logging.LogErrorf("plugin [%s] not found", name)
 		return
 	}
 
-	ret = getPetalByName(plugin.Name, petals)
+	ret = getPetalByName(name, petals)
 	if nil == ret {
 		ret = &Petal{
-			Name:    plugin.Name,
-			Enabled: enabled,
+			Name: name,
 		}
 		petals = append(petals, ret)
-	} else {
-		ret.Enabled = enabled
+	}
+	ret.DisplayName = displayName
+	ret.Enabled = enabled
+	ret.Incompatible = incompatible
+
+	if incompatible {
+		err = fmt.Errorf(Conf.Language(205))
+		return
 	}
 
 	savePetals(petals)
-
 	loadCode(ret)
 	return
 }
 
-func LoadPetals() (ret []*Petal) {
+func LoadPetals(frontend string) (ret []*Petal) {
 	ret = []*Petal{}
+
+	if Conf.Bazaar.PetalDisabled {
+		return
+	}
+
+	if !Conf.Bazaar.Trust {
+		// 移动端没有集市模块，所以要默认开启，桌面端和 Docker 容器需要用户手动确认过信任后才能开启
+		if util.ContainerStd == util.Container || util.ContainerDocker == util.Container {
+			return
+		}
+	}
+
 	petals := getPetals()
 	for _, petal := range petals {
-		if !petal.Enabled {
+		_, petal.DisplayName, petal.Incompatible = bazaar.ParseInstalledPlugin(petal.Name, frontend)
+		if !petal.Enabled || petal.Incompatible {
 			continue
 		}
 
@@ -88,7 +101,7 @@ func LoadPetals() (ret []*Petal) {
 func loadCode(petal *Petal) {
 	pluginDir := filepath.Join(util.DataDir, "plugins", petal.Name)
 	jsPath := filepath.Join(pluginDir, "index.js")
-	if !gulu.File.IsExist(jsPath) {
+	if !filelock.IsExist(jsPath) {
 		logging.LogErrorf("plugin [%s] js not found", petal.Name)
 		return
 	}
@@ -101,7 +114,7 @@ func loadCode(petal *Petal) {
 	petal.JS = string(data)
 
 	cssPath := filepath.Join(pluginDir, "index.css")
-	if gulu.File.IsExist(cssPath) {
+	if filelock.IsExist(cssPath) {
 		data, err = filelock.ReadFile(cssPath)
 		if nil != err {
 			logging.LogErrorf("read plugin [%s] css failed: %s", petal.Name, err)
@@ -191,7 +204,7 @@ func getPetals() (ret []*Petal) {
 	}
 
 	confPath := filepath.Join(petalDir, "petals.json")
-	if !gulu.File.IsExist(confPath) {
+	if !filelock.IsExist(confPath) {
 		data, err := gulu.JSON.MarshalIndentJSON(ret, "", "\t")
 		if nil != err {
 			logging.LogErrorf("marshal petals failed: %s", err)

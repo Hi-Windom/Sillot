@@ -1,10 +1,4 @@
 @font-face {
-  font-family: 'quote';
-  src: local("PingFang SC Regular"), local("SimSun");
-  unicode-range: U+2018, U+2019, U+201c, U+201d;
-}
-
-@font-face {
   font-family: 'JetBrainsMono-Regular';
   src: url(../fonts/JetBrainsMono-1.0.3/JetBrainsMono-Regular.woff) format('woff');
 }
@@ -12,6 +6,9 @@
 .b3-typography,
 .protyle-wysiwyg {
   font-variant-ligatures: no-common-ligatures;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--b3-font-family-protyle);
 
   img {
     max-width: 100%;
@@ -28,8 +25,8 @@
   [data-node-id] {
     line-height: 1.625;
     padding: 4px;
-    margin: 4px 0;
-    border-radius: 4px;
+    margin: 2px 0;
+    border-radius: var(--b3-border-radius);
   }
 
   ins > iframe {
@@ -92,22 +89,22 @@
     background-color: var(--b3-protyle-inline-mark-background);
     color: var(--b3-protyle-inline-mark-color);
 
-    &.mark__current {
-      background-color: var(--b3-protyle-search-current-background);
-      box-shadow: 0 0 1px var(--b3-theme-on-background);
+    &.mark--hl {
+      background-color: var(--b3-theme-primary-lighter);
+      box-shadow: 0 0 0 .5px var(--b3-theme-on-background);
     }
   }
 
   kbd,
   span[data-type~="kbd"] {
     padding: 2px 4px;
-    font: 75% Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font: 75% Consolas, "Liberation Mono", Menlo, Courier, monospace, var(--b3-font-family);
     line-height: 1;
     color: var(--b3-theme-on-surface);
     vertical-align: middle;
     background-color: var(--b3-theme-surface);
     border: solid 1px var(--b3-theme-surface-lighter);
-    border-radius: 3px;
+    border-radius: var(--b3-border-radius);
     box-shadow: inset 0 -1px 0 var(--b3-theme-surface-lighter);
   }
 
@@ -209,7 +206,6 @@
     margin: 0;
     overflow: auto;
     border-spacing: 0;
-    display: inline-block;
     width: max-content;
 
     tr:nth-child(2n) td {
@@ -244,6 +240,7 @@
   code:not(.hljs),
   span[data-type~="code"] {
     @extend .fn__code;
+    tab-size: 4;
   }
 
   a[href^=pdf-outline] {
@@ -267,6 +264,8 @@
     position: relative;
     padding: 0;
     margin: 1em 0;
+    display: flex;
+    flex-direction: row-reverse;
 
     .protyle-action {
       left: 4px;
@@ -300,13 +299,15 @@
   }
 
   .hljs {
-    border-radius: 4px;
-    padding: 22px 4px;
+    border-radius: var(--b3-border-radius);
+    padding: 1.6em 4px;
     font-size: 85%;
     overflow: auto;
     font-family: var(--b3-font-family-code);
     min-height: 22px !important;
     overflow-x: overlay;
+    tab-size: 4;
+    flex: 1;
   }
 
   [data-subtype="echarts"],
@@ -355,8 +356,8 @@
   [data-subtype="graphviz"] {
     text-align: center;
 
-    svg {
-      border-radius: 4px;
+    & > [contenteditable="false"] svg {
+      border-radius: var(--b3-border-radius);
 
       /* 由于会覆盖颜色，先移除看看有没有副作用 https://github.com/siyuan-note/siyuan/issues/7735
       polygon {
@@ -371,7 +372,7 @@
 
     [contenteditable="false"] svg {
       background: var(--b3-theme-on-primary);
-      border-radius: 4px;
+      border-radius: var(--b3-border-radius);
     }
   }
 
@@ -386,7 +387,7 @@
   }
 
   [data-subtype="plantuml"] img {
-    border-radius: 4px;
+    border-radius: var(--b3-border-radius);
   }
 
   .abcjs-container svg,
@@ -402,6 +403,8 @@
     text-align: center;
     vertical-align: top; // https://ld246.com/article/1647522074722
     margin: 0 auto;
+    max-width: 100%;
+    user-select: none;
 
     &:not([style]) {
       display: initial;
@@ -450,7 +453,7 @@
   hr {
     border: 0;
     border-bottom: 1px solid var(--b3-theme-background-light);
-    margin: 8px 0;
+    margin: 21px 0;
   }
 
   table {
@@ -477,34 +480,31 @@
     right: 4px;
     top: 4px;
     display: flex;
-
-    &--show {
-      opacity: .86;
-    }
   }
 
   &-icon {
     font-size: 85%;
-    line-height: 22px;
+    line-height: 14px;
     cursor: pointer;
-    padding: 0 4px;
+    padding: 5px;
     transition: var(--b3-transition);
     background-color: var(--b3-theme-on-surface);
-    height: 22px;
+    height: 24px;
     color: var(--b3-theme-surface);
+    box-sizing: border-box;
 
     &--only {
-      border-radius: 4px;
+      border-radius: var(--b3-border-radius);
     }
 
     &--first {
-      border-bottom-left-radius: 4px;
-      border-top-left-radius: 4px;
+      border-bottom-left-radius: var(--b3-border-radius);
+      border-top-left-radius: var(--b3-border-radius);
     }
 
     &--last {
-      border-bottom-right-radius: 4px;
-      border-top-right-radius: 4px;
+      border-bottom-right-radius: var(--b3-border-radius);
+      border-top-right-radius: var(--b3-border-radius);
     }
 
     &:hover {
@@ -514,7 +514,7 @@
 
     &--text {
       cursor: text;
-      border-radius: 4px;
+      border-radius: var(--b3-border-radius);
 
       &:hover {
         color: var(--b3-theme-surface);
@@ -523,29 +523,26 @@
     }
 
     & > svg {
-      height: 22px;
+      height: 14px;
+      float: left;
       width: 14px;
       fill: currentColor;
     }
   }
 
   &-linenumber {
-    margin-left: calc(3.6em);
-    position: relative;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
 
     &__rows {
-      position: absolute;
       pointer-events: none;
-      top: 0;
-      left: 0;
       user-select: none;
       counter-reset: linenumber;
       font-size: 85%;
-      line-height: 1.625;
       background-color: var(--b3-theme-surface);
-      padding: 22px 4px;
+      padding: 1.6em 4px;
       box-sizing: border-box;
-      border-radius: 4px 0 0 4px;
+      border-radius: var(--b3-border-radius) 0 0 var(--b3-border-radius);
       width: 3.6em;
       font-family: var(--b3-font-family-code);
 
@@ -573,7 +570,7 @@
     display: none;
     background-color: var(--b3-theme-surface);
     border: 1px solid var(--b3-theme-surface-lighter);
-    border-radius: 3px;
+    border-radius: var(--b3-border-radius);
     padding: 3px;
     cursor: pointer;
     color: var(--b3-theme-on-surface);
@@ -620,7 +617,7 @@
 
 .mermaidTooltip {
   position: fixed;
-  border-radius: 4px;
+  border-radius: var(--b3-border-radius);
   box-shadow: var(--b3-dialog-shadow);
   border: 1px solid var(--b3-theme-surface-lighter);
   background-color: var(--b3-theme-surface);

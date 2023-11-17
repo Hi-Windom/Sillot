@@ -16,7 +16,7 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "outDir": "./out/",
     "typeRoots": ["./node_modules/@types"],
-    "types": ["./src/types", "node", "jest"]
+    "types": ["src/types", "node", "jest"]
   },
   "include": ["src"]
 }

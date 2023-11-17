@@ -4,25 +4,29 @@ import {fetchPost} from "../../util/fetch";
 import {onGet} from "../util/onGet";
 import {isMobile} from "../../util/functions";
 import {hasClosestBlock, hasClosestByClassName} from "../util/hasClosest";
+import {stickyRow} from "../render/av/row";
 
 let getIndexTimeout: number;
 export const scrollEvent = (protyle: IProtyle, element: HTMLElement) => {
-    let elementRect = element.getBoundingClientRect();
     element.addEventListener("scroll", () => {
+        const elementRect = element.getBoundingClientRect();
         if (!protyle.toolbar.element.classList.contains("fn__none")) {
             const initY = protyle.toolbar.element.getAttribute("data-inity").split(Constants.ZWSP);
             const top = parseInt(initY[0]) + (parseInt(initY[1]) - element.scrollTop);
-            if (elementRect.width === 0) {
-                elementRect = element.getBoundingClientRect();
-            }
-            const toolbarHeight = 29;
-            if (top < elementRect.top - toolbarHeight || top > elementRect.bottom - toolbarHeight) {
+            if (top < elementRect.top - protyle.toolbar.toolbarHeight || top > elementRect.bottom - protyle.toolbar.toolbarHeight) {
                 protyle.toolbar.element.style.display = "none";
             } else {
                 protyle.toolbar.element.style.top = top + "px";
                 protyle.toolbar.element.style.display = "";
             }
         }
+
+        protyle.wysiwyg.element.querySelectorAll(".av").forEach((item: HTMLElement) => {
+            if (item.dataset.render !== "true") {
+                return;
+            }
+            stickyRow(item, elementRect, "all");
+        });
 
         if (!protyle.element.classList.contains("block__edit") && !isMobile()) {
             protyle.contentElement.setAttribute("data-scrolltop", element.scrollTop.toString());
@@ -35,11 +39,12 @@ export const scrollEvent = (protyle: IProtyle, element: HTMLElement) => {
         if (protyle.scroll && !protyle.scroll.element.classList.contains("fn__none")) {
             clearTimeout(getIndexTimeout);
             getIndexTimeout = window.setTimeout(() => {
-                elementRect = element.getBoundingClientRect();
                 const targetElement = document.elementFromPoint(elementRect.left + elementRect.width / 2, elementRect.top + 10);
                 const blockElement = hasClosestBlock(targetElement);
                 if (!blockElement) {
-                    if (protyle.wysiwyg.element.firstElementChild.getAttribute("data-eof") === "1" &&
+                    if ((protyle.wysiwyg.element.firstElementChild.getAttribute("data-eof") === "1" ||
+                            // goHome 时 data-eof 不为 1
+                            protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-index") === "0") &&
                         (hasClosestByClassName(targetElement, "protyle-background") || hasClosestByClassName(targetElement, "protyle-title"))) {
                         const inputElement = protyle.scroll.element.querySelector(".b3-slider") as HTMLInputElement;
                         inputElement.value = "1";
@@ -70,7 +75,11 @@ export const scrollEvent = (protyle: IProtyle, element: HTMLElement) => {
                 }, getResponse => {
                     protyle.contentElement.style.overflow = "";
                     protyle.contentElement.style.width = "";
-                    onGet(getResponse, protyle, [Constants.CB_GET_BEFORE, Constants.CB_GET_UNCHANGEID]);
+                    onGet({
+                        data: getResponse,
+                        protyle,
+                        action: [Constants.CB_GET_BEFORE, Constants.CB_GET_UNCHANGEID],
+                    });
                 });
             }
         } else if ((element.scrollTop > element.scrollHeight - element.clientHeight * 1.8) &&
@@ -82,7 +91,11 @@ export const scrollEvent = (protyle: IProtyle, element: HTMLElement) => {
                 mode: 2,
                 size: window.siyuan.config.editor.dynamicLoadBlocks,
             }, getResponse => {
-                onGet(getResponse, protyle, [Constants.CB_GET_APPEND, Constants.CB_GET_UNCHANGEID]);
+                onGet({
+                    data: getResponse,
+                    protyle,
+                    action: [Constants.CB_GET_APPEND, Constants.CB_GET_UNCHANGEID],
+                });
             });
         }
         protyle.scroll.lastScrollTop = Math.max(element.scrollTop, 0);

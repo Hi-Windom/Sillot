@@ -3,22 +3,28 @@ import {genUUID} from "../util/genID";
 import {moveResize} from "./moveResize";
 /// #endif
 import {isMobile} from "../util/functions";
+import {isNotCtrl} from "../protyle/util/compatibility";
+import {Protyle} from "../protyle";
 
 export class Dialog {
     private destroyCallback: (options?: IObject) => void;
     public element: HTMLElement;
     private id: string;
     private disableClose: boolean;
+    public editor: Protyle;
+    public data: any;
 
     constructor(options: {
         title?: string,
         transparent?: boolean,
         content: string,
-        width?: string
+        width?: string,
         height?: string,
-        destroyCallback?: (options?: IObject) => void
-        disableClose?: boolean
-        disableAnimation?: boolean
+        destroyCallback?: (options?: IObject) => void,
+        disableClose?: boolean,
+        hideCloseIcon?: boolean,
+        disableAnimation?: boolean,
+        resizeCallback?: (type: string) => void
     }) {
         this.disableClose = options.disableClose;
         this.id = genUUID();
@@ -26,10 +32,10 @@ export class Dialog {
         this.destroyCallback = options.destroyCallback;
         this.element = document.createElement("div") as HTMLElement;
 
-        this.element.innerHTML = `<div class="b3-dialog">
+        this.element.innerHTML = `<div class="b3-dialog" style="z-index: ${++window.siyuan.zIndex};">
 <div class="b3-dialog__scrim"${options.transparent ? 'style="background-color:transparent"' : ""}></div>
 <div class="b3-dialog__container" style="width:${options.width || "auto"};height:${options.height || "auto"}">
-  <svg ${(isMobile() && options.title) ? 'style="top:0;right:0;"' : ""} class="b3-dialog__close${this.disableClose ? " fn__none" : ""}"><use xlink:href="#iconCloseRound"></use></svg>
+  <svg ${(isMobile() && options.title) ? 'style="top:0;right:0;"' : ""} class="b3-dialog__close${(this.disableClose || options.hideCloseIcon) ? " fn__none" : ""}"><use xlink:href="#iconCloseRound"></use></svg>
   <div class="resize__move b3-dialog__header${options.title ? "" : " fn__none"}" onselectstart="return false;">${options.title || ""}</div>
   <div class="b3-dialog__body">${options.content}</div>
   <div class="resize__rd"></div><div class="resize__ld"></div><div class="resize__lt"></div><div class="resize__rt"></div><div class="resize__r"></div><div class="resize__d"></div><div class="resize__t"></div><div class="resize__l"></div>
@@ -41,8 +47,6 @@ export class Dialog {
             }
             event.preventDefault();
             event.stopPropagation();
-            // https://ld246.com/article/1657969292700/comment/1658147006669#comments
-            window.siyuan.menus.menu.remove();
         });
         if (!this.disableClose) {
             this.element.querySelector(".b3-dialog__close").addEventListener("click", (event) => {
@@ -60,14 +64,17 @@ export class Dialog {
             });
         }
         /// #if !MOBILE
-        moveResize(this.element.querySelector(".b3-dialog__container"));
+        moveResize(this.element.querySelector(".b3-dialog__container"), options.resizeCallback);
         /// #endif
     }
 
     public destroy(options?: IObject) {
+        // av 修改列头emoji后点击关闭emoji图标
+        if ((this.element.querySelector(".b3-dialog") as HTMLElement).style.zIndex < window.siyuan.menus.menu.element.style.zIndex) {
+            // https://github.com/siyuan-note/siyuan/issues/6783
+            window.siyuan.menus.menu.remove();
+        }
         this.element.remove();
-        // https://github.com/siyuan-note/siyuan/issues/6783
-        window.siyuan.menus.menu.remove();
         if (this.destroyCallback) {
             this.destroyCallback(options);
         }
@@ -79,7 +86,7 @@ export class Dialog {
         });
     }
 
-    public bindInput(inputElement: HTMLInputElement | HTMLTextAreaElement, enterEvent?: () => void) {
+    public bindInput(inputElement: HTMLInputElement | HTMLTextAreaElement, enterEvent?: () => void, bindEnter = true) {
         inputElement.focus();
         inputElement.addEventListener("keydown", (event: KeyboardEvent) => {
             if (event.isComposing) {
@@ -92,9 +99,10 @@ export class Dialog {
                 event.stopPropagation();
                 return;
             }
-            if (event.key === "Enter" && enterEvent) {
+            if (!event.shiftKey && isNotCtrl(event) && event.key === "Enter" && enterEvent && bindEnter) {
                 enterEvent();
                 event.preventDefault();
+                event.stopPropagation();
             }
         });
     }

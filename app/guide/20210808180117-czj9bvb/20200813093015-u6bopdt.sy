@@ -7,275 +7,9 @@
 		"id": "20200813093015-u6bopdt",
 		"title": "常见问题",
 		"type": "doc",
-		"updated": "20230406111909"
+		"updated": "20230820183254"
 	},
 	"Children": [
-		{
-			"ID": "20220617160928-fw4ixa3",
-			"Type": "NodeHeading",
-			"HeadingLevel": 2,
-			"Properties": {
-				"id": "20220617160928-fw4ixa3",
-				"updated": "20220617161057"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "思源适合我吗？或者说我应该如何选择笔记软件？"
-				}
-			]
-		},
-		{
-			"ID": "20220617161051-9hnwzuw",
-			"Type": "NodeParagraph",
-			"Properties": {
-				"id": "20220617161051-9hnwzuw",
-				"updated": "20220617192447"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "这个问题因人而异，很难统一回答。如果你不太确定思源是否适合你，请看如下建议："
-				}
-			]
-		},
-		{
-			"ID": "20220617161301-eouqj46",
-			"Type": "NodeList",
-			"ListData": {},
-			"Properties": {
-				"id": "20220617161301-eouqj46",
-				"updated": "20220618092735"
-			},
-			"Children": [
-				{
-					"ID": "20220617161333-cfjjt9f",
-					"Type": "NodeListItem",
-					"ListData": {
-						"BulletChar": 42,
-						"Marker": "Kg=="
-					},
-					"Properties": {
-						"id": "20220617161333-cfjjt9f",
-						"updated": "20220618092735"
-					},
-					"Children": [
-						{
-							"ID": "20220617161333-ljoc9yt",
-							"Type": "NodeParagraph",
-							"Properties": {
-								"id": "20220617161333-ljoc9yt",
-								"updated": "20220617161636"
-							},
-							"Children": [
-								{
-									"Type": "NodeText",
-									"Data": "如果你需要经常分享笔记或者与别人协作编辑，并且需要数据表格功能，推荐使用："
-								}
-							]
-						},
-						{
-							"ID": "20220617161455-izhl04n",
-							"Type": "NodeList",
-							"ListData": {},
-							"Properties": {
-								"id": "20220617161455-izhl04n",
-								"updated": "20220618092735"
-							},
-							"Children": [
-								{
-									"ID": "20220617161815-8fe1szc",
-									"Type": "NodeListItem",
-									"ListData": {
-										"BulletChar": 42,
-										"Marker": "Kg=="
-									},
-									"Properties": {
-										"id": "20220617161815-8fe1szc",
-										"updated": "20220618092733"
-									},
-									"Children": [
-										{
-											"ID": "20220617161815-tvymjq4",
-											"Type": "NodeParagraph",
-											"Properties": {
-												"id": "20220617161815-tvymjq4",
-												"updated": "20220617161852"
-											},
-											"Children": [
-												{
-													"Type": "NodeTextMark",
-													"TextMarkType": "a",
-													"TextMarkAHref": "https://flowus.cn/",
-													"TextMarkTextContent": "FlowUs 息流 - 新一代知识管理与协作平台"
-												}
-											]
-										}
-									]
-								},
-								{
-									"ID": "20220617161706-38jhxke",
-									"Type": "NodeListItem",
-									"ListData": {
-										"BulletChar": 42,
-										"Marker": "Kg=="
-									},
-									"Properties": {
-										"id": "20220617161706-38jhxke",
-										"updated": "20220618092735"
-									},
-									"Children": [
-										{
-											"ID": "20220617161706-9s8ze7c",
-											"Type": "NodeParagraph",
-											"Properties": {
-												"id": "20220617161706-9s8ze7c",
-												"updated": "20220617161813"
-											},
-											"Children": [
-												{
-													"Type": "NodeTextMark",
-													"TextMarkType": "a",
-													"TextMarkAHref": "https://www.wolai.com/",
-													"TextMarkTextContent": "我来 wolai - 不仅仅是未来的云端协作平台与个人笔记"
-												}
-											]
-										}
-									]
-								},
-								{
-									"ID": "20220617161455-z1nqmw7",
-									"Type": "NodeListItem",
-									"ListData": {
-										"BulletChar": 42,
-										"Marker": "Kg=="
-									},
-									"Properties": {
-										"id": "20220617161455-z1nqmw7"
-									},
-									"Children": [
-										{
-											"ID": "20220617161455-9v5752p",
-											"Type": "NodeParagraph",
-											"Properties": {
-												"id": "20220617161455-9v5752p",
-												"updated": "20220617161704"
-											},
-											"Children": [
-												{
-													"Type": "NodeTextMark",
-													"TextMarkType": "a",
-													"TextMarkAHref": "https://www.notion.so/",
-													"TextMarkTextContent": "Notion - One workspace. Every team."
-												}
-											]
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				{
-					"ID": "20220617161302-0qg3px1",
-					"Type": "NodeListItem",
-					"ListData": {
-						"BulletChar": 42,
-						"Marker": "Kg=="
-					},
-					"Properties": {
-						"id": "20220617161302-0qg3px1",
-						"updated": "20220617162305"
-					},
-					"Children": [
-						{
-							"ID": "20220617161302-whpf579",
-							"Type": "NodeParagraph",
-							"Properties": {
-								"id": "20220617161302-whpf579",
-								"updated": "20220617162114"
-							},
-							"Children": [
-								{
-									"Type": "NodeText",
-									"Data": "如果你喜欢使用纯文本 Markdown 文件存储笔记，推荐使用："
-								}
-							]
-						},
-						{
-							"ID": "20220617162114-l07zexd",
-							"Type": "NodeList",
-							"ListData": {},
-							"Properties": {
-								"id": "20220617162114-l07zexd",
-								"updated": "20220617162305"
-							},
-							"Children": [
-								{
-									"ID": "20220617162114-2a65c82",
-									"Type": "NodeListItem",
-									"ListData": {
-										"BulletChar": 42,
-										"Marker": "Kg=="
-									},
-									"Properties": {
-										"id": "20220617162114-2a65c82"
-									},
-									"Children": [
-										{
-											"ID": "20220617162114-j1xuvda",
-											"Type": "NodeParagraph",
-											"Properties": {
-												"id": "20220617162114-j1xuvda",
-												"updated": "20220617162141"
-											},
-											"Children": [
-												{
-													"Type": "NodeTextMark",
-													"TextMarkType": "a",
-													"TextMarkAHref": "https://obsidian.md/",
-													"TextMarkTextContent": "Obsidian - A second brain, for you, forever."
-												}
-											]
-										}
-									]
-								},
-								{
-									"ID": "20220617162143-bxv2p97",
-									"Type": "NodeListItem",
-									"ListData": {
-										"BulletChar": 42,
-										"Marker": "Kg=="
-									},
-									"Properties": {
-										"id": "20220617162143-bxv2p97",
-										"updated": "20220617162305"
-									},
-									"Children": [
-										{
-											"ID": "20220617162143-3h56sfi",
-											"Type": "NodeParagraph",
-											"Properties": {
-												"id": "20220617162143-3h56sfi",
-												"updated": "20220617162305"
-											},
-											"Children": [
-												{
-													"Type": "NodeTextMark",
-													"TextMarkType": "a",
-													"TextMarkAHref": "https://logseq.com/",
-													"TextMarkTextContent": "Logseq - A privacy-first, open-source knowledge base"
-												}
-											]
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			]
-		},
 		{
 			"ID": "20210428213311-2hv9zwx",
 			"Type": "NodeHeading",
@@ -326,7 +60,7 @@
 			"ListData": {},
 			"Properties": {
 				"id": "20210428213927-rbcfx2y",
-				"updated": "20230512170439"
+				"updated": "20230622164014"
 			},
 			"Children": [
 				{
@@ -338,7 +72,7 @@
 					},
 					"Properties": {
 						"id": "20210428213928-dft58ey",
-						"updated": "20220329160333"
+						"updated": "20230622163958"
 					},
 					"Children": [
 						{
@@ -346,7 +80,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20210428213928-3lwnco5",
-								"updated": "20220329160333"
+								"updated": "20230622163958"
 							},
 							"Children": [
 								{
@@ -360,7 +94,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​​ 用于保存所有插入的"
+									"Data": "​ 用于保存所有插入的"
 								},
 								{
 									"Type": "NodeTextMark",
@@ -382,7 +116,7 @@
 					},
 					"Properties": {
 						"id": "20221202214520-u96zbhq",
-						"updated": "20221202215129"
+						"updated": "20230622164002"
 					},
 					"Children": [
 						{
@@ -390,7 +124,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20221202214520-k8zqbno",
-								"updated": "20221202215129"
+								"updated": "20230622164002"
 							},
 							"Children": [
 								{
@@ -404,15 +138,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​ 用于保存自定义"
-								},
-								{
-									"Type": "NodeText",
-									"Data": "图标"
-								},
-								{
-									"Type": "NodeText",
-									"Data": "表情图片"
+									"Data": "​ 用于保存自定义图标表情图片"
 								}
 							]
 						}
@@ -426,7 +152,8 @@
 						"Marker": "Kg=="
 					},
 					"Properties": {
-						"id": "20221202214533-6s8dyno"
+						"id": "20221202214533-6s8dyno",
+						"updated": "20230622164005"
 					},
 					"Children": [
 						{
@@ -434,7 +161,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20221202214533-jfy92ef",
-								"updated": "20221202214549"
+								"updated": "20230622164005"
 							},
 							"Children": [
 								{
@@ -448,7 +175,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​ 用于保存代码片段"
+									"Data": "​ 用于保存代码片段"
 								}
 							]
 						}
@@ -463,7 +190,7 @@
 					},
 					"Properties": {
 						"id": "20221202214653-s19pmcp",
-						"updated": "20230429085021"
+						"updated": "20230622164007"
 					},
 					"Children": [
 						{
@@ -471,7 +198,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20221202214653-trmmieq",
-								"updated": "20230429085021"
+								"updated": "20230622164007"
 							},
 							"Children": [
 								{
@@ -485,7 +212,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​ 用于保存查询条件、布局和"
+									"Data": "​ 用于保存查询条件、布局和"
 								},
 								{
 									"Type": "NodeTextMark",
@@ -510,7 +237,8 @@
 						"Marker": "Kg=="
 					},
 					"Properties": {
-						"id": "20210428213944-j13vr82"
+						"id": "20210428213944-j13vr82",
+						"updated": "20230622164010"
 					},
 					"Children": [
 						{
@@ -518,7 +246,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20210428213944-7a9j1uc",
-								"updated": "20210428222707"
+								"updated": "20230622164010"
 							},
 							"Children": [
 								{
@@ -532,7 +260,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​​ 用于保存"
+									"Data": "​ 用于保存"
 								},
 								{
 									"Type": "NodeTextMark",
@@ -554,7 +282,7 @@
 					},
 					"Properties": {
 						"id": "20210428214009-k0zgwll",
-						"updated": "20220329160344"
+						"updated": "20230622164012"
 					},
 					"Children": [
 						{
@@ -562,7 +290,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20210428214009-lrjn6tn",
-								"updated": "20220329160344"
+								"updated": "20230622164012"
 							},
 							"Children": [
 								{
@@ -576,7 +304,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​​ 用于保存"
+									"Data": "​ 用于保存"
 								},
 								{
 									"Type": "NodeTextMark",
@@ -598,7 +326,7 @@
 					},
 					"Properties": {
 						"id": "20230512170429-itokqka",
-						"updated": "20230512170439"
+						"updated": "20230622164013"
 					},
 					"Children": [
 						{
@@ -606,7 +334,7 @@
 							"Type": "NodeParagraph",
 							"Properties": {
 								"id": "20230512170429-dzajfaa",
-								"updated": "20230512170439"
+								"updated": "20230622164013"
 							},
 							"Children": [
 								{
@@ -628,6 +356,43 @@
 									"TextMarkBlockRefID": "20230506210010-houyyvy",
 									"TextMarkBlockRefSubtype": "s",
 									"TextMarkTextContent": "插件"
+								}
+							]
+						}
+					]
+				},
+				{
+					"ID": "20230622163342-3bee88y",
+					"Type": "NodeListItem",
+					"ListData": {
+						"BulletChar": 42,
+						"Marker": "Kg=="
+					},
+					"Properties": {
+						"id": "20230622163342-3bee88y",
+						"updated": "20230622164014"
+					},
+					"Children": [
+						{
+							"ID": "20230622163342-77ojnru",
+							"Type": "NodeParagraph",
+							"Properties": {
+								"id": "20230622163342-77ojnru",
+								"updated": "20230622164014"
+							},
+							"Children": [
+								{
+									"Type": "NodeText",
+									"Data": "​"
+								},
+								{
+									"Type": "NodeTextMark",
+									"TextMarkType": "code",
+									"TextMarkTextContent": "public"
+								},
+								{
+									"Type": "NodeText",
+									"Data": "​ 用于保存公开的数据"
 								}
 							]
 						}
@@ -664,7 +429,7 @@
 								},
 								{
 									"Type": "NodeText",
-									"Data": "​​​ 后缀的文件用于保存文档数据，数据格式为 JSON"
+									"Data": "​​​​ 后缀的文件用于保存文档数据，数据格式为 JSON"
 								}
 							]
 						}
@@ -705,170 +470,18 @@
 			"Children": [
 				{
 					"Type": "NodeText",
-					"Data": "不支持通过第三方同步盘进行数据同步，否则可能会导致数据损坏。"
-				}
-			]
-		},
-		{
-			"ID": "20221112210648-7737myk",
-			"Type": "NodeParagraph",
-			"Properties": {
-				"id": "20221112210648-7737myk"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "虽然不支持第三方同步盘，但是支持第三方云端存储服务，可在 "
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "kbd",
-					"TextMarkTextContent": "设置"
-				},
-				{
-					"Type": "NodeText",
-					"Data": "​ - "
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "kbd",
-					"TextMarkTextContent": "云端"
-				},
-				{
-					"Type": "NodeText",
-					"Data": "​ - "
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "kbd",
-					"TextMarkTextContent": "云端存储服务提供商"
-				},
-				{
-					"Type": "NodeText",
-					"Data": "​ 中进行选择和配置，目前已经支持："
-				}
-			]
-		},
-		{
-			"ID": "20221112204518-3qo0gc8",
-			"Type": "NodeList",
-			"ListData": {},
-			"Properties": {
-				"id": "20221112204518-3qo0gc8",
-				"updated": "20221112204519"
-			},
-			"Children": [
-				{
-					"ID": "20221112204519-8xbk4th",
-					"Type": "NodeListItem",
-					"ListData": {
-						"BulletChar": 42,
-						"Marker": "Kg=="
-					},
-					"Properties": {
-						"id": "20221112204519-8xbk4th",
-						"updated": "20221112204519"
-					},
-					"Children": [
-						{
-							"ID": "20221112204519-52kxq65",
-							"Type": "NodeParagraph",
-							"Properties": {
-								"id": "20221112204519-52kxq65",
-								"updated": "20221112210256"
-							},
-							"Children": [
-								{
-									"Type": "NodeText",
-									"Data": "S3 兼容的对象存储服务，比如"
-								},
-								{
-									"Type": "NodeTextMark",
-									"TextMarkType": "a",
-									"TextMarkAHref": "https://s.qiniu.com/VbQfeu",
-									"TextMarkTextContent": "七牛云"
-								},
-								{
-									"Type": "NodeText",
-									"Data": "、"
-								},
-								{
-									"Type": "NodeTextMark",
-									"TextMarkType": "a",
-									"TextMarkAHref": "https://www.aliyun.com/product/oss?userCode=yqovuas2",
-									"TextMarkTextContent": "阿里云 OSS"
-								},
-								{
-									"Type": "NodeText",
-									"Data": "、"
-								},
-								{
-									"Type": "NodeTextMark",
-									"TextMarkType": "a",
-									"TextMarkAHref": "https://www.cloudflare.com/",
-									"TextMarkTextContent": "Cloudflare R2"
-								}
-							]
-						}
-					]
-				},
-				{
-					"ID": "20221112204524-19sdb6j",
-					"Type": "NodeListItem",
-					"ListData": {
-						"BulletChar": 42,
-						"Marker": "Kg=="
-					},
-					"Properties": {
-						"id": "20221112204524-19sdb6j"
-					},
-					"Children": [
-						{
-							"ID": "20221112204524-3ipwudy",
-							"Type": "NodeParagraph",
-							"Properties": {
-								"id": "20221112204524-3ipwudy",
-								"updated": "20221112210014"
-							},
-							"Children": [
-								{
-									"Type": "NodeText",
-									"Data": "WebDAV 协议，比如 "
-								},
-								{
-									"Type": "NodeTextMark",
-									"TextMarkType": "a",
-									"TextMarkAHref": "https://infini-cloud.net/",
-									"TextMarkTextContent": "InfiniCLOUD"
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
-			"ID": "20221112204704-cmwcneg",
-			"Type": "NodeParagraph",
-			"Properties": {
-				"id": "20221112204704-cmwcneg",
-				"updated": "20221112211001"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "通过第三方云端存储服务同步数据同样是"
+					"Data": "不支持通过第三方同步盘进行数据同步，否则可能会导致数据损坏。虽然不支持第三方同步盘，但是支持"
 				},
 				{
 					"Type": "NodeTextMark",
 					"TextMarkType": "block-ref",
-					"TextMarkBlockRefID": "20210721110423-5m6vo52",
+					"TextMarkBlockRefID": "20230805230131-sn7obzb",
 					"TextMarkBlockRefSubtype": "s",
-					"TextMarkTextContent": "端到端加密"
+					"TextMarkTextContent": "对接第三方云端存储"
 				},
 				{
 					"Type": "NodeText",
-					"Data": "的，第三方云端存储服务提供商无法获得我们的明文数据。"
+					"Data": "。"
 				}
 			]
 		},
@@ -1045,165 +658,12 @@
 			"Type": "NodeParagraph",
 			"Properties": {
 				"id": "20220526112824-pwyh65i",
-				"updated": "20220526112824"
+				"updated": "20230820183254"
 			},
 			"Children": [
 				{
 					"Type": "NodeText",
-					"Data": "思源笔记是完全开源的，欢迎参与贡献："
-				}
-			]
-		},
-		{
-			"ID": "20220526112824-mw30a1z",
-			"Type": "NodeList",
-			"ListData": {},
-			"Properties": {
-				"id": "20220526112824-mw30a1z",
-				"updated": "20221202214109"
-			},
-			"Children": [
-				{
-					"ID": "20220526112824-wdib9l3",
-					"Type": "NodeListItem",
-					"ListData": {
-						"BulletChar": 42,
-						"Marker": "Kg=="
-					},
-					"Properties": {
-						"id": "20220526112824-wdib9l3",
-						"updated": "20220526112824"
-					},
-					"Children": [
-						{
-							"ID": "20220526112824-1s97hgn",
-							"Type": "NodeParagraph",
-							"Properties": {
-								"id": "20220526112824-1s97hgn",
-								"updated": "20220526112824"
-							},
-							"Children": [
-								{
-									"Type": "NodeTextMark",
-									"TextMarkType": "a",
-									"TextMarkAHref": "https://github.com/siyuan-note/siyuan",
-									"TextMarkTextContent": "界面和内核"
-								}
-							]
-						}
-					]
-				},
-				{
-					"ID": "20221202214106-cbq0omo",
-					"Type": "NodeListItem",
-					"ListData": {
-						"BulletChar": 42,
-						"Marker": "Kg=="
-					},
-					"Properties": {
-						"id": "20221202214106-cbq0omo"
-					},
-					"Children": [
-						{
-							"ID": "20221202214106-cpfwdrq",
-							"Type": "NodeParagraph",
-							"Properties": {
-								"id": "20221202214106-cpfwdrq",
-								"updated": "20221202214109"
-							},
-							"Children": [
-								{
-									"Type": "NodeTextMark",
-									"TextMarkType": "a",
-									"TextMarkAHref": "https://github.com/siyuan-note/siyuan-android",
-									"TextMarkTextContent": "Android 端"
-								}
-							]
-						}
-					]
-				},
-				{
-					"ID": "20221202214109-8fu6oix",
-					"Type": "NodeListItem",
-					"ListData": {
-						"BulletChar": 42,
-						"Marker": "Kg=="
-					},
-					"Properties": {
-						"id": "20221202214109-8fu6oix",
-						"updated": "20221202214109"
-					},
-					"Children": [
-						{
-							"ID": "20221202214109-wx29l27",
-							"Type": "NodeParagraph",
-							"Properties": {
-								"id": "20221202214109-wx29l27"
-							},
-							"Children": [
-								{
-									"Type": "NodeTextMark",
-									"TextMarkType": "a",
-									"TextMarkAHref": "https://github.com/siyuan-note/siyuan-ios",
-									"TextMarkTextContent": "iOS 端"
-								}
-							]
-						}
-					]
-				},
-				{
-					"ID": "20220526112824-me0cl0l",
-					"Type": "NodeListItem",
-					"ListData": {
-						"BulletChar": 42,
-						"Marker": "Kg=="
-					},
-					"Properties": {
-						"id": "20220526112824-me0cl0l",
-						"updated": "20220526112824"
-					},
-					"Children": [
-						{
-							"ID": "20220526112824-rpzg6td",
-							"Type": "NodeParagraph",
-							"Properties": {
-								"id": "20220526112824-rpzg6td",
-								"updated": "20220526112824"
-							},
-							"Children": [
-								{
-									"Type": "NodeTextMark",
-									"TextMarkType": "a",
-									"TextMarkAHref": "https://github.com/siyuan-note/siyuan-chrome",
-									"TextMarkTextContent": "Chrome 剪藏扩展"
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
-			"ID": "20220526112824-zm96ym7",
-			"Type": "NodeParagraph",
-			"Properties": {
-				"id": "20220526112824-zm96ym7",
-				"updated": "20220526112824"
-			},
-			"Children": [
-				{
-					"Type": "NodeText",
-					"Data": "更多细节请参考"
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "a",
-					"TextMarkAHref": "https://github.com/siyuan-note/siyuan/blob/master/.github/CONTRIBUTING_zh_CN.md",
-					"TextMarkTextContent": "开发指南"
-				},
-				{
-					"Type": "NodeText",
-					"Data": "。"
+					"Data": "思源笔记是完全开源的，在 GitHub 上可以找到完整的源代码。"
 				}
 			]
 		},
@@ -1346,7 +806,8 @@
 			"ID": "20220909100742-liorixq",
 			"Type": "NodeParagraph",
 			"Properties": {
-				"id": "20220909100742-liorixq"
+				"id": "20220909100742-liorixq",
+				"updated": "20230820182913"
 			},
 			"Children": [
 				{
@@ -1360,7 +821,7 @@
 				},
 				{
 					"Type": "NodeText",
-					"Data": " - "
+					"Data": "​ - "
 				},
 				{
 					"Type": "NodeTextMark",
@@ -1369,7 +830,7 @@
 				},
 				{
 					"Type": "NodeText",
-					"Data": " - "
+					"Data": "​ - "
 				},
 				{
 					"Type": "NodeTextMark",
@@ -1378,7 +839,7 @@
 				},
 				{
 					"Type": "NodeText",
-					"Data": " 中 "
+					"Data": "​ 中 "
 				},
 				{
 					"Type": "NodeTextMark",
@@ -1387,46 +848,17 @@
 				},
 				{
 					"Type": "NodeText",
-					"Data": "，也可以通过关注 "
+					"Data": "​，也可以通过关注"
 				},
 				{
 					"Type": "NodeTextMark",
 					"TextMarkType": "a",
-					"TextMarkAHref": "https://github.com/siyuan-note/siyuan/releases",
-					"TextMarkTextContent": "GitHub Releases"
-				},
-				{
-					"Type": "NodeText",
-					"Data": " 或者"
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "a",
-					"TextMarkAHref": "https://ld246.com/tag/siyuan-announcement",
-					"TextMarkTextContent": "思源笔记公告"
+					"TextMarkAHref": "https://b3log.org/siyuan/",
+					"TextMarkTextContent": "官方网站"
 				},
 				{
 					"Type": "NodeText",
 					"Data": "来获取新版本。"
-				}
-			]
-		},
-		{
-			"ID": "20220909100800-1g0ueym",
-			"Type": "NodeParagraph",
-			"Properties": {
-				"id": "20220909100800-1g0ueym",
-				"updated": "20220909100829"
-			},
-			"Children": [
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "tag",
-					"TextMarkTextContent": "注意"
-				},
-				{
-					"Type": "NodeText",
-					"Data": "：切勿将工作空间放置于安装目录下，因为更新版本会清空安装目录下的所有文件"
 				}
 			]
 		},
@@ -2092,12 +1524,12 @@
 			"Type": "NodeParagraph",
 			"Properties": {
 				"id": "20201224120447-xj9cd10",
-				"updated": "20230406111412"
+				"updated": "20230802131007"
 			},
 			"Children": [
 				{
 					"Type": "NodeText",
-					"Data": "所有本地功能都是免费的，即使是在商业环境下使用。"
+					"Data": "大部分功能是免费的，即使是在商业环境下使用。"
 				}
 			]
 		},
@@ -2106,18 +1538,29 @@
 			"Type": "NodeParagraph",
 			"Properties": {
 				"id": "20230406111417-9705mvn",
-				"updated": "20230406111421"
+				"updated": "20230806004356"
 			},
 			"Children": [
 				{
 					"Type": "NodeTextMark",
-					"TextMarkType": "a",
-					"TextMarkAHref": "https://b3log.org/siyuan/pricing.html",
-					"TextMarkTextContent": "云端服务"
+					"TextMarkType": "block-ref",
+					"TextMarkBlockRefID": "20230805222417-2lj3dvk",
+					"TextMarkBlockRefSubtype": "s",
+					"TextMarkTextContent": "会员特权"
 				},
 				{
 					"Type": "NodeText",
-					"Data": "需要年付订阅。目前仅支持中国大陆地区用户订阅，非中国大陆地区用户请勿订阅。"
+					"Data": "需要付费后才能使用，请参考"
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "a",
+					"TextMarkAHref": "https://b3log.org/siyuan/pricing.html",
+					"TextMarkTextContent": "定价"
+				},
+				{
+					"Type": "NodeText",
+					"Data": "。"
 				}
 			]
 		},
@@ -2126,53 +1569,18 @@
 			"Type": "NodeParagraph",
 			"Properties": {
 				"id": "20230406111610-s0vr122",
-				"updated": "20230406111942"
+				"updated": "20230806002852"
 			},
 			"Children": [
 				{
 					"Type": "NodeText",
-					"Data": "如果你没有订阅需求但又想支持开发，欢迎进行捐赠："
-				}
-			]
-		},
-		{
-			"ID": "20230406111846-ph7umq6",
-			"Type": "NodeList",
-			"ListData": {},
-			"Properties": {
-				"id": "20230406111846-ph7umq6",
-				"updated": "20230406111909"
-			},
-			"Children": [
+					"Data": "如果你没有会员特权需求但又想支持开发，欢迎进行捐赠："
+				},
 				{
-					"ID": "20230406111855-v2fuz94",
-					"Type": "NodeListItem",
-					"ListData": {
-						"BulletChar": 42,
-						"Marker": "Kg=="
-					},
-					"Properties": {
-						"id": "20230406111855-v2fuz94",
-						"updated": "20230406111909"
-					},
-					"Children": [
-						{
-							"ID": "20230406111855-uuos149",
-							"Type": "NodeParagraph",
-							"Properties": {
-								"id": "20230406111855-uuos149",
-								"updated": "20230406111909"
-							},
-							"Children": [
-								{
-									"Type": "NodeTextMark",
-									"TextMarkType": "a",
-									"TextMarkAHref": "https://ld246.com/sponsor",
-									"TextMarkTextContent": "靠爱发电 - 链滴"
-								}
-							]
-						}
-					]
+					"Type": "NodeTextMark",
+					"TextMarkType": "a",
+					"TextMarkAHref": "https://ld246.com/sponsor",
+					"TextMarkTextContent": "靠爱发电 - 链滴"
 				}
 			]
 		},

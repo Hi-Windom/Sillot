@@ -1,7 +1,7 @@
 import {App} from "../index";
 import {Plugin} from "../plugin";
 import {getAllModels} from "../layout/getAll";
-import {exportLayout} from "../layout/util";
+import {exportLayout, resizeTopBar} from "../layout/util";
 import {Constants} from "../constants";
 
 export const uninstall = (app: App, name: string) => {
@@ -20,10 +20,17 @@ export const uninstall = (app: App, name: string) => {
                     custom.parent.parent.removeTab(custom.parent.id);
                 }
             });
-            // rm topbar
+            // rm topBar
             plugin.topBarIcons.forEach(item => {
                 item.remove();
             });
+            resizeTopBar();
+            // rm statusBar
+            /// #if !MOBILE
+            plugin.statusBarIcons.forEach(item => {
+                item.remove();
+            });
+            /// #endif
             // rm dock
             const docksKeys = Object.keys(plugin.docks);
             docksKeys.forEach(key => {

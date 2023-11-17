@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -25,55 +25,70 @@ import (
 	"strings"
 
 	"github.com/88250/gulu"
+	"github.com/siyuan-note/eventbus"
 	"github.com/siyuan-note/logging"
 )
 
-func ConvertPandoc(args ...string) (err error) {
+func ConvertPandoc(dir string, args ...string) (path string, err error) {
 	if "" == PandocBinPath || ContainerStd != Container {
-		return errors.New("not found executable pandoc")
+		err = errors.New("not found executable pandoc")
+		return
 	}
 
 	pandoc := exec.Command(PandocBinPath, args...)
 	gulu.CmdAttr(pandoc)
-	dir := filepath.Join(WorkspaceDir, "temp", "convert", "pandoc")
+	path = filepath.Join("temp", "convert", "pandoc", dir)
+	absPath := filepath.Join(WorkspaceDir, path)
+	if err = os.MkdirAll(absPath, 0755); nil != err {
+		logging.LogErrorf("mkdir [%s] failed: [%s]", absPath, err)
+		return
+	}
+	pandoc.Dir = absPath
+	output, err := pandoc.CombinedOutput()
+	if nil != err {
+		err = errors.Join(err, errors.New(string(output)))
+		logging.LogErrorf("pandoc convert output failed: %s", err)
+		return
+	}
+	path = "/" + filepath.ToSlash(path)
+	return
+}
+
+func Pandoc(from, to, o, content string) (err error) {
+	if "" == from || "" == to || "md" == to {
+		if err = gulu.File.WriteFileSafer(o, []byte(content), 0644); nil != err {
+			logging.LogErrorf("write export markdown file [%s] failed: %s", o, err)
+		}
+		return
+	}
+
+	dir := filepath.Join(WorkspaceDir, "temp", "convert", "pandoc", gulu.Rand.String(7))
 	if err = os.MkdirAll(dir, 0755); nil != err {
 		logging.LogErrorf("mkdir [%s] failed: [%s]", dir, err)
 		return
 	}
-	pandoc.Dir = dir
-	output, err := pandoc.CombinedOutput()
-	if nil != err {
-		logging.LogErrorf("pandoc convert output [%s]", string(output))
-		return
-	}
-	return
-}
-
-func Pandoc(from, to, o, content string) (ret string, err error) {
-	if "" == from || "" == to || "md" == to {
-		ret = content
+	tmpPath := filepath.Join(dir, gulu.Rand.String(7))
+	if err = os.WriteFile(tmpPath, []byte(content), 0644); nil != err {
+		logging.LogErrorf("write file failed: [%s]", err)
 		return
 	}
 
 	args := []string{
+		tmpPath,
 		"--from", from,
 		"--to", to,
 		"--resource-path", filepath.Dir(o),
 		"-s",
-	}
-
-	if "" != o {
-		args = append(args, "-o", o)
+		"-o", o,
 	}
 
 	pandoc := exec.Command(PandocBinPath, args...)
 	gulu.CmdAttr(pandoc)
-	pandoc.Stdin = bytes.NewBufferString(content)
 	output, err := pandoc.CombinedOutput()
 	if nil != err {
+		logging.LogErrorf("pandoc convert output [%s], error [%s]", string(output), err)
 		return
 	}
-	ret = string(output)
 	return
 }
 
@@ -81,7 +96,7 @@ var (
 	PandocBinPath string // Pandoc 可执行文件路径
 )
 
-func initPandoc() {
+func InitPandoc() {
 	if ContainerStd != Container {
 		return
 	}
@@ -104,6 +119,8 @@ func initPandoc() {
 			}
 		}
 	}
+
+	defer eventbus.Publish(EvtConfPandocInitialized)
 
 	if gulu.OS.IsWindows() {
 		PandocBinPath = filepath.Join(pandocDir, "bin", "pandoc.exe")

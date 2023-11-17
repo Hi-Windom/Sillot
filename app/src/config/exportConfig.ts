@@ -1,12 +1,13 @@
 import {fetchPost} from "../util/fetch";
 /// #if !BROWSER
-import {dialog} from "@electron/remote";
-import {shell} from "electron";
 import {afterExport} from "../protyle/export/util";
+import {ipcRenderer} from "electron";
 import * as path from "path";
 /// #endif
 import {isBrowser} from "../util/functions";
 import {showMessage} from "../dialog/message";
+import {showFileInFolder} from "../util/pathName";
+import {Constants} from "../constants";
 
 export const exportConfig = {
     element: undefined as Element,
@@ -78,6 +79,13 @@ export const exportConfig = {
 </label>
 <label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
+        ${window.siyuan.languages.export25}
+        <div class="b3-label__text">${window.siyuan.languages.export26}</div>
+    </div>
+    <input class="b3-text-field fn__flex-center fn__size200" id="docxTemplate" placeholder="F:\\template.docx">
+</label>
+<label class="fn__flex b3-label config__item">
+    <div class="fn__flex-1">
         ${window.siyuan.languages.export13}
         <div class="b3-label__text">${window.siyuan.languages.export14}</div>
     </div>
@@ -112,9 +120,11 @@ export const exportConfig = {
         <div class="b3-label__text">${window.siyuan.languages.exportDataTip}</div>
     </div>
     <span class="fn__space"></span>
-    <button class="b3-button b3-button--outline fn__flex-center fn__size200" id="exportData"><svg><use xlink:href="#iconUpload"></use></svg>${window.siyuan.languages.export}</button>
+    <button class="b3-button b3-button--outline fn__flex-center fn__size200" id="exportData">
+        <svg><use xlink:href="#iconUpload"></use></svg>${window.siyuan.languages.export}
+    </button>
 </label>
-<div class="fn__flex b3-label config__item">
+<label class="fn__flex b3-label config__item">
     <div class="fn__flex-1 fn__flex-center">
         ${window.siyuan.languages.import} Data
         <div class="b3-label__text">${window.siyuan.languages.importDataTip}</div>
@@ -124,9 +134,10 @@ export const exportConfig = {
         <input id="importData" class="b3-form__upload" type="file">
         <svg><use xlink:href="#iconDownload"></use></svg>${window.siyuan.languages.import}
     </button>
-</div>`;
+</label>`;
     },
     bindEvent: () => {
+        (exportConfig.element.querySelector("#docxTemplate") as HTMLInputElement).value = window.siyuan.config.export.docxTemplate;
         (exportConfig.element.querySelector("#pdfFooter") as HTMLInputElement).value = window.siyuan.config.export.pdfFooter;
         (exportConfig.element.querySelector("#blockRefTextLeft") as HTMLInputElement).value = window.siyuan.config.export.blockRefTextLeft;
         (exportConfig.element.querySelector("#blockRefTextRight") as HTMLInputElement).value = window.siyuan.config.export.blockRefTextRight;
@@ -142,6 +153,7 @@ export const exportConfig = {
                 blockEmbedMode: parseInt((exportConfig.element.querySelector("#blockEmbedMode") as HTMLSelectElement).value, 10),
                 fileAnnotationRefMode: parseInt((exportConfig.element.querySelector("#fileAnnotationRefMode") as HTMLSelectElement).value, 10),
                 pdfFooter: (exportConfig.element.querySelector("#pdfFooter") as HTMLInputElement).value,
+                docxTemplate: (exportConfig.element.querySelector("#docxTemplate") as HTMLInputElement).value,
                 blockRefTextLeft: (exportConfig.element.querySelector("#blockRefTextLeft") as HTMLInputElement).value,
                 blockRefTextRight: (exportConfig.element.querySelector("#blockRefTextRight") as HTMLInputElement).value,
                 tagOpenMarker: (exportConfig.element.querySelector("#tagOpenMarker") as HTMLInputElement).value,
@@ -170,39 +182,40 @@ export const exportConfig = {
                 });
             }
         });
-        exportConfig.element.querySelector("#exportData").addEventListener("click", () => {
+        exportConfig.element.querySelector("#exportData").addEventListener("click", async () => {
             /// #if BROWSER
             fetchPost("/api/export/exportData", {}, response => {
                 window.location.href = response.data.zip;
             });
             /// #else
-            const filePaths = dialog.showOpenDialogSync({
+            const result = await ipcRenderer.invoke(Constants.SIYUAN_GET, {
+                cmd: "showOpenDialog",
                 title: window.siyuan.languages.export + " " + "Data",
                 properties: ["createDirectory", "openDirectory"],
             });
-            if (filePaths && 0 < filePaths.length) {
-                const savePath = filePaths[0];
-                const msgId = showMessage(window.siyuan.languages.exporting, -1);
-                fetchPost("/api/export/exportDataInFolder", {
-                    folder: savePath,
-                }, response => {
-                    afterExport(path.join(savePath, response.data.name), msgId);
-                });
+            if (result.canceled || result.filePaths.length === 0) {
+                return;
             }
-
+            const msgId = showMessage(window.siyuan.languages.exporting, -1);
+            fetchPost("/api/export/exportDataInFolder", {
+                folder: result.filePaths[0],
+            }, response => {
+                afterExport(path.join(result.filePaths[0], response.data.name), msgId);
+            });
             /// #endif
         });
         /// #if !BROWSER
         pandocBinPathElement.addEventListener("click", () => {
             if (window.siyuan.config.export.pandocBin) {
-                shell.showItemInFolder(window.siyuan.config.export.pandocBin);
+                showFileInFolder(window.siyuan.config.export.pandocBin);
             }
         });
         const pandocBinElement = exportConfig.element.querySelector("#pandocBin") as HTMLInputElement;
         pandocBinElement.addEventListener("click", async () => {
-            const localPath = await dialog.showOpenDialog({
+            const localPath = await ipcRenderer.invoke(Constants.SIYUAN_GET, {
+                cmd: "showOpenDialog",
                 defaultPath: window.siyuan.config.system.homeDir,
-                properties: ["openFile"],
+                properties: ["openFile", "showHiddenFiles"],
             });
             if (localPath.filePaths.length === 0) {
                 pandocBinElement.value = window.siyuan.config.export.pandocBin;

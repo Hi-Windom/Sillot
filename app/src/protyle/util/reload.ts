@@ -6,6 +6,10 @@ import {hasClosestByClassName} from "./hasClosest";
 import {preventScroll} from "../scroll/preventScroll";
 
 export const reloadProtyle = (protyle: IProtyle, focus: boolean) => {
+    if (!protyle.preview.element.classList.contains("fn__none")) {
+        protyle.preview.render(protyle);
+        return;
+    }
     if (window.siyuan.config.editor.displayBookmarkIcon) {
         protyle.wysiwyg.element.classList.add("protyle-wysiwyg--attr");
     } else {
@@ -32,8 +36,8 @@ export const reloadProtyle = (protyle: IProtyle, focus: boolean) => {
                 refTreeID: protyle.block.rootID,
                 keyword: isMention ? inputsElement[1].value : inputsElement[0].value
             }, response => {
-                protyle.options.backlinkData = isMention ? response.data.backmentions : response.data.backlinks,
-                    renderBacklink(protyle, protyle.options.backlinkData);
+                protyle.options.backlinkData = isMention ? response.data.backmentions : response.data.backlinks;
+                renderBacklink(protyle, protyle.options.backlinkData);
             });
         }
     } else {

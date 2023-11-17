@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -23,10 +23,12 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/logging"
+	"github.com/88250/lute/parse"
 	"github.com/gin-gonic/gin"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -240,6 +242,42 @@ func exportData(c *gin.Context) {
 	}
 }
 
+func exportResources(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	var name string
+	if nil != arg["name"] {
+		name = util.TruncateLenFileName(arg["name"].(string))
+	}
+	if name == "" {
+		name = time.Now().Format("export-2006-01-02_15-04-05") // 生成的 *.zip 文件主文件名
+	}
+
+	var resourcePaths []string // 文件/文件夹在工作空间中的路径
+	if nil != arg["paths"] {
+		for _, resourcePath := range arg["paths"].([]interface{}) {
+			resourcePaths = append(resourcePaths, resourcePath.(string))
+		}
+	}
+
+	zipFilePath, err := model.ExportResources(resourcePaths, name)
+	if nil != err {
+		ret.Code = 1
+		ret.Msg = err.Error()
+		ret.Data = map[string]interface{}{"closeTimeout": 7000}
+		return
+	}
+	ret.Data = map[string]interface{}{
+		"path": zipFilePath, // 相对于工作空间目录的路径
+	}
+}
+
 func batchExportMd(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -347,7 +385,7 @@ func exportDocx(c *gin.Context) {
 	}
 	err := model.ExportDocx(id, savePath, removeAssets, merge)
 	if nil != err {
-		ret.Code = 1
+		ret.Code = -1
 		ret.Msg = err.Error()
 		ret.Data = map[string]interface{}{"closeTimeout": 7000}
 		return
@@ -425,14 +463,24 @@ func exportPreviewHTML(c *gin.Context) {
 	if nil != arg["image"] {
 		image = arg["image"].(bool)
 	}
-	name, content := model.ExportHTML(id, "", true, image, keepFold, merge)
+	name, content, node := model.ExportHTML(id, "", true, image, keepFold, merge)
 	// 导出 PDF 预览时点击块引转换后的脚注跳转不正确 https://github.com/siyuan-note/siyuan/issues/5894
 	content = strings.ReplaceAll(content, "http://"+util.LocalHost+":"+util.ServerPort+"/#", "#")
+
+	// Add `data-doc-type` and attribute when exporting image and PDF https://github.com/siyuan-note/siyuan/issues/9497
+	attrs := map[string]string{}
+	var typ string
+	if nil != node {
+		attrs = parse.IAL2Map(node.KramdownIAL)
+		typ = node.Type.String()
+	}
 
 	ret.Data = map[string]interface{}{
 		"id":      id,
 		"name":    name,
 		"content": content,
+		"attrs":   attrs,
+		"type":    typ,
 	}
 }
 
@@ -456,7 +504,7 @@ func exportHTML(c *gin.Context) {
 	if nil != arg["merge"] {
 		merge = arg["merge"].(bool)
 	}
-	name, content := model.ExportHTML(id, savePath, pdf, false, keepFold, merge)
+	name, content, _ := model.ExportHTML(id, savePath, pdf, false, keepFold, merge)
 	ret.Data = map[string]interface{}{
 		"id":      id,
 		"name":    name,
@@ -498,9 +546,10 @@ func exportPreview(c *gin.Context) {
 	}
 
 	id := arg["id"].(string)
-	stdHTML := model.Preview(id)
+	stdHTML, outline := model.Preview(id)
 	ret.Data = map[string]interface{}{
-		"html": stdHTML,
+		"html":    stdHTML,
+		"outline": outline,
 	}
 }
 

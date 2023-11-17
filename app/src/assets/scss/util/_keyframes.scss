@@ -1,3 +1,13 @@
+@keyframes keyframes-pulse {
+  0% {
+    transform: translateX(-100%) translateZ(0)
+  }
+
+  100% {
+    transform: translateX(100%) translateZ(0)
+  }
+}
+
 @keyframes addCard {
   0% {
     box-shadow: -100vw 0px 0px -1px var(--b3-protyle-inline-mark-background) inset;
@@ -37,6 +47,18 @@
   }
   to {
     transform: rotate(359deg);
+  }
+}
+
+@keyframes scale {
+  0% {
+    transform: scaleY(1.3);
+    transform-origin: 0 0;
+    opacity: 0;
+  }
+
+  100% {
+    transform: scaleY(1);
   }
 }
 

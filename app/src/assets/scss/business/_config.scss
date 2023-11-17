@@ -1,37 +1,68 @@
 .config {
+  &__tab-wrap {
+    overflow: hidden;
+    box-sizing: border-box;
+    background-color: var(--b3-theme-background);
+    border-radius: 0 var(--b3-border-radius-b) var(--b3-border-radius-b) 0;
+    width: 100%;
+    height: 100%;
+    padding: 16px 0;
+  }
+
   &__tab-container {
     overflow: auto;
     box-sizing: border-box;
-    flex: 1;
-    background-color: var(--b3-theme-background);
+    height: 100%;
 
     .b3-label {
       padding: 16px 0;
       margin: 0 24px;
     }
+
+    &--full {
+      margin-top: -16px;
+      height: calc(100% + 32px);
+    }
+
+    &--top {
+      margin-top: -16px;
+      height: calc(100% + 16px);
+    }
   }
 
-  &__panel {
-    & > .b3-tab-bar {
-      user-select: none;
-      width: 200px;
-      overflow: auto;
-      padding: 8px 0;
-      box-sizing: border-box;
+  &__panel > .b3-tab-bar {
+    user-select: none;
+    width: 240px;
+    overflow: auto;
+    padding: 8px 0;
+    box-sizing: border-box;
 
-      .b3-form__icon {
-        margin: 0 8px 8px;
-      }
+    .config__tab-hr {
+      margin: 16px 0;
+      background: var(--b3-border-color);
+      height: 1px;
+    }
 
-      .b3-list-item {
-        line-height: 38px;
+    .config__tab-title {
+      display: flex;
+      align-items: center;
+      height: 32px;
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
 
-        &__graphic {
-          margin-right: 0;
-          padding: 0 10px 0 5px;
-          height: 16px;
-          width: 16px;
-        }
+    .b3-form__icon {
+      margin: 0 8px 8px;
+    }
+
+    .b3-list-item {
+      line-height: 38px;
+
+      &__graphic {
+        margin-right: 0;
+        padding: 0 10px 0 5px;
+        height: 16px;
+        width: 16px;
       }
     }
   }
@@ -48,15 +79,6 @@
     }
   }
 
-  &-repos__sync {
-    margin: 0 0 -16px 16px;
-    overflow: hidden;
-    max-height: 180px;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 16px;
-  }
-
   &-account {
     height: 100%;
 
@@ -71,6 +93,7 @@
       &--text {
         background-color: var(--b3-theme-surface);
         padding: 16px 24px;
+        overflow: auto;
 
         .b3-button--outline {
           white-space: normal;
@@ -129,6 +152,16 @@
       width: 100%;
       text-align: center;
     }
+
+    &__svg {
+      flex-wrap: wrap;
+
+      svg {
+        margin: 8px;
+        height: 16px;
+        width: 16px;
+      }
+    }
   }
 
   &-about__logo {
@@ -148,8 +181,9 @@
     flex-direction: column;
     height: 100%;
     box-sizing: border-box;
+    position: relative;
 
-    #assetsList {
+    &__list {
       overflow: auto;
       flex: 1;
     }
@@ -168,13 +202,13 @@
   &-keymap {
     &__key {
       padding: 2px 4px;
-      font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace, var(--b3-font-family);
       line-height: 1;
       color: var(--b3-theme-on-surface);
       vertical-align: middle;
       background-color: var(--b3-theme-surface);
       border: solid 1px var(--b3-theme-surface-lighter);
-      border-radius: 3px;
+      border-radius: var(--b3-border-radius);
       box-shadow: inset 0 -1px 0 var(--b3-theme-surface-lighter);
       margin-left: 4px;
       cursor: pointer;
@@ -188,6 +222,7 @@
 
     div.b3-list-item > .b3-list-item__text {
       padding-left: 4px;
+      user-select: none;
     }
   }
 
@@ -204,6 +239,7 @@
     box-sizing: border-box;
     opacity: 0;
     z-index: 1;
+    border-radius: var(--b3-border-radius-b);
 
     &--show {
       opacity: 1;
@@ -233,7 +269,7 @@
       }
 
       &__title {
-        font-size: 30px;
+        font-size: 24px;
         word-break: break-all;
         color: var(--b3-theme-on-background);
       }
@@ -242,7 +278,7 @@
         height: 96px;
         width: 96px;
         margin: 32px auto 32px;
-        border-radius: 4px;
+        border-radius: var(--b3-border-radius);
         flex-shrink: 0;
       }
 
@@ -252,7 +288,7 @@
         background-position: center center;
         background-repeat: no-repeat;
         background-size: cover;
-        border-radius: 4px;
+        border-radius: var(--b3-border-radius);
         margin-bottom: 32px;
         cursor: pointer;
         left: 0;

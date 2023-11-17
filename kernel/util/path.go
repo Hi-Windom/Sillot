@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,20 +27,12 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/logging"
 )
 
 var (
 	SSL       = false
 	UserAgent = "SiYuan-Sillot/" + Ver
-)
-
-const (
-	AliyunServer     = "https://siyuan-sync.b3logfile.com"  // 云端服务地址，阿里云负载均衡，用于接口，数据同步文件上传、下载会走七牛云 OSS SiYuanSyncServer
-	SiYuanSyncServer = "https://siyuan-data.b3logfile.com/" // 云端数据同步服务地址，七牛云 OSS，用于数据同步文件上传、下载
-	BazaarStatServer = "http://bazaar.b3logfile.com"        // 集市包统计服务地址，直接对接 Bucket 没有 CDN 缓存
-	BazaarOSSServer  = "https://oss.b3logfile.com"          // 云端对象存储地址，七牛云，仅用于读取集市包
-	LiandiServer     = "https://ld246.com"                  // 链滴服务地址，用于分享发布帖子
 )
 
 func ShortPathForBootingDisplay(p string) string {
@@ -68,12 +60,69 @@ func GetLocalIPs() (ret []string) {
 		logging.LogWarnf("get interface addresses failed: %s", err)
 		return
 	}
+
+	IPv4Nets := []*net.IPNet{}
+	IPv6Nets := []*net.IPNet{}
 	for _, addr := range addrs {
-		if networkIp, ok := addr.(*net.IPNet); ok && !networkIp.IP.IsLoopback() && networkIp.IP.To4() != nil &&
-			bytes.Equal([]byte{255, 255, 255, 0}, networkIp.Mask) {
-			ret = append(ret, networkIp.IP.String())
+		if networkIp, ok := addr.(*net.IPNet); ok && networkIp.IP.String() != "<nil>" {
+			if networkIp.IP.To4() != nil {
+				IPv4Nets = append(IPv4Nets, networkIp)
+			} else if networkIp.IP.To16() != nil {
+				IPv6Nets = append(IPv6Nets, networkIp)
+			}
 		}
 	}
+
+	// loopback address
+	for _, net := range IPv4Nets {
+		if net.IP.IsLoopback() {
+			ret = append(ret, net.IP.String())
+		}
+	}
+	// private address
+	for _, net := range IPv4Nets {
+		if net.IP.IsPrivate() {
+			ret = append(ret, net.IP.String())
+		}
+	}
+	// IPv4 private address
+	for _, net := range IPv4Nets {
+		if net.IP.IsGlobalUnicast() {
+			ret = append(ret, net.IP.String())
+		}
+	}
+	// link-local unicast address
+	for _, net := range IPv4Nets {
+		if net.IP.IsLinkLocalUnicast() {
+			ret = append(ret, net.IP.String())
+		}
+	}
+
+	// loopback address
+	for _, net := range IPv6Nets {
+		if net.IP.IsLoopback() {
+			ret = append(ret, "["+net.IP.String()+"]")
+		}
+	}
+	// private address
+	for _, net := range IPv6Nets {
+		if net.IP.IsPrivate() {
+			ret = append(ret, "["+net.IP.String()+"]")
+		}
+	}
+	// IPv6 private address
+	for _, net := range IPv6Nets {
+		if net.IP.IsGlobalUnicast() {
+			ret = append(ret, "["+net.IP.String()+"]")
+		}
+	}
+	// link-local unicast address
+	for _, net := range IPv6Nets {
+		if net.IP.IsLinkLocalUnicast() {
+			ret = append(ret, "["+net.IP.String()+"]")
+		}
+	}
+
 	ret = append(ret, LocalHost)
 	ret = gulu.Str.RemoveDuplicatedElem(ret)
 	return
@@ -192,4 +241,27 @@ func FilterSelfChildDocs(paths []string) (ret []string) {
 
 func IsAssetLinkDest(dest []byte) bool {
 	return bytes.HasPrefix(dest, []byte("assets/"))
+}
+
+var (
+	SiYuanAssetsImage = []string{".apng", ".ico", ".cur", ".jpg", ".jpe", ".jpeg", ".jfif", ".pjp", ".pjpeg", ".png", ".gif", ".webp", ".bmp", ".svg", ".avif"}
+	SiYuanAssetsAudio = []string{".mp3", ".wav", ".ogg", ".m4a"}
+	SiYuanAssetsVideo = []string{".mov", ".weba", ".mkv", ".mp4", ".webm"}
+)
+
+func IsDisplayableAsset(p string) bool {
+	ext := strings.ToLower(filepath.Ext(p))
+	if "" == ext {
+		return false
+	}
+	if gulu.Str.Contains(ext, SiYuanAssetsImage) {
+		return true
+	}
+	if gulu.Str.Contains(ext, SiYuanAssetsAudio) {
+		return true
+	}
+	if gulu.Str.Contains(ext, SiYuanAssetsVideo) {
+		return true
+	}
+	return false
 }

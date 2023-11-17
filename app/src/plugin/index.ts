@@ -4,20 +4,41 @@ import {fetchPost} from "../util/fetch";
 import {isMobile, isWindow} from "../util/functions";
 /// #if !MOBILE
 import {Custom} from "../layout/dock/Custom";
+import {getAllModels} from "../layout/getAll";
 /// #endif
 import {Tab} from "../layout/Tab";
-import {getDockByType, setPanelFocus} from "../layout/util";
+import {setPanelFocus} from "../layout/util";
+import {getDockByType} from "../layout/tabUtil";
 import {hasClosestByAttribute} from "../protyle/util/hasClosest";
 import {BlockPanel} from "../block/Panel";
-import {genUUID} from "../util/genID";
+import {Setting} from "./Setting";
 
 export class Plugin {
     private app: App;
     public i18n: IObject;
     public eventBus: EventBus;
     public data: any = {};
+    public displayName: string;
     public name: string;
+    public protyleSlash: {
+        filter: string[],
+        html: string,
+        id: string,
+        callback: (protyle: import("../protyle").Protyle) => void
+    }[] = [];
+    // TODO
+    public customBlockRenders: {
+        [key: string]: {
+            icon: string,
+            action: "edit" | "more"[],
+            genCursor: boolean,
+            render: (options: { app: App, element: Element }) => void
+        }
+    } = {};
     public topBarIcons: Element[] = [];
+    public setting: Setting;
+    public statusBarIcons: Element[] = [];
+    public commands: ICommand[] = [];
     public models: {
         /// #if !MOBILE
         [key: string]: (options: { tab: Tab, data: any }) => Custom
@@ -35,11 +56,13 @@ export class Plugin {
     constructor(options: {
         app: App,
         name: string,
+        displayName: string,
         i18n: IObject
     }) {
         this.app = options.app;
         this.i18n = options.i18n;
         this.name = options.name;
+        this.displayName = options.displayName;
         this.eventBus = new EventBus(options.name);
     }
 
@@ -55,38 +78,60 @@ export class Plugin {
         // 布局加载完成
     }
 
+    public addCommand(command: ICommand) {
+        this.commands.push(command);
+    }
+
     public addIcons(svg: string) {
-        document.body.insertAdjacentHTML("afterbegin", `<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" xmlns="http://www.w3.org/2000/svg">
+        document.body.insertAdjacentHTML("afterbegin", `<svg data-name="${this.name}" style="position: absolute; width: 0; height: 0; overflow: hidden;" xmlns="http://www.w3.org/2000/svg">
 <defs>${svg}</defs></svg>`);
     }
 
     public addTopBar(options: {
         icon: string,
         title: string,
-        position?: "right",
+        position?: "right" | "left",
         callback: (evt: MouseEvent) => void
     }) {
+        if (!options.icon.startsWith("icon") && !options.icon.startsWith("<svg")) {
+            console.error(`plugin ${this.name} addTopBar error: icon must be svg id or svg tag`);
+            return;
+        }
         const iconElement = document.createElement("div");
         iconElement.setAttribute("data-menu", "true");
         iconElement.addEventListener("click", options.callback);
-        iconElement.id = "plugin" + genUUID();
+        iconElement.id = `plugin_${this.name}_${this.topBarIcons.length}`;
         if (isMobile()) {
             iconElement.className = "b3-menu__item";
             iconElement.innerHTML = (options.icon.startsWith("icon") ? `<svg class="b3-menu__icon"><use xlink:href="#${options.icon}"></use></svg>` : options.icon) +
                 `<span class="b3-menu__label">${options.title}</span>`;
         } else if (!isWindow()) {
-            iconElement.className = "toolbar__item b3-tooltips b3-tooltips__sw";
+            iconElement.className = "toolbar__item ariaLabel";
             iconElement.setAttribute("aria-label", options.title);
             iconElement.innerHTML = options.icon.startsWith("icon") ? `<svg><use xlink:href="#${options.icon}"></use></svg>` : options.icon;
             iconElement.addEventListener("click", options.callback);
-            iconElement.setAttribute("data-position", options.position);
+            iconElement.setAttribute("data-position", options.position || "right");
         }
         this.topBarIcons.push(iconElement);
         return iconElement;
     }
 
+    public addStatusBar(options: {
+        element: HTMLElement,
+        position?: "right" | "left",
+    }) {
+        /// #if !MOBILE
+        options.element.setAttribute("data-position", options.position || "right");
+        this.statusBarIcons.push(options.element);
+        return options.element;
+        /// #endif
+    }
+
     public openSetting() {
-        // 打开设置
+        if (!this.setting) {
+            return;
+        }
+        this.setting.open(this.name);
     }
 
     public loadData(storageName: string) {
@@ -137,9 +182,26 @@ export class Plugin {
         });
     }
 
+    public getOpenedTab() {
+        const tabs: { [key: string]: Custom[] } = {};
+        const modelKeys = Object.keys(this.models);
+        modelKeys.forEach(item => {
+            tabs[item.replace(this.name, "")] = [];
+        });
+        /// #if !MOBILE
+        getAllModels().custom.find(item => {
+            if (modelKeys.includes(item.type)) {
+                tabs[item.type.replace(this.name, "")].push(item);
+            }
+        });
+        /// #endif
+        return tabs;
+    }
+
     public addTab(options: {
         type: string,
         destroy?: () => void,
+        beforeDestroy?: () => void,
         resize?: () => void,
         update?: () => void,
         init: () => void
@@ -153,6 +215,7 @@ export class Plugin {
                 type: type2,
                 data: arg.data,
                 init: options.init,
+                beforeDestroy: options.beforeDestroy,
                 destroy: options.destroy,
                 resize: options.resize,
                 update: options.update,

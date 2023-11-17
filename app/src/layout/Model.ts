@@ -46,7 +46,7 @@ export class Model {
             if (logElement) {
                 // 内核中断后无法 catch fetch 请求错误，重连会导致无法执行 transactionsTimeout
                 reloadSync(this.app, {upsertRootIDs: [], removeRootIDs: []});
-                window.siyuan.dialogs.find(item =>{
+                window.siyuan.dialogs.find(item => {
                     if (item.element.id === "errorLog") {
                         item.destroy();
                         return true;

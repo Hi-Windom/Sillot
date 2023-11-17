@@ -1,10 +1,11 @@
 import {setStorageVal, updateHotkeyTip} from "../util/compatibility";
 import {ToolbarItem} from "./ToolbarItem";
 import {setPosition} from "../../util/setPosition";
-import {focusBlock, focusByRange, getSelectionPosition} from "../util/selection";
+import {focusByRange, getSelectionPosition} from "../util/selection";
 import {Constants} from "../../constants";
 import {hasClosestBlock, hasClosestByAttribute} from "../util/hasClosest";
 import {updateBatchTransaction} from "../wysiwyg/transaction";
+import {lineNumberRender} from "../render/highlightRender";
 
 export class Font extends ToolbarItem {
     declare public element: HTMLElement;
@@ -12,21 +13,12 @@ export class Font extends ToolbarItem {
     constructor(protyle: IProtyle, menuItem: IMenuItem) {
         super(protyle, menuItem);
         this.element.addEventListener("click", () => {
-            let nodeElements: Element[];
-            if (protyle.toolbar.range.toString() === "") {
-                nodeElements = Array.from(protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select"));
-                if (nodeElements.length === 0) {
-                    const nodeElement = hasClosestBlock(protyle.toolbar.range.startContainer);
-                    if (nodeElement) {
-                        nodeElements = [nodeElement];
-                    }
-                }
-            }
             protyle.toolbar.element.classList.add("fn__none");
             protyle.toolbar.subElement.innerHTML = "";
             protyle.toolbar.subElement.style.width = "";
             protyle.toolbar.subElement.style.padding = "";
-            protyle.toolbar.subElement.append(appearanceMenu(protyle, nodeElements));
+            protyle.toolbar.subElement.append(appearanceMenu(protyle, getFontNodeElements(protyle)));
+            protyle.toolbar.subElement.style.zIndex = (++window.siyuan.zIndex).toString();
             protyle.toolbar.subElement.classList.remove("fn__none");
             protyle.toolbar.subElementCloseCB = undefined;
             focusByRange(protyle.toolbar.range);
@@ -56,6 +48,13 @@ export const appearanceMenu = (protyle: IProtyle, nodeElements?: Element[]) => {
 
     const element = document.createElement("div");
     element.classList.add("protyle-font");
+    let disableFont = false;
+    nodeElements?.find((item: HTMLElement) => {
+        if (item.classList.contains("list") || item.classList.contains("li")) {
+            disableFont = true;
+            return true;
+        }
+    });
     let lastColorHTML = "";
     const lastFonts = window.siyuan.storage[Constants.LOCAL_FONTSTYLES];
     if (lastFonts.length > 0) {
@@ -82,7 +81,9 @@ export const appearanceMenu = (protyle: IProtyle, nodeElements?: Element[]) => {
                     lastColorHTML += `<button data-type="${lastFontStatus[0]}" class="protyle-font__style" style="text-shadow: 1px 1px var(--b3-theme-surface-lighter), 2px 2px var(--b3-theme-surface-lighter), 3px 3px var(--b3-theme-surface-lighter), 4px 4px var(--b3-theme-surface-lighter)">${window.siyuan.languages.shadow}</button>`;
                     break;
                 case "fontSize":
-                    lastColorHTML += `<button data-type="${lastFontStatus[0]}" class="protyle-font__style">${lastFontStatus[1]}</button>`;
+                    if (!disableFont) {
+                        lastColorHTML += `<button data-type="${lastFontStatus[0]}" class="protyle-font__style">${lastFontStatus[1]}</button>`;
+                    }
                     break;
                 case "style1":
                     lastColorHTML += `<button data-type="${lastFontStatus[0]}" style="background-color:${lastFontStatus[1]};color:${lastFontStatus[2]}" class="color__square">A</button>`;
@@ -136,10 +137,10 @@ export const appearanceMenu = (protyle: IProtyle, nodeElements?: Element[]) => {
     <button data-type="style2" class="protyle-font__style" style="-webkit-text-stroke: 0.2px var(--b3-theme-on-background);-webkit-text-fill-color : transparent;">${window.siyuan.languages.hollow}</button>
     <button data-type="style4" class="protyle-font__style" style="text-shadow: 1px 1px var(--b3-theme-surface-lighter), 2px 2px var(--b3-theme-surface-lighter), 3px 3px var(--b3-theme-surface-lighter), 4px 4px var(--b3-theme-surface-lighter)">${window.siyuan.languages.shadow}</button>
 </div>
-<div class="fn__hr"></div>
-<div>${window.siyuan.languages.fontSize}</div>
-<div class="fn__hr--small"></div>
-<div class="fn__flex">
+<div class="fn__hr${disableFont ? " fn__none" : ""}"></div>
+<div class="${disableFont ? " fn__none" : ""}">${window.siyuan.languages.fontSize}</div>
+<div class="fn__hr--small${disableFont ? " fn__none" : ""}"></div>
+<div class="fn__flex${disableFont ? " fn__none" : ""}">
     <select class="b3-select fn__block">
         <option ${fontSize === "12px" ? "selected" : ""} value="12px">12px</option>
         <option ${fontSize === "13px" ? "selected" : ""} value="13px">13px</option>
@@ -215,10 +216,16 @@ export const fontEvent = (protyle: IProtyle, nodeElements: Element[], type?: str
                 e.style.textShadow = "";
                 e.style.backgroundColor = "";
                 e.style.fontSize = "";
+                if (e.classList.contains("av")) {
+                    e.querySelector(".av__container").setAttribute("style", "--av-background:var(--b3-theme-background)");
+                }
             } else if (type === "style1") {
                 const colorList = color.split(Constants.ZWSP);
                 e.style.backgroundColor = colorList[0];
                 e.style.color = colorList[1];
+                if (e.classList.contains("av")) {
+                    e.querySelector(".av__container").setAttribute("style", `--av-background:${colorList[0]}`);
+                }
             } else if (type === "style2") {
                 e.style.webkitTextStroke = "0.2px var(--b3-theme-on-background)";
                 e.style.webkitTextFillColor = "transparent";
@@ -228,11 +235,17 @@ export const fontEvent = (protyle: IProtyle, nodeElements: Element[], type?: str
                 e.style.color = color;
             } else if (type === "backgroundColor") {
                 e.style.backgroundColor = color;
+                if (e.classList.contains("av")) {
+                    e.querySelector(".av__container").setAttribute("style", `--av-background:${color}`);
+                }
             } else if (type === "fontSize") {
                 e.style.fontSize = color;
             }
+            if ((type === "fontSize" || type === "clear") && e.getAttribute("data-type") === "NodeCodeBlock") {
+                lineNumberRender(e.querySelector(".hljs"));
+            }
         });
-        focusBlock(nodeElements[0]);
+        focusByRange(protyle.toolbar.range);
     } else {
         if (type === "clear") {
             protyle.toolbar.setInlineMark(protyle, "clear", "range", {type: "text"});
@@ -359,6 +372,15 @@ export const hasSameTextStyle = (currentElement: HTMLElement, sideElement: HTMLE
         backgroundColor = currentElement.style.backgroundColor;
         fontSize = currentElement.style.fontSize;
     }
+    if (textObj.type === "text") {
+        // 清除样式
+        return color === sideElement.style.color &&
+            webkitTextFillColor === sideElement.style.webkitTextFillColor &&
+            webkitTextStroke === sideElement.style.webkitTextStroke &&
+            textShadow === sideElement.style.textShadow &&
+            fontSize === sideElement.style.fontSize &&
+            backgroundColor === sideElement.style.backgroundColor;
+    }
     if (textObj.type === "color") {
         return textObj.color === sideElement.style.color &&
             webkitTextFillColor === sideElement.style.webkitTextFillColor &&
@@ -408,4 +430,18 @@ export const hasSameTextStyle = (currentElement: HTMLElement, sideElement: HTMLE
             backgroundColor === sideElement.style.backgroundColor;
     }
     return true; // 清除字体样式会使用 "text" 作为标识
+};
+
+export const getFontNodeElements = (protyle: IProtyle) => {
+    let nodeElements: Element[];
+    if (protyle.toolbar.range.toString() === "") {
+        nodeElements = Array.from(protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select"));
+        if (nodeElements.length === 0) {
+            const nodeElement = hasClosestBlock(protyle.toolbar.range.startContainer);
+            if (nodeElement) {
+                nodeElements = [nodeElement];
+            }
+        }
+    }
+    return nodeElements;
 };

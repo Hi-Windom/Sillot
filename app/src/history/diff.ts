@@ -4,24 +4,26 @@ import {Protyle} from "../protyle";
 import {Constants} from "../constants";
 import {disabledProtyle, onGet} from "../protyle/util/onGet";
 import {hasClosestByClassName} from "../protyle/util/hasClosest";
-import {escapeHtml} from "../util/escape";
+import {escapeAttr, escapeHtml} from "../util/escape";
 // import * as dayjs from "dayjs";
 import {format} from "date-fns";
 import {isMobile} from "../util/functions";
 import {App} from "../index";
+import {pathPosix} from "../util/pathName";
+import {renderAssetsPreview} from "../asset/renderAssets";
 
 const genItem = (data: [], data2?: { title: string, fileID: string }[]) => {
     if (!data || data.length === 0) {
         return `<li style="padding-left: 40px;" class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
     }
     let html = "";
-    data.forEach((item: { title: string, fileID: string }, index) => {
+    data.forEach((item: { title: string, fileID: string, path: string, hSize: string }, index) => {
         let id2 = "";
         if (data2) {
             id2 = `data-id2="${data2[index].fileID}"`;
         }
         html += `<li style="padding-left: 40px;" class="b3-list-item" ${id2} data-id="${item.fileID}">
-    <span class="b3-list-item__text">${escapeHtml(item.title)}</span>
+    <span class="b3-list-item__text" title="${escapeAttr(item.path)} ${item.hSize}">${escapeHtml(item.title)}</span>
 </li>`;
     });
     return html;
@@ -67,33 +69,57 @@ const renderCompare = (app: App, element: HTMLElement) => {
 
     fetchPost("/api/repo/openRepoSnapshotDoc", {id: element.getAttribute("data-id")}, (response) => {
         leftElement.classList.remove("fn__none");
-        const textElement = (leftElement.firstElementChild.nextElementSibling as HTMLTextAreaElement);
-        if (response.data.isLargeDoc) {
+        const textElement = leftElement.querySelector("textarea");
+        const type = pathPosix().extname(response.data.content).toLowerCase();
+        if (Constants.SIYUAN_ASSETS_IMAGE.concat(Constants.SIYUAN_ASSETS_AUDIO).concat(Constants.SIYUAN_ASSETS_VIDEO).includes(type)) {
+            textElement.previousElementSibling.innerHTML = renderAssetsPreview(response.data.content);
+            textElement.previousElementSibling.classList.remove("fn__none");
+            textElement.classList.add("fn__none");
+            leftElement.lastElementChild.classList.add("fn__none");
+        } else if (response.data.isProtyleDoc) {
             textElement.value = response.data.content;
             textElement.classList.remove("fn__none");
             leftElement.lastElementChild.classList.add("fn__none");
+            textElement.previousElementSibling.classList.add("fn__none");
         } else {
             textElement.classList.add("fn__none");
             leftElement.lastElementChild.classList.remove("fn__none");
-            onGet(response, leftEditor.protyle, [Constants.CB_GET_HISTORY, Constants.CB_GET_HTML]);
+            textElement.previousElementSibling.classList.add("fn__none");
+            onGet({
+                data: response,
+                protyle: leftEditor.protyle,
+                action: [Constants.CB_GET_HISTORY, Constants.CB_GET_HTML],
+            });
         }
-        textElement.previousElementSibling.textContent = dayjs(response.data.updated).format("YYYY-MM-DD HH:mm");
+        leftElement.querySelector(".history__date").textContent = format(new Date(response.data.updated), 'yyyy-MM-dd HH:mm');
     });
     const id2 = element.getAttribute("data-id2");
     if (id2) {
         rightElement.classList.remove("fn__none");
         fetchPost("/api/repo/openRepoSnapshotDoc", {id: id2}, (response) => {
-            const textElement = (rightElement.firstElementChild.nextElementSibling as HTMLTextAreaElement);
-            if (response.data.isLargeDoc) {
+            const textElement = rightElement.querySelector("textarea");
+            const type = pathPosix().extname(response.data.content).toLowerCase();
+            if (Constants.SIYUAN_ASSETS_IMAGE.concat(Constants.SIYUAN_ASSETS_AUDIO).concat(Constants.SIYUAN_ASSETS_VIDEO).includes(type)) {
+                textElement.previousElementSibling.innerHTML = renderAssetsPreview(response.data.content);
+                textElement.previousElementSibling.classList.remove("fn__none");
+                textElement.classList.add("fn__none");
+                rightElement.lastElementChild.classList.add("fn__none");
+            } else if (response.data.isProtyleDoc) {
                 textElement.value = response.data.content;
                 textElement.classList.remove("fn__none");
                 rightElement.lastElementChild.classList.add("fn__none");
+                textElement.previousElementSibling.classList.add("fn__none");
             } else {
                 textElement.classList.add("fn__none");
                 rightElement.lastElementChild.classList.remove("fn__none");
-                onGet(response, rightEditor.protyle, [Constants.CB_GET_HISTORY, Constants.CB_GET_HTML]);
+                textElement.previousElementSibling.classList.add("fn__none");
+                onGet({
+                    data: response,
+                    protyle: rightEditor.protyle,
+                    action: [Constants.CB_GET_HISTORY, Constants.CB_GET_HTML],
+                });
             }
-            textElement.previousElementSibling.textContent = dayjs(response.data.updated).format("YYYY-MM-DD HH:mm");
+            rightElement.querySelector(".history__date").textContent = format(new Date(response.data.updated), 'yyyy-MM-dd HH:mm');
         });
     } else {
         rightElement.classList.add("fn__none");
@@ -171,13 +197,13 @@ const genHTML = (left: string, right: string, dialog: Dialog, direct: string) =>
     <span class="fn__flex-1"></span>
     <code class="fn__code${isPhone ? " fn__none" : ""}">${left.substring(0, 7)}</code>
     ${isPhone ? "" : '<span class="fn__space"></span>'}
-    ${dayjs(response.data.left.created).format("YYYY-MM-DD HH:mm")}
+    ${format(new Date(response.data.left.created), 'yyyy-MM-dd HH:mm')}
     <span class="fn__space"></span>
     <span class="block__icon block__icon--show b3-tooltips b3-tooltips__s" aria-label="${window.siyuan.languages.switchDirect}" data-direct="${direct}"><svg><use xlink:href="#iconScrollHoriz"></use></svg></span>
     <span class="fn__space"></span>
     <code class="fn__code${isPhone ? " fn__none" : ""}">${right.substring(0, 7)}</code>
     ${isPhone ? "" : '<span class="fn__space"></span>'}
-    ${dayjs(response.data.right.created).format("YYYY-MM-DD HH:mm")}
+    ${format(new Date(response.data.right.created), 'yyyy-MM-dd HH:mm')}
     <span class="fn__flex-1"></span>
 </div>`;
         headElement.nextElementSibling.innerHTML = `<div class="fn__flex history__panel" style="height: 100%">
@@ -216,12 +242,14 @@ const genHTML = (left: string, right: string, dialog: Dialog, direct: string) =>
     <div class="fn__flex-1 fn__flex">
         <div class="fn__none fn__flex-1 fn__flex-column">
             <div class="history__date">${format(response.data.left.created, 'yyyy-MM-dd HH:mm')}</div>
-            <textarea class="history__text fn__none fn__flex-1"></textarea>
+            <div class="ft__center"></div>
+            <textarea class="history__text fn__none fn__flex-1" readonly></textarea>
             <div class="fn__flex-1"></div>
         </div>
         <div class="fn__none fn__flex-1 fn__flex-column" style="border-left: 1px solid var(--b3-border-color);">
             <div class="history__date">${format(response.data.right.created, 'yyyy-MM-dd HH:mm')}</div>
-            <textarea class="history__text fn__none fn__flex-1"></textarea>
+            <div class="ft__center"></div>
+            <textarea class="history__text fn__none fn__flex-1" readonly></textarea>
             <div class="fn__flex-1"></div>
         </div>
     </div>

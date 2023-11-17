@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ import (
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/logging"
 	"github.com/dgraph-io/ristretto"
 	"github.com/jinzhu/copier"
 	gcache "github.com/patrickmn/go-cache"
+	"github.com/siyuan-note/logging"
 )
 
 var cacheDisabled = true

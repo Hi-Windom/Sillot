@@ -2,7 +2,6 @@ import { Constants } from "./constants";
 import { Menus } from "./menus";
 import { Model } from "./layout/Model";
 import { onGetConfig } from "./boot/onGetConfig";
-import "./assets/scss/base.scss";
 import { initBlockPopover } from "./block/popover";
 import { account } from "./config/account";
 import { addScript, addScriptSync } from "./protyle/util/addScript";
@@ -21,20 +20,20 @@ import {
     setTitle,
     transactionError
 } from "./dialog/processSystem";
-import { promiseTransactions } from "./protyle/wysiwyg/transaction";
 import { initMessage } from "./dialog/message";
 import { getAllTabs } from "./layout/getAll";
 import { getLocalStorage } from "./protyle/util/compatibility";
 import { importIDB } from "./sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "./sillot";
-import {updateEditModeElement} from "./layout/topBar";
 import {getSearch} from "./util/functions";
 import {hideAllElements} from "./protyle/ui/hideElements";
 import VConsole from 'vconsole';
 import {loadPlugins} from "./plugin/loader";
+import "./assets/scss/base.scss";
 
 export class App {
     public plugins: import("./plugin").Plugin[] = [];
+    public appId: string;
 
     constructor() {
         /// #if BROWSER
@@ -43,7 +42,10 @@ export class App {
         addScriptSync(`${Constants.PROTYLE_CDN}/js/lute/lute.min.js?v=${Constants.SIYUAN_VERSION}`, "protyleLuteScript");
         addScript(`${Constants.PROTYLE_CDN}/js/protyle-html.js?v=${Constants.SIYUAN_VERSION}`, "protyleWcHtmlScript");
         addBaseURL();
+
+        this.appId = Constants.SIYUAN_APPID;
         window.siyuan = {
+            zIndex: 10,
             transactions: [],
             reqIds: {},
             backStack: [],
@@ -67,7 +69,6 @@ export class App {
                                 break;
                             case "readonly":
                                 window.siyuan.config.editor.readOnly = data.data;
-                                updateEditModeElement();
                                 hideAllElements(["util"]);
                                 break;
                             case "progress":
@@ -137,9 +138,6 @@ export class App {
                                     (document.getElementById("themeDefaultStyle") as HTMLLinkElement).href = data.data.theme;
                                 }
                                 break;
-                            case "createdailynote":
-                                openFileById({app: this, id: data.data.id, action: [Constants.CB_GET_FOCUS]});
-                                break;
                             case "openFileById":
                                 openFileById({app: this, id: data.data.id, action: [Constants.CB_GET_FOCUS]});
                                 break;
@@ -192,7 +190,6 @@ export class App {
         });
         setNoteBook();
         initBlockPopover(this);
-        promiseTransactions();
     }
 }
 
@@ -204,7 +201,7 @@ window.openFileByURL = (openURL) => {
         openFileById({
             app: siyuanApp,
             id: getIdFromSYProtocol(openURL),
-            action: isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
+            action: isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL],
             zoomIn: isZoomIn
         });
         return true;

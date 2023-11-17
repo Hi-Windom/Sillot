@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path"
 	"path/filepath"
@@ -36,9 +37,9 @@ import (
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/vitess-sqlparser/sqlparser"
-	"github.com/K-Sillot/logging"
 	"github.com/jinzhu/copier"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/search"
 	"github.com/siyuan-note/siyuan/kernel/sql"
@@ -160,6 +161,9 @@ func SearchRefBlock(id, rootID, keyword string, beforeLen int, isSquareBrackets 
 		if 1 > len(ret) {
 			ret = []*Block{}
 		}
+
+		// 在 hPath 中加入笔记本名 Show notebooks in hpath of block ref search list results https://github.com/siyuan-note/siyuan/issues/9378
+		prependNotebookNameInHPath(ret)
 		return
 	}
 
@@ -204,16 +208,33 @@ func SearchRefBlock(id, rootID, keyword string, beforeLen int, isSquareBrackets 
 			newDoc = nil == treenode.GetBlockTreeRootByHPath(block.BoxID, p)
 		}
 	}
+
+	// 在 hPath 中加入笔记本名 Show notebooks in hpath of block ref search list results https://github.com/siyuan-note/siyuan/issues/9378
+	prependNotebookNameInHPath(ret)
 	return
 }
 
-func FindReplace(keyword, replacement string, ids []string, method int) (err error) {
+func prependNotebookNameInHPath(blocks []*Block) {
+	var boxIDs []string
+	for _, b := range blocks {
+		boxIDs = append(boxIDs, b.Box)
+	}
+	boxIDs = gulu.Str.RemoveDuplicatedElem(boxIDs)
+	boxNames := Conf.BoxNames(boxIDs)
+	for _, b := range blocks {
+		name := boxNames[b.Box]
+		b.HPath = util.EscapeHTML(name) + b.HPath
+	}
+}
+
+func FindReplace(keyword, replacement string, ids []string, paths, boxes []string, types map[string]bool, method, orderBy, groupBy int) (err error) {
 	// method：0：文本，1：查询语法，2：SQL，3：正则表达式
 	if 1 == method || 2 == method {
 		err = errors.New(Conf.Language(132))
 		return
 	}
 
+	// No longer trim spaces for the keyword and replacement https://github.com/siyuan-note/siyuan/issues/9229
 	if keyword == replacement {
 		return
 	}
@@ -230,6 +251,14 @@ func FindReplace(keyword, replacement string, ids []string, method int) (err err
 	if nil != err {
 		logging.LogErrorf("get history dir failed: %s", err)
 		return
+	}
+
+	if 1 > len(ids) {
+		// `Replace All` is no longer affected by pagination https://github.com/siyuan-note/siyuan/issues/8265
+		blocks, _, _, _ := FullTextSearchBlock(keyword, boxes, paths, types, method, orderBy, groupBy, 1, math.MaxInt)
+		for _, block := range blocks {
+			ids = append(ids, block.ID)
+		}
 	}
 
 	for _, id := range ids {
@@ -269,7 +298,7 @@ func FindReplace(keyword, replacement string, ids []string, method int) (err err
 	}
 	indexHistoryDir(filepath.Base(historyDir), util.NewLute())
 
-	for _, id := range ids {
+	for i, id := range ids {
 		bt := treenode.GetBlockTree(id)
 		if nil == bt {
 			continue
@@ -285,125 +314,129 @@ func FindReplace(keyword, replacement string, ids []string, method int) (err err
 			continue
 		}
 
-		ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
-			if !entering {
-				return ast.WalkContinue
+		if ast.NodeDocument == node.Type {
+			title := node.IALAttr("title")
+			if 0 == method {
+				if strings.Contains(title, keyword) {
+					renameRootTitles[node.ID] = strings.ReplaceAll(title, keyword, replacement)
+					renameRoots = append(renameRoots, node)
+				}
+			} else if 3 == method {
+				if nil != r && r.MatchString(title) {
+					renameRootTitles[node.ID] = r.ReplaceAllString(title, replacement)
+					renameRoots = append(renameRoots, node)
+				}
 			}
+		} else {
+			ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+				if !entering {
+					return ast.WalkContinue
+				}
 
-			switch n.Type {
-			case ast.NodeDocument:
-				title := n.IALAttr("title")
-				if 0 == method {
-					if strings.Contains(title, keyword) {
-						renameRootTitles[n.ID] = strings.ReplaceAll(title, keyword, replacement)
-						renameRoots = append(renameRoots, n)
-					}
-				} else if 3 == method {
-					if nil != r && r.MatchString(title) {
-						renameRootTitles[n.ID] = r.ReplaceAllString(title, replacement)
-						renameRoots = append(renameRoots, n)
-					}
-				}
-			case ast.NodeText, ast.NodeLinkDest, ast.NodeLinkText, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeMathBlockContent:
-				if 0 == method {
-					if bytes.Contains(n.Tokens, []byte(keyword)) {
-						n.Tokens = bytes.ReplaceAll(n.Tokens, []byte(keyword), []byte(replacement))
-					}
-				} else if 3 == method {
-					if nil != r && r.MatchString(string(n.Tokens)) {
-						n.Tokens = []byte(r.ReplaceAllString(string(n.Tokens), replacement))
-					}
-				}
-			case ast.NodeTextMark:
-				if n.IsTextMarkType("code") {
-					if 0 == method {
-						if strings.Contains(n.TextMarkTextContent, escapedKey) {
-							n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, escapedKey, replacement)
-						}
-					} else if 3 == method {
-						if nil != escapedR && escapedR.MatchString(n.TextMarkTextContent) {
-							n.TextMarkTextContent = escapedR.ReplaceAllString(n.TextMarkTextContent, replacement)
-						}
-					}
-				} else {
+				switch n.Type {
+				case ast.NodeText, ast.NodeLinkDest, ast.NodeLinkText, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeMathBlockContent, ast.NodeHTMLBlock:
 					if 0 == method {
 						if bytes.Contains(n.Tokens, []byte(keyword)) {
-							n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, keyword, replacement)
+							n.Tokens = bytes.ReplaceAll(n.Tokens, []byte(keyword), []byte(replacement))
 						}
 					} else if 3 == method {
-						if nil != r && r.MatchString(n.TextMarkTextContent) {
-							n.TextMarkTextContent = r.ReplaceAllString(n.TextMarkTextContent, replacement)
+						if nil != r && r.MatchString(string(n.Tokens)) {
+							n.Tokens = []byte(r.ReplaceAllString(string(n.Tokens), replacement))
 						}
 					}
-				}
+				case ast.NodeTextMark:
+					if n.IsTextMarkType("code") {
+						if 0 == method {
+							if strings.Contains(n.TextMarkTextContent, escapedKey) {
+								n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, escapedKey, replacement)
+							}
+						} else if 3 == method {
+							if nil != escapedR && escapedR.MatchString(n.TextMarkTextContent) {
+								n.TextMarkTextContent = escapedR.ReplaceAllString(n.TextMarkTextContent, replacement)
+							}
+						}
+					} else {
+						if 0 == method {
+							if bytes.Contains(n.Tokens, []byte(keyword)) {
+								n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, keyword, replacement)
+							}
+						} else if 3 == method {
+							if nil != r && r.MatchString(n.TextMarkTextContent) {
+								n.TextMarkTextContent = r.ReplaceAllString(n.TextMarkTextContent, replacement)
+							}
+						}
+					}
 
-				if 0 == method {
-					if strings.Contains(n.TextMarkTextContent, keyword) {
-						n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, keyword, replacement)
-					}
-					if strings.Contains(n.TextMarkInlineMathContent, keyword) {
-						n.TextMarkInlineMathContent = strings.ReplaceAll(n.TextMarkInlineMathContent, keyword, replacement)
-					}
-					if strings.Contains(n.TextMarkInlineMemoContent, keyword) {
-						n.TextMarkInlineMemoContent = strings.ReplaceAll(n.TextMarkInlineMemoContent, keyword, replacement)
-					}
-					if strings.Contains(n.TextMarkATitle, keyword) {
-						n.TextMarkATitle = strings.ReplaceAll(n.TextMarkATitle, keyword, replacement)
-					}
-					if strings.Contains(n.TextMarkAHref, keyword) {
-						n.TextMarkAHref = strings.ReplaceAll(n.TextMarkAHref, keyword, replacement)
-					}
-				} else if 3 == method {
-					if nil != r {
-						if r.MatchString(n.TextMarkTextContent) {
-							n.TextMarkTextContent = r.ReplaceAllString(n.TextMarkTextContent, replacement)
+					if 0 == method {
+						if strings.Contains(n.TextMarkTextContent, keyword) {
+							n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, keyword, replacement)
 						}
-						if r.MatchString(n.TextMarkInlineMathContent) {
-							n.TextMarkInlineMathContent = r.ReplaceAllString(n.TextMarkInlineMathContent, replacement)
+						if strings.Contains(n.TextMarkInlineMathContent, keyword) {
+							n.TextMarkInlineMathContent = strings.ReplaceAll(n.TextMarkInlineMathContent, keyword, replacement)
 						}
-						if r.MatchString(n.TextMarkInlineMemoContent) {
-							n.TextMarkInlineMemoContent = r.ReplaceAllString(n.TextMarkInlineMemoContent, replacement)
+						if strings.Contains(n.TextMarkInlineMemoContent, keyword) {
+							n.TextMarkInlineMemoContent = strings.ReplaceAll(n.TextMarkInlineMemoContent, keyword, replacement)
 						}
-						if r.MatchString(n.TextMarkATitle) {
-							n.TextMarkATitle = r.ReplaceAllString(n.TextMarkATitle, replacement)
+						if strings.Contains(n.TextMarkATitle, keyword) {
+							n.TextMarkATitle = strings.ReplaceAll(n.TextMarkATitle, keyword, replacement)
 						}
-						if r.MatchString(n.TextMarkAHref) {
-							n.TextMarkAHref = r.ReplaceAllString(n.TextMarkAHref, replacement)
+						if strings.Contains(n.TextMarkAHref, keyword) {
+							n.TextMarkAHref = strings.ReplaceAll(n.TextMarkAHref, keyword, replacement)
+						}
+					} else if 3 == method {
+						if nil != r {
+							if r.MatchString(n.TextMarkTextContent) {
+								n.TextMarkTextContent = r.ReplaceAllString(n.TextMarkTextContent, replacement)
+							}
+							if r.MatchString(n.TextMarkInlineMathContent) {
+								n.TextMarkInlineMathContent = r.ReplaceAllString(n.TextMarkInlineMathContent, replacement)
+							}
+							if r.MatchString(n.TextMarkInlineMemoContent) {
+								n.TextMarkInlineMemoContent = r.ReplaceAllString(n.TextMarkInlineMemoContent, replacement)
+							}
+							if r.MatchString(n.TextMarkATitle) {
+								n.TextMarkATitle = r.ReplaceAllString(n.TextMarkATitle, replacement)
+							}
+							if r.MatchString(n.TextMarkAHref) {
+								n.TextMarkAHref = r.ReplaceAllString(n.TextMarkAHref, replacement)
+							}
 						}
 					}
 				}
+				return ast.WalkContinue
+			})
+
+			if err = writeJSONQueue(tree); nil != err {
+				return
 			}
-			return ast.WalkContinue
-		})
-
-		if err = writeJSONQueue(tree); nil != err {
-			return
 		}
+
+		util.PushEndlessProgress(fmt.Sprintf(Conf.Language(206), i+1, len(ids)))
 	}
 
-	for _, renameRoot := range renameRoots {
+	for i, renameRoot := range renameRoots {
 		newTitle := renameRootTitles[renameRoot.ID]
 		RenameDoc(renameRoot.Box, renameRoot.Path, newTitle)
+
+		util.PushEndlessProgress(fmt.Sprintf(Conf.Language(207), i+1, len(renameRoots)))
 	}
 
 	WaitForWritingFiles()
-	if 1 < len(ids) {
+	if 0 < len(ids) {
 		go func() {
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 500)
 			util.ReloadUI()
 		}()
 	}
 	return
 }
 
-const pageSize = 32
-
 // FullTextSearchBlock 搜索内容块。
 //
 // method：0：关键字，1：查询语法，2：SQL，3：正则表达式
 // orderBy: 0：按块类型（默认），1：按创建时间升序，2：按创建时间降序，3：按更新时间升序，4：按更新时间降序，5：按内容顺序（仅在按文档分组时），6：按相关度升序，7：按相关度降序
 // groupBy：0：不分组，1：按文档分组
-func FullTextSearchBlock(query string, boxes, paths []string, types map[string]bool, method, orderBy, groupBy, page int) (ret []*Block, matchedBlockCount, matchedRootCount, pageCount int) {
+func FullTextSearchBlock(query string, boxes, paths []string, types map[string]bool, method, orderBy, groupBy, page, pageSize int) (ret []*Block, matchedBlockCount, matchedRootCount, pageCount int) {
 	query = strings.TrimSpace(query)
 	beforeLen := 36
 	var blocks []*Block
@@ -413,19 +446,19 @@ func FullTextSearchBlock(query string, boxes, paths []string, types map[string]b
 		filter := buildTypeFilter(types)
 		boxFilter := buildBoxesFilter(boxes)
 		pathFilter := buildPathsFilter(paths)
-		blocks, matchedBlockCount, matchedRootCount = fullTextSearchByQuerySyntax(query, boxFilter, pathFilter, filter, orderByClause, beforeLen, page)
+		blocks, matchedBlockCount, matchedRootCount = fullTextSearchByQuerySyntax(query, boxFilter, pathFilter, filter, orderByClause, beforeLen, page, pageSize)
 	case 2: // SQL
-		blocks, matchedBlockCount, matchedRootCount = searchBySQL(query, beforeLen, page)
+		blocks, matchedBlockCount, matchedRootCount = searchBySQL(query, beforeLen, page, pageSize)
 	case 3: // 正则表达式
 		typeFilter := buildTypeFilter(types)
 		boxFilter := buildBoxesFilter(boxes)
 		pathFilter := buildPathsFilter(paths)
-		blocks, matchedBlockCount, matchedRootCount = fullTextSearchByRegexp(query, boxFilter, pathFilter, typeFilter, orderByClause, beforeLen, page)
+		blocks, matchedBlockCount, matchedRootCount = fullTextSearchByRegexp(query, boxFilter, pathFilter, typeFilter, orderByClause, beforeLen, page, pageSize)
 	default: // 关键字
 		filter := buildTypeFilter(types)
 		boxFilter := buildBoxesFilter(boxes)
 		pathFilter := buildPathsFilter(paths)
-		blocks, matchedBlockCount, matchedRootCount = fullTextSearchByKeyword(query, boxFilter, pathFilter, filter, orderByClause, beforeLen, page)
+		blocks, matchedBlockCount, matchedRootCount = fullTextSearchByKeyword(query, boxFilter, pathFilter, filter, orderByClause, beforeLen, page, pageSize)
 	}
 	pageCount = (matchedBlockCount + pageSize - 1) / pageSize
 
@@ -559,16 +592,16 @@ func buildOrderBy(method, orderBy int) string {
 	case 6:
 		if 0 != method && 1 != method {
 			// 只有关键字搜索和查询语法搜索才支持按相关度升序 https://github.com/siyuan-note/siyuan/issues/7861
-			return "ORDER BY sort DESC"
+			return "ORDER BY sort DESC, updated DESC"
 		}
 		return "ORDER BY rank DESC" // 默认是按相关度降序，所以按相关度升序要反过来使用 DESC
 	case 7:
 		if 0 != method && 1 != method {
-			return "ORDER BY sort ASC"
+			return "ORDER BY sort ASC, updated DESC"
 		}
 		return "ORDER BY rank" // 默认是按相关度降序
 	default:
-		return "ORDER BY sort ASC"
+		return "ORDER BY sort ASC, updated DESC" // Improve search default sort https://github.com/siyuan-note/siyuan/issues/8624
 	}
 }
 
@@ -590,6 +623,7 @@ func buildTypeFilter(types map[string]bool) string {
 		s.Paragraph = types["paragraph"]
 		s.HTMLBlock = types["htmlBlock"]
 		s.EmbedBlock = types["embedBlock"]
+		s.DatabaseBlock = types["databaseBlock"]
 	} else {
 		s.Document = Conf.Search.Document
 		s.Heading = Conf.Search.Heading
@@ -603,11 +637,12 @@ func buildTypeFilter(types map[string]bool) string {
 		s.Paragraph = Conf.Search.Paragraph
 		s.HTMLBlock = Conf.Search.HTMLBlock
 		s.EmbedBlock = Conf.Search.EmbedBlock
+		s.DatabaseBlock = Conf.Search.DatabaseBlock
 	}
 	return s.TypeFilter()
 }
 
-func searchBySQL(stmt string, beforeLen, page int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
+func searchBySQL(stmt string, beforeLen, page, pageSize int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
 	stmt = gulu.Str.RemoveInvisible(stmt)
 	stmt = strings.TrimSpace(stmt)
 	blocks := sql.SelectBlocksRawStmt(stmt, page, pageSize)
@@ -655,7 +690,7 @@ func fullTextSearchRefBlock(keyword string, beforeLen int, onlyDoc bool) (ret []
 	keyword = gulu.Str.RemoveInvisible(keyword)
 
 	if ast.IsNodeIDPattern(keyword) {
-		ret, _, _ = searchBySQL("SELECT * FROM `blocks` WHERE `id` = '"+keyword+"'", 36, 1)
+		ret, _, _ = searchBySQL("SELECT * FROM `blocks` WHERE `id` = '"+keyword+"'", 36, 1, 32)
 		return
 	}
 
@@ -710,7 +745,7 @@ func fullTextSearchRefBlock(keyword string, beforeLen int, onlyDoc bool) (ret []
 	when memo = '${keyword}' then 30
 	`
 	orderBy := ` order by case` + orderCase1 + orderCase2 + orderCase3 + `else 65535 end ASC, sort ASC, length ASC`
-	orderBy = strings.ReplaceAll(orderBy, "${keyword}", keyword)
+	orderBy = strings.ReplaceAll(orderBy, "${keyword}", quotedKeyword)
 	stmt += orderBy + " LIMIT " + strconv.Itoa(Conf.Search.Limit)
 	blocks := sql.SelectBlocksRawStmtNoParse(stmt, Conf.Search.Limit)
 	ret = fromSQLBlocks(&blocks, "", beforeLen)
@@ -720,26 +755,26 @@ func fullTextSearchRefBlock(keyword string, beforeLen int, onlyDoc bool) (ret []
 	return
 }
 
-func fullTextSearchByQuerySyntax(query, boxFilter, pathFilter, typeFilter, orderBy string, beforeLen, page int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
+func fullTextSearchByQuerySyntax(query, boxFilter, pathFilter, typeFilter, orderBy string, beforeLen, page, pageSize int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
 	query = gulu.Str.RemoveInvisible(query)
 	if ast.IsNodeIDPattern(query) {
-		ret, matchedBlockCount, matchedRootCount = searchBySQL("SELECT * FROM `blocks` WHERE `id` = '"+query+"'", beforeLen, page)
+		ret, matchedBlockCount, matchedRootCount = searchBySQL("SELECT * FROM `blocks` WHERE `id` = '"+query+"'", beforeLen, page, pageSize)
 		return
 	}
-	return fullTextSearchByFTS(query, boxFilter, pathFilter, typeFilter, orderBy, beforeLen, page)
+	return fullTextSearchByFTS(query, boxFilter, pathFilter, typeFilter, orderBy, beforeLen, page, pageSize)
 }
 
-func fullTextSearchByKeyword(query, boxFilter, pathFilter, typeFilter string, orderBy string, beforeLen, page int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
+func fullTextSearchByKeyword(query, boxFilter, pathFilter, typeFilter string, orderBy string, beforeLen, page, pageSize int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
 	query = gulu.Str.RemoveInvisible(query)
 	if ast.IsNodeIDPattern(query) {
-		ret, matchedBlockCount, matchedRootCount = searchBySQL("SELECT * FROM `blocks` WHERE `id` = '"+query+"'", beforeLen, page)
+		ret, matchedBlockCount, matchedRootCount = searchBySQL("SELECT * FROM `blocks` WHERE `id` = '"+query+"'", beforeLen, page, pageSize)
 		return
 	}
 	query = stringQuery(query)
-	return fullTextSearchByFTS(query, boxFilter, pathFilter, typeFilter, orderBy, beforeLen, page)
+	return fullTextSearchByFTS(query, boxFilter, pathFilter, typeFilter, orderBy, beforeLen, page, pageSize)
 }
 
-func fullTextSearchByRegexp(exp, boxFilter, pathFilter, typeFilter, orderBy string, beforeLen, page int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
+func fullTextSearchByRegexp(exp, boxFilter, pathFilter, typeFilter, orderBy string, beforeLen, page, pageSize int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
 	exp = gulu.Str.RemoveInvisible(exp)
 
 	fieldFilter := fieldRegexp(exp)
@@ -770,18 +805,19 @@ func fullTextSearchCountByRegexp(exp, boxFilter, pathFilter, typeFilter string) 
 	return
 }
 
-func fullTextSearchByFTS(query, boxFilter, pathFilter, typeFilter, orderBy string, beforeLen, page int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
+func fullTextSearchByFTS(query, boxFilter, pathFilter, typeFilter, orderBy string, beforeLen, page, pageSize int) (ret []*Block, matchedBlockCount, matchedRootCount int) {
 	table := "blocks_fts" // 大小写敏感
 	if !Conf.Search.CaseSensitive {
 		table = "blocks_fts_case_insensitive"
 	}
 	projections := "id, parent_id, root_id, hash, box, path, " +
-		"highlight(" + table + ", 6, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "') AS hpath, " +
-		"highlight(" + table + ", 7, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "') AS name, " +
-		"highlight(" + table + ", 8, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "') AS alias, " +
-		"highlight(" + table + ", 9, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "') AS memo, " +
+		// Improve the highlight snippet when search result content is too long https://github.com/siyuan-note/siyuan/issues/9215
+		"snippet(" + table + ", 6, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 192) AS hpath, " +
+		"snippet(" + table + ", 7, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 192) AS name, " +
+		"snippet(" + table + ", 8, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 192) AS alias, " +
+		"snippet(" + table + ", 9, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 192) AS memo, " +
 		"tag, " +
-		"highlight(" + table + ", 11, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "') AS content, " +
+		"snippet(" + table + ", 11, '" + search.SearchMarkLeft + "', '" + search.SearchMarkRight + "', '...', 192) AS content, " +
 		"fcontent, markdown, length, type, subtype, ial, sort, created, updated"
 	stmt := "SELECT " + projections + " FROM " + table + " WHERE (`" + table + "` MATCH '" + columnFilter() + ":(" + query + ")'"
 	stmt += ") AND type IN " + typeFilter
@@ -902,16 +938,14 @@ func fromSQLBlock(sqlBlock *sql.Block, terms string, beforeLen int) (block *Bloc
 	}
 
 	id := sqlBlock.ID
-	content := sqlBlock.Content
-	p := sqlBlock.Path
-
+	content := util.EscapeHTML(sqlBlock.Content) // Search dialog XSS https://github.com/siyuan-note/siyuan/issues/8525
 	content, _ = markSearch(content, terms, beforeLen)
 	content = maxContent(content, 5120)
 	markdown := maxContent(sqlBlock.Markdown, 5120)
 
 	block = &Block{
 		Box:      sqlBlock.Box,
-		Path:     p,
+		Path:     sqlBlock.Path,
 		ID:       id,
 		RootID:   sqlBlock.RootID,
 		ParentID: sqlBlock.ParentID,

@@ -1,19 +1,31 @@
-export const upDownHint = (listElement: Element, event: KeyboardEvent) => {
-    let currentHintElement: HTMLElement = listElement.querySelector(".b3-list-item--focus");
+export const upDownHint = (listElement: Element, event: KeyboardEvent, classActiveName = "b3-list-item--focus") => {
+    let currentHintElement: HTMLElement = listElement.querySelector("." + classActiveName);
+    if (!currentHintElement) {
+        return;
+    }
+    const className = classActiveName.split("--")[0];
     if (event.key === "ArrowDown") {
         event.preventDefault();
         event.stopPropagation();
-        currentHintElement.classList.remove("b3-list-item--focus");
-        if (!currentHintElement.nextElementSibling) {
-            listElement.children[0].classList.add("b3-list-item--focus");
-        } else {
-            if (currentHintElement.nextElementSibling.classList.contains("b3-list-item")) {
-                currentHintElement.nextElementSibling.classList.add("b3-list-item--focus");
-            } else {
-                currentHintElement.nextElementSibling.nextElementSibling.classList.add("b3-list-item--focus");
+        currentHintElement.classList.remove(classActiveName);
+
+        currentHintElement = currentHintElement.nextElementSibling as HTMLElement;
+        while (currentHintElement &&
+        (currentHintElement.classList.contains("fn__none") || !currentHintElement.classList.contains(className))) {
+            currentHintElement = currentHintElement.nextElementSibling as HTMLElement;
+        }
+
+        if (!currentHintElement) {
+            currentHintElement = listElement.children[0] as HTMLElement;
+            while (currentHintElement &&
+            (currentHintElement.classList.contains("fn__none") || !currentHintElement.classList.contains(className))) {
+                currentHintElement = currentHintElement.nextElementSibling as HTMLElement;
             }
         }
-        currentHintElement = listElement.querySelector(".b3-list-item--focus");
+        if (!currentHintElement) {
+            return;
+        }
+        currentHintElement.classList.add(classActiveName);
         if (listElement.scrollTop < currentHintElement.offsetTop - listElement.clientHeight + currentHintElement.clientHeight ||
             listElement.scrollTop > currentHintElement.offsetTop) {
             currentHintElement.scrollIntoView(listElement.scrollTop > currentHintElement.offsetTop);
@@ -22,21 +34,29 @@ export const upDownHint = (listElement: Element, event: KeyboardEvent) => {
     } else if (event.key === "ArrowUp") {
         event.preventDefault();
         event.stopPropagation();
-        currentHintElement.classList.remove("b3-list-item--focus");
-        if (!currentHintElement.previousElementSibling) {
-            const length = listElement.children.length;
-            listElement.children[length - 1].classList.add("b3-list-item--focus");
-        } else {
-            if (currentHintElement.previousElementSibling.classList.contains("b3-list-item")) {
-                currentHintElement.previousElementSibling.classList.add("b3-list-item--focus");
-            } else {
-                currentHintElement.previousElementSibling.previousElementSibling.classList.add("b3-list-item--focus");
+        currentHintElement.classList.remove(classActiveName);
+
+        currentHintElement = currentHintElement.previousElementSibling as HTMLElement;
+        while (currentHintElement &&
+        (currentHintElement.classList.contains("fn__none") || !currentHintElement.classList.contains(className))) {
+            currentHintElement = currentHintElement.previousElementSibling as HTMLElement;
+        }
+
+        if (!currentHintElement) {
+            currentHintElement = listElement.children[listElement.children.length - 1] as HTMLElement;
+            while (currentHintElement &&
+            (currentHintElement.classList.contains("fn__none") || !currentHintElement.classList.contains(className))) {
+                currentHintElement = currentHintElement.previousElementSibling as HTMLElement;
             }
         }
-        currentHintElement = listElement.querySelector(".b3-list-item--focus");
-        if (listElement.scrollTop < currentHintElement.offsetTop - listElement.clientHeight + currentHintElement.clientHeight ||
-            listElement.scrollTop > currentHintElement.offsetTop - currentHintElement.clientHeight * 2) {
-            currentHintElement.scrollIntoView(listElement.scrollTop > currentHintElement.offsetTop - currentHintElement.clientHeight * 2);
+        if (!currentHintElement) {
+            return;
+        }
+        currentHintElement.classList.add(classActiveName);
+
+        const overTop = listElement.scrollTop > currentHintElement.offsetTop - (currentHintElement.previousElementSibling?.clientHeight || 0);
+        if (listElement.scrollTop < currentHintElement.offsetTop - listElement.clientHeight + currentHintElement.clientHeight || overTop) {
+            currentHintElement.scrollIntoView(overTop);
         }
         return currentHintElement;
     }

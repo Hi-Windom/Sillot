@@ -70,7 +70,11 @@ export class Scroll {
             mode: 0,
             size: window.siyuan.config.editor.dynamicLoadBlocks,
         }, getResponse => {
-            onGet(getResponse, protyle, [Constants.CB_GET_FOCUSFIRST, Constants.CB_GET_UNCHANGEID]);
+            onGet({
+                data: getResponse,
+                protyle,
+                action: [Constants.CB_GET_FOCUSFIRST, Constants.CB_GET_UNCHANGEID],
+            });
         });
     }
 
