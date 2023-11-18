@@ -14,28 +14,24 @@
     <img style="position: absolute;width: 36vh;" src="../../icon.png">
 </div>
 <div class="toolbar toolbar--border">
-    <svg id="toolbarFile" class="toolbar__icon fn__none">
-        <use xlink:href="#iconMenu"></use>
-    </svg>
-    <svg id="toolbarEdit" class="toolbar__icon fn__hidden">
-        <use xlink:href="#iconEdit"></use>
-    </svg>
-    <input class="toolbar__title fn__hidden" id="toolbarName">
-    <svg id="toolbarSync" class="toolbar__icon fn__none">
-        <use xlink:href="#iconCloudSucc"></use>
-    </svg>
-    <svg id="toolbarRiffCard" class="b3-menu__icon" style="color: var(--b3-theme-secondary)"><use xlink:href="#iconRiffCard"></use></svg>
-    <svg id="toolbarConsole" class="toolbar__icon" data-mode="0">
-        <use xlink:href="#iconBug"></use>
-    </svg>
-    <svg id="toolbarMore" class="toolbar__icon fn__none">
-        <use xlink:href="#iconMore"></use>
-    </svg>
-</div>
+          <svg id="toolbarFile" class="toolbar__icon">
+              <use xlink:href="#iconMenu"></use>
+          </svg>
+          <input class="toolbar__title fn__hidden" id="toolbarName">
+          <svg id="toolbarSync" class="toolbar__icon fn__none">
+              <use xlink:href="#iconCloudSucc"></use>
+          </svg>
+          <svg id="toolbarConsole" class="toolbar__icon" data-mode="0">
+              <use xlink:href="#iconBug"></use>
+          </svg>
+          <svg id="toolbarMore" class="toolbar__icon">
+              <use xlink:href="#iconMore"></use>
+          </svg>
+      </div>
 <div id="editor" class="fn__none fn__flex-1"></div>
 <div id="empty" class="b3-list--mobile"></div>
 <div id="sidebar" class="side-panel fn__flex-column">
-    <div class="toolbar toolbar--border">
+    <div class="toolbar toolbar--border" style="-webkit-user-select: none">
         <svg data-type="sidebar-file-tab" class="toolbar__icon toolbar__icon--active"><use xlink:href="#iconFiles"></use></svg>
         <svg data-type="sidebar-outline-tab" class="toolbar__icon"><use xlink:href="#iconAlignCenter"></use></svg>
         <svg data-type="sidebar-bookmark-tab" class="toolbar__icon"><use xlink:href="#iconBookmark"></use></svg>
