@@ -480,12 +480,6 @@ func InitBlockTree(force bool) {
 			return
 		}
 
-		if err = f.Close(); nil != err {
-			logging.LogErrorf("close block tree failed: %s", err)
-			os.Exit(logging.ExitCodeFileSysErr)
-			return
-		}
-
 		name := entry.Name()[0:strings.Index(entry.Name(), ".")]
 		blockTrees.Store(name, &btSlice{data: sliceData, changed: time.Time{}, m: &sync.Mutex{}})
 	})
