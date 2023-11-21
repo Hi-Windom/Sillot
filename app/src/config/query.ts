@@ -4,7 +4,7 @@ export const query = {
     element: undefined as Element,
     genHTML: () => {
         return `<div class="b3-label">
- ${window.siyuan.languages.searchType}
+ ${window.siyuan.languages.searchBlockType}
     <div class="fn__flex config-query">
         <label class="fn__flex">
             <svg class="svg"><use xlink:href="#iconMath"></use></svg>
@@ -114,10 +114,19 @@ export const query = {
             <span class="fn__space"></span>
             <input class="b3-switch" id="embedBlock" type="checkbox"${window.siyuan.config.search.embedBlock ? " checked" : ""}/>
         </label>
+        <label class="fn__flex">
+            <svg class="svg"><use xlink:href="#iconDatabase"></use></svg>
+            <span class="fn__space"></span>
+            <div class="fn__flex-1">
+                ${window.siyuan.languages.database}
+            </div>
+            <span class="fn__space"></span>
+            <input class="b3-switch" id="databaseBlock" type="checkbox"${window.siyuan.config.search.databaseBlock ? " checked" : ""}/>
+        </label>        
     </div>
 </div>
 <div class="b3-label">
- ${window.siyuan.languages.searchAttr}
+ ${window.siyuan.languages.searchBlockAttr}
     <div class="config-query">
         <label class="fn__flex">
             <svg class="svg"><use xlink:href="#iconN"></use></svg>
@@ -228,6 +237,18 @@ export const query = {
         </label>
     </div>
 </div>
+<div class="b3-label">
+ ${window.siyuan.languages.searchIndex}
+    <div class="config-query">
+        <label class="fn__flex">
+            <div class="fn__flex-1">
+                ${window.siyuan.languages.indexAssetPath}
+            </div>
+            <span class="fn__space"></span>
+            <input class="b3-switch" id="indexAssetPath" type="checkbox"${window.siyuan.config.search.indexAssetPath ? " checked" : ""}/>
+        </label>
+    </div>
+</div>
 <label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.searchLimit}
@@ -257,6 +278,7 @@ export const query = {
                     codeBlock: (query.element.querySelector("#codeBlock") as HTMLInputElement).checked,
                     htmlBlock: (query.element.querySelector("#htmlBlock") as HTMLInputElement).checked,
                     embedBlock: (query.element.querySelector("#embedBlock") as HTMLInputElement).checked,
+                    databaseBlock: (query.element.querySelector("#databaseBlock") as HTMLInputElement).checked,
                     mathBlock: (query.element.querySelector("#mathBlock") as HTMLInputElement).checked,
                     table: (query.element.querySelector("#table") as HTMLInputElement).checked,
                     blockquote: (query.element.querySelector("#blockquote") as HTMLInputElement).checked,
@@ -266,6 +288,7 @@ export const query = {
                     alias: (query.element.querySelector("#alias") as HTMLInputElement).checked,
                     memo: (query.element.querySelector("#memo") as HTMLInputElement).checked,
                     ial: (query.element.querySelector("#ial") as HTMLInputElement).checked,
+                    indexAssetPath: (query.element.querySelector("#indexAssetPath") as HTMLInputElement).checked,
                     limit: parseInt((query.element.querySelector("#limit") as HTMLInputElement).value),
                     caseSensitive: (query.element.querySelector("#caseSensitive") as HTMLInputElement).checked,
                     backlinkMentionName: (query.element.querySelector("#backlinkMentionName") as HTMLInputElement).checked,

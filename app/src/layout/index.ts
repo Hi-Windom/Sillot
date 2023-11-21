@@ -1,9 +1,10 @@
 import {Wnd} from "./Wnd";
 import {genUUID} from "../util/genID";
-import {addResize, resizeTabs} from "./util";
+import {addResize} from "./util";
+import {resizeTabs} from "./tabUtil";
 /// #if MOBILE
 // 检测移动端是否引入了桌面端的代码
-alert("Need remove unused code");
+console.error("Need remove unused code");
 /// #endif
 
 export class Layout {
@@ -84,9 +85,7 @@ export class Layout {
                         item.element.querySelectorAll(".protyle-content").forEach((element: HTMLElement) => {
                             if (!element.parentElement.classList.contains("fn__none")) {
                                 element.classList.remove("protyle-content--transition");
-                                const wysiwygElement = element.querySelector(".protyle-wysiwyg") as HTMLElement;
-                                wysiwygElement.style.paddingRight = "16px";
-                                wysiwygElement.style.paddingLeft = "24px";
+                                (element.querySelector(".protyle-wysiwyg") as HTMLElement).style.padding = "";
                                 element.classList.add("protyle-content--transition");
                             }
                         });

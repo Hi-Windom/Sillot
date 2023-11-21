@@ -1,13 +1,15 @@
-import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName} from "./hasClosest";
+import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName, hasClosestByMatchTag} from "./hasClosest";
 // import * as dayjs from "dayjs";
 import {format} from "date-fns";
 import {transaction, updateTransaction} from "../wysiwyg/transaction";
-import {getContenteditableElement} from "../wysiwyg/getBlock";
+import {getContenteditableElement, hasNextSibling, hasPreviousSibling} from "../wysiwyg/getBlock";
 import {fixTableRange, focusBlock, focusByWbr, getEditorRange} from "./selection";
-import {mathRender} from "../markdown/mathRender";
+import {mathRender} from "../render/mathRender";
 import {Constants} from "../../constants";
-import {highlightRender} from "../markdown/highlightRender";
+import {highlightRender} from "../render/highlightRender";
 import {scrollCenter} from "../../util/highlightById";
+import {updateAVName} from "../render/av/action";
+import {readText} from "./compatibility";
 
 export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
                            // 移动端插入嵌入块时，获取到的 range 为旧值
@@ -17,8 +19,14 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
     }
     const range = useProtyleRange ? protyle.toolbar.range : getEditorRange(protyle.wysiwyg.element);
     fixTableRange(range);
+    let tableInlineHTML;
     if (hasClosestByAttribute(range.startContainer, "data-type", "NodeTable") && !isBlock) {
-        html = protyle.lute.BlockDOM2InlineBlockDOM(html);
+        if (hasClosestByMatchTag(range.startContainer, "TABLE")) {
+            tableInlineHTML = protyle.lute.BlockDOM2InlineBlockDOM(html);
+        } else {
+            // https://github.com/siyuan-note/siyuan/issues/9411
+            isBlock = true;
+        }
     }
     let blockElement = hasClosestBlock(range.startContainer) as Element;
     if (!blockElement) {
@@ -30,6 +38,22 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
         }
     }
     if (!blockElement) {
+        return;
+    }
+    if (blockElement.classList.contains("av")) {
+        range.deleteContents();
+        const text = readText();
+        if (typeof text === "string") {
+            range.insertNode(document.createTextNode(text));
+            range.collapse(false);
+            updateAVName(protyle, blockElement);
+        } else {
+            text.then((t) => {
+                range.insertNode(document.createTextNode(t));
+                range.collapse(false);
+                updateAVName(protyle, blockElement);
+            });
+        }
         return;
     }
     let id = blockElement.getAttribute("data-node-id");
@@ -52,7 +76,7 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
         updateTransaction(protyle, id, blockElement.outerHTML, oldHTML);
         setTimeout(() => {
             scrollCenter(protyle, blockElement, false, "smooth");
-        }, Constants.TIMEOUT_BLOCKLOAD);
+        }, Constants.TIMEOUT_LOAD);
         return;
     }
 
@@ -85,7 +109,8 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
     }
     const tempElement = document.createElement("template");
     // 需要再 spin 一次 https://github.com/siyuan-note/siyuan/issues/7118
-    tempElement.innerHTML = protyle.lute.SpinBlockDOM(html) ||
+    tempElement.innerHTML = tableInlineHTML // 在 table 中插入需要使用转换好的行内元素 https://github.com/siyuan-note/siyuan/issues/9358
+        || protyle.lute.SpinBlockDOM(html) ||
         html;   // 空格会被 Spin 不再，需要使用原文
     const editableElement = getContenteditableElement(blockElement);
     // 使用 lute 方法会添加 p 元素，只有一个 p 元素或者只有一个字符串或者为 <u>b</u> 时的时候只拷贝内部
@@ -100,7 +125,9 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
             // 粘贴带样式的行内元素到另一个行内元素中需进行切割
             const spanElement = range.startContainer.nodeType === 3 ? range.startContainer.parentElement : range.startContainer as HTMLElement;
             if (spanElement.tagName === "SPAN" && spanElement.isSameNode(range.endContainer.nodeType === 3 ? range.endContainer.parentElement : range.endContainer) &&
-                tempElement.content.querySelector("span") // 粘贴纯文本不需切割 https://ld246.com/article/1665556907936
+                // 粘贴纯文本不需切割 https://ld246.com/article/1665556907936
+                // emoji 图片需要切割 https://github.com/siyuan-note/siyuan/issues/9370
+                tempElement.content.querySelector("span, img")
             ) {
                 const afterElement = document.createElement("span");
                 const attributes = spanElement.attributes;
@@ -131,6 +158,15 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
                     replaceInnerHTML = replaceInnerHTML.substring(0, languageIndex) + (localStorage["local-codelang"] || "") + replaceInnerHTML.substring(languageIndex);
 
                     editableElement.innerHTML = replaceInnerHTML;
+                }
+            }
+            const editWbrElement = editableElement.querySelector("wbr");
+            if (editWbrElement && editableElement && !trimStartText.endsWith("\n")) {
+                // 数学公式后无换行，后期渲染后添加导致 rang 错误，中文输入错误 https://github.com/siyuan-note/siyuan/issues/9054
+                const previousElement = hasPreviousSibling(editWbrElement) as HTMLElement;
+                if (previousElement && previousElement.nodeType !== 3 && (previousElement.dataset.type || "").indexOf("inline-math") > -1 &&
+                    !hasNextSibling(editWbrElement)) {
+                    editWbrElement.insertAdjacentText("afterend", "\n");
                 }
             }
             mathRender(blockElement);

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -23,10 +23,25 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/logging"
 	"github.com/emirpasic/gods/sets/hashset"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/search"
 )
+
+func GetRefDuplicatedDefRootIDs() (ret []string) {
+	rows, err := query("SELECT DISTINCT def_block_root_id FROM `refs` GROUP BY def_block_id, def_block_root_id, block_id HAVING COUNT(*) > 1")
+	if nil != err {
+		logging.LogErrorf("sql query failed: %s", err)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id string
+		rows.Scan(&id)
+		ret = append(ret, id)
+	}
+	return
+}
 
 func QueryVirtualRefKeywords(name, alias, anchor, doc bool) (ret []string) {
 	if name {
@@ -203,6 +218,8 @@ func getRefText(defBlockID string) string {
 		return block.Content
 	case "query_embed":
 		return "Query Embed Block " + block.Markdown
+	case "av":
+		return "Database " + block.Markdown
 	case "iframe":
 		return "IFrame " + block.Markdown
 	case "tb":

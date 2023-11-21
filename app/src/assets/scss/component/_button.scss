@@ -1,7 +1,7 @@
 .b3-button {
   cursor: pointer;
   color: var(--b3-theme-on-primary);
-  border-radius: 4px;
+  border-radius: var(--b3-border-radius);
   line-height: 20px;
   padding: 4px 8px;
   background-color: var(--b3-theme-primary);
@@ -25,7 +25,7 @@
   &:focus,
   &--progress {
     text-decoration: none;
-    box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, .12);
+    box-shadow: var(--b3-button-shadow);
   }
 
   &:active {
@@ -45,7 +45,7 @@
       top: 0;
       width: 50%;
       background-color: var(--b3-theme-primary);
-      border-radius: 4px;
+      border-radius: var(--b3-border-radius);
     }
   }
 
@@ -56,6 +56,14 @@
 
   &--mid {
     padding: 2px 8px;
+  }
+
+  &--big {
+    min-width: 214px;
+    background: var(--b3-theme-secondary);
+    color:var(--b3-theme-on-secondary);
+    padding: 24px 16px;
+    font-size: 16px;
   }
 
   &--text,

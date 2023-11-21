@@ -8,22 +8,27 @@ import {initTabMenu} from "./tab";
 /// #endif
 import {Menu} from "./Menu";
 import {hasTopClosestByTag} from "../protyle/util/hasClosest";
+import {App} from "../index";
 
 
 export class Menus {
     public menu: Menu;
 
-    constructor() {
+    constructor(app: App) {
         this.menu = new Menu();
         /// #if !MOBILE
         window.addEventListener("contextmenu", (event) => {
+            if (event.shiftKey) {
+                return;
+            }
             let target = event.target as HTMLElement;
-            while (target && !target.parentElement.isEqualNode(document.querySelector("body"))) {
+            while (target && target.parentElement   // ⌃⇥ 后点击会为空
+            && !target.parentElement.isEqualNode(document.querySelector("body"))) {
                 event.preventDefault();
                 const dataType = target.getAttribute("data-type");
                 if (dataType === "tab-header") {
                     this.unselect();
-                    initTabMenu((getInstanceById(target.getAttribute("data-id")) as Tab)).popup({
+                    initTabMenu(app, (getInstanceById(target.getAttribute("data-id")) as Tab)).popup({
                         x: event.clientX,
                         y: event.clientY
                     });
@@ -37,7 +42,7 @@ export class Menus {
                     }
                     this.unselect();
                     // navigation 根上：新建文档/文件夹/取消挂在/打开文件位置
-                    initNavigationMenu(target).popup({x: event.clientX, y: event.clientY});
+                    initNavigationMenu(app, target).popup({x: event.clientX, y: event.clientY});
                     event.stopPropagation();
                     break;
                 }
@@ -45,7 +50,7 @@ export class Menus {
                 if (dataType === "navigation-file") {
                     this.unselect();
                     // navigation 文件上：删除/重命名/打开文件位置/导出
-                    initFileMenu(this.getDir(target), target.getAttribute("data-path"), target).popup({
+                    initFileMenu(app, this.getDir(target), target.getAttribute("data-path"), target).popup({
                         x: event.clientX,
                         y: event.clientY
                     });
@@ -54,7 +59,10 @@ export class Menus {
                 }
 
                 if (dataType === "search-item") {
-                    initSearchMenu(target.getAttribute("data-node-id")).popup({x: event.clientX, y: event.clientY});
+                    const nodeId = target.getAttribute("data-node-id");
+                    if (nodeId) {
+                        initSearchMenu(nodeId).popup({x: event.clientX, y: event.clientY});
+                    }
                     event.stopPropagation();
                     break;
                 }

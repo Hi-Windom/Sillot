@@ -31,20 +31,32 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly SIYUAN_DROP_EDITOR: string = "application/siyuan-editor";
 
     // 渲染进程调主进程
-    public static readonly SIYUAN_SHOW: string = "siyuan-show";
+    public static readonly SIYUAN_CMD: string = "siyuan-cmd";
+    public static readonly SIYUAN_GET: string = "siyuan-get";
+    public static readonly SIYUAN_EVENT: string = "siyuan-event";
+
     public static readonly SIYUAN_CONFIG_TRAY: string = "siyuan-config-tray";
-    public static readonly SIYUAN_OPEN_WORKSPACE: string = "siyuan-open-workspace";
     public static readonly SIYUAN_QUIT: string = "siyuan-quit";
     public static readonly SIYUAN_HOTKEY: string = "siyuan-hotkey";
     public static readonly SIYUAN_INIT: string = "siyuan-init";
-    public static readonly SIYUAN_OPENURL: string = "siyuan-openurl";
-    public static readonly SIYUAN_OPENWINDOW: string = "siyuan-openwindow";
-    public static readonly SIYUAN_SEND_WINDOWS: string = "siyuan-send_windows"; // 主窗口和各新窗口之间的通信，{cmd: "closetab"|"lockscreen", data: {}})
+    public static readonly SIYUAN_SEND_WINDOWS: string = "siyuan-send-windows"; // 主窗口和各新窗口之间的通信，{cmd: "closetab"|"lockscreen"|"lockscreenByMode", data: {}})
     public static readonly SIYUAN_SAVE_CLOSE: string = "siyuan-save-close";
-    public static readonly SIYUAN_EXPORT_PDF: string = "siyuan-export-pdf";
-    public static readonly SIYUAN_EXPORT_CLOSE: string = "siyuan-export-close";
-    public static readonly SIYUAN_EXPORT_PREVENT: string = "siyuan-export-prevent";
     public static readonly SIYUAN_AUTO_LAUNCH: string = "siyuan-auto-launch";
+
+    public static readonly SIYUAN_OPEN_WORKSPACE: string = "siyuan-open-workspace";
+    public static readonly SIYUAN_OPEN_URL: string = "siyuan-open-url";
+    public static readonly SIYUAN_OPEN_WINDOW: string = "siyuan-open-window";
+    public static readonly SIYUAN_OPEN_FOLDER: string = "siyuan-open-folder";
+    public static readonly SIYUAN_OPEN_FILE: string = "siyuan-open-file";
+
+    public static readonly SIYUAN_EXPORT_PDF: string = "siyuan-export-pdf";
+    public static readonly SIYUAN_EXPORT_NEWWINDOW: string = "siyuan-export-newwindow";
+
+    // custom
+    public static readonly CUSTOM_SY_READONLY: string = "custom-sy-readonly";
+    public static readonly CUSTOM_SY_FULLWIDTH: string = "custom-sy-fullwidth";
+    public static readonly CUSTOM_REMINDER_WECHAT: string = "custom-reminder-wechat";
+    public static readonly CUSTOM_RIFF_DECKS: string = "custom-riff-decks";
 
     // size
     public static readonly SIZE_LINK_TEXT_MAX: number = 24;
@@ -70,6 +82,7 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly CB_GET_UNUNDO = "cb-get-unundo"; // 不需要记录历史
     public static readonly CB_GET_SCROLL = "cb-get-scroll"; // 滚动到指定位置
     public static readonly CB_GET_CONTEXT = "cb-get-context"; // 包含上下文
+    public static readonly CB_GET_ROOTSCROLL = "cb-get-rootscroll"; // 如果为 rootID 就滚动到指定位置
     public static readonly CB_GET_HTML = "cb-get-html"; // 直接渲染，不需要再 /api/block/getDocInfo，否则搜索表格无法定位
     public static readonly CB_GET_HISTORY = "cb-get-history"; // 历史渲染
 
@@ -77,6 +90,7 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly LOCAL_ZOOM = "local-zoom";
     public static readonly LOCAL_SEARCHDATA = "local-searchdata";
     public static readonly LOCAL_SEARCHKEYS = "local-searchkeys";
+    public static readonly LOCAL_SEARCHASSET = "local-searchasset";
     public static readonly LOCAL_DOCINFO = "local-docinfo"; // only mobile
     public static readonly LOCAL_DAILYNOTEID = "local-dailynoteid"; // string
     public static readonly LOCAL_HISTORYNOTEID = "local-historynoteid"; // string
@@ -89,13 +103,15 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly LOCAL_PDFTHEME = "local-pdftheme";
     public static readonly LOCAL_LAYOUTS = "local-layouts";
     public static readonly LOCAL_AI = "local-ai";
+    public static readonly LOCAL_PLUGINTOPUNPIN = "local-plugintopunpin";
+    public static readonly LOCAL_FLASHCARD = "local-flashcard";
 
     // timeout
     public static readonly TIMEOUT_DBLCLICK = 190;
-    public static readonly TIMEOUT_SEARCH = 300;
     public static readonly TIMEOUT_INPUT = 256;
-    public static readonly TIMEOUT_BLOCKLOAD = 300;
-    public static readonly TIMEOUT_TRANSITION = 150;
+    public static readonly TIMEOUT_LOAD = 300;
+    public static readonly TIMEOUT_TRANSITION = 300;
+    public static readonly TIMEOUT_COUNT = 1000;
 
     // id
     public static readonly HELP_PATH = {
@@ -104,29 +120,121 @@ export abstract class Constants extends SConst { // Sillot extend
         en_US: "20210808180117-6v0mkxr",
         fr_FR: "20210808180117-6v0mkxr",
     };
-
     public static readonly QUICK_DECK_ID = "20230218211946-2kw8jgx";
 
-    public static readonly KEYCODE: { [key: string]: string[] } = {
-        "186": [";", ":"],
-        "187": ["=", "+"],
-        "188": [",", "<"],
-        "189": ["-", "_"],
-        "190": [".", ">"],
-        "191": ["/", "?"],
-        "192": ["`", "~"],
-        "219": ["[", "{"],
-        "220": ["\\", "|"],
-        "221": ["]", "}"],
-        "222": ["'", '"'],
+    public static readonly KEYCODELIST: { [key: number]: string } = {
+        8: "⌫",
+        9: "⇥",
+        13: "↩",
+        16: "⇧",
+        17: "⌃",
+        18: "⌥",
+        19: "Pause",
+        20: "CapsLock",
+        27: "Escape",
+        32: " ",
+        33: "PageUp",
+        34: "PageDown",
+        35: "End",
+        36: "Home",
+        37: "←",
+        38: "↑",
+        39: "→",
+        40: "↓",
+        44: "PrintScreen",
+        45: "Insert",
+        46: "⌦",
+        48: "0",
+        49: "1",
+        50: "2",
+        51: "3",
+        52: "4",
+        53: "5",
+        54: "6",
+        55: "7",
+        56: "8",
+        57: "9",
+        65: "A",
+        66: "B",
+        67: "C",
+        68: "D",
+        69: "E",
+        70: "F",
+        71: "G",
+        72: "H",
+        73: "I",
+        74: "J",
+        75: "K",
+        76: "L",
+        77: "M",
+        78: "N",
+        79: "O",
+        80: "P",
+        81: "Q",
+        82: "R",
+        83: "S",
+        84: "T",
+        85: "U",
+        86: "V",
+        87: "W",
+        88: "X",
+        89: "Y",
+        90: "Z",
+        91: "⌘",
+        92: "⌘",
+        93: "ContextMenu",
+        96: "0",
+        97: "1",
+        98: "2",
+        99: "3",
+        100: "4",
+        101: "5",
+        102: "6",
+        103: "7",
+        104: "8",
+        105: "9",
+        106: "*",
+        107: "+",
+        109: "-",
+        110: ".",
+        111: "/",
+        112: "F1",
+        113: "F2",
+        114: "F3",
+        115: "F4",
+        116: "F5",
+        117: "F6",
+        118: "F7",
+        119: "F8",
+        120: "F9",
+        121: "F10",
+        122: "F11",
+        123: "F12",
+        144: "NumLock",
+        145: "ScrollLock",
+        182: "MyComputer",
+        183: "MyCalculator",
+        186: ";",
+        187: "=",
+        188: ",",
+        189: "-",
+        190: ".",
+        191: "/",
+        192: "`",
+        219: "[",
+        220: "\\",
+        221: "]",
+        222: "'",
     };
     // 冲突不使用 "⌘S/Q"
     // "⌘", "⇧", "⌥", "⌃"
-    // "⌘A", "⌘X", "⌘C", "⌘V", "⌘-", "⌘=", "⌘0", "⇧⌘V", "⌘/", "⇧↑", "⇧↓", "⇧→", "⇧←", "⇧⇥", "⇧⌘⇥", "⌃⇥", "⌘⇥", "⌃⌘⇥", "⇧⌘→", "⇧⌘←",
+    // "⌘A", "⌘X", "⌘C", "⌘V", "⌘-", "⌘=", "⌘0", "⇧⌘V", "⌘/", "⇧↑", "⇧↓", "⇧→", "⇧←", "⇧⇥", "⌃D", "⇧⌘→", "⇧⌘←",
     // "⌘Home", "⌘End", "⇧↩", "↩", "PageUp", "PageDown", "⌫", "⌦" 不可自定义
     public static readonly SIYUAN_KEYMAP: IKeymap = {
         general: {
-            editMode: {default: "⇧⌘G", custom: "⇧⌘G"},
+            mainMenu: {default: "⌥\\", custom: "⌥\\"},
+            commandPanel: {default: "⌥⇧P", custom: "⌥⇧P"},
+            editReadonly: {default: "⇧⌘G", custom: "⇧⌘G"},
             syncNow: {default: "F9", custom: "F9"},
             enterBack: {default: "⌥←", custom: "⌥←"},
             enter: {default: "⌥→", custom: "⌥→"},
@@ -153,8 +261,31 @@ export abstract class Constants extends SConst { // Sillot extend
             toggleWin: {default: "⌥M", custom: "⌥M"},
             lockScreen: {default: "⌥N", custom: "⌥N"},
             recentDocs: {default: "⌘E", custom: "⌘E"},
+            goToTab1: {default: "⌘1", custom: "⌘1"},
+            goToTab2: {default: "⌘2", custom: "⌘2"},
+            goToTab3: {default: "⌘3", custom: "⌘3"},
+            goToTab4: {default: "⌘4", custom: "⌘4"},
+            goToTab5: {default: "⌘5", custom: "⌘5"},
+            goToTab6: {default: "⌘6", custom: "⌘6"},
+            goToTab7: {default: "⌘7", custom: "⌘7"},
+            goToTab8: {default: "⌘8", custom: "⌘8"},
+            goToTab9: {default: "⌘9", custom: "⌘9"},
+            goToTabNext: {default: "⇧⌘]", custom: "⇧⌘]"},
+            goToTabPrev: {default: "⇧⌘[", custom: "⇧⌘["},
+            goToEditTabNext: {default: "⌃⇥", custom: "⌃⇥"},
+            goToEditTabPrev: {default: "⌃⇧⇥", custom: "⌃⇧⇥"},
             move: {default: "", custom: ""},
             selectOpen1: {default: "", custom: ""},
+            toggleDock: {default: "", custom: ""},
+            splitLR: {default: "", custom: ""},
+            splitMoveR: {default: "", custom: ""},
+            splitTB: {default: "", custom: ""},
+            splitMoveB: {default: "", custom: ""},
+            closeOthers: {default: "", custom: ""},
+            closeAll: {default: "", custom: ""},
+            closeUnmodified: {default: "", custom: ""},
+            closeLeft: {default: "", custom: ""},
+            closeRight: {default: "", custom: ""},
         },
         editor: {
             general: {
@@ -163,14 +294,17 @@ export abstract class Constants extends SConst { // Sillot extend
                 expandUp: {default: "⌥⇧↑", custom: "⌥⇧↑"},
                 copyPlainText: {default: "", custom: ""},
                 copyID: {default: "", custom: ""},
+                copyProtocolInMd: {default: "", custom: ""},
                 netImg2LocalAsset: {default: "", custom: ""},
+                optimizeTypography: {default: "", custom: ""},
                 hLayout: {default: "", custom: ""},
                 vLayout: {default: "", custom: ""},
                 refPopover: {default: "", custom: ""},
+                copyText: {default: "", custom: ""},
                 expand: {default: "⌘↓", custom: "⌘↓"},
                 collapse: {default: "⌘↑", custom: "⌘↑"},
                 insertBottom: {default: "⌥⌘.", custom: "⌥⌘."},
-                refTab: {default: "⇧⌘>", custom: "⇧⌘>"},
+                refTab: {default: "⇧⌘.", custom: "⇧⌘."},
                 openBy: {default: "⌥,", custom: "⌥,"},
                 insertRight: {default: "⌥.", custom: "⌥."},
                 attr: {default: "⌥⌘A", custom: "⌥⌘A"},
@@ -204,9 +338,9 @@ export abstract class Constants extends SConst { // Sillot extend
                 moveToDown: {default: "⇧⌘↓", custom: "⇧⌘↓"},
             },
             insert: {
-                font: {default: "⌥⌘X", custom: "⌥⌘X"},
+                appearance: {default: "⌥⌘X", custom: "⌥⌘X"},
                 lastUsed: {default: "⌥X", custom: "⌥X"},
-                blockRef: {default: "⌥[", custom: "⌥["},
+                ref: {default: "⌥[", custom: "⌥["},
                 kbd: {default: "⌘'", custom: "⌘'"},
                 sup: {default: "⌘H", custom: "⌘H"},
                 sub: {default: "⌘J", custom: "⌘J"},
@@ -223,7 +357,7 @@ export abstract class Constants extends SConst { // Sillot extend
                 check: {default: "⌘L", custom: "⌘L"},
                 table: {default: "⌘O", custom: "⌘O"},
                 code: {default: "⇧⌘K", custom: "⇧⌘K"},
-                clearFontStyle: {default: "⌘\\", custom: "⌘\\"},
+                clearInline: {default: "⌘\\", custom: "⌘\\"},
             },
             heading: {
                 paragraph: {default: "⌥⌘0", custom: "⌥⌘0"},
@@ -249,9 +383,10 @@ export abstract class Constants extends SConst { // Sillot extend
                 moveToLeft: {default: "⌥⌘L", custom: "⌥⌘L"},
                 moveToRight: {default: "⌥⌘R", custom: "⌥⌘R"},
                 "delete-row": {default: "⌘-", custom: "⌘-"},
-                "delete-column": {default: "⇧⌘_", custom: "⇧⌘_"}
+                "delete-column": {default: "⇧⌘-", custom: "⇧⌘-"}
             }
-        }
+        },
+        plugin: {},
     };
 
     public static readonly SIYUAN_EMPTY_LAYOUT: Record<string, unknown> = {
@@ -396,10 +531,13 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly SIYUAN_IMAGE_FOLDER: string = "1f4d1";
 
     // assets
-    public static readonly SIYUAN_ASSETS_IMAGE: string[] = [".apng", ".ico", ".cur", ".jpg", ".jpe", ".jpeg", ".jfif", ".pjp", ".pjpeg", ".png", ".gif", ".webp", ".bmp", ".svg"];
+    public static readonly SIYUAN_ASSETS_IMAGE: string[] = [".apng", ".ico", ".cur", ".jpg", ".jpe", ".jpeg", ".jfif", ".pjp", ".pjpeg", ".png", ".gif", ".webp", ".bmp", ".svg", ".avif"];
     public static readonly SIYUAN_ASSETS_AUDIO: string[] = [".mp3", ".wav", ".ogg", ".m4a"];
     public static readonly SIYUAN_ASSETS_VIDEO: string[] = [".mov", ".weba", ".mkv", ".mp4", ".webm"];
     public static readonly SIYUAN_ASSETS_EXTS: string[] = [".pdf"].concat(Constants.SIYUAN_ASSETS_IMAGE).concat(Constants.SIYUAN_ASSETS_AUDIO).concat(Constants.SIYUAN_ASSETS_VIDEO);
+    public static readonly SIYUAN_ASSETS_SEARCH: string[] = [".txt", ".md", ".markdown", ".docx", ".xlsx", ".pptx", ".pdf", ".json", ".log", ".sql", ".html", ".xml", ".java", ".h", ".c",
+        ".cpp", ".go", ".rs", ".swift", ".kt", ".py", ".php", ".js", ".css", ".ts", ".sh", ".bat", ".cmd", ".ini", ".yaml",
+        ".rst", ".adoc", ".textile", ".opml", ".org", ".wiki", ".epub"];
 
     // protyle
     public static readonly SIYUAN_CONFIG_APPEARANCE_DARK_CODE: string[] = ["a11y-dark", "agate", "an-old-hope", "androidstudio",
@@ -437,13 +575,10 @@ export abstract class Constants extends SConst { // Sillot extend
     public static readonly INLINE_TYPE: string[] = ["block-ref", "kbd", "text", "file-annotation-ref", "a", "strong", "em", "u", "s", "mark", "sup", "sub", "tag", "code", "inline-math", "inline-memo"];
     public static readonly BLOCK_HINT_KEYS: string[] = ["((", "[[", "（（", "【【"];
     public static readonly BLOCK_HINT_CLOSE_KEYS: IObject = {"((": "))", "[[": "]]", "（（": "））", "【【": "】】"};
-    public static readonly CODE_LANGUAGES: string[] = [
-        // 同名
+    // common: "bash", "c", "csharp", "cpp", "css", "diff", "go", "xml", "json", "java", "javascript", "kotlin", "less", "lua", "makefile", "markdown", "objectivec", "php", "php-template", "perl", "plaintext", "python", "python-repl", "r", "ruby", "rust", "scss", "sql", "shell", "swift", "ini", "typescript", "vbnet", "yaml", "properties", "1c", "armasm", "avrasm", "actionscript", "ada", "angelscript", "accesslog", "apache", "applescript", "arcade", "arduino", "asciidoc", "aspectj", "abnf", "autohotkey", "autoit", "awk", "basic", "bnf", "dos", "brainfuck", "cal", "cmake", "csp", "cos", "capnproto", "ceylon", "clean", "clojure", "clojure-repl", "coffeescript", "coq", "crystal", "d", "dns", "dart", "delphi", "dts", "django", "dockerfile", "dust", "erb", "elixir", "elm", "erlang", "erlang-repl", "excel", "ebnf", "fsharp", "fix", "flix", "fortran", "gcode", "gams", "gauss", "glsl", "gml", "gherkin", "golo", "gradle", "groovy", "haml", "hsp", "http", "handlebars", "haskell", "haxe", "hy", "irpf90", "isbl", "inform7", "x86asm", "jboss-cli", "julia", "julia-repl", "ldif", "llvm", "lsl", "latex", "lasso", "leaf", "lisp", "livecodeserver", "livescript", "mel", "mipsasm", "matlab", "maxima", "mercury", "axapta", "routeros", "mizar", "mojolicious", "monkey", "moonscript", "n1ql", "nsis", "nestedtext", "nginx", "nim", "nix", "node-repl", "ocaml", "openscad", "ruleslanguage", "oxygene", "pf", "parser3", "pony", "pgsql", "powershell", "processing", "prolog", "protobuf", "puppet", "purebasic", "profile", "q", "qml", "reasonml", "rib", "rsl", "roboconf", "sas", "sml", "sqf", "step21", "scala", "scheme", "scilab", "smali", "smalltalk", "stan", "stata", "stylus", "subunit", "tp", "taggerscript", "tcl", "tap", "thrift", "twig", "vbscript", "vbscript-html", "vhdl", "vala", "verilog", "vim", "wasm", "mathematica", "wren", "xl", "xquery", "zephir", "crmsh", "dsconfig", "graphql",
+    // third: "yul", "solidity", "abap", "hlsl", "gdscript"
+    public static readonly ALIAS_CODE_LANGUAGES: string[] = [
         "js", "ts", "html", "toml", "c#", "bat",
-        // common
-        "bash", "c", "csharp", "cpp", "css", "diff", "go", "xml", "json", "java", "javascript", "kotlin", "less", "lua", "makefile", "markdown", "objectivec", "php", "php-template", "perl", "plaintext", "python", "python-repl", "r", "ruby", "rust", "scss", "sql", "shell", "swift", "ini", "typescript", "vbnet", "yaml", "properties", "1c", "armasm", "avrasm", "actionscript", "ada", "angelscript", "accesslog", "apache", "applescript", "arcade", "arduino", "asciidoc", "aspectj", "abnf", "autohotkey", "autoit", "awk", "basic", "bnf", "dos", "brainfuck", "cal", "cmake", "csp", "cos", "capnproto", "ceylon", "clean", "clojure", "clojure-repl", "coffeescript", "coq", "crystal", "d", "dns", "dart", "delphi", "dts", "django", "dockerfile", "dust", "erb", "elixir", "elm", "erlang", "erlang-repl", "excel", "ebnf", "fsharp", "fix", "flix", "fortran", "gcode", "gams", "gauss", "glsl", "gml", "gherkin", "golo", "gradle", "groovy", "haml", "hsp", "http", "handlebars", "haskell", "haxe", "hy", "irpf90", "isbl", "inform7", "x86asm", "jboss-cli", "julia", "julia-repl", "ldif", "llvm", "lsl", "latex", "lasso", "leaf", "lisp", "livecodeserver", "livescript", "mel", "mipsasm", "matlab", "maxima", "mercury", "axapta", "routeros", "mizar", "mojolicious", "monkey", "moonscript", "n1ql", "nsis", "nestedtext", "nginx", "nim", "nix", "node-repl", "ocaml", "openscad", "ruleslanguage", "oxygene", "pf", "parser3", "pony", "pgsql", "powershell", "processing", "prolog", "protobuf", "puppet", "purebasic", "profile", "q", "qml", "reasonml", "rib", "rsl", "roboconf", "sas", "sml", "sqf", "step21", "scala", "scheme", "scilab", "smali", "smalltalk", "stan", "stata", "stylus", "subunit", "tp", "taggerscript", "tcl", "tap", "thrift", "twig", "vbscript", "vbscript-html", "vhdl", "vala", "verilog", "vim", "wasm", "mathematica", "wren", "xl", "xquery", "zephir", "crmsh", "dsconfig", "graphql",
-        // third
-        "yul", "solidity", "abap",
     ];
 
     // Google Analytics 事件

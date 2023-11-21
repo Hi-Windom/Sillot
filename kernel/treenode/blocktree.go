@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,8 @@
 package treenode
 
 import (
-	"io"
 	"os"
 	"path/filepath"
-	"runtime"
-	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -29,10 +26,10 @@ import (
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
 	"github.com/panjf2000/ants/v2"
 	util2 "github.com/siyuan-note/dejavu/util"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/rococo"
 	"github.com/siyuan-note/siyuan/kernel/util"
 	"github.com/vmihailenco/msgpack/v5"
@@ -55,6 +52,21 @@ type BlockTree struct {
 	HPath    string // 文档可读路径
 	Updated  string // 更新时间
 	Type     string // 类型
+}
+
+func GetBlockTreesByType(typ string) (ret []*BlockTree) {
+	blockTrees.Range(func(key, value interface{}) bool {
+		slice := value.(*btSlice)
+		slice.m.Lock()
+		for _, b := range slice.data {
+			if b.Type == typ {
+				ret = append(ret, b)
+			}
+		}
+		slice.m.Unlock()
+		return true
+	})
+	return
 }
 
 func GetBlockTreeByPath(path string) (ret *BlockTree) {
@@ -116,6 +128,7 @@ func GetBlockTreeRootByPath(boxID, path string) (ret *BlockTree) {
 }
 
 func GetBlockTreeRootByHPath(boxID, hPath string) (ret *BlockTree) {
+	hPath = gulu.Str.RemoveInvisible(hPath)
 	blockTrees.Range(func(key, value interface{}) bool {
 		slice := value.(*btSlice)
 		slice.m.Lock()
@@ -128,6 +141,55 @@ func GetBlockTreeRootByHPath(boxID, hPath string) (ret *BlockTree) {
 		slice.m.Unlock()
 		return nil == ret
 	})
+	return
+}
+
+func GetBlockTreeRootsByHPath(boxID, hPath string) (ret []*BlockTree) {
+	hPath = gulu.Str.RemoveInvisible(hPath)
+	blockTrees.Range(func(key, value interface{}) bool {
+		slice := value.(*btSlice)
+		slice.m.Lock()
+		for _, b := range slice.data {
+			if b.BoxID == boxID && b.HPath == hPath && b.RootID == b.ID {
+				ret = append(ret, b)
+			}
+		}
+		slice.m.Unlock()
+		return true
+	})
+	return
+}
+
+func GetBlockTreeRootByHPathPreferredParentID(boxID, hPath, preferredParentID string) (ret *BlockTree) {
+	hPath = gulu.Str.RemoveInvisible(hPath)
+	var roots []*BlockTree
+	blockTrees.Range(func(key, value interface{}) bool {
+		slice := value.(*btSlice)
+		slice.m.Lock()
+		for _, b := range slice.data {
+			if b.BoxID == boxID && b.HPath == hPath && b.RootID == b.ID {
+				if "" == preferredParentID {
+					ret = b
+					break
+				}
+
+				roots = append(roots, b)
+			}
+		}
+		slice.m.Unlock()
+		return nil == ret
+	})
+	if 1 > len(roots) {
+		return
+	}
+
+	for _, root := range roots {
+		if root.ID == preferredParentID {
+			ret = root
+			return
+		}
+	}
+	ret = roots[0]
 	return
 }
 
@@ -196,6 +258,21 @@ func GetBlockTreesByPathPrefix(pathPrefix string) (ret []*BlockTree) {
 	return
 }
 
+func GetBlockTreesByRootID(rootID string) (ret []*BlockTree) {
+	blockTrees.Range(func(key, value interface{}) bool {
+		slice := value.(*btSlice)
+		slice.m.Lock()
+		for _, b := range slice.data {
+			if b.RootID == rootID {
+				ret = append(ret, b)
+			}
+		}
+		slice.m.Unlock()
+		return true
+	})
+	return
+}
+
 func RemoveBlockTreesByPathPrefix(pathPrefix string) {
 	var ids []string
 	blockTrees.Range(func(key, value interface{}) bool {
@@ -203,7 +280,7 @@ func RemoveBlockTreesByPathPrefix(pathPrefix string) {
 		slice.m.Lock()
 		for _, b := range slice.data {
 			if strings.HasPrefix(b.Path, pathPrefix) {
-				ids = append(ids, b.RootID)
+				ids = append(ids, b.ID)
 			}
 		}
 		slice.m.Unlock()
@@ -224,13 +301,28 @@ func RemoveBlockTreesByPathPrefix(pathPrefix string) {
 	}
 }
 
+func GetBlockTreesByBoxID(boxID string) (ret []*BlockTree) {
+	blockTrees.Range(func(key, value interface{}) bool {
+		slice := value.(*btSlice)
+		slice.m.Lock()
+		for _, b := range slice.data {
+			if b.BoxID == boxID {
+				ret = append(ret, b)
+			}
+		}
+		slice.m.Unlock()
+		return true
+	})
+	return
+}
+
 func RemoveBlockTreesByBoxID(boxID string) (ids []string) {
 	blockTrees.Range(func(key, value interface{}) bool {
 		slice := value.(*btSlice)
 		slice.m.Lock()
 		for _, b := range slice.data {
 			if b.BoxID == boxID {
-				ids = append(ids, b.RootID)
+				ids = append(ids, b.ID)
 			}
 		}
 		slice.m.Unlock()
@@ -332,7 +424,7 @@ func InitBlockTree(force bool) {
 	if force {
 		err := os.RemoveAll(util.BlockTreePath)
 		if nil != err {
-			logging.LogErrorf("remove blocktree file failed: %s", err)
+			logging.LogErrorf("remove block tree file failed: %s", err)
 		}
 		blockTrees = &sync.Map{}
 		return
@@ -346,36 +438,33 @@ func InitBlockTree(force bool) {
 		return
 	}
 
-	size := uint64(0)
-
-	poolSize := runtime.NumCPU()
+	size := int64(0)
 	waitGroup := &sync.WaitGroup{}
-	p, _ := ants.NewPoolWithFunc(poolSize, func(arg interface{}) {
+	p, _ := ants.NewPoolWithFunc(4, func(arg interface{}) {
 		defer waitGroup.Done()
 
 		entry := arg.(os.DirEntry)
 		p := filepath.Join(util.BlockTreePath, entry.Name())
-		var fh *os.File
-		fh, err = os.OpenFile(p, os.O_RDWR, 0644)
+
+		f, err := os.OpenFile(p, os.O_RDONLY, 0644)
 		if nil != err {
-			logging.LogErrorf("open block tree file failed: %s", err)
+			logging.LogErrorf("open block tree failed: %s", err)
 			rococo.ShowMessage2("导致内核退出的致命错误", err.Error())
 			os.Exit(logging.ExitCodeFileSysErr)
 			return
 		}
 
-		var data []byte
-		data, err = io.ReadAll(fh)
-		fh.Close()
+		info, err := f.Stat()
 		if nil != err {
-			logging.LogErrorf("read block tree failed: %s", err)
+			logging.LogErrorf("stat block tree failed: %s", err)
 			rococo.ShowMessage2("导致内核退出的致命错误", err.Error())
 			os.Exit(logging.ExitCodeFileSysErr)
 			return
 		}
+		size += info.Size()
 
 		sliceData := map[string]*BlockTree{}
-		if err = msgpack.Unmarshal(data, &sliceData); nil != err {
+		if err = msgpack.NewDecoder(f).Decode(&sliceData); nil != err {
 			logging.LogErrorf("unmarshal block tree failed: %s", err)
 			if err = os.RemoveAll(util.BlockTreePath); nil != err {
 				logging.LogErrorf("removed corrupted block tree failed: %s", err)
@@ -385,9 +474,14 @@ func InitBlockTree(force bool) {
 			return
 		}
 
+		if err = f.Close(); nil != err {
+			logging.LogErrorf("close block tree failed: %s", err)
+			os.Exit(logging.ExitCodeFileSysErr)
+			return
+		}
+
 		name := entry.Name()[0:strings.Index(entry.Name(), ".")]
 		blockTrees.Store(name, &btSlice{data: sliceData, changed: time.Time{}, m: &sync.Mutex{}})
-		size += uint64(len(data))
 	})
 	for _, entry := range entries {
 		if !strings.HasSuffix(entry.Name(), ".msgpack") {
@@ -401,9 +495,8 @@ func InitBlockTree(force bool) {
 	waitGroup.Wait()
 	p.Release()
 
-	debug.FreeOSMemory()
 	elapsed := time.Since(start).Seconds()
-	logging.LogInfof("read block tree [%s] to [%s], elapsed [%.2fs]", humanize.Bytes((size)), util.BlockTreePath, elapsed)
+	logging.LogInfof("read block tree [%s] to [%s], elapsed [%.2fs]", humanize.Bytes(uint64(size)), util.BlockTreePath, elapsed)
 	return
 }
 
@@ -416,7 +509,11 @@ func SaveBlockTree(force bool) {
 	defer blockTreeLock.Unlock()
 
 	start := time.Now()
-	os.MkdirAll(util.BlockTreePath, 0755)
+	if err := os.MkdirAll(util.BlockTreePath, 0755); nil != err {
+		logging.LogErrorf("create block tree dir [%s] failed: %s", util.BlockTreePath, err)
+		os.Exit(logging.ExitCodeFileSysErr)
+		return
+	}
 
 	size := uint64(0)
 	var count int

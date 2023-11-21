@@ -54,6 +54,15 @@ export class Options {
                 key: "「「",
                 hint: hintEmbed,
             }, {
+                key: "「『",
+                hint: hintEmbed,
+            }, {
+                key: "『「",
+                hint: hintEmbed,
+            }, {
+                key: "『『",
+                hint: hintEmbed,
+            }, {
                 key: "#", // 需在 / 之前，否则 #abc/ 会显示菜单
                 hint: hintTag,
             }, {
@@ -145,8 +154,8 @@ export class Options {
     private mergeToolbar(toolbar: Array<string | IMenuItem>) {
         const toolbarItem: IMenuItem [] = [{
             name: "block-ref",
-            hotkey: window.siyuan.config.keymap.editor.insert.blockRef.custom,
-            lang: "blockRef",
+            hotkey: window.siyuan.config.keymap.editor.insert.ref.custom,
+            lang: "ref",
             icon: "iconRef",
             tipPosition: "ne",
         }, {
@@ -229,14 +238,14 @@ export class Options {
             tipPosition: "n",
         }, {
             name: "text",
-            lang: "font",
-            hotkey: window.siyuan.config.keymap.editor.insert.font.custom,
+            lang: "appearance",
+            hotkey: window.siyuan.config.keymap.editor.insert.appearance.custom,
             icon: "iconFont",
             tipPosition: "n",
         }, {
             name: "clear",
-            lang: "clearFontStyle",
-            hotkey: window.siyuan.config.keymap.editor.insert.clearFontStyle.custom,
+            lang: "clearInline",
+            hotkey: window.siyuan.config.keymap.editor.insert.clearInline.custom,
             icon: "iconClear",
             tipPosition: "n",
         }, {

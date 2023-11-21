@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/88250/gulu"
@@ -52,11 +53,15 @@ func performTransactions(c *gin.Context) {
 		return
 	}
 
+	timestamp := int64(arg["reqId"].(float64))
 	var transactions []*model.Transaction
 	if err = gulu.JSON.UnmarshalJSON(data, &transactions); nil != err {
 		ret.Code = -1
 		ret.Msg = "parses request failed"
 		return
+	}
+	for _, transaction := range transactions {
+		transaction.Timestamp = timestamp
 	}
 
 	model.PerformTransactions(&transactions)
@@ -75,7 +80,17 @@ func performTransactions(c *gin.Context) {
 }
 
 func pushTransactions(app, session string, transactions []*model.Transaction) {
-	evt := util.NewCmdResult("transactions", 0, util.PushModeBroadcastExcludeSelf)
+	pushMode := util.PushModeBroadcastExcludeSelf
+	if 0 < len(transactions) && 0 < len(transactions[0].DoOperations) {
+		model.WaitForWritingFiles()
+		if action := transactions[0].DoOperations[0].Action; strings.Contains(strings.ToLower(action), "attrview") {
+			if "setAttrViewName" != action {
+				pushMode = util.PushModeBroadcast
+			}
+		}
+	}
+
+	evt := util.NewCmdResult("transactions", 0, pushMode)
 	evt.AppId = app
 	evt.SessionId = session
 	evt.Data = transactions

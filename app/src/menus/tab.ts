@@ -1,14 +1,17 @@
 import {Tab} from "../layout/Tab";
 import {MenuItem} from "./Menu";
 import {Editor} from "../editor";
-import {copyTab, resizeTabs} from "../layout/util";
+import {closeTabByType, copyTab, resizeTabs} from "../layout/tabUtil";
 /// #if !BROWSER
 import {openNewWindow} from "../window/openNewWindow";
 /// #endif
 import {copySubMenu} from "./commonMenuItem";
+import {App} from "../index";
+import {Layout} from "../layout";
+import {Wnd} from "../layout/Wnd";
+import {getAllWnds} from "../layout/getAll";
 
 const closeMenu = (tab: Tab) => {
-    const allTabs: Tab[] = [];
     const unmodifiedTabs: Tab[] = [];
     const leftTabs: Tab[] = [];
     const rightTabs: Tab[] = [];
@@ -26,7 +29,6 @@ const closeMenu = (tab: Tab) => {
         } else if (index > midIndex) {
             rightTabs.push(item);
         }
-        allTabs.push(item);
     });
 
     window.siyuan.menus.menu.append(new MenuItem({
@@ -37,77 +39,45 @@ const closeMenu = (tab: Tab) => {
             tab.parent.removeTab(tab.id);
         }
     }).element);
-    if (allTabs.length > 1) {
+    if (tab.parent.children.length > 1) {
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.closeOthers,
+            accelerator: window.siyuan.config.keymap.general.closeOthers.custom,
             click() {
-                for (let index = 0; index < allTabs.length; index++) {
-                    if (allTabs[index].id !== tab.id && !allTabs[index].headElement.classList.contains("item--pin")) {
-                        allTabs[index].parent.removeTab(allTabs[index].id, true, true, false);
-                    }
-                }
-                if (!tab.headElement.parentElement.querySelector(".item--focus")) {
-                    tab.parent.switchTab(tab.headElement, true);
-                }
+                closeTabByType(tab, "closeOthers");
             }
         }).element);
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.closeAll,
-            click: async () => {
-                for (let index = 0; index < allTabs.length; index++) {
-                    if (!allTabs[index].headElement.classList.contains("item--pin")) {
-                        await allTabs[index].parent.removeTab(allTabs[index].id, true);
-                    }
-                }
-                if (allTabs[0].headElement.parentElement) {
-                    allTabs[0].parent.switchTab(allTabs[0].headElement, true);
-                }
+            accelerator: window.siyuan.config.keymap.general.closeAll.custom,
+            click() {
+                closeTabByType(tab, "closeAll");
             }
         }).element);
         if (unmodifiedTabs.length > 0) {
             window.siyuan.menus.menu.append(new MenuItem({
                 label: window.siyuan.languages.closeUnmodified,
-                click: async () => {
-                    for (let index = 0; index < unmodifiedTabs.length; index++) {
-                        if (!unmodifiedTabs[index].headElement.classList.contains("item--pin")) {
-                            await unmodifiedTabs[index].parent.removeTab(unmodifiedTabs[index].id);
-                        }
-                    }
-                    if (tab.headElement.parentElement && !tab.headElement.parentElement.querySelector(".item--focus")) {
-                        tab.parent.switchTab(tab.headElement, true);
-                    } else if (allTabs[0].headElement.parentElement) {
-                        allTabs[0].parent.switchTab(allTabs[0].headElement, true);
-                    }
+                accelerator: window.siyuan.config.keymap.general.closeUnmodified.custom,
+                click() {
+                    closeTabByType(tab, "other", unmodifiedTabs);
                 }
             }).element);
         }
         if (leftTabs.length > 0) {
             window.siyuan.menus.menu.append(new MenuItem({
                 label: window.siyuan.languages.closeLeft,
+                accelerator: window.siyuan.config.keymap.general.closeLeft.custom,
                 click: async () => {
-                    for (let index = 0; index < leftTabs.length; index++) {
-                        if (!leftTabs[index].headElement.classList.contains("item--pin")) {
-                            await leftTabs[index].parent.removeTab(leftTabs[index].id);
-                        }
-                    }
-                    if (!tab.headElement.parentElement.querySelector(".item--focus")) {
-                        tab.parent.switchTab(tab.headElement, true);
-                    }
+                    closeTabByType(tab, "other", leftTabs);
                 }
             }).element);
         }
         if (rightTabs.length > 0) {
             window.siyuan.menus.menu.append(new MenuItem({
                 label: window.siyuan.languages.closeRight,
-                click: async () => {
-                    for (let index = 0; index < rightTabs.length; index++) {
-                        if (!rightTabs[index].headElement.classList.contains("item--pin")) {
-                            await rightTabs[index].parent.removeTab(rightTabs[index].id);
-                        }
-                    }
-                    if (!tab.headElement.parentElement.querySelector(".item--focus")) {
-                        tab.parent.switchTab(tab.headElement, true);
-                    }
+                accelerator: window.siyuan.config.keymap.general.closeRight.custom,
+                click() {
+                    closeTabByType(tab, "other", rightTabs);
                 }
             }).element);
         }
@@ -115,17 +85,19 @@ const closeMenu = (tab: Tab) => {
     window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
 };
 
-const splitSubMenu = (tab: Tab) => {
+const splitSubMenu = (app: App, tab: Tab) => {
     const subMenus: IMenu[] = [{
         icon: "iconSplitLR",
+        accelerator: window.siyuan.config.keymap.general.splitLR.custom,
         label: window.siyuan.languages.splitLR,
         click: () => {
-            tab.parent.split("lr").addTab(copyTab(tab));
+            tab.parent.split("lr").addTab(copyTab(app, tab));
         }
     }];
     if (tab.parent.children.length > 1) {
         subMenus.push({
             icon: "iconLayoutRight",
+            accelerator: window.siyuan.config.keymap.general.splitMoveR.custom,
             label: window.siyuan.languages.splitMoveR,
             click: () => {
                 const newWnd = tab.parent.split("lr");
@@ -138,15 +110,17 @@ const splitSubMenu = (tab: Tab) => {
     }
     subMenus.push({
         icon: "iconSplitTB",
+        accelerator: window.siyuan.config.keymap.general.splitTB.custom,
         label: window.siyuan.languages.splitTB,
         click: () => {
-            tab.parent.split("tb").addTab(copyTab(tab));
+            tab.parent.split("tb").addTab(copyTab(app, tab));
         }
     });
 
     if (tab.parent.children.length > 1) {
         subMenus.push({
             icon: "iconLayoutBottom",
+            accelerator: window.siyuan.config.keymap.general.splitMoveB.custom,
             label: window.siyuan.languages.splitMoveB,
             click: () => {
                 const newWnd = tab.parent.split("tb");
@@ -157,15 +131,43 @@ const splitSubMenu = (tab: Tab) => {
             }
         });
     }
+    let wndsTemp: Wnd[] = [];
+    getAllWnds(window.siyuan.layout.centerLayout, wndsTemp);
+    if (wndsTemp.length > 1) {
+        subMenus.push({
+            label: window.siyuan.languages.unsplit,
+            click: () => {
+                let layout = tab.parent.parent;
+                while (layout.id !== window.siyuan.layout.centerLayout.id) {
+                    wndsTemp = [];
+                    getAllWnds(layout, wndsTemp);
+                    if (wndsTemp.length > 1) {
+                        break;
+                    } else {
+                        layout = layout.parent;
+                    }
+                }
+                unsplitWnd(tab.parent.parent.children[0], layout, true);
+                resizeTabs();
+            }
+        });
+        subMenus.push({
+            label: window.siyuan.languages.unsplitAll,
+            click: () => {
+                unsplitWnd(window.siyuan.layout.centerLayout, window.siyuan.layout.centerLayout, false);
+                resizeTabs();
+            }
+        });
+    }
     return subMenus;
 };
 
-export const initTabMenu = (tab: Tab) => {
+export const initTabMenu = (app: App, tab: Tab) => {
     window.siyuan.menus.menu.remove();
     closeMenu(tab);
     window.siyuan.menus.menu.append(new MenuItem({
         label: window.siyuan.languages.split,
-        submenu: splitSubMenu(tab)
+        submenu: splitSubMenu(app, tab)
     }).element);
     const model = tab.model;
     let rootId: string;
@@ -175,7 +177,9 @@ export const initTabMenu = (tab: Tab) => {
         const initData = tab.headElement.getAttribute("data-initdata");
         if (initData) {
             const initDataObj = JSON.parse(initData);
-            rootId = initDataObj.rootId || initDataObj.blockId;
+            if (initDataObj && initDataObj.instance === "Editor") {
+                rootId = initDataObj.rootId || initDataObj.blockId;
+            }
         }
     }
     if (rootId) {
@@ -213,4 +217,25 @@ export const initTabMenu = (tab: Tab) => {
     }).element);
     /// #endif
     return window.siyuan.menus.menu;
+};
+
+const unsplitWnd = (target: Wnd | Layout, layout: Layout, onlyWnd: boolean) => {
+    let wnd: Wnd = target as Wnd;
+    while (wnd instanceof Layout) {
+        wnd = wnd.children[0] as Wnd;
+    }
+    for (let i = 0; i < layout.children.length; i++) {
+        const item = layout.children[i];
+        if (item instanceof Layout && !onlyWnd) {
+            unsplitWnd(wnd, item, onlyWnd);
+        } else if (item instanceof Wnd && item.id !== wnd.id && item.children.length > 0) {
+            for (let j = 0; j < item.children.length; j++) {
+                const tab = item.children[j];
+                wnd.headersElement.append(tab.headElement);
+                wnd.moveTab(tab);
+                j--;
+            }
+            i--;
+        }
+    }
 };

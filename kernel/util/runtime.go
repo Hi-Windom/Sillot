@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -32,13 +32,14 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/K-Sillot/httpclient"
-	"github.com/K-Sillot/logging"
 	"github.com/denisbrodbeck/machineid"
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
+	"github.com/siyuan-note/logging"
 )
 
-const DatabaseVer = "20220501" // 修改表结构的话需要修改这里
+// UseSingleLineSave 是否使用单行保存 .sy 文件。
+var UseSingleLineSave = true
 
 // IsUILoaded 是否已经加载了 UI。
 var IsUILoaded = false
@@ -64,6 +65,9 @@ var IsExiting = false
 
 // MobileOSVer 移动端操作系统版本。
 var MobileOSVer string
+
+// DatabaseVer 数据库版本。修改表结构的话需要修改这里。
+const DatabaseVer = "20220501"
 
 func logBootInfo() {
 	plat := GetOSPlatform()
@@ -139,6 +143,7 @@ var (
 	Langs           = map[string]map[int]string{}
 	TimeLangs       = map[string]map[string]interface{}{}
 	TaskActionLangs = map[string]map[string]interface{}{}
+	TrayMenuLangs   = map[string]map[string]interface{}{}
 )
 
 var (
@@ -400,3 +405,10 @@ func existAvailabilityStatus(workspaceAbsPath string) bool {
 	}
 	return false
 }
+
+const (
+	EvtConfPandocInitialized = "conf.pandoc.initialized"
+
+	EvtSQLHistoryRebuild      = "sql.history.rebuild"
+	EvtSQLAssetContentRebuild = "sql.assetContent.rebuild"
+)

@@ -1,5 +1,6 @@
 import {Tab} from "../Tab";
-import {getDockByType, setPanelFocus} from "../util";
+import {setPanelFocus} from "../util";
+import {getDockByType} from "../tabUtil";
 import {Model} from "../Model";
 import {Constants} from "../../constants";
 import {addScript} from "../../protyle/util/addScript";
@@ -9,6 +10,7 @@ import {fetchPost} from "../../util/fetch";
 import {isCurrentEditor, openFileById} from "../../editor/util";
 import {updateHotkeyTip} from "../../protyle/util/compatibility";
 import {openGlobalSearch} from "../../search/util";
+import {App} from "../../index";
 
 declare const vis: any;
 
@@ -29,12 +31,14 @@ export class Graph extends Model {
     public type: "local" | "pin" | "global";
 
     constructor(options: {
+        app: App
         tab: Tab
         blockId?: string
         rootId?: string
         type: "local" | "pin" | "global"
     }) {
         super({
+            app: options.app,
             id: options.tab.id,
             callback() {
                 if (this.type === "local") {
@@ -256,10 +260,10 @@ export class Graph extends Model {
         <svg><use xlink:href="#icon${this.type === "global" ? "GlobalGraph" : "Graph"}"></use></svg>
         ${this.type === "global" ? window.siyuan.languages.globalGraph : window.siyuan.languages.graphView}
     </div>
-    <label class="b3-form__icon b3-form__icon--small search__label">
-        <svg class="b3-form__icon-icon"><use xlink:href="#iconSearch"></use></svg>
-        <input class="b3-form__icon-input b3-text-field b3-text-field--small" placeholder="${window.siyuan.languages.search}" />
-    </label>
+    <span class="fn__flex-1"></span>
+    <span class="fn__space"></span>
+    <input class="b3-text-field search__label fn__size200 fn__none" placeholder="${window.siyuan.languages.search}" />
+    <span data-type="search" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.search}"><svg><use xlink:href='#iconFilter'></use></svg></span>
     <span class="fn__space"></span>
     <span data-type="refresh" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.refresh}"><svg><use xlink:href='#iconRefresh'></use></svg></span>
     <div class="fn__space"></div>
@@ -311,6 +315,9 @@ export class Graph extends Model {
                             target.classList.add("ft__primary");
                             this.panelElement.style.right = "0";
                         }
+                    } else if (dataType === "search") {
+                        target.previousElementSibling.classList.remove("fn__none");
+                        (target.previousElementSibling as HTMLInputElement).select();
                     } else if (dataType === "refresh") {
                         this.searchGraph(false);
                     } else if (dataType === "fullscreen") {
@@ -330,6 +337,10 @@ export class Graph extends Model {
         this.inputElement.addEventListener("compositionend", () => {
             this.searchGraph(false);
             this.inputElement.classList.add("search__input--block");
+        });
+        this.inputElement.addEventListener("blur", (event: InputEvent) => {
+            const inputElement = event.target as HTMLInputElement;
+            inputElement.classList.add("fn__none");
         });
         this.inputElement.addEventListener("input", (event: InputEvent) => {
             if (event.isComposing) {
@@ -354,9 +365,6 @@ export class Graph extends Model {
             });
         });
         this.searchGraph(options.type !== "global");
-        if (this.type !== "local") {
-            setPanelFocus(this.element);
-        }
     }
 
     private reset(conf: IGraphCommon & ({ dailyNote: boolean } | { minRefs: number, dailyNote: boolean })) {
@@ -457,7 +465,9 @@ export class Graph extends Model {
                 if (id) {
                     this.blockId = id;
                 }
-                if (!isCurrentEditor(this.blockId)) {
+                if (!isCurrentEditor(this.blockId) &&
+                    this.graphElement.firstElementChild.classList.contains("fn__none") // 引用右键打开关系图
+                ) {
                     return;
                 }
                 this.graphData = response.data;
@@ -638,28 +648,37 @@ export class Graph extends Model {
                         return;
                     }
                     if (node.type === "textmark tag") {
-                        openGlobalSearch(`#${node.id}#`, !window.siyuan.ctrlIsPressed);
+                        openGlobalSearch(this.app, `#${node.id}#`, !window.siyuan.ctrlIsPressed);
                         return;
                     }
                     if (window.siyuan.shiftIsPressed) {
                         openFileById({
+                            app: this.app,
                             id: node.id,
                             position: "bottom",
-                            action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
+                            action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]
                         });
                     } else if (window.siyuan.altIsPressed) {
                         openFileById({
+                            app: this.app,
                             id: node.id,
                             position: "right",
-                            action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
+                            action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]
                         });
                     } else if (window.siyuan.ctrlIsPressed) {
                         window.siyuan.blockPanels.push(new BlockPanel({
-                            targetElement: this.inputElement,
+                            app: this.app,
+                            isBacklink: false,
+                            x: params.event.center.x,
+                            y: params.event.center.y,
                             nodeIds: [node.id],
                         }));
                     } else {
-                        openFileById({id: node.id, action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]});
+                        openFileById({
+                            app: this.app,
+                            id: node.id,
+                            action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]
+                        });
                     }
                 });
             }, 1000);

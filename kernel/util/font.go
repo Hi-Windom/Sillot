@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -23,8 +23,8 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/ConradIrwin/font/sfnt"
-	"github.com/K-Sillot/logging"
 	"github.com/flopp/go-findfont"
+	"github.com/siyuan-note/logging"
 	ttc "golang.org/x/image/font/sfnt"
 	textUnicode "golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"

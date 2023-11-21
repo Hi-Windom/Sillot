@@ -19,6 +19,7 @@
     * [移动文档](#移动文档)
     * [根据路径获取人类可读路径](#根据路径获取人类可读路径)
     * [根据 ID 获取人类可读路径](#根据-ID-获取人类可读路径)
+    * [根据人类可读路径获取 IDs](#根据人类可读路径获取-IDs)
 * [资源文件](#资源文件)
     * [上传资源文件](#上传资源文件)
 * [块](#块)
@@ -29,6 +30,8 @@
     * [删除块](#删除块)
     * [移动块](#移动块)
     * [获取块 kramdown 源码](#获取块-kramdown-源码)
+    * [获取子块](#获取子块)
+    * [转移块引用](#转移块引用)
 * [属性](#属性)
     * [设置块属性](#设置块属性)
     * [获取块属性](#获取块属性)
@@ -41,12 +44,18 @@
     * [获取文件](#获取文件)
     * [写入文件](#写入文件)
     * [删除文件](#删除文件)
+    * [重命名文件](#重命名文件)
     * [列出文件](#列出文件)
 * [导出](#导出)
     * [导出 Markdown 文本](#导出-markdown-文本)
+    * [导出文件与目录](#导出文件与目录)
+* [转换](#转换)
+    * [Pandoc](#Pandoc)
 * [通知](#通知)
     * [推送消息](#推送消息)
     * [推送报错消息](#推送报错消息)
+* [网络](#网络)
+    * [正向代理](#正向代理)
 * [系统](#系统)
     * [获取启动进度](#获取启动进度)
     * [获取系统版本](#获取系统版本)
@@ -328,7 +337,7 @@
   ```
 
     * `data`：创建好的文档 ID
-    * 如果使用同一个 `path` 重复调用该接口，不会覆盖已有文档，而是新建随机数结尾的文档
+    * 如果使用同一个 `path` 重复调用该接口，不会覆盖已有文档
 
 ### 重命名文档
 
@@ -451,6 +460,32 @@
   }
   ```
 
+### 根据人类可读路径获取 IDs
+
+* `/api/filetree/getIDsByHPath`
+* 参数
+
+  ```json
+  {
+    "path": "/foo/bar",
+    "notebook": "20210808180117-czj9bvb"
+  }
+  ```
+
+  * `path`：人类可读路径
+  * `notebook`：笔记本 ID
+* 返回值
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": [
+        "20200813004931-q4cu8na"
+    ]
+  }
+  ```
+
 ## 资源文件
 
 ### 上传资源文件
@@ -462,7 +497,7 @@
         * `"/assets/"`：工作空间/data/assets/ 文件夹
         * `"/assets/sub/"`：工作空间/data/assets/sub/ 文件夹
 
-      常规情况下建议用第一种，统一存放到工作空间资源文件夹下。
+      常规情况下建议用第一种，统一存放到工作空间资源文件夹下，放在子目录有一些副作用，请参考用户指南资源文件章节。
     * `file[]`：上传的文件列表
 * 返回值
 
@@ -493,13 +528,19 @@
   {
     "dataType": "markdown",
     "data": "foo**bar**{: style=\"color: var(--b3-font-color8);\"}baz",
-    "previousID": "20211229114650-vrek5x6"
+    "nextID": "",
+    "previousID": "20211229114650-vrek5x6",
+    "parentID": ""
   }
   ```
 
     * `dataType`：待插入数据类型，值可选择 `markdown` 或者 `dom`
     * `data`：待插入的数据
+    * `nextID`：后一个块的 ID，用于锚定插入位置
     * `previousID`：前一个块的 ID，用于锚定插入位置
+    * `parentID`：父块 ID，用于锚定插入位置
+
+  `nextID`、`previousID`、`parentID` 三个参数必须至少存在一个有值，优先级为 `nextID` > `previousID` > `parentID`
 * 返回值
 
   ```json
@@ -760,6 +801,70 @@
   }
   ```
 
+### 获取子块
+
+* `/api/block/getChildBlocks`
+* 参数
+
+  ```json
+  {
+    "id": "20230506212712-vt9ajwj"
+  }
+  ```
+
+    * `id`：父块 ID
+    * 标题下方块也算作子块
+* 返回值
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": [
+      {
+        "id": "20230512083858-mjdwkbn",
+        "type": "h",
+        "subType": "h1"
+      },
+      {
+        "id": "20230513213727-thswvfd",
+        "type": "s"
+      },
+      {
+        "id": "20230513213633-9lsj4ew",
+        "type": "l",
+        "subType": "u"
+      }
+    ]
+  }
+  ```
+
+### 转移块引用
+
+* `/api/block/transferBlockRef`
+* 参数
+
+  ```json
+  {
+    "fromID": "20230612160235-mv6rrh1",
+    "toID": "20230613093045-uwcomng",
+    "refIDs": ["20230613092230-cpyimmd"]
+  }
+  ```
+
+    * `fromID`：定义块 ID
+    * `toID`：目标块 ID
+    * `refIDs`：指向定义块 ID 的引用所在块 ID，可选，如果不指定，所有指向定义块 ID 的引用块 ID 都会被转移
+* 返回值
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": null
+  }
+  ```
+
 ## 属性
 
 ### 设置块属性
@@ -906,7 +1011,24 @@
     * `path`：工作空间路径下的文件路径
 * 返回值
 
-  文件内容
+    * 响应状态码 `200`: 文件内容
+    * 响应状态码 `202`: 异常信息
+
+      ```json
+      {
+        "code": 404,
+        "msg": "",
+        "data": null
+      }
+      ```
+
+        * `code`: 非零的异常值
+
+            * `-1`: 参数解析错误
+            * `404`: 未找到 (文件不存在)
+            * `405`: 方法不被允许 (这是一个目录)
+            * `500`: 服务器错误 (文件查询失败 / 文件读取失败)
+        * `msg`: 一段描述错误的文本
 
 ### 写入文件
 
@@ -948,6 +1070,29 @@
   }
   ```
 
+### 重命名文件
+
+* `/api/file/renameFile`
+* 参数
+
+  ```json
+  {
+    "path": "/data/assets/image-20230523085812-k3o9t32.png",
+    "newPath": "/data/assets/test-20230523085812-k3o9t32.png"
+  }
+  ```
+    * `path`：工作空间路径下的文件路径
+    * `newPath`：新的文件路径
+* 返回值
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": null
+  }
+  ```
+
 ### 列出文件
 
 * `/api/file/readDir`
@@ -955,10 +1100,10 @@
 
   ```json
   {
-    "path": "/data/20210808180117-6v0mkxr/20200923234011-ieuun1p.sy"
+    "path": "/data/20210808180117-6v0mkxr/20200923234011-ieuun1p"
   }
   ```
-    * `path`：工作空间路径下的文件路径
+    * `path`：工作空间路径下的文件夹路径
 * 返回值
 
   ```json
@@ -966,14 +1111,18 @@
     "code": 0,
     "msg": "",
     "data": [
-        {
-            "isDir": true,
-            "name": "20210808180320-abz7w6k"
-        },
-        {
-            "isDir": false,
-            "name": "20210808180320-abz7w6k.sy"
-        }
+      {
+        "isDir": true,
+        "isSymlink": false,
+        "name": "20210808180303-6yi0dv5",
+        "updated": 1691467624
+      },
+      {
+        "isDir": false,
+        "isSymlink": false,
+        "name": "20210808180303-6yi0dv5.sy",
+        "updated": 1663298365
+      }
     ]
   }
   ```
@@ -1007,6 +1156,84 @@
 
     * `hPath`：人类可读的路径
     * `content`：Markdown 内容
+
+### 导出文件与目录
+
+* `/api/export/exportResources`
+* 参数
+
+  ```json
+  {
+    "paths": [
+      "/conf/appearance/boot",
+      "/conf/appearance/langs",
+      "/conf/appearance/emojis/conf.json",
+      "/conf/appearance/icons/index.html"
+    ],
+    "name": "zip-file-name"
+  }
+  ```
+
+    * `paths`：要导出的文件或文件夹路径列表，相同名称的文件/文件夹会被覆盖
+    * `name`：（可选）导出的文件名，未设置时默认为 `export-YYYY-MM-DD_hh-mm-ss.zip`
+* 返回值
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": {
+      "path": "temp/export/zip-file-name.zip"
+    }
+  }
+  ```
+
+    * `path`：创建的 `*.zip` 文件路径
+        * `zip-file-name.zip` 中的目录结构如下所示：
+            * `zip-file-name`
+                * `boot`
+                * `langs`
+                * `conf.json`
+                * `index.html`
+
+## 转换
+
+### Pandoc
+
+* `/api/convert/pandoc`
+* 工作目录
+    * 执行调用 pandoc 命令时工作目录会被设置在 `工作空间/temp/convert/pandoc/${test}` 下
+    * 可先通过 API [`写入文件`](#写入文件) 将待转换文件写入该目录
+    * 然后再调用该 API 进行转换，转换后的文件也会被写入该目录
+    * 最后调用 API [`获取文件`](#获取文件) 获取转换后的文件内容
+        * 或者调用 API [`通过 Markdown 创建文档`](#通过-markdown-创建文档)
+        * 或者调用内部 API `importStdMd` 将转换后的文件夹直接导入
+* 参数
+
+  ```json
+  {
+    "dir": "test",
+    "args": [
+      "--to", "markdown_strict-raw_html",
+      "foo.epub",
+      "-o", "foo.md"
+   ]
+  }
+  ```
+
+    * `args`：Pandoc 命令行参数
+* 返回值
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": {
+       "path": "/temp/convert/pandoc/test"
+    }
+  }
+  ```
+    * `path`：工作空间下的路径
 
 ## 通知
 
@@ -1059,6 +1286,80 @@
   }
   ```
     * `id`：消息 ID
+
+## 网络
+
+### 正向代理
+
+* `/api/network/forwardProxy`
+* 参数
+
+  ```json
+  {
+    "url": "https://b3log.org/siyuan/",
+    "method": "GET",
+    "timeout": 7000,
+    "contentType": "text/html",
+    "headers": [
+        {
+            "Cookie": ""
+        }
+    ],
+    "payload": {},
+    "payloadEncoding": "text",
+    "responseEncoding": "text"
+  }
+  ```
+
+    * `url`：转发的 URL
+    * `method`：HTTP 方法，默认为 `GET`
+    * `timeout`：超时时间，单位为毫秒，默认为 `7000` 毫秒
+    * `contentType`：HTTP Content-Type，默认为 `application/json`
+    * `headers`：HTTP 请求标头
+    * `payload`：HTTP 请求体，对象或者是字符串
+    * `payloadEncoding`：`pyaload` 所使用的编码方案，默认为 `text`，可选值如下所示
+
+        * `text`
+        * `base64` | `base64-std`
+        * `base64-url`
+        * `base32` | `base32-std`
+        * `base32-hex`
+        * `hex`
+    * `responseEncoding`：响应数据中 `body` 字段所使用的编码方案，默认为 `text`，可选值如下所示
+
+        * `text`
+        * `base64` | `base64-std`
+        * `base64-url`
+        * `base32` | `base32-std`
+        * `base32-hex`
+        * `hex`
+* 返回值
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": {
+      "body": "",
+      "bodyEncoding": "text",
+      "contentType": "text/html",
+      "elapsed": 1976,
+      "headers": {
+      },
+      "status": 200,
+      "url": "https://b3log.org/siyuan"
+    }
+  }
+  ```
+
+    * `bodyEncoding`：`body` 所使用的编码方案，与请求中 `responseEncoding` 字段一致，默认为 `text`，可能的值如下所示
+
+        * `text`
+        * `base64` | `base64-std`
+        * `base64-url`
+        * `base32` | `base32-std`
+        * `base32-hex`
+        * `hex`
 
 ## 系统
 

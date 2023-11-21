@@ -1,30 +1,24 @@
 import {Layout} from "./index";
 import {Wnd} from "./Wnd";
-import {mountHelp, newNotebook} from "../util/mount";
 import {Tab} from "./Tab";
 import {Model} from "./Model";
 import {Graph} from "./dock/Graph";
 import {Editor} from "../editor";
 import {Files} from "./dock/Files";
-import {setPadding} from "../protyle/ui/initUI";
-import {newFile} from "../util/newFile";
 import {Outline} from "./dock/Outline";
 import {Bookmark} from "./dock/Bookmark";
-import {updateHotkeyTip} from "../protyle/util/compatibility";
 import {Tag} from "./dock/Tag";
 import {getAllModels, getAllTabs} from "./getAll";
 import {Asset} from "../asset";
 import {Search} from "../search";
 import {Dock} from "./dock";
 import {focusByOffset, focusByRange, getSelectionOffset} from "../protyle/util/selection";
-import {hideAllElements, hideElements} from "../protyle/ui/hideElements";
+import {hideElements} from "../protyle/ui/hideElements";
 import {fetchPost} from "../util/fetch";
 import {hasClosestBlock, hasClosestByClassName} from "../protyle/util/hasClosest";
 import {getContenteditableElement} from "../protyle/wysiwyg/getBlock";
 import {Constants} from "../constants";
-import {openSearch} from "../search/spread";
 import {saveScroll} from "../protyle/scroll/saveScroll";
-import {pdfResize} from "../asset/renderAssets";
 import {Backlink} from "./dock/Backlink";
 import {openFileById} from "../editor/util";
 import {isWindow} from "../util/functions";
@@ -33,12 +27,17 @@ import {setTabPosition} from "../window/setHeader";
 /// #endif
 import {showMessage} from "../dialog/message";
 import {getIdZoomInByPath} from "../util/pathName";
-import {openHistory} from "../history/history";
 import {Custom} from "./dock/Custom";
 import {newCardModel} from "../card/newCardTab";
-import { openRecentDocs } from "../business/openRecentDocs";
+import {App} from "../index";
+import {afterLoadPlugin} from "../plugin/loader";
+import {setTitle} from "../dialog/processSystem";
+import {newCenterEmptyTab, resizeTabs} from "./tabUtil";
 
 export const setPanelFocus = (element: Element) => {
+    if (element.getAttribute("data-type") === "wnd") {
+        setTitle(element.querySelector('.layout-tab-bar .item--focus[data-type="tab-header"] .item__text')?.textContent || window.siyuan.languages.siyuanNote);
+    }
     if (element.classList.contains("layout__tab--active") || element.classList.contains("layout__wnd--active")) {
         return;
     }
@@ -55,9 +54,9 @@ export const setPanelFocus = (element: Element) => {
         element.classList.add("layout__wnd--active");
     } else {
         element.classList.add("layout__tab--active");
-        ["file", "inbox", "backlink", "tag", "bookmark", "graph", "globalGraph", "outline"].find(item => {
-            if (element.classList.contains("sy__" + item)) {
-                document.querySelector(`.dock__item[data-type="${item}"]`).classList.add("dock__item--activefocus");
+        Array.from(element.classList).find(item => {
+            if (item.startsWith("sy__")) {
+                document.querySelector(`.dock__item[data-type="${item.substring(4)}"]`).classList.add("dock__item--activefocus");
                 return true;
             }
         });
@@ -68,21 +67,6 @@ export const setPanelFocus = (element: Element) => {
                 editElement.blur();
             }
         }
-    }
-};
-
-export const getDockByType = (type: TDockType) => {
-    if (!window.siyuan.layout.leftDock) {
-        return undefined;
-    }
-    if (window.siyuan.layout.leftDock.data[type]) {
-        return window.siyuan.layout.leftDock;
-    }
-    if (window.siyuan.layout.rightDock.data[type]) {
-        return window.siyuan.layout.rightDock;
-    }
-    if (window.siyuan.layout.bottomDock.data[type]) {
-        return window.siyuan.layout.bottomDock;
     }
 };
 
@@ -119,7 +103,7 @@ export const switchWnd = (newWnd: Wnd, targetWnd: Wnd) => {
             }
         }
     });
-    // 分割线
+    // 分隔线
     newWnd.element.after(newWnd.element.previousElementSibling);
     newWnd.parent.children.find((item, index) => {
         if (item.id === newWnd.id) {
@@ -154,14 +138,16 @@ const dockToJSON = (dock: Dock) => {
         const data: IDockTab[] = [];
         dock.element.querySelectorAll(`span[data-index="${index}"]`).forEach(item => {
             data.push({
-                type: item.getAttribute("data-type") as TDockType,
+                type: item.getAttribute("data-type"),
                 size: {
                     height: parseInt(item.getAttribute("data-height")),
                     width: parseInt(item.getAttribute("data-width")),
                 },
+                title: item.getAttribute("data-title"),
                 show: item.classList.contains("dock__item--active"),
                 icon: item.querySelector("use").getAttribute("xlink:href").substring(1),
-                hotkeyLangId: item.getAttribute("data-hotkeylangid")
+                hotkey: item.getAttribute("data-hotkey") || "",
+                hotkeyLangId: item.getAttribute("data-hotkeyLangId") || ""
             });
         });
         return data;
@@ -187,20 +173,26 @@ export const resetLayout = () => {
     });
 };
 
-export const exportLayout = (reload: boolean, cb?: () => void, onlyData = false, errorExit = false) => {
+export const exportLayout = (options: {
+    reload: boolean,
+    cb?: () => void,
+    onlyData: boolean,
+    errorExit: boolean,
+    dropEditScroll?: boolean
+}) => {
     if (isWindow()) {
         const layoutJSON: any = {
             layout: {},
         };
-        layoutToJSON(window.siyuan.layout.layout, layoutJSON.layout);
-        if (onlyData) {
+        layoutToJSON(window.siyuan.layout.layout, layoutJSON.layout, !!options.dropEditScroll);
+        if (options.onlyData) {
             return layoutJSON;
         }
         sessionStorage.setItem("layout", JSON.stringify(layoutJSON));
-        if (reload) {
+        if (options.reload) {
             window.location.reload();
-        } else if (cb) {
-            cb();
+        } else if (options.cb) {
+            options.cb();
         }
         return;
     }
@@ -215,30 +207,48 @@ export const exportLayout = (reload: boolean, cb?: () => void, onlyData = false,
         left: dockToJSON(window.siyuan.layout.leftDock),
         right: dockToJSON(window.siyuan.layout.rightDock),
     };
-    layoutToJSON(window.siyuan.layout.layout, layoutJSON.layout);
-    if (onlyData) {
+    layoutToJSON(window.siyuan.layout.layout, layoutJSON.layout, !!options.dropEditScroll);
+    if (options.onlyData) {
         return layoutJSON;
     }
     fetchPost("/api/system/setUILayout", {
         layout: layoutJSON,
-        errorExit    // 后台不接受该参数，用于请求发生错误时退出程序
+        errorExit: options.errorExit    // 后台不接受该参数，用于请求发生错误时退出程序
     }, () => {
-        if (reload) {
+        if (options.reload) {
             window.location.reload();
-        } else if (cb) {
-            cb();
+        } else if (options.cb) {
+            options.cb();
         }
     });
 };
 
-const JSONToDock = (json: any) => {
-    window.siyuan.layout.centerLayout = window.siyuan.layout.layout.children[0].children[1] as Layout;
-    window.siyuan.layout.leftDock = new Dock({position: "Left", data: json.left});
-    window.siyuan.layout.rightDock = new Dock({position: "Right", data: json.right});
-    window.siyuan.layout.bottomDock = new Dock({position: "Bottom", data: json.bottom});
+const initInternalDock = (dockItem: IDockTab[]) => {
+    dockItem.forEach((existSubItem) => {
+        if (existSubItem.hotkeyLangId) {
+            existSubItem.title = window.siyuan.languages[existSubItem.hotkeyLangId];
+            existSubItem.hotkey = window.siyuan.config.keymap.general[existSubItem.hotkeyLangId].custom;
+        }
+    });
 };
 
-export const JSONToCenter = (json: any, layout?: Layout | Wnd | Tab | Model, isStart = false) => {
+const JSONToDock = (json: any, app: App) => {
+    json.left.data.forEach((existItem: IDockTab[]) => {
+        initInternalDock(existItem);
+    });
+    json.right.data.forEach((existItem: IDockTab[]) => {
+        initInternalDock(existItem);
+    });
+    json.bottom.data.forEach((existItem: IDockTab[]) => {
+        initInternalDock(existItem);
+    });
+    window.siyuan.layout.centerLayout = window.siyuan.layout.layout.children[0].children[1] as Layout;
+    window.siyuan.layout.leftDock = new Dock({position: "Left", data: json.left, app});
+    window.siyuan.layout.rightDock = new Dock({position: "Right", data: json.right, app});
+    window.siyuan.layout.bottomDock = new Dock({position: "Bottom", data: json.bottom, app});
+};
+
+export const JSONToCenter = (app: App, json: ILayoutJSON, layout?: Layout | Wnd | Tab | Model) => {
     let child: Layout | Wnd | Tab | Model;
     if (json.instance === "Layout") {
         if (!layout) {
@@ -259,7 +269,7 @@ export const JSONToCenter = (json: any, layout?: Layout | Wnd | Tab | Model, isS
             (layout as Layout).addLayout(child);
         }
     } else if (json.instance === "Wnd") {
-        child = new Wnd(json.resize, (layout as Layout).type);
+        child = new Wnd(app, json.resize, (layout as Layout).type);
         (layout as Layout).addWnd(child);
         if (json.width) {
             child.element.classList.remove("fn__flex-1");
@@ -271,7 +281,7 @@ export const JSONToCenter = (json: any, layout?: Layout | Wnd | Tab | Model, isS
         }
     } else if (json.instance === "Tab") {
         if (!json.title) {
-            child = newCenterEmptyTab();
+            child = newCenterEmptyTab(app);
         } else {
             let title = json.title;
             if (json.lang) {
@@ -298,101 +308,130 @@ export const JSONToCenter = (json: any, layout?: Layout | Wnd | Tab | Model, isS
         if (window.siyuan.config.fileTree.openFilesUseCurrentTab) {
             (layout as Tab).headElement.classList.add("item--unupdate");
         }
+        if (json.scrollAttr) {
+            // 历史数据兼容
+            json.scrollAttr.rootId = json.rootId;
+        }
         (layout as Tab).headElement.setAttribute("data-initdata", JSON.stringify(json));
     } else if (json.instance === "Asset") {
         (layout as Tab).addModel(new Asset({
+            app,
             tab: (layout as Tab),
             path: json.path,
             page: json.page,
         }));
     } else if (json.instance === "Backlink") {
         (layout as Tab).addModel(new Backlink({
+            app,
             tab: (layout as Tab),
             blockId: json.blockId,
             rootId: json.rootId,
-            type: json.type,
+            type: json.type as "pin" | "local",
         }));
     } else if (json.instance === "Bookmark") {
-        (layout as Tab).addModel(new Bookmark((layout as Tab)));
+        (layout as Tab).addModel(new Bookmark(app, (layout as Tab)));
     } else if (json.instance === "Files") {
         (layout as Tab).addModel(new Files({
+            app,
             tab: (layout as Tab),
         }));
     } else if (json.instance === "Graph") {
         (layout as Tab).addModel(new Graph({
+            app,
             tab: (layout as Tab),
             blockId: json.blockId,
             rootId: json.rootId,
-            type: json.type
+            type: json.type as "pin" | "local" | "global",
         }));
     } else if (json.instance === "Outline") {
         (layout as Tab).addModel(new Outline({
+            app,
             tab: (layout as Tab),
             blockId: json.blockId,
-            type: json.type
+            type: json.type as "pin" | "local",
+            isPreview: json.isPreview,
         }));
     } else if (json.instance === "Tag") {
-        (layout as Tab).addModel(new Tag((layout as Tab)));
+        (layout as Tab).addModel(new Tag(app, (layout as Tab)));
     } else if (json.instance === "Search") {
         (layout as Tab).addModel(new Search({
+            app,
             tab: (layout as Tab),
             config: json.config
         }));
     } else if (json.instance === "Custom") {
-        (layout as Tab).addModel(newCardModel({
-            tab: (layout as Tab),
-            data: json.data
-        }));
+        if (window.siyuan.config.fileTree.openFilesUseCurrentTab) {
+            (layout as Tab).headElement.classList.add("item--unupdate");
+        }
+        (layout as Tab).headElement.setAttribute("data-initdata", JSON.stringify(json));
     }
     if (json.children) {
         if (Array.isArray(json.children)) {
-            json.children.forEach((item: any, index: number) => {
-                JSONToCenter(item, layout ? child : window.siyuan.layout.layout, isStart);
-                if (item.instance === "Tab" && index === json.children.length - 1) {
-                    const activeTabElement = (child as Wnd).headersElement.querySelector('[data-init-active="true"]') as HTMLElement;
-                    if (activeTabElement) {
-                        if (window.siyuan.config.fileTree.closeTabsOnStart && isStart &&
-                            !item.pin && item.title) {
-                            // 启动时关闭所有页签就不应该再初始化它
-                        } else {
-                            activeTabElement.removeAttribute("data-init-active");
-                            (child as Wnd).switchTab(activeTabElement, false, false);
-                        }
-                    }
-                }
+            json.children.forEach((item: any) => {
+                JSONToCenter(app, item, layout ? child : window.siyuan.layout.layout);
             });
         } else {
-            JSONToCenter(json.children, child, isStart);
+            JSONToCenter(app, json.children, child);
         }
     }
 };
 
-export const JSONToLayout = (isStart: boolean) => {
-    JSONToCenter(window.siyuan.config.uiLayout.layout, undefined, isStart);
-    JSONToDock(window.siyuan.config.uiLayout);
+export const JSONToLayout = (app: App, isStart: boolean) => {
+    JSONToCenter(app, window.siyuan.config.uiLayout.layout, undefined);
+    JSONToDock(window.siyuan.config.uiLayout, app);
     // 启动时不打开页签，需要移除没有钉住的页签
     if (window.siyuan.config.fileTree.closeTabsOnStart && isStart) {
         getAllTabs().forEach(item => {
             if (item.headElement && !item.headElement.classList.contains("item--pin")) {
-                item.parent.removeTab(item.id);
+                item.parent.removeTab(item.id, false, false, false);
             }
         });
     }
+    app.plugins.forEach(item => {
+        afterLoadPlugin(item);
+    });
+    // 移除没有插件的 tab
+    document.querySelectorAll('li[data-type="tab-header"]').forEach((item: HTMLElement) => {
+        const initData = item.getAttribute("data-initdata");
+        if (initData) {
+            const initDataObj = JSON.parse(initData);
+            if (initDataObj.instance === "Custom" && initDataObj.customModelType !== "siyuan-card") {
+                let hasPlugin = false;
+                app.plugins.find(plugin => {
+                    if (Object.keys(plugin.models).includes(initDataObj.customModelType)) {
+                        hasPlugin = true;
+                        return true;
+                    }
+                });
+                if (!hasPlugin) {
+                    const tabId = item.getAttribute("data-id");
+                    const tab = getInstanceById(tabId) as Tab;
+                    if (tab) {
+                        tab.parent.removeTab(tabId, false, false, false);
+                    }
+                }
+            }
+        }
+    });
     const idZoomIn = getIdZoomInByPath();
-
-    // 启动时 layout 中有该文档，该文档还原会在此之后，因此需有延迟
     if (idZoomIn.id) {
-        setTimeout(() => {
-            openFileById({
-                id: idZoomIn.id,
-                action: idZoomIn.isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
-                zoomIn: idZoomIn.isZoomIn
-            });
-        }, Constants.TIMEOUT_BLOCKLOAD);
+        openFileById({
+            app,
+            id: idZoomIn.id,
+            action: idZoomIn.isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL],
+            zoomIn: idZoomIn.isZoomIn
+        });
+    } else {
+        document.querySelectorAll('li[data-type="tab-header"][data-init-active="true"]').forEach((item: HTMLElement) => {
+            item.removeAttribute("data-init-active");
+            const tab = getInstanceById(item.getAttribute("data-id")) as Tab;
+            tab.parent.switchTab(item, false, false);
+        });
     }
+    resizeTopBar();
 };
 
-export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any) => {
+export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any, dropEditScroll = false) => {
     if (layout instanceof Layout) {
         json.direction = layout.direction;
         if (layout.parent) {
@@ -441,7 +480,9 @@ export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any) => {
         json.mode = layout.editor.protyle.preview.element.classList.contains("fn__none") ? "wysiwyg" : "preview";
         json.action = layout.editor.protyle.block.showAll ? Constants.CB_GET_ALL : "";
         json.instance = "Editor";
-        json.scrollAttr = saveScroll(layout.editor.protyle, true);
+        if (!dropEditScroll) {
+            json.scrollAttr = saveScroll(layout.editor.protyle, true);
+        }
     } else if (layout instanceof Asset) {
         json.path = layout.path;
         if (layout.pdfObject) {
@@ -465,6 +506,7 @@ export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any) => {
     } else if (layout instanceof Outline) {
         json.blockId = layout.blockId;
         json.type = layout.type;
+        json.isPreview = layout.isPreview;
         json.instance = "Outline";
     } else if (layout instanceof Tag) {
         json.instance = "Tag";
@@ -473,7 +515,10 @@ export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any) => {
         json.config = layout.config;
     } else if (layout instanceof Custom) {
         json.instance = "Custom";
-        json.data = layout.data;
+        json.customModelType = layout.type;
+        json.customModelData = Object.assign({}, layout.data);
+        // https://github.com/siyuan-note/siyuan/issues/9250
+        delete json.customModelData.editor;
     }
 
     if (layout instanceof Layout || layout instanceof Wnd) {
@@ -504,13 +549,13 @@ export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any) => {
             layout.children.forEach((item: Layout | Wnd | Tab) => {
                 const itemJSON = {};
                 json.children.push(itemJSON);
-                layoutToJSON(item, itemJSON);
+                layoutToJSON(item, itemJSON, dropEditScroll);
             });
         }
     } else if (layout instanceof Tab) {
         if (layout.model) {
             json.children = {};
-            layoutToJSON(layout.model, json.children);
+            layoutToJSON(layout.model, json.children, dropEditScroll);
         } else if (layout.headElement) {
             // 当前页签没有激活时编辑器没有初始化
             json.children = JSON.parse(layout.headElement.getAttribute("data-initdata") || "{}");
@@ -521,123 +566,97 @@ export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any) => {
     }
 };
 
-export const resizeDrag = () => {
-    const dragElement = document.getElementById("drag");
+export const resizeTopBar = () => {
+    const toolbarElement = document.querySelector("#toolbar");
+    if (!toolbarElement) {
+        return;
+    }
+    const dragElement = toolbarElement.querySelector("#drag") as HTMLElement;
+
+    dragElement.style.padding = "";
+    const barMoreElement = toolbarElement.querySelector("#barMore");
+    barMoreElement.classList.remove("fn__none");
+    barMoreElement.removeAttribute("data-hideids");
+
+    Array.from(toolbarElement.querySelectorAll('[data-hide="true"]')).forEach((item) => {
+        item.classList.remove("fn__none");
+        item.removeAttribute("data-hide");
+    });
+
+    let afterDragElement = dragElement.nextElementSibling;
+    const hideIds: string[] = [];
+    while (toolbarElement.scrollWidth > toolbarElement.clientWidth + 2) {
+        hideIds.push(afterDragElement.id);
+        afterDragElement.classList.add("fn__none");
+        afterDragElement.setAttribute("data-hide", "true");
+        afterDragElement = afterDragElement.nextElementSibling;
+        if (afterDragElement.id === "barMore") {
+            break;
+        }
+    }
+
+    let beforeDragElement = dragElement.previousElementSibling;
+    while (toolbarElement.scrollWidth > toolbarElement.clientWidth + 2) {
+        hideIds.push(beforeDragElement.id);
+        beforeDragElement.classList.add("fn__none");
+        beforeDragElement.setAttribute("data-hide", "true");
+        beforeDragElement = beforeDragElement.previousElementSibling;
+        if (beforeDragElement.id === "barWorkspace") {
+            break;
+        }
+    }
+    if (hideIds.length > 0) {
+        barMoreElement.classList.remove("fn__none");
+    } else {
+        barMoreElement.classList.add("fn__none");
+    }
+    barMoreElement.setAttribute("data-hideids", hideIds.join(","));
+
     const width = dragElement.clientWidth;
     const dragRect = dragElement.getBoundingClientRect();
     const left = dragRect.left;
     const right = window.innerWidth - dragRect.right;
-    if (left > right && left - right < width) {
+    if (left > right && left - right < width / 3) {
         dragElement.style.paddingRight = (left - right) + "px";
-    } else if (left < right && right - left < width) {
+    } else if (left < right && right - left < width / 3) {
         dragElement.style.paddingLeft = (right - left) + "px";
-    } else {
-        dragElement.style.padding = "";
     }
-};
-
-let resizeTimeout: number;
-export const resizeTabs = () => {
-    clearTimeout(resizeTimeout);
-    //  .layout .fn__flex-shrink {width .15s cubic-bezier(0, 0, .2, 1) 0ms} 时需要再次计算 padding
-    // PDF 避免分屏多次调用后，页码跳转到1 https://github.com/siyuan-note/siyuan/issues/5646
-    resizeTimeout = window.setTimeout(() => {
-        const models = getAllModels();
-        models.editor.forEach((item) => {
-            if (item.editor?.protyle &&
-                item.element.parentElement && !item.element.classList.contains("fn__none")) {
-                item.editor.resize();
-            }
-        });
-        // https://github.com/siyuan-note/siyuan/issues/6250
-        models.backlink.forEach(item => {
-            const mTreeElement = item.element.querySelector(".backlinkMList") as HTMLElement;
-            if (mTreeElement.style.height && mTreeElement.style.height !== "0px" && item.element.clientHeight !== 0) {
-                mTreeElement.style.height = (item.element.clientHeight - mTreeElement.previousElementSibling.clientHeight * 2) + "px";
-            }
-            item.editors.forEach(editorItem => {
-                hideElements(["gutter"], editorItem.protyle);
-            });
-        });
-        models.custom.forEach(item => {
-            if (item.resize) {
-                item.resize();
-            }
-        });
-        pdfResize();
-        hideAllElements(["gutter"]);
-    }, 200);
-};
-
-export const copyTab = (tab: Tab) => {
-    return new Tab({
-        icon: tab.icon,
-        docIcon: tab.docIcon,
-        title: tab.title,
-        callback(newTab: Tab) {
-            let model: Model;
-            if (tab.model instanceof Editor) {
-                model = new Editor({
-                    tab: newTab,
-                    blockId: tab.model.editor.protyle.block.rootID,
-                    scrollAttr: saveScroll(tab.model.editor.protyle, true)
-                });
-            } else if (tab.model instanceof Asset) {
-                model = new Asset({
-                    tab: newTab,
-                    path: tab.model.path
-                });
-            } else if (tab.model instanceof Graph) {
-                model = new Graph({
-                    tab: newTab,
-                    blockId: tab.model.blockId,
-                    rootId: tab.model.rootId,
-                    type: tab.model.type,
-                });
-            } else if (tab.model instanceof Files) {
-                model = new Files({
-                    tab: newTab
-                });
-            } else if (tab.model instanceof Outline) {
-                model = new Outline({
-                    tab: newTab,
-                    blockId: tab.model.blockId,
-                    type: tab.model.type
-                });
-            } else if (tab.model instanceof Backlink) {
-                model = new Backlink({
-                    tab: newTab,
-                    blockId: tab.model.blockId,
-                    rootId: tab.model.rootId,
-                    type: tab.model.type
-                });
-            } else if (tab.model instanceof Bookmark) {
-                model = new Bookmark(newTab);
-            } else if (tab.model instanceof Tag) {
-                model = new Tag(newTab);
-            } else if (tab.model instanceof Search) {
-                model = new Search({
-                    tab: newTab,
-                    config: tab.model.config
-                });
-            } else if (tab.model instanceof Custom) {
-                model = newCardModel({
-                    tab,
-                    data: tab.model.data
-                });
-            } else if (!tab.model && tab.headElement) {
-                const initData = JSON.parse(tab.headElement.getAttribute("data-initdata") || "{}");
-                model = new Editor({
-                    tab: newTab,
-                    blockId: initData.rootId || initData.blockId,
-                    mode: initData.mode,
-                    action: typeof initData.action === "string" ? [initData.action] : initData.action,
-                    scrollAttr: initData.scrollAttr,
-                });
-            }
-            newTab.addModel(model);
-        }
+    window.siyuan.storage[Constants.LOCAL_PLUGINTOPUNPIN].forEach((id: string) => {
+        toolbarElement.querySelector("#" + id)?.classList.add("fn__none");
     });
+};
+
+export const newModelByInitData = (app: App, tab: Tab, json: any) => {
+    let model: Model;
+    if (json.instance === "Custom") {
+        if (json.customModelType === "siyuan-card") {
+            model = newCardModel({
+                app,
+                tab: tab,
+                data: json.customModelData
+            });
+        } else {
+            app.plugins.find(item => {
+                if (item.models[json.customModelType]) {
+                    model = item.models[json.customModelType]({
+                        tab: tab,
+                        data: json.customModelData
+                    });
+                    return true;
+                }
+            });
+        }
+    } else if (json.instance === "Editor") {
+        model = new Editor({
+            app,
+            tab,
+            blockId: json.blockId,
+            mode: json.mode,
+            action: typeof json.action === "string" ? [json.action] : json.action,
+            scrollAttr: json.scrollAttr,
+        });
+    }
+    return model;
 };
 
 export const pdfIsLoading = (element: HTMLElement) => {
@@ -788,97 +807,4 @@ export const addResize = (obj: Layout | Wnd) => {
     resizeElement.classList.add("layout__resize");
     obj.element.insertAdjacentElement("beforebegin", resizeElement);
     resizeWnd(resizeElement, obj.resize);
-};
-
-export const newCenterEmptyTab = () => {
-    return new Tab({
-        panel: `<div class="layout__empty b3-list">
-    <div class="${!window.siyuan.config.readonly ? " fn__none" : ""}">
-        <div class="config-about__logo">
-            <img src="/stage/icon.png">
-            ${window.siyuan.languages.siyuanNote}
-        </div>
-        <div class="b3-label__text">${window.siyuan.languages.slogan}</div>
-    </div>
-    <h1>${window.siyuan.languages.noOpenFile}</h1>
-    <div class="fn__hr"></div>
-    <div class="fn__hr"></div>
-    <div class="b3-list-item" id="editorEmptySearch">
-        <svg class="b3-list-item__graphic"><use xlink:href="#iconSearch"></use></svg>
-        <span>${window.siyuan.languages.search}</span>
-        <span class="b3-list-item__meta">${updateHotkeyTip(window.siyuan.config.keymap.general.globalSearch.custom)}</span>
-    </div>
-    <div id="editorEmptyRecent" class="b3-list-item">
-        <svg class="b3-list-item__graphic"><use xlink:href="#iconList"></use></svg>
-        <span>${window.siyuan.languages.recentDocs}</span>
-        <span class="b3-list-item__meta">${updateHotkeyTip(window.siyuan.config.keymap.general.recentDocs.custom)}</span>
-    </div>
-    <div id="editorEmptyHistory" class="b3-list-item${window.siyuan.config.readonly ? " fn__none" : ""}">
-        <svg class="b3-list-item__graphic"><use xlink:href="#iconHistory"></use></svg>
-        <span>${window.siyuan.languages.dataHistory}</span>
-        <span class="b3-list-item__meta">${updateHotkeyTip(window.siyuan.config.keymap.general.dataHistory.custom)}</span>
-    </div>
-    <div class="b3-list-item${window.siyuan.config.readonly ? " fn__none" : ""}" id="editorEmptyFile">
-        <svg class="b3-list-item__graphic"><use xlink:href="#iconFile"></use></svg>
-        <span>${window.siyuan.languages.newFile}</span>
-        <span class="b3-list-item__meta">${updateHotkeyTip(window.siyuan.config.keymap.general.newFile.custom)}</span>
-    </div>
-    <div class="b3-list-item${window.siyuan.config.readonly ? " fn__none" : ""}" id="editorEmptyNewNotebook">
-        <svg class="b3-list-item__graphic"><use xlink:href="#iconFilesRoot"></use></svg>
-        <span>${window.siyuan.languages.newNotebook}</span>
-    </div>
-    <div class="b3-list-item" id="editorEmptyHelp">
-        <svg class="b3-list-item__graphic"><use xlink:href="#iconHelp"></use></svg>
-        <span>${window.siyuan.languages.help}</span>
-    </div>
-</div>`,
-        callback(tab: Tab) {
-            tab.panelElement.addEventListener("click", (event) => {
-                let target = event.target as HTMLElement;
-                while (target && !target.isEqualNode( tab.panelElement)) {
-                    if (target.id === "editorEmptySearch") {
-                        openSearch(window.siyuan.config.keymap.general.globalSearch.custom);
-                        event.stopPropagation();
-                        event.preventDefault()
-                        break;
-                    } else if (target.id === "editorEmptyRecent") {
-                        const openRecentDocsDialog = window.siyuan.dialogs.find(item => {
-                            if (item.element.getAttribute("data-key") === window.siyuan.config.keymap.general.recentDocs.custom) {
-                                return true;
-                            }
-                        });
-                        if (openRecentDocsDialog) {
-                            hideElements(["dialog"]);
-                            return;
-                        }
-                        openRecentDocs();
-                        event.stopPropagation();
-                        event.preventDefault()
-                        break;
-                    }else if (target.id === "editorEmptyHistory") {
-                        openHistory();
-                        event.stopPropagation();
-                        event.preventDefault()
-                        break;
-                    }else if (target.id === "editorEmptyFile") {
-                        newFile(undefined, undefined, undefined, true);
-                        event.stopPropagation();
-                        event.preventDefault()
-                        break;
-                    }else if (target.id === "editorEmptyNewNotebook") {
-                        newNotebook();
-                        event.stopPropagation();
-                        event.preventDefault()
-                        break;
-                    }else if (target.id === "editorEmptyHelp") {
-                        mountHelp()
-                        event.stopPropagation();
-                        event.preventDefault()
-                        break;
-                    }
-                    target = target.parentElement
-                }
-            })
-        }
-    });
 };

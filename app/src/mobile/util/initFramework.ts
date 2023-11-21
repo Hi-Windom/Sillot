@@ -19,8 +19,9 @@ import {activeBlur, hideKeyboardToolbar, initKeyboardToolbar} from "./keyboardTo
 import {syncGuide} from "../../sync/syncGuide";
 import {openCard} from "../../card/openCard";
 import {Inbox} from "../../layout/dock/Inbox";
+import {App} from "../../index";
 
-export const initFramework = () => {
+export const initFramework = (app: App, isStart:boolean) => {
     setInlineStyle();
     renderSnippet();
     initKeyboardToolbar();
@@ -52,30 +53,30 @@ export const initFramework = () => {
             if (itemType === type) {
                 if (type === "sidebar-outline-tab") {
                     if (!outline) {
-                        outline = new MobileOutline();
+                        outline = new MobileOutline(app);
                     } else {
                         outline.update();
                     }
                 } else if (type === "sidebar-backlink-tab") {
                     if (!backlink) {
-                        backlink = new MobileBacklinks();
+                        backlink = new MobileBacklinks(app);
                     } else {
                         backlink.update();
                     }
                 } else if (type === "sidebar-bookmark-tab") {
                     if (!bookmark) {
-                        bookmark = new MobileBookmarks();
+                        bookmark = new MobileBookmarks(app);
                     } else {
-                        backlink.update();
+                        bookmark.update();
                     }
                 } else if (type === "sidebar-tag-tab") {
                     if (!tag) {
-                        tag = new MobileTags();
+                        tag = new MobileTags(app);
                     } else {
                         tag.update();
                     }
                 } else if (type === "sidebar-inbox-tab" && !inbox) {
-                    inbox = new Inbox(document.querySelector('#sidebar [data-type="sidebar-inbox"]'));
+                    inbox = new Inbox(app, document.querySelector('#sidebar [data-type="sidebar-inbox"]'));
                 }
                 svgElement.classList.add("toolbar__icon--active");
                 sidebarElement.lastElementChild.querySelector(`[data-type="${itemType.replace("-tab", "")}"]`).classList.remove("fn__none");
@@ -85,7 +86,7 @@ export const initFramework = () => {
             }
         });
     });
-    window.siyuan.mobile.files = new MobileFiles();
+    window.siyuan.mobile.files = new MobileFiles(app);
     document.getElementById("toolbarFile").addEventListener("click", () => {
         hideKeyboardToolbar();
         activeBlur();
@@ -105,42 +106,9 @@ export const initFramework = () => {
     document.getElementById("toolbarMore").addEventListener("click", () => {
         popMenu();
     });
-    document.getElementById("toolbarRiffCard").addEventListener("click", () => {
-        openCard();
-    });
-    const editElement = document.getElementById("toolbarEdit");
-    if (window.siyuan.config.readonly) {
-        editElement.classList.add("fn__none");
-    }
-    const inputElement = document.getElementById("toolbarName") as HTMLInputElement;
-    const editIconElement = editElement.querySelector("use");
-    if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly) {
-        inputElement.readOnly = true;
-        editIconElement.setAttribute("xlink:href", "#iconPreview");
-    } else {
-        inputElement.readOnly = false;
-        editIconElement.setAttribute("xlink:href", "#iconEdit");
-    }
-    editElement.addEventListener(getEventName(), () => {
-        window.siyuan.config.editor.readOnly = !window.siyuan.config.editor.readOnly;
-        const toolbarName = document.querySelector("#toolbarName") as HTMLElement;
-        if (toolbarName) {
-            toolbarName.style.filter = window.siyuan.config.editor.readOnly ? "brightness(0.58) opacity(0.58)" : "";
-        }
-        fetchPost("/api/setting/setEditor", window.siyuan.config.editor);
-    });
     document.getElementById("toolbarSync").addEventListener(getEventName(), () => {
-        syncGuide();
+        syncGuide(app);
     });
-    if (navigator.userAgent.indexOf("iPhone") > -1 && !window.siyuan.config.readonly && !window.siyuan.config.editor.readOnly) {
-        // 不知道为什么 iPhone 中如果是编辑状态，点击文档后无法点击标题
-        setTimeout(() => {
-            editElement.dispatchEvent(new CustomEvent(getEventName()));
-            setTimeout(() => {
-                editElement.dispatchEvent(new CustomEvent(getEventName()));
-            }, Constants.TIMEOUT_INPUT);
-        }, Constants.TIMEOUT_INPUT);
-    }
     document.getElementById("modelClose").addEventListener("click", () => {
         closeModel();
     });
@@ -151,34 +119,38 @@ export const initFramework = () => {
         }
         const idZoomIn = getIdZoomInByPath();
         if (idZoomIn.id) {
-            openMobileFileById(idZoomIn.id,
-                idZoomIn.isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]);
+            openMobileFileById(app, idZoomIn.id,
+                idZoomIn.isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
+            return;
+        }
+        if (window.siyuan.config.fileTree.closeTabsOnStart && isStart) {
+            setEmpty(app);
             return;
         }
         const localDoc = window.siyuan.storage[Constants.LOCAL_DOCINFO];
         fetchPost("/api/block/checkBlockExist", {id: localDoc.id}, existResponse => {
             if (existResponse.data) {
-                openMobileFileById(localDoc.id, localDoc.action);
+                openMobileFileById(app, localDoc.id, [Constants.CB_GET_SCROLL]);
             } else {
                 fetchPost("/api/block/getRecentUpdatedBlocks", {}, (response) => {
                     if (response.data.length !== 0) {
-                        openMobileFileById(response.data[0].id, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT]);
+                        openMobileFileById(app, response.data[0].id, [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
                     } else {
-                        setEmpty();
+                        setEmpty(app);
                     }
                 });
             }
         });
         return;
     }
-    setEmpty();
+    setEmpty(app);
 };
 
 const initEditorName = () => {
     const inputElement = document.getElementById("toolbarName") as HTMLInputElement;
     inputElement.setAttribute("placeholder", window.siyuan.languages._kernel[16]);
     inputElement.addEventListener("blur", () => {
-        if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly || window.siyuan.mobile.editor.protyle.disabled) {
+        if (inputElement.getAttribute("readonly") === "readonly") {
             return;
         }
         if (!validateName(inputElement.value)) {

@@ -3,10 +3,12 @@ import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName} from "../
 import {fetchSyncPost} from "../util/fetch";
 import {hideTooltip, showTooltip} from "../dialog/tooltip";
 import {getIdFromSYProtocol} from "../util/pathName";
+import {App} from "../index";
+import {Constants} from "../constants";
 import {isPadAppMode} from "sofill/env";
 
 let popoverTargetElement: HTMLElement;
-export const initBlockPopover = () => {
+export const initBlockPopover = (app: App) => {
     let timeout: number;
     let timeoutHide: number;
     // 编辑器内容块引用/backlinks/tag/bookmark/套娃中使用
@@ -16,17 +18,24 @@ export const initBlockPopover = () => {
         }
         const aElement = hasClosestByAttribute(event.target, "data-type", "a", true) ||
             hasClosestByAttribute(event.target, "data-type", "tab-header") ||
-            hasClosestByClassName(event.target, "emojis__item") ||
-            hasClosestByClassName(event.target, "emojis__type") ||
+            hasClosestByClassName(event.target, "av__celltext") ||
+            hasClosestByClassName(event.target, "ariaLabel") ||
             hasClosestByAttribute(event.target, "data-type", "inline-memo");
         if (aElement) {
             let tip = aElement.getAttribute("aria-label") || aElement.getAttribute("data-inline-memo-content");
-            // 折叠块标文案替换
-            if (hasClosestByAttribute(event.target, "data-type", "fold", true)) {
-                tip = window.siyuan.languages.fold;
+            if (aElement.classList.contains("av__celltext")) {
+                if (aElement.offsetWidth > aElement.parentElement.clientWidth - 5) {    // 只能减左边 padding，换行时字体会穿透到右侧 padding
+                    if (aElement.querySelector(".av__cellicon")) {
+                        tip = `${aElement.firstChild.textContent} → ${aElement.lastChild.textContent}`;
+                    } else {
+                        tip = aElement.textContent;
+                    }
+                } else {
+                    return;
+                }
             }
             if (!tip) {
-                tip = aElement.getAttribute("data-href");
+                tip = aElement.getAttribute("data-href")?.substring(0, Constants.SIZE_TITLE) || "";
                 const title = aElement.getAttribute("data-title");
                 if (title) {
                     tip += "<br>" + title;
@@ -38,20 +47,32 @@ export const initBlockPopover = () => {
                 return;
             }
         } else if (!aElement) {
-            hideTooltip();
+            const tipElement = hasClosestByAttribute(event.target, "id", "tooltip", true);
+            if (!tipElement || (
+                tipElement && (tipElement.clientHeight >= tipElement.scrollHeight && tipElement.clientWidth >= tipElement.scrollWidth)
+            )) {
+                hideTooltip();
+            }
         }
-        if (window.siyuan.config.editor.floatWindowMode === 1) {
+        if (window.siyuan.config.editor.floatWindowMode === 1 || window.siyuan.shiftIsPressed) {
             clearTimeout(timeoutHide);
             timeoutHide = window.setTimeout(() => {
                 hidePopover(event);
-            }, 200);
+            }, Constants.TIMEOUT_INPUT);
 
             if (!getTarget(event, aElement)) {
                 return;
             }
+            // https://github.com/siyuan-note/siyuan/issues/9007
+            if (event.relatedTarget && !document.contains(event.relatedTarget as Node)) {
+                return;
+            }
             if (window.siyuan.ctrlIsPressed) {
                 clearTimeout(timeoutHide);
-                showPopover();
+                showPopover(app);
+            } else if (window.siyuan.shiftIsPressed) {
+                clearTimeout(timeoutHide);
+                showPopover(app, true);
             }
             return;
         }
@@ -65,50 +86,52 @@ export const initBlockPopover = () => {
             if (!popoverTargetElement && !aElement) {
                 clearTimeout(timeout);
             }
-        }, 200);
-        timeout = window.setTimeout(async () => {
+        }, Constants.TIMEOUT_INPUT);
+        timeout = window.setTimeout(() => {
             if (!getTarget(event, aElement)) {
                 return;
             }
             clearTimeout(timeoutHide);
-            showPopover();
+            showPopover(app);
         }, 620);
     });
 };
 
-const hidePopover = (event: MouseEvent & { target: HTMLElement, path: HTMLElement[] }) => {
-    if (hasClosestByClassName(event.target, "b3-menu") ||
-        (event.target.id && event.target.tagName !== "svg" && (event.target.id.startsWith("minder_node") || event.target.id.startsWith("kity_") || event.target.id.startsWith("node_")))
-        || event.target.classList.contains("counter")
-        || event.target.tagName === "circle"
+const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
+    // pad 端点击后 event.target 不会更新。
+    const target = document.elementFromPoint(event.clientX, event.clientY);
+    if (hasClosestByClassName(target, "b3-menu") ||
+        (target.id && target.tagName !== "svg" && (target.id.startsWith("minder_node") || target.id.startsWith("kity_") || target.id.startsWith("node_")))
+        || target.classList.contains("counter")
+        || target.tagName === "circle"
     ) {
         // b3-menu 需要处理，(( 后的 hint 上的图表移上去需显示预览
         // gutter & mindmap & 文件树上的数字 & 关系图节点不处理
         return false;
     }
-    popoverTargetElement = hasClosestByAttribute(event.target, "data-type", "block-ref") as HTMLElement ||
-        hasClosestByAttribute(event.target, "data-type", "virtual-block-ref") as HTMLElement;
+    popoverTargetElement = hasClosestByAttribute(target, "data-type", "block-ref") as HTMLElement ||
+        hasClosestByAttribute(target, "data-type", "virtual-block-ref") as HTMLElement;
     if (popoverTargetElement?.classList?.contains("b3-tooltips")) {
         popoverTargetElement = undefined;
     }
     if (!popoverTargetElement) {
-        popoverTargetElement = hasClosestByClassName(event.target, "popover__block") as HTMLElement;
+        popoverTargetElement = hasClosestByClassName(target, "popover__block") as HTMLElement;
     }
-    const linkElement = hasClosestByAttribute(event.target, "data-type", "a", true);
+    const linkElement = hasClosestByAttribute(target, "data-type", "a", true);
     if (!popoverTargetElement && linkElement && linkElement.getAttribute("data-href")?.startsWith("siyuan://blocks")) {
         popoverTargetElement = linkElement;
     }
     if (!popoverTargetElement) {
         // 移动到弹窗的 loading 元素上，但经过 settimeout 后 loading 已经被移除了
         // https://ld246.com/article/1673596577519/comment/1673767749885#comments
-        let targetElement = event.target;
+        let targetElement = target;
         if (!targetElement.parentElement && event.path && event.path[1]) {
             targetElement = event.path[1];
         }
         const blockElement = hasClosestByClassName(targetElement, "block__popover", true);
         const maxEditLevels: { [key: string]: number } = {oid: 0};
         window.siyuan.blockPanels.forEach((item) => {
-            if (item.targetElement && item.element.getAttribute("data-pin") === "true") {
+            if ((item.targetElement || typeof item.x === "number") && item.element.getAttribute("data-pin") === "true") {
                 const level = parseInt(item.element.getAttribute("data-level"));
                 const oid = item.element.getAttribute("data-oid");
                 if (maxEditLevels[oid]) {
@@ -123,7 +146,7 @@ const hidePopover = (event: MouseEvent & { target: HTMLElement, path: HTMLElemen
         if (blockElement) {
             for (let i = 0; i < window.siyuan.blockPanels.length; i++) {
                 const item = window.siyuan.blockPanels[i];
-                if (item.targetElement &&
+                if ((item.targetElement || typeof item.x === "number") &&
                     parseInt(item.element.getAttribute("data-level")) > (maxEditLevels[item.element.getAttribute("data-oid")] || 0) &&
                     item.element.getAttribute("data-pin") === "false" &&
                     parseInt(item.element.getAttribute("data-level")) > parseInt(blockElement.getAttribute("data-level"))) {
@@ -134,8 +157,7 @@ const hidePopover = (event: MouseEvent & { target: HTMLElement, path: HTMLElemen
         } else {
             for (let i = 0; i < window.siyuan.blockPanels.length; i++) {
                 const item = window.siyuan.blockPanels[i];
-                if (item.targetElement && item.element.getAttribute("data-pin") === "false" &&
-                    parseInt(item.element.getAttribute("data-level")) > (maxEditLevels[item.element.getAttribute("data-oid")] || 0)) {
+                if ((item.targetElement || typeof item.x === "number") && item.element.getAttribute("data-pin") === "false") {
                     item.destroy();
                     i--;
                 }
@@ -156,11 +178,12 @@ const getTarget = (event: MouseEvent & { target: HTMLElement }, aElement: false 
     if (!popoverTargetElement) {
         popoverTargetElement = hasClosestByClassName(event.target, "popover__block") as HTMLElement;
     }
-    if (!popoverTargetElement && aElement && aElement.getAttribute("data-href")?.startsWith("siyuan://blocks") &&
-        aElement.getAttribute("prevent-popover") !== "true") {
+    if (!popoverTargetElement && aElement && (
+        (aElement.getAttribute("data-href")?.startsWith("siyuan://blocks") && aElement.getAttribute("prevent-popover") !== "true") ||
+        (aElement.classList.contains("av__celltext") && aElement.dataset.type === "url"))) {
         popoverTargetElement = aElement;
     }
-    if (!popoverTargetElement || window.siyuan.altIsPressed || window.siyuan.shiftIsPressed ||
+    if (!popoverTargetElement || window.siyuan.altIsPressed ||
         (window.siyuan.config.editor.floatWindowMode === 0 && window.siyuan.ctrlIsPressed) ||
         (popoverTargetElement && popoverTargetElement.getAttribute("prevent-popover") === "true")) {
         return false;
@@ -175,7 +198,7 @@ const getTarget = (event: MouseEvent & { target: HTMLElement }, aElement: false 
     return true;
 };
 
-export const showPopover = async () => {
+export const showPopover = async (app: App, showRef = false) => {
     if (!popoverTargetElement) {
         return;
     }
@@ -184,12 +207,18 @@ export const showPopover = async () => {
     const dataId = popoverTargetElement.getAttribute("data-id");
     if (dataId) {
         // backlink/util/hint/正文标题 上的弹层
-        if (dataId.startsWith("[")) {
-            ids = JSON.parse(dataId);
+        if (showRef) {
+            const postResponse = await fetchSyncPost("/api/block/getRefIDs", {id: dataId});
+            ids = postResponse.data.refIDs;
+            defIds = postResponse.data.defIDs;
         } else {
-            ids = [dataId];
+            if (dataId.startsWith("[")) {
+                ids = JSON.parse(dataId);
+            } else {
+                ids = [dataId];
+            }
+            defIds = JSON.parse(popoverTargetElement.getAttribute("data-defids") || "[]");
         }
-        defIds = JSON.parse(popoverTargetElement.getAttribute("data-defids") || "[]");
     } else if (popoverTargetElement.getAttribute("data-type")?.indexOf("virtual-block-ref") > -1) {
         const nodeElement = hasClosestBlock(popoverTargetElement);
         if (nodeElement) {
@@ -202,6 +231,9 @@ export const showPopover = async () => {
     } else if (popoverTargetElement.getAttribute("data-type")?.split(" ").includes("a")) {
         // 以思源协议开头的链接
         ids = [getIdFromSYProtocol(popoverTargetElement.getAttribute("data-href"))];
+    } else if (popoverTargetElement.dataset.type === "url") {
+        // 在 database 的 url 列中以思源协议开头的链接
+        ids = [getIdFromSYProtocol(popoverTargetElement.textContent.trim())];
     } else {
         // pdf
         let targetId;
@@ -223,7 +255,7 @@ export const showPopover = async () => {
 
     let hasPin = false;
     window.siyuan.blockPanels.find((item) => {
-        if (item.targetElement && item.element.getAttribute("data-pin") === "true"
+        if ((item.targetElement || typeof item.x === "number") && item.element.getAttribute("data-pin") === "true"
             && JSON.stringify(ids) === JSON.stringify(item.nodeIds)) {
             hasPin = true;
             return true;
@@ -234,11 +266,13 @@ export const showPopover = async () => {
     ) {
         if (!isPadAppMode()) {
             window.siyuan.blockPanels.push(new BlockPanel({
-                targetElement: popoverTargetElement,
-                nodeIds: ids,
+                app,
+            targetElement: popoverTargetElement,
+                isBacklink: showRef || popoverTargetElement.classList.contains("protyle-attr--refcount") || popoverTargetElement.classList.contains("counter"),
+            nodeIds: ids,
                 defIds,
             }));
         }
     }
-    popoverTargetElement = undefined;
+    // 不能清除，否则ctrl 后 shift 就 无效 popoverTargetElement = undefined;
 };

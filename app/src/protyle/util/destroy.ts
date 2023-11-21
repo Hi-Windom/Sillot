@@ -1,7 +1,10 @@
+import {hideElements} from "../ui/hideElements";
+
 export const destroy = (protyle: IProtyle) => {
     if (!protyle) {
         return;
     }
+    hideElements(["util"], protyle);
     protyle.element.classList.remove("protyle");
     protyle.element.removeAttribute("style");
     if (protyle.wysiwyg) {
@@ -17,4 +20,9 @@ export const destroy = (protyle: IProtyle) => {
             protyle.ws.send("closews", {});
         }, 10240);
     }
+    protyle.app.plugins.forEach(item => {
+        item.eventBus.emit("destroy-protyle", {
+            protyle,
+        });
+    });
 };

@@ -1,13 +1,15 @@
 import {Tab} from "../Tab";
 import {Model} from "../Model";
 import {Tree} from "../../util/Tree";
-import {getDockByType, setPanelFocus} from "../util";
+import {setPanelFocus} from "../util";
+import {getDockByType} from "../tabUtil";
 import {fetchPost} from "../../util/fetch";
 import {Constants} from "../../constants";
 import {updateHotkeyTip} from "../../protyle/util/compatibility";
 import {openFileById} from "../../editor/util";
 import {Protyle} from "../../protyle";
 import {MenuItem} from "../../menus/Menu";
+import {App} from "../../index";
 
 export class Backlink extends Model {
     public element: HTMLElement;
@@ -32,12 +34,14 @@ export class Backlink extends Model {
     } = {};
 
     constructor(options: {
+        app: App,
         tab: Tab,
         blockId: string,
         rootId?: string,
         type: "pin" | "local"
     }) {
         super({
+            app: options.app,
             id: options.tab.id,
             callback() {
                 if (this.type === "local") {
@@ -80,12 +84,11 @@ export class Backlink extends Model {
         <svg><use xlink:href="#iconLink"></use></svg>
         ${window.siyuan.languages.backlinks}
     </div>
-    <span class="counter listCount"></span>
+    <span class="counter listCount" style="margin-left: 0"></span>
+    <span class="fn__flex-1"></span>
     <span class="fn__space"></span>
-    <label class="b3-form__icon b3-form__icon--small search__label">
-        <svg class="b3-form__icon-icon"><use xlink:href="#iconFilter"></use></svg>
-        <input class="b3-text-field b3-text-field--small b3-form__icon-input" placeholder="${window.siyuan.languages.filterKeywordEnter}" />
-    </label>
+    <input class="b3-text-field search__label fn__none fn__size200" placeholder="${window.siyuan.languages.filterKeywordEnter}" />
+    <span data-type="search" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.filter}"><svg><use xlink:href='#iconFilter'></use></svg></span>
     <span class="fn__space"></span>
     <span data-type="refresh" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.refresh}"><svg><use xlink:href='#iconRefresh'></use></svg></span>
     <span class="fn__space"></span>
@@ -107,12 +110,11 @@ export class Backlink extends Model {
         <svg><use xlink:href="#iconLink"></use></svg>
         ${window.siyuan.languages.mentions}
     </div>
-    <span class="counter listMCount"></span>
+    <span class="counter listMCount" style="margin-left: 0;"></span>
+    <span class="fn__flex-1"></span>
     <span class="fn__space"></span>
-    <label class="b3-form__icon b3-form__icon--small search__label">
-        <svg class="b3-form__icon-icon"><use xlink:href="#iconFilter"></use></svg>
-        <input class="b3-text-field b3-text-field--small b3-form__icon-input" placeholder="${window.siyuan.languages.filterKeywordEnter}" />
-    </label>
+    <input class="b3-text-field search__label fn__none fn__size200" placeholder="${window.siyuan.languages.filterKeywordEnter}" />
+    <span data-type="search" class="block__icon b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.filter}"><svg><use xlink:href='#iconFilter'></use></svg></span>
     <span class="fn__space"></span>
     <span data-type="mSort" data-sort="3" class="block__icon b3-tooltips b3-tooltips__nw" aria-label="${window.siyuan.languages.sort}"><svg><use xlink:href='#iconSort'></use></svg></span>
     <span class="fn__space"></span>
@@ -132,6 +134,10 @@ export class Backlink extends Model {
 
         this.inputsElement = this.element.querySelectorAll("input");
         this.inputsElement.forEach((item) => {
+            item.addEventListener("blur", (event: KeyboardEvent) => {
+                const inputElement = event.target as HTMLInputElement;
+                inputElement.classList.add("fn__none");
+            });
             item.addEventListener("keydown", (event: KeyboardEvent) => {
                 if (!event.isComposing && event.key === "Enter") {
                     this.searchBacklinks();
@@ -156,6 +162,7 @@ export class Backlink extends Model {
             },
             ctrlClick: (element) => {
                 openFileById({
+                    app: options.app,
                     id: element.getAttribute("data-node-id"),
                     action: [Constants.CB_GET_CONTEXT]
                 });
@@ -163,6 +170,7 @@ export class Backlink extends Model {
             },
             altClick(element) {
                 openFileById({
+                    app: options.app,
                     id: element.getAttribute("data-node-id"),
                     position: "right",
                     action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
@@ -171,6 +179,7 @@ export class Backlink extends Model {
             },
             shiftClick(element) {
                 openFileById({
+                    app: options.app,
                     id: element.getAttribute("data-node-id"),
                     position: "bottom",
                     action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
@@ -193,6 +202,7 @@ export class Backlink extends Model {
             },
             ctrlClick(element) {
                 openFileById({
+                    app: options.app,
                     id: element.getAttribute("data-node-id"),
                     action: [Constants.CB_GET_CONTEXT]
                 });
@@ -200,6 +210,7 @@ export class Backlink extends Model {
             },
             altClick(element) {
                 openFileById({
+                    app: options.app,
                     id: element.getAttribute("data-node-id"),
                     position: "right",
                     action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
@@ -208,6 +219,7 @@ export class Backlink extends Model {
             },
             shiftClick(element) {
                 openFileById({
+                    app: options.app,
                     id: element.getAttribute("data-node-id"),
                     position: "bottom",
                     action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]
@@ -283,6 +295,10 @@ export class Backlink extends Model {
                         case "min":
                             getDockByType("backlink").toggleModel("backlink");
                             break;
+                        case "search":
+                            target.previousElementSibling.classList.remove("fn__none");
+                            (target.previousElementSibling as HTMLInputElement).select();
+                            break;
                         case "sort":
                         case "mSort":
                             this.showSortMenu(type, target.getAttribute("data-sort"));
@@ -325,10 +341,6 @@ export class Backlink extends Model {
         });
 
         this.searchBacklinks(true);
-
-        if (this.type === "pin") {
-            setPanelFocus(this.element);
-        }
     }
 
     private setFocus() {
@@ -405,8 +417,8 @@ export class Backlink extends Model {
     }
 
     private toggleItem(liElement: HTMLElement, isMention: boolean) {
-        const svgElement = liElement.firstElementChild.firstElementChild;
-        if (svgElement.getAttribute("disabled")) {
+        const svgElement = liElement.firstElementChild?.firstElementChild;
+        if (!svgElement || svgElement.getAttribute("disabled")) {
             return;
         }
         svgElement.setAttribute("disabled", "disabled");
@@ -414,13 +426,13 @@ export class Backlink extends Model {
         if (svgElement.classList.contains("b3-list-item__arrow--open")) {
             svgElement.classList.remove("b3-list-item__arrow--open");
             this.editors.find((item, index) => {
-                if (item.protyle.block.rootID === docId) {
+                if (item.protyle.block.rootID === docId && liElement.nextElementSibling && item.protyle.element.isSameNode(liElement.nextElementSibling)) {
                     item.destroy();
                     this.editors.splice(index, 1);
+                    liElement.nextElementSibling.remove();
                     return true;
                 }
             });
-            liElement.nextElementSibling?.remove();
             svgElement.removeAttribute("disabled");
         } else {
             fetchPost(isMention ? "/api/ref/getBackmentionDoc" : "/api/ref/getBacklinkDoc", {
@@ -435,7 +447,7 @@ export class Backlink extends Model {
                 editorElement.setAttribute("data-defid", this.blockId);
                 editorElement.setAttribute("data-ismention", isMention ? "true" : "false");
                 liElement.after(editorElement);
-                const editor = new Protyle(editorElement, {
+                const editor = new Protyle(this.app, editorElement, {
                     blockId: docId,
                     backlinkData: isMention ? response.data.backmentions : response.data.backlinks,
                     render: {
@@ -641,6 +653,6 @@ export class Backlink extends Model {
         setTimeout(() => {
             this.tree.element.scrollTop = this.status[this.blockId].scrollTop;
             this.mTree.element.scrollTop = this.status[this.blockId].mScrollTop;
-        }, Constants.TIMEOUT_BLOCKLOAD);
+        }, Constants.TIMEOUT_LOAD);
     }
 }

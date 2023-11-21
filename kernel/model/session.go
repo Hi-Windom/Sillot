@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 package model
 
 import (
+	"image/color"
 	"net/http"
 	"net/url"
 	"os"
@@ -25,8 +26,8 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 	"github.com/steambap/captcha"
 )
@@ -97,7 +98,7 @@ func LoginAuth(c *gin.Context) {
 
 		if err := session.Save(c); nil != err {
 			logging.LogErrorf("save session failed: " + err.Error())
-			c.Status(500)
+			c.Status(http.StatusInternalServerError)
 			return
 		}
 		return
@@ -108,7 +109,7 @@ func LoginAuth(c *gin.Context) {
 	workspaceSession.Captcha = gulu.Rand.String(7)
 	if err := session.Save(c); nil != err {
 		logging.LogErrorf("save session failed: " + err.Error())
-		c.Status(500)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 }
@@ -118,10 +119,11 @@ func GetCaptcha(c *gin.Context) {
 		options.CharPreset = "ABCDEFGHKLMNPQRSTUVWXYZ23456789"
 		options.Noise = 0.5
 		options.CurveNumber = 0
+		options.BackgroundColor = color.White
 	})
 	if nil != err {
 		logging.LogErrorf("generates captcha failed: " + err.Error())
-		c.Status(500)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -130,16 +132,16 @@ func GetCaptcha(c *gin.Context) {
 	workspaceSession.Captcha = img.Text
 	if err = session.Save(c); nil != err {
 		logging.LogErrorf("save session failed: " + err.Error())
-		c.Status(500)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	if err = img.WriteImage(c.Writer); nil != err {
 		logging.LogErrorf("writes captcha image failed: " + err.Error())
-		c.Status(500)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.Status(200)
+	c.Status(http.StatusOK)
 }
 
 func CheckReadonly(c *gin.Context) {
@@ -148,7 +150,7 @@ func CheckReadonly(c *gin.Context) {
 		result.Code = -1
 		result.Msg = Conf.Language(34)
 		result.Data = map[string]interface{}{"closeTimeout": 5000}
-		c.JSON(200, result)
+		c.JSON(http.StatusOK, result)
 		c.Abort()
 		return
 	}
@@ -156,8 +158,23 @@ func CheckReadonly(c *gin.Context) {
 
 func CheckAuth(c *gin.Context) {
 	//logging.LogInfof("check auth for [%s]", c.Request.RequestURI)
+	localhost := util.IsLocalHost(c.Request.RemoteAddr)
 
+	// 未设置访问授权码
 	if "" == Conf.AccessAuthCode {
+		// Authenticate requests with the Origin header other than 127.0.0.1 https://github.com/siyuan-note/siyuan/issues/9180
+		host := c.GetHeader("Host")
+		origin := c.GetHeader("Origin")
+		forwardedHost := c.GetHeader("X-Forwarded-Host")
+		if !localhost ||
+			("" != host && !util.IsLocalHost(host)) ||
+			("" != origin && !util.IsLocalOrigin(origin) && !strings.HasPrefix(origin, "chrome-extension://")) ||
+			("" != forwardedHost && !util.IsLocalHost(forwardedHost)) {
+			c.JSON(http.StatusUnauthorized, map[string]interface{}{"code": -1, "msg": "Auth failed: for security reasons, please set [Access authorization code] when using non-127.0.0.1 access\n\n为安全起见，使用非 127.0.0.1 访问时请设置 [访问授权码]"})
+			c.Abort()
+			return
+		}
+
 		c.Next()
 		return
 	}
@@ -172,9 +189,7 @@ func CheckAuth(c *gin.Context) {
 	}
 
 	// 放过来自本机的某些请求
-	if strings.HasPrefix(c.Request.RemoteAddr, util.LocalHost) ||
-		strings.HasPrefix(c.Request.RemoteAddr, "127.0.0.1") ||
-		strings.HasPrefix(c.Request.RemoteAddr, "[::1]") {
+	if localhost {
 		if strings.HasPrefix(c.Request.RequestURI, "/assets/") {
 			c.Next()
 			return
@@ -193,7 +208,7 @@ func CheckAuth(c *gin.Context) {
 		return
 	}
 
-	// 通过 API token
+	// 通过 API token (header: Authorization)
 	if authHeader := c.GetHeader("Authorization"); "" != authHeader {
 		if strings.HasPrefix(authHeader, "Token ") {
 			token := strings.TrimPrefix(authHeader, "Token ")
@@ -202,10 +217,22 @@ func CheckAuth(c *gin.Context) {
 				return
 			}
 
-			c.JSON(401, map[string]interface{}{"code": -1, "msg": "Auth failed"})
+			c.JSON(http.StatusUnauthorized, map[string]interface{}{"code": -1, "msg": "Auth failed"})
 			c.Abort()
 			return
 		}
+	}
+
+	// 通过 API token (query-params: token)
+	if token := c.Query("token"); "" != token {
+		if Conf.Api.Token == token {
+			c.Next()
+			return
+		}
+
+		c.JSON(http.StatusUnauthorized, map[string]interface{}{"code": -1, "msg": "Auth failed"})
+		c.Abort()
+		return
 	}
 
 	if "/check-auth" == c.Request.URL.Path { // 跳过访问授权页
@@ -217,7 +244,7 @@ func CheckAuth(c *gin.Context) {
 		userAgentHeader := c.GetHeader("User-Agent")
 		if strings.HasPrefix(userAgentHeader, "SiYuan-Sillot/") || strings.HasPrefix(userAgentHeader, "Mozilla/") {
 			if "GET" != c.Request.Method {
-				c.JSON(401, map[string]interface{}{"code": -1, "msg": Conf.Language(156)})
+				c.JSON(http.StatusUnauthorized, map[string]interface{}{"code": -1, "msg": Conf.Language(156)})
 				c.Abort()
 				return
 			}
@@ -227,12 +254,13 @@ func CheckAuth(c *gin.Context) {
 			queryParams.Set("to", c.Request.URL.String())
 			location.RawQuery = queryParams.Encode()
 			location.Path = "/check-auth"
-			c.Redirect(302, location.String())
+
+			c.Redirect(http.StatusFound, location.String())
 			c.Abort()
 			return
 		}
 
-		c.JSON(401, map[string]interface{}{"code": -1, "msg": "Auth failed"})
+		c.JSON(http.StatusUnauthorized, map[string]interface{}{"code": -1, "msg": "Auth failed"})
 		c.Abort()
 		return
 	}
@@ -272,7 +300,7 @@ func Timing(c *gin.Context) {
 func Recover(c *gin.Context) {
 	defer func() {
 		logging.Recover()
-		c.Status(500)
+		c.Status(http.StatusInternalServerError)
 	}()
 
 	c.Next()

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
+	"github.com/open-spaced-repetition/go-fsrs"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -61,8 +61,25 @@ type Block struct {
 	Created  string            `json:"created"`
 	Updated  string            `json:"updated"`
 
-	RiffCardID   string `json:"riffCardID"`
-	RiffCardReps uint64 `json:"riffCardReps"`
+	RiffCardID string    `json:"riffCardID"`
+	RiffCard   *RiffCard `json:"riffCard"`
+}
+
+type RiffCard struct {
+	Due  time.Time `json:"due"`
+	Reps uint64    `json:"reps"`
+}
+
+func getRiffCard(card *fsrs.Card) *RiffCard {
+	due := card.Due
+	if due.IsZero() {
+		due = time.Now()
+	}
+
+	return &RiffCard{
+		Due:  due,
+		Reps: card.Reps,
+	}
 }
 
 func (block *Block) IsContainerBlock() bool {
@@ -88,6 +105,35 @@ type Path struct {
 
 	Updated string `json:"updated"` // 更新时间
 	Created string `json:"created"` // 创建时间
+}
+
+func GetParentNextChildID(id string) string {
+	tree, err := loadTreeByBlockID(id)
+	if nil != err {
+		return ""
+	}
+
+	node := treenode.GetNodeInTree(tree, id)
+	if nil == node {
+		return ""
+	}
+
+	for p := node.Parent; nil != p; p = p.Parent {
+		if ast.NodeDocument == p.Type {
+			if nil != node.Next {
+				return node.Next.ID
+			}
+			return ""
+		}
+
+		for f := p.Next; nil != f; f = f.Next {
+			// 遍历取下一个块级元素（比如跳过超级块 Close 节点）
+			if f.IsBlock() {
+				return f.ID
+			}
+		}
+	}
+	return ""
 }
 
 func IsBlockFolded(id string) bool {
@@ -118,7 +164,7 @@ func RecentUpdatedBlocks() (ret []*Block) {
 	return
 }
 
-func TransferBlockRef(fromID, toID string) (err error) {
+func TransferBlockRef(fromID, toID string, refIDs []string) (err error) {
 	toTree, _ := loadTreeByBlockID(toID)
 	if nil == toTree {
 		err = ErrBlockNotFound
@@ -133,7 +179,9 @@ func TransferBlockRef(fromID, toID string) (err error) {
 
 	util.PushMsg(Conf.Language(116), 7000)
 
-	refIDs, _ := sql.QueryRefIDsByDefID(fromID, false)
+	if 1 > len(refIDs) { // 如果不指定 refIDs，则转移所有引用了 fromID 的块
+		refIDs, _ = sql.QueryRefIDsByDefID(fromID, false)
+	}
 	for _, refID := range refIDs {
 		tree, _ := loadTreeByBlockID(refID)
 		if nil == tree {
@@ -313,7 +361,7 @@ func GetHeadingDeleteTransaction(id string) (transaction *Transaction, err error
 			op.PreviousID = n.Previous.ID
 		}
 		op.Action = "insert"
-		op.Data = lute.RenderNodeBlockDOM(n, luteEngine.ParseOptions, luteEngine.RenderOptions)
+		op.Data = luteEngine.RenderNodeBlockDOM(n)
 		transaction.UndoOperations = append(transaction.UndoOperations, op)
 	}
 	return
@@ -391,7 +439,7 @@ func GetHeadingLevelTransaction(id string, level int) (transaction *Transaction,
 		op := &Operation{}
 		op.ID = c.ID
 		op.Action = "update"
-		op.Data = lute.RenderNodeBlockDOM(c, luteEngine.ParseOptions, luteEngine.RenderOptions)
+		op.Data = luteEngine.RenderNodeBlockDOM(c)
 		transaction.UndoOperations = append(transaction.UndoOperations, op)
 
 		c.HeadingLevel += diff
@@ -404,7 +452,7 @@ func GetHeadingLevelTransaction(id string, level int) (transaction *Transaction,
 		op = &Operation{}
 		op.ID = c.ID
 		op.Action = "update"
-		op.Data = lute.RenderNodeBlockDOM(c, luteEngine.ParseOptions, luteEngine.RenderOptions)
+		op.Data = luteEngine.RenderNodeBlockDOM(c)
 		transaction.DoOperations = append(transaction.DoOperations, op)
 	}
 	return
@@ -421,7 +469,7 @@ func GetBlockDOM(id string) (ret string) {
 	}
 	node := treenode.GetNodeInTree(tree, id)
 	luteEngine := NewLute()
-	ret = lute.RenderNodeBlockDOM(node, luteEngine.ParseOptions, luteEngine.RenderOptions)
+	ret = luteEngine.RenderNodeBlockDOM(node)
 	return
 }
 
@@ -442,6 +490,58 @@ func GetBlockKramdown(id string) (ret string) {
 	root.PrependChild(node)
 	luteEngine := NewLute()
 	ret = treenode.ExportNodeStdMd(root, luteEngine)
+	return
+}
+
+type ChildBlock struct {
+	ID      string `json:"id"`
+	Type    string `json:"type"`
+	SubType string `json:"subType,omitempty"`
+}
+
+func GetChildBlocks(id string) (ret []*ChildBlock) {
+	ret = []*ChildBlock{}
+	if "" == id {
+		return
+	}
+
+	tree, err := loadTreeByBlockID(id)
+	if nil != err {
+		return
+	}
+
+	node := treenode.GetNodeInTree(tree, id)
+	if nil == node {
+		return
+	}
+
+	if ast.NodeHeading == node.Type {
+		children := treenode.HeadingChildren(node)
+		for _, c := range children {
+			ret = append(ret, &ChildBlock{
+				ID:      c.ID,
+				Type:    treenode.TypeAbbr(c.Type.String()),
+				SubType: treenode.SubTypeAbbr(c),
+			})
+		}
+		return
+	}
+
+	if !node.IsContainerBlock() {
+		return
+	}
+
+	for c := node.FirstChild; nil != c; c = c.Next {
+		if !c.IsBlock() {
+			continue
+		}
+
+		ret = append(ret, &ChildBlock{
+			ID:      c.ID,
+			Type:    treenode.TypeAbbr(c.Type.String()),
+			SubType: treenode.SubTypeAbbr(c),
+		})
+	}
 	return
 }
 
@@ -480,7 +580,7 @@ func getBlock(id string, tree *parse.Tree) (ret *Block, err error) {
 	return
 }
 
-func getEmbeddedBlock(embedBlockID string, trees map[string]*parse.Tree, sqlBlock *sql.Block, headingMode int, breadcrumb bool) (block *Block, blockPaths []*BlockPath) {
+func getEmbeddedBlock(trees map[string]*parse.Tree, sqlBlock *sql.Block, headingMode int, breadcrumb bool) (block *Block, blockPaths []*BlockPath) {
 	tree, _ := trees[sqlBlock.RootID]
 	if nil == tree {
 		tree, _ = loadTreeByBlockID(sqlBlock.RootID)

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -28,9 +28,9 @@ import (
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/logging"
 	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/facette/natsort"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/search"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
@@ -39,21 +39,26 @@ import (
 
 func RefreshBacklink(id string) {
 	WaitForWritingFiles()
+	refreshRefsByDefID(id)
+}
 
-	refs := sql.QueryRefsByDefID(id, false)
+func refreshRefsByDefID(defID string) {
+	refs := sql.QueryRefsByDefID(defID, false)
 	trees := map[string]*parse.Tree{}
 	for _, ref := range refs {
 		tree := trees[ref.RootID]
-		if nil == tree {
-			var loadErr error
-			tree, loadErr = loadTreeByBlockID(ref.RootID)
-			if nil != loadErr {
-				logging.LogErrorf("refresh tree refs failed: %s", loadErr)
-				continue
-			}
-			trees[ref.RootID] = tree
-			sql.UpdateRefsTreeQueue(tree)
+		if nil != tree {
+			continue
 		}
+
+		var loadErr error
+		tree, loadErr = loadTreeByBlockID(ref.RootID)
+		if nil != loadErr {
+			logging.LogErrorf("refresh tree refs failed: %s", loadErr)
+			continue
+		}
+		trees[ref.RootID] = tree
+		sql.UpdateRefsTreeQueue(tree)
 	}
 }
 
@@ -252,7 +257,7 @@ func GetBacklink2(id, keyword, mentionKeyword string, sortMode, mentionSortMode 
 	refs = removeDuplicatedRefs(refs) // 同一个块中引用多个相同块时反链去重 https://github.com/siyuan-note/siyuan/issues/3317
 
 	linkRefs, linkRefsCount, excludeBacklinkIDs := buildLinkRefs(rootID, refs, keyword)
-	tmpBacklinks := toFlatTree(linkRefs, 0, "backlink")
+	tmpBacklinks := toFlatTree(linkRefs, 0, "backlink", nil)
 
 	for _, l := range tmpBacklinks {
 		l.Blocks = nil
@@ -270,19 +275,19 @@ func GetBacklink2(id, keyword, mentionKeyword string, sortMode, mentionSortMode 
 		case util.SortModeCreatedASC:
 			return backlinks[i].Created < backlinks[j].Created
 		case util.SortModeNameDESC:
-			return util.PinYinCompare(util.RemoveEmoji(backlinks[j].Name), util.RemoveEmoji(backlinks[i].Name))
+			return util.PinYinCompare(util.RemoveEmojiInvisible(backlinks[j].Name), util.RemoveEmojiInvisible(backlinks[i].Name))
 		case util.SortModeNameASC:
-			return util.PinYinCompare(util.RemoveEmoji(backlinks[i].Name), util.RemoveEmoji(backlinks[j].Name))
+			return util.PinYinCompare(util.RemoveEmojiInvisible(backlinks[i].Name), util.RemoveEmojiInvisible(backlinks[j].Name))
 		case util.SortModeAlphanumDESC:
-			return natsort.Compare(util.RemoveEmoji(backlinks[j].Name), util.RemoveEmoji(backlinks[i].Name))
+			return natsort.Compare(util.RemoveEmojiInvisible(backlinks[j].Name), util.RemoveEmojiInvisible(backlinks[i].Name))
 		case util.SortModeAlphanumASC:
-			return natsort.Compare(util.RemoveEmoji(backlinks[i].Name), util.RemoveEmoji(backlinks[j].Name))
+			return natsort.Compare(util.RemoveEmojiInvisible(backlinks[i].Name), util.RemoveEmojiInvisible(backlinks[j].Name))
 		}
 		return backlinks[i].ID > backlinks[j].ID
 	})
 
 	mentionRefs, _ := buildTreeBackmention(sqlBlock, linkRefs, mentionKeyword, excludeBacklinkIDs, 12)
-	tmpBackmentions := toFlatTree(mentionRefs, 0, "backlink")
+	tmpBackmentions := toFlatTree(mentionRefs, 0, "backlink", nil)
 	for _, l := range tmpBackmentions {
 		l.Blocks = nil
 		backmentions = append(backmentions, l)
@@ -299,13 +304,13 @@ func GetBacklink2(id, keyword, mentionKeyword string, sortMode, mentionSortMode 
 		case util.SortModeCreatedASC:
 			return backmentions[i].Created < backmentions[j].Created
 		case util.SortModeNameDESC:
-			return util.PinYinCompare(util.RemoveEmoji(backmentions[j].Name), util.RemoveEmoji(backmentions[i].Name))
+			return util.PinYinCompare(util.RemoveEmojiInvisible(backmentions[j].Name), util.RemoveEmojiInvisible(backmentions[i].Name))
 		case util.SortModeNameASC:
-			return util.PinYinCompare(util.RemoveEmoji(backmentions[i].Name), util.RemoveEmoji(backmentions[j].Name))
+			return util.PinYinCompare(util.RemoveEmojiInvisible(backmentions[i].Name), util.RemoveEmojiInvisible(backmentions[j].Name))
 		case util.SortModeAlphanumDESC:
-			return natsort.Compare(util.RemoveEmoji(backmentions[j].Name), util.RemoveEmoji(backmentions[i].Name))
+			return natsort.Compare(util.RemoveEmojiInvisible(backmentions[j].Name), util.RemoveEmojiInvisible(backmentions[i].Name))
 		case util.SortModeAlphanumASC:
-			return natsort.Compare(util.RemoveEmoji(backmentions[i].Name), util.RemoveEmoji(backmentions[j].Name))
+			return natsort.Compare(util.RemoveEmojiInvisible(backmentions[i].Name), util.RemoveEmojiInvisible(backmentions[j].Name))
 		}
 		return backmentions[i].ID > backmentions[j].ID
 	})
@@ -442,7 +447,7 @@ func GetBacklink(id, keyword, mentionKeyword string, beforeLen int) (boxID strin
 
 	mentions, _ := buildTreeBackmention(sqlBlock, linkRefs, mentionKeyword, excludeBacklinkIDs, beforeLen)
 	mentionsCount = len(mentions)
-	mentionPaths = toFlatTree(mentions, 0, "backlink")
+	mentionPaths = toFlatTree(mentions, 0, "backlink", nil)
 	return
 }
 

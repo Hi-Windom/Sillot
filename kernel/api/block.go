@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -23,11 +23,26 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/html"
-	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
+
+func getParentNextChildID(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	ret.Data = map[string]string{
+		"id": model.GetParentNextChildID(id),
+	}
+}
 
 func transferBlockRef(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
@@ -47,7 +62,14 @@ func transferBlockRef(c *gin.Context) {
 		return
 	}
 
-	err := model.TransferBlockRef(fromID, toID)
+	var refIDs []string
+	if nil != arg["refIDs"] {
+		for _, refID := range arg["refIDs"].([]interface{}) {
+			refIDs = append(refIDs, refID.(string))
+		}
+	}
+
+	err := model.TransferBlockRef(fromID, toID, refIDs)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -272,6 +294,19 @@ func getTreeStat(c *gin.Context) {
 	ret.Data = model.StatTree(id)
 }
 
+func getDOMText(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	dom := arg["dom"].(string)
+	ret.Data = model.GetDOMText(dom)
+}
+
 func getRefText(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -480,4 +515,21 @@ func getBlockKramdown(c *gin.Context) {
 		"id":       id,
 		"kramdown": kramdown,
 	}
+}
+
+func getChildBlocks(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	id := arg["id"].(string)
+	if util.InvalidIDPattern(id, ret) {
+		return
+	}
+
+	ret.Data = model.GetChildBlocks(id)
 }

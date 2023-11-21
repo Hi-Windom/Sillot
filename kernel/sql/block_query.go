@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -19,14 +19,16 @@ package sql
 import (
 	"bytes"
 	"database/sql"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/vitess-sqlparser/sqlparser"
-	"github.com/K-Sillot/logging"
 	"github.com/emirpasic/gods/sets/hashset"
+	sqlparser2 "github.com/rqlite/sql"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -378,7 +380,55 @@ func QueryBookmarkLabels() (ret []string) {
 	return
 }
 
-func Query(stmt string) (ret []map[string]interface{}, err error) {
+func QueryNoLimit(stmt string) (ret []map[string]interface{}, err error) {
+	return queryRawStmt(stmt, math.MaxInt)
+}
+
+func Query(stmt string, limit int) (ret []map[string]interface{}, err error) {
+	// Kernel API `/api/query/sql` support `||` operator https://github.com/siyuan-note/siyuan/issues/9662
+	// 这里为了支持 || 操作符，使用了另一个 sql 解析器，但是这个解析器无法处理 UNION https://github.com/siyuan-note/siyuan/issues/8226
+	// 考虑到 UNION 的使用场景不多，这里还是以支持 || 操作符为主
+	p := sqlparser2.NewParser(strings.NewReader(stmt))
+	parsedStmt2, err := p.ParseStatement()
+	if nil != err {
+		if !strings.Contains(stmt, "||") {
+			// 这个解析器无法处理 || 连接字符串操作符
+			parsedStmt, err2 := sqlparser.Parse(stmt)
+			if nil != err2 {
+				return queryRawStmt(stmt, limit)
+			}
+
+			switch parsedStmt.(type) {
+			case *sqlparser.Select:
+				limitClause := getLimitClause(parsedStmt, limit)
+				slct := parsedStmt.(*sqlparser.Select)
+				slct.Limit = limitClause
+				stmt = sqlparser.String(slct)
+			case *sqlparser.Union:
+				// Kernel API `/api/query/sql` support `UNION` statement https://github.com/siyuan-note/siyuan/issues/8226
+				limitClause := getLimitClause(parsedStmt, limit)
+				union := parsedStmt.(*sqlparser.Union)
+				union.Limit = limitClause
+				stmt = sqlparser.String(union)
+			default:
+				return queryRawStmt(stmt, limit)
+			}
+		} else {
+			return queryRawStmt(stmt, limit)
+		}
+	} else {
+		switch parsedStmt2.(type) {
+		case *sqlparser2.SelectStatement:
+			slct := parsedStmt2.(*sqlparser2.SelectStatement)
+			if nil == slct.LimitExpr {
+				slct.LimitExpr = &sqlparser2.NumberLit{Value: strconv.Itoa(limit)}
+			}
+			stmt = slct.String()
+		default:
+			return queryRawStmt(stmt, limit)
+		}
+	}
+
 	ret = []map[string]interface{}{}
 	rows, err := query(stmt)
 	if nil != err {
@@ -409,6 +459,74 @@ func Query(stmt string) (ret []map[string]interface{}, err error) {
 			m[colName] = *val
 		}
 		ret = append(ret, m)
+	}
+	return
+}
+
+func getLimitClause(parsedStmt sqlparser.Statement, limit int) (ret *sqlparser.Limit) {
+	switch parsedStmt.(type) {
+	case *sqlparser.Select:
+		slct := parsedStmt.(*sqlparser.Select)
+		if nil != slct.Limit {
+			ret = slct.Limit
+		}
+	case *sqlparser.Union:
+		union := parsedStmt.(*sqlparser.Union)
+		if nil != union.Limit {
+			ret = union.Limit
+		}
+	}
+
+	if nil == ret || nil == ret.Rowcount {
+		ret = &sqlparser.Limit{
+			Rowcount: &sqlparser.SQLVal{
+				Type: sqlparser.IntVal,
+				Val:  []byte(strconv.Itoa(limit)),
+			},
+		}
+	}
+	return
+}
+
+func queryRawStmt(stmt string, limit int) (ret []map[string]interface{}, err error) {
+	rows, err := query(stmt)
+	if nil != err {
+		if strings.Contains(err.Error(), "syntax error") {
+			return
+		}
+		return
+	}
+	defer rows.Close()
+
+	cols, err := rows.Columns()
+	if nil != err || nil == cols {
+		return
+	}
+
+	noLimit := !containsLimitClause(stmt)
+	var count, errCount int
+	for rows.Next() {
+		columns := make([]interface{}, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		if err = rows.Scan(columnPointers...); nil != err {
+			return
+		}
+
+		m := make(map[string]interface{})
+		for i, colName := range cols {
+			val := columnPointers[i].(*interface{})
+			m[colName] = *val
+		}
+
+		ret = append(ret, m)
+		count++
+		if (noLimit && limit < count) || 0 < errCount {
+			break
+		}
 	}
 	return
 }
@@ -491,7 +609,7 @@ func selectBlocksRawStmt(stmt string, limit int) (ret []*Block) {
 	}
 	defer rows.Close()
 
-	confLimit := !strings.Contains(strings.ToLower(stmt), " limit ")
+	noLimit := !containsLimitClause(stmt)
 	var count, errCount int
 	for rows.Next() {
 		count++
@@ -502,7 +620,7 @@ func selectBlocksRawStmt(stmt string, limit int) (ret []*Block) {
 			errCount++
 		}
 
-		if (confLimit && limit < count) || 0 < errCount {
+		if (noLimit && limit < count) || 0 < errCount {
 			break
 		}
 	}
@@ -717,4 +835,10 @@ func GetContainerText(container *ast.Node) string {
 		return ast.WalkContinue
 	})
 	return buf.String()
+}
+
+func containsLimitClause(stmt string) bool {
+	return strings.Contains(strings.ToLower(stmt), " limit ") ||
+		strings.Contains(strings.ToLower(stmt), "\nlimit ") ||
+		strings.Contains(strings.ToLower(stmt), "\tlimit ")
 }

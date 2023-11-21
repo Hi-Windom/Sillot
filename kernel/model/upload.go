@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -26,9 +26,9 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
-	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
+	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -52,13 +52,13 @@ func InsertLocalAssets(id string, assetPaths []string, isUpload bool) (succMap m
 	}
 
 	for _, p := range assetPaths {
-		fName := filepath.Base(p)
+		baseName := filepath.Base(p)
+		fName := baseName
 		fName = util.FilterUploadFileName(fName)
 		ext := filepath.Ext(fName)
 		fName = strings.TrimSuffix(fName, ext)
 		ext = strings.ToLower(ext)
 		fName += ext
-		baseName := fName
 		if gulu.File.IsDir(p) || !isUpload {
 			if !strings.HasPrefix(p, "\\\\") {
 				p = "file://" + p
@@ -148,13 +148,21 @@ func Upload(c *gin.Context) {
 	succMap := map[string]interface{}{}
 	files := form.File["file[]"]
 	for _, file := range files {
-		fName := file.Filename
+		baseName := file.Filename
+
+		needUnzip2Dir := false
+		if gulu.OS.IsDarwin() {
+			if strings.HasSuffix(baseName, ".rtfd.zip") {
+				needUnzip2Dir = true
+			}
+		}
+
+		fName := baseName
 		fName = util.FilterUploadFileName(fName)
 		ext := filepath.Ext(fName)
 		fName = strings.TrimSuffix(fName, ext)
 		ext = strings.ToLower(ext)
 		fName += ext
-		baseName := fName
 		f, openErr := file.Open()
 		if nil != openErr {
 			errFiles = append(errFiles, fName)
@@ -176,19 +184,86 @@ func Upload(c *gin.Context) {
 		} else {
 			fName = util.AssetName(fName)
 			writePath := filepath.Join(assetsDirPath, fName)
+			tmpDir := filepath.Join(util.TempDir, "convert", "zip", gulu.Rand.String(7))
+			if needUnzip2Dir {
+				if err = os.MkdirAll(tmpDir, 0755); nil != err {
+					errFiles = append(errFiles, fName)
+					ret.Msg = err.Error()
+					f.Close()
+					break
+				}
+				writePath = filepath.Join(tmpDir, fName)
+			}
+
 			if _, err = f.Seek(0, io.SeekStart); nil != err {
+				logging.LogErrorf("seek failed: %s", err)
 				errFiles = append(errFiles, fName)
 				ret.Msg = err.Error()
 				f.Close()
 				break
 			}
 			if err = filelock.WriteFileByReader(writePath, f); nil != err {
+				logging.LogErrorf("write file failed: %s", err)
 				errFiles = append(errFiles, fName)
 				ret.Msg = err.Error()
 				f.Close()
 				break
 			}
 			f.Close()
+
+			if needUnzip2Dir {
+				baseName = strings.TrimSuffix(file.Filename, ".rtfd.zip") + ".rtfd"
+				fName = baseName
+				fName = util.FilterUploadFileName(fName)
+				ext = filepath.Ext(fName)
+				fName = strings.TrimSuffix(fName, ext)
+				ext = strings.ToLower(ext)
+				fName += ext
+				fName = util.AssetName(fName)
+				tmpDir2 := filepath.Join(util.TempDir, "convert", "zip", gulu.Rand.String(7))
+				if err = gulu.Zip.Unzip(writePath, tmpDir2); nil != err {
+					errFiles = append(errFiles, fName)
+					ret.Msg = err.Error()
+					break
+				}
+
+				entries, readErr := os.ReadDir(tmpDir2)
+				if nil != readErr {
+					logging.LogErrorf("read dir [%s] failed: %s", tmpDir2, readErr)
+					errFiles = append(errFiles, fName)
+					ret.Msg = readErr.Error()
+					break
+				}
+				if 1 > len(entries) {
+					logging.LogErrorf("read dir [%s] failed: no entry", tmpDir2)
+					errFiles = append(errFiles, fName)
+					ret.Msg = "no entry"
+					break
+				}
+				dirName := entries[0].Name()
+				srcDir := filepath.Join(tmpDir2, dirName)
+				entries, readErr = os.ReadDir(srcDir)
+				if nil != readErr {
+					logging.LogErrorf("read dir [%s] failed: %s", filepath.Join(tmpDir2, entries[0].Name()), readErr)
+					errFiles = append(errFiles, fName)
+					ret.Msg = readErr.Error()
+					break
+				}
+				destDir := filepath.Join(assetsDirPath, fName)
+				for _, entry := range entries {
+					from := filepath.Join(srcDir, entry.Name())
+					to := filepath.Join(destDir, entry.Name())
+					if copyErr := gulu.File.Copy(from, to); nil != copyErr {
+						logging.LogErrorf("copy [%s] to [%s] failed: %s", from, to, copyErr)
+						errFiles = append(errFiles, fName)
+						ret.Msg = copyErr.Error()
+						break
+					}
+				}
+				os.RemoveAll(tmpDir)
+				os.RemoveAll(tmpDir2)
+			}
+
 			succMap[baseName] = strings.TrimPrefix(path.Join(relAssetsDirPath, fName), "/")
 		}
 	}
@@ -203,9 +278,9 @@ func Upload(c *gin.Context) {
 
 func getAssetsDir(boxLocalPath, docDirLocalPath string) (assets string) {
 	assets = filepath.Join(docDirLocalPath, "assets")
-	if !gulu.File.IsExist(assets) {
+	if !filelock.IsExist(assets) {
 		assets = filepath.Join(boxLocalPath, "assets")
-		if !gulu.File.IsExist(assets) {
+		if !filelock.IsExist(assets) {
 			assets = filepath.Join(util.DataDir, "assets")
 		}
 	}

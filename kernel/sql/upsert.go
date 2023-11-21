@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -26,8 +26,8 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/eventbus"
 	"github.com/emirpasic/gods/sets/hashset"
+	"github.com/siyuan-note/eventbus"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,8 @@ package conf
 import (
 	"os"
 	"strconv"
+
+	"github.com/sashabaranov/go-openai"
 )
 
 type AI struct {
@@ -29,6 +31,7 @@ type OpenAI struct {
 	APIKey       string `json:"apiKey"`
 	APITimeout   int    `json:"apiTimeout"`
 	APIProxy     string `json:"apiProxy"`
+	APIModel     string `json:"apiModel"`
 	APIMaxTokens int    `json:"apiMaxTokens"`
 	APIBaseURL   string `json:"apiBaseURL"`
 }
@@ -36,6 +39,7 @@ type OpenAI struct {
 func NewAI() *AI {
 	openAI := &OpenAI{
 		APITimeout: 30,
+		APIModel:   openai.GPT3Dot5Turbo,
 		APIBaseURL: "https://api.openai.com/v1",
 	}
 

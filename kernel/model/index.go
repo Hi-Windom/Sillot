@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -28,12 +28,13 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/eventbus"
-	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
 	"github.com/panjf2000/ants/v2"
+	"github.com/siyuan-note/eventbus"
+	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
@@ -76,7 +77,7 @@ func index(boxID string) {
 	var treeCount int
 	var treeSize int64
 	i := 0
-	util.PushStatusBar(fmt.Sprintf("["+box.Name+"] "+Conf.Language(64), len(files)))
+	util.PushStatusBar(fmt.Sprintf("["+html.EscapeString(box.Name)+"] "+Conf.Language(64), len(files)))
 
 	poolSize := runtime.NumCPU()
 	if 4 < poolSize {
@@ -214,7 +215,13 @@ func IndexEmbedBlockJob() {
 
 func autoIndexEmbedBlock(embedBlocks []*sql.Block) {
 	for i, embedBlock := range embedBlocks {
-		stmt := strings.TrimPrefix(embedBlock.Markdown, "{{")
+		md := strings.TrimSpace(embedBlock.Markdown)
+		if strings.Contains(md, "//js") {
+			// js 嵌入块不支持自动索引
+			continue
+		}
+
+		stmt := strings.TrimPrefix(md, "{{")
 		stmt = strings.TrimSuffix(stmt, "}}")
 		if !strings.Contains(strings.ToLower(stmt), "select") {
 			continue
@@ -252,6 +259,10 @@ func updateEmbedBlockContent(embedBlockID string, queryResultBlocks []*EmbedBloc
 }
 
 func init() {
+	subscribeSQLEvents()
+}
+
+func subscribeSQLEvents() {
 	//eventbus.Subscribe(eventbus.EvtSQLInsertBlocks, func(context map[string]interface{}, current, total, blockCount int, hash string) {
 	//	if util.ContainerAndroid == util.Container || util.ContainerIOS == util.Container {
 	//		// Android/iOS 端不显示数据索引和搜索索引状态提示 https://github.com/siyuan-note/siyuan/issues/6392
@@ -295,6 +306,18 @@ func init() {
 		current := context["current"].(int)
 		total := context["total"]
 		msg := fmt.Sprintf(Conf.Language(191), current, total)
+		util.SetBootDetails(msg)
+		util.ContextPushMsg(context, msg)
+	})
+
+	eventbus.Subscribe(eventbus.EvtSQLInsertAssetContent, func(context map[string]interface{}) {
+		if util.ContainerAndroid == util.Container || util.ContainerIOS == util.Container {
+			return
+		}
+
+		current := context["current"].(int)
+		total := context["total"]
+		msg := fmt.Sprintf(Conf.Language(217), current, total)
 		util.SetBootDetails(msg)
 		util.ContextPushMsg(context, msg)
 	})

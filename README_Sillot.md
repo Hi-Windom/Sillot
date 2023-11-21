@@ -64,6 +64,13 @@ go install github.com/ofabry/go-callvis
 
 然后在新终端 `go-callvis main.go`
 
+
+### 合并冲突
+
+注意事项：
+
+1. tpl 模板直接合并冲突没有作用，汐洛是通过 JS 生成的 tpl ，因此需要修改 genTPLData.js 等 JS 文件
+
 <p align="center">
 <img alt="split" src="./.github/split.png">
 </p>

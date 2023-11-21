@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@ package conf
 
 type Editor struct {
 	FontSize                        int      `json:"fontSize"`                        // 字体大小
+	FontSizeScrollZoom              bool     `json:"fontSizeScrollZoom"`              // 字体大小是否支持滚轮缩放
 	FontFamily                      string   `json:"fontFamily"`                      // 字体
 	CodeSyntaxHighlightLineNum      bool     `json:"codeSyntaxHighlightLineNum"`      // 代码块是否显示行号
 	CodeTabSpaces                   int      `json:"codeTabSpaces"`                   // 代码块中 Tab 转换空格数，配置为 0 则表示不转换
@@ -51,7 +52,8 @@ type Editor struct {
 func NewEditor() *Editor {
 	return &Editor{
 		FontSize:                        16,
-		CodeSyntaxHighlightLineNum:      true,
+		FontSizeScrollZoom:              false,
+		CodeSyntaxHighlightLineNum:      false,
 		CodeTabSpaces:                   0,
 		CodeLineWrap:                    false,
 		CodeLigatures:                   false,
@@ -69,7 +71,7 @@ func NewEditor() *Editor {
 		EmbedBlockBreadcrumb:            false,
 		ListLogicalOutdent:              false,
 		FloatWindowMode:                 0,
-		DynamicLoadBlocks:               128,
+		DynamicLoadBlocks:               192,
 		Justify:                         false,
 		RTL:                             false,
 		BacklinkExpandCount:             8,

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import (
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
@@ -49,8 +49,14 @@ func (tx *Transaction) doFoldHeading(operation *Operation) (ret *TxErr) {
 	children := treenode.HeadingChildren(heading)
 	for _, child := range children {
 		childrenIDs = append(childrenIDs, child.ID)
-		child.SetIALAttr("fold", "1")
-		child.SetIALAttr("heading-fold", "1")
+		ast.Walk(child, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if !entering || !n.IsBlock() {
+				return ast.WalkContinue
+			}
+
+			n.SetIALAttr("heading-fold", "1")
+			return ast.WalkContinue
+		})
 	}
 	heading.SetIALAttr("fold", "1")
 	if err = tx.writeTree(tree); nil != err {
@@ -82,8 +88,15 @@ func (tx *Transaction) doUnfoldHeading(operation *Operation) (ret *TxErr) {
 
 	children := treenode.HeadingChildren(heading)
 	for _, child := range children {
-		child.RemoveIALAttr("heading-fold")
-		child.RemoveIALAttr("fold")
+		ast.Walk(child, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if !entering {
+				return ast.WalkContinue
+			}
+
+			n.RemoveIALAttr("heading-fold")
+			n.RemoveIALAttr("fold")
+			return ast.WalkContinue
+		})
 	}
 	heading.RemoveIALAttr("fold")
 	heading.RemoveIALAttr("heading-fold")
@@ -160,6 +173,7 @@ func Doc2Heading(srcID, targetID string, after bool) (srcTreeBox, srcTreePath st
 		headingLevel = 6
 	}
 
+	srcTree.Root.RemoveIALAttr("scroll") // Remove `scroll` attribute when converting the document to a heading https://github.com/siyuan-note/siyuan/issues/9297
 	srcTree.Root.RemoveIALAttr("type")
 	tagIAL := srcTree.Root.IALAttr("tags")
 	tags := strings.Split(tagIAL, ",")
@@ -272,7 +286,7 @@ func Heading2Doc(srcHeadingID, targetBoxID, targetPath string) (srcRootBlockID, 
 	}
 
 	box := Conf.Box(targetBoxID)
-	headingText := getNodeRefText(headingNode)
+	headingText := getNodeRefText0(headingNode)
 	headingText = util.FilterFileName(headingText)
 
 	moveToRoot := "/" == targetPath
@@ -299,14 +313,21 @@ func Heading2Doc(srcHeadingID, targetBoxID, targetPath string) (srcRootBlockID, 
 	// 折叠标题转换为文档时需要自动展开下方块 https://github.com/siyuan-note/siyuan/issues/2947
 	children := treenode.HeadingChildren(headingNode)
 	for _, child := range children {
-		child.RemoveIALAttr("heading-fold")
-		child.RemoveIALAttr("fold")
+		ast.Walk(child, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if !entering {
+				return ast.WalkContinue
+			}
+
+			n.RemoveIALAttr("heading-fold")
+			n.RemoveIALAttr("fold")
+			return ast.WalkContinue
+		})
 	}
 	headingNode.RemoveIALAttr("fold")
+	headingNode.RemoveIALAttr("heading-fold")
 
 	luteEngine := util.NewLute()
 	newTree := &parse.Tree{Root: &ast.Node{Type: ast.NodeDocument, ID: srcHeadingID}, Context: &parse.Context{ParseOption: luteEngine.ParseOptions}}
-	children = treenode.HeadingChildren(headingNode)
 	for _, c := range children {
 		newTree.Root.AppendChild(c)
 	}
@@ -341,6 +362,7 @@ func Heading2Doc(srcHeadingID, targetBoxID, targetPath string) (srcRootBlockID, 
 	newTree.Box, newTree.Path = targetBoxID, newTargetPath
 	newTree.Root.SetIALAttr("updated", util.CurrentTimeSecondsStr())
 	newTree.Root.Spec = "1"
+	box.addMinSort(path.Dir(newTargetPath), newTree.ID)
 	if err = indexWriteJSONQueue(newTree); nil != err {
 		return "", "", err
 	}

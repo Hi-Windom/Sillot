@@ -6,7 +6,7 @@
 		"id": "20201004194026-s8h2cog",
 		"title": "Use on browser",
 		"type": "doc",
-		"updated": "20221025093157"
+		"updated": "20231022211844"
 	},
 	"Children": [
 		{
@@ -87,12 +87,12 @@
 			"Type": "NodeParagraph",
 			"Properties": {
 				"id": "20221025092947-5m97t0e",
-				"updated": "20221025093148"
+				"updated": "20231022211844"
 			},
 			"Children": [
 				{
 					"Type": "NodeText",
-					"Data": "In addition to the use of the local LAN, the use of the public network can be achieved by the following two methods::"
+					"Data": "In addition to the use of the local LAN, the use of the public network can be achieved by the following two methods:"
 				}
 			]
 		},
@@ -180,22 +180,12 @@
 			"Type": "NodeParagraph",
 			"Properties": {
 				"id": "20210104091447-br9zpri",
-				"updated": "20210522214311"
+				"updated": "20230820191236"
 			},
 			"Children": [
 				{
 					"Type": "NodeText",
-					"Data": "Before embarking on these two solutions, please start with understanding "
-				},
-				{
-					"Type": "NodeTextMark",
-					"TextMarkType": "a",
-					"TextMarkAHref": "https://ld246.com/article/1619868273581#%E6%8A%80%E6%9C%AF%E6%9E%B6%E6%9E%84",
-					"TextMarkTextContent": "SiYuan Technical Architecture"
-				},
-				{
-					"Type": "NodeText",
-					"Data": "."
+					"Data": "Before embarking on these two solutions, please start with understanding SiYuan Technical Architecture (github repo: siyuan-note/siyuan)."
 				}
 			]
 		},

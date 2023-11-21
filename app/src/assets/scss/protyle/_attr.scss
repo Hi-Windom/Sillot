@@ -30,19 +30,19 @@
     svg {
       height: 12px;
       width: 12px;
-      margin: 2px 2px 0 0;
+      margin: 2px 2px 2px 0;
       float: left;
     }
   }
 
   &--refcount {
     right: -16px;
-    top: 18px;
+    top: 12px;  // https://github.com/siyuan-note/siyuan/issues/8784
     position: absolute;
     line-height: 16px;
     padding: 0 4px;
     color: var(--b3-theme-on-surface);
-    border-radius: 2px;
+    border-radius: var(--b3-border-radius);
     font-size: 12px;
     user-select: none;
     cursor: pointer;

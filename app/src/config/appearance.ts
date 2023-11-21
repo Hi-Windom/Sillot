@@ -129,14 +129,6 @@ ${isAppMode() ? `<label class="b3-label fn__flex config__item">
 </label>` : ""}
 <label class="fn__flex b3-label">
     <div class="fn__flex-1">
-        ${window.siyuan.languages.appearance14}
-        <div class="b3-label__text">${window.siyuan.languages.appearance15}</div>
-    </div>
-    <span class="fn__space"></span>
-    <input class="b3-switch fn__flex-center" id="nativeEmoji" type="checkbox"${window.siyuan.config.appearance.nativeEmoji ? " checked" : ""}>
-</label>
-<label class="fn__flex b3-label">
-    <div class="fn__flex-1">
         ${window.siyuan.languages.appearance16}
         <div class="b3-label__text">${window.siyuan.languages.appearance17}</div>
     </div>
@@ -171,7 +163,6 @@ ${
             icons: window.siyuan.config.appearance.icons,
             lang: (appearance.element.querySelector("#lang") as HTMLSelectElement).value,
             closeButtonBehavior: isAppMode() ? (appearance.element.querySelector("#closeButtonBehavior") as HTMLInputElement).checked ? 1 : 0 : 0,
-            nativeEmoji: (appearance.element.querySelector("#nativeEmoji") as HTMLInputElement).checked,
             hideStatusBar: (appearance.element.querySelector("#hideStatusBar") as HTMLInputElement).checked,
         }, response => {
             if (window.siyuan.config.appearance.themeJS) {
@@ -180,14 +171,22 @@ ${
                     window.siyuan.config.appearance.themeLight !== response.data.themeLight ||
                     window.siyuan.config.appearance.themeDark !== response.data.themeDark
                 )) {
-                    exportLayout(true);
+                    exportLayout({
+                        reload: true,
+                        onlyData: false,
+                        errorExit: false,
+                    });
                     return;
                 }
                 const OSTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
                 if (response.data.modeOS && (
                     (response.data.mode === 1 && OSTheme === "light") || (response.data.mode === 0 && OSTheme === "dark")
                 )) {
-                    exportLayout(true);
+                    exportLayout({
+                        reload: true,
+                        onlyData: false,
+                        errorExit: false,
+                    });
                     return;
                 }
             }
@@ -218,7 +217,11 @@ ${
             shell.openPath(path.join(window.siyuan.config.system.dataDir, "emojis"));
         });
         appearance.element.querySelector("#appearanceRefresh").addEventListener("click", () => {
-            exportLayout(true);
+            exportLayout({
+                reload: true,
+                onlyData: false,
+                errorExit: false,
+            });
         });
         /// #endif
         appearance.element.querySelectorAll("select").forEach(item => {
@@ -233,8 +236,12 @@ ${
         });
     },
     onSetappearance(data: IAppearance) {
-        if (data.lang !== window.siyuan.config.appearance.lang || data.nativeEmoji !== window.siyuan.config.appearance.nativeEmoji) {
-            exportLayout(true);
+        if (data.lang !== window.siyuan.config.appearance.lang) {
+            exportLayout({
+                reload: true,
+                onlyData: false,
+                errorExit: false,
+            });
             return;
         }
         window.siyuan.config.appearance = data;

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/K-Sillot/httpclient"
-	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/logging"
 )
 
 var cachedRhyResult = map[string]interface{}{}
@@ -32,13 +32,18 @@ func GetRhyResult(force bool) (map[string]interface{}, error) {
 	rhyResultLock.Lock()
 	defer rhyResultLock.Unlock()
 
+	cacheDuration := int64(3600 * 6)
+	if ContainerDocker == Container {
+		cacheDuration = int64(3600 * 24)
+	}
+
 	now := time.Now().Unix()
-	if 3600 >= now-rhyResultCacheTime && !force && 0 < len(cachedRhyResult) {
+	if cacheDuration >= now-rhyResultCacheTime && !force && 0 < len(cachedRhyResult) {
 		return cachedRhyResult, nil
 	}
 
 	request := httpclient.NewCloudRequest30s()
-	_, err := request.SetSuccessResult(&cachedRhyResult).Get(AliyunServer + "/apis/siyuan/version?ver=" + Ver)
+	_, err := request.SetSuccessResult(&cachedRhyResult).Get(GetCloudServer() + "/apis/siyuan/version?ver=" + Ver)
 	if nil != err {
 		logging.LogErrorf("get version info failed: %s", err)
 		return nil, err

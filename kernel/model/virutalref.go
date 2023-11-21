@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -51,20 +51,20 @@ func getBlockVirtualRefKeywords(root *ast.Node) (ret []string) {
 				return ast.WalkContinue
 			}
 
-			content := treenode.NodeStaticContent(n, nil, false)
+			content := treenode.NodeStaticContent(n, nil, false, false)
 			buf.WriteString(content)
 			return ast.WalkContinue
 		})
 		content := buf.String()
-		ret = putBlockVirtualRefKeywords(content, root.ID, root.IALAttr("title"))
+		ret = putBlockVirtualRefKeywords(content, root)
 		return
 	}
 	ret = val.([]string)
 	return
 }
 
-func putBlockVirtualRefKeywords(blockContent, blockID, docTitle string) (ret []string) {
-	keywords := getVirtualRefKeywords(docTitle)
+func putBlockVirtualRefKeywords(blockContent string, root *ast.Node) (ret []string) {
+	keywords := getVirtualRefKeywords(root)
 	if 1 > len(keywords) {
 		return
 	}
@@ -94,7 +94,7 @@ func putBlockVirtualRefKeywords(blockContent, blockID, docTitle string) (ret []s
 	}
 
 	ret = gulu.Str.RemoveDuplicatedElem(ret)
-	virtualBlockRefCache.SetWithTTL(blockID, ret, 1, 10*time.Minute)
+	virtualBlockRefCache.SetWithTTL(root.ID, ret, 1, 10*time.Minute)
 	return
 }
 
@@ -174,7 +174,7 @@ func processVirtualRef(n *ast.Node, unlinks *[]*ast.Node, virtualBlockRefKeyword
 	return false
 }
 
-func getVirtualRefKeywords(docName string) (ret []string) {
+func getVirtualRefKeywords(root *ast.Node) (ret []string) {
 	if !Conf.Editor.VirtualBlockRef {
 		return
 	}
@@ -225,13 +225,32 @@ func getVirtualRefKeywords(docName string) (ret []string) {
 	}
 
 	// 虚拟引用排除当前文档名 https://github.com/siyuan-note/siyuan/issues/4537
-	ret = gulu.Str.ExcludeElem(ret, []string{docName})
+	// Virtual references exclude the name and aliases from the current document https://github.com/siyuan-note/siyuan/issues/9204
+	title := root.IALAttr("title")
+	ret = gulu.Str.ExcludeElem(ret, []string{title})
+	if name := root.IALAttr("name"); "" != name {
+		ret = gulu.Str.ExcludeElem(ret, []string{name})
+	}
+	if alias := root.IALAttr("alias"); "" != alias {
+		for _, a := range strings.Split(alias, ",") {
+			ret = gulu.Str.ExcludeElem(ret, []string{a})
+		}
+	}
+
 	ret = prepareMarkKeywords(ret)
 	return
 }
 
 func prepareMarkKeywords(keywords []string) (ret []string) {
 	ret = gulu.Str.RemoveDuplicatedElem(keywords)
+	var tmp []string
+	for _, k := range ret {
+		if "" != k {
+			tmp = append(tmp, k)
+		}
+	}
+	ret = tmp
+
 	sort.SliceStable(ret, func(i, j int) bool {
 		return len(ret[i]) > len(ret[j])
 	})

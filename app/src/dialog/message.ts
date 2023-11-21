@@ -19,6 +19,13 @@ export const initMessage = () => {
                 }, Constants.TIMEOUT_INPUT);
                 event.preventDefault();
                 break;
+            } else if (target.tagName === "A" || target.tagName === "BUTTON") {
+                break;
+            } else if (target.classList.contains("b3-snackbar")) {
+                hideMessage(target.getAttribute("data-id"));
+                event.preventDefault();
+                event.stopPropagation();
+                break;
             }
             target = target.parentElement;
         }
@@ -27,10 +34,14 @@ export const initMessage = () => {
 
 // type: info/error; timeout: 0 手动关闭；-1 用不关闭
 export const showMessage = (message: string, timeout = 6000, type = "info", messageId?: string) => {
-    const messageVersion = message + (type === "error" ? " v" + Constants.SIYUAN_VERSION : "");
-    const id = messageId || genUUID();
     const messagesElement = document.getElementById("message").firstElementChild;
+    if (!messagesElement) {
+        alert(message);
+        return ;
+    }
+    const id = messageId || genUUID();
     const existElement = messagesElement.querySelector(`.b3-snackbar[data-id="${id}"]`);
+    const messageVersion = message + (type === "error" ? " v" + Constants.SIYUAN_VERSION : "");
     if (existElement) {
         window.clearTimeout(parseInt(existElement.getAttribute("data-timeoutid")));
         existElement.innerHTML = `<div class="b3-snackbar__content${timeout === 0 ? " b3-snackbar__content--close" : ""}">${messageVersion}</div>${timeout === 0 ? '<svg class="b3-snackbar__close"><use xlink:href="#iconCloseRound"></use></svg>' : ""}`;
@@ -76,6 +87,9 @@ export const showMessage = (message: string, timeout = 6000, type = "info", mess
 
 export const hideMessage = (id?: string) => {
     const messagesElement = document.getElementById("message").firstElementChild;
+    if (!messagesElement) {
+        return;
+    }
     if (id) {
         const messageElement = messagesElement.querySelector(`[data-id="${id}"]`);
         if (messageElement) {

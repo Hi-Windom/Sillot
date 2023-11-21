@@ -1,22 +1,24 @@
 import {Tab} from "../Tab";
 import {Model} from "../Model";
 import {Tree} from "../../util/Tree";
-import {getDockByType, setPanelFocus} from "../util";
+import {setPanelFocus} from "../util";
+import {getDockByType} from "../tabUtil";
 import {fetchPost} from "../../util/fetch";
 import {updateHotkeyTip} from "../../protyle/util/compatibility";
 import {openGlobalSearch} from "../../search/util";
 import {MenuItem} from "../../menus/Menu";
-import {confirmDialog} from "../../dialog/confirmDialog";
-import {escapeHtml} from "../../util/escape";
-import {renameTag} from "../../util/noRelyPCFunction";
+import {App} from "../../index";
+import {openTagMenu} from "../../menus/tag";
+import {hasClosestByClassName} from "../../protyle/util/hasClosest";
 
 export class Tag extends Model {
     private openNodes: string[];
     public tree: Tree;
     private element: Element;
 
-    constructor(tab: Tab) {
+    constructor(app: App, tab: Tab) {
         super({
+            app,
             id: tab.id,
             msgCallback(data) {
                 if (data) {
@@ -58,16 +60,16 @@ export class Tag extends Model {
     <span class="fn__space"></span>
     <span data-type="refresh" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.refresh}"><svg><use xlink:href='#iconRefresh'></use></svg></span>
     <span class="fn__space"></span>
+    <span data-type="sort" class="block__icon b3-tooltips b3-tooltips__sw${window.siyuan.config.readonly ? " fn__none" : ""}" aria-label="${window.siyuan.languages.sort}">
+        <svg><use xlink:href="#iconSort"></use></svg>
+    </span>
+    <span class="fn__space${window.siyuan.config.readonly ? " fn__none" : ""}"></span>
     <span data-type="expand" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.expand} ${updateHotkeyTip(window.siyuan.config.keymap.editor.general.expand.custom)}">
         <svg><use xlink:href="#iconExpand"></use></svg>
     </span>
     <span class="fn__space"></span>
     <span data-type="collapse" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.collapse} ${updateHotkeyTip(window.siyuan.config.keymap.editor.general.collapse.custom)}">
         <svg><use xlink:href="#iconContract"></use></svg>
-    </span>
-    <span class="fn__space${window.siyuan.config.readonly ? " fn__none" : ""}"></span>
-    <span data-type="sort" class="block__icon b3-tooltips b3-tooltips__sw${window.siyuan.config.readonly ? " fn__none" : ""}" aria-label="${window.siyuan.languages.sort}">
-        <svg><use xlink:href="#iconSort"></use></svg>
     </span>
     <span class="fn__space"></span>
     <span data-type="min" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.min} ${updateHotkeyTip(window.siyuan.config.keymap.general.closeTab.custom)}"><svg><use xlink:href='#iconMin'></use></svg></span>
@@ -77,29 +79,22 @@ export class Tag extends Model {
         this.tree = new Tree({
             element: this.element.lastElementChild as HTMLElement,
             data: null,
-            click(element: HTMLElement) {
-                openGlobalSearch(`#${element.getAttribute("data-label")}#`, !window.siyuan.ctrlIsPressed);
+            click(element: HTMLElement, event?: MouseEvent) {
+                const labelName = element.getAttribute("data-label");
+                if (event) {
+                    const actionElement = hasClosestByClassName(event.target as HTMLElement, "b3-list-item__action");
+                    if (actionElement) {
+                        openTagMenu(actionElement.parentElement, event, labelName);
+                        return;
+                    }
+                }
+                openGlobalSearch(app, `#${element.getAttribute("data-label")}#`, !window.siyuan.ctrlIsPressed);
             },
             rightClick: (element: HTMLElement, event: MouseEvent) => {
-                const labelName = element.getAttribute("data-label");
-                window.siyuan.menus.menu.remove();
-                window.siyuan.menus.menu.append(new MenuItem({
-                    label: window.siyuan.languages.rename,
-                    click() {
-                        renameTag(labelName);
-                    }
-                }).element);
-                window.siyuan.menus.menu.append(new MenuItem({
-                    icon: "iconTrashcan",
-                    label: window.siyuan.languages.remove,
-                    click: () => {
-                        confirmDialog(window.siyuan.languages.deleteOpConfirm, `${window.siyuan.languages.confirmDelete} <b>${escapeHtml(labelName)}</b>?`, () => {
-                            fetchPost("/api/tag/removeTag", {label: labelName});
-                        });
-                    },
-                }).element);
-                window.siyuan.menus.menu.popup({x: event.clientX, y: event.clientY});
+                openTagMenu(element, event, element.getAttribute("data-label"));
             },
+            blockExtHTML: window.siyuan.config.readonly ? undefined : '<span class="b3-list-item__action"><svg><use xlink:href="#iconMore"></use></svg></span>',
+            topExtHTML: window.siyuan.config.readonly ? undefined : '<span class="b3-list-item__action"><svg><use xlink:href="#iconMore"></use></svg></span>'
         });
         // 为了快捷键的 dispatch
         this.element.querySelector('[data-type="collapse"]').addEventListener("click", () => {
@@ -181,7 +176,6 @@ export class Tag extends Model {
             }
         });
         this.update();
-        setPanelFocus(this.element);
     }
 
     public update() {

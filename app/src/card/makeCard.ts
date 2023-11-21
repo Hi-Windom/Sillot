@@ -8,6 +8,7 @@ import {viewCards} from "./viewCards";
 import {Constants} from "../constants";
 import {escapeAttr, escapeHtml} from "../util/escape";
 import {transaction} from "../protyle/wysiwyg/transaction";
+import {App} from "../index";
 
 export const genCardItem = (item: ICardPackage) => {
     return `<li data-id="${item.id}" data-name="${escapeAttr(item.name)}" class="b3-list-item b3-list-item--narrow${isMobile() ? "" : " b3-list-item--hide-action"}">
@@ -34,7 +35,7 @@ export const genCardItem = (item: ICardPackage) => {
 </li>`;
 };
 
-export const makeCard = (ids: string[]) => {
+export const makeCard = (app: App, ids: string[]) => {
     window.siyuan.dialogs.find(item => {
         if (item.element.getAttribute("data-key") === "makeCard") {
             hideElements(["dialog"]);
@@ -67,7 +68,6 @@ export const makeCard = (ids: string[]) => {
 </div>`,
         });
         dialog.element.setAttribute("data-key", "makeCard");
-        dialog.element.style.zIndex = "200";
         dialog.element.addEventListener("click", (event) => {
             let target = event.target as HTMLElement;
             while (target && !target.isSameNode(dialog.element)) {
@@ -122,14 +122,14 @@ export const makeCard = (ids: string[]) => {
                     event.preventDefault();
                     break;
                 } else if (type === "view") {
-                    viewCards(target.parentElement.getAttribute("data-id"), target.parentElement.getAttribute("data-name"), "", (removeResponse) => {
+                    viewCards(app, target.parentElement.getAttribute("data-id"), target.parentElement.getAttribute("data-name"), "", (removeResponse) => {
                         target.parentElement.outerHTML = genCardItem(removeResponse.data);
                     });
                     event.stopPropagation();
                     event.preventDefault();
                     break;
                 } else if (type === "viewall") {
-                    viewCards("", window.siyuan.languages.all, "");
+                    viewCards(app, "", window.siyuan.languages.all, "");
                     event.stopPropagation();
                     event.preventDefault();
                     break;
@@ -183,7 +183,7 @@ export const quickMakeCard = (protyle: IProtyle, nodeElement: Element[]) => {
         }
         item.classList.remove("protyle-wysiwyg--select");
         ids.push(item.getAttribute("data-node-id"));
-        if ((item.getAttribute("custom-riff-decks") || "").indexOf(Constants.QUICK_DECK_ID) === -1) {
+        if ((item.getAttribute(Constants.CUSTOM_RIFF_DECKS) || "").indexOf(Constants.QUICK_DECK_ID) === -1) {
             isRemove = false;
         }
     });

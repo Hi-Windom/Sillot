@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -29,6 +29,7 @@ type Export struct {
 	PandocBin               string `json:"pandocBin"`               // Pandoc 可执行文件路径
 	MarkdownYFM             bool   `json:"markdownYFM"`             // Markdown 导出时是否添加 YAML Front Matter https://github.com/siyuan-note/siyuan/issues/7727
 	PDFFooter               string `json:"pdfFooter"`               // PDF 导出时页脚内容
+	DocxTemplate            string `json:"docxTemplate"`            // Docx 导出时模板文件路径
 }
 
 func NewExport() *Export {

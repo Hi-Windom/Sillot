@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@ package util
 import (
 	"bytes"
 	"io"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -27,8 +28,16 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
-	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/logging"
 )
+
+func IsSymlinkPath(absPath string) bool {
+	fi, err := os.Lstat(absPath)
+	if nil != err {
+		return false
+	}
+	return 0 != fi.Mode()&os.ModeSymlink
+}
 
 func IsEmptyDir(p string) bool {
 	if !gulu.File.IsDir(p) {
@@ -42,11 +51,34 @@ func IsEmptyDir(p string) bool {
 	return 1 > len(files)
 }
 
+func IsSymlink(dir fs.DirEntry) bool {
+	return dir.Type() == fs.ModeSymlink
+}
+
+func IsDirRegularOrSymlink(dir fs.DirEntry) bool {
+	return dir.IsDir() || IsSymlink(dir)
+}
+
+func IsPathRegularDirOrSymlinkDir(path string) bool {
+	fio, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	if nil != err {
+		return false
+	}
+
+	return fio.IsDir()
+}
+
 func RemoveID(name string) string {
 	ext := path.Ext(name)
 	name = strings.TrimSuffix(name, ext)
 	if 23 < len(name) {
-		name = name[:len(name)-23]
+		if id := name[len(name)-22:]; ast.IsNodeIDPattern(id) {
+			name = name[:len(name)-23]
+		}
 	}
 	return name + ext
 }
@@ -110,14 +142,20 @@ func FilterUploadFileName(name string) string {
 
 func TruncateLenFileName(name string) (ret string) {
 	// 插入资源文件时文件名长度最大限制 189 字节 https://github.com/siyuan-note/siyuan/issues/7099
+	ext := filepath.Ext(name)
 	var byteCount int
+	truncated := false
 	buf := bytes.Buffer{}
 	for _, r := range name {
 		byteCount += utf8.RuneLen(r)
-		if 189 < byteCount {
+		if 189-len(ext) < byteCount {
+			truncated = true
 			break
 		}
 		buf.WriteRune(r)
+	}
+	if truncated {
+		buf.WriteString(ext)
 	}
 	ret = buf.String()
 	return

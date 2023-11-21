@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -33,20 +33,20 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/filelock"
 	"github.com/K-Sillot/httpclient"
-	"github.com/K-Sillot/logging"
 	figure "github.com/common-nighthawk/go-figure"
 	"github.com/gofrs/flock"
+	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 )
 
 // var Mode = "dev"
 var Mode = "prod"
 
 const (
-	Ver       = "0.26"
+	Ver       = "0.27"
 	VerC      = Ver + ".999" // 用于检查版本更新
-	VerSY     = "2.8.7"      // 思源版本号
+	VerSY     = "2.10.16"    // 思源版本号
 	IsInsider = true
 	VerDeno   = "1.32.5"
 )
@@ -58,12 +58,12 @@ var (
 )
 
 func Boot() {
-	IncBootProgress(3, "Booting...")
+	IncBootProgress(3, "Booting kernel...")
 	rand.Seed(time.Now().UTC().UnixNano())
 	initMime()
 	initHttpClient()
 
-	workspacePath := flag.String("workspace", "", "dir path of the workspace, default to ~/Documents/Sillot/")
+	workspacePath := flag.String("workspace", "", "dir path of the workspace, default to ~/Sillot/")
 	wdPath := flag.String("wd", WorkingDir, "working directory of Sillot")
 	port := flag.String("port", "0", "port of the HTTP server")
 	readOnly := flag.String("readonly", "false", "read-only mode")
@@ -86,6 +86,11 @@ func Boot() {
 	Container = ContainerStd
 	if isRunningInDockerContainer() {
 		Container = ContainerDocker
+		if "" == AccessAuthCode {
+			// The access authorization code command line parameter must be set when deploying via Docker https://github.com/siyuan-note/siyuan/issues/9328
+			fmt.Printf("The access authorization code command line parameter (--accessAuthCode) must be set when deploying via Docker.")
+			os.Exit(1)
+		}
 	}
 	if ContainerStd != Container {
 		ServerPort = FixedPort
@@ -94,7 +99,7 @@ func Boot() {
 	msStoreFilePath := filepath.Join(WorkingDir, "ms-store")
 	ISMicrosoftStore = gulu.File.IsExist(msStoreFilePath)
 
-	UserAgent = UserAgent + " " + Container
+	UserAgent = UserAgent + " " + Container + "/" + runtime.GOOS
 	httpclient.SetUserAgent(UserAgent)
 
 	initWorkspaceDir(*workspacePath)
@@ -117,8 +122,6 @@ func Boot() {
 
 	initPathDir()
 	go initDeno()
-	go initPandoc()
-	go initTesseract()
 
 	bootBanner := figure.NewColorFigure("Sillot", "isometric3", "green", true)
 	logging.LogInfof("\n" + bootBanner.String())
@@ -166,24 +169,24 @@ var (
 	HomeDir, _    = gulu.OS.Home()
 	WorkingDir, _ = os.Getwd()
 
-	WorkspaceDir   string        // 工作空间目录路径
-	WorkspaceLock  *flock.Flock  // 工作空间锁
-	ConfDir        string        // 配置目录路径
-	DataDir        string        // 数据目录路径
-	RepoDir        string        // 仓库目录路径
-	HistoryDir     string        // 数据历史目录路径
-	TempDir        string        // 临时目录路径
-	LogPath        string        // 配置目录下的日志文件 sillot.siyuan.log 路径
-	DBName         = "siyuan.db" // SQLite 数据库文件名
-	DBPath         string        // SQLite 数据库文件路径
-	HistoryDBPath  string        // SQLite 历史数据库文件路径
-	BlockTreePath  string        // 区块树文件路径
-	PandocBinPath  string        // Pandoc 可执行文件路径
-	DenoBinPath    string        // Deno 可执行文件路径
-	AppearancePath string        // 配置目录下的外观目录 appearance/ 路径
-	ThemesPath     string        // 配置目录下的外观目录下的 themes/ 路径
-	IconsPath      string        // 配置目录下的外观目录下的 icons/ 路径
-	SnippetsPath   string        // 数据目录下的 snippets/ 路径
+	WorkspaceDir       string        // 工作空间目录路径
+	WorkspaceLock      *flock.Flock  // 工作空间锁
+	ConfDir            string        // 配置目录路径
+	DataDir            string        // 数据目录路径
+	RepoDir            string        // 仓库目录路径
+	HistoryDir         string        // 数据历史目录路径
+	TempDir            string        // 临时目录路径
+	LogPath            string        // 配置目录下的日志文件 sillot.siyuan.log 路径
+	DBName             = "siyuan.db" // SQLite 数据库文件名
+	DBPath             string        // SQLite 数据库文件路径
+	HistoryDBPath      string        // SQLite 历史数据库文件路径
+	AssetContentDBPath string        // SQLite 资源文件内容数据库文件路径
+	BlockTreePath      string        // 区块树文件路径
+	DenoBinPath        string        // Deno 可执行文件路径
+	AppearancePath     string        // 配置目录下的外观目录 appearance/ 路径
+	ThemesPath         string        // 配置目录下的外观目录下的 themes/ 路径
+	IconsPath          string        // 配置目录下的外观目录下的 icons/ 路径
+	SnippetsPath       string        // 数据目录下的 snippets/ 路径
 
 	UIProcessIDs = sync.Map{} // UI 进程 ID
 )
@@ -200,41 +203,37 @@ func initWorkspaceDir(workspaceArg string) {
 		}
 	}
 
-	defaultWorkspaceDir := filepath.Join(HomeDir, "Documents", "Sillot")
+	defaultWorkspaceDir := filepath.Join(HomeDir, "Sillot")
 	if gulu.OS.IsWindows() {
 		// 改进 Windows 端默认工作空间路径 https://github.com/siyuan-note/siyuan/issues/5622
 		if userProfile := os.Getenv("USERPROFILE"); "" != userProfile {
-			defaultWorkspaceDir = filepath.Join(userProfile, "Documents", "Sillot")
+			defaultWorkspaceDir = filepath.Join(userProfile, "Sillot")
 		}
-	}
-	if err := os.MkdirAll(defaultWorkspaceDir, 0755); nil != err && !os.IsExist(err) {
-		logging.LogErrorf("create default workspace folder [%s] failed: %s", defaultWorkspaceDir, err)
-		os.Exit(logging.ExitCodeInitWorkspaceErr)
 	}
 
 	var workspacePaths []string
 	if !gulu.File.IsExist(workspaceConf) {
 		WorkspaceDir = defaultWorkspaceDir
-		if "" != workspaceArg {
-			WorkspaceDir = workspaceArg
-		}
 	} else {
 		workspacePaths, _ = ReadWorkspacePaths()
-
 		if 0 < len(workspacePaths) {
 			// 取最后一个（也就是最近打开的）工作空间
 			WorkspaceDir = workspacePaths[len(workspacePaths)-1]
 		} else {
 			WorkspaceDir = defaultWorkspaceDir
 		}
+	}
 
-		if "" != workspaceArg {
-			WorkspaceDir = workspaceArg
-		}
+	if "" != workspaceArg {
+		WorkspaceDir = workspaceArg
 	}
 
 	if !gulu.File.IsDir(WorkspaceDir) {
-		logging.LogWarnf("use the default workspace [%s] since the specified workspace [%s] is not a dir", WorkspaceDir, defaultWorkspaceDir)
+		logging.LogWarnf("use the default workspace [%s] since the specified workspace [%s] is not a dir", defaultWorkspaceDir, WorkspaceDir)
+		if err := os.MkdirAll(defaultWorkspaceDir, 0755); nil != err && !os.IsExist(err) {
+			logging.LogErrorf("create default workspace folder [%s] failed: %s", defaultWorkspaceDir, err)
+			os.Exit(logging.ExitCodeInitWorkspaceErr)
+		}
 		WorkspaceDir = defaultWorkspaceDir
 	}
 	workspacePaths = append(workspacePaths, WorkspaceDir)
@@ -261,6 +260,7 @@ func initWorkspaceDir(workspaceArg string) {
 	os.Setenv("TMP", osTmpDir)
 	DBPath = filepath.Join(TempDir, DBName)
 	HistoryDBPath = filepath.Join(TempDir, "history.db")
+	AssetContentDBPath = filepath.Join(TempDir, "asset_content.db")
 	BlockTreePath = filepath.Join(TempDir, "blocktree")
 	SnippetsPath = filepath.Join(DataDir, "snippets")
 }
@@ -361,9 +361,20 @@ func initPathDir() {
 		logging.LogFatalf(logging.ExitCodeInitWorkspaceErr, "create data widgets folder [%s] failed: %s", widgets, err)
 	}
 
+	plugins := filepath.Join(DataDir, "plugins")
+	if err := os.MkdirAll(plugins, 0755); nil != err && !os.IsExist(err) {
+		logging.LogFatalf(logging.ExitCodeInitWorkspaceErr, "create data plugins folder [%s] failed: %s", widgets, err)
+	}
+
 	emojis := filepath.Join(DataDir, "emojis")
 	if err := os.MkdirAll(emojis, 0755); nil != err && !os.IsExist(err) {
 		logging.LogFatalf(logging.ExitCodeInitWorkspaceErr, "create data emojis folder [%s] failed: %s", widgets, err)
+	}
+
+	// Support directly access `data/public/*` contents via URL link https://github.com/siyuan-note/siyuan/issues/8593
+	public := filepath.Join(DataDir, "public")
+	if err := os.MkdirAll(public, 0755); nil != err && !os.IsExist(err) {
+		logging.LogFatalf(logging.ExitCodeInitWorkspaceErr, "create data public folder [%s] failed: %s", widgets, err)
 	}
 }
 
@@ -376,8 +387,7 @@ func initMime() {
 	mime.AddExtensionType(".json", "application/json")
 	mime.AddExtensionType(".html", "text/html")
 
-	// 某些系统上下载资源文件后打开是 zip
-	// https://github.com/siyuan-note/siyuan/issues/6347
+	// 某些系统上下载资源文件后打开是 zip https://github.com/siyuan-note/siyuan/issues/6347
 	mime.AddExtensionType(".doc", "application/msword")
 	mime.AddExtensionType(".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 	mime.AddExtensionType(".xls", "application/vnd.ms-excel")
@@ -387,47 +397,11 @@ func initMime() {
 	mime.AddExtensionType(".dwf", "drawing/x-dwf")
 	mime.AddExtensionType(".pdf", "application/pdf")
 
+	// 某些系统上无法显示 SVG 图片 SVG images cannot be displayed on some systems https://github.com/siyuan-note/siyuan/issues/9413
+	mime.AddExtensionType(".svg", "image/svg+xml")
+
 	// 文档数据文件
 	mime.AddExtensionType(".sy", "application/json")
-}
-
-func initPandoc() {
-	if ContainerStd != Container {
-		return
-	}
-
-	pandocDir := filepath.Join(TempDir, "pandoc")
-	if gulu.OS.IsWindows() {
-		PandocBinPath = filepath.Join(pandocDir, "bin", "pandoc.exe")
-	} else if gulu.OS.IsDarwin() || gulu.OS.IsLinux() {
-		PandocBinPath = filepath.Join(pandocDir, "bin", "pandoc")
-	}
-	pandocVer := getPandocVer(PandocBinPath)
-	if "" != pandocVer {
-		logging.LogInfof("built-in pandoc [ver=%s, bin=%s]", pandocVer, PandocBinPath)
-		return
-	}
-
-	pandocZip := filepath.Join(WorkingDir, "pandoc.zip")
-	if "dev" == Mode || !gulu.File.IsExist(pandocZip) {
-		if gulu.OS.IsWindows() {
-			pandocZip = filepath.Join(WorkingDir, "pandoc/pandoc-windows-amd64.zip")
-		} else if gulu.OS.IsDarwin() {
-			pandocZip = filepath.Join(WorkingDir, "pandoc/pandoc-darwin-amd64.zip")
-		} else if gulu.OS.IsLinux() {
-			pandocZip = filepath.Join(WorkingDir, "pandoc/pandoc-linux-amd64.zip")
-		}
-	}
-	if err := gulu.Zip.Unzip(pandocZip, pandocDir); nil != err {
-		logging.LogErrorf("unzip pandoc failed: %s", err)
-		return
-	}
-
-	if gulu.OS.IsDarwin() || gulu.OS.IsLinux() {
-		exec.Command("chmod", "+x", PandocBinPath).CombinedOutput()
-	}
-	pandocVer = getPandocVer(PandocBinPath)
-	logging.LogInfof("initialized built-in pandoc [ver=%s, bin=%s]", pandocVer, PandocBinPath)
 }
 
 func initDeno() {
@@ -474,26 +448,6 @@ func initDeno() {
 	logging.LogInfof("initialized built-in deno [ver=%s, bin=%s]", denoVer, DenoBinPath)
 }
 
-func getPandocVer(binPath string) (ret string) {
-	if "" == binPath {
-		return
-	}
-
-	cmd := exec.Command(binPath, "--version")
-	gulu.CmdAttr(cmd)
-	data, err := cmd.CombinedOutput()
-	if nil == err && strings.HasPrefix(string(data), "pandoc") {
-		parts := bytes.Split(data, []byte("\n"))
-		if 0 < len(parts) {
-			ret = strings.TrimPrefix(string(parts[0]), "pandoc")
-			ret = strings.ReplaceAll(ret, ".exe", "")
-			ret = strings.TrimSpace(ret)
-		}
-		return
-	}
-	return
-}
-
 func getDenoVer(binPath string) (ret string) {
 	if "" == binPath {
 		return
@@ -514,31 +468,12 @@ func getDenoVer(binPath string) (ret string) {
 	return
 }
 
-func IsValidPandocBin(binPath string) bool {
-	if "" == binPath {
-		return false
-	}
-
-	cmd := exec.Command(binPath, "--version")
-	gulu.CmdAttr(cmd)
-	data, err := cmd.CombinedOutput()
-	if nil == err && strings.HasPrefix(string(data), "pandoc") {
-		return true
-	}
-	return false
-}
-
 func GetDataAssetsAbsPath() (ret string) {
 	ret = filepath.Join(DataDir, "assets")
-	var err error
-	stat, err := os.Lstat(ret)
-	if nil != err {
-		logging.LogErrorf("stat assets failed: %s", err)
-		return
-	}
-	if 0 != stat.Mode()&os.ModeSymlink {
+	if IsSymlinkPath(ret) {
 		// 跟随符号链接 https://github.com/siyuan-note/siyuan/issues/5480
-		ret, err = os.Readlink(ret)
+		var err error
+		ret, err = filepath.EvalSymlinks(ret)
 		if nil != err {
 			logging.LogErrorf("read assets link failed: %s", err)
 		}

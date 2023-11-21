@@ -186,6 +186,8 @@ class PDFViewerApplication {
     await this._initializeOptions();
     this._forceCssTheme();
     // NOTE await this._initializeL10n();
+    // https://github.com/siyuan-note/siyuan/issues/8997
+    AppOptions.set("ignoreDestinationZoom", true);
 
     if (
       this.isViewerEmbedded &&
@@ -901,7 +903,8 @@ class PDFViewerApplication {
     };
 
     if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("PRODUCTION")) {
-      params.docBaseUrl ||= document.URL.split("#")[0];
+      // NOTE https://github.com/siyuan-note/siyuan/issues/8103
+      // params.docBaseUrl ||= document.URL.split("#")[0];
     } else if (PDFJSDev.test("MOZCENTRAL || CHROME")) {
       params.docBaseUrl ||= this.baseUrl;
     }
@@ -2466,20 +2469,7 @@ function webViewerResize() {
 }
 
 function webViewerHashchange(evt) {
-  const hash = evt.hash;
-  if (!hash) {
-    return;
-  }
   // NOTE
-  const pdfInstance = getPdfInstance(evt.source)
-  if (!pdfInstance) {
-    return
-  }
-  if (!pdfInstance.isInitialViewSet) {
-    pdfInstance.initialBookmark = hash;
-  } else if (!pdfInstance.pdfHistory?.popStateInProgress) {
-    pdfInstance.pdfLinkService.setHash(hash);
-  }
 }
 
 if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
@@ -3184,6 +3174,16 @@ function webViewerKeyDown(evt) {
     (evt.shiftKey ? 4 : 0) |
     (evt.metaKey ? 8 : 0);
 
+  if (cmd === 0 && [38, 40].includes(evt.keyCode)) {
+    // NOTE https://github.com/siyuan-note/siyuan/issues/8164
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
+    setTimeout(() => {
+      pdfViewer.focus();
+    })
+    return;
+  }
 
   // NOTE
   if (!evt.repeat && (cmd === 8 || cmd === 1 || cmd === 2) && evt.keyCode === 68 &&  // D

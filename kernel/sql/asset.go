@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,12 @@ package sql
 
 import (
 	"database/sql"
+	"github.com/siyuan-note/filelock"
 	"path/filepath"
 	"strings"
 
-	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
-	"github.com/K-Sillot/logging"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -139,17 +139,17 @@ func scanAssetRows(rows *sql.Rows) (ret *Asset) {
 
 func assetLocalPath(linkDest, boxLocalPath, docDirLocalPath string) (ret string) {
 	ret = filepath.Join(docDirLocalPath, linkDest)
-	if gulu.File.IsExist(ret) {
+	if filelock.IsExist(ret) {
 		return
 	}
 
 	ret = filepath.Join(boxLocalPath, linkDest)
-	if gulu.File.IsExist(ret) {
+	if filelock.IsExist(ret) {
 		return
 	}
 
 	ret = filepath.Join(util.DataDir, linkDest)
-	if gulu.File.IsExist(ret) {
+	if filelock.IsExist(ret) {
 		return
 	}
 	return ""

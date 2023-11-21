@@ -3,9 +3,10 @@ import {removeLoading} from "../ui/initUI";
 import {fetchPost} from "../../util/fetch";
 import {Constants} from "../../constants";
 import {processRender} from "../util/processCode";
-import {highlightRender} from "../markdown/highlightRender";
-import {blockRender} from "../markdown/blockRender";
+import {highlightRender} from "../render/highlightRender";
+import {blockRender} from "../render/blockRender";
 import {disabledForeverProtyle, disabledProtyle} from "../util/onGet";
+import {avRender} from "../render/av/render";
 
 export const renderBacklink = (protyle: IProtyle, backlinkData: {
     blockPaths: IBreadcrumb[],
@@ -20,6 +21,7 @@ export const renderBacklink = (protyle: IProtyle, backlinkData: {
     protyle.wysiwyg.element.innerHTML = html;
     processRender(protyle.wysiwyg.element);
     highlightRender(protyle.wysiwyg.element);
+    avRender(protyle.wysiwyg.element, protyle);
     blockRender(protyle, protyle.wysiwyg.element);
     removeLoading(protyle);
     if (window.siyuan.config.readonly || window.siyuan.config.editor.readOnly) {
@@ -31,7 +33,7 @@ export const renderBacklink = (protyle: IProtyle, backlinkData: {
 export const foldPassiveType = (expand: boolean, element: HTMLElement | DocumentFragment) => {
     if (element.firstElementChild.classList.contains("li")) {
         if (expand) {
-            element.querySelectorAll(".li .li .li").forEach(item => {
+            element.querySelectorAll(".li .li").forEach(item => {
                 if (item.childElementCount > 3) {
                     item.setAttribute("fold", "1");
                 }
@@ -73,7 +75,7 @@ export const loadBreadcrumb = (protyle: IProtyle, element: HTMLElement) => {
         }
         element.parentElement.insertAdjacentHTML("afterend", setBacklinkFold(getResponse.data.content, true));
         processRender(element.parentElement.parentElement);
-        highlightRender(element.parentElement.parentElement);
+        avRender(element.parentElement.parentElement, protyle);
         blockRender(protyle, element.parentElement.parentElement);
         if (getResponse.data.isSyncing) {
             disabledForeverProtyle(protyle);
@@ -111,5 +113,5 @@ export const genBreadcrumb = (blockPaths: IBreadcrumb[], renderFirst = false) =>
             html += '<svg class="protyle-breadcrumb__arrow"><use xlink:href="#iconRight"></use></svg>';
         }
     });
-    return `<div contenteditable="false" class="protyle-breadcrumb__bar protyle-breadcrumb__bar--nowrap">${html}</div>`;
+    return `<div contenteditable="false" style="margin-bottom: 8px" class="protyle-breadcrumb__bar protyle-breadcrumb__bar--nowrap">${html}</div>`;
 };

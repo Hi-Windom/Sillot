@@ -21,7 +21,7 @@
             border: 1px solid rgba(0, 0, 0, .06);
             min-height: 100vh;
             box-sizing: border-box;
-            padding: 0 calc((100vw - 608px) / 2);
+            padding: 0 calc((100vw - 608px) * 0.3);
         }
 
         .fn__flex-1 {
@@ -31,7 +31,7 @@
         }
 
         h2 {
-            margin: 0 0 4px 0;
+            margin: 0 0 12px 0;
             line-height: 24px;
         }
 
@@ -179,7 +179,7 @@
             vertical-align: middle;
             background-color: #f3f3f3;
             border: solid 1px rgba(0, 0, 0, .06);
-            border-radius: 3px;
+            border-radius: 6px;
             box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .06);
         }
 
@@ -210,7 +210,7 @@
     <label class="b3-label">
         <div>
             🌐 外观语言
-            <div class="b3-label__text">用户界面语言，后续可在 <kbd>设置</kbd> - <kbd>外观</kbd> 中切换</div>
+            <div class="b3-label__text">用户界面语言，后续可以在 <kbd>设置</kbd> - <kbd>外观</kbd> 中进行切换</div>
         </div>
         <div class="fn__space"></div>
         <div class="fn__flex-1"></div>
@@ -222,7 +222,7 @@
     <label class="b3-label">
         <div>
             🗂️ 工作空间
-            <div class="b3-label__text"> 工作空间用于存放数据，后续可在顶栏菜单中切换</div>
+            <div class="b3-label__text"> 工作空间用于存放数据，后续可以在顶栏左上角的主菜单中进行切换</div>
         </div>
         <div class="fn__space"></div>
         <div class="fn__flex-1"></div>
@@ -248,8 +248,8 @@
     <label class="b3-label">
         <div>
             🌐 Language
-            <div class="b3-label__text">User interface language, which can be switched later in <br>
-                <kbd>Settings</kbd> - <kbd>Appearance</kbd>
+            <div class="b3-label__text">User interface language, which can be switched later in <kbd>Settings</kbd> -
+                <kbd>Appearance</kbd>
             </div>
         </div>
         <div class="fn__space"></div>
@@ -262,8 +262,8 @@
     <label class="b3-label">
         <div>
             🗂️ Workspace
-            <div class="b3-label__text">The workspace is used to store data, which can be switched <br>
-                later in the top bar menu later
+            <div class="b3-label__text">The workspace is used to store data, which can be switched later in the top bar
+                menu later
             </div>
         </div>
         <div class="fn__space"></div>
@@ -272,7 +272,7 @@
     </label>
     <div class="fn__flex-1"></div>
     <div class="fn__flex-1 notice">
-        <span>⚠️ Do not use a third-party synchronization disk to synchronize data, otherwise it will cause abnormal operation and data damage</span>
+        <span>⚠️ Do not use a third-party sync disk to sync data, otherwise it will cause abnormal operation and data damage</span>
     </div>
     <div class="feedback">
         <span>❤️ Feedback via <a href="https://github.com/Hi-Windom/Sillot/issues"
@@ -289,6 +289,10 @@
 </svg>
 <div class="drag"></div>
 <script>
+    const isChinese = (lang) => {
+        return 'zh_CN' === lang || 'zh_CHT' === lang
+    }
+
     const getSearch = (key) => {
         if (window.location.search.indexOf('?') === -1) {
             return ''
@@ -307,7 +311,7 @@
 
     let currentLang = decodeURIComponent(getSearch('lang'))
     const setLang = (lang) => {
-        if ('zh_CN' === lang) {
+        if (isChinese(lang)) {
             document.title = `汐洛 v${getSearch('v')}`
             document.getElementById('zhCN').classList.remove('fn__none')
             document.getElementById('enUS').classList.add('fn__none')
@@ -321,7 +325,7 @@
     setLang(currentLang)
 
     document.querySelectorAll('.version').forEach(item => {
-        item.textContent = `🔖 v${getSearch('v')}`
+        item.textContent = `v${getSearch('v')}`
     })
 
     document.querySelectorAll('.icon').forEach(item => {
@@ -343,58 +347,62 @@
         ipcRenderer.send('siyuan-first-quit')
     })
     document.getElementById('min').addEventListener('click', () => {
-        const {getCurrentWindow} = require('@electron/remote')
-        getCurrentWindow().minimize()
+        const {ipcRenderer} = require('electron')
+        ipcRenderer.send("siyuan-cmd", "minimize");
     })
 
     document.querySelectorAll('.choosePath').forEach((item) => {
-        item.addEventListener('click', () => {
-            const {dialog} = require('@electron/remote')
+        item.addEventListener('click', async () => {
             const path = require('path')
-            dialog.showOpenDialog({
-                defaultPath: path.join(decodeURIComponent(getSearch('home')), 'Documents'),
+            const fs = require('fs')
+
+            const defaultWorkspace = path.join(decodeURIComponent(getSearch('home')), "SiYuan")
+            if (!fs.existsSync(defaultWorkspace)) {
+                fs.mkdirSync(defaultWorkspace, {mode: 0o755, recursive: true})
+            }
+
+            const {ipcRenderer} = require('electron')
+            const result = await ipcRenderer.invoke("siyuan-get", {
+                cmd: "showOpenDialog",
+                defaultPath: defaultWorkspace,
                 properties: ['openDirectory', 'createDirectory'],
-            }).then((result) => {
-                if (result.canceled) {
-                    return
-                }
+            });
 
-                const {ipcRenderer} = require('electron')
-                const fs = require('fs')
-                const initPath = result.filePaths[0]
-                if (isICloudPath(initPath)) {
-                    let msg = '⚠️ This folder is under the iCloud sync path, please change another path'
-                    if ('zh_CN' === currentLang) {
-                        msg = '⚠️ 该文件夹位于 iCloud 同步路径下，请更换其他路径'
-                    }
-                    alert(msg)
-                    return
-                }
+            if (result.canceled) {
+                return
+            }
+            const initPath = result.filePaths[0]
 
-                if (isCloudDrivePath(initPath)) {
-                    let msg = '⚠️ The folder path can not contain onedrive, dropbox, google drive, pcloud and 坚果云, please change another path'
-                    if ('zh_CN' === currentLang) {
-                        msg = '⚠️ 文件夹路径不能包含 onedrive、dropbox、google drive、pcloud 和 坚果云，请更换其他路径'
-                    }
-                    alert(msg)
-                    return
+            if (isICloudPath(initPath)) {
+                let msg = '⚠️ This folder is under the iCloud sync path, please change another path'
+                if (isChinese(currentLang)) {
+                    msg = '⚠️ 该文件夹位于 iCloud 同步路径下，请更换其他路径'
                 }
+                alert(msg)
+                return
+            }
 
-                let msg = '⚠️ Do not set the workspace under the path of a third-party sync disk, otherwise the data will be damaged (iCloud/OneDrive/Dropbox/Google Drive/Nutstore/Baidu Netdisk/Tencent Weiyun, etc.), continue?'
-                if ('zh_CN' === currentLang) {
-                    msg = '⚠️ 请勿将工作空间设置在第三方同步盘路径下，否则数据会被损坏（iCloud/OneDrive/Dropbox/Google Drive/坚果云/百度网盘/腾讯微云等），是否继续？'
+            if (isCloudDrivePath(initPath)) {
+                let msg = '⚠️ The folder path can not contain onedrive, dropbox, google drive, pcloud and 坚果云, please change another path'
+                if (isChinese(currentLang)) {
+                    msg = '⚠️ 文件夹路径不能包含 onedrive、dropbox、google drive、pcloud 和 坚果云，请更换其他路径'
                 }
-                if (!confirm(msg)) {
-                    return
-                }
-
-                if (!fs.existsSync(initPath)) {
-                    fs.mkdirSync(initPath, {mode: 0o755, recursive: true})
-                }
-                ipcRenderer.send('siyuan-first-init', {
-                    workspace: initPath,
-                    lang: document.querySelector('.lang').value
-                })
+                alert(msg)
+                return
+            }
+            let msg = '⚠️ Do not set the workspace under the path of a third-party sync disk, otherwise the data will be damaged (iCloud/OneDrive/Dropbox/Google Drive/Nutstore/Baidu Netdisk/Tencent Weiyun, etc.), continue?'
+            if (isChinese(currentLang)) {
+                msg = '⚠️ 请勿将工作空间设置在第三方同步盘路径下，否则数据会被损坏（iCloud/OneDrive/Dropbox/Google Drive/坚果云/百度网盘/腾讯微云等），是否继续？'
+            }
+            if (!confirm(msg)) {
+                return
+            }
+            if (!fs.existsSync(initPath)) {
+                fs.mkdirSync(initPath, {mode: 0o755, recursive: true})
+            }
+            ipcRenderer.send('siyuan-first-init', {
+                workspace: initPath,
+                lang: document.querySelector('.lang').value
             })
         })
     })
@@ -414,14 +422,47 @@
 
         // macOS 端对工作空间放置在 iCloud 路径下做检查 https://github.com/siyuan-note/siyuan/issues/7747
         const path = require('path')
-        const iCloudRoot = path.join(decodeURIComponent(getSearch('home')), 'Library', 'Mobile Documents')
-        const allFiles = walk(iCloudRoot)
-        for (const file of allFiles) {
-            if (-1 < absPath.indexOf(file.toLowerCase())) {
-                return true
+        const homePath = decodeURIComponent(getSearch('home'))
+        const absPathLower = absPath.toLowerCase()
+        const iCloudRoot = path.join(homePath, 'Library', 'Mobile Documents')
+        if (!simpleCheckIcloudPath(absPath, homePath)) {
+            // 简单判断无法通过则复杂验证
+            const allFiles = walk(iCloudRoot)
+            for (const file of allFiles) {
+                if (-1 < absPathLower.indexOf(file.toLowerCase())) {
+                    return true
+                }
             }
         }
         return false
+    }
+
+    // 简单判断 iCloud 同步目录
+    // 不允许 为桌面 文档 和 iCloud 文件夹 和软链接
+    const simpleCheckIcloudPath = (absPath, homePath) => {
+        const fs = require('fs')
+        let stat = fs.lstatSync(absPath)
+        if (stat.isSymbolicLink()) {
+            return false
+        }
+
+        const path = require('path')
+        const absPathLower = absPath.toLowerCase()
+        const iCloudRoot = path.join(homePath, 'Library', 'Mobile Documents')
+        if (absPathLower.startsWith(iCloudRoot.toLowerCase())) {
+            return false
+        }
+
+        const documentsRoot = path.join(homePath, 'Documents')
+        if (absPathLower.startsWith(documentsRoot.toLowerCase())) {
+            return false
+        }
+
+        const desktopRoot = path.join(homePath, 'Desktop')
+        if (absPathLower.startsWith(desktopRoot.toLowerCase())) {
+            return false
+        }
+        return true
     }
 
     const walk = (dir, files = []) => {
@@ -432,7 +473,6 @@
                 console.log("dir [" + dir + "] not exists")
                 return files
             }
-
             dirFiles = fs.readdirSync(dir)
         } catch (e) {
             console.error("read dir [" + dir + "] failed: ", e)
@@ -451,9 +491,8 @@
                 if (files.includes(dir + path.sep + f)) {
                     continue
                 }
-                walk(dir + path.sep + f, files)
-            } else {
                 files.push(dir + path.sep + f)
+                walk(dir + path.sep + f, files)
             }
         }
         return files

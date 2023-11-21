@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -89,6 +89,10 @@ func EncloseHighlighting(text string, keywords []string, openMark, closeMark str
 	}
 	re := ic + "("
 	for i, k := range keywords {
+		if "" == k {
+			continue
+		}
+
 		wordBoundary := false
 		if splitWords {
 			wordBoundary = lex.IsASCIILetterNums(gulu.Str.ToBytes(k)) // Improve virtual reference split words https://github.com/siyuan-note/siyuan/issues/7833

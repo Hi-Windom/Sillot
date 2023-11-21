@@ -1,6 +1,7 @@
 /// #if !MOBILE
 import {Tab} from "../Tab";
-import {getDockByType, setPanelFocus} from "../util";
+import {setPanelFocus} from "../util";
+import {getDockByType} from "../tabUtil";
 /// #endif
 import {fetchPost} from "../../util/fetch";
 import {updateHotkeyTip} from "../../protyle/util/compatibility";
@@ -9,9 +10,9 @@ import {needSubscribe} from "../../util/needSubscribe";
 import {MenuItem} from "../../menus/Menu";
 import {confirmDialog} from "../../dialog/confirmDialog";
 import {replaceFileName} from "../../editor/rename";
-import {escapeHtml} from "../../util/escape";
-import {unicode2Emoji} from "../../emoji";
-import {Constants} from "../../constants";
+import {getDisplayName, movePathTo, pathPosix} from "../../util/pathName";
+import {App} from "../../index";
+import {getCloudURL} from "../../config/util/about";
 
 export class Inbox extends Model {
     private element: Element;
@@ -20,8 +21,8 @@ export class Inbox extends Model {
     private pageCount = 1;
     private data: { [key: string]: IInbox } = {};
 
-    constructor(tab: Tab | Element) {
-        super({id: tab.id});
+    constructor(app: App, tab: Tab | Element) {
+        super({app, id: tab.id});
         if (tab instanceof Element) {
             this.element = tab;
         } else {
@@ -89,7 +90,6 @@ export class Inbox extends Model {
                 const type = target.getAttribute("data-type");
                 if (type === "min") {
                     getDockByType("inbox").toggleModel("inbox");
-                    event.stopPropagation();
                     event.preventDefault();
                     break;
                 } else if (type === "selectall") {
@@ -106,6 +106,7 @@ export class Inbox extends Model {
                         });
                     }
                     countElement.innerHTML = `${this.selectIds.length.toString()}/${this.pageCount.toString()}`;
+                    window.siyuan.menus.menu.remove();
                     event.stopPropagation();
                     break;
                 } else if (type === "select") {
@@ -117,6 +118,7 @@ export class Inbox extends Model {
                     }
                     countElement.innerHTML = `${this.selectIds.length.toString()}/${this.pageCount.toString()}`;
                     selectAllElement.checked = this.element.lastElementChild.querySelectorAll("input:checked").length === this.element.lastElementChild.querySelectorAll(".b3-list-item").length;
+                    window.siyuan.menus.menu.remove();
                     event.stopPropagation();
                     break;
                 } else if (type === "previous") {
@@ -124,7 +126,6 @@ export class Inbox extends Model {
                         this.currentPage--;
                         this.update();
                     }
-                    event.stopPropagation();
                     event.preventDefault();
                     break;
                 } else if (type === "next") {
@@ -132,12 +133,10 @@ export class Inbox extends Model {
                         this.currentPage++;
                         this.update();
                     }
-                    event.stopPropagation();
                     event.preventDefault();
                     break;
                 } else if (type === "back") {
                     this.back();
-                    event.stopPropagation();
                     event.preventDefault();
                     break;
                 } else if (type === "more") {
@@ -155,7 +154,6 @@ export class Inbox extends Model {
                     detailsElement.classList.remove("fn__none");
                     detailsElement.scrollTop = 0;
                     this.element.lastElementChild.classList.add("fn__none");
-                    event.stopPropagation();
                     event.preventDefault();
                     break;
                 }
@@ -163,9 +161,6 @@ export class Inbox extends Model {
             }
         });
         this.update();
-        /// #if !MOBILE
-        setPanelFocus(this.element);
-        /// #endif
     }
 
     private back() {
@@ -176,7 +171,7 @@ export class Inbox extends Model {
         this.element.lastElementChild.classList.remove("fn__none");
     }
 
-    private genDetail(data:IInbox) {
+    private genDetail(data: IInbox) {
         let linkHTML = "";
         /// #if MOBILE
         if (data.shorthandURL) {
@@ -204,7 +199,7 @@ ${(Lute.New()).MarkdownStr("", data.shorthandContent)}
     </div>
     ${linkHTML}
 </div>
-<div class="b3-typography b3-typography--default" style="padding: 0 8px 8px">
+<div class="b3-typography b3-typography--default" style="padding: 0 8px 8px;user-select: text">
 ${(Lute.New()).MarkdownStr("", data.shorthandContent)}
 </div>`;
         /// #endif
@@ -230,42 +225,36 @@ ${(Lute.New()).MarkdownStr("", data.shorthandContent)}
                 }
             }
         }).element);
-        const submenu: IMenu[] = [];
-        window.siyuan.notebooks.forEach((item) => {
-            if (!item.closed) {
-                submenu.push({
-                    iconHTML: `${unicode2Emoji(item.icon || Constants.SIYUAN_IMAGE_NOTE, false, "b3-menu__icon", true)}`,
-                    label: escapeHtml(item.name),
-                    click: () => {
+        let ids: string[] = [];
+        if (detailsElement.classList.contains("fn__none")) {
+            ids = this.selectIds;
+        } else {
+            ids = [detailsElement.getAttribute("data-id")];
+        }
+        if (ids.length > 0) {
+            window.siyuan.menus.menu.append(new MenuItem({
+                label: window.siyuan.languages.move,
+                icon: "iconMove",
+                click: () => {
+                    this.move(ids);
+                }
+            }).element);
+            window.siyuan.menus.menu.append(new MenuItem({
+                label: window.siyuan.languages.remove,
+                icon: "iconTrashcan",
+                click: () => {
+                    confirmDialog(window.siyuan.languages.deleteOpConfirm, window.siyuan.languages.confirmDelete + "?", () => {
                         if (detailsElement.classList.contains("fn__none")) {
-                            this.move(item.id);
+                            this.remove();
                         } else {
-                            this.move(item.id, detailsElement.getAttribute("data-id"));
+                            this.remove(detailsElement.getAttribute("data-id"));
                         }
-                    }
-                });
-            }
-        });
-        window.siyuan.menus.menu.append(new MenuItem({
-            label: window.siyuan.languages.move,
-            icon: "iconMove",
-            submenu
-        }).element);
-        window.siyuan.menus.menu.append(new MenuItem({
-            label: window.siyuan.languages.remove,
-            icon: "iconTrashcan",
-            click: () => {
-                confirmDialog(window.siyuan.languages.deleteOpConfirm, window.siyuan.languages.confirmDelete + "?", () => {
-                    if (detailsElement.classList.contains("fn__none")) {
-                        this.remove();
-                    } else {
-                        this.remove(detailsElement.getAttribute("data-id"));
-                    }
-                });
-            }
-        }).element);
-        window.siyuan.menus.menu.popup({x: event.clientX, y: event.clientY});
-        window.siyuan.menus.menu.element.style.zIndex = "221";  // 移动端被右侧栏遮挡
+                    });
+                }
+            }).element);
+        }
+
+        window.siyuan.menus.menu.popup({x: event.clientX, y: event.clientY + 16});
     }
 
     private remove(id?: string) {
@@ -292,22 +281,17 @@ ${(Lute.New()).MarkdownStr("", data.shorthandContent)}
         });
     }
 
-    private move(notebookId: string, id?: string) {
-        let ids: string[];
-        if (id) {
-            ids = [id];
-        } else {
-            ids = this.selectIds;
-        }
-
-        ids.forEach(item => {
-            fetchPost("/api/filetree/createDoc", {
-                notebook: notebookId,
-                path: `/${Lute.NewNodeID()}.sy`,
-                title: replaceFileName(this.data[item].shorthandTitle),
-                md: this.data[item].shorthandContent,
-            }, () => {
-                this.remove(item);
+    private move(ids: string[]) {
+        movePathTo((toPath, toNotebook) => {
+            ids.forEach(item => {
+                fetchPost("/api/filetree/createDoc", {
+                    notebook: toNotebook[0],
+                    path: pathPosix().join(getDisplayName(toPath[0], false, true), Lute.NewNodeID() + ".sy"),
+                    title: replaceFileName(this.data[item].shorthandTitle),
+                    md: this.data[item].shorthandContent,
+                }, () => {
+                    this.remove(item);
+                });
             });
         });
     }
@@ -317,10 +301,10 @@ ${(Lute.New()).MarkdownStr("", data.shorthandContent)}
         if (needSubscribe("")) {
             this.element.lastElementChild.innerHTML = `<ul class="b3-list b3-list--background">
     <li class="b3-list--empty">
-        相关功能可打开帮助文档搜索 <code>收集箱</code> 查看使用说明
+        ${window.siyuan.languages.inboxTip}
     </li>
     <li class="b3-list--empty">
-        ${window.siyuan.config.system.container === "ios" ? window.siyuan.languages._kernel[122] : window.siyuan.languages._kernel[29]}
+        ${window.siyuan.config.system.container === "ios" ? window.siyuan.languages._kernel[122] : window.siyuan.languages._kernel[29].replace("${url}", getCloudURL("subscribe/siyuan"))}
     </li>
 </ul>`;
             loadingElement.classList.add("fn__none");
@@ -334,7 +318,7 @@ ${(Lute.New()).MarkdownStr("", data.shorthandContent)}
             loadingElement.classList.add("fn__none");
             let html = "";
             if (response.data.data.shorthands.length === 0) {
-                html = '<ul class="b3-list b3-list--background"><li class="b3-list--empty">打开帮助文档搜索 <b>收集箱</b> 查看使用说明</li></ul>';
+                html = `<ul class="b3-list b3-list--background"><li class="b3-list--empty">${window.siyuan.languages.inboxTip}</li></ul>`;
             } else {
                 html = '<ul style="padding: 8px 0" class="b3-list b3-list--background">';
                 response.data.data.shorthands.forEach((item: IInbox) => {

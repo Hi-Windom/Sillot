@@ -1,26 +1,3 @@
-declare const echarts: {
-    init(element: HTMLElement, theme?: string, options?: { width: number }): IEChart;
-    dispose(element: Element): void;
-    getInstanceById(id: string): { resize: () => void };
-};
-
-declare const hljs: {
-    highlight(text: string, options: { language?: string, ignoreIllegals: boolean }): { value: string };
-    getLanguage(text: string): { name: string };
-};
-
-interface IEChart {
-    setOption(option: any): void;
-
-    getZr(): any;
-
-    on(name: string, event: (e: any) => void): any;
-
-    containPixel(name: string, position: number[]): any;
-
-    resize(): void;
-}
-
 interface ILuteNode {
     TokensStr: () => string;
     __internal_object__: {
@@ -120,6 +97,42 @@ interface ILuteOptions extends IMarkdownConfig {
     lazyLoadImage?: string;
 }
 
+declare class Viz {
+    constructor(worker: { worker: Worker });
+
+    renderSVGElement: (code: string) => Promise<any>;
+}
+
+declare class Viewer {
+    public destroyed: boolean;
+
+    constructor(element: Element, options: {
+        title: [number, (image: HTMLImageElement, imageData: IObject) => string],
+        button: boolean,
+        initialViewIndex?: number,
+        transition: boolean,
+        hidden: () => void,
+        toolbar: {
+            zoomIn: boolean,
+            zoomOut: boolean,
+            oneToOne: boolean,
+            reset: boolean,
+            prev: boolean,
+            play: boolean,
+            next: boolean,
+            rotateLeft: boolean,
+            rotateRight: boolean,
+            flipHorizontal: boolean,
+            flipVertical: boolean,
+            close: () => void
+        }
+    })
+
+    public destroy(): void
+
+    public show(): void
+}
+
 declare class Lute {
     public static WalkStop: number;
     public static WalkSkipChildren: number;
@@ -146,6 +159,8 @@ declare class Lute {
     private constructor();
 
     public BlockDOM2Content(text: string): string;
+
+    public BlockDOM2EscapeMarkerContent(text: string): string;
 
     public SetTextMark(enable: boolean): void;
 
@@ -343,7 +358,7 @@ interface IHintData {
 interface IHintExtend {
     key: string;
 
-    hint?(value: string, protyle: IProtyle): IHintData[];
+    hint?(value: string, protyle: IProtyle, source: THintSource): IHintData[];
 }
 
 /** @link https://ld246.com/article/1549638745630#options-hint */
@@ -405,6 +420,8 @@ interface IOptions {
 }
 
 interface IProtyle {
+    getInstance: () => import("../protyle").Protyle,
+    app: import("../index").App,
     transactionTime: number,
     id: string,
     block: {

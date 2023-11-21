@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -79,7 +79,7 @@ func renderOutline(heading *ast.Node, luteEngine *lute.Lute) (ret string) {
 		case ast.NodeBackslashContent:
 			buf.Write(n.Tokens)
 		case ast.NodeTextMark:
-			dom := lute.RenderNodeBlockDOM(n, luteEngine.ParseOptions, luteEngine.RenderOptions)
+			dom := luteEngine.RenderNodeBlockDOM(n)
 			buf.WriteString(dom)
 			return ast.WalkSkipChildren
 		case ast.NodeImage:
@@ -94,7 +94,7 @@ func renderOutline(heading *ast.Node, luteEngine *lute.Lute) (ret string) {
 }
 
 func renderBlockText(node *ast.Node, excludeTypes []string) (ret string) {
-	ret = treenode.NodeStaticContent(node, excludeTypes, false)
+	ret = treenode.NodeStaticContent(node, excludeTypes, false, false)
 	ret = strings.TrimSpace(ret)
 	ret = strings.ReplaceAll(ret, "\n", "")
 	ret = util.EscapeHTML(ret)
@@ -157,7 +157,7 @@ func renderBlockContentByNodes(nodes []*ast.Node) string {
 
 	buf := bytes.Buffer{}
 	for _, n := range subNodes {
-		buf.WriteString(treenode.NodeStaticContent(n, nil, false))
+		buf.WriteString(treenode.NodeStaticContent(n, nil, false, false))
 	}
 	return buf.String()
 }

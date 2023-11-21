@@ -2,8 +2,10 @@
 
 ## Get the source code
 
-* `git clone --recurse-submodules git@github.com:siyuan-note/siyuan.git` For example saved in `D:/siyuan/`
-* switch to dev branch
+* `git clone --depth=1 git@github.com:siyuan-note/siyuan.git`
+* switch to dev branch `git checkout dev`
+
+Note: `app/stage/protyle/**` is managed by git lfs, and you don't need to pay attention to it under normal circumstances, related to [#9253](https://github.com/siyuan-note/siyuan/issues/9253).
 
 ## User Interface
 
@@ -14,10 +16,10 @@ Install pnpm: `npm install -g pnpm`
 
 Set the Electron mirror environment variable and install Electron:
 
-* macOS/Linux: `ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ pnpm install electron@21.4.2 -D`
+* macOS/Linux: `ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ pnpm install electron@25.9.4 -D`
 * Windows:
     * `SET ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/`
-    * `pnpm install electron@21.4.2 -D`
+    * `pnpm install electron@25.9.4 -D`
 
 NPM mirror:
 
@@ -28,13 +30,16 @@ NPM mirror:
 
 On the desktop, go to the app folder to run:
 
-* `pnpm install electron@21.4.2 -D`
+* `pnpm install electron@25.9.4 -D`
 * `pnpm run dev`
 * `pnpm run start`
 
 Note: In the development environment, the kernel process will not be automatically started, and you need to manually start the kernel process first.
 
 ## Kernel
+
+1. Install the latest version of [golang](https://go.dev/)
+2. Open CGO support, that is, configure the environment variable `CGO_ENABLED=1`
 
 ### Desktop
 
@@ -52,7 +57,7 @@ Note: In the development environment, the kernel process will not be automatical
 ### Android
 
 * `cd kernel`
-* `gomobile bind --tags fts5 -ldflags '-s -w' -v -o kernel.aar -target='android/arm64' ./mobile/`
+* `gomobile bind --tags fts5 -ldflags '-s -w' -v -o kernel.aar -target='android/arm64' -androidapi 24 ./mobile/`
 * https://github.com/siyuan-note/siyuan-android
 
 For the mobile-end, please refer to the corresponding project repository.

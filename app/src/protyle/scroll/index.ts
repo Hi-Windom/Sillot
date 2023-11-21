@@ -70,7 +70,22 @@ export class Scroll {
             mode: 0,
             size: window.siyuan.config.editor.dynamicLoadBlocks,
         }, getResponse => {
-            onGet(getResponse, protyle, [Constants.CB_GET_FOCUSFIRST, Constants.CB_GET_UNCHANGEID]);
+            onGet({
+                data: getResponse,
+                protyle,
+                action: [Constants.CB_GET_FOCUSFIRST, Constants.CB_GET_UNCHANGEID],
+            });
+        });
+    }
+
+    public updateIndex(protyle: IProtyle, id: string) {
+        fetchPost("/api/block/getBlockIndex", {id}, (response) => {
+            if (!response.data) {
+                return;
+            }
+            const inputElement = protyle.scroll.element.querySelector(".b3-slider") as HTMLInputElement;
+            inputElement.value = response.data;
+            protyle.scroll.element.setAttribute("aria-label", `Blocks ${response.data}/${protyle.block.blockCount}`);
         });
     }
 

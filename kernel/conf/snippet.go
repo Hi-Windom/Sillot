@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,6 @@ package conf
 type Snippet struct {
 	ID      string `json:"id"`
 	Name    string `json:"name"`
-	Memo    string `json:"memo"`
 	Type    string `json:"type"` // js/css
 	Enabled bool   `json:"enabled"`
 	Content string `json:"content"`

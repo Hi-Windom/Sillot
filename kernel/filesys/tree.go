@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -28,9 +28,9 @@ import (
 	"github.com/88250/lute"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
-	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/logging"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -158,20 +158,21 @@ func prepareWriteTree(tree *parse.Tree) (data []byte, filePath string, err error
 
 	filePath = filepath.Join(util.DataDir, tree.Box, tree.Path)
 	if oldSpec := tree.Root.Spec; "" == oldSpec {
-		parse.NestedInlines2FlattedSpans(tree)
+		parse.NestedInlines2FlattedSpans(tree, false)
 		tree.Root.Spec = "1"
 		logging.LogInfof("migrated tree [%s] from spec [%s] to [%s]", filePath, oldSpec, tree.Root.Spec)
 	}
 	renderer := render.NewJSONRenderer(tree, luteEngine.RenderOptions)
 	data = renderer.Render()
 
-	// .sy 文档数据使用格式化好的 JSON 而非单行 JSON
-	buf := bytes.Buffer{}
-	buf.Grow(4096)
-	if err = json.Indent(&buf, data, "", "\t"); nil != err {
-		return
+	if !util.UseSingleLineSave {
+		buf := bytes.Buffer{}
+		buf.Grow(1024 * 1024 * 2)
+		if err = json.Indent(&buf, data, "", "\t"); nil != err {
+			return
+		}
+		data = buf.Bytes()
 	}
-	data = buf.Bytes()
 
 	if err = os.MkdirAll(filepath.Dir(filePath), 0755); nil != err {
 		return
@@ -198,26 +199,28 @@ func parseJSON2Tree(boxID, p string, jsonData []byte, luteEngine *lute.Lute) (re
 
 	filePath := filepath.Join(util.DataDir, ret.Box, ret.Path)
 	if oldSpec := ret.Root.Spec; "" == oldSpec {
-		parse.NestedInlines2FlattedSpans(ret)
+		parse.NestedInlines2FlattedSpans(ret, false)
 		ret.Root.Spec = "1"
 		needFix = true
 		logging.LogInfof("migrated tree [%s] from spec [%s] to [%s]", filePath, oldSpec, ret.Root.Spec)
 	}
 	if needFix {
 		renderer := render.NewJSONRenderer(ret, luteEngine.RenderOptions)
-		output := renderer.Render()
+		data := renderer.Render()
 
-		buf := bytes.Buffer{}
-		buf.Grow(4096)
-		if err = json.Indent(&buf, output, "", "\t"); nil != err {
-			return
+		if !util.UseSingleLineSave {
+			buf := bytes.Buffer{}
+			buf.Grow(1024 * 1024 * 2)
+			if err = json.Indent(&buf, data, "", "\t"); nil != err {
+				return
+			}
+			data = buf.Bytes()
 		}
-		output = buf.Bytes()
 
 		if err = os.MkdirAll(filepath.Dir(filePath), 0755); nil != err {
 			return
 		}
-		if err = filelock.WriteFile(filePath, output); nil != err {
+		if err = filelock.WriteFile(filePath, data); nil != err {
 			msg := fmt.Sprintf("write data [%s] failed: %s", filePath, err)
 			logging.LogErrorf(msg)
 		}

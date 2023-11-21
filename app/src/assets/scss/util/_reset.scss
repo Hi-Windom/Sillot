@@ -1,3 +1,7 @@
+::selection {
+  background-color: var(--b3-theme-primary-lighter);
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
@@ -34,7 +38,7 @@ body {
       }
 
       &__tab--active {
-        .b3-list--background .b3-list-item--focus:not(.dragover):not(.dragover__top):not(.dragover__bottom) {
+        .b3-list--background .b3-list-item--focus:not(.dragover) {
           background-color: var(--b3-list-hover);
         }
 
@@ -63,6 +67,10 @@ body {
       & > .block__icons {
         padding-left: 10px;
         padding-right: 108px;
+      }
+
+      & > .block__icons > .search__label {
+        right: 108px;
       }
     }
   }
@@ -186,6 +194,11 @@ button::-moz-focus-inner,
 input::-moz-focus-inner {
   padding: 0;
   border: 0;
+}
+
+button::placeholder,
+input::placeholder {
+  color: var(--b3-empty-color);
 }
 
 button,

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,9 @@ import (
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/araddon/dateparse"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/cache"
+	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -64,7 +66,7 @@ func SetBlockReminder(id string, timed string) (err error) {
 	if ast.NodeDocument != node.Type && node.IsContainerBlock() {
 		node = treenode.FirstLeafBlock(node)
 	}
-	content := treenode.NodeStaticContent(node, nil, false)
+	content := treenode.NodeStaticContent(node, nil, false, false)
 	content = gulu.Str.SubStr(content, 128)
 	err = SetCloudBlockReminder(id, content, timedMills)
 	if nil != err {
@@ -135,6 +137,13 @@ func setNodeAttrs(node *ast.Node, tree *parse.Tree, nameValues map[string]string
 	cache.PutBlockIAL(node.ID, parse.IAL2Map(node.KramdownIAL))
 
 	pushBroadcastAttrTransactions(oldAttrs, node)
+
+	go func() {
+		if !sql.IsEmptyQueue() {
+			sql.WaitForWritingDatabase()
+		}
+		refreshDynamicRefText(node, tree)
+	}()
 	return
 }
 
@@ -167,13 +176,13 @@ func setNodeAttrs0(node *ast.Node, nameValues map[string]string) (oldAttrs map[s
 	}
 
 	for name, value := range nameValues {
-		if strings.HasPrefix(name, "av") {
+		if strings.HasPrefix(name, "custom-av") {
 			// 属性视图设置的属性值可以为空
 			node.SetIALAttr(name, value)
 			continue
 		}
 
-		if "" == value {
+		if "" == strings.TrimSpace(value) {
 			node.RemoveIALAttr(name)
 		} else {
 			node.SetIALAttr(name, value)
@@ -248,6 +257,11 @@ func GetBlockAttrs(id string) (ret map[string]string) {
 	}
 
 	node := treenode.GetNodeInTree(tree, id)
+	if nil == node {
+		logging.LogWarnf("block [%s] not found", id)
+		return
+	}
+
 	for _, kv := range node.KramdownIAL {
 		ret[kv[0]] = html.UnescapeAttrVal(kv[1])
 	}

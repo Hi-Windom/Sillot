@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -32,10 +32,11 @@ import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
-	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/logging"
-	sprig "github.com/Masterminds/sprig/v3"
+	"github.com/Masterminds/sprig/v3"
 	"github.com/araddon/dateparse"
+	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
+	"github.com/siyuan-note/siyuan/kernel/av"
 	"github.com/siyuan-note/siyuan/kernel/search"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
@@ -70,6 +71,10 @@ func SearchTemplate(keyword string) (ret []*Block) {
 	ret = []*Block{}
 
 	templates := filepath.Join(util.DataDir, "templates")
+	if !util.IsPathRegularDirOrSymlinkDir(templates) {
+		return
+	}
+
 	groups, err := os.ReadDir(templates)
 	if nil != err {
 		logging.LogErrorf("read templates failed: %s", err)
@@ -89,16 +94,17 @@ func SearchTemplate(keyword string) (ret []*Block) {
 		if group.IsDir() {
 			var templateBlocks []*Block
 			templateDir := filepath.Join(templates, group.Name())
-			filepath.Walk(templateDir, func(path string, info fs.FileInfo, err error) error {
-				name := strings.ToLower(info.Name())
+			// filepath.Walk 与 filepath.WalkDir 均不支持跟踪符号链接
+			filepath.WalkDir(templateDir, func(path string, entry fs.DirEntry, err error) error {
+				name := strings.ToLower(entry.Name())
 				if strings.HasPrefix(name, ".") {
-					if info.IsDir() {
+					if entry.IsDir() {
 						return filepath.SkipDir
 					}
 					return nil
 				}
 
-				if !strings.HasSuffix(name, ".md") || "readme.md" == name || !strings.Contains(name, k) {
+				if !strings.HasSuffix(name, ".md") || strings.HasPrefix(name, "readme") || !strings.Contains(name, k) {
 					return nil
 				}
 
@@ -141,13 +147,32 @@ func DocSaveAsTemplate(id, name string, overwrite bool) (code int, err error) {
 	tree := prepareExportTree(bt)
 	addBlockIALNodes(tree, true)
 
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		// Code content in templates is not properly escaped https://github.com/siyuan-note/siyuan/issues/9649
+		switch n.Type {
+		case ast.NodeCodeBlockCode:
+			n.Tokens = bytes.ReplaceAll(n.Tokens, []byte("&quot;"), []byte("\""))
+		case ast.NodeCodeSpanContent:
+			n.Tokens = bytes.ReplaceAll(n.Tokens, []byte("&quot;"), []byte("\""))
+		case ast.NodeTextMark:
+			if n.IsTextMarkType("code") {
+				n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, "&quot;", "\"")
+			}
+		}
+		return ast.WalkContinue
+	})
+
 	luteEngine := NewLute()
 	formatRenderer := render.NewFormatRenderer(tree, luteEngine.RenderOptions)
 	md := formatRenderer.Render()
 	name = util.FilterFileName(name) + ".md"
 	name = util.TruncateLenFileName(name)
 	savePath := filepath.Join(util.DataDir, "templates", name)
-	if gulu.File.IsExist(savePath) {
+	if filelock.IsExist(savePath) {
 		if !overwrite {
 			code = 1
 			return
@@ -158,11 +183,11 @@ func DocSaveAsTemplate(id, name string, overwrite bool) (code int, err error) {
 	return
 }
 
-func RenderTemplate(p, id string) (string, error) {
-	return renderTemplate(p, id)
+func RenderTemplate(p, id string, preview bool) (string, error) {
+	return renderTemplate(p, id, preview)
 }
 
-func renderTemplate(p, id string) (string, error) {
+func renderTemplate(p, id string, preview bool) (string, error) {
 	tree, err := loadTreeByBlockID(id)
 	if nil != err {
 		return "", err
@@ -245,6 +270,10 @@ func renderTemplate(p, id string) (string, error) {
 			// 重新生成 ID
 			n.ID = ast.NewNodeID()
 			n.SetIALAttr("id", n.ID)
+			n.RemoveIALAttr(av.NodeAttrNameAvs)
+
+			// Blocks created via template update time earlier than creation time https://github.com/siyuan-note/siyuan/issues/8607
+			refreshUpdated(n)
 		}
 
 		if (ast.NodeListItem == n.Type && (nil == n.FirstChild ||
@@ -263,7 +292,63 @@ func renderTemplate(p, id string) (string, error) {
 					unlinks = append(unlinks, n)
 				}
 			}
+		} else if n.IsTextMarkType("inline-math") {
+			if n.ParentIs(ast.NodeTableCell) {
+				// 表格中的公式中带有管道符时使用 HTML 实体替换管道符 Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
+				n.TextMarkInlineMathContent = strings.ReplaceAll(n.TextMarkInlineMathContent, "|", "&#124;")
+			}
 		}
+
+		if ast.NodeAttributeView == n.Type {
+			// 重新生成数据库视图
+			attrView, parseErr := av.ParseAttributeView(n.AttributeViewID)
+			if nil != parseErr {
+				logging.LogErrorf("parse attribute view [%s] failed: %s", n.AttributeViewID, parseErr)
+			} else {
+				cloned := av.ShallowCloneAttributeView(attrView)
+				if nil != cloned {
+					n.AttributeViewID = cloned.ID
+					if !preview {
+						// 非预览时持久化数据库
+						if saveErr := av.SaveAttributeView(cloned); nil != saveErr {
+							logging.LogErrorf("save attribute view [%s] failed: %s", cloned.ID, saveErr)
+						}
+					} else {
+						// 预览时使用简单表格渲染
+						view, getErr := attrView.GetView()
+						if nil != getErr {
+							logging.LogErrorf("get attribute view [%s] failed: %s", n.AttributeViewID, getErr)
+							return ast.WalkContinue
+						}
+
+						table, renderErr := renderAttributeViewTable(attrView, view)
+						if nil != renderErr {
+							logging.LogErrorf("render attribute view [%s] table failed: %s", n.AttributeViewID, renderErr)
+							return ast.WalkContinue
+						}
+
+						var aligns []int
+						for range table.Columns {
+							aligns = append(aligns, 0)
+						}
+						mdTable := &ast.Node{Type: ast.NodeTable, TableAligns: aligns}
+						mdTableHead := &ast.Node{Type: ast.NodeTableHead}
+						mdTable.AppendChild(mdTableHead)
+						mdTableHeadRow := &ast.Node{Type: ast.NodeTableRow, TableAligns: aligns}
+						mdTableHead.AppendChild(mdTableHeadRow)
+						for _, col := range table.Columns {
+							cell := &ast.Node{Type: ast.NodeTableCell}
+							cell.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(col.Name)})
+							mdTableHeadRow.AppendChild(cell)
+						}
+
+						n.InsertBefore(mdTable)
+						unlinks = append(unlinks, n)
+					}
+				}
+			}
+		}
+
 		return ast.WalkContinue
 	})
 	for _, n := range nodesNeedAppendChild {

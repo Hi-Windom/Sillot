@@ -2,8 +2,10 @@
 
 ## 获取源码
 
-* `git clone --recurse-submodules git@github.com:siyuan-note/siyuan.git` 例如保存在 `D:/siyuan/`
-* 切换到 dev 分支
+* `git clone --depth=1 git@github.com:siyuan-note/siyuan.git`
+* 切换到 dev 分支 `git checkout dev`
+
+备注：`app/stage/protyle/**` 使用 git lfs 管理，正常情况下无需关注，关联 [#9253](https://github.com/siyuan-note/siyuan/issues/9253)。
 
 ## NPM 依赖
 
@@ -16,11 +18,11 @@
 
 * macOS/Linux: 
  ```
- ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ pnpm install electron@21.4.2 -D
+ ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/ pnpm install electron@25.9.4 -D
  ```
 * Windows:
     * `SET ELECTRON_MIRROR=https://cnpmjs.org/mirrors/electron/`
-    * `pnpm install electron@21.4.2 -D`
+    * `pnpm install electron@25.9.4 -D`
 
 NPM 镜像：
 
@@ -30,13 +32,16 @@ NPM 镜像：
 
 桌面端进入 app 文件夹运行：
 
-* `pnpm install electron@21.4.2 -D`
+* `pnpm install electron@25.9.4 -D`
 * `pnpm run dev`
 * `pnpm run start`
 
 注意：在开发环境下不会自动拉起内核进程，需要先手动拉起内核进程。
 
 ## 内核
+
+1. 安装最新版 [golang](https://go.dev/)
+2. 打开 CGO 支持，即配置环境变量 `CGO_ENABLED=1`
 
 ### 桌面端
 
@@ -47,12 +52,14 @@ NPM 镜像：
 
 ### iOS
 
-* `gomobile bind --tags fts5 -ldflags '-s -w' -v -o ./ios/iosk.xcframework -target=ios ./kernel/mobile/`
+* `cd kernel`
+* `gomobile bind --tags fts5 -ldflags '-s -w' -v -o ./ios/iosk.xcframework -target=ios ./mobile/`
 * https://github.com/siyuan-note/siyuan-ios
 
 ### Android
 
-* `gomobile bind --tags fts5 -ldflags '-s -w' -v -o kernel.aar -target='android/arm64' ./kernel/mobile/`
+* `cd kernel`
+* `gomobile bind --tags fts5 -ldflags '-s -w' -v -o kernel.aar -target='android/arm64' -androidapi 24 ./mobile/`
 * https://github.com/siyuan-note/siyuan-android
 
 移动端请参考对应项目仓库。

@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 package util
 
 import (
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -25,11 +26,63 @@ import (
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/K-Sillot/httpclient"
-	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/imroc/req/v3"
 	"github.com/olahol/melody"
+	"github.com/siyuan-note/logging"
 )
+
+func ValidOptionalPort(port string) bool {
+	if port == "" {
+		return true
+	}
+	if port[0] != ':' {
+		return false
+	}
+	for _, b := range port[1:] {
+		if b < '0' || b > '9' {
+			return false
+		}
+	}
+	return true
+}
+
+func SplitHost(host string) (hostname, port string) {
+	hostname = host
+
+	colon := strings.LastIndexByte(hostname, ':')
+	if colon != -1 && ValidOptionalPort(hostname[colon:]) {
+		hostname, port = hostname[:colon], hostname[colon+1:]
+	}
+
+	if strings.HasPrefix(hostname, "[") && strings.HasSuffix(hostname, "]") {
+		hostname = hostname[1 : len(hostname)-1]
+	}
+
+	return
+}
+
+func IsLocalHostname(hostname string) bool {
+	if "localhost" == hostname {
+		return true
+	}
+	if ip := net.ParseIP(hostname); nil != ip {
+		return ip.IsLoopback()
+	}
+	return false
+}
+
+func IsLocalHost(host string) bool {
+	hostname, _ := SplitHost(host)
+	return IsLocalHostname(hostname)
+}
+
+func IsLocalOrigin(origin string) bool {
+	if url, err := url.Parse(origin); nil == err {
+		return IsLocalHostname(url.Hostname())
+	}
+	return false
+}
 
 func IsOnline(checkURL string, skipTlsVerify bool) bool {
 	_, err := url.Parse(checkURL)
@@ -55,13 +108,30 @@ func isOnline(checkURL string, skipTlsVerify bool) (ret bool) {
 	if skipTlsVerify {
 		c.EnableInsecureSkipVerify()
 	}
+	c.SetUserAgent(UserAgent)
 
 	for i := 0; i < 3; i++ {
-		_, err := c.R().Get(checkURL)
+		resp, err := c.R().Get(checkURL)
+		if resp.GetHeader("Location") != "" {
+			return true
+		}
+
+		switch err.(type) {
+		case *url.Error:
+			if err.(*url.Error).URL != checkURL {
+				// DNS 重定向
+				logging.LogWarnf("network is online [DNS redirect, checkURL=%s, retURL=%s]", checkURL, err.(*url.Error).URL)
+				return true
+			}
+		}
+
 		ret = nil == err
 		if ret {
 			break
 		}
+
+		time.Sleep(1 * time.Second)
+		logging.LogWarnf("check url [%s] is online failed: %s", checkURL, err)
 	}
 	return
 }

@@ -4,20 +4,20 @@ import {ipcRenderer, shell} from "electron";
 /// #endif
 import {isBrowser} from "../util/functions";
 import {fetchPost} from "../util/fetch";
-import {setAccessAuthCode} from "./util/setAccessAuthCode";
+import {setAccessAuthCode, setProxy} from "./util/about";
 import {exportLayout} from "../layout/util";
 import {exitSiYuan, processSync} from "../dialog/processSystem";
-import {openByMobile, writeText} from "../protyle/util/compatibility";
+import {isInAndroid, isInIOS, isIPad, openByMobile, writeText} from "../protyle/util/compatibility";
 import {showMessage} from "../dialog/message";
 import {Dialog} from "../dialog";
 import {confirmDialog} from "../dialog/confirmDialog";
-import {setProxy} from "./util/setProxy";
+import {setKey} from "../sync/syncGuide";
 import {isAppMode} from "sofill/env"
 
 export const about = {
     element: undefined as Element,
     genHTML: () => {
-        return `<label class="fn__flex b3-label${isBrowser() || "std" !== window.siyuan.config.system.container || "linux" === window.siyuan.config.system.os ? " fn__none" : ""}">
+        return `<label class="fn__flex b3-label${isBrowser() || window.siyuan.config.system.isMicrosoftStore || "std" !== window.siyuan.config.system.container || "linux" === window.siyuan.config.system.os ? " fn__none" : ""}">
     <div class="fn__flex-1">
         ${window.siyuan.languages.autoLaunch}
         <div class="b3-label__text">${window.siyuan.languages.autoLaunchTip}</div>
@@ -57,12 +57,33 @@ export const about = {
     <div class="fn__space"></div>
     <input class="b3-switch fn__flex-center" id="networkServe" type="checkbox"${window.siyuan.config.system.networkServe ? " checked" : ""}>
 </label>
-<label class="b3-label config__item${isBrowser() ? " fn__none" : " fn__flex"}">
+<div class="b3-label${(window.siyuan.config.readonly || (isBrowser() && !isInIOS() && !isInAndroid() && !isIPad())) ? " fn__none" : ""}">
+    <label class="fn__flex">
+        <div class="fn__flex-1">
+            ${window.siyuan.languages.about5}
+            <div class="b3-label__text">${window.siyuan.languages.about6}</div>
+        </div>
+        <div class="fn__space"></div>
+        <button class="fn__flex-center b3-button b3-button--outline fn__size200" id="authCode">
+            <svg><use xlink:href="#iconLock"></use></svg>${window.siyuan.languages.config}
+        </button>
+    </label>
+    <label class="b3-label fn__flex${!window.siyuan.config.accessAuthCode || isBrowser() ? " fn__none" : ""}">
+        <div class="fn__flex-1">
+            ${window.siyuan.languages.about7}
+            <div class="b3-label__text">${window.siyuan.languages.about8}</div>
+        </div>
+        <div class="fn__space"></div>
+        <input class="b3-switch fn__flex-center" id="lockScreenMode" type="checkbox"${window.siyuan.config.system.lockScreenMode === 1 ? " checked" : ""}>
+    </label>
+</div>
+<label class="b3-label config__item${(isBrowser() && !isInAndroid()) ? " fn__none" : " fn__flex"}">
     <div class="fn__flex-1">
        ${window.siyuan.languages.about2}
         <div class="b3-label__text">${window.siyuan.languages.about3.replace("${port}", location.port)}</div>
-        <span class="b3-label__text"><code class="fn__code">${window.siyuan.config.localIPs.join("</code> <code class='fn__code'>")}</code></span>
-      
+        <div class="b3-label__text"><code class="fn__code">${window.siyuan.config.localIPs.filter(ip => !(ip.startsWith("[") && ip.endsWith("]"))).join("</code> <code class='fn__code'>")}</code></div>
+        <div class="b3-label__text"><code class="fn__code">${window.siyuan.config.localIPs.filter(ip => (ip.startsWith("[") && ip.endsWith("]"))).join("</code> <code class='fn__code'>")}</code></div>
+        <div class="b3-label__text">${window.siyuan.languages.about18}</div>
     </div>
     <div class="fn__space"></div>
     <button data-type="open" data-url="http://${window.siyuan.config.system.networkServe ? window.siyuan.config.localIPs[0] : "127.0.0.1"}:${location.port}" class="b3-button b3-button--outline fn__size200 fn__flex-center">
@@ -84,7 +105,7 @@ ${
 <div class="fn__flex-1 fn__flex-center">
     ${window.siyuan.languages.dataRepoKey}
     <div class="b3-label__text">${window.siyuan.languages.dataRepoKeyTip1}</div>
-    <div class="b3-label__text ft__error">${window.siyuan.languages.dataRepoKeyTip2}</div>
+    <div class="b3-label__text"><span class="ft__error">${window.siyuan.languages.dataRepoKeyTip2}</span></div>
 </div>
 <div class="fn__space"></div>
 <div class="fn__size200 config__item-line fn__flex-center${window.siyuan.config.repo.key ? " fn__none" : ""}">
@@ -106,7 +127,7 @@ ${
     </button>
     <div class="fn__hr"></div>
     <button class="b3-button b3-button--outline fn__block" id="resetRepo">
-        <svg><use xlink:href="#iconTrashcan"></use></svg>${window.siyuan.languages.resetRepo}
+        <svg><use xlink:href="#iconUndo"></use></svg>${window.siyuan.languages.resetRepo}
     </button>
 </div>
 </div>
@@ -117,7 +138,7 @@ ${
     </div>
     <div class="fn__space"></div>
     <button id="purgeRepo" class="b3-button b3-button--outline fn__size200 fn__flex-center">
-        <svg><use xlink:href="#iconUpload"></use></svg>${window.siyuan.languages.purge}
+        <svg><use xlink:href="#iconTrashcan"></use></svg>${window.siyuan.languages.purge}
     </button>
 </label>` : `<div class="fn__none"></div>`
 }
@@ -135,16 +156,12 @@ ${
     <div class="fn__flex-1">
         ${window.siyuan.languages.currentVer} v${Constants.SIYUAN_VERSION}（${window.siyuan.languages.baseSY} v${Constants.SIYUAN_ORIGIN_VERSION}）
         <span id="isInsider"></span>
-        <div class="b3-label__text">${window.siyuan.languages.visitAnnouncements}</div>
+        <div class="b3-label__text">${window.siyuan.languages.downloadLatestVer}</div>
     </div>
     <div class="fn__space"></div>
     <div class="fn__flex-center fn__size200 config__item-line">
         <button id="checkUpdateBtn" class="b3-button b3-button--outline fn__block">
             <svg><use xlink:href="#iconRefresh"></use></svg>${window.siyuan.languages.checkUpdate}
-        </button>
-        <div class="fn__hr${isBrowser() ? "" : " fn__none"}"></div>
-        <button id="menuSafeQuit" class="b3-button b3-button--outline fn__block${(window.webkit?.messageHandlers || window.JSAndroid) ? "" : " fn__none"}">
-            <svg><use xlink:href="#iconQuit"></use></svg>${window.siyuan.languages.safeQuit}
         </button>
     </div>
 </label>
@@ -155,7 +172,7 @@ ${
      <div class="b3-label__text">${window.siyuan.languages.about14}</div>
 </div>
 <span class="fn__space"></span>
-<input class="b3-text-field fn__flex-center fn__size200" id="token" value="${window.siyuan.config.api.token}" readonly="readonly">
+<input class="b3-text-field fn__flex-center fn__size200" id="token" value="${window.siyuan.config.api.token}">
 </label>` : ""
 }
 <div class="b3-label${(window.siyuan.config.system.container === "std" || window.siyuan.config.system.container === "docker") ? "" : " fn__none"}">
@@ -201,13 +218,15 @@ ${
                 tokenElement.select();
             });
         }
+        tokenElement.addEventListener("change", () => {
+            fetchPost("/api/system/setAPIToken", {token: tokenElement.value}, () => {
+                window.siyuan.config.api.token = tokenElement.value;
+            });
+        });
         about.element.querySelector("#exportLog").addEventListener("click", () => {
             fetchPost("/api/system/exportLog", {}, (response) => {
                 openByMobile(response.data.zip);
             });
-        });
-        about.element.querySelector("#menuSafeQuit").addEventListener("click", () => {
-            exitSiYuan();
         });
         const updateElement = about.element.querySelector("#checkUpdateBtn");
         updateElement.addEventListener("click", () => {
@@ -219,112 +238,82 @@ ${
                 updateElement.innerHTML = `<svg><use xlink:href="#iconRefresh"></use></svg>${window.siyuan.languages.checkUpdate}`;
             });
         });
-        /// #if !BROWSER
         about.element.querySelectorAll('[data-type="open"]').forEach(item => {
             item.addEventListener("click", () => {
                 const url = item.getAttribute("data-url");
+                /// #if !BROWSER
                 if (url.startsWith("http")) {
                     shell.openExternal(url);
                 } else {
                     shell.openPath(url);
                 }
+                /// #else
+                window.open(url);
+                /// #endif
             });
         });
-        /// #endif
-        if(isAppMode(true)) {
-            about.element.querySelector("#authCode").addEventListener("click", () => {
-                setAccessAuthCode();
+
+        if(isAppMode(true)) { about.element.querySelector("#authCode").addEventListener("click", () => {
+            setAccessAuthCode();
+        });
+        const importKeyElement = about.element.querySelector("#importKey");
+        importKeyElement.addEventListener("click", () => {
+            const passwordDialog = new Dialog({
+                title: "🔑 " + window.siyuan.languages.key,
+                content: `<div class="b3-dialog__content">
+    <textarea class="b3-text-field fn__block" placeholder="${window.siyuan.languages.keyPlaceholder}"></textarea>
+</div>
+<div class="b3-dialog__action">
+    <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
+    <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
+</div>`,
+                width: "520px",
             });
-            const importKeyElement = about.element.querySelector("#importKey");
-            importKeyElement.addEventListener("click", () => {
-                const passwordDialog = new Dialog({
-                    title: "🔑 " + window.siyuan.languages.key,
-                    content: `<div class="b3-dialog__content">
-        <textarea class="b3-text-field fn__block" placeholder="${window.siyuan.languages.keyPlaceholder}"></textarea>
-    </div>
-    <div class="b3-dialog__action">
-        <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
-        <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
-    </div>`,
-                    width: "520px",
-                });
-                const textAreaElement = passwordDialog.element.querySelector("textarea");
-                textAreaElement.focus();
-                const btnsElement = passwordDialog.element.querySelectorAll(".b3-button");
-                btnsElement[0].addEventListener("click", () => {
+            const textAreaElement = passwordDialog.element.querySelector("textarea");
+            textAreaElement.focus();
+            const btnsElement = passwordDialog.element.querySelectorAll(".b3-button");
+            btnsElement[0].addEventListener("click", () => {
+                passwordDialog.destroy();
+            });
+            btnsElement[1].addEventListener("click", () => {
+                fetchPost("/api/repo/importRepoKey", {key: textAreaElement.value}, () => {
+                    window.siyuan.config.repo.key = textAreaElement.value;
+                    importKeyElement.parentElement.classList.add("fn__none");
+                    importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
                     passwordDialog.destroy();
                 });
-                btnsElement[1].addEventListener("click", () => {
-                    fetchPost("/api/repo/importRepoKey", {key: textAreaElement.value}, () => {
-                        window.siyuan.config.repo.key = textAreaElement.value;
-                        importKeyElement.parentElement.classList.add("fn__none");
-                        importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
-                        passwordDialog.destroy();
-                    });
+            });
+        });
+        about.element.querySelector("#initKey").addEventListener("click", () => {
+            confirmDialog("🔑 " + window.siyuan.languages.genKey, window.siyuan.languages.initRepoKeyTip, () => {
+                fetchPost("/api/repo/initRepoKey", {}, (response) => {
+                    window.siyuan.config.repo.key = response.data.key;
+                    importKeyElement.parentElement.classList.add("fn__none");
+                    importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
                 });
             });
-            about.element.querySelector("#initKey").addEventListener("click", () => {
-                confirmDialog("🔑 " + window.siyuan.languages.genKey, window.siyuan.languages.initRepoKeyTip, () => {
-                    fetchPost("/api/repo/initRepoKey", {}, (response) => {
-                        window.siyuan.config.repo.key = response.data.key;
-                        importKeyElement.parentElement.classList.add("fn__none");
-                        importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
-                    });
+        });
+        about.element.querySelector("#initKeyByPW").addEventListener("click", () => {
+            setKey(false, () => {
+                importKeyElement.parentElement.classList.add("fn__none");
+                importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
+            });
+        });
+        about.element.querySelector("#copyKey").addEventListener("click", () => {
+            showMessage(window.siyuan.languages.copied);
+            writeText(window.siyuan.config.repo.key);
+        });
+        about.element.querySelector("#resetRepo").addEventListener("click", () => {
+            confirmDialog("⚠️ " + window.siyuan.languages.resetRepo, window.siyuan.languages.resetRepoTip, () => {
+                fetchPost("/api/repo/resetRepo", {}, () => {
+                    window.siyuan.config.repo.key = "";
+                    window.siyuan.config.sync.enabled = false;
+                    processSync();
+                    importKeyElement.parentElement.classList.remove("fn__none");
+                    importKeyElement.parentElement.nextElementSibling.classList.add("fn__none");
                 });
             });
-            about.element.querySelector("#initKeyByPW").addEventListener("click", () => {
-                const initDialog = new Dialog({
-                    title: "🔑 " + window.siyuan.languages.genKeyByPW,
-                    content: `<div class="b3-dialog__content">
-        <input class="b3-text-field fn__block" placeholder="${window.siyuan.languages.password}">
-    </div>
-    <div class="b3-dialog__action">
-        <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
-        <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
-    </div>`,
-                    width: "520px",
-                });
-                const inputElement = initDialog.element.querySelector(".b3-text-field") as HTMLInputElement;
-                inputElement.focus();
-                const btnsElement = initDialog.element.querySelectorAll(".b3-button");
-                initDialog.bindInput(inputElement, () => {
-                    (btnsElement[1] as HTMLButtonElement).click();
-                });
-                btnsElement[0].addEventListener("click", () => {
-                    initDialog.destroy();
-                });
-                btnsElement[1].addEventListener("click", () => {
-                    if (!inputElement.value) {
-                        showMessage(window.siyuan.languages._kernel[142]);
-                        return;
-                    }
-                    confirmDialog("🔑 " + window.siyuan.languages.genKeyByPW, window.siyuan.languages.initRepoKeyTip, () => {
-                        initDialog.destroy();
-                        fetchPost("/api/repo/initRepoKeyFromPassphrase", {pass: inputElement.value}, (response) => {
-                            window.siyuan.config.repo.key = response.data.key;
-                            importKeyElement.parentElement.classList.add("fn__none");
-                            importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
-                        });
-                    });
-                });
-            });
-
-            about.element.querySelector("#copyKey").addEventListener("click", () => {
-                showMessage(window.siyuan.languages.copied);
-                writeText(window.siyuan.config.repo.key);
-            });
-            about.element.querySelector("#resetRepo").addEventListener("click", () => {
-                confirmDialog("⚠️ " + window.siyuan.languages.resetRepo, window.siyuan.languages.resetRepoTip, () => {
-                    fetchPost("/api/repo/resetRepo", {}, () => {
-                        window.siyuan.config.repo.key = "";
-                        window.siyuan.config.sync.enabled = false;
-                        processSync();
-                        importKeyElement.parentElement.classList.remove("fn__none");
-                        importKeyElement.parentElement.nextElementSibling.classList.add("fn__none");
-                    });
-                });
-            });
-        }
+        }); } // if(isAppMode(true))
         about.element.querySelector("#purgeRepo").addEventListener("click", () => {
             confirmDialog("♻️ " + window.siyuan.languages.dataRepoPurge, window.siyuan.languages.dataRepoPurgeConfirm, () => {
                 fetchPost("/api/repo/purgeRepo");
@@ -333,23 +322,39 @@ ${
         const networkServeElement = about.element.querySelector("#networkServe") as HTMLInputElement;
         networkServeElement.addEventListener("change", () => {
             fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
-                exportLayout(false, () => {
-                    exitSiYuan();
-                }, false, true);
+                exportLayout({
+                    reload: false,
+                    onlyData: false,
+                    errorExit: true,
+                    cb: exitSiYuan
+                });
+            });
+        });
+        const lockScreenModeElement = about.element.querySelector("#lockScreenMode") as HTMLInputElement;
+        lockScreenModeElement.addEventListener("change", () => {
+            fetchPost("/api/system/setFollowSystemLockScreen", {lockScreenMode: lockScreenModeElement.checked ? 1 : 0}, () => {
+                window.siyuan.config.system.lockScreenMode = lockScreenModeElement.checked ? 1 : 0;
             });
         });
         const googleAnalyticsElement = about.element.querySelector("#googleAnalytics") as HTMLInputElement;
         googleAnalyticsElement.addEventListener("change", () => {
             fetchPost("/api/system/setGoogleAnalytics", {googleAnalytics: googleAnalyticsElement.checked}, () => {
-                exportLayout(true);
+                exportLayout({
+                    reload: true,
+                    onlyData: false,
+                    errorExit: false,
+                });
             });
         });
         const uploadErrLogElement = about.element.querySelector("#uploadErrLog") as HTMLInputElement;
         uploadErrLogElement.addEventListener("change", () => {
             fetchPost("/api/system/setUploadErrLog", {uploadErrLog: uploadErrLogElement.checked}, () => {
-                exportLayout(false, () => {
-                    exitSiYuan();
-                }, false, true);
+                exportLayout({
+                    reload: false,
+                    onlyData: false,
+                    errorExit: true,
+                    cb: exitSiYuan
+                });
             });
         });
         const downloadInstallPkgElement = about.element.querySelector("#downloadInstallPkg") as HTMLInputElement;

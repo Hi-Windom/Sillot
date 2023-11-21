@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,12 +27,63 @@ import (
 	"unicode/utf8"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/logging"
 	"github.com/facette/natsort"
 	"github.com/gin-gonic/gin"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
+
+func checkWorkspaceDir(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	path := arg["path"].(string)
+	if isInvalidWorkspacePath(path) {
+		ret.Code = -1
+		ret.Msg = "This workspace name is not allowed, please use another name"
+		return
+	}
+
+	if !gulu.File.IsExist(path) {
+		ret.Code = -1
+		ret.Msg = "This workspace does not exist"
+		return
+	}
+
+	entries, err := os.ReadDir(path)
+	if nil != err {
+		ret.Code = -1
+		ret.Msg = fmt.Sprintf("read workspace dir [%s] failed: %s", path, err)
+	}
+
+	var existsConf, existsData bool
+	for _, entry := range entries {
+		if !existsConf {
+			existsConf = "conf" == entry.Name() && entry.IsDir()
+		}
+		if !existsData {
+			existsData = "data" == entry.Name() && entry.IsDir()
+		}
+
+		if existsConf && existsData {
+			break
+		}
+	}
+
+	if existsConf {
+		existsConf = gulu.File.IsExist(filepath.Join(path, "conf", "conf.json"))
+	}
+
+	ret.Data = map[string]interface{}{
+		"isWorkspace": existsConf && existsData,
+	}
+}
 
 func createWorkspaceDir(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
@@ -112,6 +163,31 @@ func removeWorkspaceDir(c *gin.Context) {
 	}
 }
 
+func removeWorkspaceDirPhysically(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	path := arg["path"].(string)
+	if gulu.File.IsDir(path) {
+		err := os.RemoveAll(path)
+		if nil != err {
+			ret.Code = -1
+			ret.Msg = err.Error()
+			return
+		}
+	}
+
+	logging.LogInfof("removed workspace [%s] physically", path)
+	if util.WorkspaceDir == path {
+		os.Exit(logging.ExitCodeOk)
+	}
+}
+
 type Workspace struct {
 	Path   string `json:"path"`
 	Closed bool   `json:"closed"`
@@ -170,10 +246,10 @@ func getWorkspaces(c *gin.Context) {
 		}
 	}
 	sort.Slice(openedWorkspaces, func(i, j int) bool {
-		return natsort.Compare(util.RemoveEmoji(filepath.Base(openedWorkspaces[i].Path)), util.RemoveEmoji(filepath.Base(openedWorkspaces[j].Path)))
+		return natsort.Compare(util.RemoveEmojiInvisible(filepath.Base(openedWorkspaces[i].Path)), util.RemoveEmojiInvisible(filepath.Base(openedWorkspaces[j].Path)))
 	})
 	sort.Slice(closedWorkspaces, func(i, j int) bool {
-		return natsort.Compare(util.RemoveEmoji(filepath.Base(closedWorkspaces[i].Path)), util.RemoveEmoji(filepath.Base(closedWorkspaces[j].Path)))
+		return natsort.Compare(util.RemoveEmojiInvisible(filepath.Base(closedWorkspaces[i].Path)), util.RemoveEmojiInvisible(filepath.Base(closedWorkspaces[j].Path)))
 	})
 	workspaces = append(workspaces, openedWorkspaces...)
 	workspaces = append(workspaces, closedWorkspaces...)
@@ -255,7 +331,8 @@ func isInvalidWorkspacePath(absPath string) bool {
 	if !gulu.File.IsValidFilename(name) {
 		return true
 	}
-	if 16 < utf8.RuneCountInString(name) {
+	if 32 < utf8.RuneCountInString(name) {
+		// Adjust workspace name length limit to 32 runes https://github.com/siyuan-note/siyuan/issues/9440
 		return true
 	}
 	toLower := strings.ToLower(name)

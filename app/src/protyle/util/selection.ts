@@ -37,12 +37,7 @@ export const fixTableRange = (range: Range) => {
             } else if (startCellElement &&
                 // 不能包含自身元素，否则对 cell 中的部分文字两次高亮后就会选中整个 cell。 https://github.com/siyuan-note/siyuan/issues/3649 第二点
                 !startCellElement.contains(range.endContainer)) {
-                const cloneRange = range.cloneRange();
-                range.setEnd(startCellElement.lastChild, startCellElement.lastChild.textContent.length);
-                if (range.toString() === "" && endCellElement) {
-                    range.setStart(endCellElement.firstChild, 0);
-                    range.setEnd(cloneRange.endContainer, cloneRange.endOffset);
-                }
+                setLastNodeRange(startCellElement, range, false);
             }
         }
     }
@@ -125,6 +120,17 @@ export const selectAll = (protyle: IProtyle, nodeElement: Element, range: Range)
     countBlockWord(ids, protyle.block.rootID);
 };
 
+// https://github.com/siyuan-note/siyuan/issues/8196
+export const getRangeByPoint = (x: number, y: number) => {
+    const range = document.caretRangeFromPoint(x, y);
+    const imgElement = hasClosestByAttribute(range.startContainer, "data-type", "img");
+    if (imgElement) {
+        range.setStart(imgElement.nextSibling, 0);
+        range.collapse();
+    }
+    return range;
+};
+
 export const getEditorRange = (element: Element) => {
     let range: Range;
     if (getSelection().rangeCount > 0) {
@@ -168,9 +174,19 @@ export const getSelectionPosition = (nodeElement: Element, range?: Range) => {
     if (range.getClientRects().length === 0) {
         if (range.startContainer.nodeType === 3) {
             // 空行时，会出现没有 br 的情况，需要根据父元素 <p> 获取位置信息
-            const parent = range.startContainer.parentElement;
-            if (parent && parent.getClientRects().length > 0) {
-                cursorRect = parent.getClientRects()[0];
+            const parentRects = range.startContainer.parentElement?.getClientRects();
+            // 连续粘贴图片时
+            const previousRects = (range.startContainer as Element).previousElementSibling?.getClientRects();
+            if (parentRects.length > 0 || previousRects.length > 0) {
+                if (parentRects.length === 0 || (previousRects &&
+                    previousRects.length > 0 && parentRects[0].top < previousRects[previousRects.length - 1].bottom)) {
+                    cursorRect = {
+                        left: previousRects[previousRects.length - 1].left,
+                        top: previousRects[previousRects.length - 1].bottom,
+                    };
+                } else {
+                    cursorRect = parentRects[0];
+                }
             } else {
                 return {
                     left: 0,
@@ -341,7 +357,7 @@ export const focusByOffset = (container: Element, start: number, end: number) =>
     window.sout.tracker(editElement);
     if (editElement) {
         container = editElement;
-    } else if (isNotEditBlock(container)) {
+    } else if (isNotEditBlock(container) || container.classList.contains("av")) {
         return focusBlock(container);
     }
     let startNode;
@@ -520,6 +536,17 @@ export const focusBlock = (element: Element, parentElement?: HTMLElement, toStar
             focusSideBlock(element);
             return false;
         }
+    } else if (element.classList.contains("av")) {
+        const avTitleElement = element.querySelector(".av__title");
+        if (avTitleElement) {
+            const range = document.createRange();
+            range.selectNodeContents(avTitleElement);
+            range.collapse();
+            focusByRange(range);
+            return range;
+        } else {
+            return false;
+        }
     }
     let cursorElement;
     if (toStart) {
@@ -547,8 +574,23 @@ export const focusBlock = (element: Element, parentElement?: HTMLElement, toStar
             range = setFirstNodeRange(cursorElement, getEditorRange(cursorElement));
             range.collapse(true);
         } else {
+            let focusHljs = false;
             // 定位到末尾 https://github.com/siyuan-note/siyuan/issues/5982
-            range = setLastNodeRange(cursorElement, getEditorRange(cursorElement));
+            if (cursorElement.classList.contains("hljs")) {
+                // 代码块末尾定位需在 /n 之前 https://github.com/siyuan-note/siyuan/issues/9141，https://github.com/siyuan-note/siyuan/issues/9189
+                let lastNode = cursorElement.lastChild;
+                if (lastNode.textContent === "" && lastNode.nodeType === 3) {
+                    lastNode = hasPreviousSibling(cursorElement.lastChild) as HTMLElement;
+                }
+                if (lastNode && lastNode.textContent.endsWith("\n")) {
+                    range = getEditorRange(cursorElement);
+                    range.setStart(lastNode, lastNode.textContent.length - 1);
+                    focusHljs = true;
+                }
+            }
+            if (!focusHljs) {
+                range = setLastNodeRange(cursorElement, getEditorRange(cursorElement));
+            }
             range.collapse(false);
         }
         focusByRange(range);

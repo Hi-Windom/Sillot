@@ -2,17 +2,15 @@ import {getAllModels} from "../layout/getAll";
 import {setInlineStyle} from "../util/assets";
 import {fetchPost} from "../util/fetch";
 import {confirmDialog} from "../dialog/confirmDialog";
-import {setPadding} from "../protyle/ui/initUI";
 import {reloadProtyle} from "../protyle/util/reload";
 import {updateHotkeyTip} from "../protyle/util/compatibility";
 import {isAppMode} from "sofill/env"
+import {Constants} from "../constants";
+import {resize} from "../protyle/util/resize";
 
 export const editor = {
     element: undefined as Element,
-    setReadonly: (readOnly?: boolean) => {
-        if (typeof readOnly === "undefined") {
-            readOnly =  document.querySelector("#barReadonly").getAttribute("aria-label") === `${window.siyuan.languages.use} ${window.siyuan.languages.editReadonly} ${updateHotkeyTip(window.siyuan.config.keymap.general.editMode.custom)}`;
-        }
+    setReadonly: (readOnly: boolean) => {
         window.siyuan.config.editor.readOnly = readOnly;
         fetchPost("/api/setting/setEditor", window.siyuan.config.editor);
     },
@@ -45,7 +43,8 @@ export const editor = {
 </label>
 <label class="fn__flex b3-label">
     <div class="fn__flex-1">
-        ${window.siyuan.languages.editReadonly}
+        ${window.siyuan.languages.editReadonly} 
+        <code class="fn__code">${updateHotkeyTip(window.siyuan.config.keymap.general.editReadonly.custom)}</code>
         <div class="b3-label__text">${window.siyuan.languages.editReadonlyTip}</div>
     </div>
     <span class="fn__space"></span>
@@ -211,7 +210,7 @@ export const editor = {
         <div class="b3-label__text">${window.siyuan.languages.historyRetentionDaysTip}</div>
     </div>
     <span class="fn__space"></span>
-    <input class="b3-text-field fn__flex-center fn__size200" id="historyRetentionDays" type="number" min="0" max="120" value="${window.siyuan.config.editor.historyRetentionDays}"/>
+    <input class="b3-text-field fn__flex-center fn__size200" id="historyRetentionDays" type="number" min="0" value="${window.siyuan.config.editor.historyRetentionDays}"/>
 </label>
 <label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
@@ -220,6 +219,14 @@ export const editor = {
     </div>
     <span class="fn__space"></span>
     ${fontFamilyHTML}
+</label>
+<label class="fn__flex b3-label">
+    <div class="fn__flex-1">
+        ${window.siyuan.languages.fontSizeScrollZoom}
+        <div class="b3-label__text">${window.siyuan.languages.fontSizeScrollZoomTip.replace("Ctrl", updateHotkeyTip("⌘"))}</div>
+    </div>
+    <span class="fn__space"></span>
+    <input class="b3-switch fn__flex-center" id="fontSizeScrollZoom" type="checkbox"${window.siyuan.config.editor.fontSizeScrollZoom ? " checked" : ""}/>
 </label>
 <label class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
@@ -246,7 +253,7 @@ export const editor = {
         ${window.siyuan.languages.katexMacros}
         <div class="b3-label__text">${window.siyuan.languages.katexMacrosTip}</div>
         <div class="fn__hr"></div>
-        <textarea class="b3-text-field fn__block" id="katexMacros">${window.siyuan.config.editor.katexMacros}</textarea>
+        <textarea class="b3-text-field fn__block" id="katexMacros" spellcheck="false">${window.siyuan.config.editor.katexMacros}</textarea>
     </div>
 </label>`;
     },
@@ -304,6 +311,7 @@ export const editor = {
                 codeLigatures: (editor.element.querySelector("#codeLigatures") as HTMLInputElement).checked,
                 codeTabSpaces: parseInt((editor.element.querySelector("#codeTabSpaces") as HTMLInputElement).value),
                 fontSize: parseInt((editor.element.querySelector("#fontSize") as HTMLInputElement).value),
+                fontSizeScrollZoom: (editor.element.querySelector("#fontSizeScrollZoom") as HTMLInputElement).checked,
                 generateHistoryInterval: parseInt((editor.element.querySelector("#generateHistoryInterval") as HTMLInputElement).value),
                 historyRetentionDays: parseInt((editor.element.querySelector("#historyRetentionDays") as HTMLInputElement).value),
                 fontFamily: fontFamilyElement.value,
@@ -335,9 +343,16 @@ export const editor = {
         }
         window.siyuan.config.editor = editorData;
         getAllModels().editor.forEach((item) => {
-            reloadProtyle(item.editor.protyle);
-            setPadding(item.editor.protyle);
-            if (window.siyuan.config.editor.fullWidth) {
+            reloadProtyle(item.editor.protyle, false);
+            let isFullWidth = item.editor.protyle.wysiwyg.element.getAttribute(Constants.CUSTOM_SY_FULLWIDTH);
+            if (!isFullWidth) {
+                isFullWidth = window.siyuan.config.editor.fullWidth ? "true" : "false";
+            }
+            if (isFullWidth === "true" && item.editor.protyle.contentElement.getAttribute("data-fullwidth") === "true") {
+                return;
+            }
+            resize(item.editor.protyle);
+            if (isFullWidth === "true") {
                 item.editor.protyle.contentElement.setAttribute("data-fullwidth", "true");
             } else {
                 item.editor.protyle.contentElement.removeAttribute("data-fullwidth");

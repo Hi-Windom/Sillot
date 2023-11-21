@@ -23,7 +23,12 @@ export const processMessage = (response: IWebSocketData) => {
         /// #if MOBILE
         window.location.reload();
         /// #else
-        exportLayout(true);
+        exportLayout({
+            reload: true,
+            onlyData: false,
+            errorExit: false,
+            dropEditScroll: response.data?.resetScroll,
+        });
         /// #endif
         return false;
     }

@@ -13,8 +13,10 @@ import {query} from "./query";
 import {Dialog} from "../dialog";
 import {ai} from "./ai";
 import {flashcard} from "./flashcard";
+import {App} from "../index";
+import {isHuawei} from "../protyle/util/compatibility";
 
-export const genItemPanel = (type: string, containerElement:Element) => {
+export const genItemPanel = (type: string, containerElement: Element, app: App) => {
     switch (type) {
         case "filetree":
             containerElement.innerHTML = fileTree.genHTML();
@@ -47,14 +49,14 @@ export const genItemPanel = (type: string, containerElement:Element) => {
             appearance.bindEvent();
             break;
         case "keymap":
-            containerElement.innerHTML = keymap.genHTML();
+            containerElement.innerHTML = keymap.genHTML(app);
             keymap.element = containerElement;
-            keymap.bindEvent();
+            keymap.bindEvent(app);
             break;
         case "bazaar":
             bazaar.element = containerElement;
             containerElement.innerHTML = bazaar.genHTML();
-            bazaar.bindEvent();
+            bazaar.bindEvent(app);
             break;
         case "account":
             containerElement.innerHTML = account.genHTML();
@@ -81,7 +83,7 @@ export const genItemPanel = (type: string, containerElement:Element) => {
     }
 };
 
-export const openSetting = () => {
+export const openSetting = (app: App) => {
     const exitDialog = window.siyuan.dialogs.find((item) => {
         if (item.element.querySelector(".config__tab-container")) {
             item.destroy();
@@ -110,25 +112,28 @@ export const openSetting = () => {
     <li data-name="repos" class="b3-list-item b3-list-item--big"><svg class="b3-list-item__graphic"><use xlink:href="#iconCloud"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.cloud}</span></li>
     <li data-name="about" class="b3-list-item b3-list-item--big"><svg class="b3-list-item__graphic"><use xlink:href="#iconInfo"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.about}</span></li>
   </ul>
-  <div class="config__tab-container" style="height:85vh" data-name="editor">${editor.genHTML()}</div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="filetree"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="card"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="AI"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="image"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="export"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="appearance"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="bazaar"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="search"></div>
-  <div class="config__tab-container fn__none" style="height:85vh;overflow: scroll" data-name="keymap"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="account"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="repos"></div>
-  <div class="config__tab-container fn__none" style="height:85vh" data-name="about"></div>
+  <div class="config__tab-wrap"> 
+      <div class="config__tab-container" style="height:85vh" data-name="editor">${editor.genHTML()}</div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="filetree"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="card"></div>
+      <div class="config__tab-container config__tab-container--top fn__none" style="height:85vh" data-name="AI"></div>
+      <div class="config__tab-container config__tab-container--top fn__none" style="height:85vh" data-name="image"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="export"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="appearance"></div>
+      <div class="config__tab-container config__tab-container--top fn__none" style="height:85vh" data-name="bazaar"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="search"></div>
+      <div class="config__tab-container fn__none" style="height:85vh;overflow: scroll" data-name="keymap"></div>
+      <div class="config__tab-container config__tab-container--full fn__none" style="height:85vh" data-name="account"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="repos"></div>
+      <div class="config__tab-container fn__none" style="height:85vh" data-name="about"></div>
 </div>
+  </div>
 </div>`,
         width: "90vw",
+        height: "90vh",
     });
 
-    initConfigSearch(dialog.element);
+    initConfigSearch(dialog.element, app);
     (dialog.element.querySelector(".b3-dialog__container") as HTMLElement).style.maxWidth = "1280px";
     dialog.element.querySelectorAll(".b3-tab-bar .b3-list-item").forEach(item => {
         item.addEventListener("click", () => {
@@ -141,7 +146,7 @@ export const openSetting = () => {
             item.classList.add("b3-list-item--focus");
             containerElement.classList.remove("fn__none");
             if (containerElement.innerHTML === "" || type === "repos" || type === "bazaar") {
-                genItemPanel(type, containerElement);
+                genItemPanel(type, containerElement, app);
             }
         });
     });

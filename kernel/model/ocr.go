@@ -1,7 +1,6 @@
 package model
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -9,8 +8,9 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
+	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -37,8 +37,9 @@ func autoOCRAssets() {
 			util.AssetsTextsLock.Lock()
 			util.AssetsTexts[p] = text
 			util.AssetsTextsLock.Unlock()
-			util.AssetsTextsChanged = true
-
+			if "" != text {
+				util.AssetsTextsChanged = true
+			}
 			if 4 <= i { // 一次任务中最多处理 4 张图片，防止卡顿
 				break
 			}
@@ -57,7 +58,7 @@ func cleanNotExistAssetsTexts() {
 	for asset, _ := range util.AssetsTexts {
 		assetAbsPath := strings.TrimPrefix(asset, "assets")
 		assetAbsPath = filepath.Join(assetsPath, assetAbsPath)
-		if !gulu.File.IsExist(assetAbsPath) {
+		if !filelock.IsExist(assetAbsPath) {
 			toRemoves = append(toRemoves, asset)
 		}
 	}
@@ -98,20 +99,12 @@ func FlushAssetsTextsJob() {
 func LoadAssetsTexts() {
 	assetsPath := util.GetDataAssetsAbsPath()
 	assetsTextsPath := filepath.Join(assetsPath, "ocr-texts.json")
-	if !gulu.File.IsExist(assetsTextsPath) {
+	if !filelock.IsExist(assetsTextsPath) {
 		return
 	}
 
 	start := time.Now()
-	var err error
-	fh, err := os.OpenFile(assetsTextsPath, os.O_RDWR, 0644)
-	if nil != err {
-		logging.LogErrorf("open assets texts failed: %s", err)
-		return
-	}
-	defer fh.Close()
-
-	data, err := io.ReadAll(fh)
+	data, err := filelock.ReadFile(assetsTextsPath)
 	if nil != err {
 		logging.LogErrorf("read assets texts failed: %s", err)
 		return
@@ -151,7 +144,7 @@ func SaveAssetsTexts() {
 
 	assetsPath := util.GetDataAssetsAbsPath()
 	assetsTextsPath := filepath.Join(assetsPath, "ocr-texts.json")
-	if err = gulu.File.WriteFileSafer(assetsTextsPath, data, 0644); nil != err {
+	if err = filelock.WriteFile(assetsTextsPath, data); nil != err {
 		logging.LogErrorf("write assets texts failed: %s", err)
 		return
 	}

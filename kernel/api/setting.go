@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,35 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
+
+func setBazaar(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	param, err := gulu.JSON.MarshalJSON(arg)
+	if nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	bazaar := &conf.Bazaar{}
+	if err = gulu.JSON.UnmarshalJSON(param, bazaar); nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	model.Conf.Bazaar = bazaar
+	model.Conf.Save()
+
+	ret.Data = bazaar
+}
 
 func setAI(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
@@ -61,9 +90,6 @@ func setAI(c *gin.Context) {
 
 	if 0 > ai.OpenAI.APIMaxTokens {
 		ai.OpenAI.APIMaxTokens = 0
-	}
-	if 4096 < ai.OpenAI.APIMaxTokens {
-		ai.OpenAI.APIMaxTokens = 4096
 	}
 
 	model.Conf.AI = ai
@@ -225,6 +251,8 @@ func setExport(c *gin.Context) {
 		if !util.IsValidPandocBin(export.PandocBin) {
 			util.PushErrMsg(fmt.Sprintf(model.Conf.Language(117), export.PandocBin), 5000)
 			export.PandocBin = util.PandocBinPath
+		} else {
+			util.PandocBinPath = export.PandocBin
 		}
 	}
 
@@ -265,6 +293,9 @@ func setFiletree(c *gin.Context) {
 	}
 
 	fileTree.DocCreateSavePath = strings.TrimSpace(fileTree.DocCreateSavePath)
+	if "../" == fileTree.DocCreateSavePath {
+		fileTree.DocCreateSavePath = "../Untitled"
+	}
 	for strings.HasSuffix(fileTree.DocCreateSavePath, "/") {
 		fileTree.DocCreateSavePath = strings.TrimSuffix(fileTree.DocCreateSavePath, "/")
 		fileTree.DocCreateSavePath = strings.TrimSpace(fileTree.DocCreateSavePath)
@@ -278,6 +309,8 @@ func setFiletree(c *gin.Context) {
 	}
 	model.Conf.FileTree = fileTree
 	model.Conf.Save()
+
+	util.UseSingleLineSave = model.Conf.FileTree.UseSingleLineSave
 
 	ret.Data = model.Conf.FileTree
 }
@@ -310,6 +343,8 @@ func setSearch(c *gin.Context) {
 	}
 
 	oldCaseSensitive := model.Conf.Search.CaseSensitive
+	oldIndexAssetPath := model.Conf.Search.IndexAssetPath
+
 	oldVirtualRefName := model.Conf.Search.VirtualRefName
 	oldVirtualRefAlias := model.Conf.Search.VirtualRefAlias
 	oldVirtualRefAnchor := model.Conf.Search.VirtualRefAnchor
@@ -317,8 +352,11 @@ func setSearch(c *gin.Context) {
 
 	model.Conf.Search = s
 	model.Conf.Save()
+
 	sql.SetCaseSensitive(s.CaseSensitive)
-	if s.CaseSensitive != oldCaseSensitive {
+	sql.SetIndexAssetPath(s.IndexAssetPath)
+
+	if needFullReindex := s.CaseSensitive != oldCaseSensitive || s.IndexAssetPath != oldIndexAssetPath; needFullReindex {
 		model.FullReindex()
 	}
 
@@ -404,11 +442,7 @@ func getCloudUser(c *gin.Context) {
 	if nil != t {
 		token = t.(string)
 	}
-	if err := model.RefreshUser(token); nil != err {
-		ret.Code = 1
-		ret.Msg = err.Error()
-		return
-	}
+	model.RefreshUser(token)
 	ret.Data = model.Conf.User
 }
 

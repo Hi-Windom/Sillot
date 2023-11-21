@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,9 @@ func main() {
 	model.InitAppearance()
 	sql.InitDatabase(false)
 	sql.InitHistoryDatabase(false)
+	sql.InitAssetContentDatabase(false)
 	sql.SetCaseSensitive(model.Conf.Search.CaseSensitive)
+	sql.SetIndexAssetPath(model.Conf.Search.IndexAssetPath)
 
 	model.BootSyncData()
 	model.InitBoxes()

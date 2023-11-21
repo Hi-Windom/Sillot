@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,9 +27,9 @@ import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
-	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
+	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -85,6 +85,32 @@ func html2BlockDOM(c *gin.Context) {
 		n.Unlink()
 	}
 
+	// 表格只包含一个单元格时，将其转换为段落
+	// Copy one cell from Excel/HTML table and paste it using the cell's content https://github.com/siyuan-note/siyuan/issues/9614
+	unlinks = nil
+	if nil != tree.Root.FirstChild && ast.NodeTable == tree.Root.FirstChild.Type && (nil == tree.Root.FirstChild.Next ||
+		(ast.NodeKramdownBlockIAL == tree.Root.FirstChild.Next.Type && nil == tree.Root.FirstChild.Next.Next)) {
+		if nil != tree.Root.FirstChild.FirstChild && ast.NodeTableHead == tree.Root.FirstChild.FirstChild.Type {
+			head := tree.Root.FirstChild.FirstChild
+			if nil == head.Next && nil != head.FirstChild && nil == head.FirstChild.Next {
+				row := head.FirstChild
+				if nil != row.FirstChild && nil == row.FirstChild.Next {
+					cell := row.FirstChild
+					p := treenode.NewParagraph()
+					var contents []*ast.Node
+					for c := cell.FirstChild; nil != c; c = c.Next {
+						contents = append(contents, c)
+					}
+					for _, c := range contents {
+						p.AppendChild(c)
+					}
+					tree.Root.FirstChild.Unlink()
+					tree.Root.PrependChild(p)
+				}
+			}
+		}
+	}
+
 	if util.ContainerStd == model.Conf.System.Container {
 		// 处理本地资源文件复制
 		ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -105,6 +131,11 @@ func html2BlockDOM(c *gin.Context) {
 			if gulu.OS.IsWindows() {
 				localPath = strings.TrimPrefix(localPath, "/")
 			}
+
+			if !filepath.IsAbs(localPath) {
+				// Kernel crash when copy-pasting from some browsers https://github.com/siyuan-note/siyuan/issues/9203
+				return ast.WalkContinue
+			}
 			if !gulu.File.IsExist(localPath) {
 				return ast.WalkContinue
 			}
@@ -124,7 +155,7 @@ func html2BlockDOM(c *gin.Context) {
 	}
 
 	// 复制带超链接的图片无法保存到本地 https://github.com/siyuan-note/siyuan/issues/5993
-	parse.NestedInlines2FlattedSpans(tree)
+	parse.NestedInlines2FlattedSpans(tree, false)
 
 	renderer := render.NewProtyleRenderer(tree, luteEngine.RenderOptions)
 	output := renderer.Render()

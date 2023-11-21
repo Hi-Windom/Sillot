@@ -1,6 +1,8 @@
 import {fetchPost} from "../../util/fetch";
 import {hasClosestByClassName} from "../../protyle/util/hasClosest";
 import {Dialog} from "../../dialog";
+import {objEquals} from "../../util/functions";
+import {confirmDialog} from "../../dialog/confirmDialog";
 
 export const renderSnippet = () => {
     fetchPost("/api/snippet/getSnippet", {type: "all", enabled: 2}, (response) => {
@@ -45,36 +47,41 @@ export const openSnippets = () => {
         });
         const dialog = new Dialog({
             width: "70vw",
-            content: `<div style="height: 60vh;" class="fn__flex-column">
-    <div class="layout-tab-bar fn__flex fn__flex-shrink" style="border-radius: 4px 4px 0 0">
-        <div data-type="css" class="item item--full item--focus"><span class="fn__flex-1"></span><span class="item__text">CSS</span><span class="fn__flex-1"></span></div>
-        <div data-type="js" class="item item--full"><span class="fn__flex-1"></span><span class="item__text">JS</span><span class="fn__flex-1"></span></div>
-    </div>
-    <div class="fn__flex-1" style="overflow:auto;padding: 16px 24px">
-        <div>
-            ${cssHTML}
-            <div class="fn__flex">
-                <div class="fn__flex-1"></div>
-                <button class="b3-button b3-button--outline fn__flex-center fn__size200" id="addCodeSnippetCSS">
-                    <svg><use xlink:href="#iconAdd"></use></svg> ${window.siyuan.languages.addAttr} CSS
-                </button>
-            </div>
+            height: "80vh",
+            content: `<div class="layout-tab-bar fn__flex fn__flex-shrink" style="border-radius: var(--b3-border-radius-b) var(--b3-border-radius-b) 0 0">
+    <div data-type="css" class="item item--full item--focus"><span class="fn__flex-1"></span><span class="item__text">CSS</span><span class="fn__flex-1"></span></div>
+    <div data-type="js" class="item item--full"><span class="fn__flex-1"></span><span class="item__text">JS</span><span class="fn__flex-1"></span></div>
+</div>
+<div class="fn__flex-1" style="overflow:auto;padding: 16px 24px">
+    <div>
+        ${cssHTML}
+        <div class="fn__flex">
+            <div class="fn__flex-1"></div>
+            <button class="b3-button b3-button--outline fn__flex-center fn__size200" id="addCodeSnippetCSS">
+                <svg><use xlink:href="#iconAdd"></use></svg> ${window.siyuan.languages.addAttr} CSS
+            </button>
         </div>
-        <div class="fn__none">
-            ${jsHTML}
-            <div class="fn__flex">
-                <div class="fn__flex-1"></div>
-                <button class="b3-button b3-button--outline fn__flex-center fn__size200" id="addCodeSnippetJS">
-                    <svg><use xlink:href="#iconAdd"></use></svg> ${window.siyuan.languages.addAttr} JS
-                </button>
-            </div>
+    </div>
+    <div class="fn__none">
+        ${jsHTML}
+        <div class="fn__flex">
+            <div class="fn__flex-1"></div>
+            <button class="b3-button b3-button--outline fn__flex-center fn__size200" id="addCodeSnippetJS">
+                <svg><use xlink:href="#iconAdd"></use></svg> ${window.siyuan.languages.addAttr} JS
+            </button>
         </div>
     </div>
 </div>
 <div class="b3-dialog__action">
     <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
     <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
-</div>`
+</div>`,
+            destroyCallback: (options) => {
+                if (options?.cancel === "true") {
+                    return;
+                }
+                setSnippet(dialog, response.data.snippets, removeIds, true);
+            }
         });
         response.data.snippets.forEach((item: ISnippet) => {
             const nameElement = (dialog.element.querySelector(`[data-id="${item.id}"] input`) as HTMLInputElement);
@@ -95,30 +102,11 @@ export const openSnippets = () => {
                 return;
             }
             if (target.classList.contains("b3-button--cancel")) {
-                dialog.destroy();
+                dialog.destroy({cancel: "true"});
                 return;
             }
             if (target.classList.contains("b3-button--text")) {
-                const snippets: ISnippet[] = [];
-                dialog.element.querySelectorAll("[data-id]").forEach((item) => {
-                    snippets.push({
-                        id: item.getAttribute("data-id"),
-                        name: item.querySelector("input").value,
-                        type: item.getAttribute("data-type"),
-                        content: item.querySelector("textarea").value,
-                        enabled: (item.querySelector(".b3-switch") as HTMLInputElement).checked
-                    });
-                });
-                fetchPost("/api/snippet/setSnippet", {snippets}, () => {
-                    removeIds.forEach(item => {
-                        const rmElement = document.querySelector(item);
-                        if (rmElement) {
-                            rmElement.remove();
-                        }
-                    });
-                    renderSnippet();
-                    dialog.destroy();
-                });
+                setSnippet(dialog, response.data.snippets, removeIds);
                 return;
             }
             const tabElement = hasClosestByClassName(target, "item");
@@ -159,6 +147,43 @@ const genSnippet = (options: ISnippet) => {
         </span>
     </div>
     <div class="fn__hr"></div>
-    <textarea class="fn__block b3-text-field" placeholder="${window.siyuan.languages.codeSnippet}" style="resize: vertical" spellcheck="false"></textarea>
+    <textarea class="fn__block b3-text-field" placeholder="${window.siyuan.languages.codeSnippet}" style="resize: vertical;font-family:var(--b3-font-family-code)" spellcheck="false"></textarea>
 </div><div class="fn__hr--b"></div>`;
+};
+
+const setSnippetPost = (dialog: Dialog, snippets: ISnippet[], removeIds: string[]) => {
+    fetchPost("/api/snippet/setSnippet", {snippets}, () => {
+        removeIds.forEach(item => {
+            const rmElement = document.querySelector(item);
+            if (rmElement) {
+                rmElement.remove();
+            }
+        });
+        renderSnippet();
+        dialog.destroy({cancel: "true"});
+    });
+};
+
+const setSnippet = (dialog: Dialog, oldSnippets: ISnippet[], removeIds: string[], confirm = false) => {
+    const snippets: ISnippet[] = [];
+    dialog.element.querySelectorAll("[data-id]").forEach((item) => {
+        snippets.push({
+            id: item.getAttribute("data-id"),
+            name: item.querySelector("input").value,
+            type: item.getAttribute("data-type"),
+            content: item.querySelector("textarea").value,
+            enabled: (item.querySelector(".b3-switch") as HTMLInputElement).checked
+        });
+    });
+    if (objEquals(oldSnippets, snippets)) {
+        dialog.destroy({cancel: "true"});
+    } else {
+        if (confirm) {
+            confirmDialog(window.siyuan.languages.save, window.siyuan.languages.snippetsTip, () => {
+                setSnippetPost(dialog, snippets, removeIds);
+            });
+        } else {
+            setSnippetPost(dialog, snippets, removeIds);
+        }
+    }
 };

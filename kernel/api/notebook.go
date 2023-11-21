@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,8 @@ import (
 	"strings"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/logging"
 	"github.com/gin-gonic/gin"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -299,6 +299,15 @@ func setNotebookConf(c *gin.Context) {
 		if !strings.HasPrefix(boxConf.DailyNoteTemplatePath, "/") {
 			boxConf.DailyNoteTemplatePath = "/" + boxConf.DailyNoteTemplatePath
 		}
+	}
+
+	boxConf.DocCreateSavePath = strings.TrimSpace(boxConf.DocCreateSavePath)
+	if "../" == boxConf.DocCreateSavePath {
+		boxConf.DocCreateSavePath = "../Untitled"
+	}
+	for strings.HasSuffix(boxConf.DocCreateSavePath, "/") {
+		boxConf.DocCreateSavePath = strings.TrimSuffix(boxConf.DocCreateSavePath, "/")
+		boxConf.DocCreateSavePath = strings.TrimSpace(boxConf.DocCreateSavePath)
 	}
 
 	box.SaveConf(boxConf)

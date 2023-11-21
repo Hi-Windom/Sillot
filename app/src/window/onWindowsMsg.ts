@@ -15,11 +15,30 @@ export const onWindowsMsg = (ipcData: IWebSocketData) => {
             closeTab(ipcData);
             break;
         case "lockscreen":
-            exportLayout(false, () => {
-                fetchPost("/api/system/logoutAuth", {}, () => {
-                    redirectToCheckAuth();
+            exportLayout({
+                reload: false,
+                onlyData: false,
+                errorExit: false,
+                cb() {
+                    fetchPost("/api/system/logoutAuth", {}, () => {
+                        redirectToCheckAuth();
+                    });
+                }
+            });
+            break;
+        case "lockscreenByMode":
+            if (window.siyuan.config.system.lockScreenMode === 1) {
+                exportLayout({
+                    reload: false,
+                    onlyData: false,
+                    errorExit: false,
+                    cb() {
+                        fetchPost("/api/system/logoutAuth", {}, () => {
+                            redirectToCheckAuth();
+                        });
+                    }
                 });
-            }, false, false);
+            }
             break;
     }
 };

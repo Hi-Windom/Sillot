@@ -17,6 +17,7 @@
 @import "business/graph";
 @import "business/layout";
 @import "business/block";
+@import "business/drag";
 @import "util/reset";
 @import "component/card";
 @import "component/menu";
@@ -31,6 +32,8 @@
 @import "business/export";
 @import "business/card";
 @import "business/custom";
+@import "business/resize";
+@import "business/av";
 
 // sillot extend start
 @import "sillot/logic";
@@ -39,45 +42,23 @@
 /*
 .status: 2
 
-// 需小于 .block__popover
-// 需小于 ctrl+p https://github.com/siyuan-note/siyuan/issues/7174
 .protyle-util: 4
 
-// 引用提示需小于 .block__popover
-.protyle-hint: 201
+.protyle-hint: 5
 
-// 需小于 .block__popover https://github.com/siyuan-note/siyuan/issues/3515
-// 需大于 .protyle-hint https://github.com/siyuan-note/siyuan/pull/7247
-ctrl+p 搜索: 202
+.side-mask: 6
 
-// 需小于 .b3-menu 悬浮窗点击更多
-// 需小于 .b3-dialog https://ld246.com/article/1637204682648
-.block__popover: 205
-.block__popover--top: 206
+Mobile #menu & .side-panel: 7
 
-// 需大于 .block__popover
-.b3-menu: 210
+.fullscreen: 8
 
-// 需小于 .b3-dialog 关于中的锁屏密码设置
-#menu & .side-panel: 220
+ window.siyuan.zIndex: 10
 
-// 需小于 #windowControls
-// 需大于 .protyle-util https://github.com/siyuan-note/siyuan/issues/5069
-.b3-dialog: 305
+#windowControls: 999998
 
-// 需大于 mobile .status、.b3-dialog
-.keyboard: 306
+.b3-snackbar: 999999
 
-// 历史中切换笔记本需临时大于 .b3-dialog https://github.com/siyuan-note/siyuan/issues/5107
-// 移动端排序和菜单需临时大于 .side-panel https://github.com/siyuan-note/siyuan/issues/5254
-.b3-menu: 310
-
-// 需大于 .b3-dialog
-progressLoading: 400
-
-#windowControls: 502
-
-.b3-snackbar: 503
+.b3-tooltips: 1000000
 */
 
 html {
@@ -93,7 +74,7 @@ html {
   width: 100% !important;
   left: 0;
   height: 100vh !important;
-  z-index: 90;
+  z-index: 8;
   border-radius: 0;
 
   & > .protyle-breadcrumb,
@@ -104,12 +85,14 @@ html {
   }
 
   .protyle-breadcrumb > .protyle-breadcrumb__space,
-  & > .block__icons > .fn__flex-1{
+  & > .block__icons > .fn__flex-1 {
     -webkit-app-region: drag;
     min-width: 32px;
+    height: 100%;
+    box-sizing: border-box;
 
     &:hover {
-      border-radius: 16px;
+      border-radius: var(--b3-border-radius-b);
       background-color: var(--b3-theme-surface-light);
     }
   }
@@ -140,6 +123,7 @@ html {
   height: 32px;
   line-height: 32px;
   padding: 0 5px 0 var(--b3-toolbar-left-mac);
+  overflow: hidden; // 最小化后右上角显示不全
   border-bottom: .5px solid var(--b3-border-color);
 
   &--browser {
@@ -148,13 +132,10 @@ html {
 
   #windowControls {
     top: 0;
-    z-index: 502;
+    z-index: 999998;
     right: 0;
     position: relative;
-
-    .toolbar__item svg {
-      width: 13px;
-    }
+    margin-left: 2px;
   }
 
   #drag {
@@ -165,13 +146,17 @@ html {
     white-space: nowrap;
     align-self: center;
     font-size: 12px;
+    min-width: 148px;
+    box-sizing: border-box;
   }
 
   &__item {
     flex-shrink: 0;
     cursor: pointer;
     color: var(--b3-toolbar-color);
-    padding: 9px;
+    padding: 5px;
+    margin: 2px;
+    border-radius: var(--b3-border-radius);
     box-sizing: border-box;
     transition: var(--b3-transition);
     display: flex;
@@ -179,10 +164,12 @@ html {
     background-color: transparent;
     border: 0;
     line-height: 13.5px;
+    height: 23.5px;
 
     &:not(.toolbar__item--disabled):not(.toolbar__item--close):hover,
     &--active {
       background-color: var(--b3-toolbar-hover);
+      color: var(--b3-theme-on-background);
     }
 
     svg {
@@ -202,8 +189,18 @@ html {
       cursor: not-allowed;
     }
 
+    &--win {
+      padding: 9px;
+      margin: 0;
+      height: 31.5px;
+      border-radius: 0;
+    }
+
     &--close {
       padding: 9px 16px;
+      margin: 0;
+      height: 31.5px;
+      border-radius: 0;
 
       svg {
         width: 10px !important;
@@ -225,6 +222,9 @@ html {
 
     .toolbar__item {
       padding: 14.25px;
+      height: auto;
+      margin: 0;
+      border-radius: 0;
 
       &:not(.toolbar__item--disabled):not(.toolbar__item--close):hover,
       &--active {
@@ -240,7 +240,6 @@ html {
     text-overflow: ellipsis;
     white-space: nowrap;
     user-select: none;
-    color: #ebecf0;
   }
 }
 
@@ -284,7 +283,7 @@ html {
 
     & > div {
       height: 4px;
-      border-radius: 4px;
+      border-radius: var(--b3-border-radius);
       overflow: hidden;
       background-color: #fff;
       width: 64px;
@@ -323,26 +322,30 @@ html {
 }
 
 .file-tree {
-  .dragover {
-    background-color: var(--b3-theme-primary-lightest);
-
-    &__top {
-      background-color: var(--b3-theme-primary-lightest);
-      box-shadow: 0 -2px 0 var(--b3-theme-primary-lighter), inset 0 2px 0 var(--b3-theme-primary-lighter);
-    }
-
-    &__bottom {
-      background-color: var(--b3-theme-primary-lightest);
-      box-shadow: 0 2px 0 var(--b3-theme-primary-lighter), inset 0px -2px 0 var(--b3-theme-primary-lighter);
-    }
-  }
-
-  &:hover .block__icons .block__icon:not([disabled]) {
+  &:hover .block__icons .block__icon:not([disabled]),
+  &.fullscreen .block__icons .block__icon:not([disabled]) {
     opacity: 1;
   }
 
   &:hover .block__icons .block__icon[disabled] {
     opacity: .38;
+  }
+
+  .dragover__top:after,
+  .dragover__bottom:after {
+    content: "";
+    width: var(--file-toggle-width);
+    height: 4px;
+    background-color: var(--b3-theme-surface);
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    z-index: 1;
+  }
+
+  .dragover__top:after {
+    top: -3px;
+    bottom: auto;
   }
 
   &__close {
@@ -362,10 +365,15 @@ html {
   line-height: 22px;
   padding: 0 8px;
   color: var(--b3-theme-on-surface-light);
-  border-radius: 2px;
+  border-radius: var(--b3-border-radius);
   font-size: 12px;
   user-select: none;
   height: 22px;
+
+  &--right {
+    width: 32px;
+    text-align: right;
+  }
 }
 
 .reveal {
@@ -385,12 +393,15 @@ html {
 
 .switch-doc {
   max-height: 70vh;
-  max-width: 768px;
+  max-width: 100%;
   min-width: 426px;
+
+  .b3-list {
+    padding: 8px 0;
+  }
 
   .b3-list:last-child {
     border-left: 1px solid var(--b3-theme-surface-lighter);
-    max-height: calc(70vh - 35px)
   }
 
   &__path {

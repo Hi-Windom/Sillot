@@ -36,7 +36,6 @@ export class Tab {
             this.headElement.setAttribute("data-type", "tab-header");
             this.headElement.setAttribute("draggable", "true");
             this.headElement.setAttribute("data-id", this.id);
-            this.headElement.setAttribute("data-position", "center"); // showTooltip 位置标识
             this.headElement.classList.add("item", "item--focus");
             let iconHTML = "";
             if (options.icon) {
@@ -54,7 +53,7 @@ export class Tab {
                     id = (this.model as Editor).editor.protyle.block.rootID;
                 } else if (!this.model) {
                     const initData = JSON.parse(this.headElement.getAttribute("data-initdata") || "{}");
-                    if (initData) {
+                    if (initData && initData.instance === "Editor") {
                         id = initData.blockId;
                     }
                 }
@@ -102,7 +101,7 @@ export class Tab {
                         (event.clientX < 0 || event.clientY < 0 || event.clientX > window.innerWidth || event.clientY > window.innerHeight)) {
                         openNewWindow(this);
                     }
-                }, Constants.TIMEOUT_BLOCKLOAD); // 等待主进程发送关闭消息
+                }, Constants.TIMEOUT_LOAD); // 等待主进程发送关闭消息
                 /// #endif
                 window.siyuan.dragElement = undefined;
                 if (event.dataTransfer.dropEffect === "none") {
@@ -209,5 +208,9 @@ export class Tab {
         if (this.docIcon || this.icon) {
             this.headElement.querySelector(".item__text").classList.remove("fn__none");
         }
+    }
+
+    public close() {
+        this.parent.removeTab(this.id);
     }
 }

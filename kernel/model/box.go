@@ -1,4 +1,4 @@
-// SiYuan - Build Your Eternal Digital Garden
+// SiYuan - Refactor your thinking
 // Copyright (c) 2020-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
@@ -31,11 +31,12 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
-	"github.com/K-Sillot/filelock"
-	"github.com/K-Sillot/logging"
 	"github.com/dustin/go-humanize"
 	"github.com/facette/natsort"
+	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
@@ -52,6 +53,10 @@ type Box struct {
 	Sort     int    `json:"sort"`
 	SortMode int    `json:"sortMode"`
 	Closed   bool   `json:"closed"`
+
+	NewFlashcardCount int `json:"newFlashcardCount"`
+	DueFlashcardCount int `json:"dueFlashcardCount"`
+	FlashcardCount    int `json:"flashcardCount"`
 
 	historyGenerated int64 // 最近一次历史生成时间
 }
@@ -106,50 +111,60 @@ func ListNotebooks() (ret []*Box, err error) {
 		boxConf := conf.NewBoxConf()
 		boxDirPath := filepath.Join(util.DataDir, dir.Name())
 		boxConfPath := filepath.Join(boxDirPath, ".siyuan", "conf.json") // 这个不要改为 .sillot
-		if !gulu.File.IsExist(boxConfPath) {
+		isExistConf := filelock.IsExist(boxConfPath)
+		if !isExistConf {
+			// 数据同步时展开文档树操作可能导致数据丢失 https://github.com/siyuan-note/siyuan/issues/7129
 			logging.LogWarnf("found a corrupted box [%s]", boxDirPath)
-			continue
-		}
-
-		data, readErr := filelock.ReadFile(boxConfPath)
-		if nil != readErr {
-			logging.LogErrorf("read box conf [%s] failed: %s", boxConfPath, readErr)
-			continue
-		}
-		if readErr = gulu.JSON.UnmarshalJSON(data, boxConf); nil != readErr {
-			logging.LogErrorf("parse box conf [%s] failed: %s", boxConfPath, readErr)
-			continue
+		} else {
+			data, readErr := filelock.ReadFile(boxConfPath)
+			if nil != readErr {
+				logging.LogErrorf("read box conf [%s] failed: %s", boxConfPath, readErr)
+				continue
+			}
+			if readErr = gulu.JSON.UnmarshalJSON(data, boxConf); nil != readErr {
+				logging.LogErrorf("parse box conf [%s] failed: %s", boxConfPath, readErr)
+				os.RemoveAll(boxConfPath)
+				continue
+			}
 		}
 
 		id := dir.Name()
-		ret = append(ret, &Box{
+		box := &Box{
 			ID:       id,
 			Name:     boxConf.Name,
 			Icon:     boxConf.Icon,
 			Sort:     boxConf.Sort,
 			SortMode: boxConf.SortMode,
 			Closed:   boxConf.Closed,
-		})
+		}
+
+		if !isExistConf {
+			// Automatically create notebook conf.json if not found it https://github.com/siyuan-note/siyuan/issues/9647
+			box.SaveConf(boxConf)
+			box.Unindex()
+			logging.LogWarnf("fixed a corrupted box [%s]", boxDirPath)
+		}
+		ret = append(ret, box)
 	}
 
 	switch Conf.FileTree.Sort {
 	case util.SortModeNameASC:
 		sort.Slice(ret, func(i, j int) bool {
-			return util.PinYinCompare(util.RemoveEmoji(ret[i].Name), util.RemoveEmoji(ret[j].Name))
+			return util.PinYinCompare(util.RemoveEmojiInvisible(ret[i].Name), util.RemoveEmojiInvisible(ret[j].Name))
 		})
 	case util.SortModeNameDESC:
 		sort.Slice(ret, func(i, j int) bool {
-			return util.PinYinCompare(util.RemoveEmoji(ret[j].Name), util.RemoveEmoji(ret[i].Name))
+			return util.PinYinCompare(util.RemoveEmojiInvisible(ret[j].Name), util.RemoveEmojiInvisible(ret[i].Name))
 		})
 	case util.SortModeUpdatedASC:
 	case util.SortModeUpdatedDESC:
 	case util.SortModeAlphanumASC:
 		sort.Slice(ret, func(i, j int) bool {
-			return natsort.Compare(util.RemoveEmoji(ret[i].Name), util.RemoveEmoji(ret[j].Name))
+			return natsort.Compare(util.RemoveEmojiInvisible(ret[i].Name), util.RemoveEmojiInvisible(ret[j].Name))
 		})
 	case util.SortModeAlphanumDESC:
 		sort.Slice(ret, func(i, j int) bool {
-			return natsort.Compare(util.RemoveEmoji(ret[j].Name), util.RemoveEmoji(ret[i].Name))
+			return natsort.Compare(util.RemoveEmojiInvisible(ret[j].Name), util.RemoveEmojiInvisible(ret[i].Name))
 		})
 	case util.SortModeCustom:
 		sort.Slice(ret, func(i, j int) bool { return ret[i].Sort < ret[j].Sort })
@@ -167,7 +182,7 @@ func (box *Box) GetConf() (ret *conf.BoxConf) {
 	ret = conf.NewBoxConf()
 
 	confPath := filepath.Join(util.DataDir, box.ID, ".siyuan/conf.json") // 这个不要改为 .sillot
-	if !gulu.File.IsExist(confPath) {
+	if !filelock.IsExist(confPath) {
 		return
 	}
 
@@ -288,7 +303,7 @@ func (box *Box) Stat(p string) (ret *FileInfo) {
 }
 
 func (box *Box) Exist(p string) bool {
-	return gulu.File.IsExist(filepath.Join(util.DataDir, box.ID, p))
+	return filelock.IsExist(filepath.Join(util.DataDir, box.ID, p))
 }
 
 func (box *Box) Mkdir(path string) error {
@@ -316,7 +331,7 @@ func (box *Box) Move(oldPath, newPath string) error {
 	fromPath := filepath.Join(boxLocalPath, oldPath)
 	toPath := filepath.Join(boxLocalPath, newPath)
 
-	if err := filelock.Move(fromPath, toPath); nil != err {
+	if err := filelock.Rename(fromPath, toPath); nil != err {
 		msg := fmt.Sprintf(Conf.Language(5), box.Name, fromPath, err)
 		logging.LogErrorf("move [path=%s] in box [%s] failed: %s", fromPath, box.Name, err)
 		return errors.New(msg)
@@ -374,6 +389,11 @@ func isSkipFile(filename string) bool {
 
 func moveTree(tree *parse.Tree) {
 	treenode.SetBlockTreePath(tree)
+
+	if hidden := tree.Root.IALAttr("custom-hidden"); "true" == hidden {
+		tree.Root.RemoveIALAttr("custom-hidden")
+		filesys.WriteTree(tree)
+	}
 	sql.UpsertTreeQueue(tree)
 
 	box := Conf.Box(tree.Box)
@@ -399,7 +419,7 @@ func (box *Box) moveTrees0(files []*FileInfo) {
 
 		treenode.SetBlockTreePath(subTree)
 		sql.RenameSubTreeQueue(subTree)
-		msg := fmt.Sprintf(Conf.Language(107), subTree.HPath)
+		msg := fmt.Sprintf(Conf.Language(107), html.EscapeString(subTree.HPath))
 		util.PushStatusBar(msg)
 	}
 }
@@ -482,6 +502,8 @@ func FullReindex() {
 	task.AppendTask(task.DatabaseIndexFull, fullReindex)
 	task.AppendTask(task.DatabaseIndexRef, IndexRefs)
 	task.AppendTask(task.ReloadUI, util.ReloadUI)
+
+	// TODO ReindexAssetContent()
 }
 
 func fullReindex() {

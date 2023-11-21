@@ -5,7 +5,6 @@ import {exportLayout} from "../layout/util";
 /// #endif
 /// #if !BROWSER
 import {ipcRenderer} from "electron";
-import {getCurrentWindow} from "@electron/remote";
 /// #endif
 import {hideMessage, showMessage} from "./message";
 import {Dialog} from "./index";
@@ -14,13 +13,16 @@ import {confirmDialog} from "./confirmDialog";
 import {escapeHtml} from "../util/escape";
 import {getWorkspaceName} from "../util/noRelyPCFunction";
 import {needSubscribe} from "../util/needSubscribe";
-import {redirectToCheckAuth} from "../util/pathName";
+import {redirectToCheckAuth, setNoteBook} from "../util/pathName";
 import { exportIDB } from "../sillot/util/sillot-idb-backup-and-restore";
 import {getAllModels} from "../layout/getAll";
 import {reloadProtyle} from "../protyle/util/reload";
 import {Tab} from "../layout/Tab";
 import {setEmpty} from "../mobile/util/setEmpty";
-import {hideElements} from "../protyle/ui/hideElements";
+import {hideAllElements, hideElements} from "../protyle/ui/hideElements";
+import {App} from "../index";
+import {saveScroll} from "../protyle/scroll/saveScroll";
+import {isInAndroid, isInIOS} from "../protyle/util/compatibility";
 
 const updateTitle = (rootID: string, tab: Tab) => {
     fetchPost("/api/block/getDocInfo", {
@@ -30,21 +32,21 @@ const updateTitle = (rootID: string, tab: Tab) => {
     });
 };
 
-export const reloadSync = (data: { upsertRootIDs: string[], removeRootIDs: string[] }) => {
+export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRootIDs: string[] }) => {
+    hideMessage();
     /// #if MOBILE
     if (window.siyuan.mobile.popEditor) {
         if (data.removeRootIDs.includes(window.siyuan.mobile.popEditor.protyle.block.rootID)) {
             hideElements(["dialog"]);
         } else {
-            reloadProtyle(window.siyuan.mobile.popEditor.protyle);
-            window.siyuan.mobile.popEditor.protyle.breadcrumb.render(window.siyuan.mobile.popEditor.protyle, true);
+            reloadProtyle(window.siyuan.mobile.popEditor.protyle, false);
         }
     }
     if (window.siyuan.mobile.editor) {
         if (data.removeRootIDs.includes(window.siyuan.mobile.editor.protyle.block.rootID)) {
-            setEmpty();
+            setEmpty(app);
         } else {
-            reloadProtyle(window.siyuan.mobile.editor.protyle);
+            reloadProtyle(window.siyuan.mobile.editor.protyle, false);
             fetchPost("/api/block/getDocInfo", {
                 id: window.siyuan.mobile.editor.protyle.block.rootID
             }, (response) => {
@@ -52,12 +54,14 @@ export const reloadSync = (data: { upsertRootIDs: string[], removeRootIDs: strin
             });
         }
     }
-    window.siyuan.mobile.files.init(false);
+    setNoteBook(() => {
+        window.siyuan.mobile.files.init(false);
+    });
     /// #else
     const allModels = getAllModels();
     allModels.editor.forEach(item => {
         if (data.upsertRootIDs.includes(item.editor.protyle.block.rootID)) {
-            reloadProtyle(item.editor.protyle);
+            reloadProtyle(item.editor.protyle, false);
             updateTitle(item.editor.protyle.block.rootID, item.parent);
         } else if (data.removeRootIDs.includes(item.editor.protyle.block.rootID)) {
             item.parent.parent.removeTab(item.parent.id, false, false, false);
@@ -98,7 +102,9 @@ export const reloadSync = (data: { upsertRootIDs: string[], removeRootIDs: strin
         }
     });
     allModels.files.forEach(item => {
-        item.init(false);
+        setNoteBook(() => {
+            item.init(false);
+        });
     });
     allModels.bookmark.forEach(item => {
         item.update();
@@ -137,7 +143,7 @@ export const kernelError = () => {
         return;
     }
     let iosReStart = "";
-    if (window.siyuan.config.system.container === "ios" && window.webkit?.messageHandlers) {
+    if (isInIOS()) {
         iosReStart = `<div class="fn__hr"></div><div class="fn__flex"><div class="fn__flex-1"></div><button class="b3-button">${window.siyuan.languages.retry}</button></div>`;
     }
     const dialog = new Dialog({
@@ -165,6 +171,10 @@ export const kernelError = () => {
 
 export const exitSiYuan = () => {
     exportIDB().then(() => {
+    hideAllElements(["util"]);
+    /// #if MOBILE
+    saveScroll(window.siyuan.mobile.editor.protyle);
+    /// #endif
     fetchPost("/api/system/exit", {force: false}, (response) => {
         if (response.code === 1) { // 同步执行失败
             const msgId = showMessage(response.msg, response.data.closeTimeout, "error");
@@ -175,7 +185,7 @@ export const exitSiYuan = () => {
                         /// #if !BROWSER
                         ipcRenderer.send(Constants.SIYUAN_QUIT, location.port);
                         /// #else
-                        if (["ios", "android"].includes(window.siyuan.config.system.container) && (window.webkit?.messageHandlers || window.JSAndroid)) {
+                        if (isInIOS() || isInAndroid()) {
                             window.location.href = "siyuan://api/system/exit";
                         }
                         /// #endif
@@ -193,7 +203,7 @@ export const exitSiYuan = () => {
                     // 桌面端退出拉起更新安装时有时需要重启两次 https://github.com/siyuan-note/siyuan/issues/6544
                     // 这里先将主界面隐藏
                     setTimeout(() => {
-                        getCurrentWindow().hide();
+                        ipcRenderer.send(Constants.SIYUAN_CMD, "hide");
                     }, 2000);
                     // 然后等待一段时间后再退出，避免界面主进程退出以后内核子进程被杀死
                     setTimeout(() => {
@@ -215,7 +225,7 @@ export const exitSiYuan = () => {
             /// #if !BROWSER
             ipcRenderer.send(Constants.SIYUAN_QUIT, location.port);
             /// #else
-            if (["ios", "android"].includes(window.siyuan.config.system.container) && (window.webkit?.messageHandlers || window.JSAndroid)) {
+            if (isInIOS() || isInAndroid()) {
                 window.location.href = "siyuan://api/system/exit";
             }
             /// #endif
@@ -244,9 +254,12 @@ export const transactionError = () => {
         /// #if MOBILE
         exitSiYuan();
         /// #else
-        exportLayout(false, () => {
-            exitSiYuan();
-        }, false, true);
+        exportLayout({
+            reload: false,
+            onlyData: false,
+            errorExit: true,
+            cb: exitSiYuan
+        });
         /// #endif
     });
     btnsElement[1].addEventListener("click", () => {
@@ -278,7 +291,7 @@ export const progressStatus = (data: IWebSocketData) => {
 export const progressLoading = (data: IWebSocketData) => {
     let progressElement = document.getElementById("progress");
     if (!progressElement) {
-        document.body.insertAdjacentHTML("beforeend", '<div id="progress"></div>');
+        document.body.insertAdjacentHTML("beforeend", `<div id="progress" style="z-index: ${++window.siyuan.zIndex}"></div>`);
         progressElement = document.getElementById("progress");
     }
     // code 0: 有进度；1: 无进度；2: 关闭
@@ -287,19 +300,19 @@ export const progressLoading = (data: IWebSocketData) => {
         return;
     }
     if (data.code === 0) {
-        progressElement.innerHTML = /*html*/ `<div class="b3-dialog__scrim" style="z-index:400;opacity: 1"></div>
-<div style="position: fixed;top: 45vh;width: 70vw;left: 15vw;color:#fff;z-index:400;">
+        progressElement.innerHTML = /*html*/ `<div class="b3-dialog__scrim" style="opacity: 1"></div>
+<div style="position: fixed;top: 45vh;width: 70vw;left: 15vw;color:var(--b3-theme-on-surface);">
     <div style="text-align: right">${data.data.current}/${data.data.total}</div>
-    <div style="margin: 8px 0;height: 8px;border-radius: 4px;overflow: hidden;background-color:#fff;"><div style="width: ${data.data.current / data.data.total * 100}%;transition: var(--b3-transition);background-color: var(--b3-theme-primary);height: 8px;"></div></div>
+    <div style="margin: 8px 0;height: 8px;border-radius: var(--b3-border-radius);overflow: hidden;background-color:#fff;"><div style="width: ${data.data.current / data.data.total * 100}%;transition: var(--b3-transition);background-color: var(--b3-theme-primary);height: 8px;"></div></div>
     <div>${data.msg}</div>
 </div>`;
     } else if (data.code === 1) {
         if (progressElement.lastElementChild) {
             progressElement.lastElementChild.lastElementChild.innerHTML = data.msg;
         } else {
-            progressElement.innerHTML = /*html*/ `<div class="b3-dialog__scrim" style="z-index:400;opacity: 1"></div>
-<div style="position: fixed;top: 45vh;width: 70vw;left: 15vw;color:#fff;z-index:400;">
-    <div style="margin: 8px 0;height: 8px;border-radius: 4px;overflow: hidden;background-color:#fff;"><div style="background-color: var(--b3-theme-primary);height: 8px;background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);animation: stripMove 450ms linear infinite;background-size: 50px 50px;"></div></div>
+            progressElement.innerHTML = /*html*/ `<div class="b3-dialog__scrim" style="opacity: 1"></div>
+<div style="position: fixed;top: 45vh;width: 70vw;left: 15vw;color:var(--b3-theme-on-surface);">
+    <div style="margin: 8px 0;height: 8px;border-radius: var(--b3-border-radius);overflow: hidden;background-color:#fff;"><div style="background-color: var(--b3-theme-primary);height: 8px;background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);animation: stripMove 450ms linear infinite;background-size: 50px 50px;"></div></div>
     <div>${data.msg}</div>
 </div>`;
         }
@@ -360,7 +373,7 @@ export const setTitle = (title: string) => {
     const dragElement = document.getElementById("drag");
     const workspaceName = getWorkspaceName();
     if (title === window.siyuan.languages.siyuanNote) {
-        const versionTitle = `${title} - ${workspaceName} - v${Constants.SIYUAN_VERSION}`;
+        const versionTitle = `${workspaceName} - ${window.siyuan.languages.siyuanNote} v${Constants.SIYUAN_VERSION}`;
         document.title = versionTitle;
         if (dragElement) {
             dragElement.textContent = versionTitle;
@@ -436,7 +449,6 @@ export const processSync = (data?: IWebSocketData) => {
     if (!data) {
         iconElement.classList.remove("toolbar__item--active");
         if (!window.siyuan.config.sync.enabled || (0 === window.siyuan.config.sync.provider && needSubscribe(""))) {
-            iconElement.setAttribute("aria-label", window.siyuan.languages["_kernel"]["53"]);
             useElement.setAttribute("xlink:href", "#iconCloudOff");
         } else {
             useElement.setAttribute("xlink:href", "#iconCloudSucc");
@@ -455,6 +467,5 @@ export const processSync = (data?: IWebSocketData) => {
         iconElement.classList.remove("toolbar__item--active");
         useElement.setAttribute("xlink:href", "#iconCloudSucc");
     }
-    iconElement.setAttribute("aria-label", data.msg);
     /// #endif
 };

@@ -1,4 +1,4 @@
-import { highlightRender } from "../protyle/markdown/highlightRender";
+import { highlightRender } from "../protyle/render/highlightRender";
 const lodash = require("lodash");
 import { exAce } from "./ace";
 import { Toastify } from "./react-toastify";
