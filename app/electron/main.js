@@ -657,14 +657,30 @@ setProtocol("sillot");
 setProtocol("sisi");
 
 app.commandLine.appendSwitch('ignore-certificate-errors') // 忽略证书相关错误
+app.setPath("userData", app.getPath("userData") + "-Electron"); // `~/.config` 下 Electron 相关文件夹名称改为 `SiYuan-Electron` https://github.com/siyuan-note/siyuan/issues/3349
+
 app.commandLine.appendSwitch("disable-web-security");
 app.commandLine.appendSwitch("auto-detect", "false");
-app.commandLine.appendSwitch("no-proxy-server"); // 不使用任何代理，强制直连，该参数会覆盖任何代理设置
-app.commandLine.appendSwitch("enable-features", "PlatformHEVCDecoderSupport"); // 列表以逗号分隔要禁用的要素的名称。有关详细信息，请参阅base::FeatureList::InitializeFromCommandLine。
-// PlatformHEVCDecoderSupport       HEVC硬件解码支持---Windows以外平台需要提供解码包
-app.commandLine.appendSwitch("force_high_performance_gpu"); // 当有多个GPU可用时，强制使用独立显卡  REF https://www.electronjs.org/zh/docs/latest/api/command-line-switches
+app.commandLine.appendSwitch("no-proxy-server");
+app.commandLine.appendSwitch("enable-features", "PlatformHEVCDecoderSupport");
+app.commandLine.appendSwitch("force_high_performance_gpu"); // Force using discrete GPU when there are multiple GPUs available on the desktop https://github.com/siyuan-note/siyuan/issues/9694
 
-app.setPath("userData", app.getPath("userData") + "-Electron"); // `~/.config` 下 Electron 相关文件夹名称改为 `SiYuan-Electron` https://github.com/siyuan-note/siyuan/issues/3349
+// Support set Chromium command line arguments on the desktop https://github.com/siyuan-note/siyuan/issues/9696
+writeLog("app is packaged [" + app.isPackaged + "], command line args [" + process.argv.join(", ") + "]");
+let argStart = 1;
+if (!app.isPackaged) {
+    argStart = 2;
+}
+for (let i = argStart; i < process.argv.length; i++) {
+    let arg = process.argv[i];
+    if (arg.startsWith("--workspace=") || arg.startsWith("--port=") || arg.startsWith("siyuan://")) {
+        // 跳过内置参数
+        continue;
+    }
+
+    app.commandLine.appendSwitch(arg);
+    writeLog("command line switch [" + arg + "]");
+}
 
 app.whenReady().then(() => {
   const loadExtension = (P)=> {
