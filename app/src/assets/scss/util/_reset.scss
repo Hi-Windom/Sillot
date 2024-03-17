@@ -157,11 +157,11 @@ sup {
 }
 
 sup {
-  top: -0.5em;
+  top: -.5em;
 }
 
 sub {
-  bottom: -0.25em;
+  bottom: -.25em;
 }
 
 img {
@@ -171,7 +171,10 @@ img {
   height: auto;
   -ms-interpolation-mode: bicubic;
   overflow: hidden;
-  font-size: 12px;
+
+  &:not(.emoji) {
+    font-size: 12px;
+  }
 }
 
 button,

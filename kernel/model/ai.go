@@ -40,6 +40,12 @@ func ChatGPTWithAction(ids []string, action string) (ret string) {
 		return
 	}
 
+	if "Clear context" == action {
+		// AI clear context action https://github.com/siyuan-note/siyuan/issues/10255
+		cachedContextMsg = nil
+		return
+	}
+
 	msg := getBlocksContent(ids)
 	ret = chatGPTWithAction(msg, action, false)
 	return
@@ -48,6 +54,12 @@ func ChatGPTWithAction(ids []string, action string) (ret string) {
 var cachedContextMsg []string
 
 func chatGPT(msg string, cloud bool) (ret string) {
+	if "Clear context" == strings.TrimSpace(msg) {
+		// AI clear context action https://github.com/siyuan-note/siyuan/issues/10255
+		cachedContextMsg = nil
+		return
+	}
+
 	ret, retCtxMsgs, err := chatGPTContinueWrite(msg, cachedContextMsg, cloud)
 	if nil != err {
 		return
@@ -80,7 +92,7 @@ func chatGPTContinueWrite(msg string, contextMsgs []string, cloud bool) (ret str
 	if cloud {
 		gpt = &CloudGPT{}
 	} else {
-		gpt = &OpenAIGPT{c: util.NewOpenAIClient(Conf.AI.OpenAI.APIKey, Conf.AI.OpenAI.APIProxy, Conf.AI.OpenAI.APIBaseURL)}
+		gpt = &OpenAIGPT{c: util.NewOpenAIClient(Conf.AI.OpenAI.APIKey, Conf.AI.OpenAI.APIProxy, Conf.AI.OpenAI.APIBaseURL, Conf.AI.OpenAI.APIUserAgent, Conf.AI.OpenAI.APIVersion, Conf.AI.OpenAI.APIProvider)}
 	}
 
 	buf := &bytes.Buffer{}
@@ -120,7 +132,7 @@ func getBlocksContent(ids []string) string {
 
 		var tree *parse.Tree
 		if tree = trees[bt.RootID]; nil == tree {
-			tree, _ = loadTreeByBlockID(bt.RootID)
+			tree, _ = LoadTreeByBlockID(bt.RootID)
 			if nil == tree {
 				continue
 			}

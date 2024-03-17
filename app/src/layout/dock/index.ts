@@ -87,7 +87,7 @@ export class Dock {
         }
         if (!showDock) {
             this.element.firstElementChild.innerHTML = `<span class="dock__item dock__item--pin b3-tooltips b3-tooltips__${this.getClassDirect(0)}" aria-label="${this.pin ? window.siyuan.languages.unpin : window.siyuan.languages.pin}">
-    <svg><use xlink:href="#iconPin"></use></svg>
+    <svg><use xlink:href="#icon${this.pin ? "Unpin" : "Pin"}"></use></svg>
 </span>`;
             this.element.classList.add("fn__none");
         } else {
@@ -102,8 +102,8 @@ export class Dock {
         // 初始化文件树
         this.element.querySelectorAll(".dock__item").forEach(item => {
             if (item.getAttribute("data-type") === "file" && !item.classList.contains("dock__item--active")) {
-                this.toggleModel("file", true);
-                this.toggleModel("file");
+                this.toggleModel("file", true, false, false, false);
+                this.toggleModel("file", false, false, false, false);
             }
         });
 
@@ -111,7 +111,7 @@ export class Dock {
             this.resizeElement.classList.add("fn__none");
         } else {
             activeElements.forEach(item => {
-                this.toggleModel(item.getAttribute("data-type"), true);
+                this.toggleModel(item.getAttribute("data-type"), true, false, false, false);
             });
         }
         this.element.addEventListener("click", (event) => {
@@ -125,6 +125,7 @@ export class Dock {
                 } else if (target.classList.contains("dock__item")) {
                     this.togglePin();
                     target.setAttribute("aria-label", this.pin ? window.siyuan.languages.unpin : window.siyuan.languages.pin);
+                    target.querySelector("use").setAttribute("xlink:href", this.pin ? "#iconUnpin" : "#iconPin");
                     event.preventDefault();
                     break;
                 }
@@ -256,6 +257,18 @@ export class Dock {
             this.layout.element.clientHeight === 0 && this.layout.element.style.height.startsWith("0")) {
             return;
         }
+        if ((
+            document.querySelector(".b3-dialog") ||
+            document.querySelector(".block__popover") ||
+            document.querySelector("#commonMenu:not(.fn__none)")
+        ) && (
+            window.siyuan.layout.leftDock?.layout.element.style.opacity === "1" ||
+            window.siyuan.layout.rightDock?.layout.element.style.opacity === "1" ||
+            window.siyuan.layout.bottomDock?.layout.element.style.opacity === "1"
+        )) {
+            return;
+        }
+
         if (!reset) {
             this.layout.element.style.opacity = "1";
         }
@@ -280,6 +293,15 @@ export class Dock {
         if (document.activeElement && this.layout.element.contains(document.activeElement) && document.activeElement.classList.contains("b3-text-field")) {
             return;
         }
+        const dialogElement = document.querySelector(".b3-dialog") as HTMLElement;
+        const blockElement = document.querySelector(".block__popover") as HTMLElement;
+        const menuElement = document.querySelector("#commonMenu:not(.fn__none)") as HTMLElement;
+        if ((dialogElement && dialogElement.style.zIndex > this.layout.element.style.zIndex) ||  // 文档树上修改 emoji 时
+            (blockElement && blockElement.style.zIndex > this.layout.element.style.zIndex) ||  // 文档树上弹出悬浮层
+            (menuElement && menuElement.style.zIndex > this.layout.element.style.zIndex)  // 面板上弹出菜单时
+        ) {
+            return;
+        }
         if (this.position === "Left") {
             this.layout.element.style.transform = `translateX(-${this.layout.element.clientWidth + 8}px)`;
             this.layout.element.style.left = "";
@@ -298,7 +320,7 @@ export class Dock {
         this.layout.element.querySelector(".layout__tab--active")?.classList.remove("layout__tab--active");
     }
 
-    public toggleModel(type: string, show = false, close = false, hide = false) {
+    public toggleModel(type: string, show = false, close = false, hide = false, isSaveLayout = true) {
         if (!type) {
             return;
         }
@@ -343,9 +365,9 @@ export class Dock {
             if ((type === "graph" || type === "globalGraph") && this.layout.element.querySelector(".fullscreen")) {
                 document.getElementById("drag")?.classList.remove("fn__hidden");
             }
-            // 关闭 dock 后设置光标
-            if (!document.querySelector(".layout__center .layout__wnd--active")) {
-                const currentElement = document.querySelector(".layout__center .layout-tab-bar .item--focus");
+            // 关闭 dock 后设置光标，初始化的时候不能设置，否则关闭文档树且多页签时会请求两次 getDoc
+            if (isSaveLayout && !document.querySelector(".layout__center .layout__wnd--active")) {
+                const currentElement = document.querySelector(".layout__center ul.layout-tab-bar .item--focus");
                 if (currentElement) {
                     getAllTabs().find(item => {
                         if (item.id === currentElement.getAttribute("data-id")) {
@@ -468,7 +490,7 @@ export class Dock {
                         });
                         break;
                 }
-                wnd.addTab(tab);
+                wnd.addTab(tab, false, false);
                 target.setAttribute("data-id", tab.id);
                 this.data[type] = tab.model;
                 setPanelFocus(tab.panelElement);
@@ -556,7 +578,7 @@ export class Dock {
             anotherWnd.element.style.height = "";
             anotherWnd.element.style.width = "";
         }
-        resizeTabs();
+        resizeTabs(isSaveLayout);
         this.showDock();
     }
 
@@ -677,7 +699,7 @@ export class Dock {
                 }
             } else {
                 this.element.firstElementChild.innerHTML = `${html}<span class="dock__item dock__item--pin b3-tooltips b3-tooltips__${this.getClassDirect(index)}" aria-label="${this.pin ? window.siyuan.languages.unpin : window.siyuan.languages.pin}">
-    <svg><use xlink:href="#iconPin"></use></svg>
+    <svg><use xlink:href="#icon${this.pin ? "Unpin" : "Pin"}"></use></svg>
 </span>`;
             }
         } else {
@@ -698,7 +720,7 @@ export class Dock {
                 this.element.classList.remove("fn__none");
             }
             if (data[0].show) {
-                this.toggleModel(data[0].type, true);
+                this.toggleModel(data[0].type, true, false, false, false);
             }
         }
     }

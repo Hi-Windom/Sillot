@@ -21,13 +21,13 @@ import {getSearch} from "../util/functions";
 import {initRightMenu} from "./menu";
 import {openChangelog} from "../boot/openChangelog";
 import {registerServiceWorker} from "../util/serviceWorker";
-import {afterLoadPlugin, loadPlugins} from "../plugin/loader";
+import {loadPlugins} from "../plugin/loader";
 import { SillotEnv } from "../sillot";
 import VConsole from 'vconsole';
 import {saveScroll} from "../protyle/scroll/saveScroll";
 import {removeBlock} from "../protyle/wysiwyg/remove";
 import {isNotEditBlock} from "../protyle/wysiwyg/getBlock";
-import {Menu} from "../plugin/Menu";
+import {updateCardHV} from "../card/util";
 
 class App {
     public plugins: import("../plugin").Plugin[] = [];
@@ -83,12 +83,16 @@ class App {
         window.addEventListener("pagehide", () => {
             saveScroll(window.siyuan.mobile.editor.protyle);
         }, false);
+        // 判断手机横竖屏状态
+        window.matchMedia("(orientation:portrait)").addEventListener("change", () => {
+            updateCardHV();
+        });
         fetchPost("/api/system/getConf", {}, async (confResponse) => {
             confResponse.data.conf.keymap = Constants.SIYUAN_KEYMAP;
             window.siyuan.config = confResponse.data.conf;
             await loadPlugins(this);
             getLocalStorage(() => {
-                fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
+                fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages: IObject) => {
                     window.siyuan.languages = lauguages;
                     window.siyuan.menus = new Menus(this);
                     document.title = window.siyuan.languages.siyuanNote;
@@ -104,14 +108,8 @@ class App {
                                 initFramework(this, confResponse.data.start);
                             console.log("initFramework() invoked");
                                 initRightMenu(this);
-                                console.log("initRightMenu() invoked");
-                            openChangelog();
-                                const unPinsMenu: IMenu[] = [];
-                                this.plugins.forEach(item => {
-                                    afterLoadPlugin(item);
-                                });
+                                openChangelog();
                             });
-                            console.log("openChangelog() invoked");
                         });
                     });
                     addGA();
@@ -133,7 +131,7 @@ class App {
                         const nodeElement = hasClosestBlock(range.startContainer);
                         if (nodeElement && isNotEditBlock(nodeElement)) {
                             nodeElement.classList.add("protyle-wysiwyg--select");
-                            removeBlock(editor.protyle, nodeElement, range);
+                            removeBlock(editor.protyle, nodeElement, range, event.key);
                             event.stopPropagation();
                             event.preventDefault();
                             return;
@@ -156,14 +154,14 @@ window.reconnectWebSocket = () => {
 };
 window.goBack = goBack;
 window.showKeyboardToolbar = (height) => {
-    document.getElementById("keyboardToolbar").setAttribute("data-keyboardheight", (height ? height : window.innerHeight / 2 - 42).toString());
+    document.getElementById("keyboardToolbar").setAttribute("data-keyboardheight", (height ? height : window.outerHeight / 2 - 42).toString());
     showKeyboardToolbar();
 };
 window.hideKeyboardToolbar = hideKeyboardToolbar;
 window.openFileByURL = (openURL) => {
     if (openURL && isSYProtocol(openURL)) {
         openMobileFileById(siyuanApp, getIdFromSYProtocol(openURL),
-            getSearch("focus", openURL) === "1" ? [Constants.CB_GET_ALL, Constants.CB_GET_FOCUS] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
+            getSearch("focus", openURL) === "1" ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
         return true;
     }
     return false;

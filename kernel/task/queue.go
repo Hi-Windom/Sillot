@@ -45,7 +45,7 @@ func AppendTask(action string, handler interface{}, args ...interface{}) {
 }
 
 func AppendTaskWithTimeout(action string, timeout time.Duration, handler interface{}, args ...interface{}) {
-	if util.IsExiting {
+	if util.IsExiting.Load() {
 		//logging.LogWarnf("task queue is paused, action [%s] will be ignored", action)
 		return
 	}
@@ -69,15 +69,18 @@ func AppendTaskWithTimeout(action string, timeout time.Duration, handler interfa
 
 func getCurrentActions() (ret []string) {
 	queueLock.Lock()
-	defer queueLock.Unlock()
 
+	currentTaskActionLock.Lock()
 	if "" != currentTaskAction {
 		ret = append(ret, currentTaskAction)
 	}
+	currentTaskActionLock.Unlock()
 
 	for _, task := range taskQueue {
 		ret = append(ret, task.Action)
 	}
+
+	queueLock.Unlock()
 	return
 }
 
@@ -94,7 +97,6 @@ const (
 	HistoryDatabaseIndexCommit      = "task.history.database.index.commit" // 历史数据库索引提交
 	DatabaseIndexEmbedBlock         = "task.database.index.embedBlock"     // 数据库索引嵌入块
 	ReloadUI                        = "task.reload.ui"                     // 重载 UI
-	UpgradeUserGuide                = "task.upgrade.userGuide"             // 升级用户指南文档笔记本
 	AssetContentDatabaseIndexFull   = "task.asset.database.index.full"     // 资源文件数据库重建索引
 	AssetContentDatabaseIndexCommit = "task.asset.database.index.commit"   // 资源文件数据库索引提交
 )
@@ -117,20 +119,23 @@ func Contain(action string, moreActions ...string) bool {
 	actions := append(moreActions, action)
 	actions = gulu.Str.RemoveDuplicatedElem(actions)
 
+	queueLock.Lock()
 	for _, task := range taskQueue {
 		if gulu.Str.Contains(task.Action, actions) {
 			return true
 		}
 	}
+	queueLock.Unlock()
 	return false
 }
 
 func StatusJob() {
-	tasks := taskQueue
 	var items []map[string]interface{}
 	count := map[string]int{}
 	actionLangs := util.TaskActionLangs[util.Lang]
-	for _, task := range tasks {
+
+	queueLock.Lock()
+	for _, task := range taskQueue {
 		action := task.Action
 		if c := count[action]; 2 < c {
 			logging.LogWarnf("too many tasks [%s], ignore show its status", action)
@@ -147,7 +152,9 @@ func StatusJob() {
 		item := map[string]interface{}{"action": action}
 		items = append(items, item)
 	}
+	defer queueLock.Unlock()
 
+	currentTaskActionLock.Lock()
 	if "" != currentTaskAction {
 		if nil != actionLangs {
 			if label := actionLangs[currentTaskAction]; nil != label {
@@ -155,6 +162,7 @@ func StatusJob() {
 			}
 		}
 	}
+	currentTaskActionLock.Unlock()
 
 	if 1 > len(items) {
 		items = []map[string]interface{}{}
@@ -170,7 +178,7 @@ func ExecTaskJob() {
 		return
 	}
 
-	if util.IsExiting {
+	if util.IsExiting.Load() {
 		return
 	}
 
@@ -190,7 +198,10 @@ func popTask() (ret *Task) {
 	return
 }
 
-var currentTaskAction string
+var (
+	currentTaskAction     string
+	currentTaskActionLock = sync.Mutex{}
+)
 
 func execTask(task *Task) {
 	defer logging.Recover()
@@ -204,7 +215,9 @@ func execTask(task *Task) {
 		}
 	}
 
+	currentTaskActionLock.Lock()
 	currentTaskAction = task.Action
+	currentTaskActionLock.Unlock()
 
 	ctx, cancel := context.WithTimeout(context.Background(), task.Timeout)
 	defer cancel()
@@ -221,5 +234,7 @@ func execTask(task *Task) {
 		//logging.LogInfof("task [%s] done", task.Action)
 	}
 
+	currentTaskActionLock.Lock()
 	currentTaskAction = ""
+	currentTaskActionLock.Unlock()
 }

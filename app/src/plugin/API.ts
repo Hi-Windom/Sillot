@@ -15,6 +15,8 @@ import {Constants} from "../constants";
 import {Setting} from "./Setting";
 import {Menu} from "./Menu";
 import {Protyle} from "../protyle";
+import {openMobileFileById} from "../mobile/editor";
+import {lockScreen} from "../dialog/processSystem";
 
 let openTab;
 let openWindow;
@@ -171,6 +173,8 @@ export const API = {
     fetchGet,
     getFrontend,
     getBackend,
+    lockScreen,
+    openMobileFileById,
     openTab,
     openWindow,
     Protyle,

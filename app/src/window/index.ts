@@ -19,7 +19,8 @@ import {initMessage} from "../dialog/message";
 import {getAllTabs} from "../layout/getAll";
 import {getLocalStorage} from "../protyle/util/compatibility";
 import {init} from "../window/init";
-import {loadPlugins} from "../plugin/loader";
+import {loadPlugins, reloadPlugin} from "../plugin/loader";
+import {hideAllElements} from "../protyle/ui/hideElements";
 import { importIDB } from "../sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "../sillot";
 
@@ -52,8 +53,18 @@ class App {
                     });
                     if (data) {
                         switch (data.cmd) {
+                            case "reloadPlugin":
+                                reloadPlugin(this);
+                                break;
                             case "syncMergeResult":
                                 reloadSync(this, data.data);
+                                break;
+                            case "readonly":
+                                window.siyuan.config.editor.readOnly = data.data;
+                                hideAllElements(["util"]);
+                                break;
+                            case "setConf":
+                                window.siyuan.config = data.data;
                                 break;
                             case "progress":
                                 progressLoading(data);
@@ -107,7 +118,7 @@ class App {
                                 transactionError();
                                 break;
                             case "syncing":
-                                processSync(data);
+                                processSync(data, this.plugins);
                                 break;
                             case "backgroundtask":
                                 progressBackgroundTask(data.data.tasks);
@@ -139,7 +150,7 @@ class App {
                 });
                 await loadPlugins(this);
             getLocalStorage(() => {
-                    fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages) => {
+                    fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages: IObject) => {
                         window.siyuan.languages = lauguages;
                         window.siyuan.menus = new Menus(this);
                     fetchPost("/api/setting/getCloudUser", {}, userResponse => {

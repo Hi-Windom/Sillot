@@ -52,7 +52,7 @@ func RemoveTag(label string) (err error) {
 
 	for treeID, blocks := range treeBlocks {
 		util.PushEndlessProgress("[" + treeID + "]")
-		tree, e := loadTreeByBlockID(treeID)
+		tree, e := LoadTreeByBlockID(treeID)
 		if nil != e {
 			util.ClearPushProgress(100)
 			return e
@@ -137,7 +137,7 @@ func RenameTag(oldLabel, newLabel string) (err error) {
 
 	for treeID, blocks := range treeBlocks {
 		util.PushEndlessProgress("[" + treeID + "]")
-		tree, e := loadTreeByBlockID(treeID)
+		tree, e := LoadTreeByBlockID(treeID)
 		if nil != e {
 			util.ClearPushProgress(100)
 			return e
@@ -285,6 +285,10 @@ func labelBlocksByKeyword(keyword string) (ret map[string]TagBlocks) {
 	sqlBlocks := sql.GetBlocks(blockIDs)
 	blockMap := map[string]*sql.Block{}
 	for _, block := range sqlBlocks {
+		if nil == block {
+			continue
+		}
+
 		blockMap[block.ID] = block
 	}
 

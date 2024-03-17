@@ -27,13 +27,18 @@ export const hideElements = (panels: string[], protyle?: IProtyle, focusHide = f
             item.classList.remove("protyle-wysiwyg--hl");
         });
     }
+    //  不能 remove("protyle-wysiwyg--hl") 否则打开页签的时候 "cb-get-hl" 高亮会被移除
+    if (protyle.gutter && panels.includes("gutterOnly")) {
+        protyle.gutter.element.classList.add("fn__none");
+        protyle.gutter.element.innerHTML = "";
+    }
     if (protyle.toolbar && panels.includes("toolbar")) {
         protyle.toolbar.element.classList.add("fn__none");
         protyle.toolbar.element.style.display = "";
     }
     if (protyle.toolbar && panels.includes("util")) {
         const pinElement = protyle.toolbar.subElement.querySelector('[data-type="pin"]');
-        if (focusHide || !pinElement || (pinElement && !pinElement.classList.contains("block__icon--active"))) {
+        if (focusHide || !pinElement || (pinElement && pinElement.getAttribute("aria-label") === window.siyuan.languages.pin)) {
             protyle.toolbar.subElement.classList.add("fn__none");
             if (protyle.toolbar.subElementCloseCB) {
                 protyle.toolbar.subElementCloseCB();
@@ -61,10 +66,12 @@ export const hideAllElements = (types: string[]) => {
     if (types.includes("util")) {
         /// #if MOBILE
         const editor = getCurrentEditor();
-        editor.protyle.toolbar.subElement.classList.add("fn__none");
-        if (editor.protyle.toolbar.subElementCloseCB) {
-            editor.protyle.toolbar.subElementCloseCB();
-            editor.protyle.toolbar.subElementCloseCB = undefined;
+        if (editor) {
+            editor.protyle.toolbar.subElement.classList.add("fn__none");
+            if (editor.protyle.toolbar.subElementCloseCB) {
+                editor.protyle.toolbar.subElementCloseCB();
+                editor.protyle.toolbar.subElementCloseCB = undefined;
+            }
         }
         /// #else
         getAllEditor().forEach(item => {

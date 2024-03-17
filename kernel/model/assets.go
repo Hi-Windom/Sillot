@@ -34,6 +34,7 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
 	"github.com/K-Sillot/httpclient"
@@ -51,7 +52,7 @@ import (
 )
 
 func DocImageAssets(rootID string) (ret []string, err error) {
-	tree, err := loadTreeByBlockID(rootID)
+	tree, err := LoadTreeByBlockID(rootID)
 	if nil != err {
 		return
 	}
@@ -74,7 +75,7 @@ func DocImageAssets(rootID string) (ret []string, err error) {
 }
 
 func NetImg2LocalAssets(rootID, originalURL string) (err error) {
-	tree, err := loadTreeByBlockID(rootID)
+	tree, err := LoadTreeByBlockID(rootID)
 	if nil != err {
 		return
 	}
@@ -102,6 +103,14 @@ func NetImg2LocalAssets(rootID, originalURL string) (err error) {
 		}
 		if ast.NodeImage == n.Type {
 			linkDest := n.ChildByType(ast.NodeLinkDest)
+			linkText := n.ChildByType(ast.NodeLinkText)
+			if nil == linkText {
+				linkText = &ast.Node{Type: ast.NodeLinkText, Tokens: []byte("image")}
+				if openBracket := n.ChildByType(ast.NodeOpenBracket); nil != openBracket {
+					openBracket.InsertAfter(linkText)
+				}
+			}
+
 			dest := linkDest.Tokens
 			if util.IsAssetLinkDest(dest) {
 				return ast.WalkSkipChildren
@@ -111,13 +120,21 @@ func NetImg2LocalAssets(rootID, originalURL string) (err error) {
 				// `网络图片转换为本地图片` 支持处理 `file://` 本地路径图片 https://github.com/siyuan-note/siyuan/issues/6546
 
 				u := string(dest)[7:]
+				unescaped, _ := url.PathUnescape(u)
+				if unescaped != u {
+					// `Convert network images/assets to local` supports URL-encoded local file names https://github.com/siyuan-note/siyuan/issues/9929
+					u = unescaped
+				}
 				if !gulu.File.IsExist(u) || gulu.File.IsDir(u) {
 					return ast.WalkSkipChildren
 				}
 
 				name := filepath.Base(u)
-				name = util.FilterFileName(name)
+				name = util.FilterUploadFileName(name)
 				name = util.TruncateLenFileName(name)
+				if 1 > len(bytes.TrimSpace(linkText.Tokens)) {
+					linkText.Tokens = []byte(name)
+				}
 				name = "net-img-" + name
 				name = util.AssetName(name)
 				writePath := filepath.Join(assetsDirPath, name)
@@ -131,7 +148,12 @@ func NetImg2LocalAssets(rootID, originalURL string) (err error) {
 				return ast.WalkSkipChildren
 			}
 
-			if bytes.HasPrefix(bytes.ToLower(dest), []byte("https://")) || bytes.HasPrefix(bytes.ToLower(dest), []byte("http://")) {
+			if bytes.HasPrefix(bytes.ToLower(dest), []byte("https://")) || bytes.HasPrefix(bytes.ToLower(dest), []byte("http://")) || bytes.HasPrefix(dest, []byte("//")) {
+				if bytes.HasPrefix(dest, []byte("//")) {
+					// `Convert network images to local` supports `//` https://github.com/siyuan-note/siyuan/issues/10598
+					dest = append([]byte("https:"), dest...)
+				}
+
 				u := string(dest)
 				if strings.Contains(u, "qpic.cn") {
 					// 改进 `网络图片转换为本地图片` 微信图片拉取 https://github.com/siyuan-note/siyuan/issues/5052
@@ -192,8 +214,11 @@ func NetImg2LocalAssets(rootID, originalURL string) (err error) {
 					}
 				}
 				name = strings.TrimSuffix(name, ext)
-				name = util.FilterFileName(name)
+				name = util.FilterUploadFileName(name)
 				name = util.TruncateLenFileName(name)
+				if 1 > len(bytes.TrimSpace(linkText.Tokens)) {
+					linkText.Tokens = []byte(name)
+				}
 				name = "net-img-" + name + "-" + ast.NewNodeID() + ext
 				writePath := filepath.Join(assetsDirPath, name)
 				if err = filelock.WriteFile(writePath, data); nil != err {
@@ -208,6 +233,193 @@ func NetImg2LocalAssets(rootID, originalURL string) (err error) {
 		}
 		return ast.WalkContinue
 	})
+	if 0 < files {
+		util.PushUpdateMsg(msgId, Conf.Language(113), 7000)
+		if err = writeJSONQueue(tree); nil != err {
+			return
+		}
+		util.PushUpdateMsg(msgId, fmt.Sprintf(Conf.Language(120), files), 5000)
+	} else {
+		util.PushUpdateMsg(msgId, Conf.Language(121), 3000)
+	}
+	return
+}
+
+func NetAssets2LocalAssets(rootID string) (err error) {
+	tree, err := LoadTreeByBlockID(rootID)
+	if nil != err {
+		return
+	}
+
+	var files int
+	msgId := gulu.Rand.String(7)
+
+	docDirLocalPath := filepath.Join(util.DataDir, tree.Box, path.Dir(tree.Path))
+	assetsDirPath := getAssetsDir(filepath.Join(util.DataDir, tree.Box), docDirLocalPath)
+	if !gulu.File.IsExist(assetsDirPath) {
+		if err = os.MkdirAll(assetsDirPath, 0755); nil != err {
+			return
+		}
+	}
+
+	browserClient := req.C().
+		SetUserAgent(util.UserAgent).
+		SetTimeout(30 * time.Second).
+		EnableInsecureSkipVerify().
+		SetProxy(httpclient.ProxyFromEnvironment)
+
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering || (ast.NodeLinkDest != n.Type && !n.IsTextMarkType("a") && ast.NodeAudio != n.Type && ast.NodeVideo != n.Type) {
+			return ast.WalkContinue
+		}
+
+		var dest []byte
+		if ast.NodeLinkDest == n.Type {
+			dest = n.Tokens
+		} else if n.IsTextMarkType("a") {
+			dest = []byte(n.TextMarkAHref)
+		} else if ast.NodeAudio == n.Type || ast.NodeVideo == n.Type {
+			if srcIndex := bytes.Index(n.Tokens, []byte("src=\"")); 0 < srcIndex {
+				src := n.Tokens[srcIndex+len("src=\""):]
+				if srcIndex = bytes.Index(src, []byte("\"")); 0 < srcIndex {
+					src = src[:bytes.Index(src, []byte("\""))]
+					dest = bytes.TrimSpace(src)
+				}
+			}
+		}
+
+		if util.IsAssetLinkDest(dest) {
+			return ast.WalkContinue
+		}
+
+		if bytes.HasPrefix(bytes.ToLower(dest), []byte("file://")) { // 处理本地文件链接
+			u := string(dest)[7:]
+			unescaped, _ := url.PathUnescape(u)
+			if unescaped != u {
+				// `Convert network images/assets to local` supports URL-encoded local file names https://github.com/siyuan-note/siyuan/issues/9929
+				u = unescaped
+			}
+			if !gulu.File.IsExist(u) || gulu.File.IsDir(u) {
+				return ast.WalkContinue
+			}
+
+			name := filepath.Base(u)
+			name = util.FilterUploadFileName(name)
+			name = util.TruncateLenFileName(name)
+			name = "network-asset-" + name
+			name = util.AssetName(name)
+			writePath := filepath.Join(assetsDirPath, name)
+			if err = filelock.Copy(u, writePath); nil != err {
+				logging.LogErrorf("copy [%s] to [%s] failed: %s", u, writePath, err)
+				return ast.WalkContinue
+			}
+
+			if ast.NodeLinkDest == n.Type {
+				n.Tokens = []byte("assets/" + name)
+			} else if n.IsTextMarkType("a") {
+				n.TextMarkAHref = "assets/" + name
+			} else if ast.NodeAudio == n.Type || ast.NodeVideo == n.Type {
+				n.Tokens = bytes.ReplaceAll(n.Tokens, dest, []byte("assets/"+name))
+			}
+			files++
+			return ast.WalkContinue
+		}
+
+		if bytes.HasPrefix(bytes.ToLower(dest), []byte("https://")) || bytes.HasPrefix(bytes.ToLower(dest), []byte("http://")) || bytes.HasPrefix(dest, []byte("//")) {
+			if bytes.HasPrefix(dest, []byte("//")) {
+				// `Convert network images to local` supports `//` https://github.com/siyuan-note/siyuan/issues/10598
+				dest = append([]byte("https:"), dest...)
+			}
+
+			u := string(dest)
+			if strings.Contains(u, "qpic.cn") {
+				// 改进 `网络图片转换为本地图片` 微信图片拉取 https://github.com/siyuan-note/siyuan/issues/5052
+				if strings.Contains(u, "http://") {
+					u = strings.Replace(u, "http://", "https://", 1)
+				}
+
+				// 改进 `网络图片转换为本地图片` 微信图片拉取 https://github.com/siyuan-note/siyuan/issues/6431
+				// 下面这部分需要注释掉，否则会导致响应 400
+				//if strings.HasSuffix(u, "/0") {
+				//	u = strings.Replace(u, "/0", "/640", 1)
+				//} else if strings.Contains(u, "/0?") {
+				//	u = strings.Replace(u, "/0?", "/640?", 1)
+				//}
+			}
+			util.PushUpdateMsg(msgId, fmt.Sprintf(Conf.Language(119), u), 15000)
+			request := browserClient.R()
+			request.SetRetryCount(1).SetRetryFixedInterval(3 * time.Second)
+			resp, reqErr := request.Get(u)
+			if strings.Contains(strings.ToLower(resp.GetContentType()), "text/html") {
+				// 忽略超链接网页 `Convert network assets to local` no longer process webpage https://github.com/siyuan-note/siyuan/issues/9965
+				return ast.WalkContinue
+			}
+
+			if nil != reqErr {
+				logging.LogErrorf("download network asset [%s] failed: %s", u, reqErr)
+				return ast.WalkContinue
+			}
+			if 200 != resp.StatusCode {
+				logging.LogErrorf("download network asset [%s] failed: %d", u, resp.StatusCode)
+				return ast.WalkContinue
+			}
+
+			if 1024*1024*96 < resp.ContentLength {
+				logging.LogWarnf("network asset [%s]' size [%s] is large then [96 MB], ignore it", u, humanize.IBytes(uint64(resp.ContentLength)))
+				return ast.WalkContinue
+			}
+
+			data, repErr := resp.ToBytes()
+			if nil != repErr {
+				logging.LogErrorf("download network asset [%s] failed: %s", u, repErr)
+				return ast.WalkContinue
+			}
+			var name string
+			if strings.Contains(u, "?") {
+				name = u[:strings.Index(u, "?")]
+				name = path.Base(name)
+			} else {
+				name = path.Base(u)
+			}
+			if strings.Contains(name, "#") {
+				name = name[:strings.Index(name, "#")]
+			}
+			name, _ = url.PathUnescape(name)
+			ext := path.Ext(name)
+			if "" == ext {
+				if mtype := mimetype.Detect(data); nil != mtype {
+					ext = mtype.Extension()
+				}
+			}
+			if "" == ext {
+				contentType := resp.Header.Get("Content-Type")
+				exts, _ := mime.ExtensionsByType(contentType)
+				if 0 < len(exts) {
+					ext = exts[0]
+				}
+			}
+			name = strings.TrimSuffix(name, ext)
+			name = util.FilterUploadFileName(name)
+			name = util.TruncateLenFileName(name)
+			name = "network-asset-" + name + "-" + ast.NewNodeID() + ext
+			writePath := filepath.Join(assetsDirPath, name)
+			if err = filelock.WriteFile(writePath, data); nil != err {
+				logging.LogErrorf("write downloaded network asset [%s] to local asset [%s] failed: %s", u, writePath, err)
+				return ast.WalkContinue
+			}
+
+			if ast.NodeLinkDest == n.Type {
+				n.Tokens = []byte("assets/" + name)
+			} else if n.IsTextMarkType("a") {
+				n.TextMarkAHref = "assets/" + name
+			} else if ast.NodeAudio == n.Type || ast.NodeVideo == n.Type {
+				n.Tokens = bytes.ReplaceAll(n.Tokens, dest, []byte("assets/"+name))
+			}
+			files++
+		}
+		return ast.WalkContinue
+	})
+
 	if 0 < files {
 		util.PushUpdateMsg(msgId, Conf.Language(113), 7000)
 		if err = writeJSONQueue(tree); nil != err {
@@ -240,11 +452,19 @@ func SearchAssetsByName(keyword string, exts []string) (ret []*cache.Asset) {
 			}
 		}
 
-		if !strings.Contains(strings.ToLower(asset.HName), strings.ToLower(keyword)) {
+		lowerHName := strings.ToLower(asset.HName)
+		lowerPath := strings.ToLower(asset.Path)
+		lowerKeyword := strings.ToLower(keyword)
+		hitName := strings.Contains(lowerHName, lowerKeyword)
+		hitPath := strings.Contains(lowerPath, lowerKeyword)
+		if !hitName && !hitPath {
 			continue
 		}
 
-		_, hName := search.MarkText(asset.HName, keyword, 64, Conf.Search.CaseSensitive)
+		hName := asset.HName
+		if hitName {
+			_, hName = search.MarkText(asset.HName, keyword, 64, Conf.Search.CaseSensitive)
+		}
 		ret = append(ret, &cache.Asset{
 			HName:   hName,
 			Path:    asset.Path,
@@ -262,7 +482,7 @@ func SearchAssetsByName(keyword string, exts []string) (ret []*cache.Asset) {
 	return
 }
 
-func GetAssetAbsPath(relativePath string) (absPath string, err error) {
+func GetAssetAbsPath(relativePath string) (ret string, err error) {
 	relativePath = strings.TrimSpace(relativePath)
 	if strings.Contains(relativePath, "?") {
 		relativePath = relativePath[:strings.Index(relativePath, "?")]
@@ -276,7 +496,7 @@ func GetAssetAbsPath(relativePath string) (absPath string, err error) {
 	// 在笔记本下搜索
 	for _, notebook := range notebooks {
 		notebookAbsPath := filepath.Join(util.DataDir, notebook.ID)
-		filepath.Walk(notebookAbsPath, func(path string, info fs.FileInfo, _ error) error {
+		filelock.Walk(notebookAbsPath, func(path string, info fs.FileInfo, _ error) error {
 			if isSkipFile(info.Name()) {
 				if info.IsDir() {
 					return filepath.SkipDir
@@ -285,13 +505,18 @@ func GetAssetAbsPath(relativePath string) (absPath string, err error) {
 			}
 			if p := filepath.ToSlash(path); strings.HasSuffix(p, relativePath) {
 				if gulu.File.IsExist(path) {
-					absPath = path
+					ret = path
 					return io.EOF
 				}
 			}
 			return nil
 		})
-		if "" != absPath {
+
+		if "" != ret {
+			if !util.IsSubPath(util.WorkspaceDir, ret) {
+				err = fmt.Errorf("[%s] is not sub path of workspace", ret)
+				return
+			}
 			return
 		}
 	}
@@ -299,19 +524,35 @@ func GetAssetAbsPath(relativePath string) (absPath string, err error) {
 	// 在全局 assets 路径下搜索
 	p := filepath.Join(util.DataDir, relativePath)
 	if gulu.File.IsExist(p) {
-		absPath = p
+		ret = p
+		if !util.IsSubPath(util.WorkspaceDir, ret) {
+			err = fmt.Errorf("[%s] is not sub path of workspace", ret)
+			return
+		}
 		return
 	}
 	return "", errors.New(fmt.Sprintf(Conf.Language(12), relativePath))
 }
 
-func UploadAssets2Cloud(rootID string) (err error) {
+func UploadAssets2Cloud(rootID string) (count int, err error) {
 	if !IsSubscriber() {
 		return
 	}
 
-	sqlAssets := sql.QueryRootBlockAssets(rootID)
-	err = uploadAssets2Cloud(sqlAssets, bizTypeUploadAssets)
+	tree, err := LoadTreeByBlockID(rootID)
+	if nil != err {
+		return
+	}
+
+	assets := assetsLinkDestsInTree(tree)
+	embedAssets := assetsLinkDestsInQueryEmbedNodes(tree)
+	assets = append(assets, embedAssets...)
+	assets = gulu.Str.RemoveDuplicatedElem(assets)
+	err = uploadAssets2Cloud(assets, bizTypeUploadAssets)
+	if nil != err {
+		return
+	}
+	count = len(assets)
 	return
 }
 
@@ -321,17 +562,17 @@ const (
 )
 
 // uploadAssets2Cloud 将资源文件上传到云端图床。
-func uploadAssets2Cloud(sqlAssets []*sql.Asset, bizType string) (err error) {
+func uploadAssets2Cloud(assetPaths []string, bizType string) (err error) {
 	var uploadAbsAssets []string
-	for _, asset := range sqlAssets {
+	for _, assetPath := range assetPaths {
 		var absPath string
-		absPath, err = GetAssetAbsPath(asset.Path)
+		absPath, err = GetAssetAbsPath(assetPath)
 		if nil != err {
-			logging.LogWarnf("get asset [%s] abs path failed: %s", asset, err)
+			logging.LogWarnf("get asset [%s] abs path failed: %s", assetPath, err)
 			return
 		}
 		if "" == absPath {
-			logging.LogErrorf("not found asset [%s]", asset)
+			logging.LogErrorf("not found asset [%s]", assetPath)
 			continue
 		}
 
@@ -454,7 +695,7 @@ func RemoveUnusedAssets() (ret []string) {
 
 	for _, unusedAsset := range unusedAssets {
 		if unusedAsset = filepath.Join(util.DataDir, unusedAsset); filelock.IsExist(unusedAsset) {
-			if err := os.RemoveAll(unusedAsset); nil != err {
+			if err := filelock.Remove(unusedAsset); nil != err {
 				logging.LogErrorf("remove unused asset [%s] failed: %s", unusedAsset, err)
 			}
 		}
@@ -492,7 +733,7 @@ func RemoveUnusedAsset(p string) (ret string) {
 		sql.BatchRemoveAssetsQueue([]string{hash})
 	}
 
-	if err = os.RemoveAll(absPath); nil != err {
+	if err = filelock.Remove(absPath); nil != err {
 		logging.LogErrorf("remove unused asset [%s] failed: %s", absPath, err)
 	}
 	ret = absPath
@@ -632,7 +873,7 @@ func UnusedAssets() (ret []string) {
 		}
 
 		var linkDestFolderPaths, linkDestFilePaths []string
-		for dest, _ := range dests {
+		for dest := range dests {
 			if !strings.HasPrefix(dest, "assets/") {
 				continue
 			}
@@ -654,7 +895,7 @@ func UnusedAssets() (ret []string) {
 
 		// 排除文件夹链接
 		var toRemoves []string
-		for asset, _ := range assetsPathMap {
+		for asset := range assetsPathMap {
 			for _, linkDestFolder := range linkDestFolderPaths {
 				if strings.HasPrefix(asset, linkDestFolder) {
 					toRemoves = append(toRemoves, asset)
@@ -680,7 +921,7 @@ func UnusedAssets() (ret []string) {
 	}
 
 	var toRemoves []string
-	for asset, _ := range assetsPathMap {
+	for asset := range assetsPathMap {
 		if strings.HasSuffix(asset, "ocr-texts.json") {
 			// 排除 OCR 结果文本
 			toRemoves = append(toRemoves, asset)
@@ -710,7 +951,7 @@ func UnusedAssets() (ret []string) {
 				return
 			}
 
-			for asset, _ := range assetsPathMap {
+			for asset := range assetsPathMap {
 				if bytes.Contains(data, []byte(asset)) {
 					toRemoves = append(toRemoves, asset)
 				}
@@ -788,7 +1029,7 @@ func MissingAssets() (ret []string) {
 			}
 		}
 
-		for dest, _ := range dests {
+		for dest := range dests {
 			if !strings.HasPrefix(dest, "assets/") {
 				continue
 			}
@@ -840,9 +1081,45 @@ func emojisInTree(tree *parse.Tree) (ret []string) {
 	return
 }
 
-func assetsLinkDestsInTree(tree *parse.Tree) (ret []string) {
+func assetsLinkDestsInQueryEmbedNodes(tree *parse.Tree) (ret []string) {
+	// The images in the embed blocks are not uploaded to the community hosting https://github.com/siyuan-note/siyuan/issues/10042
+
 	ret = []string{}
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering || ast.NodeBlockQueryEmbedScript != n.Type {
+			return ast.WalkContinue
+		}
+
+		stmt := n.TokensStr()
+		stmt = html.UnescapeString(stmt)
+		stmt = strings.ReplaceAll(stmt, editor.IALValEscNewLine, "\n")
+		sqlBlocks := sql.SelectBlocksRawStmt(stmt, 1, Conf.Search.Limit)
+		for _, sqlBlock := range sqlBlocks {
+			subtree, _ := LoadTreeByBlockID(sqlBlock.ID)
+			if nil == subtree {
+				continue
+			}
+			embedNode := treenode.GetNodeInTree(subtree, sqlBlock.ID)
+			if nil == embedNode {
+				continue
+			}
+
+			ret = append(ret, assetsLinkDestsInNode(embedNode)...)
+		}
+		return ast.WalkContinue
+	})
+	ret = gulu.Str.RemoveDuplicatedElem(ret)
+	return
+}
+
+func assetsLinkDestsInTree(tree *parse.Tree) (ret []string) {
+	ret = assetsLinkDestsInNode(tree.Root)
+	return
+}
+
+func assetsLinkDestsInNode(node *ast.Node) (ret []string) {
+	ret = []string{}
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		// 修改以下代码时需要同时修改 database 构造行级元素实现，增加必要的类型
 		if !entering || (ast.NodeLinkDest != n.Type && ast.NodeHTMLBlock != n.Type && ast.NodeInlineHTML != n.Type &&
 			ast.NodeIFrame != n.Type && ast.NodeWidget != n.Type && ast.NodeAudio != n.Type && ast.NodeVideo != n.Type &&
@@ -851,21 +1128,21 @@ func assetsLinkDestsInTree(tree *parse.Tree) (ret []string) {
 		}
 
 		if ast.NodeLinkDest == n.Type {
-			if !isRelativePath(n.Tokens) {
+			if !treenode.IsRelativePath(n.Tokens) {
 				return ast.WalkContinue
 			}
 
 			dest := strings.TrimSpace(string(n.Tokens))
 			ret = append(ret, dest)
 		} else if n.IsTextMarkType("a") {
-			if !isRelativePath(gulu.Str.ToBytes(n.TextMarkAHref)) {
+			if !treenode.IsRelativePath(gulu.Str.ToBytes(n.TextMarkAHref)) {
 				return ast.WalkContinue
 			}
 
 			dest := strings.TrimSpace(n.TextMarkAHref)
 			ret = append(ret, dest)
 		} else if n.IsTextMarkType("file-annotation-ref") {
-			if !isRelativePath(gulu.Str.ToBytes(n.TextMarkFileAnnotationRefID)) {
+			if !treenode.IsRelativePath(gulu.Str.ToBytes(n.TextMarkFileAnnotationRefID)) {
 				return ast.WalkContinue
 			}
 
@@ -883,24 +1160,14 @@ func assetsLinkDestsInTree(tree *parse.Tree) (ret []string) {
 					// 兼容两种属性名 custom-data-assets 和 data-assets https://github.com/siyuan-note/siyuan/issues/4122#issuecomment-1154796568
 					dataAssets = n.IALAttr("data-assets")
 				}
-				if "" == dataAssets || !isRelativePath([]byte(dataAssets)) {
+				if "" == dataAssets || !treenode.IsRelativePath([]byte(dataAssets)) {
 					return ast.WalkContinue
 				}
 				ret = append(ret, dataAssets)
 			} else { // HTMLBlock/InlineHTML/IFrame/Audio/Video
-				if index := bytes.Index(n.Tokens, []byte("src=\"")); 0 < index {
-					src := n.Tokens[index+len("src=\""):]
-					if index = bytes.Index(src, []byte("\"")); 0 < index {
-						src = src[:bytes.Index(src, []byte("\""))]
-						if !isRelativePath(src) {
-							return ast.WalkContinue
-						}
-
-						dest := strings.TrimSpace(string(src))
-						ret = append(ret, dest)
-					} else {
-						logging.LogWarnf("src is missing the closing double quote in tree [%s] ", tree.Box+tree.Path)
-					}
+				dest := treenode.GetNodeSrcTokens(n)
+				if "" != dest {
+					ret = append(ret, dest)
 				}
 			}
 		}
@@ -916,16 +1183,6 @@ func assetsLinkDestsInTree(tree *parse.Tree) (ret []string) {
 	return
 }
 
-func isRelativePath(dest []byte) bool {
-	if 1 > len(dest) {
-		return false
-	}
-	if '/' == dest[0] {
-		return false
-	}
-	return !bytes.Contains(dest, []byte(":"))
-}
-
 // allAssetAbsPaths 返回 asset 相对路径（assets/xxx）到绝对路径（F:\SiYuan\data\assets\xxx）的映射。
 func allAssetAbsPaths() (assetsAbsPathMap map[string]string, err error) {
 	notebooks, err := ListNotebooks()
@@ -937,7 +1194,7 @@ func allAssetAbsPaths() (assetsAbsPathMap map[string]string, err error) {
 	// 笔记本 assets
 	for _, notebook := range notebooks {
 		notebookAbsPath := filepath.Join(util.DataDir, notebook.ID)
-		filepath.Walk(notebookAbsPath, func(path string, info fs.FileInfo, err error) error {
+		filelock.Walk(notebookAbsPath, func(path string, info fs.FileInfo, err error) error {
 			if notebookAbsPath == path {
 				return nil
 			}
@@ -949,7 +1206,7 @@ func allAssetAbsPaths() (assetsAbsPathMap map[string]string, err error) {
 			}
 
 			if info.IsDir() && "assets" == info.Name() {
-				filepath.Walk(path, func(assetPath string, info fs.FileInfo, err error) error {
+				filelock.Walk(path, func(assetPath string, info fs.FileInfo, err error) error {
 					if path == assetPath {
 						return nil
 					}
@@ -975,7 +1232,7 @@ func allAssetAbsPaths() (assetsAbsPathMap map[string]string, err error) {
 
 	// 全局 assets
 	dataAssetsAbsPath := util.GetDataAssetsAbsPath()
-	filepath.Walk(dataAssetsAbsPath, func(assetPath string, info fs.FileInfo, err error) error {
+	filelock.Walk(dataAssetsAbsPath, func(assetPath string, info fs.FileInfo, err error) error {
 		if dataAssetsAbsPath == assetPath {
 			return nil
 		}
@@ -1012,7 +1269,7 @@ func copyDocAssetsToDataAssets(boxID, parentDocPath string) {
 
 func copyAssetsToDataAssets(rootPath string) {
 	var assetsDirPaths []string
-	filepath.Walk(rootPath, func(path string, info fs.FileInfo, err error) error {
+	filelock.Walk(rootPath, func(path string, info fs.FileInfo, err error) error {
 		if rootPath == path || nil == info {
 			return nil
 		}

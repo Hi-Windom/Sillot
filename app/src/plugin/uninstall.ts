@@ -1,32 +1,38 @@
 import {App} from "../index";
 import {Plugin} from "../plugin";
+/// #if !MOBILE
 import {getAllModels} from "../layout/getAll";
-import {exportLayout, resizeTopBar} from "../layout/util";
-import {Constants} from "../constants";
+import {resizeTopBar} from "../layout/util";
+/// #endif
 
-export const uninstall = (app: App, name: string) => {
+export const uninstall = (app: App, name: string, isUninstall = false) => {
     app.plugins.find((plugin: Plugin, index) => {
         if (plugin.name === name) {
             // rm command
             try {
                 plugin.onunload();
+                if (isUninstall) {
+                    plugin.uninstall();
+                }
             } catch (e) {
                 console.error(`plugin ${plugin.name} onunload error:`, e);
             }
             // rm tab
+            /// #if !MOBILE
             const modelsKeys = Object.keys(plugin.models);
             getAllModels().custom.forEach(custom => {
                 if (modelsKeys.includes(custom.type)) {
                     custom.parent.parent.removeTab(custom.parent.id);
                 }
             });
+            /// #endif
             // rm topBar
             plugin.topBarIcons.forEach(item => {
                 item.remove();
             });
+            /// #if !MOBILE
             resizeTopBar();
             // rm statusBar
-            /// #if !MOBILE
             plugin.statusBarIcons.forEach(item => {
                 item.remove();
             });
@@ -51,14 +57,6 @@ export const uninstall = (app: App, name: string) => {
             });
             // rm plugin
             app.plugins.splice(index, 1);
-
-            setTimeout(() => {
-                exportLayout({
-                    reload: false,
-                    onlyData: false,
-                    errorExit: false
-                });
-            }, Constants.TIMEOUT_LOAD); // 移除页签时切换到新的文档页签，需等待新页签初始化完成，才有 editor.protyle.block 等数据
             return true;
         }
     });

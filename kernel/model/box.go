@@ -26,7 +26,6 @@ import (
 	"runtime/debug"
 	"sort"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/88250/gulu"
@@ -61,12 +60,9 @@ type Box struct {
 	historyGenerated int64 // 最近一次历史生成时间
 }
 
-var statLock = sync.Mutex{}
-
 func StatJob() {
-	statLock.Lock()
-	defer statLock.Unlock()
 
+	Conf.m.Lock()
 	Conf.Stat.TreeCount = treenode.CountTrees()
 	Conf.Stat.CTreeCount = treenode.CeilTreeCount(Conf.Stat.TreeCount)
 	Conf.Stat.BlockCount = treenode.CountBlocks()
@@ -74,6 +70,7 @@ func StatJob() {
 	Conf.Stat.DataSize, Conf.Stat.AssetsSize = util.DataSize()
 	Conf.Stat.CDataSize = util.CeilSize(Conf.Stat.DataSize)
 	Conf.Stat.CAssetsSize = util.CeilSize(Conf.Stat.AssetsSize)
+	Conf.m.Unlock()
 	Conf.Save()
 
 	logging.LogInfof("auto stat [trees=%d, blocks=%d, dataSize=%s, assetsSize=%s]", Conf.Stat.TreeCount, Conf.Stat.BlockCount, humanize.Bytes(uint64(Conf.Stat.DataSize)), humanize.Bytes(uint64(Conf.Stat.AssetsSize)))
@@ -123,7 +120,7 @@ func ListNotebooks() (ret []*Box, err error) {
 			}
 			if readErr = gulu.JSON.UnmarshalJSON(data, boxConf); nil != readErr {
 				logging.LogErrorf("parse box conf [%s] failed: %s", boxConfPath, readErr)
-				os.RemoveAll(boxConfPath)
+				filelock.Remove(boxConfPath)
 				continue
 			}
 		}
@@ -261,10 +258,12 @@ func (box *Box) Ls(p string) (ret []*FileInfo, totals int, err error) {
 			continue
 		}
 		if strings.HasSuffix(name, ".tmp") {
-			// 移除写入失败时产生的临时文件
+			// 移除写入失败时产生的并且早于 30 分钟前的临时文件，近期创建的临时文件可能正在写入中
 			removePath := filepath.Join(util.DataDir, box.ID, p, name)
-			if removeErr := os.Remove(removePath); nil != removeErr {
-				logging.LogWarnf("remove tmp file [%s] failed: %s", removePath, removeErr)
+			if info.ModTime().Before(time.Now().Add(-30 * time.Minute)) {
+				if removeErr := os.Remove(removePath); nil != removeErr {
+					logging.LogWarnf("remove tmp file [%s] failed: %s", removePath, removeErr)
+				}
 			}
 			continue
 		}
@@ -394,7 +393,9 @@ func moveTree(tree *parse.Tree) {
 		tree.Root.RemoveIALAttr("custom-hidden")
 		filesys.WriteTree(tree)
 	}
-	sql.UpsertTreeQueue(tree)
+
+	sql.RemoveTreeQueue(tree.ID)
+	sql.IndexTreeQueue(tree)
 
 	box := Conf.Box(tree.Box)
 	box.renameSubTrees(tree)
@@ -502,8 +503,6 @@ func FullReindex() {
 	task.AppendTask(task.DatabaseIndexFull, fullReindex)
 	task.AppendTask(task.DatabaseIndexRef, IndexRefs)
 	task.AppendTask(task.ReloadUI, util.ReloadUI)
-
-	// TODO ReindexAssetContent()
 }
 
 func fullReindex() {
@@ -516,6 +515,7 @@ func fullReindex() {
 	}
 	treenode.InitBlockTree(true)
 
+	sql.IndexIgnoreCached = false
 	openedBoxes := Conf.GetOpenedBoxes()
 	for _, openedBox := range openedBoxes {
 		index(openedBox.ID)

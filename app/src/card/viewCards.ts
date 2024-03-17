@@ -21,6 +21,7 @@ export const viewCards = (app: App, deckID: string, title: string, deckType: "Tr
         page: pageIndex
     }, (response) => {
         const dialog = new Dialog({
+            positionId: Constants.DIALOG_VIEWCARDS,
             content: `<div class="fn__flex-column" style="height: 100%">
     <div class="block__icons">
         <span class="fn__flex-1 fn__flex-center resize__move">${escapeHtml(title)}</span>
@@ -56,6 +57,11 @@ export const viewCards = (app: App, deckID: string, title: string, deckType: "Tr
                         window.siyuan.mobile.popEditor = null;
                     }
                 }
+            },
+            resizeCallback(type: string) {
+                if (type !== "d" && type !== "t" && edit) {
+                    edit.resize();
+                }
             }
         });
         if (response.data.blocks.length > 0) {
@@ -69,7 +75,10 @@ export const viewCards = (app: App, deckID: string, title: string, deckType: "Tr
             if (window.siyuan.mobile) {
                 window.siyuan.mobile.popEditor = edit;
             }
-            dialog.editor = edit;
+            dialog.editors = {
+                card: edit
+            };
+            edit.resize();
             getArticle(edit, dialog.element.querySelector(".b3-list-item--focus")?.getAttribute("data-id"));
         }
         const previousElement = dialog.element.querySelector('[data-type="previous"]');
@@ -78,7 +87,7 @@ export const viewCards = (app: App, deckID: string, title: string, deckType: "Tr
         if (response.data.pageCount > 1) {
             nextElement.removeAttribute("disabled");
         }
-        dialog.element.setAttribute("data-key", "viewCards");
+        dialog.element.setAttribute("data-key", Constants.DIALOG_VIEWCARDS);
         dialog.element.addEventListener("click", (event) => {
             if (typeof event.detail === "string") {
                 let currentElement = listElement.querySelector(".b3-list-item--focus");
@@ -88,6 +97,10 @@ export const viewCards = (app: App, deckID: string, title: string, deckType: "Tr
                         currentElement = currentElement.previousElementSibling || currentElement.parentElement.lastElementChild;
                     } else if (event.detail === "arrowdown") {
                         currentElement = currentElement.nextElementSibling || currentElement.parentElement.firstElementChild;
+                    } else if (event.detail === "home") {
+                        currentElement = currentElement.parentElement.firstElementChild;
+                    } else if (event.detail === "end") {
+                        currentElement = currentElement.parentElement.lastElementChild;
                     }
                     const currentRect = currentElement.getBoundingClientRect();
                     const parentRect = currentElement.parentElement.getBoundingClientRect();
@@ -166,16 +179,16 @@ export const viewCards = (app: App, deckID: string, title: string, deckType: "Tr
                 } else if (type === "resetAll") {
                     confirmDialog(window.siyuan.languages.reset,
                         window.siyuan.languages.resetCardTip.replace("${x}", dialog.element.querySelector(".counter").textContent), () => {
-                        fetchPost("/api/riff/resetRiffCards", {
-                            type: deckType === "" ? "deck" : deckType.toLowerCase(),
-                            deckID: deckType === "" ? deckID : Constants.QUICK_DECK_ID,
-                            id: deckID,
-                        }, () => {
-                            dialog.element.querySelectorAll(".ariaLabel.b3-list-item__meta").forEach(item => {
-                                item.textContent = format(new Date(), 'yyyy-MM-dd');
+                            fetchPost("/api/riff/resetRiffCards", {
+                                type: deckType === "" ? "deck" : deckType.toLowerCase(),
+                                deckID: deckType === "" ? deckID : Constants.QUICK_DECK_ID,
+                                id: deckID,
+                            }, () => {
+                                dialog.element.querySelectorAll(".ariaLabel.b3-list-item__meta").forEach(item => {
+                                    item.textContent = format(new Date(), 'yyyy-MM-dd');
+                                });
                             });
                         });
-                    });
                     event.stopPropagation();
                     event.preventDefault();
                     break;
@@ -283,15 +296,21 @@ const getArticle = (edit: Protyle, id: string) => {
     edit.protyle.element.nextElementSibling.classList.add("fn__none");
     edit.protyle.scroll.lastScrollTop = 0;
     addLoading(edit.protyle);
-    fetchPost("/api/filetree/getDoc", {
+    fetchPost("/api/block/getDocInfo", {
         id,
-        mode: 0,
-        size: Constants.SIZE_GET_MAX,
-    }, getResponse => {
-        onGet({
-            data: getResponse,
-            protyle: edit.protyle,
-            action: getResponse.data.rootID === getResponse.data.id ? [Constants.CB_GET_HTML] : [Constants.CB_GET_ALL, Constants.CB_GET_HTML],
+    }, (response) => {
+        edit.protyle.wysiwyg.renderCustom(response.data.ial);
+        fetchPost("/api/filetree/getDoc", {
+            id,
+            mode: 0,
+            size: Constants.SIZE_GET_MAX,
+        }, getResponse => {
+            onGet({
+                updateReadonly: true,
+                data: getResponse,
+                protyle: edit.protyle,
+                action: getResponse.data.rootID === getResponse.data.id ? [Constants.CB_GET_HTML] : [Constants.CB_GET_ALL, Constants.CB_GET_HTML],
+            });
         });
     });
 };

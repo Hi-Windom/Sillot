@@ -1,10 +1,15 @@
 import {BlockPanel} from "./Panel";
-import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName} from "../protyle/util/hasClosest";
+import {
+    hasClosestBlock,
+    hasClosestByAttribute,
+    hasClosestByClassName,
+} from "../protyle/util/hasClosest";
 import {fetchSyncPost} from "../util/fetch";
 import {hideTooltip, showTooltip} from "../dialog/tooltip";
 import {getIdFromSYProtocol} from "../util/pathName";
 import {App} from "../index";
 import {Constants} from "../constants";
+import {getCellText} from "../protyle/render/av/cell";
 import {isPadAppMode} from "sofill/env";
 
 let popoverTargetElement: HTMLElement;
@@ -17,21 +22,24 @@ export const initBlockPopover = (app: App) => {
             return;
         }
         const aElement = hasClosestByAttribute(event.target, "data-type", "a", true) ||
-            hasClosestByAttribute(event.target, "data-type", "tab-header") ||
-            hasClosestByClassName(event.target, "av__celltext") ||
             hasClosestByClassName(event.target, "ariaLabel") ||
-            hasClosestByAttribute(event.target, "data-type", "inline-memo");
+            hasClosestByAttribute(event.target, "data-type", "tab-header") ||
+            hasClosestByAttribute(event.target, "data-type", "inline-memo") ||
+            hasClosestByClassName(event.target, "av__cell");
         if (aElement) {
             let tip = aElement.getAttribute("aria-label") || aElement.getAttribute("data-inline-memo-content");
-            if (aElement.classList.contains("av__celltext")) {
-                if (aElement.offsetWidth > aElement.parentElement.clientWidth - 5) {    // 只能减左边 padding，换行时字体会穿透到右侧 padding
-                    if (aElement.querySelector(".av__cellicon")) {
-                        tip = `${aElement.firstChild.textContent} → ${aElement.lastChild.textContent}`;
-                    } else {
-                        tip = aElement.textContent;
+            if (aElement.classList.contains("av__cell")) {
+                if (aElement.classList.contains("av__cell--header")) {
+                    const textElement = aElement.querySelector(".av__celltext");
+                    if (textElement.scrollWidth > textElement.clientWidth + 2) {
+                        tip = getCellText(aElement);
                     }
-                } else {
-                    return;
+                } else if (aElement.dataset.wrap !== "true" && event.target.dataset.type !== "block-more" && !hasClosestByClassName(event.target, "block__icon")) {
+                    aElement.style.overflow = "auto";
+                    if (aElement.scrollWidth > aElement.clientWidth + 2) {
+                        tip = getCellText(aElement);
+                    }
+                    aElement.style.overflow = "";
                 }
             }
             if (!tip) {
@@ -41,10 +49,11 @@ export const initBlockPopover = (app: App) => {
                     tip += "<br>" + title;
                 }
             }
-            if (tip && !tip.startsWith("siyuan://blocks") && !aElement.classList.contains("b3-tooltips")) {
+            if (tip && !aElement.classList.contains("b3-tooltips")) {
                 showTooltip(tip, aElement);
                 event.stopPropagation();
-                return;
+            } else {
+                hideTooltip();
             }
         } else if (!aElement) {
             const tipElement = hasClosestByAttribute(event.target, "id", "tooltip", true);
@@ -100,14 +109,41 @@ export const initBlockPopover = (app: App) => {
 const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
     // pad 端点击后 event.target 不会更新。
     const target = document.elementFromPoint(event.clientX, event.clientY);
-    if (hasClosestByClassName(target, "b3-menu") ||
-        (target.id && target.tagName !== "svg" && (target.id.startsWith("minder_node") || target.id.startsWith("kity_") || target.id.startsWith("node_")))
+    if (!target) {
+        return false;
+    }
+    if ((target.id && target.tagName !== "svg" && (target.id.startsWith("minder_node") || target.id.startsWith("kity_") || target.id.startsWith("node_")))
         || target.classList.contains("counter")
         || target.tagName === "circle"
     ) {
-        // b3-menu 需要处理，(( 后的 hint 上的图表移上去需显示预览
         // gutter & mindmap & 文件树上的数字 & 关系图节点不处理
         return false;
+    }
+
+    const avPanelElement = hasClosestByClassName(target, "av__panel");
+    if (avPanelElement) {
+        // 浮窗上点击 av 操作，浮窗不能消失
+        const blockPanel = window.siyuan.blockPanels.find((item) => {
+            if (item.element.style.zIndex < avPanelElement.style.zIndex) {
+                return true;
+            }
+        });
+        if (blockPanel) {
+            return false;
+        }
+    } else {
+        // 浮窗上点击菜单，浮窗不能消失 https://ld246.com/article/1632668091023
+        const menuElement = hasClosestByClassName(target, "b3-menu");
+        if (menuElement) {
+            const blockPanel = window.siyuan.blockPanels.find((item) => {
+                if (item.element.style.zIndex < menuElement.style.zIndex) {
+                    return true;
+                }
+            });
+            if (blockPanel) {
+                return false;
+            }
+        }
     }
     popoverTargetElement = hasClosestByAttribute(target, "data-type", "block-ref") as HTMLElement ||
         hasClosestByAttribute(target, "data-type", "virtual-block-ref") as HTMLElement;
@@ -143,23 +179,32 @@ const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
                 }
             }
         });
+        const menuLevel = parseInt(window.siyuan.menus.menu.element.dataset.from);
         if (blockElement) {
-            for (let i = 0; i < window.siyuan.blockPanels.length; i++) {
+            for (let i = window.siyuan.blockPanels.length - 1; i >= 0; i--) {
                 const item = window.siyuan.blockPanels[i];
+                const itemLevel = parseInt(item.element.getAttribute("data-level"));
                 if ((item.targetElement || typeof item.x === "number") &&
-                    parseInt(item.element.getAttribute("data-level")) > (maxEditLevels[item.element.getAttribute("data-oid")] || 0) &&
+                    itemLevel > (maxEditLevels[item.element.getAttribute("data-oid")] || 0) &&
                     item.element.getAttribute("data-pin") === "false" &&
-                    parseInt(item.element.getAttribute("data-level")) > parseInt(blockElement.getAttribute("data-level"))) {
-                    item.destroy();
-                    i--;
+                    itemLevel > parseInt(blockElement.getAttribute("data-level"))) {
+                    if (menuLevel && menuLevel >= itemLevel) {
+                        // 有 gutter 菜单时不隐藏
+                    } else {
+                        item.destroy();
+                    }
                 }
             }
         } else {
-            for (let i = 0; i < window.siyuan.blockPanels.length; i++) {
+            for (let i = window.siyuan.blockPanels.length - 1; i >= 0; i--) {
                 const item = window.siyuan.blockPanels[i];
+                const itemLevel = parseInt(item.element.getAttribute("data-level"));
                 if ((item.targetElement || typeof item.x === "number") && item.element.getAttribute("data-pin") === "false") {
-                    item.destroy();
-                    i--;
+                    if (menuLevel && menuLevel >= itemLevel) {
+                        // 有 gutter 菜单时不隐藏
+                    } else {
+                        item.destroy();
+                    }
                 }
             }
         }
@@ -167,7 +212,7 @@ const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
 };
 
 const getTarget = (event: MouseEvent & { target: HTMLElement }, aElement: false | HTMLElement) => {
-    if (hasClosestByClassName(event.target, "history__repo", true)) {
+    if (window.siyuan.config.editor.floatWindowMode === 2 || hasClosestByClassName(event.target, "history__repo", true)) {
         return false;
     }
     popoverTargetElement = hasClosestByAttribute(event.target, "data-type", "block-ref") as HTMLElement ||
@@ -178,10 +223,15 @@ const getTarget = (event: MouseEvent & { target: HTMLElement }, aElement: false 
     if (!popoverTargetElement) {
         popoverTargetElement = hasClosestByClassName(event.target, "popover__block") as HTMLElement;
     }
-    if (!popoverTargetElement && aElement && (
-        (aElement.getAttribute("data-href")?.startsWith("siyuan://blocks") && aElement.getAttribute("prevent-popover") !== "true") ||
-        (aElement.classList.contains("av__celltext") && aElement.dataset.type === "url"))) {
-        popoverTargetElement = aElement;
+    if (!popoverTargetElement && aElement) {
+        if (aElement.getAttribute("data-href")?.startsWith("siyuan://blocks") && aElement.getAttribute("prevent-popover") !== "true") {
+            popoverTargetElement = aElement;
+        } else if (aElement.classList.contains("av__cell")) {
+            const textElement = aElement.querySelector(".av__celltext--url") as HTMLElement;
+            if (textElement && textElement.dataset.type === "url" && textElement.dataset.href?.startsWith("siyuan://blocks")) {
+                popoverTargetElement = textElement;
+            }
+        }
     }
     if (!popoverTargetElement || window.siyuan.altIsPressed ||
         (window.siyuan.config.editor.floatWindowMode === 0 && window.siyuan.ctrlIsPressed) ||
@@ -234,6 +284,10 @@ export const showPopover = async (app: App, showRef = false) => {
     } else if (popoverTargetElement.dataset.type === "url") {
         // 在 database 的 url 列中以思源协议开头的链接
         ids = [getIdFromSYProtocol(popoverTargetElement.textContent.trim())];
+    } else if (popoverTargetElement.dataset.popoverUrl) {
+        // 镜像数据库
+        const postResponse = await fetchSyncPost(popoverTargetElement.dataset.popoverUrl, {avID: popoverTargetElement.dataset.avId});
+        ids = postResponse.data;
     } else {
         // pdf
         let targetId;
@@ -242,15 +296,23 @@ export const showPopover = async (app: App, showRef = false) => {
             // 编辑器中的引用数
             targetId = popoverTargetElement.parentElement.parentElement.getAttribute("data-node-id");
         } else if (popoverTargetElement.classList.contains("pdf__rect")) {
-            targetId = popoverTargetElement.getAttribute("data-node-id");
-            url = "/api/block/getRefIDsByFileAnnotationID";
+            const relationIds = popoverTargetElement.getAttribute("data-relations");
+            if (relationIds) {
+                ids = relationIds.split(",");
+                url = "";
+            } else {
+                targetId = popoverTargetElement.getAttribute("data-node-id");
+                url = "/api/block/getRefIDsByFileAnnotationID";
+            }
         } else if (!targetId) {
             // 文件树中的引用数
             targetId = popoverTargetElement.parentElement.getAttribute("data-node-id");
         }
-        const postResponse = await fetchSyncPost(url, {id: targetId});
-        ids = postResponse.data.refIDs;
-        defIds = postResponse.data.defIDs;
+        if (url) {
+            const postResponse = await fetchSyncPost(url, {id: targetId});
+            ids = postResponse.data.refIDs;
+            defIds = postResponse.data.defIDs;
+        }
     }
 
     let hasPin = false;

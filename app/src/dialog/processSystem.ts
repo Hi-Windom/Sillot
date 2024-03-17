@@ -22,13 +22,17 @@ import {setEmpty} from "../mobile/util/setEmpty";
 import {hideAllElements, hideElements} from "../protyle/ui/hideElements";
 import {App} from "../index";
 import {saveScroll} from "../protyle/scroll/saveScroll";
-import {isInAndroid, isInIOS} from "../protyle/util/compatibility";
+import {isInAndroid, isInIOS, setStorageVal} from "../protyle/util/compatibility";
+import {Plugin} from "../plugin";
 
-const updateTitle = (rootID: string, tab: Tab) => {
+const updateTitle = (rootID: string, tab: Tab, protyle?: IProtyle) => {
     fetchPost("/api/block/getDocInfo", {
         id: rootID
     }, (response) => {
         tab.updateTitle(response.data.name);
+        if (protyle && protyle.title) {
+            protyle.title.setTitle(response.data.name);
+        }
     });
 };
 
@@ -50,6 +54,7 @@ export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRoot
             fetchPost("/api/block/getDocInfo", {
                 id: window.siyuan.mobile.editor.protyle.block.rootID
             }, (response) => {
+                setTitle(response.data.name);
                 (document.getElementById("toolbarName") as HTMLInputElement).value = response.data.name === "Untitled" ? "" : response.data.name;
             });
         }
@@ -62,14 +67,16 @@ export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRoot
     allModels.editor.forEach(item => {
         if (data.upsertRootIDs.includes(item.editor.protyle.block.rootID)) {
             reloadProtyle(item.editor.protyle, false);
-            updateTitle(item.editor.protyle.block.rootID, item.parent);
+            updateTitle(item.editor.protyle.block.rootID, item.parent, item.editor.protyle);
         } else if (data.removeRootIDs.includes(item.editor.protyle.block.rootID)) {
-            item.parent.parent.removeTab(item.parent.id, false, false, false);
+            item.parent.parent.removeTab(item.parent.id, false, false);
+            delete window.siyuan.storage[Constants.LOCAL_FILEPOSITION][item.editor.protyle.block.rootID];
+            setStorageVal(Constants.LOCAL_FILEPOSITION, window.siyuan.storage[Constants.LOCAL_FILEPOSITION]);
         }
     });
     allModels.graph.forEach(item => {
         if (item.type === "local" && data.removeRootIDs.includes(item.rootId)) {
-            item.parent.parent.removeTab(item.parent.id, false, false, false);
+            item.parent.parent.removeTab(item.parent.id, false, false);
         } else if (item.type !== "local" || data.upsertRootIDs.includes(item.rootId)) {
             item.searchGraph(false);
             if (item.type === "local") {
@@ -79,7 +86,7 @@ export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRoot
     });
     allModels.outline.forEach(item => {
         if (item.type === "local" && data.removeRootIDs.includes(item.blockId)) {
-            item.parent.parent.removeTab(item.parent.id, false, false, false);
+            item.parent.parent.removeTab(item.parent.id, false, false);
         } else if (item.type !== "local" || data.upsertRootIDs.includes(item.blockId)) {
             fetchPost("/api/outline/getDocOutline", {
                 id: item.blockId,
@@ -93,7 +100,7 @@ export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRoot
     });
     allModels.backlink.forEach(item => {
         if (item.type === "local" && data.removeRootIDs.includes(item.rootId)) {
-            item.parent.parent.removeTab(item.parent.id, false, false, false);
+            item.parent.parent.removeTab(item.parent.id, false, false);
         } else {
             item.refresh();
             if (item.type === "local") {
@@ -124,10 +131,13 @@ export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRoot
     /// #endif
 };
 
-export const lockScreen = () => {
+export const lockScreen = (app: App) => {
     if (window.siyuan.config.readonly) {
         return;
     }
+    app.plugins.forEach(item => {
+        item.eventBus.emit("lock-screen");
+    });
     /// #if BROWSER
     fetchPost("/api/system/logoutAuth", {}, () => {
         redirectToCheckAuth();
@@ -160,6 +170,7 @@ export const kernelError = () => {
 </div>`
     });
     dialog.element.id = "errorLog";
+    dialog.element.setAttribute("data-key", Constants.DIALOG_KERNELFAULT);
     const restartElement = dialog.element.querySelector(".b3-button");
     if (restartElement) {
         restartElement.addEventListener("click", () => {
@@ -173,7 +184,9 @@ export const exitSiYuan = () => {
     exportIDB().then(() => {
     hideAllElements(["util"]);
     /// #if MOBILE
-    saveScroll(window.siyuan.mobile.editor.protyle);
+    if (window.siyuan.mobile.editor) {
+        saveScroll(window.siyuan.mobile.editor.protyle);
+    }
     /// #endif
     fetchPost("/api/system/exit", {force: false}, (response) => {
         if (response.code === 1) { // 同步执行失败
@@ -249,14 +262,13 @@ export const transactionError = () => {
 </div>`,
         width: isMobile() ? "92vw" : "520px",
     });
+    dialog.element.setAttribute("data-key", Constants.DIALOG_STATEEXCEPTED);
     const btnsElement = dialog.element.querySelectorAll(".b3-button");
     btnsElement[0].addEventListener("click", () => {
         /// #if MOBILE
         exitSiYuan();
         /// #else
         exportLayout({
-            reload: false,
-            onlyData: false,
             errorExit: true,
             cb: exitSiYuan
         });
@@ -301,7 +313,7 @@ export const progressLoading = (data: IWebSocketData) => {
     }
     if (data.code === 0) {
         progressElement.innerHTML = /*html*/ `<div class="b3-dialog__scrim" style="opacity: 1"></div>
-<div style="position: fixed;top: 45vh;width: 70vw;left: 15vw;color:var(--b3-theme-on-surface);">
+<div class="b3-dialog__loading">
     <div style="text-align: right">${data.data.current}/${data.data.total}</div>
     <div style="margin: 8px 0;height: 8px;border-radius: var(--b3-border-radius);overflow: hidden;background-color:#fff;"><div style="width: ${data.data.current / data.data.total * 100}%;transition: var(--b3-transition);background-color: var(--b3-theme-primary);height: 8px;"></div></div>
     <div>${data.msg}</div>
@@ -311,7 +323,7 @@ export const progressLoading = (data: IWebSocketData) => {
             progressElement.lastElementChild.lastElementChild.innerHTML = data.msg;
         } else {
             progressElement.innerHTML = /*html*/ `<div class="b3-dialog__scrim" style="opacity: 1"></div>
-<div style="position: fixed;top: 45vh;width: 70vw;left: 15vw;color:var(--b3-theme-on-surface);">
+<div class="b3-dialog__loading">
     <div style="margin: 8px 0;height: 8px;border-radius: var(--b3-border-radius);overflow: hidden;background-color:#fff;"><div style="background-color: var(--b3-theme-primary);height: 8px;background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);animation: stripMove 450ms linear infinite;background-size: 50px 50px;"></div></div>
     <div>${data.msg}</div>
 </div>`;
@@ -349,6 +361,7 @@ export const bootSync = () => {
     <button class="b3-button b3-button--text">${window.siyuan.languages.syncNow}</button>
 </div>`
             });
+            dialog.element.setAttribute("data-key", Constants.DIALOG_BOOTSYNCFAILED);
             const btnsElement = dialog.element.querySelectorAll(".b3-button");
             btnsElement[0].addEventListener("click", () => {
                 dialog.destroy();
@@ -412,7 +425,7 @@ export const downloadProgress = (data: { id: string, percent: number }) => {
     }
 };
 
-export const processSync = (data?: IWebSocketData) => {
+export const processSync = (data?: IWebSocketData, plugins?: Plugin[]) => {
     /// #if MOBILE
     const menuSyncUseElement = document.querySelector("#menuSyncNow use");
     const barSyncUseElement = document.querySelector("#toolbarSync use");
@@ -468,4 +481,13 @@ export const processSync = (data?: IWebSocketData) => {
         useElement.setAttribute("xlink:href", "#iconCloudSucc");
     }
     /// #endif
+    plugins.forEach((item) => {
+        if (data.code === 0) {
+            item.eventBus.emit("sync-start", data);
+        } else if (data.code === 1) {
+            item.eventBus.emit("sync-end", data);
+        } else if (data.code === 2) {
+            item.eventBus.emit("sync-fail", data);
+        }
+    });
 };

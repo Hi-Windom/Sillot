@@ -40,7 +40,6 @@ import (
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/sql"
-	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 	"golang.org/x/mod/semver"
@@ -60,9 +59,9 @@ type AppConf struct {
 	Editor         *conf.Editor     `json:"editor"`         // 编辑器配置
 	Export         *conf.Export     `json:"export"`         // 导出配置
 	Graph          *conf.Graph      `json:"graph"`          // 关系图配置
-	UILayout       *conf.UILayout   `json:"uiLayout"`       // 界面布局，v2.8.0 后这个字段不再使用
+	UILayout       *conf.UILayout   `json:"uiLayout"`       // 界面布局。不要直接使用，使用 GetUILayout() 和 SetUILayout() 方法
 	UserData       string           `json:"userData"`       // 社区用户信息，对 User 加密存储
-	User           *conf.User       `json:"-"`              // 社区用户内存结构，不持久化
+	User           *conf.User       `json:"-"`              // 社区用户内存结构，不持久化。不要直接使用，使用 GetUser() 和 SetUser() 方法
 	Account        *conf.Account    `json:"account"`        // 帐号配置
 	ReadOnly       bool             `json:"readonly"`       // 是否是以只读模式运行
 	LocalIPs       []string         `json:"localIPs"`       // 本地 IP 列表
@@ -80,6 +79,33 @@ type AppConf struct {
 	OpenHelp       bool             `json:"openHelp"`       // 启动后是否需要打开用户指南
 	ShowChangelog  bool             `json:"showChangelog"`  // 是否显示版本更新日志
 	CloudRegion    int              `json:"cloudRegion"`    // 云端区域，0：中国大陆，1：北美
+	Snippet        *conf.Snpt       `json:"snippet"`        // 代码片段
+
+	m *sync.Mutex
+}
+
+func (conf *AppConf) GetUILayout() *conf.UILayout {
+	conf.m.Lock()
+	defer conf.m.Unlock()
+	return conf.UILayout
+}
+
+func (conf *AppConf) SetUILayout(uiLayout *conf.UILayout) {
+	conf.m.Lock()
+	defer conf.m.Unlock()
+	conf.UILayout = uiLayout
+}
+
+func (conf *AppConf) GetUser() *conf.User {
+	conf.m.Lock()
+	defer conf.m.Unlock()
+	return conf.User
+}
+
+func (conf *AppConf) SetUser(user *conf.User) {
+	conf.m.Lock()
+	defer conf.m.Unlock()
+	conf.User = user
 }
 
 func InitConf() {
@@ -92,7 +118,7 @@ func InitConf() {
 		}
 	}
 
-	Conf = &AppConf{LogLevel: "debug"}
+	Conf = &AppConf{LogLevel: "debug", m: &sync.Mutex{}}
 	confPath := filepath.Join(util.ConfDir, "conf.json")
 	if gulu.File.IsExist(confPath) {
 		data, err := os.ReadFile(confPath)
@@ -181,9 +207,8 @@ func InitConf() {
 	if "../" == Conf.FileTree.DocCreateSavePath {
 		Conf.FileTree.DocCreateSavePath = "../Untitled"
 	}
-	for strings.HasSuffix(Conf.FileTree.DocCreateSavePath, "/") {
-		Conf.FileTree.DocCreateSavePath = strings.TrimSuffix(Conf.FileTree.DocCreateSavePath, "/")
-		Conf.FileTree.DocCreateSavePath = strings.TrimSpace(Conf.FileTree.DocCreateSavePath)
+	if "/" == Conf.FileTree.DocCreateSavePath {
+		Conf.FileTree.DocCreateSavePath = "/Untitled"
 	}
 	util.UseSingleLineSave = Conf.FileTree.UseSingleLineSave
 
@@ -258,7 +283,6 @@ func InitConf() {
 
 		Conf.System.KernelVersion = util.Ver
 		Conf.System.IsInsider = util.IsInsider
-		task.AppendTask(task.UpgradeUserGuide, upgradeUserGuide)
 	}
 	if nil == Conf.System.NetworkProxy {
 		Conf.System.NetworkProxy = &conf.NetworkProxy{}
@@ -272,6 +296,10 @@ func InitConf() {
 	if util.ContainerStd == util.Container {
 		Conf.System.ID = util.GetDeviceID()
 		Conf.System.Name = util.GetDeviceName()
+	}
+
+	if nil == Conf.Snippet {
+		Conf.Snippet = conf.NewSnpt()
 	}
 
 	Conf.System.AppDir = util.WorkingDir
@@ -288,7 +316,7 @@ func InitConf() {
 	Conf.System.OSPlatform = util.GetOSPlatform()
 
 	if "" != Conf.UserData {
-		Conf.User = loadUserFromConf()
+		Conf.SetUser(loadUserFromConf())
 	}
 	if nil == Conf.Account {
 		Conf.Account = conf.NewAccount()
@@ -331,8 +359,8 @@ func InitConf() {
 			Conf.Repo.SyncIndexTiming = int64(val)
 		}
 	}
-	if 7000 > Conf.Repo.SyncIndexTiming {
-		Conf.Repo.SyncIndexTiming = 7 * 1000
+	if 12000 > Conf.Repo.SyncIndexTiming {
+		Conf.Repo.SyncIndexTiming = 12 * 1000
 	}
 
 	if nil == Conf.Search {
@@ -377,15 +405,27 @@ func InitConf() {
 	if "" == Conf.AI.OpenAI.APIModel {
 		Conf.AI.OpenAI.APIModel = openai.GPT3Dot5Turbo
 	}
+	if "" == Conf.AI.OpenAI.APIUserAgent {
+		Conf.AI.OpenAI.APIUserAgent = util.UserAgent
+	}
+	if "" == Conf.AI.OpenAI.APIProvider {
+		Conf.AI.OpenAI.APIProvider = "OpenAI"
+	}
 
 	if "" != Conf.AI.OpenAI.APIKey {
 		logging.LogInfof("OpenAI API enabled\n"+
+			"    userAgent=%s\n"+
 			"    baseURL=%s\n"+
 			"    timeout=%ds\n"+
 			"    proxy=%s\n"+
 			"    model=%s\n"+
 			"    maxTokens=%d",
-			Conf.AI.OpenAI.APIBaseURL, Conf.AI.OpenAI.APITimeout, Conf.AI.OpenAI.APIProxy, Conf.AI.OpenAI.APIModel, Conf.AI.OpenAI.APIMaxTokens)
+			Conf.AI.OpenAI.APIUserAgent,
+			Conf.AI.OpenAI.APIBaseURL,
+			Conf.AI.OpenAI.APITimeout,
+			Conf.AI.OpenAI.APIProxy,
+			Conf.AI.OpenAI.APIModel,
+			Conf.AI.OpenAI.APIMaxTokens)
 	}
 
 	Conf.ReadOnly = util.ReadOnly
@@ -466,6 +506,7 @@ func initLang() {
 		util.TimeLangs[name] = langMap["_time"].(map[string]interface{})
 		util.TaskActionLangs[name] = langMap["_taskAction"].(map[string]interface{})
 		util.TrayMenuLangs[name] = langMap["_trayMenu"].(map[string]interface{})
+		util.AttrViewLangs[name] = langMap["_attrView"].(map[string]interface{})
 	}
 }
 
@@ -485,14 +526,23 @@ var exitLock = sync.Mutex{}
 // Close 退出内核进程.
 //
 // force：是否不执行同步过程而直接退出
+//
 // execInstallPkg：是否执行新版本安装包
-// 0：默认按照设置项 System.DownloadInstallPkg 检查并推送提示
-// 1：不执行新版本安装
-// 2：执行新版本安装
+//
+//	0：默认按照设置项 System.DownloadInstallPkg 检查并推送提示
+//	1：不执行新版本安装
+//	2：执行新版本安装
+//
+// 返回值 exitCode：
+//
+//	0：正常退出
+//	1：同步执行失败
+//	2：提示新安装包
+//
+// 当 force 为 true（强制退出）并且 execInstallPkg 为 0（默认检查更新）并且同步失败并且新版本安装版已经准备就绪时，执行新版本安装 https://github.com/siyuan-note/siyuan/issues/10288
 func Close(force bool, execInstallPkg int) (exitCode int) {
 	exitLock.Lock()
 	defer exitLock.Unlock()
-	util.IsExiting = true
 
 	logging.LogInfof("exiting kernel [force=%v, execInstallPkg=%d]", force, execInstallPkg)
 	util.PushMsg(Conf.Language(95), 10000*60)
@@ -501,7 +551,7 @@ func Close(force bool, execInstallPkg int) (exitCode int) {
 	if !force {
 		if Conf.Sync.Enabled && 3 != Conf.Sync.Mode &&
 			((IsSubscriber() && conf.ProviderSiYuan == Conf.Sync.Provider) || conf.ProviderSiYuan != Conf.Sync.Provider) {
-			syncData(true, false, false)
+			syncData(true, false)
 			if 0 != ExitSyncSucc {
 				exitCode = 1
 				return
@@ -509,20 +559,23 @@ func Close(force bool, execInstallPkg int) (exitCode int) {
 		}
 	}
 
+	// Close the user guide when exiting https://github.com/siyuan-note/siyuan/issues/10322
+	closeUserGuide()
+
+	util.IsExiting.Store(true)
 	waitSecondForExecInstallPkg := false
 	if !skipNewVerInstallPkg() {
-		newVerInstallPkgPath := getNewVerInstallPkgPath()
-		if "" != newVerInstallPkgPath {
-			if 0 == execInstallPkg { // 新版本安装包已经准备就绪
-				exitCode = 2
-				logging.LogInfof("the new version install pkg is ready [%s], waiting for the user's next instruction", newVerInstallPkgPath)
-				return
-			} else if 2 == execInstallPkg { // 执行新版本安装
+		if newVerInstallPkgPath := getNewVerInstallPkgPath(); "" != newVerInstallPkgPath {
+			if 2 == execInstallPkg || (force && 0 == execInstallPkg) { // 执行新版本安装
 				waitSecondForExecInstallPkg = true
 				if gulu.OS.IsWindows() {
 					util.PushMsg(Conf.Language(130), 1000*30)
 				}
 				go execNewVerInstallPkg(newVerInstallPkgPath)
+			} else if 0 == execInstallPkg { // 新版本安装包已经准备就绪
+				exitCode = 2
+				logging.LogInfof("the new version install pkg is ready [%s], waiting for the user's next instruction", newVerInstallPkgPath)
+				return
 			}
 		}
 	}
@@ -534,6 +587,18 @@ func Close(force bool, execInstallPkg int) (exitCode int) {
 	clearWorkspaceTemp()
 	clearCorruptedNotebooks()
 	clearPortJSON()
+
+	// 将当前工作空间放到工作空间列表的最后一个
+	// Open the last workspace by default https://github.com/siyuan-note/siyuan/issues/10570
+	workspacePaths, err := util.ReadWorkspacePaths()
+	if nil != err {
+		logging.LogErrorf("read workspace paths failed: %s", err)
+	} else {
+		workspacePaths = gulu.Str.RemoveElem(workspacePaths, util.WorkspaceDir)
+		workspacePaths = append(workspacePaths, util.WorkspaceDir)
+		util.WriteWorkspacePaths(workspacePaths)
+	}
+
 	util.UnlockWorkspace()
 
 	time.Sleep(500 * time.Millisecond)
@@ -572,15 +637,13 @@ func NewLute() (ret *lute.Lute) {
 	return
 }
 
-var confSaveLock = sync.Mutex{}
-
 func (conf *AppConf) Save() {
 	if util.ReadOnly {
 		return
 	}
 
-	confSaveLock.Lock()
-	defer confSaveLock.Unlock()
+	Conf.m.Lock()
+	defer Conf.m.Unlock()
 
 	newData, _ := gulu.JSON.MarshalIndentJSON(Conf, "", "  ")
 	confPath := filepath.Join(util.ConfDir, "conf.json")
@@ -612,6 +675,15 @@ func (conf *AppConf) Close() {
 
 func (conf *AppConf) Box(boxID string) *Box {
 	for _, box := range conf.GetOpenedBoxes() {
+		if box.ID == boxID {
+			return box
+		}
+	}
+	return nil
+}
+
+func (conf *AppConf) GetBox(boxID string) *Box {
+	for _, box := range conf.GetBoxes() {
 		if box.ID == boxID {
 			return box
 		}
@@ -736,16 +808,22 @@ func InitBoxes() {
 }
 
 func IsSubscriber() bool {
-	return nil != Conf.User && (-1 == Conf.User.UserSiYuanProExpireTime || 0 < Conf.User.UserSiYuanProExpireTime) && 0 == Conf.User.UserSiYuanSubscriptionStatus
+	u := Conf.GetUser()
+	return nil != u && (-1 == u.UserSiYuanProExpireTime || 0 < u.UserSiYuanProExpireTime) && 0 == u.UserSiYuanSubscriptionStatus
 }
 
 func IsPaidUser() bool {
+	// S3/WebDAV data sync and backup are available for a fee https://github.com/siyuan-note/siyuan/issues/8780
+
 	if IsSubscriber() {
 		return true
 	}
-	return nil != Conf.User // Sign in to use S3/WebDAV data sync https://github.com/siyuan-note/siyuan/issues/8779
-	// TODO S3/WebDAV data sync and backup are available for a fee https://github.com/siyuan-note/siyuan/issues/8780
-	// return nil != Conf.User && 1 == Conf.User.UserSiYuanOneTimePayStatus
+
+	u := Conf.GetUser()
+	if nil == u {
+		return false
+	}
+	return 1 == u.UserSiYuanOneTimePayStatus
 }
 
 const (
@@ -892,7 +970,7 @@ func clearWorkspaceTemp() {
 	logging.LogInfof("cleared workspace temp")
 }
 
-func upgradeUserGuide() {
+func closeUserGuide() {
 	defer logging.Recover()
 
 	dirs, err := os.ReadDir(util.DataDir)
@@ -923,10 +1001,20 @@ func upgradeUserGuide() {
 		data, readErr := filelock.ReadFile(boxConfPath)
 		if nil != readErr {
 			logging.LogErrorf("read box conf [%s] failed: %s", boxConfPath, readErr)
+			if removeErr := filelock.Remove(boxDirPath); nil != removeErr {
+				logging.LogErrorf("remove corrupted user guide box [%s] failed: %s", boxDirPath, removeErr)
+			} else {
+				logging.LogInfof("removed corrupted user guide box [%s]", boxDirPath)
+			}
 			continue
 		}
 		if readErr = gulu.JSON.UnmarshalJSON(data, boxConf); nil != readErr {
 			logging.LogErrorf("parse box conf [%s] failed: %s", boxConfPath, readErr)
+			if removeErr := filelock.Remove(boxDirPath); nil != removeErr {
+				logging.LogErrorf("remove corrupted user guide box [%s] failed: %s", boxDirPath, removeErr)
+			} else {
+				logging.LogInfof("removed corrupted user guide box [%s]", boxDirPath)
+			}
 			continue
 		}
 
@@ -934,17 +1022,23 @@ func upgradeUserGuide() {
 			continue
 		}
 
+		msgId := util.PushMsg(Conf.language(233), 30000)
+		evt := util.NewCmdResult("unmount", 0, util.PushModeBroadcast)
+		evt.Data = map[string]interface{}{
+			"box": boxID,
+		}
+		util.PushEvent(evt)
+
 		unindex(boxID)
 
-		if err = filelock.Remove(boxDirPath); nil != err {
-			return
-		}
-		p := filepath.Join(util.WorkingDir, "guide", boxID)
-		if err = filelock.Copy(p, boxDirPath); nil != err {
-			return
+		if removeErr := filelock.Remove(boxDirPath); nil != removeErr {
+			logging.LogErrorf("remove corrupted user guide box [%s] failed: %s", boxDirPath, removeErr)
 		}
 
-		index(boxID)
+		sql.WaitForWritingDatabase()
+
+		util.PushClearMsg(msgId)
+		logging.LogInfof("closed user guide box [%s]", boxID)
 	}
 }
 

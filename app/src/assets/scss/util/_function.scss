@@ -12,6 +12,12 @@
     width: 8px;
     display: inline-block;
     flex-shrink: 0;
+
+    &--small {
+      width: 4px;
+      display: inline-block;
+      flex-shrink: 0;
+    }
   }
 
   &__hr {
@@ -40,9 +46,9 @@
 
     &-1 {
       flex: 1;
-      min-width: 0.1px;
+      min-width: .1px;
       overflow: auto;
-      min-height: 0.1px;
+      min-height: .1px;
     }
 
     &-column {
@@ -62,6 +68,10 @@
 
   &__pointer {
     cursor: pointer;
+  }
+
+  &__grab {
+    cursor: grab;
   }
 
   &__none {
@@ -119,7 +129,7 @@
   }
 
   &__code {
-    padding: 0.2em 0.4em;
+    padding: .2em .4em;
     margin: 0;
     font-size: 85%;
     border-radius: var(--b3-border-radius);
@@ -167,6 +177,10 @@
 
   &__primary {
     color: var(--b3-theme-primary);
+  }
+
+  &__success {
+    color: var(--b3-theme-success);
   }
 
   &__secondary {

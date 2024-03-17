@@ -20,7 +20,6 @@ import {hideElements} from "../ui/hideElements";
 import {genAssetHTML} from "../../asset/renderAssets";
 import {unicode2Emoji} from "../../emoji";
 import {avRender} from "../render/av/render";
-import {isPaidUser} from "../../util/needSubscribe";
 
 export const hintSlash = (key: string, protyle: IProtyle) => {
     const allList: IHintData[] = [{
@@ -47,15 +46,11 @@ export const hintSlash = (key: string, protyle: IProtyle) => {
         filter: ["ai chat"],
         value: Constants.ZWSP + 5,
         html: '<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconSparkles"></use></svg><span class="b3-list-item__text">AI Chat</span></div>',
-    }];
-    if (isPaidUser()) {
-        allList.push({
-            filter: ["数据库", "属性视图", "shujuku", "shuxingshitu", "sjk", "sxst", "database", "attribute view"],
-            value: '<div data-type="NodeAttributeView" data-av-type="table"></div>',
-            html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconDatabase"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.database}</span></div>`,
-        });
-    }
-    [{
+    },{
+        filter: ["数据库", "属性视图", "shujuku", "shuxingshitu", "sjk", "sxst", "database", "attribute view"],
+        value: '<div data-type="NodeAttributeView" data-av-type="table"></div>',
+        html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconDatabase"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.database}</span></div>`,
+    }, {
         filter: ["文档", "子文档", "wendang", "wd", "ziwendang", "zwd", "xjwd"],
         value: Constants.ZWSP + 4,
         html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconFile"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.newFile}</span><span class="b3-menu__accelerator">${updateHotkeyTip(window.siyuan.config.keymap.general.newFile.custom)}</span></div>`,
@@ -246,13 +241,10 @@ export const hintSlash = (key: string, protyle: IProtyle) => {
         filter: ["移除样式", "yichuyangshi", "ycys", "remove style"],
         value: `style${Constants.ZWSP}`,
         html: `<div class="b3-list-item__first"><div class="color__square">A</div><span class="b3-list-item__text">${window.siyuan.languages.clearFontStyle}</span></div>`,
-    }].forEach(item => {
-        allList.push(item);
-    });
-    allList.push({
+    },{
         value: "",
         html: "separator",
-    });
+    }];
     let hasPlugin = false;
     protyle.app.plugins.forEach((plugin) => {
         plugin.protyleSlash.forEach(slash => {
@@ -345,7 +337,7 @@ export const genHintItemHTML = (item: IBlock) => {
     ${iconHTML}
     <span class="b3-list-item__text">${item.content}</span>
 </div>
-<div class="b3-list-item__meta b3-list-item__showall" style="margin-bottom: 4px">${item.hPath}</div>`;
+<div class="b3-list-item__meta b3-list-item__showall">${item.hPath}</div>`;
 };
 
 export const hintRef = (key: string, protyle: IProtyle, source: THintSource): IHintData[] => {
@@ -368,9 +360,9 @@ export const hintRef = (key: string, protyle: IProtyle, source: THintSource): IH
             });
         }
         response.data.blocks.forEach((item: IBlock) => {
-            let value = `<span data-type="block-ref" data-id="${item.id}" data-subtype="d">${item.name || item.refText}</span>`;
+            let value = `<span data-type="block-ref" data-id="${item.id}" data-subtype="d">${item.name || item.refText.replace(new RegExp(Constants.ZWSP, "g"), "")}</span>`;
             if (source === "search") {
-                value = `<span data-type="block-ref" data-id="${item.id}" data-subtype="s">${key}${Constants.ZWSP}${item.name || item.refText}</span>`;
+                value = `<span data-type="block-ref" data-id="${item.id}" data-subtype="s">${key}${Constants.ZWSP}${item.name || item.refText.replace(new RegExp(Constants.ZWSP, "g"), "")}</span>`;
             }
             dataList.push({
                 value,
@@ -450,7 +442,9 @@ export const hintRenderTemplate = (value: string, protyle: IProtyle, nodeElement
 
 export const hintRenderWidget = (value: string, protyle: IProtyle) => {
     focusByRange(protyle.toolbar.range);
-    insertHTML(protyle.lute.SpinBlockDOM(`<iframe src="/widgets/${value}" data-subtype="widget" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>`), protyle, true);
+    // src 地址以 / 结尾
+    // Use the path ending with `/` when loading the widget https://github.com/siyuan-note/siyuan/issues/10520
+    insertHTML(protyle.lute.SpinBlockDOM(`<iframe src="/widgets/${value}/" data-subtype="widget" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>`), protyle, true);
     hideElements(["util"], protyle);
 };
 

@@ -14,7 +14,13 @@ import {WYSIWYG} from "./wysiwyg";
 import {Toolbar} from "./toolbar";
 import {Gutter} from "./gutter";
 import {Breadcrumb} from "./breadcrumb";
-import {onTransaction, transaction} from "./wysiwyg/transaction";
+import {
+    onTransaction,
+    transaction,
+    turnsIntoOneTransaction, turnsIntoTransaction,
+    updateBatchTransaction,
+    updateTransaction
+} from "./wysiwyg/transaction";
 import {fetchPost} from "../util/fetch";
 /// #if !MOBILE
 import {Title} from "./header/Title";
@@ -22,7 +28,7 @@ import {updatePanelByEditor} from "../editor/util";
 import {setPanelFocus} from "../layout/util";
 /// #endif
 import {Background} from "./header/Background";
-import {disabledProtyle, enableProtyle, onGet} from "./util/onGet";
+import {onGet, setReadonlyByConfig} from "./util/onGet";
 import {reloadProtyle} from "./util/reload";
 import {renderBacklink} from "./wysiwyg/renderBacklink";
 import {setEmpty} from "../mobile/util/setEmpty";
@@ -31,6 +37,10 @@ import {getDocByScroll} from "./scroll/saveScroll";
 import {App} from "../index";
 import {insertHTML} from "./util/insertHTML";
 import {avRender} from "./render/av/render";
+import {focusBlock, getEditorRange} from "./util/selection";
+import {hasClosestBlock} from "./util/hasClosest";
+import {setStorageVal} from "./util/compatibility";
+import {merge} from "./util/merge";
 
 export class Protyle {
 
@@ -43,9 +53,14 @@ export class Protyle {
      */
     constructor(app: App, id: HTMLElement, options?: IOptions) {
         this.version = Constants.SIYUAN_VERSION;
-        const getOptions = new Options(options);
+        let pluginsOptions: IOptions = options;
+        app.plugins.forEach(item => {
+            if (item.protyleOptions) {
+                pluginsOptions = merge(pluginsOptions, item.protyleOptions);
+            }
+        });
+        const getOptions = new Options(pluginsOptions);
         const mergedOptions = getOptions.merge();
-
         this.protyle = {
             getInstance: () => this,
             app,
@@ -123,13 +138,8 @@ export class Protyle {
                             });
                             break;
                         case "readonly":
-                            if (!this.protyle.wysiwyg.element.getAttribute(Constants.CUSTOM_SY_READONLY)) {
-                                if (data.data) {
-                                    disabledProtyle(this.protyle);
-                                } else {
-                                    enableProtyle(this.protyle);
-                                }
-                            }
+                            window.siyuan.config.editor.readOnly = data.data;
+                            setReadonlyByConfig(this.protyle, true);
                             break;
                         case "heading2doc":
                         case "li2doc":
@@ -177,7 +187,8 @@ export class Protyle {
                             // update ref
                             this.protyle.wysiwyg.element.querySelectorAll(`[data-type~="block-ref"][data-id="${data.data.id}"]`).forEach(item => {
                                 if (item.getAttribute("data-subtype") === "d") {
-                                    item.textContent = data.data.refText;
+                                    // 同 updateRef 一样处理 https://github.com/siyuan-note/siyuan/issues/10458
+                                    item.innerHTML = data.data.refText;
                                 }
                             });
                             break;
@@ -193,7 +204,7 @@ export class Protyle {
                                 setEmpty(app);
                                 /// #else
                                 if (this.protyle.model) {
-                                    this.protyle.model.parent.parent.removeTab(this.protyle.model.parent.id, false, false);
+                                    this.protyle.model.parent.parent.removeTab(this.protyle.model.parent.id, false);
                                 }
                                 /// #endif
                             }
@@ -204,9 +215,11 @@ export class Protyle {
                                 setEmpty(app);
                                 /// #else
                                 if (this.protyle.model) {
-                                    this.protyle.model.parent.parent.removeTab(this.protyle.model.parent.id, false, false);
+                                    this.protyle.model.parent.parent.removeTab(this.protyle.model.parent.id, false);
                                 }
                                 /// #endif
+                                delete window.siyuan.storage[Constants.LOCAL_FILEPOSITION][this.protyle.block.rootID];
+                                setStorageVal(Constants.LOCAL_FILEPOSITION, window.siyuan.storage[Constants.LOCAL_FILEPOSITION]);
                             }
                             break;
                     }
@@ -222,46 +235,20 @@ export class Protyle {
                 removeLoading(this.protyle);
                 return;
             }
-            if (options.scrollAttr) {
+
+            if (this.protyle.options.mode !== "preview" &&
+                options.rootId && window.siyuan.storage[Constants.LOCAL_FILEPOSITION][options.rootId] &&
+                (
+                    mergedOptions.action.includes(Constants.CB_GET_SCROLL) ||
+                    (mergedOptions.action.includes(Constants.CB_GET_ROOTSCROLL) && options.rootId === options.blockId)
+                )
+            ) {
                 getDocByScroll({
                     protyle: this.protyle,
-                    scrollAttr: options.scrollAttr,
+                    scrollAttr: window.siyuan.storage[Constants.LOCAL_FILEPOSITION][options.rootId],
                     mergedOptions,
                     cb: () => {
                         this.afterOnGet(mergedOptions);
-                    }
-                });
-            } else if (this.protyle.options.mode !== "preview" &&
-                (mergedOptions.action.includes(Constants.CB_GET_SCROLL) || mergedOptions.action.includes(Constants.CB_GET_ROOTSCROLL))) {
-                fetchPost("/api/block/getDocInfo", {
-                    id: options.blockId
-                }, (response) => {
-                    if (!mergedOptions.action.includes(Constants.CB_GET_SCROLL) &&
-                        response.data.rootID !== options.blockId && mergedOptions.action.includes(Constants.CB_GET_ROOTSCROLL)) {
-                        // 打开根文档保持上一次历史，否则按照原有 action 执行 https://github.com/siyuan-note/siyuan/issues/9082
-                        this.getDoc(mergedOptions);
-                        return;
-                    }
-                    let scrollObj;
-                    if (response.data.ial.scroll) {
-                        try {
-                            scrollObj = JSON.parse(response.data.ial.scroll.replace(/&quot;/g, '"'));
-                        } catch (e) {
-                            scrollObj = undefined;
-                        }
-                    }
-                    if (scrollObj) {
-                        scrollObj.rootId = response.data.rootID;
-                        getDocByScroll({
-                            protyle: this.protyle,
-                            scrollAttr: scrollObj,
-                            mergedOptions,
-                            cb: () => {
-                                this.afterOnGet(mergedOptions);
-                            }
-                        });
-                    } else {
-                        this.getDoc(mergedOptions);
                     }
                 });
             } else {
@@ -392,7 +379,54 @@ export class Protyle {
         insertHTML(html, this.protyle, isBlock, useProtyleRange);
     }
 
-    public transaction( doOperations: IOperation[], undoOperations?: IOperation[]) {
-        transaction(this.protyle,  doOperations, undoOperations);
+    public transaction(doOperations: IOperation[], undoOperations?: IOperation[]) {
+        transaction(this.protyle, doOperations, undoOperations);
+    }
+
+    /**
+     * 多个块转换为一个块
+     * @param {TTurnIntoOneSub} [subType] type 为 "BlocksMergeSuperBlock" 时必传
+     */
+    public turnIntoOneTransaction(selectsElement: Element[], type: TTurnIntoOne, subType?: TTurnIntoOneSub) {
+        turnsIntoOneTransaction({
+            protyle: this.protyle,
+            selectsElement,
+            type,
+            level: subType
+        });
+    }
+
+    /**
+     * 多个块转换
+     * @param {Element} [nodeElement] 优先使用包含 protyle-wysiwyg--select 的块，否则使用 nodeElement 单块
+     * @param {number} [subType] type 为 "Blocks2Hs" 时必传
+     */
+    public turnIntoTransaction(nodeElement: Element, type: TTurnInto, subType?: number) {
+        turnsIntoTransaction({
+            protyle: this.protyle,
+            nodeElement,
+            type,
+            level: subType,
+        });
+    }
+
+    public updateTransaction(id: string, newHTML: string, html: string) {
+        updateTransaction(this.protyle, id, newHTML, html);
+    }
+
+    public updateBatchTransaction(nodeElements: Element[], cb: (e: HTMLElement) => void) {
+        updateBatchTransaction(nodeElements, this.protyle, cb);
+    }
+
+    public getRange(element: Element) {
+        return getEditorRange(element);
+    }
+
+    public hasClosestBlock(element: Node) {
+        return hasClosestBlock(element);
+    }
+
+    public focusBlock(element: Element, toStart = true) {
+        return focusBlock(element, undefined, toStart);
     }
 }

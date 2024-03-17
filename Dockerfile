@@ -8,7 +8,7 @@ WORKDIR /go/src/github.com/Hi-Windom/Sillot/
 COPY --from=NODE_BUILD /go/src/github.com/Hi-Windom/Sillot/ /go/src/github.com/Hi-Windom/Sillot/
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1
-RUN apk add --no-cache gcc musl-dev git && \
+RUN apk add --no-cache gcc musl-dev && \
     cd kernel && go build --tags fts5 -v -ldflags "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod" && \
     mkdir /opt/Sillot/ && \
     mv /go/src/github.com/Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \

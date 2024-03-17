@@ -29,6 +29,108 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
+func setEditorReadOnly(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	readOnly := arg["readonly"].(bool)
+
+	oldReadOnly := model.Conf.Editor.ReadOnly
+	model.Conf.Editor.ReadOnly = readOnly
+	model.Conf.Save()
+
+	if oldReadOnly != model.Conf.Editor.ReadOnly {
+		util.BroadcastByType("protyle", "readonly", 0, "", model.Conf.Editor.ReadOnly)
+		util.BroadcastByType("main", "readonly", 0, "", model.Conf.Editor.ReadOnly)
+	}
+}
+
+func setConfSnippet(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	param, err := gulu.JSON.MarshalJSON(arg)
+	if nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	snippet := &conf.Snpt{}
+	if err = gulu.JSON.UnmarshalJSON(param, snippet); nil != err {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	model.Conf.Snippet = snippet
+	model.Conf.Save()
+
+	ret.Data = snippet
+}
+
+func addVirtualBlockRefExclude(c *gin.Context) {
+	// Add internal kernel API `/api/setting/addVirtualBlockRefExclude` https://github.com/siyuan-note/siyuan/issues/9909
+
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	keywordsArg := arg["keywords"]
+	var keywords []string
+	for _, k := range keywordsArg.([]interface{}) {
+		keywords = append(keywords, k.(string))
+	}
+
+	model.AddVirtualBlockRefExclude(keywords)
+	util.BroadcastByType("main", "setConf", 0, "", model.Conf)
+}
+
+func addVirtualBlockRefInclude(c *gin.Context) {
+	// Add internal kernel API `/api/setting/addVirtualBlockRefInclude` https://github.com/siyuan-note/siyuan/issues/9909
+
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	keywordsArg := arg["keywords"]
+	var keywords []string
+	for _, k := range keywordsArg.([]interface{}) {
+		keywords = append(keywords, k.(string))
+	}
+
+	model.AddVirtualBlockRefInclude(keywords)
+	util.BroadcastByType("main", "setConf", 0, "", model.Conf)
+}
+
+func refreshVirtualBlockRef(c *gin.Context) {
+	// Add internal kernel API `/api/setting/refreshVirtualBlockRef` https://github.com/siyuan-note/siyuan/issues/9829
+
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	model.ResetVirtualBlockRefCache()
+	util.BroadcastByType("main", "setConf", 0, "", model.Conf)
+}
+
 func setBazaar(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -296,9 +398,8 @@ func setFiletree(c *gin.Context) {
 	if "../" == fileTree.DocCreateSavePath {
 		fileTree.DocCreateSavePath = "../Untitled"
 	}
-	for strings.HasSuffix(fileTree.DocCreateSavePath, "/") {
-		fileTree.DocCreateSavePath = strings.TrimSuffix(fileTree.DocCreateSavePath, "/")
-		fileTree.DocCreateSavePath = strings.TrimSpace(fileTree.DocCreateSavePath)
+	if "/" == fileTree.DocCreateSavePath {
+		fileTree.DocCreateSavePath = "/Untitled"
 	}
 
 	if 1 > fileTree.MaxOpenTabCount {
@@ -443,7 +544,7 @@ func getCloudUser(c *gin.Context) {
 		token = t.(string)
 	}
 	model.RefreshUser(token)
-	ret.Data = model.Conf.User
+	ret.Data = model.Conf.GetUser()
 }
 
 func logoutCloudUser(c *gin.Context) {

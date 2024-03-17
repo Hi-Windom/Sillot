@@ -2,14 +2,126 @@ import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName, hasCloses
 // import * as dayjs from "dayjs";
 import {format} from "date-fns";
 import {transaction, updateTransaction} from "../wysiwyg/transaction";
-import {getContenteditableElement, hasNextSibling, hasPreviousSibling} from "../wysiwyg/getBlock";
+import {getContenteditableElement} from "../wysiwyg/getBlock";
 import {fixTableRange, focusBlock, focusByWbr, getEditorRange} from "./selection";
-import {mathRender} from "../render/mathRender";
 import {Constants} from "../../constants";
 import {highlightRender} from "../render/highlightRender";
 import {scrollCenter} from "../../util/highlightById";
-import {updateAVName} from "../render/av/action";
-import {readText} from "./compatibility";
+import {updateAttrViewCellAnimation, updateAVName} from "../render/av/action";
+import {genCellValue, genCellValueByElement, getTypeByCellElement, updateCellsValue} from "../render/av/cell";
+import {input} from "../wysiwyg/input";
+import {objEquals} from "../../util/functions";
+
+const processAV = (range: Range, html: string, protyle: IProtyle, blockElement: HTMLElement) => {
+    if (html.endsWith("]") && html.startsWith("[")) {
+        try {
+            const values = JSON.parse(html);
+            const cellElements: Element[] = Array.from(blockElement.querySelectorAll(".av__cell--active, .av__cell--select")) || [];
+            if (cellElements.length === 0) {
+                blockElement.querySelectorAll(".av__row--select:not(.av__row--header)").forEach(rowElement => {
+                    rowElement.querySelectorAll(".av__cell").forEach(cellElement => {
+                        cellElements.push(cellElement);
+                    });
+                });
+            }
+            const doOperations: IOperation[] = [];
+            const undoOperations: IOperation[] = [];
+
+            const avID = blockElement.dataset.avId;
+            const id = blockElement.dataset.nodeId;
+            cellElements.forEach((item: HTMLElement, elementIndex) => {
+                let cellValue: IAVCellValue = values[elementIndex];
+                if (!cellValue) {
+                    return;
+                }
+                const rowElement = hasClosestByClassName(item, "av__row");
+                if (!rowElement) {
+                    return;
+                }
+                if (!blockElement.contains(item)) {
+                    item = cellElements[elementIndex] = blockElement.querySelector(`.av__row[data-id="${rowElement.dataset.id}"] .av__cell[data-col-id="${item.dataset.colId}"]`) as HTMLElement;
+                }
+                const type = getTypeByCellElement(item) || item.dataset.type as TAVCol;
+                if (["created", "updated", "template", "rollup"].includes(type)) {
+                    return;
+                }
+
+                const rowID = rowElement.getAttribute("data-id");
+                const cellId = item.getAttribute("data-id");
+                const colId = item.getAttribute("data-col-id");
+
+                const oldValue = genCellValueByElement(type, item);
+                if (cellValue.type !== type) {
+                    if (type === "date") {
+                        // 类型不能转换时就不进行替换
+                        return;
+                    }
+                    const content = cellValue[cellValue.type as "text"].content;
+                    if (!content) {
+                        return;
+                    }
+                    cellValue = genCellValue(type, cellValue[cellValue.type as "text"].content.toString());
+                } else if (cellValue.type === "block") {
+                    cellValue.isDetached = true;
+                    delete cellValue.block.id;
+                }
+                cellValue.id = cellId;
+                if ((cellValue.type === "date" && typeof cellValue.date === "string") ||
+                    (cellValue.type === "relation" && typeof cellValue.relation === "string")) {
+                    return;
+                }
+                if (objEquals(cellValue, oldValue)) {
+                    return;
+                }
+                doOperations.push({
+                    action: "updateAttrViewCell",
+                    id: cellId,
+                    avID,
+                    keyID: colId,
+                    rowID,
+                    data: cellValue
+                });
+                undoOperations.push({
+                    action: "updateAttrViewCell",
+                    id: cellId,
+                    avID,
+                    keyID: colId,
+                    rowID,
+                    data: oldValue
+                });
+                updateAttrViewCellAnimation(item, cellValue);
+            });
+            if (doOperations.length > 0) {
+                doOperations.push({
+                    action: "doUpdateUpdated",
+                    id,
+                    data: format(new Date(), 'yyyyMMddHHmmss'),
+                });
+                undoOperations.push({
+                    action: "doUpdateUpdated",
+                    id,
+                    data: blockElement.getAttribute("updated"),
+                });
+                transaction(protyle, doOperations, undoOperations);
+            }
+            return;
+        } catch (e) {
+            console.warn("insert cell: JSON.parse error");
+        }
+    }
+    const text = protyle.lute.BlockDOM2EscapeMarkerContent(html);
+    const cellsElement: HTMLElement[] = Array.from(blockElement.querySelectorAll(".av__cell--select"));
+    const rowsElement = blockElement.querySelector(".av__row--select");
+    if (rowsElement) {
+        updateCellsValue(protyle, blockElement as HTMLElement, text);
+    } else if (cellsElement.length > 0) {
+        updateCellsValue(protyle, blockElement as HTMLElement, text, cellsElement);
+    } else {
+        range.insertNode(document.createTextNode(text));
+        range.collapse(false);
+        updateAVName(protyle, blockElement);
+    }
+};
 
 export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
                            // 移动端插入嵌入块时，获取到的 range 为旧值
@@ -42,18 +154,7 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
     }
     if (blockElement.classList.contains("av")) {
         range.deleteContents();
-        const text = readText();
-        if (typeof text === "string") {
-            range.insertNode(document.createTextNode(text));
-            range.collapse(false);
-            updateAVName(protyle, blockElement);
-        } else {
-            text.then((t) => {
-                range.insertNode(document.createTextNode(t));
-                range.collapse(false);
-                updateAVName(protyle, blockElement);
-            });
-        }
+        processAV(range, html, protyle, blockElement as HTMLElement);
         return;
     }
     let id = blockElement.getAttribute("data-node-id");
@@ -108,10 +209,14 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
         });
     }
     const tempElement = document.createElement("template");
-    // 需要再 spin 一次 https://github.com/siyuan-note/siyuan/issues/7118
-    tempElement.innerHTML = tableInlineHTML // 在 table 中插入需要使用转换好的行内元素 https://github.com/siyuan-note/siyuan/issues/9358
-        || protyle.lute.SpinBlockDOM(html) ||
+
+    let innerHTML = tableInlineHTML || // 在 table 中插入需要使用转换好的行内元素 https://github.com/siyuan-note/siyuan/issues/9358
+        protyle.lute.SpinBlockDOM(html) || // 需要再 spin 一次 https://github.com/siyuan-note/siyuan/issues/7118
         html;   // 空格会被 Spin 不再，需要使用原文
+    // 粘贴纯文本时会进行内部转义，这里需要进行反转义 https://github.com/siyuan-note/siyuan/issues/10620
+    innerHTML = innerHTML.replace(/;;;lt;;;/g, "&lt;").replace(/;;;gt;;;/g, "&gt;");
+    tempElement.innerHTML = innerHTML;
+
     const editableElement = getContenteditableElement(blockElement);
     // 使用 lute 方法会添加 p 元素，只有一个 p 元素或者只有一个字符串或者为 <u>b</u> 时的时候只拷贝内部
     if (!isBlock) {
@@ -142,36 +247,9 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
             }
             range.insertNode(tempElement.content.cloneNode(true));
             range.collapse(false);
-            blockElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
-            // 使用 innerHTML,避免行内元素为代码块
-            const trimStartText = editableElement ? editableElement.innerHTML.trimStart() : "";
-            if (editableElement && (trimStartText.startsWith("```") || trimStartText.startsWith("~~~") || trimStartText.startsWith("···") ||
-                trimStartText.indexOf("\n```") > -1 || trimStartText.indexOf("\n~~~") > -1 || trimStartText.indexOf("\n···") > -1)) {
-                if (trimStartText.indexOf("\n") === -1 && trimStartText.replace(/·|~/g, "`").replace(/^`{3,}/g, "").indexOf("`") > -1) {
-                    // ```test` 不处理
-                } else {
-                    let replaceInnerHTML = editableElement.innerHTML.replace(/^(~|·|`){3,}/g, "```").replace(/\n(~|·|`){3,}/g, "\n```").trim();
-                    if (!replaceInnerHTML.endsWith("\n```")) {
-                        replaceInnerHTML += "\n```";
-                    }
-                    const languageIndex = replaceInnerHTML.indexOf("```") + 3;
-                    replaceInnerHTML = replaceInnerHTML.substring(0, languageIndex) + (localStorage["local-codelang"] || "") + replaceInnerHTML.substring(languageIndex);
-
-                    editableElement.innerHTML = replaceInnerHTML;
-                }
-            }
-            const editWbrElement = editableElement.querySelector("wbr");
-            if (editWbrElement && editableElement && !trimStartText.endsWith("\n")) {
-                // 数学公式后无换行，后期渲染后添加导致 rang 错误，中文输入错误 https://github.com/siyuan-note/siyuan/issues/9054
-                const previousElement = hasPreviousSibling(editWbrElement) as HTMLElement;
-                if (previousElement && previousElement.nodeType !== 3 && (previousElement.dataset.type || "").indexOf("inline-math") > -1 &&
-                    !hasNextSibling(editWbrElement)) {
-                    editWbrElement.insertAdjacentText("afterend", "\n");
-                }
-            }
-            mathRender(blockElement);
-            updateTransaction(protyle, id, blockElement.outerHTML, oldHTML);
-            focusByWbr(protyle.wysiwyg.element, range);
+            blockElement.querySelector("wbr")?.remove();
+            protyle.wysiwyg.lastHTMLs[id] = oldHTML;
+            input(protyle, blockElement as HTMLElement, range);
             return;
         }
     }

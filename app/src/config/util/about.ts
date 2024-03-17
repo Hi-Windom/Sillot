@@ -1,19 +1,7 @@
-/// #if !BROWSER
-import {ipcRenderer} from "electron";
-/// #endif
 import {Dialog} from "../../dialog";
 import {isMobile} from "../../util/functions";
 import {fetchPost} from "../../util/fetch";
 import {Constants} from "../../constants";
-
-export const setProxy = () => {
-    /// #if !BROWSER
-    ipcRenderer.send(Constants.SIYUAN_CMD, {
-        cmd: "setProxy",
-        proxyURL: `${window.siyuan.config.system.networkProxy.scheme}://${window.siyuan.config.system.networkProxy.host}:${window.siyuan.config.system.networkProxy.port}`
-    });
-    /// #endif
-};
 
 export const setAccessAuthCode = () => {
     const dialog = new Dialog({
@@ -30,6 +18,7 @@ export const setAccessAuthCode = () => {
     });
     const inputElement = dialog.element.querySelector("input") as HTMLInputElement;
     const btnsElement = dialog.element.querySelectorAll(".b3-button");
+    dialog.element.setAttribute("data-key", Constants.DIALOG_ACCESSAUTHCODE);
     dialog.bindInput(inputElement, () => {
         (btnsElement[1] as HTMLButtonElement).click();
     });
@@ -45,4 +34,9 @@ export const setAccessAuthCode = () => {
 export const getCloudURL = (key: string) => {
     const origin = window.siyuan.config.cloudRegion === 0 ? "https://ld246.com" : "https://liuyun.io";
     return `${origin}/${key}`;
+};
+
+export const getIndexURL = (key: string) => {
+    const lang = "zh_CN" === window.siyuan.config.lang ? "" : "/en";
+    return "https://b3log.org/siyuan" + `${lang}/${key}`;
 };

@@ -3,6 +3,7 @@ import {getSelectionOffset} from "../util/selection";
 import {fetchPost} from "../../util/fetch";
 import {onGet} from "../util/onGet";
 import {Constants} from "../../constants";
+import {setStorageVal} from "../util/compatibility";
 
 export const saveScroll = (protyle: IProtyle, getObject = false) => {
     if (!protyle.wysiwyg.element.firstElementChild || window.siyuan.config.readonly) {
@@ -38,10 +39,8 @@ export const saveScroll = (protyle: IProtyle, getObject = false) => {
     if (getObject) {
         return attr;
     }
-    const jsonAttr = JSON.stringify(attr);
-    fetchPost("/api/attr/setBlockAttrs", {id: protyle.block.rootID, attrs: {scroll: jsonAttr}}, () => {
-        protyle.wysiwyg.element.setAttribute("scroll", jsonAttr);
-    });
+    window.siyuan.storage[Constants.LOCAL_FILEPOSITION][protyle.block.rootID] = attr;
+    setStorageVal(Constants.LOCAL_FILEPOSITION, window.siyuan.storage[Constants.LOCAL_FILEPOSITION]);
     window.sout.tracker(range);
 };
 
@@ -67,14 +66,28 @@ export const getDocByScroll = (options: {
             id: options.scrollAttr.zoomInId,
             size: Constants.SIZE_GET_MAX,
         }, response => {
-            actions.push(Constants.CB_GET_ALL);
-            onGet({
-                data: response,
-                protyle: options.protyle,
-                action: actions,
-                scrollAttr: options.scrollAttr,
-                afterCB: options.cb
-            });
+            if (response.code === 1) {
+                fetchPost("/api/filetree/getDoc", {
+                    id: options.scrollAttr.rootId || options.mergedOptions?.blockId || options.protyle.block?.rootID || options.scrollAttr.startId,
+                }, response => {
+                    onGet({
+                        data: response,
+                        protyle: options.protyle,
+                        action: actions,
+                        scrollAttr: options.scrollAttr,
+                        afterCB: options.cb
+                    });
+                });
+            } else {
+                actions.push(Constants.CB_GET_ALL);
+                onGet({
+                    data: response,
+                    protyle: options.protyle,
+                    action: actions,
+                    scrollAttr: options.scrollAttr,
+                    afterCB: options.cb
+                });
+            }
         });
         return;
     }

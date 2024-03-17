@@ -18,6 +18,7 @@ package model
 
 import (
 	"errors"
+	"github.com/siyuan-note/siyuan/kernel/task"
 	"io/fs"
 	"path"
 	"path/filepath"
@@ -30,7 +31,6 @@ import (
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
-	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -107,7 +107,7 @@ func resetTree(tree *parse.Tree, titleSuffix string) {
 func pagedPaths(localPath string, pageSize int) (ret map[int][]string) {
 	ret = map[int][]string{}
 	page := 1
-	filepath.Walk(localPath, func(path string, info fs.FileInfo, err error) error {
+	filelock.Walk(localPath, func(path string, info fs.FileInfo, err error) error {
 		if info.IsDir() {
 			if strings.HasPrefix(info.Name(), ".") {
 				return filepath.SkipDir
@@ -150,11 +150,7 @@ var (
 	ErrIndexing      = errors.New("indexing")
 )
 
-func LoadTreeByID(id string) (ret *parse.Tree, err error) {
-	return loadTreeByBlockID(id)
-}
-
-func loadTreeByBlockID(id string) (ret *parse.Tree, err error) {
+func LoadTreeByBlockID(id string) (ret *parse.Tree, err error) {
 	if "" == id {
 		return nil, ErrTreeNotFound
 	}

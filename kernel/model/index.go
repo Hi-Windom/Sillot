@@ -19,6 +19,7 @@ package model
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
@@ -42,6 +43,64 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
+
+func UpsertIndexes(paths []string) {
+	var syFiles []string
+	for _, p := range paths {
+		if strings.HasSuffix(p, "/") {
+			syFiles = append(syFiles, listSyFiles(p)...)
+			continue
+		}
+
+		if strings.HasSuffix(p, ".sy") {
+			syFiles = append(syFiles, p)
+		}
+	}
+
+	syFiles = gulu.Str.RemoveDuplicatedElem(syFiles)
+	upsertIndexes(syFiles)
+}
+
+func RemoveIndexes(paths []string) {
+	var syFiles []string
+	for _, p := range paths {
+		if strings.HasSuffix(p, "/") {
+			syFiles = append(syFiles, listSyFiles(p)...)
+			continue
+		}
+
+		if strings.HasSuffix(p, ".sy") {
+			syFiles = append(syFiles, p)
+		}
+	}
+
+	syFiles = gulu.Str.RemoveDuplicatedElem(syFiles)
+	removeIndexes(syFiles)
+}
+
+func listSyFiles(dir string) (ret []string) {
+	dirPath := filepath.Join(util.DataDir, dir)
+	err := filelock.Walk(dirPath, func(path string, d fs.FileInfo, err error) error {
+		if nil != err {
+			logging.LogWarnf("walk dir [%s] failed: %s", dirPath, err)
+			return err
+		}
+
+		if d.IsDir() {
+			return nil
+		}
+
+		if strings.HasSuffix(path, ".sy") {
+			p := filepath.ToSlash(strings.TrimPrefix(path, util.DataDir))
+			ret = append(ret, p)
+		}
+		return nil
+	})
+	if nil != err {
+		logging.LogWarnf("walk dir [%s] failed: %s", dirPath, err)
+	}
+	return
+}
 
 func (box *Box) Unindex() {
 	task.AppendTask(task.DatabaseIndex, unindex, box.ID)
@@ -70,13 +129,13 @@ func index(boxID string) {
 	if 1 > boxLen {
 		boxLen = 1
 	}
-	bootProgressPart := 30.0 / float64(boxLen) / float64(len(files))
+	bootProgressPart := int32(30.0 / float64(boxLen) / float64(len(files)))
 
 	start := time.Now()
 	luteEngine := util.NewLute()
 	var treeCount int
 	var treeSize int64
-	i := 0
+	lock := sync.Mutex{}
 	util.PushStatusBar(fmt.Sprintf("["+html.EscapeString(box.Name)+"] "+Conf.Language(64), len(files)))
 
 	poolSize := runtime.NumCPU()
@@ -88,6 +147,11 @@ func index(boxID string) {
 		defer waitGroup.Done()
 
 		file := arg.(*FileInfo)
+		lock.Lock()
+		treeSize += file.size
+		treeCount++
+		i := treeCount
+		lock.Unlock()
 		tree, err := filesys.LoadTree(box.ID, file.path, luteEngine)
 		if nil != err {
 			logging.LogErrorf("read box [%s] tree [%s] failed: %s", box.ID, file.path, err)
@@ -106,15 +170,11 @@ func index(boxID string) {
 
 		cache.PutDocIAL(file.path, docIAL)
 		treenode.IndexBlockTree(tree)
-		sql.IndexTreeQueue(box.ID, file.path)
-
+		sql.IndexTreeQueue(tree)
 		util.IncBootProgress(bootProgressPart, fmt.Sprintf(Conf.Language(92), util.ShortPathForBootingDisplay(tree.Path)))
-		treeSize += file.size
-		treeCount++
 		if 1 < i && 0 == i%64 {
-			util.PushStatusBar(fmt.Sprintf(Conf.Language(88), i, len(files)-i))
+			util.PushStatusBar(fmt.Sprintf(Conf.Language(88), i, (len(files))-i))
 		}
-		i++
 	})
 	for _, file := range files {
 		if file.isdir || !strings.HasSuffix(file.name, ".sy") {
@@ -122,7 +182,11 @@ func index(boxID string) {
 		}
 
 		waitGroup.Add(1)
-		p.Invoke(file)
+		invokeErr := p.Invoke(file)
+		if nil != invokeErr {
+			logging.LogErrorf("invoke [%s] failed: %s", file.path, invokeErr)
+			continue
+		}
 	}
 	waitGroup.Wait()
 	p.Release()
@@ -139,7 +203,6 @@ func IndexRefs() {
 	start := time.Now()
 	util.SetBootDetails("Resolving refs...")
 	util.PushStatusBar(Conf.Language(54))
-
 	util.SetBootDetails("Indexing refs...")
 
 	var defBlockIDs []string
@@ -187,10 +250,10 @@ func IndexRefs() {
 	i := 0
 	size := len(defBlockIDs)
 	if 0 < size {
-		bootProgressPart := 10.0 / float64(size)
+		bootProgressPart := int32(10.0 / float64(size))
 
 		for _, defBlockID := range defBlockIDs {
-			defTree, loadErr := LoadTreeByID(defBlockID)
+			defTree, loadErr := LoadTreeByBlockID(defBlockID)
 			if nil != loadErr {
 				continue
 			}
@@ -217,7 +280,7 @@ func autoIndexEmbedBlock(embedBlocks []*sql.Block) {
 	for i, embedBlock := range embedBlocks {
 		md := strings.TrimSpace(embedBlock.Markdown)
 		if strings.Contains(md, "//js") {
-			// js 嵌入块不支持自动索引
+			// js 嵌入块不支持自动索引，由前端主动调用 /api/search/updateEmbedBlock 接口更新内容 https://github.com/siyuan-note/siyuan/issues/9736
 			continue
 		}
 
@@ -263,6 +326,7 @@ func init() {
 }
 
 func subscribeSQLEvents() {
+	// 使用下面的 EvtSQLInsertBlocksFTS 就可以了
 	//eventbus.Subscribe(eventbus.EvtSQLInsertBlocks, func(context map[string]interface{}, current, total, blockCount int, hash string) {
 	//	if util.ContainerAndroid == util.Container || util.ContainerIOS == util.Container {
 	//		// Android/iOS 端不显示数据索引和搜索索引状态提示 https://github.com/siyuan-note/siyuan/issues/6392

@@ -19,6 +19,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -350,6 +351,10 @@ func matchPackage(keywords []string, pkg *bazaar.Package) bool {
 		return true
 	}
 
+	if nil == pkg || nil == pkg.DisplayName || nil == pkg.Description {
+		return false
+	}
+
 	for _, keyword := range keywords {
 		if strings.Contains(strings.ToLower(pkg.DisplayName.Default), keyword) ||
 			strings.Contains(strings.ToLower(pkg.DisplayName.ZhCN), keyword) ||
@@ -358,7 +363,8 @@ func matchPackage(keywords []string, pkg *bazaar.Package) bool {
 			strings.Contains(strings.ToLower(pkg.Description.Default), keyword) ||
 			strings.Contains(strings.ToLower(pkg.Description.ZhCN), keyword) ||
 			strings.Contains(strings.ToLower(pkg.Description.ZhCHT), keyword) ||
-			strings.Contains(strings.ToLower(pkg.Description.EnUS), keyword) {
+			strings.Contains(strings.ToLower(pkg.Description.EnUS), keyword) ||
+			strings.Contains(strings.ToLower(path.Base(pkg.RepoURL)), keyword) {
 			return true
 		}
 

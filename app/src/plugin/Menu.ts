@@ -18,7 +18,7 @@ export class Menu {
         }
         this.menu.remove();
         if (!this.isOpen) {
-            this.menu.element.setAttribute("data-name", id);
+            this.menu.element.setAttribute("data-name", id || "");
             this.menu.removeCB = closeCB;
         }
     }
@@ -38,10 +38,10 @@ export class Menu {
         if (this.isOpen) {
             return;
         }
-        this.menu.addSeparator(index);
+        return this.menu.addSeparator(index);
     }
 
-    open(options:IPosition) {
+    open(options: IPosition) {
         if (this.isOpen) {
             return;
         }

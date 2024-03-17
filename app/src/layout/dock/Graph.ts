@@ -11,6 +11,7 @@ import {isCurrentEditor, openFileById} from "../../editor/util";
 import {updateHotkeyTip} from "../../protyle/util/compatibility";
 import {openGlobalSearch} from "../../search/util";
 import {App} from "../../index";
+import {checkFold} from "../../util/noRelyPCFunction";
 
 declare const vis: any;
 
@@ -257,8 +258,7 @@ export class Graph extends Model {
         this.element.innerHTML = /*html*/ `
 <div class="block__icons"> 
     <div class="block__logo">
-        <svg><use xlink:href="#icon${this.type === "global" ? "GlobalGraph" : "Graph"}"></use></svg>
-        ${this.type === "global" ? window.siyuan.languages.globalGraph : window.siyuan.languages.graphView}
+        <svg class="block__logoicon"><use xlink:href="#icon${this.type === "global" ? "GlobalGraph" : "Graph"}"></use></svg>${this.type === "global" ? window.siyuan.languages.globalGraph : window.siyuan.languages.graphView}
     </div>
     <span class="fn__flex-1"></span>
     <span class="fn__space"></span>
@@ -652,18 +652,24 @@ export class Graph extends Model {
                         return;
                     }
                     if (window.siyuan.shiftIsPressed) {
-                        openFileById({
-                            app: this.app,
-                            id: node.id,
-                            position: "bottom",
-                            action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]
+                        checkFold(node.id, (zoomIn, action: string[]) => {
+                            openFileById({
+                                app: this.app,
+                                id: node.id,
+                                position: "bottom",
+                                action,
+                                zoomIn
+                            });
                         });
                     } else if (window.siyuan.altIsPressed) {
-                        openFileById({
-                            app: this.app,
-                            id: node.id,
-                            position: "right",
-                            action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]
+                        checkFold(node.id, (zoomIn, action: string[]) => {
+                            openFileById({
+                                app: this.app,
+                                id: node.id,
+                                position: "right",
+                                action,
+                                zoomIn
+                            });
                         });
                     } else if (window.siyuan.ctrlIsPressed) {
                         window.siyuan.blockPanels.push(new BlockPanel({
@@ -674,10 +680,13 @@ export class Graph extends Model {
                             nodeIds: [node.id],
                         }));
                     } else {
-                        openFileById({
-                            app: this.app,
-                            id: node.id,
-                            action: [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]
+                        checkFold(node.id, (zoomIn, action: string[]) => {
+                            openFileById({
+                                app: this.app,
+                                id: node.id,
+                                action,
+                                zoomIn
+                            });
                         });
                     }
                 });

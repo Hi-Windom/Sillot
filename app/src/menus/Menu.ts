@@ -2,6 +2,7 @@ import {getEventName, updateHotkeyTip} from "../protyle/util/compatibility";
 import {setPosition} from "../util/setPosition";
 import {hasClosestByClassName} from "../protyle/util/hasClosest";
 import {isMobile} from "../util/functions";
+import {Constants} from "../constants";
 
 export class Menu {
     public element: HTMLElement;
@@ -83,7 +84,7 @@ export class Menu {
     }
 
     public addSeparator(index?: number) {
-        this.addItem({type: "separator", index});
+        return this.addItem({type: "separator", index});
     }
 
     public addItem(option: IMenu) {
@@ -104,10 +105,12 @@ export class Menu {
         this.removeScrollEvent();
         this.element.firstElementChild.classList.add("fn__none");
         this.element.lastElementChild.innerHTML = "";
+        this.element.lastElementChild.removeAttribute("style");  // 输入框 focus 后 boxShadow 显示不全
         this.element.classList.add("fn__none");
         this.element.classList.remove("b3-menu--list", "b3-menu--fullscreen");
         this.element.removeAttribute("style");  // zIndex
         window.siyuan.menus.menu.element.removeAttribute("data-name");    // 标识再次点击不消失
+        window.siyuan.menus.menu.element.removeAttribute("data-from");    // 标识是否在浮窗内打开
     }
 
     public append(element?: HTMLElement, index?: number) {
@@ -135,6 +138,9 @@ export class Menu {
     }
 
     public fullscreen(position: "bottom" | "all" = "all") {
+        if (this.element.lastElementChild.innerHTML === "") {
+            return;
+        }
         this.element.classList.add("b3-menu--fullscreen");
         this.element.style.zIndex = (++window.siyuan.zIndex).toString();
         this.element.firstElementChild.classList.remove("fn__none");
@@ -157,6 +163,15 @@ export class MenuItem {
     public element: HTMLElement;
 
     constructor(options: IMenu) {
+        if (options.type === "empty") {
+            this.element = document.createElement("div");
+            this.element.innerHTML = options.label;
+            if (options.bind) {
+                options.bind(this.element);
+            }
+            return;
+        }
+
         this.element = document.createElement("button");
         if (options.disabled) {
             this.element.setAttribute("disabled", "disabled");
@@ -197,7 +212,7 @@ export class MenuItem {
         if (options.element) {
             this.element.append(options.element);
         } else {
-            let html = `<span class="b3-menu__label">${options.label}</span>`;
+            let html = `<span class="b3-menu__label">${options.label || "&nbsp;"}</span>`;
             if (typeof options.iconHTML === "string") {
                 html = options.iconHTML + html;
             } else {
@@ -207,7 +222,7 @@ export class MenuItem {
                 html += `<span class="b3-menu__accelerator">${updateHotkeyTip(options.accelerator)}</span>`;
             }
             if (options.action) {
-                html += `<svg class="b3-menu__action"><use xlink:href="#${options.action}"></use></svg>`;
+                html += `<svg class="b3-menu__action${options.action === "iconCloseRound" ? " b3-menu__action--close" : ""}"><use xlink:href="#${options.action}"></use></svg>`;
             }
             this.element.innerHTML = html;
         }
@@ -225,7 +240,7 @@ export class MenuItem {
             options.submenu.forEach((item) => {
                 submenuElement.firstElementChild.append(new MenuItem(item).element);
             });
-            this.element.insertAdjacentHTML("beforeend", '<svg class="b3-menu__icon b3-menu__icon--arrow"><use xlink:href="#iconRight"></use></svg>');
+            this.element.insertAdjacentHTML("beforeend", '<svg class="b3-menu__icon b3-menu__icon--small"><use xlink:href="#iconRight"></use></svg>');
             this.element.append(submenuElement);
         }
     }
@@ -252,21 +267,22 @@ export const bindMenuKeydown = (event: KeyboardEvent) => {
         return false;
     }
     const target = event.target as HTMLElement;
-    if (window.siyuan.menus.menu.element.contains(target) && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
+    if (window.siyuan.menus.menu.element.contains(target) && ["INPUT", "TEXTAREA"].includes(target.tagName)) {
         return false;
     }
-    if (event.code === "ArrowDown" || event.code === "ArrowUp") {
+    const eventCode = Constants.KEYCODELIST[event.keyCode];
+    if (eventCode === "↓" || eventCode === "↑") {
         const currentElement = window.siyuan.menus.menu.element.querySelector(".b3-menu__item--current");
         let actionMenuElement;
         if (!currentElement) {
-            if (event.code === "ArrowUp") {
+            if (eventCode === "↑") {
                 actionMenuElement = getActionMenu(window.siyuan.menus.menu.element.lastElementChild.lastElementChild, false);
             } else {
                 actionMenuElement = getActionMenu(window.siyuan.menus.menu.element.lastElementChild.firstElementChild, true);
             }
         } else {
             currentElement.classList.remove("b3-menu__item--current", "b3-menu__item--show");
-            if (event.code === "ArrowUp") {
+            if (eventCode === "↑") {
                 actionMenuElement = getActionMenu(currentElement.previousElementSibling, false);
                 if (!actionMenuElement) {
                     actionMenuElement = getActionMenu(currentElement.parentElement.lastElementChild, false);
@@ -288,7 +304,7 @@ export const bindMenuKeydown = (event: KeyboardEvent) => {
             }
         }
         return true;
-    } else if (event.code === "ArrowRight") {
+    } else if (eventCode === "→") {
         const currentElement = window.siyuan.menus.menu.element.querySelector(".b3-menu__item--current");
         if (!currentElement) {
             return true;
@@ -306,7 +322,7 @@ export const bindMenuKeydown = (event: KeyboardEvent) => {
         }
         window.siyuan.menus.menu.showSubMenu(subMenuElement);
         return true;
-    } else if (event.code === "ArrowLeft") {
+    } else if (eventCode === "←") {
         const currentElement = window.siyuan.menus.menu.element.querySelector(".b3-menu__submenu .b3-menu__item--current");
         if (!currentElement) {
             return true;
@@ -318,7 +334,7 @@ export const bindMenuKeydown = (event: KeyboardEvent) => {
             currentElement.classList.remove("b3-menu__item--current");
         }
         return true;
-    } else if (event.code === "Enter") {
+    } else if (eventCode === "↩") {
         const currentElement = window.siyuan.menus.menu.element.querySelector(".b3-menu__item--current");
         if (!currentElement) {
             return false;
@@ -333,7 +349,10 @@ export const bindMenuKeydown = (event: KeyboardEvent) => {
             } else {
                 currentElement.dispatchEvent(new CustomEvent(getEventName()));
             }
-            window.siyuan.menus.menu.remove();
+            if (window.siyuan.menus.menu.element.contains(currentElement)) {
+                // 块标上 AI 会使用新的 menu，不能移除
+                window.siyuan.menus.menu.remove();
+            }
         }
         return true;
     }

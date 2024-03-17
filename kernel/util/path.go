@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 )
 
@@ -166,7 +167,7 @@ func GetChildDocDepth(treeAbsPath string) (ret int) {
 
 	baseDepth := strings.Count(filepath.ToSlash(treeAbsPath), "/")
 	depth := 1
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	filelock.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		p := filepath.ToSlash(path)
 		currentDepth := strings.Count(p, "/")
 		if depth < currentDepth {
@@ -264,4 +265,16 @@ func IsDisplayableAsset(p string) bool {
 		return true
 	}
 	return false
+}
+
+func GetAbsPathInWorkspace(relPath string) (string, error) {
+	absPath := filepath.Join(WorkspaceDir, relPath)
+	if WorkspaceDir == absPath {
+		return absPath, nil
+	}
+
+	if IsSubPath(WorkspaceDir, absPath) {
+		return absPath, nil
+	}
+	return "", os.ErrPermission
 }

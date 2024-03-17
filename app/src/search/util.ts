@@ -25,7 +25,15 @@ import {unicode2Emoji} from "../emoji";
 import {hasClosestByClassName} from "../protyle/util/hasClosest";
 import {isNotCtrl, setStorageVal, updateHotkeyTip} from "../protyle/util/compatibility";
 import {newFileByName} from "../util/newFile";
-import {filterMenu, getKeyByLiElement, initCriteriaMenu, moreMenu, queryMenu, saveCriterion} from "./menu";
+import {
+    filterMenu,
+    getKeyByLiElement,
+    initCriteriaMenu,
+    moreMenu,
+    queryMenu,
+    replaceFilterMenu,
+    saveCriterion
+} from "./menu";
 import {App} from "../index";
 import {
     assetFilterMenu,
@@ -38,51 +46,147 @@ import {
     toggleAssetHistory
 } from "./assets";
 import {resize} from "../protyle/util/resize";
+import {Menu} from "../plugin/Menu";
+import {addClearButton} from "../util/addClearButton";
+import {checkFold} from "../util/noRelyPCFunction";
+import {getUnRefList, openSearchUnRef, unRefMoreMenu} from "./unRef";
 
-export const toggleReplaceHistory = (replaceHistoryElement: Element, historyElement: Element, replaceInputElement: HTMLInputElement) => {
-    if (replaceHistoryElement.classList.contains("fn__none")) {
-        const list = window.siyuan.storage[Constants.LOCAL_SEARCHKEYS];
-        if (!list.replaceKeys || list.replaceKeys.length === 0) {
-            return;
-        }
-        let html = "";
-        list.replaceKeys.forEach((s: string) => {
-            if (s !== replaceInputElement.value && s) {
-                html += `<div class="b3-list-item${html ? "" : " b3-list-item--focus"}">${escapeHtml(s)}</div>`;
-            }
-        });
-        if (html === "") {
-            return;
-        }
-        replaceHistoryElement.classList.remove("fn__none");
-        replaceHistoryElement.innerHTML = html;
-    } else {
-        replaceHistoryElement.classList.add("fn__none");
+export const toggleReplaceHistory = (searchElement: Element) => {
+    const list = window.siyuan.storage[Constants.LOCAL_SEARCHKEYS];
+    if (!list.replaceKeys || list.replaceKeys.length === 0) {
+        return;
     }
-    historyElement.classList.add("fn__none");
+    const menu = new Menu("search-replace-history");
+    if (menu.isOpen) {
+        return;
+    }
+    menu.element.classList.add("b3-menu--list");
+    menu.addItem({
+        iconHTML: "",
+        label: window.siyuan.languages.clearHistory,
+        click() {
+            window.siyuan.storage[Constants.LOCAL_SEARCHKEYS].replaceKeys = [];
+            setStorageVal(Constants.LOCAL_SEARCHKEYS, window.siyuan.storage[Constants.LOCAL_SEARCHKEYS]);
+        }
+    });
+    const separatorElement = menu.addSeparator(1);
+    let current = true;
+    const replaceInputElement = searchElement.querySelector("#replaceInput") as HTMLInputElement;
+    list.replaceKeys.forEach((s: string) => {
+        if (s !== replaceInputElement.value && s) {
+            const menuItem = menu.addItem({
+                iconHTML: "",
+                label: escapeHtml(s),
+                action: "iconCloseRound",
+                bind(element) {
+                    element.addEventListener("click", (itemEvent) => {
+                        if (hasClosestByClassName(itemEvent.target as Element, "b3-menu__action")) {
+                            list.replaceKeys.find((item: string, index: number) => {
+                                if (item === s) {
+                                    list.replaceKeys.splice(index, 1);
+                                    return true;
+                                }
+                            });
+                            window.siyuan.storage[Constants.LOCAL_SEARCHKEYS].replaceKeys = list.replaceKeys;
+                            setStorageVal(Constants.LOCAL_SEARCHKEYS, window.siyuan.storage[Constants.LOCAL_SEARCHKEYS]);
+                            if (element.previousElementSibling?.classList.contains("b3-menu__separator") && !element.nextElementSibling) {
+                                window.siyuan.menus.menu.remove();
+                            } else {
+                                element.remove();
+                            }
+                        } else {
+                            replaceInputElement.value = element.textContent;
+                            window.siyuan.menus.menu.remove();
+                        }
+                        itemEvent.preventDefault();
+                        itemEvent.stopPropagation();
+                    });
+                }
+            });
+            if (current) {
+                menuItem.classList.add("b3-menu__item--current");
+            }
+            current = false;
+        }
+    });
+    if (current) {
+        separatorElement.remove();
+    }
+    const rect = replaceInputElement.getBoundingClientRect();
+    menu.open({
+        x: rect.left,
+        y: rect.bottom
+    });
 };
 
-export const toggleSearchHistory = (historyElement: Element, replaceHistoryElement: Element, searchInputElement: HTMLInputElement) => {
-    if (historyElement.classList.contains("fn__none")) {
-        const list = window.siyuan.storage[Constants.LOCAL_SEARCHKEYS];
-        if (!list.keys || list.keys.length === 0) {
-            return;
-        }
-        let html = "";
-        list.keys.forEach((s: string) => {
-            if (s !== searchInputElement.value && s) {
-                html += `<div class="b3-list-item${html ? "" : " b3-list-item--focus"}">${escapeHtml(s)}</div>`;
-            }
-        });
-        if (html === "") {
-            return;
-        }
-        historyElement.classList.remove("fn__none");
-        historyElement.innerHTML = html;
-    } else {
-        historyElement.classList.add("fn__none");
+export const toggleSearchHistory = (searchElement: Element, config: ISearchOption, edit: Protyle) => {
+    const list = window.siyuan.storage[Constants.LOCAL_SEARCHKEYS];
+    if (!list.keys || list.keys.length === 0) {
+        return;
     }
-    replaceHistoryElement.classList.add("fn__none");
+    const menu = new Menu("search-history");
+    if (menu.isOpen) {
+        return;
+    }
+    menu.element.classList.add("b3-menu--list");
+    menu.addItem({
+        iconHTML: "",
+        label: window.siyuan.languages.clearHistory,
+        click() {
+            window.siyuan.storage[Constants.LOCAL_SEARCHKEYS].keys = [];
+            setStorageVal(Constants.LOCAL_SEARCHKEYS, window.siyuan.storage[Constants.LOCAL_SEARCHKEYS]);
+        }
+    });
+    const separatorElement = menu.addSeparator(1);
+    let current = true;
+    const searchInputElement = searchElement.querySelector("#searchInput") as HTMLInputElement;
+    list.keys.forEach((s: string) => {
+        if (s !== searchInputElement.value && s) {
+            const menuItem = menu.addItem({
+                iconHTML: "",
+                label: escapeHtml(s),
+                action: "iconCloseRound",
+                bind(element) {
+                    element.addEventListener("click", (itemEvent) => {
+                        if (hasClosestByClassName(itemEvent.target as Element, "b3-menu__action")) {
+                            list.keys.find((item: string, index: number) => {
+                                if (item === s) {
+                                    list.keys.splice(index, 1);
+                                    return true;
+                                }
+                            });
+                            window.siyuan.storage[Constants.LOCAL_SEARCHKEYS].keys = list.keys;
+                            setStorageVal(Constants.LOCAL_SEARCHKEYS, window.siyuan.storage[Constants.LOCAL_SEARCHKEYS]);
+                            if (element.previousElementSibling?.classList.contains("b3-menu__separator") && !element.nextElementSibling) {
+                                window.siyuan.menus.menu.remove();
+                            } else {
+                                element.remove();
+                            }
+                        } else {
+                            searchInputElement.value = element.textContent;
+                            config.page = 1;
+                            inputEvent(searchElement, config, edit, true);
+                            window.siyuan.menus.menu.remove();
+                        }
+                        itemEvent.preventDefault();
+                        itemEvent.stopPropagation();
+                    });
+                }
+            });
+            if (current) {
+                menuItem.classList.add("b3-menu__item--current");
+            }
+            current = false;
+        }
+    });
+    if (current) {
+        separatorElement.remove();
+    }
+    const rect = searchInputElement.getBoundingClientRect();
+    menu.open({
+        x: rect.left,
+        y: rect.bottom
+    });
 };
 
 const saveKeyList = (type: "keys" | "replaceKeys", value: string) => {
@@ -120,6 +224,7 @@ export const openGlobalSearch = (app: App, text: string, replace: boolean) => {
             group: localData.group,
             sort: localData.sort,
             types: Object.assign({}, localData.types),
+            replaceTypes: Object.assign({}, localData.replaceTypes),
             removed: localData.removed,
             page: 1
         },
@@ -148,87 +253,101 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
         }
     });
     const data = window.siyuan.storage[Constants.LOCAL_SEARCHKEYS];
+    const unRefLocal = window.siyuan.storage[Constants.LOCAL_SEARCHUNREF];
     element.innerHTML = `<div class="fn__flex-column" style="height: 100%;${closeCB ? "border-radius: var(--b3-border-radius-b);overflow: hidden;" : ""}">
-    <div class="b3-form__icon search__header">
-        <span class="fn__a" id="searchHistoryBtn">
-            <svg data-menu="true" class="b3-form__icon-icon"><use xlink:href="#iconSearch"></use></svg>
-            <svg class="search__arrowdown"><use xlink:href="#iconDown"></use></svg>
-        </span>
-        <input id="searchInput" style="padding-right: 60px" class="b3-text-field b3-text-field--text" placeholder="${window.siyuan.languages.showRecentUpdatedBlocks}">
-        <div id="searchHistoryList" data-close="false" class="fn__none b3-menu b3-list b3-list--background"></div>
-        <div class="block__icons">
-            <span id="searchRefresh" aria-label="${window.siyuan.languages.refresh}" class="block__icon b3-tooltips b3-tooltips__w">
-                <svg><use xlink:href="#iconRefresh"></use></svg>
-            </span>
-            <span class="fn__space"></span>
-            <span id="searchReplace" aria-label="${window.siyuan.languages.replace}" class="block__icon b3-tooltips b3-tooltips__w">
-                <svg><use xlink:href="#iconReplace"></use></svg>
-            </span>
-            <span class="fn__space"></span>
-            <span id="searchSyntaxCheck" aria-label="${window.siyuan.languages.searchMethod} ${methodText}" class="block__icon b3-tooltips b3-tooltips__w">
-                <svg><use xlink:href="#iconRegex"></use></svg>
-            </span>
-            <span class="fn__space"></span>
-            <span id="searchFilter" aria-label="${window.siyuan.languages.type}" class="block__icon b3-tooltips b3-tooltips__w">
-                <svg><use xlink:href="#iconFilter"></use></svg>
-            </span>
-            <span class="fn__space"></span>
-            <span id="searchMore" aria-label="${window.siyuan.languages.more}" class="block__icon b3-tooltips b3-tooltips__w">
-                <svg><use xlink:href="#iconMore"></use></svg>
-            </span>
-            <span class="${closeCB ? "" : "fn__none "}fn__space"></span>
-            <span id="searchOpen" aria-label="${window.siyuan.languages.openInNewTab}" class="${closeCB ? "" : "fn__none "}block__icon b3-tooltips b3-tooltips__w">
-                <svg><use xlink:href="#iconLayoutRight"></use></svg>
-            </span>
-            <span class="fn__space"></span>
-            <span id="searchAsset" aria-label="${window.siyuan.languages.searchAssetContent}" class="block__icon b3-tooltips b3-tooltips__w">
-                <svg><use xlink:href="#iconExact"></use></svg>
-            </span>
-        </div>
-    </div>
-    <div class="b3-form__icon search__header${config.hasReplace ? "" : " fn__none"}">
-        <span class="fn__a" id="replaceHistoryBtn">
-            <svg data-menu="true" class="b3-form__icon-icon"><use xlink:href="#iconReplace"></use></svg>
-            <svg class="search__arrowdown"><use xlink:href="#iconDown"></use></svg>
-        </span>
-        <input id="replaceInput" class="b3-text-field b3-text-field--text">
-        <svg class="fn__rotate fn__none svg" style="padding: 0 8px;align-self: center;"><use xlink:href="#iconRefresh"></use></svg>
-        <button id="replaceAllBtn" class="b3-button b3-button--small b3-button--outline fn__flex-center">${window.siyuan.languages.replaceAll}</button>
-        <div class="fn__space"></div>
-        <button id="replaceBtn" class="b3-button b3-button--small b3-button--outline fn__flex-center">↵ ${window.siyuan.languages.replace}</button>
-        <div class="fn__space"></div>
-        <div id="replaceHistoryList" data-close="false" class="fn__none b3-menu b3-list b3-list--background"></div>
-    </div>
-    <div id="criteria" class="fn__flex" style="min-height:40px;background-color: var(--b3-theme-background)"></div>
-    <div class="block__icons">
-        <span data-type="previous" class="block__icon block__icon--show b3-tooltips b3-tooltips__ne" disabled="disabled" aria-label="${window.siyuan.languages.previousLabel}"><svg><use xlink:href='#iconLeft'></use></svg></span>
+    <div class="block__icons" style="overflow: auto">
+        <span data-position="9bottom" data-type="previous" class="block__icon block__icon--show ariaLabel" disabled="disabled" aria-label="${window.siyuan.languages.previousLabel}"><svg><use xlink:href='#iconLeft'></use></svg></span>
         <span class="fn__space"></span>
-        <span data-type="next" class="block__icon block__icon--show b3-tooltips b3-tooltips__ne" disabled="disabled" aria-label="${window.siyuan.languages.nextLabel}"><svg><use xlink:href='#iconRight'></use></svg></span>
+        <span data-position="9bottom" data-type="next" class="block__icon block__icon--show ariaLabel" disabled="disabled" aria-label="${window.siyuan.languages.nextLabel}"><svg><use xlink:href='#iconRight'></use></svg></span>
         <span class="fn__space"></span>
         <span id="searchResult" class="fn__flex-shrink ft__selectnone"></span>
         <span class="fn__space"></span>
-        <span class="fn__flex-1"></span>
-        <span id="searchPathInput" class="search__path ft__on-surface fn__flex-center ft__smaller fn__ellipsis ariaLabel" aria-label="${escapeAriaLabel(config.hPath)}">
+        <span class="fn__flex-1${closeCB ? " resize__move" : ""}" style="min-height: 100%"></span>
+        <span id="searchPathInput" data-position="9bottom" class="search__path ft__on-surface fn__flex-center ft__smaller fn__ellipsis ariaLabel" aria-label="${escapeAriaLabel(config.hPath)}">
             ${escapeHtml(config.hPath)}
             <svg class="search__rmpath${config.hPath ? "" : " fn__none"}"><use xlink:href="#iconCloseRound"></use></svg>
         </span>
         <span class="fn__space"></span>
-        <button ${enableIncludeChild ? "" : "disabled"} id="searchInclude" class="b3-button b3-button--mid${includeChild ? "" : " b3-button--cancel"}">${window.siyuan.languages.includeChildDoc}</button>
+        <span data-position="9bottom" id="searchInclude" ${enableIncludeChild ? "" : "disabled"} aria-label="${window.siyuan.languages.includeChildDoc}" class="block__icon block__icon--show ariaLabel">
+            <svg${includeChild ? ' class="ft__primary"' : ""}><use xlink:href="#iconCopy"></use></svg>
+        </span>
         <span class="fn__space"></span>
-        <span id="searchPath" aria-label="${window.siyuan.languages.specifyPath}" class="block__icon block__icon--show b3-tooltips b3-tooltips__w">
+        <span id="searchPath" aria-label="${window.siyuan.languages.specifyPath}" class="block__icon block__icon--show ariaLabel" data-position="9bottom">
             <svg><use xlink:href="#iconFolder"></use></svg>
         </span>
-        <div class="fn__flex${config.group === 0 ? " fn__none" : ""}">
+        <span class="fn__space"></span>
+        <span id="searchMore" aria-label="${window.siyuan.languages.more}" class="block__icon block__icon--show ariaLabel" data-position="9bottom">
+            <svg><use xlink:href="#iconMore"></use></svg>
+        </span>
+        <span class="${closeCB ? "" : "fn__none "}fn__space"></span>
+        <span id="searchOpen" aria-label="${window.siyuan.languages.openInNewTab}" class="${closeCB ? "" : "fn__none "}block__icon block__icon--show ariaLabel" data-position="9bottom">
+            <svg><use xlink:href="#iconLayoutRight"></use></svg>
+        </span>
+        <span class="fn__space"></span>
+        <span id="searchUnRef" aria-label="${window.siyuan.languages.listInvalidRefBlocks}" class="block__icon block__icon--show ariaLabel" data-position="9bottom">
+            <svg><use xlink:href="#iconLinkOff"></use></svg>
+        </span>
+        <span class="fn__space"></span>
+        <span id="searchAsset" aria-label="${window.siyuan.languages.searchAssetContent}" class="block__icon block__icon--show ariaLabel" data-position="9bottom">
+            <svg><use xlink:href="#iconExact"></use></svg>
+        </span>
+    </div>
+    <div class="b3-form__icon search__header">
+        <div style="position: relative" class="fn__flex-1">
+             <span class="search__history-icon ariaLabel" id="searchHistoryBtn" aria-label="${updateHotkeyTip("⌥↓")}">
+                <svg data-menu="true" class="b3-form__icon-icon"><use xlink:href="#iconSearch"></use></svg>
+                <svg class="search__arrowdown"><use xlink:href="#iconDown"></use></svg>
+            </span>
+            <input id="searchInput" class="b3-text-field b3-text-field--text" placeholder="${window.siyuan.languages.showRecentUpdatedBlocks}">
+        </div>
+        <div class="block__icons">
+            <span id="searchFilter" aria-label="${window.siyuan.languages.searchType}" class="block__icon ariaLabel" data-position="9bottom">
+                <svg><use xlink:href="#iconFilter"></use></svg>
+            </span> 
             <span class="fn__space"></span>
-            <span id="searchExpand" class="block__icon block__icon--show b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.expand}">
-                <svg><use xlink:href="#iconExpand"></use></svg>
+            <span id="searchSyntaxCheck" aria-label="${window.siyuan.languages.searchMethod} ${methodText}" class="block__icon ariaLabel" data-position="9bottom">
+                <svg><use xlink:href="#iconRegex"></use></svg>
             </span>
             <span class="fn__space"></span>
-            <span id="searchCollapse" class="block__icon block__icon--show b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.collapse}">
-                <svg><use xlink:href="#iconContract"></use></svg>
+            <span id="searchReplace" aria-label="${window.siyuan.languages.replace}" class="block__icon ariaLabel" data-position="9bottom">
+                <svg><use xlink:href="#iconReplace"></use></svg>
             </span>
+            <span class="fn__space"></span>
+            <span id="searchRefresh" aria-label="${window.siyuan.languages.refresh}" class="block__icon ariaLabel" data-position="9bottom">
+                <svg><use xlink:href="#iconRefresh"></use></svg>
+            </span>
+            <div class="fn__flex${config.group === 0 ? " fn__none" : ""}">
+                <span class="fn__space"></span>
+                <span id="searchExpand" class="block__icon block__icon--show ariaLabel" data-position="9bottom" aria-label="${window.siyuan.languages.expand}">
+                    <svg><use xlink:href="#iconExpand"></use></svg>
+                </span>
+                <span class="fn__space"></span>
+                <span id="searchCollapse" class="block__icon block__icon--show ariaLabel" data-position="9bottom" aria-label="${window.siyuan.languages.collapse}">
+                    <svg><use xlink:href="#iconContract"></use></svg>
+                </span>
+            </div>
         </div>
     </div>
+    <div class="b3-form__icon search__header${config.hasReplace ? "" : " fn__none"}">
+        <div class="fn__flex-1" style="position: relative">
+            <span class="search__history-icon ariaLabel" id="replaceHistoryBtn" aria-label="${updateHotkeyTip("⌥↓")}">
+                <svg data-menu="true" class="b3-form__icon-icon"><use xlink:href="#iconReplace"></use></svg>
+                <svg class="search__arrowdown"><use xlink:href="#iconDown"></use></svg>
+            </span>
+            <input id="replaceInput" class="b3-text-field b3-text-field--text">
+        </div>
+        <div class="fn__space"></div>
+        <svg class="fn__rotate fn__none svg" style="padding: 0 8px;align-self: center;margin-right: 8px"><use xlink:href="#iconRefresh"></use></svg>
+        <span id="replaceFilter" aria-label="${window.siyuan.languages.replaceType}" class="block__icon ariaLabel fn__flex-center" data-position="9bottom">
+            <svg><use xlink:href="#iconFilter"></use></svg>
+        </span>
+        <span class="fn__space"></span>
+        <button id="replaceAllBtn" class="b3-button b3-button--small b3-button--outline fn__flex-center">${window.siyuan.languages.replaceAll}</button>
+        <div class="fn__space"></div>
+        <button id="replaceBtn" class="b3-button b3-button--small b3-button--outline fn__flex-center">↵ ${window.siyuan.languages.replace}</button>
+        <div class="fn__space"></div>
+    </div>
+    <div id="criteria" class="search__header"></div>
     <div class="search__layout${(closeCB ? data.layout === 1 : data.layoutTab === 1) ? " search__layout--row" : ""}">
         <div id="searchList" class="fn__flex-1 search__list b3-list b3-list--background"></div>
         <div class="search__drag"></div>
@@ -244,6 +363,35 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
     </div>
 </div>
 <div class="fn__flex-column fn__none" id="searchAssets" style="height: 100%;${closeCB ? "border-radius: var(--b3-border-radius-b);overflow: hidden;" : ""}"></div>
+<div class="fn__flex-column fn__none" id="searchUnRefPanel" style="height: 100%;${closeCB ? "border-radius: var(--b3-border-radius-b);overflow: hidden;" : ""}">
+    <div class="block__icons">
+        <span data-type="unRefPrevious" class="block__icon block__icon--show ariaLabel" data-position="9bottom" disabled="disabled" aria-label="${window.siyuan.languages.previousLabel}"><svg><use xlink:href='#iconLeft'></use></svg></span>
+        <span class="fn__space"></span>
+        <span data-type="unRefNext" class="block__icon block__icon--show ariaLabel" data-position="9bottom" disabled="disabled" aria-label="${window.siyuan.languages.nextLabel}"><svg><use xlink:href='#iconRight'></use></svg></span>
+        <span class="fn__space"></span>
+        <span id="searchUnRefResult" class="ft__selectnone"></span>
+        <span class="fn__flex-1"></span>
+        <span class="fn__space"></span>
+        <span id="unRefMore" aria-label="${window.siyuan.languages.more}" class="block__icon block__icon--show ariaLabel" data-position="9bottom">
+            <svg><use xlink:href="#iconMore"></use></svg>
+        </span>
+        <span class="fn__space"></span>
+        <span id="searchUnRefClose" aria-label="${!closeCB ? window.siyuan.languages.stickSearch : window.siyuan.languages.globalSearch}" class="block__icon block__icon--show ariaLabel" data-position="9bottom">
+            <svg><use xlink:href="#iconBack"></use></svg>
+        </span>
+    </div>
+    <div class="search__layout${unRefLocal.layout === 1 ? " search__layout--row" : ""}">
+        <div id="searchUnRefList" class="fn__flex-1 search__list b3-list b3-list--background"></div>
+        <div class="search__drag"></div>
+        <div id="searchUnRefPreview" class="fn__flex-1 search__preview b3-typography" style="padding: 8px"></div>
+    </div>
+    <div class="search__tip${closeCB ? "" : " fn__none"}">
+        <kbd>↑/↓/PageUp/PageDown</kbd> ${window.siyuan.languages.searchTip1}
+        <kbd>Enter/Double Click</kbd> ${window.siyuan.languages.searchTip2}
+        <kbd>${updateHotkeyTip(window.siyuan.config.keymap.editor.general.insertRight.custom)}/${updateHotkeyTip("⌥Click")}</kbd> ${window.siyuan.languages.searchTip4}
+        <kbd>Esc</kbd> ${window.siyuan.languages.searchTip5}
+    </div>
+</div>
 <div class="fn__loading fn__loading--top"><img width="120px" src="/stage/loading-pure.svg"></div>`;
 
     const criteriaData: ISearchOption[] = [];
@@ -251,8 +399,6 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
     const searchPanelElement = element.querySelector("#searchList");
     const searchInputElement = element.querySelector("#searchInput") as HTMLInputElement;
     const replaceInputElement = element.querySelector("#replaceInput") as HTMLInputElement;
-    const replaceHistoryElement = element.querySelector("#replaceHistoryList");
-    const historyElement = element.querySelector("#searchHistoryList");
 
     const edit = new Protyle(app, element.querySelector("#searchPreview") as HTMLElement, {
         blockId: "",
@@ -261,6 +407,15 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
             breadcrumbDocName: true
         },
     });
+    edit.resize();
+    const unRefEdit = new Protyle(app, element.querySelector("#searchUnRefPreview") as HTMLElement, {
+        blockId: "",
+        render: {
+            gutter: true,
+            breadcrumbDocName: true
+        },
+    });
+    unRefEdit.resize();
     if (closeCB) {
         if (data.layout === 1) {
             if (data.col) {
@@ -333,6 +488,7 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
 
     const localSearch = window.siyuan.storage[Constants.LOCAL_SEARCHASSET] as ISearchAssetOption;
     const assetsElement = element.querySelector("#searchAssets");
+    const unRefPanelElement = element.querySelector("#searchUnRefPanel");
     element.addEventListener("click", (event: MouseEvent) => {
         let target = event.target as HTMLElement;
         const searchPathInputElement = element.querySelector("#searchPathInput");
@@ -364,7 +520,8 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                         paragraph: window.siyuan.config.search.paragraph,
                         embedBlock: window.siyuan.config.search.embedBlock,
                         databaseBlock: window.siyuan.config.search.databaseBlock,
-                    }
+                    },
+                    replaceTypes: Object.assign({}, Constants.SIYUAN_DEFAULT_REPLACETYPES),
                 }, config, edit);
                 element.querySelector(".b3-chip--current")?.classList.remove("b3-chip--current");
                 event.stopPropagation();
@@ -425,11 +582,11 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                 config.idPath = [];
                 config.hPath = "";
                 config.page = 1;
-                searchPathInputElement.innerHTML = config.hPath;
+                searchPathInputElement.textContent = "";
                 searchPathInputElement.setAttribute("aria-label", "");
                 inputEvent(element, config, edit, true);
                 const includeElement = element.querySelector("#searchInclude");
-                includeElement.classList.remove("b3-button--cancel");
+                includeElement.firstElementChild.classList.add("ft__primary");
                 includeElement.setAttribute("disabled", "disabled");
                 event.stopPropagation();
                 event.preventDefault();
@@ -474,10 +631,10 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                         }
                         config.hPath = hPathList.join(" ");
                         config.page = 1;
-                        searchPathInputElement.innerHTML = `${escapeHtml(config.hPath)}<svg class="search__rmpath"><use xlink:href="#iconCloseRound"></use></svg>`;
+                        searchPathInputElement.innerHTML = `${escapeGreat(config.hPath)}<svg class="search__rmpath"><use xlink:href="#iconCloseRound"></use></svg>`;
                         searchPathInputElement.setAttribute("aria-label", escapeHtml(config.hPath));
                         const includeElement = element.querySelector("#searchInclude");
-                        includeElement.classList.remove("b3-button--cancel");
+                        includeElement.firstElementChild.classList.add("ft__primary");
                         if (enableIncludeChild) {
                             includeElement.removeAttribute("disabled");
                         } else {
@@ -490,8 +647,9 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                 event.preventDefault();
                 break;
             } else if (target.id === "searchInclude") {
-                target.classList.toggle("b3-button--cancel");
-                if (target.classList.contains("b3-button--cancel")) {
+                const svgElement = target.firstElementChild;
+                svgElement.classList.toggle("ft__primary");
+                if (!svgElement.classList.contains("ft__primary")) {
                     config.idPath.forEach((item, index) => {
                         if (!item.endsWith(".sy") && item.split("/").length > 1) {
                             config.idPath[index] = item + ".sy";
@@ -512,7 +670,47 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
             } else if (target.id === "searchReplace") {
                 // ctrl+P 不需要保存
                 config.hasReplace = !config.hasReplace;
-                element.querySelector("#replaceHistoryBtn").parentElement.classList.toggle("fn__none");
+                element.querySelectorAll(".search__header")[1].classList.toggle("fn__none");
+                event.stopPropagation();
+                event.preventDefault();
+                break;
+            } else if (target.id === "searchUnRef") {
+                openSearchUnRef(unRefPanelElement, unRefEdit);
+                event.stopPropagation();
+                event.preventDefault();
+                break;
+            } else if (target.id === "unRefMore") {
+                unRefMoreMenu(target, unRefPanelElement, unRefEdit);
+                event.stopPropagation();
+                event.preventDefault();
+                break;
+            } else if (target.id === "searchUnRefClose") {
+                window.siyuan.menus.menu.remove();
+                unRefPanelElement.classList.add("fn__none");
+                assetsElement.previousElementSibling.classList.remove("fn__none");
+                searchInputElement.select();
+                event.stopPropagation();
+                event.preventDefault();
+                break;
+            } else if (type === "unRefPrevious") {
+                if (!target.getAttribute("disabled")) {
+                    let currentPage = parseInt(unRefPanelElement.querySelector("#searchUnRefResult").textContent);
+                    if (currentPage > 1) {
+                        currentPage--;
+                        getUnRefList(unRefPanelElement, unRefEdit, currentPage);
+                    }
+                }
+                event.stopPropagation();
+                event.preventDefault();
+                break;
+            } else if (type === "unRefNext") {
+                if (!target.getAttribute("disabled")) {
+                    let currentPage = parseInt(unRefPanelElement.querySelector("#searchUnRefResult").textContent);
+                    if (currentPage < parseInt(unRefPanelElement.querySelector("#searchUnRefResult").textContent.split("/")[1])) {
+                        currentPage++;
+                        getUnRefList(unRefPanelElement, unRefEdit, currentPage);
+                    }
+                }
                 event.stopPropagation();
                 event.preventDefault();
                 break;
@@ -578,18 +776,19 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                             paragraph: window.siyuan.config.search.paragraph,
                             embedBlock: window.siyuan.config.search.embedBlock,
                             databaseBlock: window.siyuan.config.search.databaseBlock,
-                        }
+                        },
+                        replaceTypes: Object.assign({}, Constants.SIYUAN_DEFAULT_REPLACETYPES),
                     }, config, edit);
                     element.querySelector("#criteria .b3-chip--current")?.classList.remove("b3-chip--current");
                 }, () => {
                     const localData = window.siyuan.storage[Constants.LOCAL_SEARCHKEYS];
                     const isPopover = hasClosestByClassName(element, "b3-dialog__container");
                     window.siyuan.menus.menu.append(new MenuItem({
-                        iconHTML: Constants.ZWSP,
+                        iconHTML: "",
                         label: window.siyuan.languages.layout,
                         type: "submenu",
                         submenu: [{
-                            iconHTML: Constants.ZWSP,
+                            iconHTML: "",
                             label: window.siyuan.languages.topBottomLayout,
                             current: isPopover ? localData.layout === 0 : localData.layoutTab === 0,
                             click() {
@@ -610,7 +809,7 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                                 setStorageVal(Constants.LOCAL_SEARCHKEYS, window.siyuan.storage[Constants.LOCAL_SEARCHKEYS]);
                             }
                         }, {
-                            iconHTML: Constants.ZWSP,
+                            iconHTML: "",
                             label: window.siyuan.languages.leftRightLayout,
                             current: isPopover ? localData.layout === 1 : localData.layoutTab === 1,
                             click() {
@@ -644,6 +843,12 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                     config.page = 1;
                     inputEvent(element, config, edit, true);
                 });
+                event.stopPropagation();
+                event.preventDefault();
+                break;
+            } else if (target.id === "replaceFilter") {
+                window.siyuan.menus.menu.remove();
+                replaceFilterMenu(config);
                 event.stopPropagation();
                 event.preventDefault();
                 break;
@@ -703,17 +908,17 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                 event.preventDefault();
                 break;
             } else if (target.id === "searchHistoryBtn") {
-                toggleSearchHistory(historyElement, replaceHistoryElement, searchInputElement);
+                toggleSearchHistory(element, config, edit);
                 event.stopPropagation();
                 event.preventDefault();
                 return;
             } else if (target.id === "assetHistoryBtn") {
-                toggleAssetHistory(target.nextElementSibling.nextElementSibling, target.nextElementSibling as HTMLInputElement);
+                toggleAssetHistory(assetsElement);
                 event.stopPropagation();
                 event.preventDefault();
                 return;
             } else if (target.id === "replaceHistoryBtn") {
-                toggleReplaceHistory(replaceHistoryElement, historyElement, replaceInputElement);
+                toggleReplaceHistory(element);
                 event.stopPropagation();
                 event.preventDefault();
                 return;
@@ -740,20 +945,12 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                 break;
             } else if (target.classList.contains("b3-list-item")) {
                 const searchAssetInputElement = element.querySelector("#searchAssetInput") as HTMLInputElement;
-                if (target.parentElement.id === "searchHistoryList") {
-                    searchInputElement.value = target.textContent;
-                    config.page = 1;
-                    inputEvent(element, config, edit, true);
-                } else if (target.parentElement.id === "searchAssetHistoryList") {
-                    searchAssetInputElement.value = target.textContent;
-                    assetInputEvent(assetsElement);
-                } else if (target.parentElement.id === "replaceHistoryList") {
-                    replaceInputElement.value = target.textContent;
-                    replaceHistoryElement.classList.add("fn__none");
-                } else if (type === "search-new") {
-                    newFileByName(app, searchInputElement.value);
+                if (type === "search-new") {
+                    if (config.method == 0) {
+                        newFileByName(app, searchInputElement.value);
+                    }
                 } else if (type === "search-item") {
-                    const isAsset = target.dataset.id;
+                    const searchType = target.dataset.id ? "asset" : (unRefPanelElement.classList.contains("fn__none") ? "doc" : "unRef");
                     let isClick = event.detail === 1;
                     let isDblClick = event.detail === 2;
                     /// #if BROWSER
@@ -764,7 +961,7 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                     /// #endif
                     if (isClick) {
                         clickTimeout = window.setTimeout(() => {
-                            if (isAsset) {
+                            if (searchType === "asset") {
                                 if (!target.classList.contains("b3-list-item--focus")) {
                                     assetsElement.querySelector(".b3-list-item--focus").classList.remove("b3-list-item--focus");
                                     target.classList.add("b3-list-item--focus");
@@ -777,13 +974,12 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                             } else {
                                 if (event.altKey) {
                                     const id = target.getAttribute("data-node-id");
-                                    fetchPost("/api/block/checkBlockFold", {id}, (foldResponse) => {
+                                    checkFold(id, (zoomIn, action) => {
                                         openFileById({
                                             app,
                                             id,
-                                            action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] :
-                                                (id === target.getAttribute("data-root-id") ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ROOTSCROLL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]),
-                                            zoomIn: foldResponse.data,
+                                            action,
+                                            zoomIn,
                                             position: "right"
                                         });
                                         if (closeCB) {
@@ -791,16 +987,16 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                                         }
                                     });
                                 } else if (!target.classList.contains("b3-list-item--focus")) {
-                                    searchPanelElement.querySelector(".b3-list-item--focus").classList.remove("b3-list-item--focus");
+                                    (searchType === "doc" ? searchPanelElement : unRefPanelElement).querySelector(".b3-list-item--focus").classList.remove("b3-list-item--focus");
                                     target.classList.add("b3-list-item--focus");
                                     getArticle({
-                                        edit,
+                                        edit: searchType === "doc" ? edit : unRefEdit,
                                         id: target.getAttribute("data-node-id"),
-                                        config,
-                                        value: searchInputElement.value,
+                                        config: searchType === "doc" ? config : null,
+                                        value: searchType === "doc" ? searchInputElement.value : null,
                                     });
                                     searchInputElement.focus();
-                                } else if (target.classList.contains("b3-list-item--focus")) {
+                                } else if (searchType === "doc" && target.classList.contains("b3-list-item--focus")) {
                                     renderNextSearchMark({
                                         edit,
                                         id: target.getAttribute("data-node-id"),
@@ -812,19 +1008,18 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
                         }, Constants.TIMEOUT_DBLCLICK);
                     } else if (isDblClick && isNotCtrl(event)) {
                         clearTimeout(clickTimeout);
-                        if (isAsset) {
+                        if (searchType === "asset") {
                             /// #if !BROWSER
                             showFileInFolder(path.join(window.siyuan.config.system.dataDir, target.lastElementChild.getAttribute("aria-label")));
                             /// #endif
                         } else {
                             const id = target.getAttribute("data-node-id");
-                            fetchPost("/api/block/checkBlockFold", {id}, (foldResponse) => {
+                            checkFold(id, (zoomIn, action) => {
                                 openFileById({
                                     app,
                                     id,
-                                    action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] :
-                                        (id === target.getAttribute("data-root-id") ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ROOTSCROLL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT]),
-                                    zoomIn: foldResponse.data
+                                    action,
+                                    zoomIn
                                 });
                                 if (closeCB) {
                                     closeCB();
@@ -843,9 +1038,6 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
             }
             target = target.parentElement;
         }
-        historyElement.classList.add("fn__none");
-        replaceHistoryElement.classList.add("fn__none");
-        element.querySelector("#searchAssetHistoryList")?.classList.add("fn__none");
     }, false);
 
     searchInputElement.addEventListener("compositionend", (event: InputEvent) => {
@@ -870,8 +1062,22 @@ export const genSearch = (app: App, config: ISearchOption, element: Element, clo
         }
         saveKeyList("keys", searchInputElement.value);
     });
+    addClearButton({
+        inputElement: searchInputElement,
+        right: 8,
+        height: searchInputElement.clientHeight,
+        clearCB() {
+            config.page = 1;
+            inputEvent(element, config, edit);
+        }
+    });
+    addClearButton({
+        right: 8,
+        inputElement: replaceInputElement,
+        height: searchInputElement.clientHeight,
+    });
     inputEvent(element, config, edit);
-    return edit;
+    return {edit, unRefEdit};
 };
 
 export const getQueryTip = (method: number) => {
@@ -895,21 +1101,22 @@ export const getQueryTip = (method: number) => {
 
 const updateConfig = (element: Element, item: ISearchOption, config: ISearchOption, edit: Protyle) => {
     const dialogElement = hasClosestByClassName(element, "b3-dialog--open");
-    if (dialogElement && dialogElement.getAttribute("data-key") === window.siyuan.config.keymap.general.search.custom) {
+    if (dialogElement && dialogElement.getAttribute("data-key") === Constants.DIALOG_SEARCH) {
         // https://github.com/siyuan-note/siyuan/issues/6828
         item.hPath = config.hPath;
         item.idPath = config.idPath.join(",").split(",");
     }
     if (config.hasReplace !== item.hasReplace) {
+        const replaceHeaderElement = element.querySelectorAll(".search__header")[1];
         if (item.hasReplace) {
-            element.querySelector("#replaceHistoryBtn").parentElement.classList.remove("fn__none");
+            replaceHeaderElement.classList.remove("fn__none");
         } else {
-            element.querySelector("#replaceHistoryBtn").parentElement.classList.add("fn__none");
+            replaceHeaderElement.classList.add("fn__none");
         }
     }
     const searchPathInputElement = element.querySelector("#searchPathInput");
     if (item.hPath) {
-        searchPathInputElement.innerHTML = `${escapeHtml(item.hPath)}<svg class="search__rmpath"><use xlink:href="#iconCloseRound"></use></svg>`;
+        searchPathInputElement.innerHTML = `${escapeGreat(item.hPath)}<svg class="search__rmpath"><use xlink:href="#iconCloseRound"></use></svg>`;
         searchPathInputElement.setAttribute("aria-label", escapeHtml(item.hPath));
     } else {
         searchPathInputElement.innerHTML = "";
@@ -934,9 +1141,9 @@ const updateConfig = (element: Element, item: ISearchOption, config: ISearchOpti
     });
     const searchIncludeElement = element.querySelector("#searchInclude");
     if (includeChild) {
-        searchIncludeElement.classList.remove("b3-button--cancel");
+        searchIncludeElement.firstElementChild.classList.add("ft__primary");
     } else {
-        searchIncludeElement.classList.add("b3-button--cancel");
+        searchIncludeElement.firstElementChild.classList.remove("ft__primary");
     }
     if (enableIncludeChild) {
         searchIncludeElement.removeAttribute("disabled");
@@ -979,33 +1186,39 @@ const renderNextSearchMark = (options: {
 
 export const getArticle = (options: {
     id: string,
-    config: ISearchOption,
+    config?: ISearchOption,
     edit: Protyle
-    value: string,
+    value?: string,
 }) => {
-    fetchPost("/api/block/checkBlockFold", {id: options.id}, (foldResponse) => {
+    checkFold(options.id, (zoomIn) => {
         options.edit.protyle.scroll.lastScrollTop = 0;
         addLoading(options.edit.protyle);
-        fetchPost("/api/filetree/getDoc", {
+        fetchPost("/api/block/getDocInfo", {
             id: options.id,
-            query: options.value,
-            queryMethod: options.config.method,
-            queryTypes: options.config.types,
-            mode: foldResponse.data ? 0 : 3,
-            size: foldResponse.data ? Constants.SIZE_GET_MAX : window.siyuan.config.editor.dynamicLoadBlocks,
-            zoom: foldResponse.data,
-        }, getResponse => {
-            onGet({
-                data: getResponse,
-                protyle: options.edit.protyle,
-                action: foldResponse.data ? [Constants.CB_GET_ALL, Constants.CB_GET_HTML] : [Constants.CB_GET_HL, Constants.CB_GET_HTML],
+        }, (response) => {
+            options.edit.protyle.wysiwyg.renderCustom(response.data.ial);
+            fetchPost("/api/filetree/getDoc", {
+                id: options.id,
+                query: options.value || null,
+                queryMethod: options.config?.method || null,
+                queryTypes: options.config?.types || null,
+                mode: zoomIn ? 0 : 3,
+                size: zoomIn ? Constants.SIZE_GET_MAX : window.siyuan.config.editor.dynamicLoadBlocks,
+                zoom: zoomIn,
+            }, getResponse => {
+                onGet({
+                    updateReadonly: true,
+                    data: getResponse,
+                    protyle: options.edit.protyle,
+                    action: zoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_HTML] : [Constants.CB_GET_HL, Constants.CB_GET_HTML],
+                });
+                const matchElement = options.edit.protyle.wysiwyg.element.querySelector(`div[data-node-id="${options.id}"] span[data-type~="search-mark"]`);
+                if (matchElement) {
+                    matchElement.classList.add("search-mark--hl");
+                    const contentRect = options.edit.protyle.contentElement.getBoundingClientRect();
+                    options.edit.protyle.contentElement.scrollTop = options.edit.protyle.contentElement.scrollTop + matchElement.getBoundingClientRect().top - contentRect.top - contentRect.height / 2;
+                }
             });
-            const matchElement = options.edit.protyle.wysiwyg.element.querySelector(`div[data-node-id="${options.id}"] span[data-type~="search-mark"]`);
-            if (matchElement) {
-                matchElement.classList.add("search-mark--hl");
-                const contentRect = options.edit.protyle.contentElement.getBoundingClientRect();
-                options.edit.protyle.contentElement.scrollTop = options.edit.protyle.contentElement.scrollTop + matchElement.getBoundingClientRect().top - contentRect.top - contentRect.height / 2;
-            }
         });
     });
 };
@@ -1019,7 +1232,7 @@ export const replace = (element: Element, config: ISearchOption, edit: Protyle, 
     const replaceInputElement = element.querySelector("#replaceInput") as HTMLInputElement;
     const searchInputElement = element.querySelector("#searchInput") as HTMLInputElement;
 
-    const loadElement = replaceInputElement.nextElementSibling;
+    const loadElement = element.querySelector("svg.fn__rotate");
     if (!loadElement.classList.contains("fn__none")) {
         return;
     }
@@ -1038,7 +1251,8 @@ export const replace = (element: Element, config: ISearchOption, edit: Protyle, 
         groupBy: config.group,
         orderBy: config.sort,
         page: config.page,
-        ids: isAll ? [] : [currentList.getAttribute("data-node-id")]
+        ids: isAll ? [] : [currentList.getAttribute("data-node-id")],
+        replaceTypes: config.replaceTypes
     }, (response) => {
         loadElement.classList.add("fn__none");
         if (response.code === 1) {
@@ -1159,7 +1373,7 @@ export const inputEvent = (element: Element, config: ISearchOption, edit: Protyl
     element.setAttribute("data-timeout", inputTimeout.toString());
 };
 
-const getAttr = (block: IBlock) => {
+export const getAttr = (block: IBlock) => {
     let attrHTML = "";
     if (block.name) {
         attrHTML += `<span class="b3-list-item__meta fn__flex" style="max-width: 30%"><svg class="b3-list-item__hinticon"><use xlink:href="#iconN"></use></svg><span class="b3-list-item__hinttext">${block.name}</span></span>`;
@@ -1228,8 +1442,8 @@ ${getAttr(item)}
         edit.protyle.element.classList.add("fn__none");
         element.querySelector(".search__drag").classList.add("fn__none");
     }
-    element.querySelector("#searchList").innerHTML = resultHTML ||
-        `<div class="b3-list-item b3-list-item--focus" data-type="search-new">
+    element.querySelector("#searchList").innerHTML = resultHTML || (
+        config.method === 0 ? `<div class="b3-list-item b3-list-item--focus" data-type="search-new">
     <svg class="b3-list-item__graphic"><use xlink:href="#iconFile"></use></svg>
     <span class="b3-list-item__text">
         ${window.siyuan.languages.newFile} <mark>${(element.querySelector("#searchInput") as HTMLInputElement).value}</mark>
@@ -1238,5 +1452,9 @@ ${getAttr(item)}
 </div>
 <div class="search__empty">
     ${window.siyuan.languages.enterNewTip}
-</div>`;
+</div>` : `<div class="b3-list-item b3-list-item--focus" data-type="search-new">
+    <span class="b3-list-item__text">
+        ${window.siyuan.languages.emptyContent}
+    </span>
+</div>`);
 };

@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/88250/lute/ast"
@@ -66,8 +67,11 @@ type Block struct {
 }
 
 type RiffCard struct {
-	Due  time.Time `json:"due"`
-	Reps uint64    `json:"reps"`
+	Due        time.Time  `json:"due"`
+	Reps       uint64     `json:"reps"`
+	Lapses     uint64     `json:"lapses"`
+	State      fsrs.State `json:"state"`
+	LastReview time.Time  `json:"lastReview"`
 }
 
 func getRiffCard(card *fsrs.Card) *RiffCard {
@@ -77,8 +81,11 @@ func getRiffCard(card *fsrs.Card) *RiffCard {
 	}
 
 	return &RiffCard{
-		Due:  due,
-		Reps: card.Reps,
+		Due:        due,
+		Reps:       card.Reps,
+		Lapses:     card.Lapses,
+		State:      card.State,
+		LastReview: card.LastReview,
 	}
 }
 
@@ -108,7 +115,7 @@ type Path struct {
 }
 
 func GetParentNextChildID(id string) string {
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return ""
 	}
@@ -165,7 +172,7 @@ func RecentUpdatedBlocks() (ret []*Block) {
 }
 
 func TransferBlockRef(fromID, toID string, refIDs []string) (err error) {
-	toTree, _ := loadTreeByBlockID(toID)
+	toTree, _ := LoadTreeByBlockID(toID)
 	if nil == toTree {
 		err = ErrBlockNotFound
 		return
@@ -183,7 +190,7 @@ func TransferBlockRef(fromID, toID string, refIDs []string) (err error) {
 		refIDs, _ = sql.QueryRefIDsByDefID(fromID, false)
 	}
 	for _, refID := range refIDs {
-		tree, _ := loadTreeByBlockID(refID)
+		tree, _ := LoadTreeByBlockID(refID)
 		if nil == tree {
 			continue
 		}
@@ -204,12 +211,11 @@ func TransferBlockRef(fromID, toID string, refIDs []string) (err error) {
 	}
 
 	sql.WaitForWritingDatabase()
-	util.ReloadUI()
 	return
 }
 
 func SwapBlockRef(refID, defID string, includeChildren bool) (err error) {
-	refTree, err := loadTreeByBlockID(refID)
+	refTree, err := LoadTreeByBlockID(refID)
 	if nil != err {
 		return
 	}
@@ -220,7 +226,7 @@ func SwapBlockRef(refID, defID string, includeChildren bool) (err error) {
 	if ast.NodeListItem == refNode.Parent.Type {
 		refNode = refNode.Parent
 	}
-	defTree, err := loadTreeByBlockID(defID)
+	defTree, err := LoadTreeByBlockID(defID)
 	if nil != err {
 		return
 	}
@@ -325,7 +331,7 @@ func SwapBlockRef(refID, defID string, includeChildren bool) (err error) {
 }
 
 func GetHeadingDeleteTransaction(id string) (transaction *Transaction, err error) {
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return
 	}
@@ -368,7 +374,7 @@ func GetHeadingDeleteTransaction(id string) (transaction *Transaction, err error
 }
 
 func GetHeadingChildrenIDs(id string) (ret []string) {
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return
 	}
@@ -386,7 +392,7 @@ func GetHeadingChildrenIDs(id string) (ret []string) {
 }
 
 func GetHeadingChildrenDOM(id string) (ret string) {
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return
 	}
@@ -404,7 +410,7 @@ func GetHeadingChildrenDOM(id string) (ret string) {
 }
 
 func GetHeadingLevelTransaction(id string, level int) (transaction *Transaction, err error) {
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return
 	}
@@ -463,7 +469,7 @@ func GetBlockDOM(id string) (ret string) {
 		return
 	}
 
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return
 	}
@@ -478,7 +484,7 @@ func GetBlockKramdown(id string) (ret string) {
 		return
 	}
 
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return
 	}
@@ -505,7 +511,7 @@ func GetChildBlocks(id string) (ret []*ChildBlock) {
 		return
 	}
 
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return
 	}
@@ -545,6 +551,60 @@ func GetChildBlocks(id string) (ret []*ChildBlock) {
 	return
 }
 
+func GetTailChildBlocks(id string, n int) (ret []*ChildBlock) {
+	ret = []*ChildBlock{}
+	if "" == id {
+		return
+	}
+
+	tree, err := LoadTreeByBlockID(id)
+	if nil != err {
+		return
+	}
+
+	node := treenode.GetNodeInTree(tree, id)
+	if nil == node {
+		return
+	}
+
+	if ast.NodeHeading == node.Type {
+		children := treenode.HeadingChildren(node)
+		for i := len(children) - 1; 0 <= i; i-- {
+			c := children[i]
+			ret = append(ret, &ChildBlock{
+				ID:      c.ID,
+				Type:    treenode.TypeAbbr(c.Type.String()),
+				SubType: treenode.SubTypeAbbr(c),
+			})
+			if n == len(ret) {
+				return
+			}
+		}
+		return
+	}
+
+	if !node.IsContainerBlock() {
+		return
+	}
+
+	for c := node.LastChild; nil != c; c = c.Previous {
+		if !c.IsBlock() {
+			continue
+		}
+
+		ret = append(ret, &ChildBlock{
+			ID:      c.ID,
+			Type:    treenode.TypeAbbr(c.Type.String()),
+			SubType: treenode.SubTypeAbbr(c),
+		})
+
+		if n == len(ret) {
+			return
+		}
+	}
+	return
+}
+
 func GetBlock(id string, tree *parse.Tree) (ret *Block, err error) {
 	ret, err = getBlock(id, tree)
 	return
@@ -556,10 +616,10 @@ func getBlock(id string, tree *parse.Tree) (ret *Block, err error) {
 	}
 
 	if nil == tree {
-		tree, err = loadTreeByBlockID(id)
+		tree, err = LoadTreeByBlockID(id)
 		if nil != err {
 			time.Sleep(1 * time.Second)
-			tree, err = loadTreeByBlockID(id)
+			tree, err = LoadTreeByBlockID(id)
 			if nil != err {
 				return
 			}
@@ -583,7 +643,7 @@ func getBlock(id string, tree *parse.Tree) (ret *Block, err error) {
 func getEmbeddedBlock(trees map[string]*parse.Tree, sqlBlock *sql.Block, headingMode int, breadcrumb bool) (block *Block, blockPaths []*BlockPath) {
 	tree, _ := trees[sqlBlock.RootID]
 	if nil == tree {
-		tree, _ = loadTreeByBlockID(sqlBlock.RootID)
+		tree, _ = LoadTreeByBlockID(sqlBlock.RootID)
 	}
 	if nil == tree {
 		return
@@ -646,6 +706,16 @@ func getEmbeddedBlock(trees map[string]*parse.Tree, sqlBlock *sql.Block, heading
 	dom := renderBlockDOMByNodes(nodes, luteEngine)
 	content := renderBlockContentByNodes(nodes)
 	block = &Block{Box: def.Box, Path: def.Path, HPath: b.HPath, ID: def.ID, Type: def.Type.String(), Content: dom, Markdown: content /* 这里使用 Markdown 字段来临时存储 content */}
+
+	if "" != sqlBlock.IAL {
+		block.IAL = map[string]string{}
+		ialStr := strings.TrimPrefix(sqlBlock.IAL, "{:")
+		ialStr = strings.TrimSuffix(ialStr, "}")
+		ial := parse.Tokens2IAL([]byte(ialStr))
+		for _, kv := range ial {
+			block.IAL[kv[0]] = kv[1]
+		}
+	}
 
 	if breadcrumb {
 		blockPaths = buildBlockBreadcrumb(def, nil)

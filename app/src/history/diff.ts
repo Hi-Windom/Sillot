@@ -36,11 +36,18 @@ const renderCompare = (app: App, element: HTMLElement) => {
     if (!listElement) {
         return;
     }
+    const dialogContainerElement = hasClosestByClassName(element, "b3-dialog__container");
+    if (!dialogContainerElement) {
+        return;
+    }
     const leftElement = listElement.nextElementSibling.firstElementChild;
     const rightElement = listElement.nextElementSibling.lastElementChild;
     if (!leftEditor) {
         leftEditor = new Protyle(app, leftElement.lastElementChild as HTMLElement, {
             blockId: "",
+            history: {
+                snapshot: ""
+            },
             action: [Constants.CB_GET_HISTORY],
             render: {
                 background: false,
@@ -55,6 +62,9 @@ const renderCompare = (app: App, element: HTMLElement) => {
         rightEditor = new Protyle(app, rightElement.lastElementChild as HTMLElement, {
             blockId: "",
             action: [Constants.CB_GET_HISTORY],
+            history: {
+                snapshot: ""
+            },
             render: {
                 background: false,
                 title: false,
@@ -85,6 +95,7 @@ const renderCompare = (app: App, element: HTMLElement) => {
             textElement.classList.add("fn__none");
             leftElement.lastElementChild.classList.remove("fn__none");
             textElement.previousElementSibling.classList.add("fn__none");
+            leftEditor.protyle.options.history.snapshot = dialogContainerElement.querySelector(".b3-dialog__header code").getAttribute("data-snapshot");
             onGet({
                 data: response,
                 protyle: leftEditor.protyle,
@@ -113,6 +124,7 @@ const renderCompare = (app: App, element: HTMLElement) => {
                 textElement.classList.add("fn__none");
                 rightElement.lastElementChild.classList.remove("fn__none");
                 textElement.previousElementSibling.classList.add("fn__none");
+                rightEditor.protyle.options.history.snapshot = dialogContainerElement.querySelectorAll(".b3-dialog__header code")[1].getAttribute("data-snapshot");
                 onGet({
                     data: response,
                     protyle: rightEditor.protyle,
@@ -150,7 +162,14 @@ export const showDiff = (app: App, data: { id: string, time: string }[]) => {
             rightEditor = undefined;
         }
     });
+    dialog.element.setAttribute("data-key", Constants.DIALOG_HISTORYCOMPARE);
     dialog.element.addEventListener("click", (event) => {
+        if (typeof event.detail === "string") {
+            renderCompare(app, dialog.element.querySelector(".history__diff .b3-list-item--focus"));
+            event.stopPropagation();
+            event.preventDefault();
+            return;
+        }
         let target = event.target as HTMLElement;
         while (target && target !== dialog.element) {
             if (target.classList.contains("b3-list-item") && !target.dataset.id) {
@@ -195,13 +214,13 @@ const genHTML = (left: string, right: string, dialog: Dialog, direct: string) =>
         const headElement = dialog.element.querySelector(".b3-dialog__header");
         headElement.innerHTML = `<div style="padding: 0;min-height: auto;" class="block__icons">
     <span class="fn__flex-1"></span>
-    <code class="fn__code${isPhone ? " fn__none" : ""}">${left.substring(0, 7)}</code>
+    <code class="fn__code${isPhone ? " fn__none" : ""}" data-snapshot="${left}">${left.substring(0, 7)}</code>
     ${isPhone ? "" : '<span class="fn__space"></span>'}
     ${format(new Date(response.data.left.created), 'yyyy-MM-dd HH:mm')}
     <span class="fn__space"></span>
     <span class="block__icon block__icon--show b3-tooltips b3-tooltips__s" aria-label="${window.siyuan.languages.switchDirect}" data-direct="${direct}"><svg><use xlink:href="#iconScrollHoriz"></use></svg></span>
     <span class="fn__space"></span>
-    <code class="fn__code${isPhone ? " fn__none" : ""}">${right.substring(0, 7)}</code>
+    <code class="fn__code${isPhone ? " fn__none" : ""}" data-snapshot="${right}">${right.substring(0, 7)}</code>
     ${isPhone ? "" : '<span class="fn__space"></span>'}
     ${format(new Date(response.data.right.created), 'yyyy-MM-dd HH:mm')}
     <span class="fn__flex-1"></span>

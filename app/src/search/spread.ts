@@ -17,13 +17,13 @@ export const openSearch = async (options: {
         if (item.element.querySelector("#searchList")) {
             const lastKey = item.element.getAttribute("data-key");
             const replaceHeaderElement = item.element.querySelectorAll(".search__header")[1];
-            if (lastKey !== options.hotkey && options.hotkey === window.siyuan.config.keymap.general.replace.custom && replaceHeaderElement.classList.contains("fn__none")) {
+            if (lastKey !== options.hotkey && options.hotkey === Constants.DIALOG_REPLACE && replaceHeaderElement.classList.contains("fn__none")) {
                 replaceHeaderElement.classList.remove("fn__none");
                 item.element.setAttribute("data-key", options.hotkey);
                 return true;
             }
             const searchPathElement = item.element.querySelector("#searchPathInput");
-            if (lastKey !== options.hotkey && options.hotkey === window.siyuan.config.keymap.general.globalSearch.custom) {
+            if (lastKey !== options.hotkey && options.hotkey === Constants.DIALOG_GLOBALSEARCH) {
                 if (searchPathElement.textContent !== "") {
                     item.destroy();
                     return false;
@@ -33,7 +33,7 @@ export const openSearch = async (options: {
                     return true;
                 }
             }
-            if (lastKey !== options.hotkey && options.hotkey === window.siyuan.config.keymap.general.search.custom) {
+            if (lastKey !== options.hotkey && options.hotkey === Constants.DIALOG_SEARCH) {
                 if (searchPathElement.textContent === "") {
                     item.destroy();
                     return false;
@@ -65,7 +65,7 @@ export const openSearch = async (options: {
             hPath = pathPosix().join(hPath, response.data);
             idPath[0] = pathPosix().join(idPath[0], options.searchPath);
         }
-    } else if (window.siyuan.config.keymap.general.globalSearch.custom === options.hotkey) {
+    } else if (Constants.DIALOG_GLOBALSEARCH === options.hotkey) {
         if (localData.removed) {
             hPath = "";
             idPath = [];
@@ -80,6 +80,7 @@ export const openSearch = async (options: {
         range = getSelection().getRangeAt(0);
     }
     const dialog = new Dialog({
+        positionId: options.hotkey,
         content: "",
         width: "80vw",
         height: "90vh",
@@ -87,13 +88,16 @@ export const openSearch = async (options: {
             if (range && !options) {
                 focusByRange(range);
             }
-            if (edit) {
-                edit.destroy();
-            }
+            dialog.editors.edit.destroy();
+            dialog.editors.unRefEdit.destroy();
         },
         resizeCallback(type: string) {
-            if (type !== "d" && type !== "t" && edit) {
-                edit.resize();
+            if (type !== "d" && type !== "t") {
+                if (dialog.element.querySelector("#searchUnRefPanel").classList.contains("fn__none")) {
+                    dialog.editors.edit.resize();
+                } else {
+                    dialog.editors.unRefEdit.resize();
+                }
             }
         }
     });
@@ -102,18 +106,18 @@ export const openSearch = async (options: {
         removed: localData.removed,
         k: options.key || localData.k,
         r: localData.r,
-        hasReplace: options.hotkey === window.siyuan.config.keymap.general.replace.custom,
+        hasReplace: options.hotkey === Constants.DIALOG_REPLACE,
         method: localData.method,
         hPath,
         idPath,
         group: localData.group,
         sort: localData.sort,
         types: Object.assign({}, localData.types),
+        replaceTypes: Object.assign({}, localData.replaceTypes),
         page: options.key ? 1 : localData.page
     };
-    const edit = genSearch(options.app, config, dialog.element.querySelector(".b3-dialog__body"), () => {
+    dialog.editors = genSearch(options.app, config, dialog.element.querySelector(".b3-dialog__body"), () => {
         dialog.destroy({focus: "false"});
     });
-    dialog.editor = edit;
     dialog.data = config;
 };

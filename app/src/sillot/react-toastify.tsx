@@ -33,14 +33,13 @@ export class Toastify {
     position?: string;
   }) {
     this.root = ReactDOM.createRoot(document.getElementById(props.id)); // https://beta.reactjs.org/reference/react/createElement 示例
-    this.setPosition(props.position);
+    // this.setPosition(props.position);
     this.transition = Bounce;
     this.limit = props.limit;
     this.cID = `cID-${props.id}`;
     this.root.render(
       <>
         <ToastContainer
-          enableMultiContainer
           containerId={this.cID}
           limit={this.limit}
           theme={props.theme}
@@ -60,77 +59,79 @@ export class Toastify {
     }
         ```
    * 将 {@link Toastify.position} 设置为 {@link toast.POSITION} 规定的值
+        升级到v10后不再需要
    */
-  public setPosition(p: string): void {
-    switch (p) {
-      case "ToCenter":
-      case "TOP_CENTER":
-      case "top-center":
-        this.position = toast.POSITION.TOP_CENTER;
-        break;
-      case "ToLeft":
-      case "TOP_LEFT":
-      case "top-left":
-        this.position = toast.POSITION.TOP_LEFT;
-        break;
-      case "ToRight":
-      case "TOP_RIGHT":
-      case "top-right":
-        this.position = toast.POSITION.TOP_RIGHT;
-        break;
-      case "BoCenter":
-      case "BOTTOM_CENTER":
-      case "bottom-center":
-        this.position = toast.POSITION.BOTTOM_CENTER;
-        break;
-      case "BoLeft":
-      case "BOTTOM_LEFT":
-      case "bottom-left":
-        this.position = toast.POSITION.BOTTOM_LEFT;
-        break;
-      case "BoRight":
-      case "BOTTOM_RIGHT":
-      case "bottom-right":
-      default:
-        this.position = toast.POSITION.BOTTOM_RIGHT;
-        break;
-    }
-  }
+  // public setPosition(p: string): void {
+  //   switch (p) {
+  //     case "ToCenter":
+  //     case "TOP_CENTER":
+  //     case "top-center":
+  //       this.position = toast.POSITION.TOP_CENTER;
+  //       break;
+  //     case "ToLeft":
+  //     case "TOP_LEFT":
+  //     case "top-left":
+  //       this.position = toast.POSITION.TOP_LEFT;
+  //       break;
+  //     case "ToRight":
+  //     case "TOP_RIGHT":
+  //     case "top-right":
+  //       this.position = toast.POSITION.TOP_RIGHT;
+  //       break;
+  //     case "BoCenter":
+  //     case "BOTTOM_CENTER":
+  //     case "bottom-center":
+  //       this.position = toast.POSITION.BOTTOM_CENTER;
+  //       break;
+  //     case "BoLeft":
+  //     case "BOTTOM_LEFT":
+  //     case "bottom-left":
+  //       this.position = toast.POSITION.BOTTOM_LEFT;
+  //       break;
+  //     case "BoRight":
+  //     case "BOTTOM_RIGHT":
+  //     case "bottom-right":
+  //     default:
+  //       this.position = toast.POSITION.BOTTOM_RIGHT;
+  //       break;
+  //   }
+  // }
 
   /**
    * 返回一个 {@link toast.POSITION} 规定的值
    * @param p - 语义化的位置声明
+   * 升级到v10后不再需要
    */
-  public getPosition(p: string): any {
-    switch (p) {
-      case "ToCenter":
-      case "TOP_CENTER":
-      case "top-center":
-        return toast.POSITION.TOP_CENTER;
-      case "ToLeft":
-      case "TOP_LEFT":
-      case "top-left":
-        return toast.POSITION.TOP_LEFT;
-      case "ToRight":
-      case "TOP_RIGHT":
-      case "top-right":
-        return toast.POSITION.TOP_RIGHT;
-      case "BoCenter":
-      case "BOTTOM_CENTER":
-      case "bottom-center":
-        return toast.POSITION.BOTTOM_CENTER;
-      case "BoLeft":
-      case "BOTTOM_LEFT":
-      case "bottom-left":
-        return toast.POSITION.BOTTOM_LEFT;
-      case "BoRight":
-      case "BOTTOM_RIGHT":
-      case "bottom-right":
-        return toast.POSITION.BOTTOM_RIGHT;
-      default:
-        return this.position;
-    }
-  }
+  // public getPosition(p: string): any {
+  //   switch (p) {
+  //     case "ToCenter":
+  //     case "TOP_CENTER":
+  //     case "top-center":
+  //       return toast.POSITION.TOP_CENTER;
+  //     case "ToLeft":
+  //     case "TOP_LEFT":
+  //     case "top-left":
+  //       return toast.POSITION.TOP_LEFT;
+  //     case "ToRight":
+  //     case "TOP_RIGHT":
+  //     case "top-right":
+  //       return toast.POSITION.TOP_RIGHT;
+  //     case "BoCenter":
+  //     case "BOTTOM_CENTER":
+  //     case "bottom-center":
+  //       return toast.POSITION.BOTTOM_CENTER;
+  //     case "BoLeft":
+  //     case "BOTTOM_LEFT":
+  //     case "bottom-left":
+  //       return toast.POSITION.BOTTOM_LEFT;
+  //     case "BoRight":
+  //     case "BOTTOM_RIGHT":
+  //     case "bottom-right":
+  //       return toast.POSITION.BOTTOM_RIGHT;
+  //     default:
+  //       return this.position;
+  //   }
+  // }
   /**
    *
    * ```tsx
@@ -203,7 +204,7 @@ export class Toastify {
   public success(_: ItoastifyOptions): void {
     toast.success(_.message, {
       containerId: this.cID,
-      position: this.getPosition(_.position),
+      // position: this.getPosition(_.position),
       autoClose: this.getDuration(_.duration),
       transition: this.getTransition(_.transition),
       theme: this.getTheme(_.theme),
@@ -212,7 +213,7 @@ export class Toastify {
   public error(_: ItoastifyOptions): void {
     toast.error(_.message, {
       containerId: this.cID,
-      position: this.getPosition(_.position),
+      // position: this.getPosition(_.position),
       autoClose: this.getDuration(_.duration),
       transition: this.getTransition(_.transition),
       theme: this.getTheme(_.theme),
@@ -221,7 +222,7 @@ export class Toastify {
   public warn(_: ItoastifyOptions): void {
     toast.warn(_.message, {
       containerId: this.cID,
-      position: this.getPosition(_.position),
+      // position: this.getPosition(_.position),
       autoClose: this.getDuration(_.duration),
       transition: this.getTransition(_.transition),
       theme: this.getTheme(_.theme),
@@ -230,7 +231,7 @@ export class Toastify {
   public info(_: ItoastifyOptions): void {
     toast.info(_.message, {
       containerId: this.cID,
-      position: this.getPosition(_.position),
+      // position: this.getPosition(_.position),
       autoClose: this.getDuration(_.duration),
       transition: this.getTransition(_.transition),
       theme: this.getTheme(_.theme),
@@ -239,7 +240,7 @@ export class Toastify {
   public toast(_: ItoastifyOptions): void {
     toast(_.message, {
       containerId: this.cID,
-      position: this.getPosition(_.position),
+      // position: this.getPosition(_.position),
       autoClose: this.getDuration(_.duration),
       transition: this.getTransition(_.transition),
       theme: this.getTheme(_.theme),
@@ -249,7 +250,7 @@ export class Toastify {
     toast(_.message, {
       type: this.getType(type),
       containerId: this.cID,
-      position: this.getPosition(_.position),
+      // position: this.getPosition(_.position),
       autoClose: this.getDuration(_.duration),
       transition: this.getTransition(_.transition),
       theme: this.getTheme(_.theme),
@@ -287,27 +288,27 @@ export class Toastify {
 
     toast.success("Success Notification !", {
       containerId: this.cID,
-      position: toast.POSITION.TOP_CENTER,
+      position: "top-center",
     });
 
     toast.error("Error Notification !", {
       containerId: this.cID,
-      position: toast.POSITION.TOP_LEFT,
+      position: "top-left",
     });
 
     toast.warn("Warning Notification !", {
       containerId: this.cID,
-      position: toast.POSITION.BOTTOM_LEFT,
+      position: "bottom-left",
     });
 
     toast.info("Info Notification !", {
       containerId: this.cID,
-      position: toast.POSITION.BOTTOM_CENTER,
+      position: "bottom-center",
     });
 
     toast("Custom Style Notification with css class!", {
       containerId: this.cID,
-      position: toast.POSITION.BOTTOM_RIGHT,
+      position: "bottom-right",
       className: "foo-bar",
       autoClose: false,
       onOpen: () => window.alert("Called when I open"),
