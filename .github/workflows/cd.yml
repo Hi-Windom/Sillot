@@ -179,6 +179,9 @@ jobs:
         run: npm install -g pnpm
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
+      - name: Change NPMRC File
+        run: pnpm config set registry https://registry.npmjs.org/ --location project
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
       - name: Install Node Dependencies
         run: pnpm install --no-frozen-lockfile
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
