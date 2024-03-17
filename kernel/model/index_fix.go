@@ -31,6 +31,7 @@ import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/sql"
@@ -39,8 +40,8 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
-// FixIndexJob 自动校验数据库索引 https://github.com/siyuan-note/siyuan/issues/7016
-func FixIndexJob() {
+// CheckIndex 自动校验数据库索引 https://github.com/siyuan-note/siyuan/issues/7016 https://github.com/siyuan-note/siyuan/issues/10563
+func CheckIndex() {
 	task.AppendTask(task.DatabaseIndexFix, removeDuplicateDatabaseIndex)
 	sql.WaitForWritingDatabase()
 
@@ -54,7 +55,11 @@ func FixIndexJob() {
 
 	task.AppendTask(task.DatabaseIndexFix, removeDuplicateDatabaseRefs)
 
-	util.PushStatusBar(Conf.Language(185))
+	// 后面要加任务的话记得修改推送任务栏的进度 util.PushStatusBar(fmt.Sprintf(Conf.Language(58), 1, 5))
+
+	task.AppendTask(task.DatabaseIndexFix, func() {
+		util.PushStatusBar(Conf.Language(185))
+	})
 	debug.FreeOSMemory()
 }
 
@@ -67,7 +72,7 @@ func removeDuplicateDatabaseRefs() {
 	autoFixLock.Lock()
 	defer autoFixLock.Unlock()
 
-	util.PushStatusBar(Conf.Language(58))
+	util.PushStatusBar(fmt.Sprintf(Conf.Language(58), 5, 5))
 	duplicatedRootIDs := sql.GetRefDuplicatedDefRootIDs()
 	for _, rootID := range duplicatedRootIDs {
 		refreshRefsByDefID(rootID)
@@ -85,7 +90,7 @@ func removeDuplicateDatabaseIndex() {
 	autoFixLock.Lock()
 	defer autoFixLock.Unlock()
 
-	util.PushStatusBar(Conf.Language(58))
+	util.PushStatusBar(fmt.Sprintf(Conf.Language(58), 1, 5))
 	duplicatedRootIDs := sql.GetDuplicatedRootIDs("blocks")
 	if 1 > len(duplicatedRootIDs) {
 		duplicatedRootIDs = sql.GetDuplicatedRootIDs("blocks_fts")
@@ -94,7 +99,6 @@ func removeDuplicateDatabaseIndex() {
 		}
 	}
 
-	util.PushStatusBar(Conf.Language(58))
 	roots := sql.GetBlocks(duplicatedRootIDs)
 	rootMap := map[string]*sql.Block{}
 	for _, root := range roots {
@@ -113,7 +117,7 @@ func removeDuplicateDatabaseIndex() {
 		}
 		deletes++
 		toRemoveRootIDs = append(toRemoveRootIDs, rootID)
-		if util.IsExiting {
+		if util.IsExiting.Load() {
 			break
 		}
 	}
@@ -132,7 +136,7 @@ func resetDuplicateBlocksOnFileSys() {
 	autoFixLock.Lock()
 	defer autoFixLock.Unlock()
 
-	util.PushStatusBar(Conf.Language(58))
+	util.PushStatusBar(fmt.Sprintf(Conf.Language(58), 2, 5))
 	boxes := Conf.GetBoxes()
 	luteEngine := lute.New()
 	blockIDs := map[string]bool{}
@@ -150,10 +154,14 @@ func resetDuplicateBlocksOnFileSys() {
 
 		boxPath := filepath.Join(util.DataDir, box.ID)
 		var duplicatedTrees []*parse.Tree
-		filepath.Walk(boxPath, func(path string, info os.FileInfo, err error) error {
+		filelock.Walk(boxPath, func(path string, info os.FileInfo, err error) error {
+			if nil == info {
+				return nil
+			}
+
 			if info.IsDir() {
 				if boxPath == path {
-					// 跳过根路径（笔记本文件夹）
+					// 跳过笔记本文件夹
 					return nil
 				}
 
@@ -162,14 +170,6 @@ func resetDuplicateBlocksOnFileSys() {
 				}
 
 				if !ast.IsNodeIDPattern(info.Name()) {
-					return nil
-				}
-
-				if util.IsEmptyDir(filepath.Join(path)) {
-					// 删除空的子文档文件夹
-					if removeErr := os.RemoveAll(path); nil != removeErr {
-						logging.LogErrorf("remove empty folder failed: %s", removeErr)
-					}
 					return nil
 				}
 				return nil
@@ -275,7 +275,7 @@ func recreateTree(tree *parse.Tree, absPath string) {
 		}
 	}
 
-	if err := os.RemoveAll(absPath); nil != err {
+	if err := filelock.Remove(absPath); nil != err {
 		logging.LogWarnf("remove [%s] failed: %s", absPath, err)
 		return
 	}
@@ -288,15 +288,19 @@ func fixBlockTreeByFileSys() {
 	autoFixLock.Lock()
 	defer autoFixLock.Unlock()
 
-	util.PushStatusBar(Conf.Language(58))
+	util.PushStatusBar(fmt.Sprintf(Conf.Language(58), 3, 5))
 	boxes := Conf.GetOpenedBoxes()
 	luteEngine := lute.New()
 	for _, box := range boxes {
 		boxPath := filepath.Join(util.DataDir, box.ID)
 		var paths []string
-		filepath.Walk(boxPath, func(path string, info os.FileInfo, err error) error {
+		filelock.Walk(boxPath, func(path string, info os.FileInfo, err error) error {
 			if boxPath == path {
 				// 跳过根路径（笔记本文件夹）
+				return nil
+			}
+
+			if nil == info {
 				return nil
 			}
 
@@ -332,12 +336,12 @@ func fixBlockTreeByFileSys() {
 			}
 
 			reindexTreeByPath(box.ID, p, i, size, luteEngine)
-			if util.IsExiting {
+			if util.IsExiting.Load() {
 				break
 			}
 		}
 
-		if util.IsExiting {
+		if util.IsExiting.Load() {
 			break
 		}
 	}
@@ -353,7 +357,7 @@ func fixBlockTreeByFileSys() {
 func fixDatabaseIndexByBlockTree() {
 	defer logging.Recover()
 
-	util.PushStatusBar(Conf.Language(58))
+	util.PushStatusBar(fmt.Sprintf(Conf.Language(58), 4, 5))
 	rootUpdatedMap := treenode.GetRootUpdated()
 	dbRootUpdatedMap, err := sql.GetRootUpdated()
 	if nil == err {
@@ -368,7 +372,7 @@ func reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap map[string]string) {
 	for rootID, updated := range rootUpdatedMap {
 		i++
 
-		if util.IsExiting {
+		if util.IsExiting.Load() {
 			break
 		}
 
@@ -393,18 +397,18 @@ func reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap map[string]string) {
 			continue
 		}
 
-		if util.IsExiting {
+		if util.IsExiting.Load() {
 			break
 		}
 	}
 
 	var rootIDs []string
-	for rootID, _ := range dbRootUpdatedMap {
+	for rootID := range dbRootUpdatedMap {
 		if _, ok := rootUpdatedMap[rootID]; !ok {
 			rootIDs = append(rootIDs, rootID)
 		}
 
-		if util.IsExiting {
+		if util.IsExiting.Load() {
 			break
 		}
 	}
@@ -421,7 +425,7 @@ func reindexTreeByUpdated(rootUpdatedMap, dbRootUpdatedMap map[string]string) {
 		}
 
 		toRemoveRootIDs = append(toRemoveRootIDs, id)
-		if util.IsExiting {
+		if util.IsExiting.Load() {
 			break
 		}
 	}
@@ -466,7 +470,7 @@ func reindexTree0(tree *parse.Tree, i, size int) {
 		indexWriteJSONQueue(tree)
 	} else {
 		treenode.IndexBlockTree(tree)
-		sql.IndexTreeQueue(tree.Box, tree.Path)
+		sql.IndexTreeQueue(tree)
 	}
 
 	if 0 == i%64 {

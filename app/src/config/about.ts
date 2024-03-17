@@ -4,7 +4,7 @@ import {ipcRenderer, shell} from "electron";
 /// #endif
 import {isBrowser} from "../util/functions";
 import {fetchPost} from "../util/fetch";
-import {setAccessAuthCode, setProxy} from "./util/about";
+import {setAccessAuthCode} from "./util/about";
 import {exportLayout} from "../layout/util";
 import {exitSiYuan, processSync} from "../dialog/processSystem";
 import {isInAndroid, isInIOS, isIPad, openByMobile, writeText} from "../protyle/util/compatibility";
@@ -58,7 +58,7 @@ export const about = {
     <input class="b3-switch fn__flex-center" id="networkServe" type="checkbox"${window.siyuan.config.system.networkServe ? " checked" : ""}>
 </label>
 <div class="b3-label${(window.siyuan.config.readonly || (isBrowser() && !isInIOS() && !isInAndroid() && !isIPad())) ? " fn__none" : ""}">
-    <label class="fn__flex">
+    <div class="fn__flex">
         <div class="fn__flex-1">
             ${window.siyuan.languages.about5}
             <div class="b3-label__text">${window.siyuan.languages.about6}</div>
@@ -67,7 +67,7 @@ export const about = {
         <button class="fn__flex-center b3-button b3-button--outline fn__size200" id="authCode">
             <svg><use xlink:href="#iconLock"></use></svg>${window.siyuan.languages.config}
         </button>
-    </label>
+    </div>
     <label class="b3-label fn__flex${!window.siyuan.config.accessAuthCode || isBrowser() ? " fn__none" : ""}">
         <div class="fn__flex-1">
             ${window.siyuan.languages.about7}
@@ -77,7 +77,7 @@ export const about = {
         <input class="b3-switch fn__flex-center" id="lockScreenMode" type="checkbox"${window.siyuan.config.system.lockScreenMode === 1 ? " checked" : ""}>
     </label>
 </div>
-<label class="b3-label config__item${(isBrowser() && !isInAndroid()) ? " fn__none" : " fn__flex"}">
+<div class="b3-label config__item${(isBrowser() && !isInAndroid()) ? " fn__none" : " fn__flex"}">
     <div class="fn__flex-1">
        ${window.siyuan.languages.about2}
         <div class="b3-label__text">${window.siyuan.languages.about3.replace("${port}", location.port)}</div>
@@ -100,7 +100,7 @@ ${
 <button class="fn__flex-center b3-button b3-button--outline fn__size200" id="authCode">
     <svg><use xlink:href="#iconLock"></use></svg>${window.siyuan.languages.config}
 </button>
-</label>
+</div>
 <div class="b3-label fn__flex config__item">
 <div class="fn__flex-1 fn__flex-center">
     ${window.siyuan.languages.dataRepoKey}
@@ -131,7 +131,7 @@ ${
     </button>
 </div>
 </div>
-<label class="fn__flex b3-label config__item">
+<div class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.dataRepoPurge}
         <div class="b3-label__text">${window.siyuan.languages.dataRepoPurgeTip}</div>
@@ -140,9 +140,9 @@ ${
     <button id="purgeRepo" class="b3-button b3-button--outline fn__size200 fn__flex-center">
         <svg><use xlink:href="#iconTrashcan"></use></svg>${window.siyuan.languages.purge}
     </button>
-</label>` : `<div class="fn__none"></div>`
+</div>` : `<div class="fn__none"></div>`
 }
-<label class="fn__flex b3-label config__item">
+<div class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.systemLog}
         <div class="b3-label__text">${window.siyuan.languages.systemLogTip}</div>
@@ -151,8 +151,8 @@ ${
     <button id="exportLog" class="b3-button b3-button--outline fn__size200 fn__flex-center">
         <svg><use xlink:href="#iconUpload"></use></svg>${window.siyuan.languages.export}
     </button>
-</label>
-<label class="fn__flex b3-label config__item">
+</div>
+<div class="fn__flex b3-label config__item">
     <div class="fn__flex-1">
         ${window.siyuan.languages.currentVer} v${Constants.SIYUAN_VERSION}（${window.siyuan.languages.baseSY} v${Constants.SIYUAN_ORIGIN_VERSION}）
         <span id="isInsider"></span>
@@ -164,16 +164,16 @@ ${
             <svg><use xlink:href="#iconRefresh"></use></svg>${window.siyuan.languages.checkUpdate}
         </button>
     </div>
-</label>
+</div>
 ${
-    isAppMode() ? `<label class="fn__flex config__item  b3-label">
+    isAppMode() ? `<div class="fn__flex config__item  b3-label">
 <div class="fn__flex-1">
     ${window.siyuan.languages.about13}
      <div class="b3-label__text">${window.siyuan.languages.about14}</div>
 </div>
 <span class="fn__space"></span>
 <input class="b3-text-field fn__flex-center fn__size200" id="token" value="${window.siyuan.config.api.token}">
-</label>` : ""
+</div>` : ""
 }
 <div class="b3-label${(window.siyuan.config.system.container === "std" || window.siyuan.config.system.container === "docker") ? "" : " fn__none"}">
     ${window.siyuan.languages.networkProxy}
@@ -269,6 +269,7 @@ ${
 </div>`,
                 width: "520px",
             });
+            passwordDialog.element.setAttribute("data-key", Constants.DIALOG_PASSWORD);
             const textAreaElement = passwordDialog.element.querySelector("textarea");
             textAreaElement.focus();
             const btnsElement = passwordDialog.element.querySelectorAll(".b3-button");
@@ -323,8 +324,6 @@ ${
         networkServeElement.addEventListener("change", () => {
             fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
                 exportLayout({
-                    reload: false,
-                    onlyData: false,
                     errorExit: true,
                     cb: exitSiYuan
                 });
@@ -340,9 +339,10 @@ ${
         googleAnalyticsElement.addEventListener("change", () => {
             fetchPost("/api/system/setGoogleAnalytics", {googleAnalytics: googleAnalyticsElement.checked}, () => {
                 exportLayout({
-                    reload: true,
-                    onlyData: false,
                     errorExit: false,
+                    cb() {
+                        window.location.reload();
+                    }
                 });
             });
         });
@@ -350,8 +350,6 @@ ${
         uploadErrLogElement.addEventListener("change", () => {
             fetchPost("/api/system/setUploadErrLog", {uploadErrLog: uploadErrLogElement.checked}, () => {
                 exportLayout({
-                    reload: false,
-                    onlyData: false,
                     errorExit: true,
                     cb: exitSiYuan
                 });
@@ -376,11 +374,23 @@ ${
             const scheme = (about.element.querySelector("#aboutScheme") as HTMLInputElement).value;
             const host = (about.element.querySelector("#aboutHost") as HTMLInputElement).value;
             const port = (about.element.querySelector("#aboutPort") as HTMLInputElement).value;
-            fetchPost("/api/system/setNetworkProxy", {scheme, host, port}, () => {
+            fetchPost("/api/system/setNetworkProxy", {scheme, host, port}, async () => {
                 window.siyuan.config.system.networkProxy.scheme = scheme;
                 window.siyuan.config.system.networkProxy.host = host;
                 window.siyuan.config.system.networkProxy.port = port;
-                setProxy();
+                /// #if !BROWSER
+                ipcRenderer.invoke(Constants.SIYUAN_GET, {
+                    cmd: "setProxy",
+                    proxyURL: `${window.siyuan.config.system.networkProxy.scheme}://${window.siyuan.config.system.networkProxy.host}:${window.siyuan.config.system.networkProxy.port}`,
+                }).then(() => {
+                    exportLayout({
+                        errorExit: false,
+                        cb() {
+                            window.location.reload();
+                        },
+                    });
+                });
+                /// #endif
             });
         });
     }

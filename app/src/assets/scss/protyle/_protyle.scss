@@ -71,7 +71,6 @@
     border: 0;
     background-color: transparent;
     padding: 4px;
-    transition: var(--b3-transition);
     cursor: pointer;
     position: relative;
 
@@ -98,7 +97,7 @@
     color: var(--b3-theme-on-surface-light);
     width: 14px;
     float: left;
-    transition: var(--b3-transition);
+    transition: var(--b3-color-transition);
   }
 }
 
@@ -115,6 +114,15 @@
   box-sizing: border-box;
   min-height: 30px;
   z-index: 1;
+
+  .block__icon {
+    opacity: 1;
+    margin-left: 8px;
+
+    &:disabled {
+        opacity: .38;
+    }
+  }
 
   &__space {
     min-width: 8px;
@@ -154,7 +162,6 @@
   }
 
   &__icon {
-    margin-right: 8px;
     opacity: 1;
     border: 0;
     line-height: 24px;
@@ -193,9 +200,9 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    padding: 4px;
-    line-height: 16px;
-    height: 16px;
+    padding: 0 4px;
+    line-height: 24px;
+    height: 24px;
     border-radius: var(--b3-border-radius);
     margin: 3px 0;
     color: var(--b3-theme-on-surface);
@@ -232,15 +239,15 @@
 
   &--transition {
     .protyle-wysiwyg {
-      transition: padding .3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0ms;
+      transition: padding .3s cubic-bezier(.25, .46, .45, .94) 0ms;
     }
 
     .protyle-title {
-      transition: margin .3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0ms;
+      transition: margin .3s cubic-bezier(.25, .46, .45, .94) 0ms;
     }
 
     .protyle-background__iconw {
-      transition: left .3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0ms;
+      transition: left .3s cubic-bezier(.25, .46, .45, .94) 0ms;
     }
   }
 }
@@ -341,7 +348,7 @@
   }
 
   &[custom-riff-decks] {
-    box-shadow: -3px 0px 0px -1px var(--b3-protyle-inline-mark-background) inset;
+    box-shadow: 3px 0 0 -1px var(--b3-protyle-inline-mark-background) inset;
   }
 
   &__icon {
@@ -390,7 +397,11 @@
   }
 }
 
-.protyle-action__table {
+table[contenteditable="false"] + .protyle-action__table {
+  display: none;
+}
+
+table[contenteditable="true"] + .protyle-action__table {
   position: absolute;
   top: 4px;
   height: 0;

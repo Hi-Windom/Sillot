@@ -1,12 +1,11 @@
 import {Tab} from "./Tab";
-import {getInstanceById, newModelByInitData} from "./util";
+import {getInstanceById, newModelByInitData, saveLayout} from "./util";
 import {getAllModels, getAllTabs} from "./getAll";
 import {hideAllElements, hideElements} from "../protyle/ui/hideElements";
 import {pdfResize} from "../asset/renderAssets";
 import {App} from "../index";
 import {Model} from "./Model";
 import {Editor} from "../editor";
-import {saveScroll} from "../protyle/scroll/saveScroll";
 import {Asset} from "../asset";
 import {Graph} from "./dock/Graph";
 import {Files} from "./dock/Files";
@@ -23,6 +22,7 @@ import {openRecentDocs} from "../business/openRecentDocs";
 import {openHistory} from "../history/history";
 import {newFile} from "../util/newFile";
 import {mountHelp, newNotebook} from "../util/mount";
+import {Constants} from "../constants";
 
 export const getActiveTab = (wndActive = true) => {
     const activeTabElement = document.querySelector(".layout__wnd--active .item--focus");
@@ -53,9 +53,18 @@ export const switchTabByIndex = (index: number) => {
         } else if (index === -2) {
             // 上一个
             indexElement = activeDockIcoElement.previousElementSibling;
+            if (!indexElement) {
+                indexElement = activeDockIcoElement.parentElement.lastElementChild;
+                if (indexElement.classList.contains("dock__item--pin")) {
+                    indexElement = indexElement.previousElementSibling;
+                }
+            }
         } else if (index === -3) {
             // 下一个
             indexElement = activeDockIcoElement.nextElementSibling;
+            if (!indexElement || indexElement.classList.contains("dock__item--pin")) {
+                indexElement = activeDockIcoElement.parentElement.firstElementChild;
+            }
         }
         const type = indexElement?.getAttribute("data-type");
         if (type) {
@@ -72,9 +81,15 @@ export const switchTabByIndex = (index: number) => {
         } else if (index === -2) {
             // 上一个
             indexElement = tab.headElement.previousElementSibling;
+            if (!indexElement) {
+                indexElement = tab.headElement.parentElement.lastElementChild;
+            }
         } else if (index === -3) {
             // 下一个
             indexElement = tab.headElement.nextElementSibling;
+            if (!indexElement) {
+                indexElement = tab.headElement.parentElement.firstElementChild;
+            }
         }
         if (indexElement) {
             tab.parent.switchTab(indexElement as HTMLElement, true);
@@ -84,7 +99,7 @@ export const switchTabByIndex = (index: number) => {
 };
 
 let resizeTimeout: number;
-export const resizeTabs = () => {
+export const resizeTabs = (isSaveLayout = true) => {
     clearTimeout(resizeTimeout);
     //  .layout .fn__flex-shrink {width .15s cubic-bezier(0, 0, .2, 1) 0ms} 时需要再次计算 padding
     // PDF 避免分屏多次调用后，页码跳转到1 https://github.com/siyuan-note/siyuan/issues/5646
@@ -108,7 +123,11 @@ export const resizeTabs = () => {
             });
         });
         models.search.forEach(item => {
-            item.edit.resize();
+            if (item.element.querySelector("#searchUnRefPanel").classList.contains("fn__none")) {
+                item.editors.edit.resize();
+            } else {
+                item.editors.unRefEdit.resize();
+            }
         });
         models.custom.forEach(item => {
             if (item.resize) {
@@ -117,6 +136,9 @@ export const resizeTabs = () => {
         });
         pdfResize();
         hideAllElements(["gutter"]);
+        if (isSaveLayout) {
+            saveLayout();
+        }
     }, 200);
 };
 
@@ -182,7 +204,7 @@ export const newCenterEmptyTab = (app: App) => {
                     if (target.id === "editorEmptySearch") {
                         openSearch({
                             app,
-                            hotkey: window.siyuan.config.keymap.general.globalSearch.custom,
+                            hotkey: Constants.DIALOG_GLOBALSEARCH,
                         });
                         event.stopPropagation();
                         event.preventDefault();
@@ -235,7 +257,7 @@ export const copyTab = (app: App, tab: Tab) => {
                     app,
                     tab: newTab,
                     blockId: tab.model.editor.protyle.block.id,
-                    scrollAttr: saveScroll(tab.model.editor.protyle, true)
+                    rootId: tab.model.editor.protyle.block.rootID
                 });
             } else if (tab.model instanceof Asset) {
                 model = new Asset({
@@ -304,10 +326,6 @@ export const copyTab = (app: App, tab: Tab) => {
             } else if (!tab.model && tab.headElement) {
                 const initData = JSON.parse(tab.headElement.getAttribute("data-initdata") || "{}");
                 if (initData) {
-                    // 历史数据兼容 2023-05-24
-                    if (initData.scrollAttr) {
-                        initData.scrollAttr.rootId = initData.rootId;
-                    }
                     model = newModelByInitData(app, newTab, initData);
                 }
             }
@@ -320,7 +338,7 @@ export const closeTabByType = async (tab: Tab, type: "closeOthers" | "closeAll" 
     if (type === "closeOthers") {
         for (let index = 0; index < tab.parent.children.length; index++) {
             if (tab.parent.children[index].id !== tab.id && !tab.parent.children[index].headElement.classList.contains("item--pin")) {
-                await tab.parent.children[index].parent.removeTab(tab.parent.children[index].id, true, true, false);
+                await tab.parent.children[index].parent.removeTab(tab.parent.children[index].id, true, false);
                 index--;
             }
         }

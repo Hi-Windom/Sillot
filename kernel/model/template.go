@@ -26,14 +26,11 @@ import (
 	"sort"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
-	"github.com/Masterminds/sprig/v3"
-	"github.com/araddon/dateparse"
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/av"
@@ -44,7 +41,11 @@ import (
 )
 
 func RenderGoTemplate(templateContent string) (ret string, err error) {
-	tpl, err := template.New("").Funcs(sprig.TxtFuncMap()).Parse(templateContent)
+	tmpl := template.New("")
+	tplFuncMap := util.BuiltInTemplateFuncs()
+	SQLTemplateFuncs(&tplFuncMap)
+	tmpl = tmpl.Funcs(tplFuncMap)
+	tpl, err := tmpl.Parse(templateContent)
 	if nil != err {
 		return "", errors.New(fmt.Sprintf(Conf.Language(44), err.Error()))
 	}
@@ -94,11 +95,10 @@ func SearchTemplate(keyword string) (ret []*Block) {
 		if group.IsDir() {
 			var templateBlocks []*Block
 			templateDir := filepath.Join(templates, group.Name())
-			// filepath.Walk 与 filepath.WalkDir 均不支持跟踪符号链接
-			filepath.WalkDir(templateDir, func(path string, entry fs.DirEntry, err error) error {
-				name := strings.ToLower(entry.Name())
+			filelock.Walk(templateDir, func(path string, info fs.FileInfo, err error) error {
+				name := strings.ToLower(info.Name())
 				if strings.HasPrefix(name, ".") {
-					if entry.IsDir() {
+					if info.IsDir() {
 						return filepath.SkipDir
 					}
 					return nil
@@ -188,7 +188,7 @@ func RenderTemplate(p, id string, preview bool) (string, error) {
 }
 
 func renderTemplate(p, id string, preview bool) (string, error) {
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return "", err
 	}
@@ -216,33 +216,11 @@ func renderTemplate(p, id string, preview bool) (string, error) {
 		dataModel["alias"] = block.Alias
 	}
 
-	funcMap := sprig.TxtFuncMap()
-	funcMap["queryBlocks"] = func(stmt string, args ...string) (ret []*sql.Block) {
-		for _, arg := range args {
-			stmt = strings.Replace(stmt, "?", arg, 1)
-		}
-		ret = sql.SelectBlocksRawStmt(stmt, 1, Conf.Search.Limit)
-		return
-	}
-	funcMap["querySpans"] = func(stmt string, args ...string) (ret []*sql.Span) {
-		for _, arg := range args {
-			stmt = strings.Replace(stmt, "?", arg, 1)
-		}
-		ret = sql.SelectSpansRawStmt(stmt, Conf.Search.Limit)
-		return
-	}
-	funcMap["parseTime"] = func(dateStr string) time.Time {
-		now := time.Now()
-		ret, err := dateparse.ParseIn(dateStr, now.Location())
-		if nil != err {
-			logging.LogWarnf("parse date [%s] failed [%s], return current time instead", dateStr, err)
-			return now
-		}
-		return ret
-	}
-
 	goTpl := template.New("").Delims(".action{", "}")
-	tpl, err := goTpl.Funcs(funcMap).Parse(gulu.Str.FromBytes(md))
+	tplFuncMap := util.BuiltInTemplateFuncs()
+	SQLTemplateFuncs(&tplFuncMap)
+	goTpl = goTpl.Funcs(tplFuncMap)
+	tpl, err := goTpl.Funcs(tplFuncMap).Parse(gulu.Str.FromBytes(md))
 	if nil != err {
 		return "", errors.New(fmt.Sprintf(Conf.Language(44), err.Error()))
 	}
@@ -305,46 +283,50 @@ func renderTemplate(p, id string, preview bool) (string, error) {
 			if nil != parseErr {
 				logging.LogErrorf("parse attribute view [%s] failed: %s", n.AttributeViewID, parseErr)
 			} else {
-				cloned := av.ShallowCloneAttributeView(attrView)
-				if nil != cloned {
-					n.AttributeViewID = cloned.ID
-					if !preview {
-						// 非预览时持久化数据库
-						if saveErr := av.SaveAttributeView(cloned); nil != saveErr {
-							logging.LogErrorf("save attribute view [%s] failed: %s", cloned.ID, saveErr)
-						}
-					} else {
-						// 预览时使用简单表格渲染
-						view, getErr := attrView.GetView()
-						if nil != getErr {
-							logging.LogErrorf("get attribute view [%s] failed: %s", n.AttributeViewID, getErr)
-							return ast.WalkContinue
-						}
+				cloned := attrView.ShallowClone()
+				if nil == cloned {
+					logging.LogErrorf("clone attribute view [%s] failed", n.AttributeViewID)
+					return ast.WalkContinue
+				}
 
-						table, renderErr := renderAttributeViewTable(attrView, view)
-						if nil != renderErr {
-							logging.LogErrorf("render attribute view [%s] table failed: %s", n.AttributeViewID, renderErr)
-							return ast.WalkContinue
-						}
-
-						var aligns []int
-						for range table.Columns {
-							aligns = append(aligns, 0)
-						}
-						mdTable := &ast.Node{Type: ast.NodeTable, TableAligns: aligns}
-						mdTableHead := &ast.Node{Type: ast.NodeTableHead}
-						mdTable.AppendChild(mdTableHead)
-						mdTableHeadRow := &ast.Node{Type: ast.NodeTableRow, TableAligns: aligns}
-						mdTableHead.AppendChild(mdTableHeadRow)
-						for _, col := range table.Columns {
-							cell := &ast.Node{Type: ast.NodeTableCell}
-							cell.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(col.Name)})
-							mdTableHeadRow.AppendChild(cell)
-						}
-
-						n.InsertBefore(mdTable)
-						unlinks = append(unlinks, n)
+				n.AttributeViewID = cloned.ID
+				if !preview {
+					// 非预览时持久化数据库
+					if saveErr := av.SaveAttributeView(cloned); nil != saveErr {
+						logging.LogErrorf("save attribute view [%s] failed: %s", cloned.ID, saveErr)
 					}
+				} else {
+					// 预览时使用简单表格渲染
+					viewID := n.IALAttr(av.NodeAttrView)
+					view, getErr := attrView.GetCurrentView(viewID)
+					if nil != getErr {
+						logging.LogErrorf("get attribute view [%s] failed: %s", n.AttributeViewID, getErr)
+						return ast.WalkContinue
+					}
+
+					table, renderErr := renderAttributeViewTable(attrView, view, "")
+					if nil != renderErr {
+						logging.LogErrorf("render attribute view [%s] table failed: %s", n.AttributeViewID, renderErr)
+						return ast.WalkContinue
+					}
+
+					var aligns []int
+					for range table.Columns {
+						aligns = append(aligns, 0)
+					}
+					mdTable := &ast.Node{Type: ast.NodeTable, TableAligns: aligns}
+					mdTableHead := &ast.Node{Type: ast.NodeTableHead}
+					mdTable.AppendChild(mdTableHead)
+					mdTableHeadRow := &ast.Node{Type: ast.NodeTableRow, TableAligns: aligns}
+					mdTableHead.AppendChild(mdTableHeadRow)
+					for _, col := range table.Columns {
+						cell := &ast.Node{Type: ast.NodeTableCell}
+						cell.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(col.Name)})
+						mdTableHeadRow.AppendChild(cell)
+					}
+
+					n.InsertBefore(mdTable)
+					unlinks = append(unlinks, n)
 				}
 			}
 		}
@@ -411,5 +393,22 @@ func addBlockIALNodes(tree *parse.Tree, removeUpdated bool) {
 	})
 	for _, block := range blocks {
 		block.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: parse.IAL2Tokens(block.KramdownIAL)})
+	}
+}
+
+func SQLTemplateFuncs(templateFuncMap *template.FuncMap) {
+	(*templateFuncMap)["queryBlocks"] = func(stmt string, args ...string) (retBlocks []*sql.Block) {
+		for _, arg := range args {
+			stmt = strings.Replace(stmt, "?", arg, 1)
+		}
+		retBlocks = sql.SelectBlocksRawStmt(stmt, 1, 512)
+		return
+	}
+	(*templateFuncMap)["querySpans"] = func(stmt string, args ...string) (retSpans []*sql.Span) {
+		for _, arg := range args {
+			stmt = strings.Replace(stmt, "?", arg, 1)
+		}
+		retSpans = sql.SelectSpansRawStmt(stmt, 512)
+		return
 	}
 }

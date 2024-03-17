@@ -15,6 +15,7 @@ import {insertHTML} from "./insertHTML";
 import {scrollCenter} from "../../util/highlightById";
 import {hideElements} from "../ui/hideElements";
 import {avRender} from "../render/av/render";
+import {cellScrollIntoView} from "../render/av/cell";
 
 export const pasteEscaped = async (protyle: IProtyle, nodeElement: Element) => {
     try {
@@ -26,27 +27,27 @@ export const pasteEscaped = async (protyle: IProtyle, nodeElement: Element) => {
         // task-blog-2~default~baiduj 无法原义粘贴含有 `~foo~` 的文本 https://github.com/siyuan-note/siyuan/issues/5523
 
         // 这里必须多加一个反斜杆，因为 Lute 在进行 Markdown 嵌套节点转换平铺标记节点时会剔除 Backslash 节点，
-        // 多加入的一个反斜杆会作为文本节点保留下来，后续 Spin 时刚好用于转义标记符 https://github.com/siyuan-note/siyuan/issues/6341
-        clipText = clipText.replace(/\\/g, "\\\\\\\\")
-            .replace(/\*/g, "\\\\\\*")
-            .replace(/\_/g, "\\\\\\_")
-            .replace(/\[/g, "\\\\\\[")
-            .replace(/\]/g, "\\\\\\]")
-            .replace(/\!/g, "\\\\\\!")
-            .replace(/\`/g, "\\\\\\`")
-            .replace(/\</g, "\\\\\\<")
-            .replace(/\>/g, "\\\\\\>")
-            .replace(/\&/g, "\\\\\\&")
-            .replace(/\~/g, "\\\\\\~")
-            .replace(/\{/g, "\\\\\\{")
-            .replace(/\}/g, "\\\\\\}")
-            .replace(/\(/g, "\\\\\\(")
-            .replace(/\)/g, "\\\\\\)")
-            .replace(/\=/g, "\\\\\\=")
-            .replace(/\#/g, "\\\\\\#")
-            .replace(/\$/g, "\\\\\\$")
-            .replace(/\^/g, "\\\\\\^")
-            .replace(/\|/g, "\\\\\\|");
+        // 多加入的一个反斜杆会作为文本节点保留下来，后续 Spin 时刚好用于转义标记符
+        clipText = clipText.replace(/\\/g, "\\\\")
+            .replace(/\*/g, "\\*")
+            .replace(/_/g, "\\_")
+            .replace(/\[/g, "\\[")
+            .replace(/]/g, "\\]")
+            .replace(/!/g, "\\!")
+            .replace(/`/g, "\\`")
+            .replace(/</g, "\\<")
+            .replace(/>/g, "\\>")
+            .replace(/&/g, "\\&")
+            .replace(/~/g, "\\~")
+            .replace(/\{/g, "\\{")
+            .replace(/}/g, "\\}")
+            .replace(/\(/g, "\\(")
+            .replace(/\)/g, "\\)")
+            .replace(/=/g, "\\=")
+            .replace(/#/g, "\\#")
+            .replace(/\$/g, "\\$")
+            .replace(/\^/g, "\\^")
+            .replace(/\|/g, "\\|");
         pasteText(protyle, clipText, nodeElement);
     } catch (e) {
         console.log(e);
@@ -90,7 +91,11 @@ export const pasteAsPlainText = async (protyle: IProtyle) => {
     if (localFiles.length === 0) {
         // Inline-level elements support pasted as plain text https://github.com/siyuan-note/siyuan/issues/8010
         navigator.clipboard.readText().then(textPlain => {
-            insertHTML(protyle.lute.BlockDOM2EscapeMarkerContent(protyle.lute.Md2BlockDOM(textPlain)), protyle);
+            // 对 HTML 标签进行内部转移，避免被 Lute 解析以后变为小写 https://github.com/siyuan-note/siyuan/issues/10620
+            // 在
+            textPlain = textPlain.replace(/</g, ";;;lt;;;").replace(/>/g, ";;;gt;;;");
+            const content = protyle.lute.BlockDOM2EscapeMarkerContent(protyle.lute.Md2BlockDOM(textPlain));
+            insertHTML(content, protyle);
             filterClipboardHint(protyle, textPlain);
         });
     }
@@ -270,7 +275,20 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
             e.setAttribute("contenteditable", "true");
         });
         const tempInnerHTML = tempElement.innerHTML;
-        insertHTML(tempInnerHTML, protyle, isBlock);
+        if (!nodeElement.classList.contains("av") && tempInnerHTML.startsWith("[{") && tempInnerHTML.endsWith("}]")) {
+            try {
+                const json = JSON.parse(tempInnerHTML);
+                if (json.length > 0 && json[0].id && json[0].type) {
+                    insertHTML(textPlain, protyle, isBlock);
+                } else {
+                    insertHTML(tempInnerHTML, protyle, isBlock);
+                }
+            } catch (e) {
+                insertHTML(tempInnerHTML, protyle, isBlock);
+            }
+        } else {
+            insertHTML(tempInnerHTML, protyle, isBlock);
+        }
         filterClipboardHint(protyle, protyle.lute.BlockDOM2StdMd(tempInnerHTML));
         blockRender(protyle, protyle.wysiwyg.element);
         processRender(protyle.wysiwyg.element);
@@ -369,5 +387,10 @@ export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEven
         highlightRender(protyle.wysiwyg.element);
         avRender(protyle.wysiwyg.element, protyle);
     }
-    scrollCenter(protyle, undefined, false, "smooth");
+    const selectCellElement = nodeElement.querySelector(".av__cell--select");
+    if (nodeElement.classList.contains("av") && selectCellElement) {
+        cellScrollIntoView(nodeElement, selectCellElement);
+    } else {
+        scrollCenter(protyle, undefined, false, "smooth");
+    }
 };

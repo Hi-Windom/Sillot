@@ -30,11 +30,12 @@ import (
 )
 
 func AutoSpace(rootID string) (err error) {
-	tree, err := loadTreeByBlockID(rootID)
+	tree, err := LoadTreeByBlockID(rootID)
 	if nil != err {
 		return
 	}
 
+	logging.LogInfof("formatting tree [%s]...", rootID)
 	util.PushProtyleLoading(rootID, Conf.Language(116))
 	defer util.PushProtyleReload(rootID)
 
@@ -77,6 +78,7 @@ func AutoSpace(rootID string) (err error) {
 	if nil != err {
 		return
 	}
+	logging.LogInfof("formatted tree [%s]", rootID)
 	util.RandomSleep(500, 700)
 	return
 }

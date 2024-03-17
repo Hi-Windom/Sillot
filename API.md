@@ -28,6 +28,8 @@
     * [Update a block](#Update-a-block)
     * [Delete a block](#Delete-a-block)
     * [Move a block](#Move-a-block)
+    * [Fold a block](#Fold-a-block)
+    * [Unfold a block](#Unfold-a-block)
     * [Get a block kramdown](#Get-a-block-kramdown)
     * [Get child blocks](#get-child-blocks)
     * [Transfer block ref](#transfer-block-ref)
@@ -783,6 +785,50 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
   }
   ```
 
+### Fold a block
+
+* `/api/block/foldBlock`
+* Parameters
+
+  ```json
+  {
+    "id": "20231224160424-2f5680o"
+  }
+  ```
+
+  * `id`: Block ID to fold
+* Return value
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": null
+  }
+  ```
+
+### Unfold a block
+
+* `/api/block/unfoldBlock`
+* Parameters
+
+  ```json
+  {
+    "id": "20231224160424-2f5680o"
+  }
+  ```
+
+  * `id`: Block ID to unfold
+* Return value
+
+  ```json
+  {
+    "code": 0,
+    "msg": "",
+    "data": null
+  }
+  ```
+
 ### Get a block kramdown
 
 * `/api/block/getBlockKramdown`
@@ -1032,6 +1078,7 @@ View API token in <kbd>Settings - About</kbd>, request header: `Authorization: T
         * `code`: non-zero for exceptions
 
             * `-1`: Parameter parsing error
+            * `403`: Permission denied (file is not in the workspace)
             * `404`: Not Found (file doesn't exist)
             * `405`: Method Not Allowed (it's a directory)
             * `500`: Server Error (stat file failed / read file failed)

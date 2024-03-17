@@ -6,6 +6,8 @@ import {Constants} from "../constants";
 import {Tab} from "../layout/Tab";
 import {fetchPost} from "../util/fetch";
 import {showMessage} from "../dialog/message";
+import {getDisplayName, pathPosix} from "../util/pathName";
+import {getSearch} from "../util/functions";
 
 interface windowOptions {
     position?: {
@@ -50,38 +52,51 @@ export const openNewWindowById = (id: string, options: windowOptions = {}) => {
                 rootId: response.data.rootID,
                 mode: "wysiwyg",
                 instance: "Editor",
+                action: response.data.rootID === id ? Constants.CB_GET_SCROLL : Constants.CB_GET_ALL
             }
         };
-        if (response.data.rootID === id) {
-            fetchPost("/api/attr/getBlockAttrs", {id}, (attrResponse) => {
-                if (attrResponse.data.scroll) {
-                    json.children.scrollAttr = JSON.parse(attrResponse.data.scroll);
-                    // 历史数据兼容
-                    json.children.scrollAttr.rootId = response.data.rootID;
-                }
-                /// #if !BROWSER
-                ipcRenderer.send(Constants.SIYUAN_OPEN_WINDOW, {
-                    position: options.position,
-                    width: options.width,
-                    height: options.height,
-                    url: `${window.location.protocol}//${window.location.host}/stage/build/app/window.html?v=${Constants.SIYUAN_VERSION}&json=${encodeURIComponent(JSON.stringify(json))}`
-                });
-                /// #endif
-            });
-        } else {
-            json.children.action = Constants.CB_GET_ALL;
-            json.children.scrollAttr = {
-                zoomInId: id,
-            };
-            /// #if !BROWSER
-            ipcRenderer.send(Constants.SIYUAN_OPEN_WINDOW, {
-                position: options.position,
-                width: options.width,
-                height: options.height,
-                url: `${window.location.protocol}//${window.location.host}/stage/build/app/window.html?v=${Constants.SIYUAN_VERSION}&json=${encodeURIComponent(JSON.stringify(json))}`
-            });
-            /// #endif
-        }
+        /// #if !BROWSER
+        ipcRenderer.send(Constants.SIYUAN_OPEN_WINDOW, {
+            position: options.position,
+            width: options.width,
+            height: options.height,
+            url: `${window.location.protocol}//${window.location.host}/stage/build/app/window.html?v=${Constants.SIYUAN_VERSION}&json=${encodeURIComponent(JSON.stringify(json))}`
+        });
+        /// #endif
     });
+};
 
+export const openAssetNewWindow = (assetPath: string, options: windowOptions = {}) => {
+    /// #if !BROWSER
+    const suffix = pathPosix().extname(assetPath.split("?page")[0]);
+    if (Constants.SIYUAN_ASSETS_EXTS.includes(suffix)) {
+        let docIcon = "iconPDF";
+        if (Constants.SIYUAN_ASSETS_IMAGE.includes(suffix)) {
+            docIcon = "iconImage";
+        } else if (Constants.SIYUAN_ASSETS_AUDIO.includes(suffix)) {
+            docIcon = "iconRecord";
+        } else if (Constants.SIYUAN_ASSETS_VIDEO.includes(suffix)) {
+            docIcon = "iconVideo";
+        }
+        const json: any = {
+            title: getDisplayName(assetPath),
+            docIcon,
+            pin: false,
+            active: true,
+            instance: "Tab",
+            action: "Tab",
+            children: {
+                path: assetPath,
+                page: parseInt(getSearch("page", assetPath)),
+                instance: "Asset",
+            }
+        };
+        ipcRenderer.send(Constants.SIYUAN_OPEN_WINDOW, {
+            position: options.position,
+            width: options.width,
+            height: options.height,
+            url: `${window.location.protocol}//${window.location.host}/stage/build/app/window.html?v=${Constants.SIYUAN_VERSION}&json=${encodeURIComponent(JSON.stringify(json))}`
+        });
+    }
+    /// #endif
 };

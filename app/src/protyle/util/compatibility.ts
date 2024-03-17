@@ -166,6 +166,11 @@ export const getLocalStorage = (cb: () => void) => {
             sort: 0,
             k: "",
         };
+        defaultStorage[Constants.LOCAL_SEARCHUNREF] = {
+            col: "",
+            row: "",
+            layout: 0,
+        };
         Constants.SIYUAN_ASSETS_SEARCH.forEach(type => {
             defaultStorage[Constants.LOCAL_SEARCHASSET].types[type] = true;
         });
@@ -187,6 +192,9 @@ export const getLocalStorage = (cb: () => void) => {
         defaultStorage[Constants.LOCAL_LAYOUTS] = [];   // {name: "", layout:{}}
         defaultStorage[Constants.LOCAL_AI] = [];   // {name: "", memo: ""}
         defaultStorage[Constants.LOCAL_PLUGINTOPUNPIN] = [];
+        defaultStorage[Constants.LOCAL_OUTLINE] = {keepExpand: true};
+        defaultStorage[Constants.LOCAL_FILEPOSITION] = {}; // {id: IScrollAttr}
+        defaultStorage[Constants.LOCAL_DIALOGPOSITION] = {}; // {id: IPosition}
         defaultStorage[Constants.LOCAL_FLASHCARD] = {
             fullscreen: false
         };
@@ -205,9 +213,11 @@ export const getLocalStorage = (cb: () => void) => {
             removeAssets: true,
             keepFold: false,
             mergeSubdocs: false,
+            watermark: false
         };
         defaultStorage[Constants.LOCAL_EXPORTIMG] = {
             keepFold: false,
+            watermark: false
         };
         defaultStorage[Constants.LOCAL_DOCINFO] = {
             id: "",
@@ -237,14 +247,17 @@ export const getLocalStorage = (cb: () => void) => {
                 paragraph: window.siyuan.config.search.paragraph,
                 embedBlock: window.siyuan.config.search.embedBlock,
                 databaseBlock: window.siyuan.config.search.databaseBlock,
-            }
+            },
+            replaceTypes: Object.assign({}, Constants.SIYUAN_DEFAULT_REPLACETYPES),
         };
         defaultStorage[Constants.LOCAL_ZOOM] = 1;
 
         [Constants.LOCAL_EXPORTIMG, Constants.LOCAL_SEARCHKEYS, Constants.LOCAL_PDFTHEME, Constants.LOCAL_BAZAAR,
             Constants.LOCAL_EXPORTWORD, Constants.LOCAL_EXPORTPDF, Constants.LOCAL_DOCINFO, Constants.LOCAL_FONTSTYLES,
             Constants.LOCAL_SEARCHDATA, Constants.LOCAL_ZOOM, Constants.LOCAL_LAYOUTS, Constants.LOCAL_AI,
-            Constants.LOCAL_PLUGINTOPUNPIN, Constants.LOCAL_SEARCHASSET, Constants.LOCAL_FLASHCARD].forEach((key) => {
+            Constants.LOCAL_PLUGINTOPUNPIN, Constants.LOCAL_SEARCHASSET, Constants.LOCAL_FLASHCARD,
+            Constants.LOCAL_DIALOGPOSITION, Constants.LOCAL_SEARCHUNREF,
+            Constants.LOCAL_OUTLINE, Constants.LOCAL_FILEPOSITION].forEach((key) => {
             if (typeof response.data[key] === "string") {
                 try {
                     const parseData = JSON.parse(response.data[key]);
@@ -261,13 +274,12 @@ export const getLocalStorage = (cb: () => void) => {
                 window.siyuan.storage[key] = defaultStorage[key];
             }
         });
+        // 搜索数据添加 replaceTypes 兼容
+        if (!window.siyuan.storage[Constants.LOCAL_SEARCHDATA].replaceTypes ||
+            Object.keys(window.siyuan.storage[Constants.LOCAL_SEARCHDATA].replaceTypes).length === 0) {
+            window.siyuan.storage[Constants.LOCAL_SEARCHDATA].replaceTypes = Object.assign({}, Constants.SIYUAN_DEFAULT_REPLACETYPES);
+        }
         cb();
-
-        // 数据兼容，移除历史数据，3.8.4 移除
-        fetchPost("/api/storage/removeLocalStorageVals", {
-            app: Constants.SIYUAN_APPID,
-            keys: ["leftColumn", "local-searchkey", "local-searchedata", "local-searchekeys", "local-searchetabdata", "rightColumn", "topBar"]
-        });
     });
 };
 

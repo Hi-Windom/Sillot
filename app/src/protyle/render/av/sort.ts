@@ -10,7 +10,8 @@ export const addSort = (options: {
     menuElement: HTMLElement,
     tabRect: DOMRect,
     avId: string,
-    protyle: IProtyle
+    protyle: IProtyle,
+    blockID: string,
 }) => {
     const menu = new Menu("av-add-sort");
     options.data.view.columns.forEach((column) => {
@@ -34,14 +35,16 @@ export const addSort = (options: {
                     transaction(options.protyle, [{
                         action: "setAttrViewSorts",
                         avID: options.data.id,
-                        data: options.data.view.sorts
+                        data: options.data.view.sorts,
+                        blockID: options.blockID,
                     }], [{
                         action: "setAttrViewSorts",
                         avID: options.data.id,
-                        data: oldSorts
+                        data: oldSorts,
+                        blockID: options.blockID,
                     }]);
                     options.menuElement.innerHTML = getSortsHTML(options.data.view.columns, options.data.view.sorts);
-                    bindSortsEvent(options.protyle, options.menuElement, options.data);
+                    bindSortsEvent(options.protyle, options.menuElement, options.data, options.blockID);
                     setPosition(options.menuElement, options.tabRect.right - options.menuElement.clientWidth, options.tabRect.bottom, options.tabRect.height);
                 }
             });
@@ -54,7 +57,7 @@ export const addSort = (options: {
     });
 };
 
-export const bindSortsEvent = (protyle: IProtyle, menuElement: HTMLElement, data: IAV) => {
+export const bindSortsEvent = (protyle: IProtyle, menuElement: HTMLElement, data: IAV, blockID: string) => {
     menuElement.querySelectorAll("select").forEach((item: HTMLSelectElement) => {
         item.addEventListener("change", () => {
             const colId = item.parentElement.getAttribute("data-id");
@@ -73,11 +76,13 @@ export const bindSortsEvent = (protyle: IProtyle, menuElement: HTMLElement, data
             transaction(protyle, [{
                 action: "setAttrViewSorts",
                 avID: data.id,
-                data: data.view.sorts
+                data: data.view.sorts,
+                blockID
             }], [{
                 action: "setAttrViewSorts",
                 avID: data.id,
-                data: oldSort
+                data: oldSort,
+                blockID
             }]);
         });
     });
@@ -88,13 +93,13 @@ export const getSortsHTML = (columns: IAVColumn[], sorts: IAVSort[]) => {
     const genSortItem = (id: string) => {
         let sortHTML = "";
         columns.forEach((item) => {
-            sortHTML += `<option value="${item.id}" ${item.id === id ? "selected" : ""}>${item.name}</option>`;
+            sortHTML += `<option value="${item.id}" ${item.id === id ? "selected" : ""}>${item.icon && unicode2Emoji(item.icon)}${item.name}</option>`;
         });
         return sortHTML;
     };
     sorts.forEach((item: IAVSort) => {
         html += `<button draggable="true" class="b3-menu__item" data-id="${item.column}">
-    <svg class="b3-menu__icon"><use xlink:href="#iconDrag"></use></svg>
+    <svg class="b3-menu__icon fn__grab"><use xlink:href="#iconDrag"></use></svg>
     <select class="b3-select" style="margin: 4px 0">
         ${genSortItem(item.column)}
     </select>
@@ -108,7 +113,7 @@ export const getSortsHTML = (columns: IAVColumn[], sorts: IAVSort[]) => {
     });
     return `<div class="b3-menu__items">
 <button class="b3-menu__item" data-type="nobg">
-    <span class="block__icon" style="padding: 8px;margin-left: -4px;" data-type="goConfig">
+    <span class="block__icon" style="padding: 8px;margin-left: -4px;" data-type="go-config">
         <svg><use xlink:href="#iconLeft"></use></svg>
     </span>
     <span class="b3-menu__label ft__center">${window.siyuan.languages.sort}</span>

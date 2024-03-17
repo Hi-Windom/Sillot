@@ -23,10 +23,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/88250/gulu"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 	"github.com/steambap/captcha"
@@ -69,18 +71,21 @@ func LoginAuth(c *gin.Context) {
 		if nil == captchaArg {
 			ret.Code = 1
 			ret.Msg = Conf.Language(21)
+			logging.LogWarnf("invalid captcha")
 			return
 		}
 		inputCaptcha = captchaArg.(string)
 		if "" == inputCaptcha {
 			ret.Code = 1
 			ret.Msg = Conf.Language(21)
+			logging.LogWarnf("invalid captcha")
 			return
 		}
 
 		if strings.ToLower(workspaceSession.Captcha) != strings.ToLower(inputCaptcha) {
 			ret.Code = 1
 			ret.Msg = Conf.Language(22)
+			logging.LogWarnf("invalid captcha")
 			return
 		}
 	}
@@ -89,6 +94,7 @@ func LoginAuth(c *gin.Context) {
 	if Conf.AccessAuthCode != authCode {
 		ret.Code = -1
 		ret.Msg = Conf.Language(83)
+		logging.LogWarnf("invalid auth code")
 
 		util.WrongAuthCount++
 		workspaceSession.Captcha = gulu.Rand.String(7)
@@ -107,6 +113,7 @@ func LoginAuth(c *gin.Context) {
 	workspaceSession.AccessAuthCode = authCode
 	util.WrongAuthCount = 0
 	workspaceSession.Captcha = gulu.Rand.String(7)
+	logging.LogInfof("auth success")
 	if err := session.Save(c); nil != err {
 		logging.LogErrorf("save session failed: " + err.Error())
 		c.Status(http.StatusInternalServerError)
@@ -162,11 +169,19 @@ func CheckAuth(c *gin.Context) {
 
 	// 未设置访问授权码
 	if "" == Conf.AccessAuthCode {
+		// Skip the empty access authorization code check https://github.com/siyuan-note/siyuan/issues/9709
+		if util.SiyuanAccessAuthCodeBypass {
+			c.Next()
+			return
+		}
+
 		// Authenticate requests with the Origin header other than 127.0.0.1 https://github.com/siyuan-note/siyuan/issues/9180
+		clientIP := c.ClientIP()
 		host := c.GetHeader("Host")
 		origin := c.GetHeader("Origin")
 		forwardedHost := c.GetHeader("X-Forwarded-Host")
 		if !localhost ||
+			("" != clientIP && !util.IsLocalHostname(clientIP)) ||
 			("" != host && !util.IsLocalHost(host)) ||
 			("" != origin && !util.IsLocalOrigin(origin) && !strings.HasPrefix(origin, "chrome-extension://")) ||
 			("" != forwardedHost && !util.IsLocalHost(forwardedHost)) {
@@ -197,6 +212,16 @@ func CheckAuth(c *gin.Context) {
 		if strings.HasPrefix(c.Request.RequestURI, "/api/system/exit") {
 			c.Next()
 			return
+		}
+		if strings.HasPrefix(c.Request.RequestURI, "/api/system/getNetwork") {
+			c.Next()
+			return
+		}
+		if strings.HasPrefix(c.Request.RequestURI, "/api/sync/performSync") {
+			if util.ContainerIOS == util.Container || util.ContainerAndroid == util.Container {
+				c.Next()
+				return
+			}
 		}
 	}
 
@@ -243,7 +268,7 @@ func CheckAuth(c *gin.Context) {
 	if workspaceSession.AccessAuthCode != Conf.AccessAuthCode {
 		userAgentHeader := c.GetHeader("User-Agent")
 		if strings.HasPrefix(userAgentHeader, "SiYuan-Sillot/") || strings.HasPrefix(userAgentHeader, "Mozilla/") {
-			if "GET" != c.Request.Method {
+			if "GET" != c.Request.Method || c.IsWebsocket() {
 				c.JSON(http.StatusUnauthorized, map[string]interface{}{"code": -1, "msg": Conf.Language(156)})
 				c.Abort()
 				return
@@ -303,5 +328,49 @@ func Recover(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 	}()
 
+	c.Next()
+}
+
+var (
+	requestingLock = sync.Mutex{}
+	requesting     = map[string]*sync.Mutex{}
+)
+
+func ControlConcurrency(c *gin.Context) {
+	if websocket.IsWebSocketUpgrade(c.Request) {
+		c.Next()
+		return
+	}
+
+	reqPath := c.Request.URL.Path
+
+	// Improve the concurrency of the kernel data reading interfaces https://github.com/siyuan-note/siyuan/issues/10149
+	if strings.HasPrefix(reqPath, "/stage/") || strings.HasPrefix(reqPath, "/assets/") || strings.HasPrefix(reqPath, "/appearance/") {
+		c.Next()
+		return
+	}
+
+	parts := strings.Split(reqPath, "/")
+	function := parts[len(parts)-1]
+	if strings.HasPrefix(function, "get") || strings.HasPrefix(function, "list") ||
+		strings.HasPrefix(function, "search") || strings.HasPrefix(function, "render") || strings.HasPrefix(function, "ls") {
+		c.Next()
+		return
+	}
+	if strings.HasPrefix(function, "/api/query/") || strings.HasPrefix(function, "/api/search/") {
+		c.Next()
+		return
+	}
+
+	requestingLock.Lock()
+	mutex := requesting[reqPath]
+	if nil == mutex {
+		mutex = &sync.Mutex{}
+		requesting[reqPath] = mutex
+	}
+	requestingLock.Unlock()
+
+	mutex.Lock()
+	defer mutex.Unlock()
 	c.Next()
 }

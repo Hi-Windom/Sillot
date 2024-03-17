@@ -8,6 +8,12 @@ interface ILuteNode {
     };
 }
 
+type TTurnIntoOne = "BlocksMergeSuperBlock" | "Blocks2ULs" | "Blocks2OLs" | "Blocks2TLs" | "Blocks2Blockquote"
+
+type TTurnIntoOneSub = "row" | "col"
+
+type TTurnInto = "Blocks2Ps" | "Blocks2Hs"
+
 type ILuteRenderCallback = (node: ILuteNode, entering: boolean) => [string, number];
 
 /** @link https://ld246.com/article/1588412297062 */
@@ -162,7 +168,11 @@ declare class Lute {
 
     public BlockDOM2EscapeMarkerContent(text: string): string;
 
+    public SetSpin(enable: boolean): void;
+
     public SetTextMark(enable: boolean): void;
+
+    public SetHTMLTag2TextMark(enable: boolean): void;
 
     public SetHeadingID(enable: boolean): void;
 
@@ -187,8 +197,6 @@ declare class Lute {
     public BlockDOM2Md(html: string): string;
 
     public BlockDOM2StdMd(html: string): string;
-
-    public SetGitConflict(enable: boolean): void;
 
     public SetSuperBlock(enable: boolean): void;
 
@@ -297,15 +305,18 @@ interface IUpload {
 interface IMenuItem {
     /** 唯一标示 */
     name: string;
+    /** 提示 */
+    tip?: string;
+    /** 语言 key */
     lang?: string;
     /** svg 图标 */
     icon?: string;
-    /** 提示 */
-    tip?: string;
     /** 快捷键 */
     hotkey?: string;
-    /** 插入编辑器中的后缀 */
+    /** 提示的位置 */
     tipPosition?: string;
+
+    click?(protyle: import("../protyle").Protyle): void;
 }
 
 /** @link https://ld246.com/article/1549638745630#options-preview-markdown */
@@ -375,6 +386,10 @@ interface IHint {
 
 /** @link https://ld246.com/article/1549638745630#options */
 interface IOptions {
+    history?: {
+        created?: string
+        snapshot?: string
+    },
     backlinkData?: {
         blockPaths: IBreadcrumb[],
         dom: string
@@ -383,8 +398,8 @@ interface IOptions {
     action?: string[],
     mode?: TEditorMode,
     blockId: string
+    rootId?: string
     key?: string
-    scrollAttr?: IScrollAttr
     defId?: string
     render?: {
         background?: boolean
@@ -421,6 +436,8 @@ interface IOptions {
 
 interface IProtyle {
     getInstance: () => import("../protyle").Protyle,
+    observerLoad?: ResizeObserver,
+    observer?: ResizeObserver,
     app: import("../index").App,
     transactionTime: number,
     id: string,

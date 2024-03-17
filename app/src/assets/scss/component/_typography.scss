@@ -15,6 +15,7 @@
     margin: 0 auto;
 
     &.emoji {
+      width: .7lh;
       cursor: auto;
       max-width: none;
       vertical-align: sub; // text-top windows 不兼容
@@ -51,11 +52,11 @@
   }
 
   span[data-type~="sup"] {
-    top: -0.5em;
+    top: -.5em;
   }
 
   span[data-type~="sub"] {
-    bottom: -0.25em;
+    bottom: -.25em;
   }
 
   em,
@@ -126,7 +127,7 @@
   .bq {
     padding: 4px;
     color: var(--b3-theme-on-surface);
-    border-left: 0.25em solid var(--b3-theme-surface-lighter);
+    border-left: .25em solid var(--b3-theme-surface-lighter);
     background-color: var(--b3-list-hover);
     margin: 4px 0;
   }
@@ -147,17 +148,21 @@
     margin: 4px 0;
     font-weight: 600;
     line-height: 1.25;
+
+    .emoji {
+      width: 1lh;
+    }
   }
 
   .h1,
   h1 {
-    padding: 0.3em 4px;
+    padding: .3em 4px;
     font-size: 1.75em;
   }
 
   .h2,
   h2 {
-    padding: 0.3em 4px;
+    padding: .3em 4px;
     font-size: 1.55em;
   }
 
@@ -218,6 +223,8 @@
       padding: 4px 8px;
       border: 1px solid var(--b3-theme-surface-lighter);
       box-sizing: border-box;
+      max-width: 620px;
+      word-wrap: break-word;
 
       &:empty::after {
         content: "";
@@ -252,7 +259,7 @@
     display: inline-block !important;
     position: absolute !important;
     width: 1px !important;
-    right: 0 !important;
+    right: 6px !important;
     outline: 0 !important;
     background: 0 0 !important;
     text-decoration: initial !important;
@@ -279,6 +286,7 @@
         font-size: 85%;
         color: var(--b3-theme-on-surface);
         margin-top: -4px;
+        align-self: center;
       }
 
       .protyle-icon,
@@ -300,7 +308,7 @@
 
   .hljs {
     border-radius: var(--b3-border-radius);
-    padding: 1.6em 4px;
+    padding: 2em 4px 1.6em 4px;
     font-size: 85%;
     overflow: auto;
     font-family: var(--b3-font-family-code);
@@ -345,7 +353,9 @@
   }
 
   .katex {
-    font-size: 113%;
+    // https://github.com/siyuan-note/siyuan/issues/10251
+    // https://github.com/siyuan-note/siyuan/issues/10321
+    // https://github.com/siyuan-note/siyuan/issues/10346
     line-height: normal; // https://ld246.com/article/1649890278771
 
     .mathnormal {
@@ -382,8 +392,10 @@
     text-align: center;
   }
 
-  [data-subtype="mermaid"] {
+  [data-subtype="mermaid"] > [spin="1"] {
+    // 不能加到上一级，否则属性会跟随滚动
     overflow: auto;
+    line-height: initial;
   }
 
   [data-subtype="plantuml"] img {
@@ -406,12 +418,14 @@
     max-width: 100%;
     user-select: none;
 
-    &:not([style]) {
-      display: initial;
+    & > span:nth-child(1),
+    & > span:nth-child(3) {
+      width: 4px;
+      display: inline-block;
     }
 
     & > span:nth-child(2) {
-      max-width: calc(100% - 10px);
+      max-width: calc(100% - 8px);
       position: relative;
       display: inline-block;
       min-width: 22px;
@@ -480,6 +494,10 @@
     right: 4px;
     top: 4px;
     display: flex;
+
+    &--show {
+      opacity: .86;
+    }
   }
 
   &-icon {
@@ -540,7 +558,7 @@
       counter-reset: linenumber;
       font-size: 85%;
       background-color: var(--b3-theme-surface);
-      padding: 1.6em 4px;
+      padding: 2em 4px 1.6em 4px;
       box-sizing: border-box;
       border-radius: var(--b3-border-radius) 0 0 var(--b3-border-radius);
       width: 3.6em;

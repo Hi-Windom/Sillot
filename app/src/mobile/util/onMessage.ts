@@ -2,12 +2,19 @@ import {openMobileFileById} from "../editor";
 import {processSync, progressLoading, progressStatus, reloadSync, transactionError} from "../../dialog/processSystem";
 import {Constants} from "../../constants";
 import {App} from "../../index";
+import {reloadPlugin} from "../../plugin/loader";
 
 export const onMessage = (app: App, data: IWebSocketData) => {
     if (data) {
         switch (data.cmd) {
+            case "reloadPlugin":
+                reloadPlugin(app);
+                break;
             case "syncMergeResult":
                 reloadSync(app, data.data);
+                break;
+            case "setConf":
+                window.siyuan.config = data.data;
                 break;
             case "readonly":
                 window.siyuan.config.editor.readOnly = data.data;
@@ -16,13 +23,13 @@ export const onMessage = (app: App, data: IWebSocketData) => {
                 progressLoading(data);
                 break;
             case"syncing":
-                processSync(data);
+                processSync(data, app.plugins);
                 if (data.code === 1) {
                     document.getElementById("toolbarSync").classList.add("fn__none");
                 }
                 break;
             case "openFileById":
-                openMobileFileById(app, data.data.id, [Constants.CB_GET_FOCUS]);
+                openMobileFileById(app, data.data.id, [Constants.CB_GET_HL]);
                 break;
             case"txerr":
                 transactionError();

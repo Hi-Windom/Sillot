@@ -3,6 +3,7 @@ export const setLute = (options: ILuteOptions) => {
     lute.SetSpellcheck(window.siyuan.config.editor.spellcheck);
     lute.SetProtyleMarkNetImg(window.siyuan.config.editor.displayNetImgMark);
     lute.SetFileAnnotationRef(true);
+    lute.SetHTMLTag2TextMark(true);
     lute.SetTextMark(true);
     lute.SetHeadingID(false);
     lute.SetYamlFrontMatter(false);
@@ -23,10 +24,10 @@ export const setLute = (options: ILuteOptions) => {
     lute.SetKramdownIAL(true);
     lute.SetTag(true);
     lute.SetSuperBlock(true);
-    lute.SetGitConflict(true);
     lute.SetMark(true);
     lute.SetSup(true);
     lute.SetSub(true);
+    lute.SetSpin(true);
     lute.SetProtyleWYSIWYG(true);
     if (options.lazyLoadImage) {
         lute.SetImageLazyLoading(options.lazyLoadImage);

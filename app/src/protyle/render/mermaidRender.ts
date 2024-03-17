@@ -1,6 +1,7 @@
 import {addScript} from "../util/addScript";
 import {Constants} from "../../constants";
-import {hasClosestByAttribute} from "../util/hasClosest";
+import {hasClosestByAttribute, hasClosestByClassName} from "../util/hasClosest";
+import {genIconHTML} from "./util";
 
 export const mermaidRender = (element: Element, cdn = Constants.PROTYLE_CDN) => {
     let mermaidElements: Element[] = [];
@@ -13,7 +14,7 @@ export const mermaidRender = (element: Element, cdn = Constants.PROTYLE_CDN) => 
     if (mermaidElements.length === 0) {
         return;
     }
-    addScript(`${cdn}/js/mermaid/mermaid.min.js?v=10.3.0`, "protyleMermaidScript").then(() => {
+    addScript(`${cdn}/js/mermaid/mermaid.min.js?v=10.8.0`, "protyleMermaidScript").then(() => {
         const config: any = {
             securityLevel: "loose", // 升级后无 https://github.com/siyuan-note/siyuan/issues/3587，可使用该选项
             altFontFamily: "sans-serif",
@@ -56,26 +57,26 @@ export const mermaidRender = (element: Element, cdn = Constants.PROTYLE_CDN) => 
 };
 
 const initMermaid = (mermaidElements: Element[]) => {
-    mermaidElements.forEach((item, index) => {
+    const wysiswgElement = hasClosestByClassName(mermaidElements[0], "protyle-wysiwyg", true);
+    mermaidElements.forEach(async (item: HTMLElement) => {
         if (item.getAttribute("data-render") === "true") {
             return;
         }
         if (!item.firstElementChild.classList.contains("protyle-icons")) {
-            item.insertAdjacentHTML("afterbegin", `<div class="protyle-icons">
-    <span aria-label="${window.siyuan.languages.edit}" class="b3-tooltips__sw b3-tooltips protyle-icon protyle-icon--first protyle-action__edit"><svg><use xlink:href="#iconEdit"></use></svg></span>
-    <span aria-label="${window.siyuan.languages.more}" class="b3-tooltips__sw b3-tooltips protyle-icon protyle-action__menu protyle-icon--last"><svg><use xlink:href="#iconMore"></use></svg></span>
-</div>`);
+            item.insertAdjacentHTML("afterbegin", genIconHTML(wysiswgElement));
         }
         const renderElement = item.firstElementChild.nextElementSibling as HTMLElement;
-        renderElement.removeAttribute("data-processed");
-        renderElement.textContent = Lute.UnEscapeHTMLStr(item.getAttribute("data-content"));
-        setTimeout(() => {
-            window.mermaid.init(undefined, renderElement);
-        }, Constants.TIMEOUT_LOAD * index);
-        item.setAttribute("data-render", "true");
-        renderElement.setAttribute("contenteditable", "false");
-        if (!item.textContent.endsWith(Constants.ZWSP)) {
-            item.insertAdjacentHTML("beforeend", `<span style="position: absolute">${Constants.ZWSP}</span>`);
+        const id = "mermaid" + Lute.NewNodeID();
+        renderElement.innerHTML = `<span style="position: absolute;left:0;top:0;width: 1px;">${Constants.ZWSP}</span><div contenteditable="false"><span id="${id}"></span></div>`;
+        try {
+            const mermaidData = await window.mermaid.render(id, Lute.UnEscapeHTMLStr(item.getAttribute("data-content")));
+            renderElement.lastElementChild.innerHTML = mermaidData.svg;
+        } catch (e) {
+            const errorElement = document.querySelector("#" + id);
+            renderElement.lastElementChild.innerHTML = `${errorElement.outerHTML}<div class="fn__hr"></div><div class="ft__error">${e.message.replace(/\n/, "<br>")}</div>`;
+            errorElement.parentElement.remove();
         }
+
+        item.setAttribute("data-render", "true");
     });
 };

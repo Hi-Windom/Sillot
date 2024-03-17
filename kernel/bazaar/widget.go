@@ -28,6 +28,7 @@ import (
 	"github.com/K-Sillot/httpclient"
 	"github.com/dustin/go-humanize"
 	ants "github.com/panjf2000/ants/v2"
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -180,7 +181,7 @@ func InstallWidget(repoURL, repoHash, installPath string, systemID string) error
 }
 
 func UninstallWidget(installPath string) error {
-	if err := os.RemoveAll(installPath); nil != err {
+	if err := filelock.Remove(installPath); nil != err {
 		logging.LogErrorf("remove widget [%s] failed: %s", installPath, err)
 		return errors.New("remove community widget failed")
 	}

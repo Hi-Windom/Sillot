@@ -8,13 +8,13 @@ import {Constants} from "../../constants";
 import {isIPad} from "../../protyle/util/compatibility";
 import {globalTouchEnd, globalTouchStart} from "./touch";
 import {initDockMenu} from "../../menus/dock";
-import {hasClosestByAttribute, hasClosestByClassName} from "../../protyle/util/hasClosest";
+import {hasClosestByAttribute, hasClosestByClassName, hasTopClosestByAttribute} from "../../protyle/util/hasClosest";
 import {initTabMenu} from "../../menus/tab";
 import {getInstanceById} from "../../layout/util";
 import {Tab} from "../../layout/Tab";
 import {hideTooltip} from "../../dialog/tooltip";
-import {fetchPost} from "../../util/fetch";
 import {openFileById} from "../../editor/util";
+import {checkFold} from "../../util/noRelyPCFunction";
 
 export const initWindowEvent = (app: App) => {
     document.body.addEventListener("mouseleave", () => {
@@ -85,7 +85,7 @@ export const initWindowEvent = (app: App) => {
             }
             return;
         }
-        const embedBlockElement = hasClosestByAttribute(target, "data-type", "NodeBlockQueryEmbed");
+        const embedBlockElement = hasTopClosestByAttribute(target, "data-type", "NodeBlockQueryEmbed");
         if (embedBlockElement) {
             embedBlockElement.firstElementChild.classList.toggle("protyle-icons--show");
             return;
@@ -131,12 +131,12 @@ export const initWindowEvent = (app: App) => {
             if (backlinkBreadcrumbItemElement) {
                 const breadcrumbId = backlinkBreadcrumbItemElement.getAttribute("data-id") || backlinkBreadcrumbItemElement.getAttribute("data-node-id");
                 if (breadcrumbId) {
-                    fetchPost("/api/block/checkBlockFold", {id: breadcrumbId}, (foldResponse) => {
+                    checkFold(breadcrumbId, (zoomIn) => {
                         openFileById({
                             app,
                             id: breadcrumbId,
-                            action: foldResponse.data ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
-                            zoomIn: foldResponse.data
+                            action: zoomIn ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS, Constants.CB_GET_CONTEXT],
+                            zoomIn,
                         });
                         window.siyuan.menus.menu.remove();
                     });

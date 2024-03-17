@@ -117,10 +117,8 @@ export const initBar = (app: App) => {
                 break;
             } else if (targetId === "barExit") {
                 exportLayout({
-                    reload: false,
-                    onlyData: false,
                     errorExit: true,
-                    cb: exitSiYuan
+                    cb: exitSiYuan,
                 });
                 event.stopPropagation();
                 break;
@@ -173,7 +171,7 @@ export const initBar = (app: App) => {
             } else if (targetId === "barSearch") {
                 openSearch({
                     app,
-                    hotkey: window.siyuan.config.keymap.general.globalSearch.custom
+                    hotkey: Constants.DIALOG_GLOBALSEARCH
                 });
                 event.stopPropagation();
                 break;
@@ -296,7 +294,7 @@ export const setZoom = (type: "zoomIn" | "zoomOut" | "restore") => {
 
 const openPlugin = (app: App, target: Element) => {
     const menu = new Menu("topBarPlugin");
-    if(!isHuawei()) {
+    if (!isHuawei()) {
         menu.addItem({
             icon: "iconSettings",
             label: window.siyuan.languages.manage,
@@ -322,7 +320,7 @@ const openPlugin = (app: App, target: Element) => {
         plugin.topBarIcons.forEach(item => {
             const hasUnpin = window.siyuan.storage[Constants.LOCAL_PLUGINTOPUNPIN].includes(item.id);
             const submenu = [{
-                icon: "iconPin",
+                icon: hasUnpin ? "iconPin" : "iconUnpin",
                 label: hasUnpin ? window.siyuan.languages.pin : window.siyuan.languages.unpin,
                 click() {
                     if (hasUnpin) {

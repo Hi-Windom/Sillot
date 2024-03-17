@@ -2,19 +2,24 @@ import {fetchSyncPost} from "../util/fetch";
 import {App} from "../index";
 import {Plugin} from "./index";
 /// #if !MOBILE
-import {exportLayout, resizeTopBar} from "../layout/util";
+import {resizeTopBar, saveLayout} from "../layout/util";
 /// #endif
 import {API} from "./API";
 import {getFrontend, isMobile, isWindow} from "../util/functions";
 import {Constants} from "../constants";
+import {uninstall} from "./uninstall";
 
-const getObject = (key: string) => {
-    const api = {
+const requireFunc = (key: string) => {
+    const modules = {
         siyuan: API
     };
     // @ts-ignore
-    return api[key];
+    return modules[key]
+        ?? window.require?.(key);
 };
+if (window.require instanceof Function) {
+    requireFunc.__proto__ = window.require;
+}
 
 const runCode = (code: string, sourceURL: string) => {
     return window.eval("(function anonymous(require, module, exports){".concat(code, "\n})\n//# sourceURL=").concat(sourceURL, "\n"));
@@ -40,7 +45,7 @@ const loadPluginJS = async (app: App, item: IPluginData) => {
     const exportsObj: { [key: string]: any } = {};
     const moduleObj = {exports: exportsObj};
     try {
-        runCode(item.js, "plugin:" + encodeURIComponent(item.name))(getObject, moduleObj, exportsObj);
+        runCode(item.js, "plugin:" + encodeURIComponent(item.name))(requireFunc, moduleObj, exportsObj);
     } catch (e) {
         console.error(`plugin ${item.name} run error:`, e);
         return;
@@ -76,13 +81,7 @@ export const loadPlugin = async (app: App, item: IPluginData) => {
     styleElement.textContent = item.css;
     document.head.append(styleElement);
     afterLoadPlugin(plugin);
-    /// #if !MOBILE
-    exportLayout({
-        reload: false,
-        onlyData: false,
-        errorExit: false
-    });
-    /// #endif
+    saveLayout();
     return plugin;
 };
 
@@ -231,5 +230,19 @@ export const afterLoadPlugin = (plugin: Plugin) => {
             }], dock.config.position === "RightBottom" ? 1 : 0, dock.config.index);
         }
     });
+    /// #endif
+};
+
+export const reloadPlugin = (app: App) => {
+    app.plugins.forEach((item) => {
+        uninstall(this, item.name);
+    });
+    loadPlugins(this).then(() => {
+        app.plugins.forEach(item => {
+            afterLoadPlugin(item);
+        });
+    });
+    /// #if !MOBILE
+    saveLayout();
     /// #endif
 };

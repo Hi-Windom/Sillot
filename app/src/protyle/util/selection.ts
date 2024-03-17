@@ -476,6 +476,12 @@ export const focusByRange = (range: Range) => {
     if (!range) {
         return;
     }
+
+    const startNode = range.startContainer.childNodes[range.startOffset] as HTMLElement;
+    if (startNode && startNode.nodeType !== 3 && ["INPUT", "TEXTAREA"].includes(startNode.tagName)) {
+        startNode.focus();
+        return;
+    }
     window.sout.tracker(range);
     const selection = window.getSelection();
     selection.removeAllRanges();
@@ -579,6 +585,11 @@ export const focusBlock = (element: Element, parentElement?: HTMLElement, toStar
             if (cursorElement.classList.contains("hljs")) {
                 // 代码块末尾定位需在 /n 之前 https://github.com/siyuan-note/siyuan/issues/9141，https://github.com/siyuan-note/siyuan/issues/9189
                 let lastNode = cursorElement.lastChild;
+                if (!lastNode) {
+                    // 粘贴 ``` 报错
+                    cursorElement.innerHTML = "\n";
+                    lastNode = cursorElement.lastChild;
+                }
                 if (lastNode.textContent === "" && lastNode.nodeType === 3) {
                     lastNode = hasPreviousSibling(cursorElement.lastChild) as HTMLElement;
                 }

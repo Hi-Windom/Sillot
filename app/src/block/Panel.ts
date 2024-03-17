@@ -80,13 +80,13 @@ export class BlockPanel {
             const iconsElement = hasClosestByClassName(target, "block__icons");
             if (iconsElement) {
                 const pingElement = iconsElement.querySelector('[data-type="pin"]');
-                if (pingElement.classList.contains("block__icon--active")) {
-                    pingElement.classList.remove("block__icon--active");
+                if (this.element.getAttribute("data-pin") === "true") {
                     pingElement.setAttribute("aria-label", window.siyuan.languages.pin);
+                    pingElement.querySelector("use").setAttribute("xlink:href", "#iconPin");
                     this.element.setAttribute("data-pin", "false");
                 } else {
-                    pingElement.classList.add("block__icon--active");
                     pingElement.setAttribute("aria-label", window.siyuan.languages.unpin);
+                    pingElement.querySelector("use").setAttribute("xlink:href", "#iconUnpin");
                     this.element.setAttribute("data-pin", "true");
                 }
                 event.preventDefault();
@@ -105,13 +105,13 @@ export class BlockPanel {
                     if (type === "close") {
                         this.destroy();
                     } else if (type === "pin") {
-                        if (target.classList.contains("block__icon--active")) {
-                            target.classList.remove("block__icon--active");
+                        if (this.element.getAttribute("data-pin") === "true") {
                             target.setAttribute("aria-label", window.siyuan.languages.pin);
+                            target.querySelector("use").setAttribute("xlink:href", "#iconPin");
                             this.element.setAttribute("data-pin", "false");
                         } else {
-                            target.classList.add("block__icon--active");
                             target.setAttribute("aria-label", window.siyuan.languages.unpin);
+                            target.querySelector("use").setAttribute("xlink:href", "#iconUnpin");
                             this.element.setAttribute("data-pin", "true");
                         }
                     } else if (type === "open") {
@@ -134,8 +134,8 @@ export class BlockPanel {
                 });
             }
             const pinElement = this.element.firstElementChild.querySelector('[data-type="pin"]');
-            pinElement.classList.add("block__icon--active");
             pinElement.setAttribute("aria-label", window.siyuan.languages.unpin);
+            pinElement.querySelector("use").setAttribute("xlink:href", "#iconUnpin");
             this.element.setAttribute("data-pin", "true");
         });
         /// #endif
@@ -211,11 +211,16 @@ export class BlockPanel {
             });
             this.editors = [];
         }
+        const level = parseInt(this.element.dataset.level);
         this.element.remove();
         this.element = undefined;
         this.targetElement = undefined;
         // 移除弹出上使用右键菜单
-        window.siyuan.menus.menu.remove();
+        const menuLevel = parseInt(window.siyuan.menus.menu.element.dataset.from);
+        if (window.siyuan.menus.menu.element.dataset.from !== "app" && menuLevel && menuLevel >= level) {
+            // https://github.com/siyuan-note/siyuan/issues/9854 右键菜单不是从浮窗中弹出的则不进行移除
+            window.siyuan.menus.menu.remove();
+        }
     }
 
     private render() {

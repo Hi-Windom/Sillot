@@ -52,9 +52,9 @@ func createDocsByHPath(boxID, hPath, content, parentID, id string /* id 参数�
 			return
 		}
 	} else {
+		retID = ast.NewNodeID()
 		if "" == id {
-			id = ast.NewNodeID()
-			retID = id
+			id = retID
 		}
 	}
 
@@ -95,8 +95,12 @@ func createDocsByHPath(boxID, hPath, content, parentID, id string /* id 参数�
 		root = hpathBtMap[hp]
 		isNotLast := i < len(parts)-1
 		if nil == root {
-			retID = ast.NewNodeID()
-			pathBuilder.WriteString(retID)
+			rootID := ast.NewNodeID()
+			if i == len(parts)-1 {
+				rootID = retID
+			}
+
+			pathBuilder.WriteString(rootID)
 			docP := pathBuilder.String() + ".sy"
 			if isNotLast {
 				if _, err = createDoc(boxID, docP, part, ""); nil != err {
@@ -116,7 +120,6 @@ func createDocsByHPath(boxID, hPath, content, parentID, id string /* id 参数�
 				}
 			}
 		} else {
-			retID = root.ID
 			pathBuilder.WriteString(root.ID)
 			if !isNotLast {
 				pathBuilder.WriteString(".sy")
@@ -204,7 +207,7 @@ func toSubTree(blocks []*Block, keyword string) (ret []*Path) {
 		}
 		for _, c := range root.Children {
 			if "NodeListItem" == c.Type {
-				tree, _ := loadTreeByBlockID(c.RootID)
+				tree, _ := LoadTreeByBlockID(c.RootID)
 				li := treenode.GetNodeInTree(tree, c.ID)
 				if nil == li || nil == li.FirstChild {
 					// 反链面板拖拽到文档以后可能会出现这种情况 https://github.com/siyuan-note/siyuan/issues/5363
@@ -306,7 +309,7 @@ func toSubTree(blocks []*Block, keyword string) (ret []*Path) {
 					treeNode.Children = append(treeNode.Children, subRoot)
 				}
 			} else if "NodeHeading" == c.Type {
-				tree, _ := loadTreeByBlockID(c.RootID)
+				tree, _ := LoadTreeByBlockID(c.RootID)
 				h := treenode.GetNodeInTree(tree, c.ID)
 				if nil == h {
 					continue

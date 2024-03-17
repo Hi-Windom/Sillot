@@ -75,15 +75,15 @@ export const keymap = {
     </div>
 </div>`;
         }
-        return `<label class="fn__flex b3-label config__item">
+        return `<div class="fn__flex b3-label config__item">
     <span class="fn__flex-center">${window.siyuan.languages.keymapTip}</span>
     <span class="fn__flex-1"></span>
     <button id="keymapRefreshBtn" class="b3-button b3-button--outline fn__flex-center fn__size200">
         <svg><use xlink:href="#iconRefresh"></use></svg>
         ${window.siyuan.languages.refresh}
     </button>
-</label>
-<label class="fn__flex b3-label config__item">
+</div>
+<div class="fn__flex b3-label config__item">
     <span class="fn__flex-center">${window.siyuan.languages.keymapTip2}</span>
     <span class="fn__flex-1"></span>
     <span class="fn__space"></span>
@@ -91,7 +91,7 @@ export const keymap = {
         <svg><use xlink:href="#iconUndo"></use></svg>
         ${window.siyuan.languages.reset}
     </button>
-</label>
+</div>
 <div class="b3-label file-tree config-keymap" id="keymapList">
     <div class="fn__flex config__item">
         <label class="b3-form__icon fn__block">
@@ -259,8 +259,9 @@ export const keymap = {
     bindEvent(app: App) {
         keymap.element.querySelector("#keymapRefreshBtn").addEventListener("click", () => {
             exportLayout({
-                reload: true,
-                onlyData: false,
+                cb() {
+                    window.location.reload();
+                },
                 errorExit: false,
             });
         });
@@ -382,7 +383,7 @@ export const keymap = {
                     }
                     let hasConflict = false;
                     if (["⌘", "⇧", "⌥", "⌃"].includes(keymapStr.substring(keymapStr.length - 1, keymapStr.length)) ||
-                        ["⌘A", "⌘X", "⌘C", "⌘V", "⌘-", "⌘=", "⌘0", "⇧⌘V", "⌘/", "⇧↑", "⇧↓", "⇧→", "⇧←", "⇧⇥", "⌃D", "⇧⌘→", "⇧⌘←", "⌘Home", "⌘End", "⇧↩", "↩", "PageUp", "PageDown", "⌫", "⌦"].includes(keymapStr) ||
+                        ["⌘A", "⌘X", "⌘C", "⌘V", "⌘-", "⌘=", "⌘0", "⇧⌘V", "⌘/", "⇧↑", "⇧↓", "⇧→", "⇧←", "⇧⇥", "⌃D", "⇧⌘→", "⇧⌘←", "⌘Home", "⌘End", "⇧↩", "↩", "PageUp", "PageDown", "⌫", "⌦", "Escape"].includes(keymapStr) ||
                         // 跳转到下/上一个编辑页签不能包含 ctrl， 否则不能监听到 keyup
                         (isMac() && keys[0] === "general" && ["goToEditTabNext", "goToEditTabPrev"].includes(keys[1]) && keymapStr.includes("⌘"))
                     ) {

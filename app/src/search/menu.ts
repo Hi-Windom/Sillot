@@ -7,11 +7,11 @@ import {fetchPost} from "../util/fetch";
 import {escapeHtml} from "../util/escape";
 import {setStorageVal} from "../protyle/util/compatibility";
 import {confirmDialog} from "../dialog/confirmDialog";
-import {updateSearchResult} from "../mobile/menu/search";
+import {goUnRef, updateSearchResult} from "../mobile/menu/search";
 
 export const filterMenu = (config: ISearchOption, cb: () => void) => {
     const filterDialog = new Dialog({
-        title: window.siyuan.languages.type,
+        title: window.siyuan.languages.searchType,
         content: `<div class="b3-dialog__content">
     <label class="fn__flex b3-label">
         <svg class="ft__on-surface svg fn__flex-center"><use xlink:href="#iconMath"></use></svg>
@@ -138,6 +138,7 @@ export const filterMenu = (config: ISearchOption, cb: () => void) => {
         width: isMobile() ? "92vw" : "520px",
         height: "70vh",
     });
+    filterDialog.element.setAttribute("data-key", Constants.DIALOG_SEARCHTYPE);
     const btnsElement = filterDialog.element.querySelectorAll(".b3-button");
     btnsElement[0].addEventListener("click", () => {
         filterDialog.destroy();
@@ -147,6 +148,41 @@ export const filterMenu = (config: ISearchOption, cb: () => void) => {
             config.types[item.getAttribute("data-type") as TSearchFilter] = item.checked;
         });
         cb();
+        filterDialog.destroy();
+    });
+};
+
+export const replaceFilterMenu = (config: ISearchOption) => {
+    let html = "";
+    Object.keys(Constants.SIYUAN_DEFAULT_REPLACETYPES).forEach((key) => {
+        html += `<label class="fn__flex b3-label">
+    <span class="fn__space"></span>
+    <div class="fn__flex-1 fn__flex-center">
+        ${window.siyuan.languages.replaceTypes[key]}
+    </div>
+    <span class="fn__space"></span>
+    <input class="b3-switch fn__flex-center" data-type="${key}" type="checkbox"${config.replaceTypes[key] ? " checked" : ""}>
+</label>`;
+    });
+    const filterDialog = new Dialog({
+        title: window.siyuan.languages.replaceType,
+        content: `<div class="b3-dialog__content">${html}</div>
+<div class="b3-dialog__action">
+    <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
+    <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
+</div>`,
+        width: isMobile() ? "92vw" : "520px",
+        height: "70vh",
+    });
+    filterDialog.element.setAttribute("data-key", Constants.DIALOG_REPLACETYPE);
+    const btnsElement = filterDialog.element.querySelectorAll(".b3-button");
+    btnsElement[0].addEventListener("click", () => {
+        filterDialog.destroy();
+    });
+    btnsElement[1].addEventListener("click", () => {
+        filterDialog.element.querySelectorAll(".b3-switch").forEach((item: HTMLInputElement) => {
+            config.replaceTypes[item.getAttribute("data-type") as TSearchFilter] = item.checked;
+        });
         filterDialog.destroy();
     });
 };
@@ -231,6 +267,7 @@ export const saveCriterion = (config: ISearchOption,
 </div>`,
         width: isMobile() ? "92vw" : "520px",
     });
+    saveDialog.element.setAttribute("data-key", Constants.DIALOG_SAVECRITERION);
     const btnsElement = saveDialog.element.querySelectorAll(".b3-button");
     saveDialog.bindInput(saveDialog.element.querySelector("input"), () => {
         btnsElement[1].dispatchEvent(new CustomEvent("click"));
@@ -336,11 +373,26 @@ export const moreMenu = async (config: ISearchOption,
     /// #if MOBILE
     window.siyuan.menus.menu.append(new MenuItem({
         iconHTML: "",
-        label: window.siyuan.languages.type,
+        label: window.siyuan.languages.listInvalidRefBlocks,
+        click() {
+            goUnRef();
+        }
+    }).element);
+    window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
+    window.siyuan.menus.menu.append(new MenuItem({
+        iconHTML: "",
+        label: window.siyuan.languages.searchType,
         click() {
             filterMenu(config, () => {
                 updateSearchResult(config, element, true);
             });
+        }
+    }).element);
+    window.siyuan.menus.menu.append(new MenuItem({
+        iconHTML: "",
+        label: window.siyuan.languages.replaceType,
+        click() {
+            replaceFilterMenu(config);
         }
     }).element);
     window.siyuan.menus.menu.append(new MenuItem({
@@ -520,7 +572,8 @@ export const moreMenu = async (config: ISearchOption,
 const configIsSame = (config: ISearchOption, config2: ISearchOption) => {
     if (config2.group === config.group && config2.hPath === config.hPath && config2.hasReplace === config.hasReplace &&
         config2.k === config.k && config2.method === config.method && config2.r === config.r &&
-        config2.sort === config.sort && objEquals(config2.types, config.types) && objEquals(config2.idPath, config.idPath)) {
+        config2.sort === config.sort && objEquals(config2.types, config.types) &&
+        objEquals(config2.replaceTypes, config.replaceTypes) && objEquals(config2.idPath, config.idPath)) {
         return true;
     }
     return false;
@@ -553,7 +606,7 @@ export const initCriteriaMenu = (element: HTMLElement, data: ISearchOption[], co
 <span class="fn__flex-1"></span>
 <button data-type="saveCriterion" class="b3-button b3-button--small b3-button--outline fn__flex-center">${window.siyuan.languages.saveCriterion}</button>
 <span class="fn__space"></span>
-<button data-type="removeCriterion" aria-label="${window.siyuan.languages.useCriterion}" class="b3-tooltips b3-tooltips__nw b3-button b3-button--small b3-button--outline fn__flex-center">${window.siyuan.languages.removeCriterion}</button>
+<button data-type="removeCriterion" aria-label="${window.siyuan.languages.useCriterion}" class="ariaLabel b3-button b3-button--small b3-button--outline fn__flex-center fn__flex-shrink" data-position="9bottom">${window.siyuan.languages.removeCriterion}</button>
 <span class="fn__space"></span>`;
         /// #endif
     });

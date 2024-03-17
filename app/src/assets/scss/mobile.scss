@@ -41,10 +41,6 @@
 .fn__flex-column[data-type="sidebar-file"] {
   .b3-list-item {
     -webkit-user-select: none;
-
-    &:hover {
-      background-color: transparent;
-    }
   }
 }
 
@@ -55,7 +51,6 @@
   }
 
   .b3-list-item {
-
     font-size: 16px;
     line-height: 40px;
 
@@ -73,7 +68,7 @@
     }
 
     &__toggle {
-      height: 24px;
+      height: 32px;
       padding: 4px;
     }
 
@@ -136,10 +131,12 @@
     border-radius: var(--b3-border-radius);
 
     &[disabled] {
-      opacity: 0.38;
+      opacity: .38;
     }
 
-    &--active {
+    &--active,
+    &:not(.toolbar__icon-deactivate):focus,
+    &:not(.toolbar__icon-deactivate):hover {
       background-color: var(--b3-list-hover);
     }
   }
@@ -176,7 +173,7 @@
   width: 100vw;
   z-index: 7;
   transform: translateX(-100vw);
-  transition: transform 0.15s cubic-bezier(0, 0, 0.2, 1) 0ms;
+  transition: transform .15s cubic-bezier(0, 0, .2, 1) 0ms;
 
   &--all {
     transform: translateY(-200vh);
@@ -198,6 +195,11 @@
 #model {
   box-sizing: border-box;
 
+  .toolbar__text {
+    min-height: 48px;
+    line-height: 48px;
+  }
+
   .config-about__logo {
     display: flex;
     align-items: center;
@@ -210,32 +212,29 @@
   .config-account {
     &__bg {
       position: relative;
-      margin-bottom: 82px;
       width: 100%;
       flex: 1;
     }
 
     &__cover {
-      position: absolute;
-      top: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 50vh;
       background-size: cover;
       background-position: center center;
     }
 
     &__avatar {
       position: absolute;
-      bottom: 24px;
+      top: 50vh;
       width: 128px;
       height: 128px;
       left: 50%;
-      margin-left: -64px;
+      margin: -160px 0 0 -64px;
       background-repeat: no-repeat;
       background-position: 50%;
       background-size: cover;
       border-radius: 90px;
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: rgba(255, 255, 255, .8);
       box-shadow: var(--b3-point-shadow);
       border: 1px solid var(--b3-theme-surface-lighter);
     }
@@ -244,12 +243,9 @@
       width: 100%;
       box-sizing: border-box;
       padding: 16px;
-      margin-top: 10vh;
     }
 
     &__name {
-      bottom: -58px;
-      position: absolute;
       width: 100%;
       text-align: center;
     }
@@ -324,7 +320,7 @@
     }
 
     &[disabled] {
-      opacity: 0.38;
+      opacity: .38;
     }
 
     &.protyle-toolbar__item--current svg {
@@ -373,6 +369,8 @@
       box-shadow: inset 0 0 0 .6px var(--b3-theme-on-surface);
       border: 0;
       color: var(--b3-theme-on-background);
+      min-height: 50px;
+      text-align: left;
     }
 
     &-icon {
@@ -386,7 +384,6 @@
     }
 
     &-text {
-      line-height: 48px;
       margin-left: 6px;
     }
   }
@@ -488,6 +485,13 @@ html[lang="zh_CN"] .protyle-wysiwyg [data-node-id]:last-child [spellcheck][conte
   content: "键入文字";
 }
 
+.av__views .block__icon {
+  opacity: 1;
+}
+
+.b3-dialog__container {
+  max-width: 100vw;
+}
 
 @media (max-width: 620px) {
   .protyle-wysiwyg [data-node-id].sb[data-sb-layout="col"] {

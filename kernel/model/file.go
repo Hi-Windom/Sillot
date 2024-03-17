@@ -40,6 +40,7 @@ import (
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/riff"
+	"github.com/siyuan-note/siyuan/kernel/av"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/search"
@@ -490,7 +491,7 @@ func BlocksWordCount(ids []string) (ret *util.BlockStatResult) {
 func StatTree(id string) (ret *util.BlockStatResult) {
 	WaitForWritingFiles()
 
-	tree, _ := loadTreeByBlockID(id)
+	tree, _ := LoadTreeByBlockID(id)
 	if nil == tree {
 		return
 	}
@@ -514,7 +515,7 @@ func GetDoc(startID, endID, id string, index int, query string, queryTypes map[s
 	WaitForWritingFiles() // 写入数据时阻塞，避免获取到的数据不一致
 
 	inputIndex := index
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		if ErrBlockNotFound == err {
 			if 0 == mode {
@@ -725,9 +726,17 @@ func GetDoc(startID, endID, id string, index int, query string, queryTypes map[s
 			if "1" == n.IALAttr("heading-fold") {
 				// 折叠标题下被引用的块无法悬浮查看
 				// The referenced block under the folded heading cannot be hovered to view https://github.com/siyuan-note/siyuan/issues/9582
-				if 0 != mode && id != n.ID {
+				if (0 != mode && id != n.ID) || isDoc {
 					unlinks = append(unlinks, n)
 					return ast.WalkContinue
+				}
+			}
+
+			if avs := n.IALAttr(av.NodeAttrNameAvs); "" != avs {
+				// 填充属性视图角标 Display the database title on the block superscript https://github.com/siyuan-note/siyuan/issues/10545
+				avNames := getAvNames(n.IALAttr(av.NodeAttrNameAvs))
+				if "" != avNames {
+					n.SetIALAttr(av.NodeAttrViewNames, avNames)
 				}
 			}
 
@@ -967,22 +976,9 @@ func writeJSONQueue(tree *parse.Tree) (err error) {
 	return
 }
 
-func writeJSONQueueWithoutChangeTime(tree *parse.Tree) (err error) {
-	if err = filesys.WriteTreeWithoutChangeTime(tree); nil != err {
-		return
-	}
-	sql.UpsertTreeQueue(tree)
-	return
-}
-
 func indexWriteJSONQueue(tree *parse.Tree) (err error) {
 	treenode.IndexBlockTree(tree)
 	return writeJSONQueue(tree)
-}
-
-func indexWriteJSONQueueWithoutChangeTime(tree *parse.Tree) (err error) {
-	treenode.IndexBlockTree(tree)
-	return writeJSONQueueWithoutChangeTime(tree)
 }
 
 func renameWriteJSONQueue(tree *parse.Tree) (err error) {
@@ -1028,6 +1024,7 @@ func CreateDocByMd(boxID, p, title, md string, sorts []string) (tree *parse.Tree
 		return
 	}
 
+	WaitForWritingFiles()
 	ChangeFileTreeSort(box.ID, sorts)
 	return
 }
@@ -1046,6 +1043,7 @@ func CreateWithMarkdown(boxID, hPath, md, parentID, id string) (retID string, er
 	luteEngine := util.NewLute()
 	dom := luteEngine.Md2BlockDOM(md, false)
 	retID, err = createDocsByHPath(box.ID, hPath, dom, parentID, id)
+	WaitForWritingFiles()
 	return
 }
 
@@ -1076,6 +1074,20 @@ func CreateDailyNote(boxID string) (p string, existed bool, err error) {
 	if nil != existRoot {
 		existed = true
 		p = existRoot.Path
+
+		tree, loadErr := LoadTreeByBlockID(existRoot.RootID)
+		if nil != loadErr {
+			logging.LogWarnf("load tree by block id [%s] failed: %v", existRoot.RootID, loadErr)
+			return
+		}
+		p = tree.Path
+		date := time.Now().Format("20060102")
+		if tree.Root.IALAttr("custom-dailynote-"+date) == "" {
+			tree.Root.SetIALAttr("custom-dailynote-"+date, date)
+			if err = indexWriteJSONQueue(tree); nil != err {
+				return
+			}
+		}
 		return
 	}
 
@@ -1098,7 +1110,7 @@ func CreateDailyNote(boxID string) (p string, existed bool, err error) {
 	}
 	if "" != dom {
 		var tree *parse.Tree
-		tree, err = loadTreeByBlockID(id)
+		tree, err = LoadTreeByBlockID(id)
 		if nil == err {
 			tree.Root.FirstChild.Unlink()
 
@@ -1119,8 +1131,20 @@ func CreateDailyNote(boxID string) (p string, existed bool, err error) {
 	}
 	IncSync()
 
-	b := treenode.GetBlockTree(id)
-	p = b.Path
+	WaitForWritingFiles()
+
+	tree, err := LoadTreeByBlockID(id)
+	if nil != err {
+		logging.LogErrorf("load tree by block id [%s] failed: %v", id, err)
+		return
+	}
+	p = tree.Path
+	date := time.Now().Format("20060102")
+	tree.Root.SetIALAttr("custom-dailynote-"+date, date)
+	if err = indexWriteJSONQueue(tree); nil != err {
+		return
+	}
+
 	return
 }
 
@@ -1160,7 +1184,7 @@ func GetHPathsByPaths(paths []string) (hPaths []string, err error) {
 }
 
 func GetHPathByID(id string) (hPath string, err error) {
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return
 	}
@@ -1169,7 +1193,7 @@ func GetHPathByID(id string) (hPath string, err error) {
 }
 
 func GetFullHPathByID(id string) (hPath string, err error) {
-	tree, err := loadTreeByBlockID(id)
+	tree, err := LoadTreeByBlockID(id)
 	if nil != err {
 		return
 	}
@@ -1184,6 +1208,7 @@ func GetFullHPathByID(id string) (hPath string, err error) {
 }
 
 func GetIDsByHPath(hpath, boxID string) (ret []string, err error) {
+	ret = []string{}
 	roots := treenode.GetBlockTreeRootsByHPath(boxID, hpath)
 	if 1 > len(roots) {
 		return
@@ -1193,6 +1218,9 @@ func GetIDsByHPath(hpath, boxID string) (ret []string, err error) {
 		ret = append(ret, root.ID)
 	}
 	ret = gulu.Str.RemoveDuplicatedElem(ret)
+	if 1 > len(ret) {
+		ret = []string{}
+	}
 	return
 }
 
@@ -1210,6 +1238,16 @@ func MoveDocs(fromPaths []string, toBoxID, toPath string, callback interface{}) 
 
 	pathsBoxes := getBoxesByPaths(fromPaths)
 
+	if 1 == len(fromPaths) {
+		// 移动到自己的父文档下的情况相当于不移动，直接返回
+		if fromBox := pathsBoxes[fromPaths[0]]; nil != fromBox && fromBox.ID == toBoxID {
+			parentDir := path.Dir(fromPaths[0])
+			if ("/" == toPath && "/" == parentDir) || (parentDir+".sy" == toPath) {
+				return
+			}
+		}
+	}
+
 	// 检查路径深度是否超过限制
 	for fromPath, fromBox := range pathsBoxes {
 		childDepth := util.GetChildDocDepth(filepath.Join(util.DataDir, fromBox.ID, fromPath))
@@ -1219,8 +1257,12 @@ func MoveDocs(fromPaths []string, toBoxID, toPath string, callback interface{}) 
 		}
 	}
 
-	// A progress layer appears when moving more than 16 documents at once https://github.com/siyuan-note/siyuan/issues/9356
-	needShowProgress := 16 < len(fromPaths)
+	// A progress layer appears when moving more than 64 documents at once https://github.com/siyuan-note/siyuan/issues/9356
+	subDocsCount := 0
+	for fromPath, fromBox := range pathsBoxes {
+		subDocsCount += countSubDocs(fromBox.ID, fromPath)
+	}
+	needShowProgress := 64 < subDocsCount
 	if needShowProgress {
 		defer util.PushClearProgress()
 	}
@@ -1241,6 +1283,23 @@ func MoveDocs(fromPaths []string, toBoxID, toPath string, callback interface{}) 
 	}
 	cache.ClearDocsIAL()
 	IncSync()
+	return
+}
+
+func countSubDocs(box, p string) (ret int) {
+	p = strings.TrimSuffix(p, ".sy")
+	_ = filepath.Walk(filepath.Join(util.DataDir, box, p), func(path string, info os.FileInfo, err error) error {
+		if nil != err {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if strings.HasSuffix(path, ".sy") {
+			ret++
+		}
+		return nil
+	})
 	return
 }
 
@@ -1409,6 +1468,16 @@ func removeDoc(box *Box, p string, luteEngine *lute.Lute) {
 		return
 	}
 
+	// 关联的属性视图也要复制到历史中 https://github.com/siyuan-note/siyuan/issues/9567
+	avNodes := tree.Root.ChildrenByType(ast.NodeAttributeView)
+	for _, avNode := range avNodes {
+		srcAvPath := filepath.Join(util.DataDir, "storage", "av", avNode.AttributeViewID+".json")
+		destAvPath := filepath.Join(historyDir, "storage", "av", avNode.AttributeViewID+".json")
+		if copyErr := filelock.Copy(srcAvPath, destAvPath); nil != copyErr {
+			logging.LogErrorf("copy av [%s] failed: %s", srcAvPath, copyErr)
+		}
+	}
+
 	copyDocAssetsToDataAssets(box.ID, p)
 
 	removeIDs := treenode.RootChildIDs(tree.ID)
@@ -1427,12 +1496,17 @@ func removeDoc(box *Box, p string, luteEngine *lute.Lute) {
 
 	if existChildren {
 		if err = box.Remove(childrenDir); nil != err {
+			logging.LogErrorf("remove children dir [%s%s] failed: %s", box.ID, childrenDir, err)
 			return
 		}
+		logging.LogInfof("removed children dir [%s%s]", box.ID, childrenDir)
 	}
 	if err = box.Remove(p); nil != err {
+		logging.LogErrorf("remove [%s%s] failed: %s", box.ID, p, err)
 		return
 	}
+	logging.LogInfof("removed doc [%s%s]", box.ID, p)
+
 	box.removeSort(removeIDs)
 	RemoveRecentDoc(removeIDs)
 	if "/" != dir {
@@ -1542,7 +1616,7 @@ func createDoc(boxID, p, title, dom string) (tree *parse.Tree, err error) {
 	folder := path.Dir(p)
 	if "/" != folder {
 		parentID := path.Base(folder)
-		parentTree, loadErr := loadTreeByBlockID(parentID)
+		parentTree, loadErr := LoadTreeByBlockID(parentID)
 		if nil != loadErr {
 			logging.LogErrorf("get parent tree [%s] failed", parentID)
 			err = ErrBlockNotFound
@@ -1581,6 +1655,38 @@ func createDoc(boxID, p, title, dom string) (tree *parse.Tree, err error) {
 	tree.Root.KramdownIAL = [][]string{{"id", id}, {"title", html.EscapeAttrVal(title)}, {"updated", updated}}
 	if nil == tree.Root.FirstChild {
 		tree.Root.AppendChild(treenode.NewParagraph())
+	}
+
+	// 如果段落块中仅包含一个 mp3/mp4 超链接，则将其转换为音视频块
+	// Convert mp3 and mp4 hyperlinks to audio and video when moving cloud inbox to docs https://github.com/siyuan-note/siyuan/issues/9778
+	var unlinks []*ast.Node
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if ast.NodeParagraph == n.Type {
+			link := n.FirstChild
+			if nil != link && link.IsTextMarkType("a") {
+				if strings.HasSuffix(link.TextMarkAHref, ".mp3") {
+					unlinks = append(unlinks, n)
+					audio := &ast.Node{ID: n.ID, Type: ast.NodeAudio, Tokens: []byte("<audio controls=\"controls\" src=\"" + link.TextMarkAHref + "\" data-src=\"" + link.TextMarkAHref + "\"></audio>")}
+					audio.SetIALAttr("id", n.ID)
+					audio.SetIALAttr("updated", util.TimeFromID(n.ID))
+					n.InsertBefore(audio)
+				} else if strings.HasSuffix(link.TextMarkAHref, ".mp4") {
+					unlinks = append(unlinks, n)
+					video := &ast.Node{ID: n.ID, Type: ast.NodeVideo, Tokens: []byte("<video controls=\"controls\" src=\"" + link.TextMarkAHref + "\" data-src=\"" + link.TextMarkAHref + "\"></video>")}
+					video.SetIALAttr("id", n.ID)
+					video.SetIALAttr("updated", util.TimeFromID(n.ID))
+					n.InsertBefore(video)
+				}
+			}
+		}
+		return ast.WalkContinue
+	})
+	for _, unlink := range unlinks {
+		unlink.Unlink()
 	}
 
 	transaction := &Transaction{DoOperations: []*Operation{{Action: "create", Data: tree}}}

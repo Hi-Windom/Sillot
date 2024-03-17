@@ -1,5 +1,5 @@
 import {genEmptyElement, insertEmptyBlock} from "../../block/util";
-import {getSelectionOffset, focusByWbr, setLastNodeRange, focusBlock} from "../util/selection";
+import {getSelectionOffset, focusByWbr, setLastNodeRange, focusBlock, focusByRange} from "../util/selection";
 import {
     getContenteditableElement,
     getTopEmptyElement,
@@ -13,8 +13,9 @@ import {highlightRender} from "../render/highlightRender";
 import {Constants} from "../../constants";
 import {scrollCenter} from "../../util/highlightById";
 import {hideElements} from "../ui/hideElements";
-import {setStorageVal} from "../util/compatibility";
+import {isIPad, setStorageVal} from "../util/compatibility";
 import {mathRender} from "../render/mathRender";
+import {isMobile} from "../../util/functions";
 
 const listEnter = (protyle: IProtyle, blockElement: HTMLElement, range: Range) => {
     const listItemElement = blockElement.parentElement;
@@ -138,11 +139,19 @@ const listEnter = (protyle: IProtyle, blockElement: HTMLElement, range: Range) =
         removeEmptyNode(newElement);
         return true;
     }
-    if ((range.toString() === "" || range.toString() === Constants.ZWSP) && range.startContainer.nodeType === 3 && range.startContainer.textContent === Constants.ZWSP && range.startOffset === 0) {
+    if ((range.toString() === "" || range.toString() === Constants.ZWSP) && range.startContainer.nodeType === 3 && range.startOffset === 0) {
         // 图片后的零宽空格前回车 https://github.com/siyuan-note/siyuan/issues/5690
         // 列表中的图片后双击换行图片光标错误 https://ld246.com/article/1660987186727/comment/1662181221732?r=Vanessa#comments
-        range.setStart(range.startContainer, 1);
-        range.collapse(false);
+        let nextSibling = range.startContainer;
+        while (nextSibling) {
+            if (nextSibling.textContent === Constants.ZWSP) {
+                range.setStart(nextSibling, 1);
+                range.collapse(false);
+                break;
+            } else {
+                nextSibling = nextSibling.nextSibling;
+            }
+        }
     }
     range.insertNode(document.createElement("wbr"));
     const listItemHTML = listItemElement.outerHTML;
@@ -233,6 +242,10 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
     editableElement.querySelectorAll(".img--select").forEach(item => {
         item.classList.remove("img--select");
     });
+    // 数据库
+    if (blockElement.getAttribute("data-type") === "NodeAttributeView") {
+        return true;
+    }
     // 代码块
     const trimStartText = editableElement.innerHTML.trimStart();
     if (trimStartText.startsWith("```") || trimStartText.startsWith("···") || trimStartText.startsWith("~~~") ||
@@ -370,7 +383,6 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
     newElement.querySelector('[contenteditable="true"]').appendChild(range.extractContents());
     // https://github.com/siyuan-note/insider/issues/480
     newElement.innerHTML = protyle.lute.SpinBlockDOM(newElement.innerHTML);
-    const newId = newElement.firstElementChild.getAttribute("data-node-id");
 
     // https://github.com/siyuan-note/siyuan/issues/3850
     // https://github.com/siyuan-note/siyuan/issues/6018
@@ -378,28 +390,57 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
     // 图片后的零宽空格前回车 https://github.com/siyuan-note/siyuan/issues/5690
     const enterElement = document.createElement("div");
     enterElement.innerHTML = protyle.lute.SpinBlockDOM(editableElement.parentElement.outerHTML);
-    editableElement.innerHTML = enterElement.querySelector('[contenteditable="true"]').innerHTML;
-    mathRender(editableElement);
+    const doOperation: IOperation[] = [];
+    const undoOperation: IOperation[] = [];
+    // 回车之前的块为 1\n\n2 时会产生多个块
+    Array.from(enterElement.children).forEach((item: HTMLElement) => {
+        if (item.dataset.nodeId === id) {
+            editableElement.innerHTML = item.querySelector('[contenteditable="true"]').innerHTML;
+            doOperation.push({
+                action: "update",
+                data: blockElement.outerHTML,
+                id,
+            });
+            undoOperation.push({
+                action: "update",
+                data: html,
+                id,
+            });
+            mathRender(editableElement);
+        } else {
+            doOperation.push({
+                action: "insert",
+                data: item.outerHTML,
+                id: item.dataset.nodeId,
+                nextID: id,
+            });
+            blockElement.insertAdjacentElement("beforebegin", item);
+            undoOperation.push({
+                action: "delete",
+                id: item.dataset.nodeId,
+            });
+            mathRender(item);
+        }
+    });
 
-    transaction(protyle, [{
-        action: "update",
-        data: blockElement.outerHTML,
-        id: id,
-    }, {
-        action: "insert",
-        data: newElement.innerHTML,
-        id: newId,
-        previousID: id,
-    }], [{
-        action: "delete",
-        id: newId,
-    }, {
-        action: "update",
-        data: html,
-        id: id,
-    }]);
-    blockElement.insertAdjacentElement("afterend", newElement.firstElementChild);
-    mathRender(blockElement.nextElementSibling);
+    let previousElement = blockElement;
+    Array.from(newElement.children).forEach((item: HTMLElement) => {
+        const newId = item.getAttribute("data-node-id");
+        doOperation.push({
+            action: "insert",
+            data: item.outerHTML,
+            id: newId,
+            previousID: previousElement.getAttribute("data-node-id"),
+        });
+        undoOperation.push({
+            action: "delete",
+            id: newId,
+        });
+        previousElement.insertAdjacentElement("afterend", item);
+        mathRender(previousElement.nextElementSibling);
+        previousElement = item;
+    });
+    transaction(protyle, doOperation, undoOperation);
     focusBlock(blockElement.nextElementSibling);
     scrollCenter(protyle);
     return true;
@@ -413,4 +454,69 @@ const removeEmptyNode = (newElement: Element) => {
             i--;
         }
     }
+};
+
+export const softEnter = (range: Range, nodeElement: HTMLElement, protyle: IProtyle) => {
+    let startElement = range.startContainer as HTMLElement;
+    const nextSibling = hasNextSibling(startElement) as Element;
+    // 图片之前软换行
+    if (nextSibling && nextSibling.nodeType !== 3 && nextSibling.classList.contains("img")) {
+        nextSibling.insertAdjacentHTML("beforebegin", "<wbr>");
+        const oldHTML = nodeElement.outerHTML;
+        nextSibling.previousElementSibling.remove();
+        const newlineNode = document.createTextNode("\n");
+        startElement.after(document.createTextNode(Constants.ZWSP));
+        startElement.after(newlineNode);
+        range.selectNode(newlineNode);
+        range.collapse(false);
+        updateTransaction(protyle, nodeElement.getAttribute("data-node-id"), nodeElement.outerHTML, oldHTML);
+        return true;
+    }
+    // 行内元素末尾软换行 https://github.com/siyuan-note/insider/issues/886
+    if (startElement.nodeType === 3) {
+        startElement = startElement.parentElement;
+    }
+    if (startElement && protyle.toolbar.getCurrentType(range).length > 0 &&
+        getSelectionOffset(startElement, startElement, range).end === startElement.textContent.length) {
+        addNewLineToEnd(range, nodeElement, protyle, startElement);
+        return true;
+    }
+    if (isIPad() || isMobile()) {
+        // iPad shift+enter 无效
+        startElement = range.startContainer as HTMLElement;
+        const nextSibling = hasNextSibling(startElement);
+        if (nextSibling && nextSibling.textContent.trim() !== "") {
+            document.execCommand("insertHTML", false, "\n");
+            return true;
+        }
+        addNewLineToEnd(range, nodeElement, protyle, startElement);
+        return true;
+    }
+    return false;
+};
+
+const addNewLineToEnd = (range: Range, nodeElement: HTMLElement, protyle: IProtyle, startElement: Element) => {
+    const wbrElement = document.createElement("wbr");
+    if (startElement.nodeType === 3) {
+        range.insertNode(wbrElement);
+    } else {
+        startElement.insertAdjacentElement("afterend", wbrElement);
+    }
+    const oldHTML = nodeElement.outerHTML;
+    wbrElement.remove();
+    let endNewlineNode;
+    if (!hasNextSibling(startElement)) {
+        endNewlineNode = document.createTextNode("\n");
+        startElement.after(endNewlineNode);
+    }
+    const newlineNode = document.createTextNode("\n");
+    startElement.after(newlineNode);
+    if (endNewlineNode) {
+        range.setStart(endNewlineNode, 0);
+    } else {
+        range.setStart(newlineNode, 1);
+    }
+    range.collapse(true);
+    focusByRange(range);
+    updateTransaction(protyle, nodeElement.getAttribute("data-node-id"), nodeElement.outerHTML, oldHTML);
 };

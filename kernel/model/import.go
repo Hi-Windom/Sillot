@@ -84,8 +84,8 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 	util.PushEndlessProgress(Conf.Language(73))
 	defer util.ClearPushProgress(100)
 
-	syncLock.Lock()
-	defer syncLock.Unlock()
+	lockSync()
+	defer unlockSync()
 
 	baseName := filepath.Base(zipPath)
 	ext := filepath.Ext(baseName)
@@ -98,7 +98,7 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 	defer os.RemoveAll(unzipPath)
 
 	var syPaths []string
-	filepath.Walk(unzipPath, func(path string, info fs.FileInfo, err error) error {
+	filelock.Walk(unzipPath, func(path string, info fs.FileInfo, err error) error {
 		if nil != err {
 			return err
 		}
@@ -147,7 +147,9 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 				return ast.WalkContinue
 			}
 
-			newNodeID := ast.NewNodeID()
+			// 新 ID 保留时间部分，仅修改随机值，避免时间变化导致更新时间早于创建时间
+			// Keep original creation time when importing .sy.zip https://github.com/siyuan-note/siyuan/issues/9923
+			newNodeID := util.TimeFromID(n.ID) + "-" + gulu.Rand.String(7)
 			blockIDs[n.ID] = newNodeID
 			oldNodeID := n.ID
 			n.ID = newNodeID
@@ -204,7 +206,7 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 	renameAvPaths := map[string]string{}
 	if gulu.File.IsExist(storageAvDir) {
 		// 重新生成数据库数据
-		filepath.Walk(storageAvDir, func(path string, info fs.FileInfo, err error) error {
+		filelock.Walk(storageAvDir, func(path string, info fs.FileInfo, err error) error {
 			if !strings.HasSuffix(path, ".json") || !ast.IsNodeIDPattern(strings.TrimSuffix(info.Name(), ".json")) {
 				return nil
 			}
@@ -215,30 +217,32 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 			newPath := filepath.Join(filepath.Dir(path), newAvID+".json")
 			renameAvPaths[path] = newPath
 			avIDs[oldAvID] = newAvID
-
-			// 将数据库文件中的块 ID 替换为新的块 ID
-			data, readErr := os.ReadFile(path)
-			if nil != readErr {
-				logging.LogErrorf("read av file [%s] failed: %s", path, readErr)
-				return nil
-			}
-			var newData []byte
-			newData = data
-			for oldID, newID := range avBlockIDs {
-				newData = bytes.ReplaceAll(newData, []byte(oldID), []byte(newID))
-			}
-			newData = bytes.ReplaceAll(newData, []byte(oldAvID), []byte(newAvID))
-			if !bytes.Equal(data, newData) {
-				if writeErr := os.WriteFile(path, newData, 0644); nil != writeErr {
-					logging.LogErrorf("write av file [%s] failed: %s", path, writeErr)
-					return nil
-				}
-			}
 			return nil
 		})
 
 		// 重命名数据库文件
 		for oldPath, newPath := range renameAvPaths {
+			data, readErr := os.ReadFile(oldPath)
+			if nil != readErr {
+				logging.LogErrorf("read av file [%s] failed: %s", oldPath, readErr)
+				return nil
+			}
+
+			// 将数据库文件中的块 ID 替换为新的块 ID
+			newData := data
+			for oldAvID, newAvID := range avIDs {
+				for oldID, newID := range avBlockIDs {
+					newData = bytes.ReplaceAll(newData, []byte(oldID), []byte(newID))
+				}
+				newData = bytes.ReplaceAll(newData, []byte(oldAvID), []byte(newAvID))
+			}
+			if !bytes.Equal(data, newData) {
+				if writeErr := os.WriteFile(oldPath, newData, 0644); nil != writeErr {
+					logging.LogErrorf("write av file [%s] failed: %s", oldPath, writeErr)
+					return nil
+				}
+			}
+
 			if err = os.Rename(oldPath, newPath); nil != err {
 				logging.LogErrorf("rename av file from [%s] to [%s] failed: %s", oldPath, newPath, err)
 				return
@@ -393,7 +397,7 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 
 	// 重命名文件路径
 	renamePaths := map[string]string{}
-	filepath.Walk(unzipRootPath, func(path string, info fs.FileInfo, err error) error {
+	filelock.Walk(unzipRootPath, func(path string, info fs.FileInfo, err error) error {
 		if nil != err {
 			return err
 		}
@@ -468,7 +472,7 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 
 	// 将包含的资源文件统一移动到 data/assets/ 下
 	var assetsDirs []string
-	filepath.Walk(unzipRootPath, func(path string, info fs.FileInfo, err error) error {
+	filelock.Walk(unzipRootPath, func(path string, info fs.FileInfo, err error) error {
 		if strings.Contains(path, "assets") && info.IsDir() {
 			assetsDirs = append(assetsDirs, path)
 		}
@@ -503,7 +507,7 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 	}
 
 	var treePaths []string
-	filepath.Walk(unzipRootPath, func(path string, info fs.FileInfo, err error) error {
+	filelock.Walk(unzipRootPath, func(path string, info fs.FileInfo, err error) error {
 		if info.IsDir() {
 			if strings.HasPrefix(info.Name(), ".") {
 				return filepath.SkipDir
@@ -550,8 +554,8 @@ func ImportData(zipPath string) (err error) {
 	util.PushEndlessProgress(Conf.Language(73))
 	defer util.ClearPushProgress(100)
 
-	syncLock.Lock()
-	defer syncLock.Unlock()
+	lockSync()
+	defer unlockSync()
 
 	baseName := filepath.Base(zipPath)
 	ext := filepath.Ext(baseName)
@@ -605,6 +609,9 @@ func ImportFromLocalPath(boxID, localPath string, toPath string) (err error) {
 		}
 	}()
 
+	lockSync()
+	defer unlockSync()
+
 	WaitForWritingFiles()
 
 	var baseHPath, baseTargetPath, boxLocalPath string
@@ -625,7 +632,7 @@ func ImportFromLocalPath(boxID, localPath string, toPath string) (err error) {
 	if gulu.File.IsDir(localPath) {
 		// 收集所有资源文件
 		assets := map[string]string{}
-		filepath.Walk(localPath, func(currentPath string, info os.FileInfo, walkErr error) error {
+		filelock.Walk(localPath, func(currentPath string, info os.FileInfo, walkErr error) error {
 			if localPath == currentPath {
 				return nil
 			}
@@ -647,7 +654,7 @@ func ImportFromLocalPath(boxID, localPath string, toPath string) (err error) {
 		assetsDone := map[string]string{}
 
 		// md 转换 sy
-		filepath.Walk(localPath, func(currentPath string, info os.FileInfo, walkErr error) error {
+		filelock.Walk(localPath, func(currentPath string, info os.FileInfo, walkErr error) error {
 			if strings.HasPrefix(info.Name(), ".") {
 				if info.IsDir() {
 					return filepath.SkipDir
@@ -892,7 +899,6 @@ func ImportFromLocalPath(boxID, localPath string, toPath string) (err error) {
 	}
 
 	IncSync()
-	util.ReloadUI()
 	debug.FreeOSMemory()
 	return
 }
@@ -945,7 +951,7 @@ func processBase64Img(n *ast.Node, dest string, assetDirPath string, err error) 
 	if nil != alt {
 		name = alt.TokensStr() + ext
 	}
-	name = util.FilterFileName(name)
+	name = util.FilterUploadFileName(name)
 	name = util.AssetName(name)
 
 	tmp := filepath.Join(base64TmpDir, name)

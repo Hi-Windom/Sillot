@@ -86,8 +86,7 @@ export class Files extends Model {
         options.tab.panelElement.classList.add("fn__flex-column", "file-tree", "sy__file");
         options.tab.panelElement.innerHTML = `<div class="block__icons">
     <div class="block__logo">
-        <svg><use xlink:href="#iconFiles"></use></svg>
-        ${window.siyuan.languages.fileTree}
+        <svg class="block__logoicon"><use xlink:href="#iconFiles"></use></svg>${window.siyuan.languages.fileTree}
     </div>
     <span class="fn__flex-1 fn__space"></span>
     <span data-type="focus" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="${window.siyuan.languages.selectOpen1} ${updateHotkeyTip(window.siyuan.config.keymap.general.selectOpen1.custom)}"><svg><use xlink:href='#iconFocus'></use></svg></span>
@@ -192,7 +191,7 @@ export class Files extends Model {
                     break;
                 } else if (type === "focus") {
                     const element = document.querySelector(".layout__wnd--active > .fn__flex > .layout-tab-bar > .item--focus") ||
-                        document.querySelector(".layout-tab-bar > .item--focus");
+                        document.querySelector("ul.layout-tab-bar > .item--focus");
                     if (element) {
                         const tab = getInstanceById(element.getAttribute("data-id")) as Tab;
                         if (tab && tab.model instanceof Editor) {
@@ -265,7 +264,6 @@ export class Files extends Model {
                         break;
                     } else if (isNotCtrl(event) && target.classList.contains("b3-list-item__toggle")) {
                         this.getLeaf(target.parentElement, notebookId);
-                        this.setCurrent(target.parentElement);
                         event.preventDefault();
                         event.stopPropagation();
                         window.siyuan.menus.menu.remove();
@@ -420,6 +418,13 @@ export class Files extends Model {
         this.element.addEventListener("dragover", (event: DragEvent & { target: HTMLElement }) => {
             if (window.siyuan.config.readonly) {
                 return;
+            }
+            const contentRect = this.element.getBoundingClientRect();
+            if (event.clientY < contentRect.top + Constants.SIZE_SCROLL_TB || event.clientY > contentRect.bottom - Constants.SIZE_SCROLL_TB) {
+                this.element.scroll({
+                    top: this.element.scrollTop + (event.clientY < contentRect.top + Constants.SIZE_SCROLL_TB ? -Constants.SIZE_SCROLL_STEP : Constants.SIZE_SCROLL_STEP),
+                    behavior: "smooth"
+                });
             }
             let liElement = hasClosestByTag(event.target, "LI");
             if (!liElement) {

@@ -13,7 +13,7 @@ export const newCardModel = (options: {
         cardType: TCardType,
         id: string,
         title?: string
-        blocks?: ICard[],
+        cardsData?: ICardData,
         index?: number,
     }
 }) => {
@@ -23,27 +23,30 @@ export const newCardModel = (options: {
         type: "siyuan-card",
         tab: options.tab,
         data: options.data,
-        init() {
-            if (options.data.blocks) {
+        async init() {
+            if (options.data.cardsData) {
+                for (let i = 0; i < options.app.plugins.length; i++) {
+                    options.data.cardsData = await options.app.plugins[i].updateCards(options.data.cardsData);
+                }
                 this.element.innerHTML = genCardHTML({
                     id: this.data.id,
                     cardType: this.data.cardType,
-                    blocks: options.data.blocks,
+                    cardsData: options.data.cardsData,
                     isTab: true,
                 });
 
-                editor = bindCardEvent({
+                editor = await bindCardEvent({
                     app: options.app,
                     element: this.element,
                     id: this.data.id,
                     title: this.data.title,
                     cardType: this.data.cardType,
-                    blocks: options.data.blocks,
+                    cardsData: options.data.cardsData,
                     index: options.data.index,
                 });
                 this.data.editor = editor;
                 // https://github.com/siyuan-note/siyuan/issues/9561#issuecomment-1794473512
-                delete options.data.blocks;
+                delete options.data.cardsData;
                 delete options.data.index;
             } else {
                 fetchPost(this.data.cardType === "all" ? "/api/riff/getRiffDueCards" :
@@ -51,21 +54,25 @@ export const newCardModel = (options: {
                     rootID: this.data.id,
                     deckID: this.data.id,
                     notebook: this.data.id,
-                }, (response) => {
+                }, async (response) => {
+                    let cardsData: ICardData = response.data;
+                    for (let i = 0; i < options.app.plugins.length; i++) {
+                        cardsData = await options.app.plugins[i].updateCards(response.data);
+                    }
                     this.element.innerHTML = genCardHTML({
                         id: this.data.id,
                         cardType: this.data.cardType,
-                        blocks: response.data.cards,
+                        cardsData,
                         isTab: true,
                     });
 
-                    editor = bindCardEvent({
+                    editor = await bindCardEvent({
                         app: options.app,
                         element: this.element,
                         id: this.data.id,
                         title: this.data.title,
                         cardType: this.data.cardType,
-                        blocks: response.data.cards,
+                        cardsData,
                     });
                     customObj.data.editor = editor;
                 });
@@ -87,11 +94,14 @@ export const newCardModel = (options: {
                 rootID: this.data.id,
                 deckID: this.data.id,
                 notebook: this.data.id,
-            }, (response) => {
+            }, async (response) => {
+                for (let i = 0; i < options.app.plugins.length; i++) {
+                    options.data.cardsData = await options.app.plugins[i].updateCards(options.data.cardsData);
+                }
                 this.element.innerHTML = genCardHTML({
                     id: this.data.id,
                     cardType: this.data.cardType,
-                    blocks: response.data.cards,
+                    cardsData: response.data,
                     isTab: true,
                 });
             });

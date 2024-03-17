@@ -52,11 +52,12 @@ const focusStack = async (app: App, stack: IBackStack) => {
                     scrollAttr.focusId = stack.id;
                     scrollAttr.focusStart = stack.position.start;
                     scrollAttr.focusEnd = stack.position.end;
+                    window.siyuan.storage[Constants.LOCAL_FILEPOSITION][stack.protyle.block.rootID] = scrollAttr;
                     const editor = new Editor({
                         app: app,
                         tab,
-                        scrollAttr,
                         blockId: stack.zoomId || stack.protyle.block.rootID,
+                        rootId: stack.protyle.block.rootID,
                         action: stack.zoomId ? [Constants.CB_GET_FOCUS, Constants.CB_GET_ALL] : [Constants.CB_GET_FOCUS]
                     });
                     tab.addModel(editor);
@@ -134,7 +135,7 @@ const focusStack = async (app: App, stack: IBackStack) => {
             stack.protyle.model.parent.parent.switchTab(stack.protyle.model.parent.headElement);
         }
         focusByOffset(getContenteditableElement(blockElement), stack.position.start, stack.position.end);
-        scrollCenter(stack.protyle, blockElement, true);
+        scrollCenter(stack.protyle, blockElement);
         getAllModels().outline.forEach(item => {
             if (item.blockId === stack.protyle.block.rootID) {
                 item.setCurrent(blockElement);

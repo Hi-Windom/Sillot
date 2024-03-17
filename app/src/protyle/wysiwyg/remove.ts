@@ -11,7 +11,7 @@ import {
     getNextBlock,
     getPreviousBlock,
     getTopAloneElement,
-    getTopEmptyElement, hasNextSibling
+    getTopEmptyElement, hasNextSibling, hasPreviousSibling
 } from "./getBlock";
 import {transaction, turnsIntoTransaction, updateTransaction} from "./transaction";
 import {cancelSB, genEmptyElement} from "../../block/util";
@@ -23,9 +23,9 @@ import {Constants} from "../../constants";
 import {scrollCenter} from "../../util/highlightById";
 import {isMobile} from "../../util/functions";
 
-const removeLi = (protyle: IProtyle, blockElement: Element, range: Range) => {
+const removeLi = (protyle: IProtyle, blockElement: Element, range: Range, isDelete = false) => {
     if (!blockElement.parentElement.previousElementSibling && blockElement.parentElement.nextElementSibling && blockElement.parentElement.nextElementSibling.classList.contains("protyle-attr")) {
-        listOutdent(protyle, [blockElement.parentElement], range);
+        listOutdent(protyle, [blockElement.parentElement], range, isDelete, blockElement);
         return;
     }
     // 第一个子列表合并到上一个块的末尾
@@ -67,6 +67,7 @@ const removeLi = (protyle: IProtyle, blockElement: Element, range: Range) => {
         if (blockElement.parentElement.parentElement.classList.contains("protyle-wysiwyg")) {
             return;
         }
+        moveToPrevious(blockElement, range, isDelete);
         range.insertNode(document.createElement("wbr"));
         const listElement = blockElement.parentElement.parentElement;
         const listHTML = listElement.outerHTML;
@@ -116,6 +117,7 @@ const removeLi = (protyle: IProtyle, blockElement: Element, range: Range) => {
     }
     const listItemId = listItemElement.getAttribute("data-node-id");
     const listElement = listItemElement.parentElement;
+    moveToPrevious(blockElement, range, isDelete);
     range.insertNode(document.createElement("wbr"));
     const html = listElement.outerHTML;
     const doOperations: IOperation[] = [];
@@ -184,14 +186,29 @@ const removeLi = (protyle: IProtyle, blockElement: Element, range: Range) => {
     focusByWbr(previousLastElement.parentElement, range);
 };
 
-export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Range) => {
+export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Range, type: "Delete" | "Backspace" | "remove") => {
     // 删除后，防止滚动条滚动后调用 get 请求，因为返回的请求已查找不到内容块了
     preventScroll(protyle);
     const selectElements = Array.from(protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select"));
     if (selectElements?.length > 0) {
         const deletes: IOperation[] = [];
         const inserts: IOperation[] = [];
-        let sideElement = selectElements[0].previousElementSibling || selectElements[selectElements.length - 1].nextElementSibling;
+        let sideElement;
+        let sideIsNext = false;
+        if (type === "Backspace") {
+            sideElement = selectElements[0].previousElementSibling;
+            if (!sideElement) {
+                sideIsNext = true;
+                sideElement = selectElements[selectElements.length - 1].nextElementSibling;
+            }
+        } else {
+            sideElement = selectElements[selectElements.length - 1].nextElementSibling;
+            sideIsNext = true;
+            if (!sideElement) {
+                sideIsNext = false;
+                sideElement = selectElements[0].previousElementSibling;
+            }
+        }
         let listElement: Element;
         let topParentElement: Element;
         hideElements(["select"], protyle);
@@ -203,7 +220,24 @@ export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Ran
                 action: "delete",
                 id,
             });
-            sideElement = getNextBlock(topElement) || getPreviousBlock(topElement) || topElement.parentElement || protyle.wysiwyg.element.firstElementChild;
+            if (type === "Backspace") {
+                sideElement = getPreviousBlock(topElement);
+                if (!sideElement) {
+                    sideIsNext = true;
+                    sideElement = getNextBlock(topElement);
+                }
+            } else {
+                sideElement = getNextBlock(topElement);
+                sideIsNext = true;
+                if (!sideElement) {
+                    sideIsNext = false;
+                    sideElement = getPreviousBlock(topElement);
+                }
+            }
+            if (!sideElement) {
+                sideElement = topElement.parentElement || protyle.wysiwyg.element.firstElementChild;
+                sideIsNext = false;
+            }
             if (topElement.getAttribute("data-type") === "NodeHeading" && topElement.getAttribute("fold") === "1") {
                 // https://github.com/siyuan-note/siyuan/issues/2188
                 setFold(protyle, topElement, undefined, true);
@@ -269,7 +303,12 @@ export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Ran
                     focusByWbr(emptyElement, range);
                 }
                 // https://github.com/siyuan-note/siyuan/issues/5485
-                focusBlock(sideElement);
+                // https://github.com/siyuan-note/siyuan/issues/10389
+                if (type === "remove" && sideIsNext) {
+                    focusBlock(sideElement);
+                } else {
+                    focusBlock(sideElement, undefined, false);
+                }
                 scrollCenter(protyle, sideElement);
                 if (listElement) {
                     inserts.push({
@@ -301,7 +340,7 @@ export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Ran
     // 空代码块直接删除
     if (blockElement.getAttribute("data-type") === "NodeCodeBlock" && getContenteditableElement(blockElement).textContent.trim() === "") {
         blockElement.classList.add("protyle-wysiwyg--select");
-        removeBlock(protyle, blockElement, range);
+        removeBlock(protyle, blockElement, range, type);
         return;
     }
     // 设置 bq 和代码块光标
@@ -310,14 +349,6 @@ export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Ran
         if (blockElement.previousElementSibling) {
             focusBlock(blockElement.previousElementSibling, undefined, false);
         }
-        return;
-    }
-    if (blockElement.getAttribute("data-type") === "NodeHeading") {
-        turnsIntoTransaction({
-            protyle: protyle,
-            selectsElement: [blockElement],
-            type: "Blocks2Ps",
-        });
         return;
     }
     if (!blockElement.previousElementSibling && blockElement.parentElement.getAttribute("data-type") === "NodeBlockquote") {
@@ -362,10 +393,18 @@ export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Ran
     }
 
     if (blockElement.parentElement.classList.contains("li") && blockElement.previousElementSibling.classList.contains("protyle-action")) {
-        removeLi(protyle, blockElement, range);
+        removeLi(protyle, blockElement, range, type === "Delete");
         return;
     }
-
+    if (blockElement.getAttribute("data-type") === "NodeHeading") {
+        turnsIntoTransaction({
+            protyle: protyle,
+            selectsElement: [blockElement],
+            type: "Blocks2Ps",
+            range: moveToPrevious(blockElement, range, type === "Delete")
+        });
+        return;
+    }
     if (blockElement.previousElementSibling?.classList.contains("protyle-breadcrumb__bar")) {
         return;
     }
@@ -444,7 +483,9 @@ export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Ran
             }
             return;
         }
-        if (editableElement.textContent !== "") {
+        if (editableElement.textContent !== "" ||
+            // https://github.com/siyuan-note/siyuan/issues/10207
+            blockElement.classList.contains("av")) {
             focusBlock(previousLastElement, undefined, false);
             return;
         }
@@ -509,4 +550,33 @@ export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Ran
         transaction(protyle, doOperations, undoOperations);
     }
     focusByWbr(protyle.wysiwyg.element, range);
+};
+
+export const moveToPrevious = (blockElement: Element, range: Range, isDelete: boolean) => {
+    if (isDelete) {
+        const previousBlockElement = getPreviousBlock(blockElement);
+        if (previousBlockElement) {
+            const previousEditElement = getContenteditableElement(getLastBlock(previousBlockElement));
+            if (previousEditElement) {
+                return setLastNodeRange(previousEditElement, range, false);
+            }
+        }
+    }
+};
+
+// https://github.com/siyuan-note/siyuan/issues/10393
+export const removeImage = (imgSelectElement: Element, nodeElement: HTMLElement, range: Range, protyle: IProtyle) => {
+    const oldHTML = nodeElement.outerHTML;
+    const imgPreviousSibling = hasPreviousSibling(imgSelectElement);
+    if (imgPreviousSibling && imgPreviousSibling.textContent.endsWith(Constants.ZWSP)) {
+        imgPreviousSibling.textContent = imgPreviousSibling.textContent.substring(0, imgPreviousSibling.textContent.length - 1);
+    }
+    const imgNextSibling = hasNextSibling(imgSelectElement);
+    if (imgNextSibling && imgNextSibling.textContent.startsWith(Constants.ZWSP)) {
+        imgNextSibling.textContent = imgNextSibling.textContent.replace(Constants.ZWSP, "");
+    }
+    imgSelectElement.insertAdjacentHTML("afterend", "<wbr>");
+    imgSelectElement.remove();
+    updateTransaction(protyle, nodeElement.getAttribute("data-node-id"), nodeElement.outerHTML, oldHTML);
+    focusByWbr(nodeElement, range);
 };

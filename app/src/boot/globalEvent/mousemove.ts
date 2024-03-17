@@ -47,17 +47,14 @@ export const windowMouseMove = (event: MouseEvent & { target: HTMLElement }, mou
     if (!mouseIsEnter &&
         event.buttons === 0 &&  // 鼠标按键被按下时不触发
         window.siyuan.layout.bottomDock &&
-        !isWindow() &&
-        !hasClosestByClassName(event.target, "b3-dialog", true) &&
-        !hasClosestByClassName(event.target, "block__popover", true) &&
-        !hasClosestByClassName(event.target, "b3-menu")) {
-        if (event.clientX < 43) {
+        !isWindow()) {
+        if (event.clientX < Math.max(document.getElementById("dockLeft").clientWidth + 1, 16)) {
             if (!window.siyuan.layout.leftDock.pin && window.siyuan.layout.leftDock.layout.element.clientWidth > 0 &&
                 // 隐藏停靠栏会导致点击两侧内容触发浮动面板弹出，因此需减小鼠标范围
                 (window.siyuan.layout.leftDock.element.clientWidth > 0 || (window.siyuan.layout.leftDock.element.clientWidth === 0 && event.clientX < 8))) {
                 if (event.clientY > document.getElementById("toolbar").clientHeight &&
                     event.clientY < window.innerHeight - document.getElementById("status").clientHeight - document.getElementById("dockBottom").clientHeight) {
-                    if (!hasClosestByClassName(event.target, "b3-menu") &&
+                    if (!hasClosestByClassName(event.target, "b3-menu") && !hasClosestByClassName(event.target, "protyle-toolbar") &&
                         !hasClosestByClassName(event.target, "layout--float")) {
                         window.siyuan.layout.leftDock.showDock();
                     }
@@ -65,12 +62,12 @@ export const windowMouseMove = (event: MouseEvent & { target: HTMLElement }, mou
                     window.siyuan.layout.leftDock.hideDock();
                 }
             }
-        } else if (event.clientX > window.innerWidth - 41) {
+        } else if (event.clientX > window.innerWidth - Math.max(document.getElementById("dockRight").clientWidth - 2, 16)) {
             if (!window.siyuan.layout.rightDock.pin && window.siyuan.layout.rightDock.layout.element.clientWidth > 0 &&
                 (window.siyuan.layout.rightDock.element.clientWidth > 0 || (window.siyuan.layout.rightDock.element.clientWidth === 0 && event.clientX > window.innerWidth - 8))) {
                 if (event.clientY > document.getElementById("toolbar").clientHeight &&
                     event.clientY < window.innerHeight - document.getElementById("status").clientHeight - document.getElementById("dockBottom").clientHeight) {
-                    if (!hasClosestByClassName(event.target, "layout--float")) {
+                    if (!hasClosestByClassName(event.target, "layout--float") && !hasClosestByClassName(event.target, "protyle-toolbar")) {
                         window.siyuan.layout.rightDock.showDock();
                     }
                 } else {
@@ -78,8 +75,7 @@ export const windowMouseMove = (event: MouseEvent & { target: HTMLElement }, mou
                 }
             }
         }
-
-        if (event.clientY > window.innerHeight - 73) {
+        if (event.clientY > Math.min(window.innerHeight - 10, window.innerHeight - (window.siyuan.config.uiLayout.hideDock ? 0 : document.getElementById("dockBottom").clientHeight) - document.querySelector("#status").clientHeight)) {
             window.siyuan.layout.bottomDock.showDock();
         }
     }
@@ -93,11 +89,15 @@ export const windowMouseMove = (event: MouseEvent & { target: HTMLElement }, mou
             if (!targetBlockElement) {
                 return;
             }
+            let rowElement: Element;
+            if (targetBlockElement.classList.contains("av")) {
+                rowElement = hasClosestByClassName(mouseElement, "av__row") as HTMLElement;
+            }
             const allModels = getAllModels();
             let findNode = false;
             allModels.editor.find(item => {
                 if (item.editor.protyle.wysiwyg.element.isSameNode(eventPath0)) {
-                    item.editor.protyle.gutter.render(item.editor.protyle, targetBlockElement, item.editor.protyle.wysiwyg.element);
+                    item.editor.protyle.gutter.render(item.editor.protyle, targetBlockElement, item.editor.protyle.wysiwyg.element, rowElement);
                     findNode = true;
                     return true;
                 }
@@ -106,7 +106,7 @@ export const windowMouseMove = (event: MouseEvent & { target: HTMLElement }, mou
                 window.siyuan.blockPanels.find(item => {
                     item.editors.find(eItem => {
                         if (eItem.protyle.wysiwyg.element.contains(eventPath0)) {
-                            eItem.protyle.gutter.render(eItem.protyle, targetBlockElement, eItem.protyle.wysiwyg.element);
+                            eItem.protyle.gutter.render(eItem.protyle, targetBlockElement, eItem.protyle.wysiwyg.element, rowElement);
                             findNode = true;
                             return true;
                         }
@@ -120,7 +120,7 @@ export const windowMouseMove = (event: MouseEvent & { target: HTMLElement }, mou
                 allModels.backlink.find(item => {
                     item.editors.find(eItem => {
                         if (eItem.protyle.wysiwyg.element.isSameNode(eventPath0)) {
-                            eItem.protyle.gutter.render(eItem.protyle, targetBlockElement, eItem.protyle.wysiwyg.element);
+                            eItem.protyle.gutter.render(eItem.protyle, targetBlockElement, eItem.protyle.wysiwyg.element, rowElement);
                             findNode = true;
                             return true;
                         }

@@ -74,6 +74,15 @@ try {
     app.exit();
 }
 
+const setProxy = (proxyURL, webContents) => {
+    if (proxyURL.startsWith("://")) {
+        console.log("network proxy [system]");
+        return webContents.session.setProxy({mode: "system"});
+    }
+    console.log("network proxy [" + proxyURL + "]");
+    return webContents.session.setProxy({proxyRules: proxyURL});
+};
+
 const hotKey2Electron = (key) => {
     if (!key) {
         return key;
@@ -310,6 +319,16 @@ const boot = () => {
     windowStateInitialized ? currentWindow.setPosition(x, y) : currentWindow.center();
     currentWindow.webContents.userAgent = "SiYuan-Sillot/" + appVer + " https://b3log.org/siyuan Electron " + currentWindow.webContents.userAgent;
 
+    // set proxy
+    net.fetch(getServer() + "/api/system/getNetwork", {method: "POST"}).then((response) => {
+        return response.json();
+    }).then((response) => {
+        setProxy(`${response.data.proxy.scheme}://${response.data.proxy.host}:${response.data.proxy.port}`, currentWindow.webContents).then(() => {
+            // 加载主界面
+            currentWindow.loadURL(getServer() + "/stage/build/app/index.html?v=" + new Date().getTime());
+        });
+    });
+
     currentWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);
 
     // 发起互联网服务请求时绕过安全策略 https://github.com/siyuan-note/siyuan/issues/5516
@@ -376,10 +395,6 @@ const boot = () => {
 
     // 加载主界面
     currentWindow.loadURL(getServer() + "/stage/build/app/index.html?v=" + new Date().getTime());
-    currentWindow.webContents.on("devtools-open-url", (event, url) => {
-        // 支持在devtools打开网址 #188 需要 electron@24.0.0+
-        shell.openExternal(url);
-      });
 
     // 菜单
     const productName = "Sillot";
@@ -462,7 +477,7 @@ const initKernel = (workspace, port, lang) => {
     }
     console.log("debug: $kernelPath = " + kernelPath);
         if (!fs.existsSync(kernelPath)) {
-            showErrorWindow("⚠️ 内核文件丢失 Kernel is missing", "<div>内核可执行文件丢失，请重新安装思源，并将思源加入杀毒软件信任列表。</div><div>The kernel binary is not found, please reinstall SiYuan and add SiYuan into the trust list of your antivirus software.</div>");
+            showErrorWindow("⚠️ 内核程序丢失 Kernel program is missing", `<div>内核程序丢失，请重新安装思源，并将思源内核程序加入杀毒软件信任列表。</div><div>The kernel program is not found, please reinstall SiYuan and add SiYuan Kernel prgram into the trust list of your antivirus software.</div><div><i>${kernelPath}</i></div>`);
             bootWindow.destroy();
             resolve(false);
             return;
@@ -558,34 +573,28 @@ const initKernel = (workspace, port, lang) => {
             });
         }
 
-        let gotVersion = false;
         let apiData;
         let count = 0;
         writeLog("checking kernel version");
-        while (!gotVersion && count < 15) {
+        for (; ;) {
             try {
                 const apiResult = await net.fetch(getServer() + "/api/system/version");
                 apiData = await apiResult.json();
-                gotVersion = true;
                 bootWindow.setResizable(false);
                 bootWindow.loadURL(getServer() + "/appearance/boot/index.html");
                 bootWindow.show();
+                break;
             } catch (e) {
                 writeLog("get kernel version failed: " + e.message);
-                await sleep(200);
-            } finally {
-                count++;
-                if (14 < count) {
+                if (14 < ++count) {
                     writeLog("get kernel ver failed");
                     showErrorWindow("⚠️ 获取内核服务端口失败 Failed to get kernel serve port", "<div>获取内核服务端口失败，请确保程序拥有网络权限并不受防火墙和杀毒软件阻止。</div><div>Failed to get kernel serve port, please make sure the program has network permissions and is not blocked by firewalls and antivirus software.</div>");
                     bootWindow.destroy();
                     resolve(false);
+                    return;
                 }
+                await sleep(200);
             }
-        }
-
-        if (!gotVersion) {
-            return;
         }
 
         if (0 === apiData.code) {
@@ -663,7 +672,6 @@ app.commandLine.appendSwitch("disable-web-security");
 app.commandLine.appendSwitch("auto-detect", "false");
 app.commandLine.appendSwitch("no-proxy-server");
 app.commandLine.appendSwitch("enable-features", "PlatformHEVCDecoderSupport");
-app.commandLine.appendSwitch("force_high_performance_gpu"); // Force using discrete GPU when there are multiple GPUs available on the desktop https://github.com/siyuan-note/siyuan/issues/9694
 
 // Support set Chromium command line arguments on the desktop https://github.com/siyuan-note/siyuan/issues/9696
 writeLog("app is packaged [" + app.isPackaged + "], command line args [" + process.argv.join(", ") + "]");
@@ -776,6 +784,9 @@ app.whenReady().then(() => {
         if (data.cmd === "showOpenDialog") {
             return dialog.showOpenDialog(data);
         }
+        if (data.cmd === "setProxy") {
+            return setProxy(data.proxyURL, event.sender);
+        }
         if (data.cmd === "showSaveDialog") {
             return dialog.showSaveDialog(data);
         }
@@ -884,7 +895,7 @@ app.whenReady().then(() => {
                 currentWindow.setAlwaysOnTop(false);
                 break;
             case "setAlwaysOnTopTrue":
-                currentWindow.setAlwaysOnTop(true, "pop-up-menu");
+                currentWindow.setAlwaysOnTop(true);
                 break;
             case "clearCache":
                 event.sender.session.clearCache();
@@ -907,19 +918,6 @@ app.whenReady().then(() => {
                 } else {
                     currentWindow.hide();
                 }
-                break;
-            case "setProxy":
-                event.sender.session.closeAllConnections().then(() => {
-                    if (data.proxyURL.startsWith("://")) {
-                        event.sender.session.setProxy({mode: "system"}).then(() => {
-                            console.log("network proxy [system]");
-                        });
-                        return;
-                    }
-                    event.sender.session.setProxy({proxyRules: data.proxyURL}).then(() => {
-                        console.log("network proxy [" + data.proxyURL + "]");
-                    });
-                });
                 break;
         }
     });
@@ -960,12 +958,16 @@ app.whenReady().then(() => {
         });
     });
     ipcMain.on("siyuan-export-newwindow", (event, data) => {
+        const parentWnd = getWindowByContentId(event.sender.id);
+        // The PDF/Word export preview window automatically adjusts according to the size of the main window https://github.com/siyuan-note/siyuan/issues/10554
+        const width = parentWnd.getBounds().width * 0.8;
+        const height = parentWnd.getBounds().height * 0.8;
         const printWin = new BrowserWindow({
-            parent: getWindowByContentId(event.sender.id),
-            modal: true,
+            parent: parentWnd,
+            modal: false,
             show: true,
-            width: 1032,
-            height: 650,
+            width: width,
+            height: height,
             resizable: false,
             frame: "darwin" === process.platform,
             icon: path.join(appDir, "stage", "icon-large.png"),
@@ -1476,9 +1478,13 @@ app.on("activate", () => {
     }
 });
 
-// 在编辑器内打开链接的处理，比如 iframe 上的打开链接。
 app.on("web-contents-created", (webContentsCreatedEvent, contents) => {
     contents.setWindowOpenHandler((details) => {
+        // https://github.com/siyuan-note/siyuan/issues/10567
+        if (details.url.startsWith("file:///") && details.disposition === "foreground-tab") {
+            return;
+        }
+        // 在编辑器内打开链接的处理，比如 iframe 上的打开链接。
         shell.openExternal(details.url);
         return {action: "deny"};
     });

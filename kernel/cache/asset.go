@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -51,6 +52,14 @@ func RemoveAsset(path string) {
 	delete(assetsCache, path)
 }
 
+func ExistAsset(path string) (ret bool) {
+	assetsLock.Lock()
+	defer assetsLock.Unlock()
+
+	_, ret = assetsCache[path]
+	return
+}
+
 func LoadAssets() {
 	defer logging.Recover()
 
@@ -60,7 +69,7 @@ func LoadAssets() {
 
 	assetsCache = map[string]*Asset{}
 	assets := util.GetDataAssetsAbsPath()
-	filepath.Walk(assets, func(path string, info fs.FileInfo, err error) error {
+	filelock.Walk(assets, func(path string, info fs.FileInfo, err error) error {
 		if nil == info {
 			return err
 		}

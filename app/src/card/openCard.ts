@@ -6,22 +6,53 @@ import {Constants} from "../constants";
 import {onGet} from "../protyle/util/onGet";
 import {hasClosestByAttribute, hasClosestByClassName} from "../protyle/util/hasClosest";
 import {hideElements} from "../protyle/ui/hideElements";
-import {needLogin, needSubscribe} from "../util/needSubscribe";
+import {isPaidUser, needSubscribe} from "../util/needSubscribe";
 import {fullscreen} from "../protyle/breadcrumb/action";
 import {MenuItem} from "../menus/Menu";
 import {escapeHtml} from "../util/escape";
 /// #if !MOBILE
 import {openFile} from "../editor/util";
 /// #endif
+// import * as dayjs from "dayjs";
+import {format} from "date-fns";
 import {getDisplayName, movePathTo} from "../util/pathName";
 import {App} from "../index";
 import {resize} from "../protyle/util/resize";
 import {setStorageVal} from "../protyle/util/compatibility";
+import {focusByRange} from "../protyle/util/selection";
+import {updateCardHV} from "./util";
+import {showMessage} from "../dialog/message";
+import {Menu} from "../plugin/Menu";
+import {transaction} from "../protyle/wysiwyg/transaction";
+
+const genCardCount = (cardsData: ICardData, allIndex = 0) => {
+    let newIndex = 0;
+    let oldIndex = 0;
+    cardsData.cards.forEach((item, index) => {
+        if (index > allIndex) {
+            return;
+        }
+        if (item.state === 0) {
+            newIndex++;
+        } else {
+            oldIndex++;
+        }
+    });
+    return `<span class="ariaLabel" aria-label="${window.siyuan.languages.flashcardNewCard}">
+    <span class="ft__error">${newIndex}</span> /
+    <span class="ariaLabel ft__primary" aria-label="${window.siyuan.languages.flashcardNewCard}">${cardsData.unreviewedNewCardCount}</span>
+</span>
+<span class="fn__space"></span>+<span class="fn__space"></span>
+<span class="ariaLabel" aria-label="${window.siyuan.languages.flashcardReviewCard}">
+    <span class="ft__error">${oldIndex}</span> /
+    <span class="ft__success">${cardsData.unreviewedOldCardCount}</span>
+</span>`;
+};
 
 export const genCardHTML = (options: {
     id: string,
     cardType: TCardType,
-    blocks: ICard[],
+    cardsData: ICardData,
     isTab: boolean
 }) => {
     let iconsHTML: string;
@@ -29,26 +60,29 @@ export const genCardHTML = (options: {
     iconsHTML = `<div class="toolbar toolbar--border">
     <svg class="toolbar__icon"><use xlink:href="#iconRiffCard"></use></svg>
     <span class="fn__flex-1 fn__flex-center toolbar__text">${window.siyuan.languages.riffCard}</span>
-    <div data-type="count" class="${options.blocks.length === 0 ? "fn__none" : ""}">1/${options.blocks.length}</span></div>
+    <div data-type="count" class="${options.cardsData.cards.length === 0 ? "fn__none" : "fn__flex"}">${genCardCount(options.cardsData)}</span></div>
     <svg class="toolbar__icon" data-id="${options.id || ""}" data-cardtype="${options.cardType}" data-type="filter"><use xlink:href="#iconFilter"></use></svg>
+    <svg class="toolbar__icon" data-type="more"><use xlink:href="#iconMore"></use></svg>
     <svg class="toolbar__icon" data-type="close"><use xlink:href="#iconCloseRound"></use></svg>
 </div>`;
     /// #else
     iconsHTML = `<div class="block__icons">
-        ${options.isTab ? '<div class="fn__flex-1"></div>' : `<div class="block__icon block__icon--show">
-            <svg><use xlink:href="#iconRiffCard"></use></svg>
-        </div>
-        <span class="fn__space"></span>
-        <span class="fn__flex-center">${window.siyuan.languages.riffCard}</span>`}
-        <span class="fn__space fn__flex-1 resize__move" style="min-height: 100%"></span>
-        <div data-type="count" class="ft__on-surface ft__smaller fn__flex-center${options.blocks.length === 0 ? " fn__none" : ""}">1/${options.blocks.length}</span></div>
+        ${options.isTab ? '<div class="fn__flex-1"></div>' : `<div class="block__logo">
+            <svg class="block__logoicon"><use xlink:href="#iconRiffCard"></use></svg>${window.siyuan.languages.riffCard}
+        </div>`}
+        <span class="fn__flex-1 resize__move" style="min-height: 100%"></span>
+        <div data-type="count" class="ft__on-surface ft__smaller fn__flex-center${options.cardsData.cards.length === 0 ? " fn__none" : " fn__flex"}">${genCardCount(options.cardsData)}</span></div>
         <div class="fn__space"></div>
-        <div data-id="${options.id || ""}" data-cardtype="${options.cardType}" data-type="filter" class="block__icon block__icon--show">
+        <button data-id="${options.id || ""}" data-cardtype="${options.cardType}" data-type="filter" class="block__icon block__icon--show">
             <svg><use xlink:href="#iconFilter"></use></svg>
-        </div>
+        </button>
         <div class="fn__space"></div>
         <div data-type="fullscreen" class="b3-tooltips b3-tooltips__sw block__icon block__icon--show" aria-label="${window.siyuan.languages.fullscreen}">
             <svg><use xlink:href="#iconFullscreen"></use></svg>
+        </div>
+        <div class="fn__space"></div>
+        <div data-type="more" class="b3-tooltips b3-tooltips__sw block__icon block__icon--show" aria-label="${window.siyuan.languages.more}">
+            <svg><use xlink:href="#iconMore"></use></svg>
         </div>
         <div class="fn__space${options.isTab ? " fn__none" : ""}"></div>
         <div data-type="sticktab" class="b3-tooltips b3-tooltips__sw block__icon block__icon--show${options.isTab ? " fn__none" : ""}" aria-label="${window.siyuan.languages.openInNewTab}">
@@ -58,56 +92,56 @@ export const genCardHTML = (options: {
     /// #endif
     return `<div class="card__main">
     ${iconsHTML}
-    <div class="card__block fn__flex-1 ${options.blocks.length === 0 ? "fn__none" : ""} 
+    <div class="card__block fn__flex-1 ${options.cardsData.cards.length === 0 ? "fn__none" : ""} 
 ${window.siyuan.config.flashcard.mark ? "card__block--hidemark" : ""} 
 ${window.siyuan.config.flashcard.superBlock ? "card__block--hidesb" : ""} 
 ${window.siyuan.config.flashcard.heading ? "card__block--hideh" : ""} 
 ${window.siyuan.config.flashcard.list ? "card__block--hideli" : ""}" data-type="render"></div>
-    <div class="card__empty card__empty--space${options.blocks.length === 0 ? "" : " fn__none"}" data-type="empty">
+    <div class="card__empty card__empty--space${options.cardsData.cards.length === 0 ? "" : " fn__none"}" data-type="empty">
         <div>🔮</div>
         ${window.siyuan.languages.noDueCard}
     </div>
-    <div class="fn__flex card__action${options.blocks.length === 0 ? " fn__none" : ""}">
+    <div class="fn__flex card__action${options.cardsData.cards.length === 0 ? " fn__none" : ""}">
         <button class="b3-button b3-button--cancel" disabled="disabled" data-type="-2" style="width: 25%;min-width: 86px;display: flex">
             <svg><use xlink:href="#iconLeft"></use></svg>
-            (p)
+            (p / q)
         </button>
         <span class="fn__space"></span>
-        <button data-type="-1" class="b3-button fn__flex-1">${window.siyuan.languages.cardShowAnswer} (${window.siyuan.languages.space})</button>
+        <button data-type="-1" class="b3-button fn__flex-1">${window.siyuan.languages.cardShowAnswer} (${window.siyuan.languages.space} / Enter)</button>
     </div>
     <div class="fn__flex card__action fn__none">
         <div>
             <span>${window.siyuan.languages.nextRound}</span>
-            <button data-type="-3" aria-label="0" class="b3-button b3-button--cancel b3-tooltips__n b3-tooltips">
-                <div>💤</div>
+            <button data-type="-3" aria-label="0 / x" class="b3-button b3-button--cancel b3-tooltips__n b3-tooltips">
+                <div class="card__icon">💤</div>
                 ${window.siyuan.languages.skip} (0)
             </button>
         </div>
         <div>
             <span></span>
-            <button data-type="1" aria-label="1 / j" class="b3-button b3-button--error b3-tooltips__n b3-tooltips">
-                <div>🙈</div>
+            <button data-type="1" aria-label="1 / j / a" class="b3-button b3-button--error b3-tooltips__n b3-tooltips">
+                <div class="card__icon">🙈</div>
                 ${window.siyuan.languages.cardRatingAgain} (1)
             </button>
         </div>
         <div>
             <span></span>
-            <button data-type="2" aria-label="2 / k" class="b3-button b3-button--warning b3-tooltips__n b3-tooltips">
-                <div>😬</div>
+            <button data-type="2" aria-label="2 / k / s" class="b3-button b3-button--warning b3-tooltips__n b3-tooltips">
+                <div class="card__icon">😬</div>
                 ${window.siyuan.languages.cardRatingHard} (2)
             </button>
         </div>
         <div>
             <span></span>
-            <button data-type="3" aria-label="3 / l" class="b3-button b3-button--info b3-tooltips__n b3-tooltips">
-                <div>😊</div>
+            <button data-type="3" aria-label="3 / l / d / ${window.siyuan.languages.space} / Enter" class="b3-button b3-button--info b3-tooltips__n b3-tooltips">
+                <div class="card__icon">😊</div>
                 ${window.siyuan.languages.cardRatingGood} (3)
             </button>
         </div>
         <div>
             <span></span>
-            <button data-type="4" aria-label="4 / ;" class="b3-button b3-button--success b3-tooltips__n b3-tooltips">
-                <div>🌈</div>
+            <button data-type="4" aria-label="4 / ; / f" class="b3-button b3-button--success b3-tooltips__n b3-tooltips">
+                <div class="card__icon">🌈</div>
                 ${window.siyuan.languages.cardRatingEasy} (4)
             </button>
         </div>
@@ -115,11 +149,11 @@ ${window.siyuan.config.flashcard.list ? "card__block--hideli" : ""}" data-type="
 </div>`;
 };
 
-export const bindCardEvent = (options: {
+export const bindCardEvent = async (options: {
     app: App,
     element: Element,
     title?: string,
-    blocks: ICard[],
+    cardsData: ICardData
     cardType: TCardType,
     id?: string,
     dialog?: Dialog,
@@ -147,41 +181,55 @@ export const bindCardEvent = (options: {
     if (window.siyuan.mobile) {
         window.siyuan.mobile.popEditor = editor;
     }
-    if (options.blocks.length > 0) {
-        fetchPost("/api/filetree/getDoc", {
-            id: options.blocks[index].blockID,
-            mode: 0,
-            size: Constants.SIZE_GET_MAX
+    if (options.cardsData.cards.length > 0) {
+        fetchPost("/api/block/getDocInfo", {
+            id: options.cardsData.cards[index].blockID,
         }, (response) => {
-            onGet({
-                data: response,
-                protyle: editor.protyle,
-                action: response.data.rootID === response.data.id ? [Constants.CB_GET_HTML] : [Constants.CB_GET_ALL, Constants.CB_GET_HTML],
+            editor.protyle.wysiwyg.renderCustom(response.data.ial);
+            fetchPost("/api/filetree/getDoc", {
+                id: options.cardsData.cards[index].blockID,
+                mode: 0,
+                size: Constants.SIZE_GET_MAX
+            }, (response) => {
+                onGet({
+                    updateReadonly: true,
+                    data: response,
+                    protyle: editor.protyle,
+                    action: response.data.rootID === response.data.id ? [Constants.CB_GET_HTML] : [Constants.CB_GET_ALL, Constants.CB_GET_HTML],
+                });
             });
         });
     }
-    options.element.setAttribute("data-key", window.siyuan.config.keymap.general.riffCard.custom);
-    const countElement = options.element.querySelector('[data-type="count"]');
-    countElement.innerHTML = `${index + 1}/${options.blocks.length}`;
+    options.element.setAttribute("data-key", Constants.DIALOG_OPENCARD);
     const actionElements = options.element.querySelectorAll(".card__action");
+    if (options.index === 0) {
+        actionElements[0].firstElementChild.setAttribute("disabled", "disabled");
+    } else {
+        actionElements[0].firstElementChild.removeAttribute("disabled");
+    }
+    const countElement = options.element.querySelector('[data-type="count"]');
     const filterElement = options.element.querySelector('[data-type="filter"]');
     const fetchNewRound = () => {
         const currentCardType = filterElement.getAttribute("data-cardtype");
+        const docId = filterElement.getAttribute("data-id");
         fetchPost(currentCardType === "all" ? "/api/riff/getRiffDueCards" :
             (currentCardType === "doc" ? "/api/riff/getTreeRiffDueCards" : "/api/riff/getNotebookRiffDueCards"), {
-            rootID: filterElement.getAttribute("data-id"),
-            deckID: filterElement.getAttribute("data-id"),
-            notebook: filterElement.getAttribute("data-id"),
-        }, (treeCards) => {
+            rootID: docId,
+            deckID: docId,
+            notebook: docId,
+        }, async (treeCards) => {
             index = 0;
-            options.blocks = treeCards.data.cards;
-            if (options.blocks.length > 0) {
+            options.cardsData = treeCards.data;
+            for (let i = 0; i < options.app.plugins.length; i++) {
+                options.cardsData = await options.app.plugins[i].updateCards(options.cardsData);
+            }
+            if (options.cardsData.cards.length > 0) {
                 nextCard({
                     countElement,
                     editor,
                     actionElements,
                     index,
-                    blocks: options.blocks
+                    cardsData: options.cardsData
                 });
             } else {
                 allDone(countElement, editor, actionElements);
@@ -189,23 +237,26 @@ export const bindCardEvent = (options: {
         });
     };
 
+    countElement.innerHTML = genCardCount(options.cardsData, index);
     options.element.addEventListener("click", (event: MouseEvent) => {
         const target = event.target as HTMLElement;
         let type = "";
+        const currentCard = options.cardsData.cards[index];
+        const docId = filterElement.getAttribute("data-id");
         if (typeof event.detail === "string") {
-            if (event.detail === "1" || event.detail === "j") {
+            if (["1", "j", "a"].includes(event.detail)) {
                 type = "1";
-            } else if (event.detail === "2" || event.detail === "k") {
+            } else if (["2", "k", "s"].includes(event.detail)) {
                 type = "2";
-            } else if (event.detail === "3" || event.detail === "l") {
+            } else if (["3", "l", "d"].includes(event.detail)) {
                 type = "3";
-            } else if (event.detail === "4" || event.detail === ";") {
+            } else if (["4", ";", "f"].includes(event.detail)) {
                 type = "4";
-            } else if (event.detail === " ") {
+            } else if ([" ", "enter"].includes(event.detail)) {
                 type = "-1";
-            } else if (event.detail === "p") {
+            } else if (["p", "q"].includes(event.detail)) {
                 type = "-2";
-            } else if (event.detail === "0") {
+            } else if (["0", "x"].includes(event.detail)) {
                 type = "-3";
             }
         } else {
@@ -220,6 +271,150 @@ export const bindCardEvent = (options: {
                 event.preventDefault();
                 return;
             }
+            const moreElement = hasClosestByAttribute(target, "data-type", "more");
+            if (moreElement) {
+                event.stopPropagation();
+                event.preventDefault();
+                if (filterElement.getAttribute("data-cardtype") === "all") {
+                    showMessage(window.siyuan.languages.noSupportTip);
+                    return;
+                }
+                const menu = new Menu();
+                menu.addItem({
+                    icon: "iconClock",
+                    label: window.siyuan.languages.setDueTime,
+                    click() {
+                        const timedialog = new Dialog({
+                            title: window.siyuan.languages.setDueTime,
+                            content: `<div class="b3-dialog__content">
+    <div class="b3-label__text">${window.siyuan.languages.showCardDay}</div>
+    <div class="fn__hr"></div>
+    <input class="b3-text-field fn__block" value="1" type="number" step="1" min="1">
+</div>
+<div class="b3-dialog__action">
+    <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
+    <button class="b3-button b3-button--text">${window.siyuan.languages.confirm}</button>
+</div>`,
+                            width: isMobile() ? "92vw" : "520px",
+                        });
+                        const inputElement = timedialog.element.querySelector("input") as HTMLInputElement;
+                        const btnsElement = timedialog.element.querySelectorAll(".b3-button");
+                        timedialog.bindInput(inputElement, () => {
+                            (btnsElement[1] as HTMLButtonElement).click();
+                        });
+                        inputElement.focus();
+                        inputElement.select();
+                        btnsElement[0].addEventListener("click", () => {
+                            timedialog.destroy();
+                        });
+                        btnsElement[1].addEventListener("click", () => {
+                            fetchPost("/api/riff/batchSetRiffCardsDueTime", {
+                                cardDues: [{
+                                    id: currentCard.cardID,
+                                    due: format(parseInt(inputElement.value) * 1000, 'yyyyMMddHHmmss')
+                                }]
+                            }, () => {
+                                actionElements[0].classList.add("fn__none");
+                                actionElements[1].classList.remove("fn__none");
+                                if (currentCard.state === 0) {
+                                    options.cardsData.unreviewedNewCardCount--;
+                                } else {
+                                    options.cardsData.unreviewedOldCardCount--;
+                                }
+                                options.element.dispatchEvent(new CustomEvent("click", {detail: "0"}));
+                                options.cardsData.cards.splice(index, 1);
+                                index--;
+                                timedialog.destroy();
+                            });
+                        });
+                    }
+                });
+                if (currentCard.state !== 0) {
+                    menu.addItem({
+                        icon: "iconRefresh",
+                        label: window.siyuan.languages.reset,
+                        click() {
+                            fetchPost("/api/riff/resetRiffCards", {
+                                type: filterElement.getAttribute("data-cardtype"),
+                                id: docId,
+                                deckID: Constants.QUICK_DECK_ID,
+                                blockIDs: [currentCard.blockID],
+                            }, () => {
+                                const minLang = window.siyuan.languages._time["1m"].replace("%s", "")
+                                currentCard.lapses = 0;
+                                currentCard.lastReview = -62135596800000;
+                                currentCard.reps = 0;
+                                currentCard.state = 0;
+                                currentCard.nextDues = {
+                                    1: minLang,
+                                    2: minLang.replace("1", "5"),
+                                    3: minLang.replace("1", "10"),
+                                    4: window.siyuan.languages._time["1d"].replace("%s", "").replace("1", "6")
+                                };
+                                actionElements[1].querySelectorAll(".b3-button").forEach((element, btnIndex) => {
+                                    element.previousElementSibling.textContent = currentCard.nextDues[btnIndex];
+                                });
+                                options.cardsData.unreviewedOldCardCount--;
+                                options.cardsData.unreviewedNewCardCount++;
+                                countElement.innerHTML = genCardCount(options.cardsData, index);
+                            });
+                        }
+                    });
+                }
+                menu.addItem({
+                    icon: "iconTrashcan",
+                    label: `${window.siyuan.languages.remove} <b>${window.siyuan.languages.riffCard}</b>`,
+                    click() {
+                        actionElements[0].classList.add("fn__none");
+                        actionElements[1].classList.remove("fn__none");
+                        if (currentCard.state === 0) {
+                            options.cardsData.unreviewedNewCardCount--;
+                        } else {
+                            options.cardsData.unreviewedOldCardCount--;
+                        }
+                        options.element.dispatchEvent(new CustomEvent("click", {detail: "0"}));
+                        transaction(undefined, [{
+                            action: "removeFlashcards",
+                            deckID: Constants.QUICK_DECK_ID,
+                            blockIDs: [currentCard.blockID]
+                        }]);
+                        options.cardsData.cards.splice(index, 1);
+                        index--;
+                    }
+                });
+                menu.addSeparator();
+                menu.addItem({
+                    iconHTML: "",
+                    type: "readonly",
+                    label: `<div class="fn__flex">
+    <div class="fn__flex-1">${window.siyuan.languages.forgetCount}</div>
+    <div class="fn__space"></div>
+    <div>${currentCard.lapses}</div>
+</div><div class="fn__flex${currentCard.lastReview > 0 ? "" : " fn__none"}">
+    <div class="fn__flex-1">${window.siyuan.languages.lastReviewTime}</div>
+    <div class="fn__space"></div>
+    <div>${format(currentCard.lastReview, 'yyyy-MM-dd')}</div>
+</div><div class="fn__flex">
+    <div class="fn__flex-1">${window.siyuan.languages.revisionCount}</div>
+    <div class="fn__space"></div>
+    <div>${currentCard.reps}</div>
+</div><div class="fn__flex">
+    <div class="fn__flex-1">${window.siyuan.languages.cardStatus}</div>
+    <div class="fn__space"></div>
+    <div class="${currentCard.state === 0 ? "ft__primary" : "ft__success"}">${currentCard.state === 0 ? window.siyuan.languages.flashcardNewCard : window.siyuan.languages.flashcardReviewCard}</div>
+</div>`,
+                });
+                /// #if MOBILE
+                menu.fullscreen();
+                /// #else
+                const rect = target.getBoundingClientRect();
+                menu.open({
+                    x: rect.left,
+                    y: rect.bottom
+                });
+                /// #endif
+                return;
+            }
             /// #if !MOBILE
             const sticktabElement = hasClosestByAttribute(target, "data-type", "sticktab");
             if (sticktabElement) {
@@ -230,10 +425,10 @@ export const bindCardEvent = (options: {
                         icon: "iconRiffCard",
                         title: window.siyuan.languages.spaceRepetition,
                         data: {
-                            blocks: options.blocks,
+                            cardsData: options.cardsData,
                             index,
                             cardType: filterElement.getAttribute("data-cardtype") as TCardType,
-                            id: filterElement.getAttribute("data-id"),
+                            id: docId,
                             title: options.title
                         },
                         id: "siyuan-card"
@@ -261,7 +456,7 @@ export const bindCardEvent = (options: {
                 fetchPost("/api/riff/getRiffDecks", {}, (response) => {
                     window.siyuan.menus.menu.remove();
                     window.siyuan.menus.menu.append(new MenuItem({
-                        iconHTML: Constants.ZWSP,
+                        iconHTML: "",
                         label: window.siyuan.languages.all,
                         click() {
                             filterElement.setAttribute("data-id", "");
@@ -270,7 +465,7 @@ export const bindCardEvent = (options: {
                         },
                     }).element);
                     window.siyuan.menus.menu.append(new MenuItem({
-                        iconHTML: Constants.ZWSP,
+                        iconHTML: "",
                         label: window.siyuan.languages.fileTree,
                         click() {
                             movePathTo((toPath, toNotebook) => {
@@ -285,7 +480,7 @@ export const bindCardEvent = (options: {
                     }
                     if (options.title) {
                         window.siyuan.menus.menu.append(new MenuItem({
-                            iconHTML: Constants.ZWSP,
+                            iconHTML: "",
                             label: escapeHtml(options.title),
                             click() {
                                 filterElement.setAttribute("data-id", options.id);
@@ -293,11 +488,13 @@ export const bindCardEvent = (options: {
                                 fetchNewRound();
                             },
                         }).element);
-                        window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
+                        if (response.data.length > 0) {
+                            window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
+                        }
                     }
                     response.data.forEach((deck: { id: string, name: string }) => {
                         window.siyuan.menus.menu.append(new MenuItem({
-                            iconHTML: Constants.ZWSP,
+                            iconHTML: "",
                             label: escapeHtml(deck.name),
                             click() {
                                 filterElement.setAttribute("data-id", deck.id);
@@ -328,25 +525,26 @@ export const bindCardEvent = (options: {
                 type = buttonElement.getAttribute("data-type");
             }
         }
-        if (!type || !options.blocks[index]) {
+        if (!type || !currentCard) {
             return;
         }
         event.preventDefault();
         event.stopPropagation();
-        hideElements(["toolbar", "hint", "util"], editor.protyle);
+        hideElements(["toolbar", "hint", "util", "gutter"], editor.protyle);
         if (type === "-1") {    // 显示答案
             if (actionElements[0].classList.contains("fn__none")) {
+                type = "3";
+            } else {
+                editor.protyle.element.classList.remove("card__block--hidemark", "card__block--hideli", "card__block--hidesb", "card__block--hideh");
+                actionElements[0].classList.add("fn__none");
+                actionElements[1].querySelectorAll(".b3-button").forEach((element, btnIndex) => {
+                    element.previousElementSibling.textContent = currentCard.nextDues[btnIndex];
+                });
+                actionElements[1].classList.remove("fn__none");
+                emitEvent(options.app, currentCard, type);
                 return;
             }
-            editor.protyle.element.classList.remove("card__block--hidemark", "card__block--hideli", "card__block--hidesb", "card__block--hideh");
-            actionElements[0].classList.add("fn__none");
-            actionElements[1].querySelectorAll(".b3-button").forEach((element, btnIndex) => {
-                element.previousElementSibling.textContent = options.blocks[index].nextDues[btnIndex];
-            });
-            actionElements[1].classList.remove("fn__none");
-            return;
-        }
-        if (type === "-2") {    // 上一步
+        } else if (type === "-2") {    // 上一步
             if (actionElements[0].classList.contains("fn__none")) {
                 return;
             }
@@ -357,40 +555,45 @@ export const bindCardEvent = (options: {
                     editor,
                     actionElements,
                     index,
-                    blocks: options.blocks
+                    cardsData: options.cardsData
                 });
+                emitEvent(options.app, options.cardsData.cards[index + 1], type);
             }
             return;
         }
         if (["1", "2", "3", "4", "-3"].includes(type) && actionElements[0].classList.contains("fn__none")) {
             fetchPost(type === "-3" ? "/api/riff/skipReviewRiffCard" : "/api/riff/reviewRiffCard", {
-                deckID: options.blocks[index].deckID,
-                cardID: options.blocks[index].cardID,
+                deckID: currentCard.deckID,
+                cardID: currentCard.cardID,
                 rating: parseInt(type),
-                reviewedCards: options.blocks
+                reviewedCards: options.cardsData.cards
             }, () => {
                 /// #if MOBILE
                 if (type !== "-3" &&
-                    ((0 !== window.siyuan.config.sync.provider && !needLogin("")) ||
+                    ((0 !== window.siyuan.config.sync.provider && isPaidUser()) ||
                         (0 === window.siyuan.config.sync.provider && !needSubscribe(""))) &&
                     window.siyuan.config.repo.key && window.siyuan.config.sync.enabled) {
                     document.getElementById("toolbarSync").classList.remove("fn__none");
                 }
                 /// #endif
                 index++;
-                if (index > options.blocks.length - 1) {
+                if (index > options.cardsData.cards.length - 1) {
                     const currentCardType = filterElement.getAttribute("data-cardtype");
                     fetchPost(currentCardType === "all" ? "/api/riff/getRiffDueCards" :
                         (currentCardType === "doc" ? "/api/riff/getTreeRiffDueCards" : "/api/riff/getNotebookRiffDueCards"), {
-                        rootID: filterElement.getAttribute("data-id"),
-                        deckID: filterElement.getAttribute("data-id"),
-                        notebook: filterElement.getAttribute("data-id"),
-                        reviewedCards: options.blocks
-                    }, (result) => {
+                        rootID: docId,
+                        deckID: docId,
+                        notebook: docId,
+                        reviewedCards: options.cardsData.cards
+                    }, async (result) => {
+                        emitEvent(options.app, options.cardsData.cards[index - 1], type);
                         index = 0;
-                        options.blocks = result.data.cards;
-                        if (options.blocks.length === 0) {
-                            if (result.data.unreviewedCount > 0) {
+                        options.cardsData = result.data;
+                        for (let i = 0; i < options.app.plugins.length; i++) {
+                            options.cardsData = await options.app.plugins[i].updateCards(options.cardsData);
+                        }
+                        if (options.cardsData.cards.length === 0) {
+                            if (options.cardsData.unreviewedCount > 0) {
                                 newRound(countElement, editor, actionElements, result.data.unreviewedCount);
                             } else {
                                 allDone(countElement, editor, actionElements);
@@ -401,7 +604,7 @@ export const bindCardEvent = (options: {
                                 editor,
                                 actionElements,
                                 index,
-                                blocks: options.blocks
+                                cardsData: options.cardsData
                             });
                         }
                     });
@@ -412,12 +615,22 @@ export const bindCardEvent = (options: {
                     editor,
                     actionElements,
                     index,
-                    blocks: options.blocks
+                    cardsData: options.cardsData
                 });
+                emitEvent(options.app, options.cardsData.cards[index - 1], type);
             });
         }
     });
     return editor;
+};
+
+const emitEvent = (app: App, card: ICard, type: string) => {
+    app.plugins.forEach(item => {
+        item.eventBus.emit("click-flashcard-action", {
+            type,
+            card
+        });
+    });
 };
 
 export const openCard = (app: App) => {
@@ -426,12 +639,9 @@ export const openCard = (app: App) => {
     });
 };
 
-export const openCardByData = (app: App, cardsData: {
-    cards: ICard[],
-    unreviewedCount: number
-}, cardType: TCardType, id?: string, title?: string) => {
+export const openCardByData = async (app: App, cardsData: ICardData, cardType: TCardType, id?: string, title?: string) => {
     const exit = window.siyuan.dialogs.find(item => {
-        if (item.element.getAttribute("data-key") === window.siyuan.config.keymap.general.riffCard.custom) {
+        if (item.element.getAttribute("data-key") === Constants.DIALOG_OPENCARD) {
             item.destroy();
             return true;
         }
@@ -439,9 +649,16 @@ export const openCardByData = (app: App, cardsData: {
     if (exit) {
         return;
     }
-
+    let lastRange: Range;
+    if (getSelection().rangeCount > 0) {
+        lastRange = getSelection().getRangeAt(0);
+    }
+    for (let i = 0; i < app.plugins.length; i++) {
+        cardsData = await app.plugins[i].updateCards(cardsData);
+    }
     const dialog = new Dialog({
-        content: genCardHTML({id, cardType, blocks: cardsData.cards, isTab: false}),
+        positionId: Constants.DIALOG_OPENCARD,
+        content: genCardHTML({id, cardType, cardsData, isTab: false}),
         width: isMobile() ? "100vw" : "80vw",
         height: isMobile() ? "100vh" : "70vh",
         destroyCallback() {
@@ -451,20 +668,40 @@ export const openCardByData = (app: App, cardsData: {
                     window.siyuan.mobile.popEditor = null;
                 }
             }
+            if (lastRange) {
+                focusByRange(lastRange);
+            }
+        },
+        resizeCallback(type: string) {
+            if (type !== "d" && type !== "t" && editor) {
+                editor.resize();
+            }
         }
     });
     (dialog.element.querySelector(".b3-dialog__scrim") as HTMLElement).style.backgroundColor = "var(--b3-theme-background)";
     (dialog.element.querySelector(".b3-dialog__container") as HTMLElement).style.maxWidth = "1024px";
-    const editor = bindCardEvent({
+    const editor = await bindCardEvent({
         app,
         element: dialog.element,
-        blocks: cardsData.cards,
+        cardsData,
         title,
         id,
         cardType,
         dialog
     });
-    dialog.editor = editor;
+    editor.resize();
+    dialog.editors = {
+        card: editor
+    };
+    /// #if !MOBILE
+    const focusElement = dialog.element.querySelector(".block__icons button.block__icon") as HTMLElement;
+    focusElement.focus();
+    const range = document.createRange();
+    range.selectNodeContents(focusElement);
+    range.collapse();
+    focusByRange(range);
+    /// #endif
+    updateCardHV();
 };
 
 const nextCard = (options: {
@@ -472,7 +709,7 @@ const nextCard = (options: {
     editor: Protyle,
     actionElements: NodeListOf<Element>,
     index: number,
-    blocks: ICard[]
+    cardsData: ICardData
 }) => {
     options.editor.protyle.element.classList.add("card__block--hide");
     if (window.siyuan.config.flashcard.superBlock) {
@@ -491,22 +728,28 @@ const nextCard = (options: {
     options.actionElements[1].classList.add("fn__none");
     options.editor.protyle.element.classList.remove("fn__none");
     options.editor.protyle.element.nextElementSibling.classList.add("fn__none");
-    options.countElement.innerHTML = `${options.index + 1}/${options.blocks.length}`;
+    options.countElement.innerHTML = genCardCount(options.cardsData, options.index);
     options.countElement.classList.remove("fn__none");
     if (options.index === 0) {
         options.actionElements[0].firstElementChild.setAttribute("disabled", "disabled");
     } else {
         options.actionElements[0].firstElementChild.removeAttribute("disabled");
     }
-    fetchPost("/api/filetree/getDoc", {
-        id: options.blocks[options.index].blockID,
-        mode: 0,
-        size: Constants.SIZE_GET_MAX
+    fetchPost("/api/block/getDocInfo", {
+        id: options.cardsData.cards[options.index].blockID,
     }, (response) => {
-        onGet({
-            data: response,
-            protyle: options.editor.protyle,
-            action: response.data.rootID === response.data.id ? [Constants.CB_GET_HTML] : [Constants.CB_GET_ALL, Constants.CB_GET_HTML],
+        options.editor.protyle.wysiwyg.renderCustom(response.data.ial);
+        fetchPost("/api/filetree/getDoc", {
+            id: options.cardsData.cards[options.index].blockID,
+            mode: 0,
+            size: Constants.SIZE_GET_MAX
+        }, (response) => {
+            onGet({
+                updateReadonly: true,
+                data: response,
+                protyle: options.editor.protyle,
+                action: response.data.rootID === response.data.id ? [Constants.CB_GET_HTML] : [Constants.CB_GET_ALL, Constants.CB_GET_HTML],
+            });
         });
     });
 };

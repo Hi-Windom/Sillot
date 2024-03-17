@@ -41,6 +41,11 @@ func CreateBox(name string) (id string, err error) {
 		return
 	}
 
+	WaitForWritingFiles()
+
+	createDocLock.Lock()
+	defer createDocLock.Unlock()
+
 	id = ast.NewNodeID()
 	boxLocalPath := filepath.Join(util.DataDir, id)
 	err = os.MkdirAll(boxLocalPath, 0755)
@@ -71,11 +76,14 @@ func RenameBox(boxID, name string) (err error) {
 }
 
 func RemoveBox(boxID string) (err error) {
-	WaitForWritingFiles()
-
 	if util.IsReservedFilename(boxID) {
 		return errors.New(fmt.Sprintf("can not remove [%s] caused by it is a reserved file", boxID))
 	}
+
+	WaitForWritingFiles()
+
+	createDocLock.Lock()
+	defer createDocLock.Unlock()
 
 	localPath := filepath.Join(util.DataDir, boxID)
 	if !filelock.IsExist(localPath) {
@@ -154,6 +162,13 @@ func Mount(boxID string) (alreadyMount bool, err error) {
 		p := filepath.Join(util.WorkingDir, "guide", boxID)
 		if err = filelock.Copy(p, localPath); nil != err {
 			return
+		}
+
+		avDirPath := filepath.Join(util.WorkingDir, "guide", boxID, "storage", "av")
+		if filelock.IsExist(avDirPath) {
+			if err = filelock.Copy(avDirPath, filepath.Join(util.DataDir, "storage", "av")); nil != err {
+				return
+			}
 		}
 
 		if box := Conf.Box(boxID); nil != box {

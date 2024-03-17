@@ -32,7 +32,7 @@ exports.default = {
               <use xlink:href="#iconMenu"></use>
           </svg>
           <input class="toolbar__title fn__hidden" id="toolbarName">
-          <svg id="toolbarSync" class="toolbar__icon fn__none">
+          <svg id="toolbarSync" class="toolbar__icon toolbar__icon-deactivate fn__none">
               <use xlink:href="#iconCloudSucc"></use>
           </svg>
           <svg id="toolbarConsole" class="toolbar__icon" data-mode="0">
@@ -52,6 +52,7 @@ exports.default = {
         <svg data-type="sidebar-tag-tab" class="toolbar__icon"><use xlink:href="#iconTags"></use></svg>
         <svg data-type="sidebar-backlink-tab" class="toolbar__icon"><use xlink:href="#iconLink"></use></svg>
         <svg data-type="sidebar-inbox-tab" class="toolbar__icon"><use xlink:href="#iconInbox"></use></svg>
+        <svg data-menu="true" data-type="sidebar-plugin-tab" class="toolbar__icon"><use xlink:href="#iconPlugin"></use></svg>
         <span class="fn__flex-1"></span>
         <svg class="toolbar__icon"><use xlink:href="#iconRight"></use></svg>
     </div>
@@ -62,6 +63,7 @@ exports.default = {
         <div class="fn__flex-column fn__none" data-type="sidebar-tag"></div>
         <div class="fn__flex-column fn__none" data-type="sidebar-backlink"></div>
         <div class="fn__flex-column fn__none" data-type="sidebar-inbox"></div>
+        <div class="fn__flex-column fn__none" data-type="sidebar-plugin"></div>
     </div>
 </div>`,
           menu: /*html*/ `<div id="menu" class="b3-menu b3-menu--fullscreen"></div>`,
