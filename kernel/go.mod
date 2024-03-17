@@ -3,6 +3,8 @@ module github.com/siyuan-note/siyuan/kernel
 go 1.21
 
 // $ g install 1.21.3 or $ g use 1.21.3  # ref https://github.com/voidint/g
+// VSCode 的GO工具链安装/升级失败导致报错多半是因为：golang.org 在国内由于一些 众所周知的 原因无法直接访问，可以先运行下面的命令
+// go env -w GOPROXY=https://goproxy.io,direct
 toolchain go1.21.3
 
 require (
