@@ -1,0 +1,28 @@
+{
+  "recommendations": [
+    "editorconfig.editorconfig",
+    "mqycn.huile8",
+    "codeinchinese.chineseinputassistant",
+    "russell.any-rule",
+    "mrcrowl.easy-less",
+    "igorsbitnev.error-gutters",
+    "usernamehw.errorlens",
+    "mkxml.vscode-filesize",
+    "mhutchie.git-graph",
+    "donjayamanne.githistory",
+    "michelemelluso.gitignore",
+    "eamodio.gitlens",
+    "ldez.ignore-files",
+    "wix.vscode-import-cost",
+    "josee9988.minifyall",
+    "christian-kohler.npm-intellisense",
+    "leizongmin.node-module-intellisense",
+    "christian-kohler.path-intellisense",
+    "rome.rome",
+    "tyriar.vscode-terminal-here",
+    "symbolk.somanyconflicts",
+    "shardulm94.trailing-spaces",
+    "xboxyan.tree-generator"
+  ],
+  "unwantedRecommendations": []
+}
