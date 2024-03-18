@@ -4,7 +4,7 @@
   "forgetCount": "Forget to count",
   "lastReviewTime": "Last review time",
   "cardStatus": "Card status",
-  "noSupportTip": "This function does not support the use of card packages",
+  "noSupportTip": "This function does not support the use of card decks",
   "insertRowTip": "The newly added rows have been filtered and can be viewed by canceling filtering/searching/sorting",
   "insertRowTip2": "New rows do not participate in sorting",
   "insertPhoto": "Take a photo and insert it",
@@ -1441,6 +1441,7 @@
     "230": "Deleting cloud storage unreferenced check indexes...",
     "231": "Deleting unreferenced data objects in cloud storage...",
     "232": "The cloud data storage has been purged. [%d] snapshots and [%d] data objects have been deleted, and a total of [%s] disk space has been released",
-    "233": "Closing user guide..."
+    "233": "Closing user guide...",
+    "234": "[%d/%d] Updated [%d] of readable paths of doc [%s]"
   }
 }

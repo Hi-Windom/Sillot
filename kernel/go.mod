@@ -56,7 +56,7 @@ require (
 	github.com/sashabaranov/go-openai v1.20.2
 	github.com/shirou/gopsutil/v3 v3.24.2
 	github.com/siyuan-note/dejavu v0.0.0-20240312083319-7cf60efe5c66
-	github.com/siyuan-note/eventbus v0.0.0-20240124091459-8e1b37a55255
+	github.com/siyuan-note/eventbus v0.0.0-20240318125243-801c98e8f025
 	github.com/siyuan-note/filelock v0.0.0-20240128091141-94d7bb3e0772
 	github.com/siyuan-note/httpclient v0.0.0-20240312073515-af29be1cfb4e
 	github.com/siyuan-note/logging v0.0.0-20231208035918-61f884c854f0
