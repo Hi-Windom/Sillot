@@ -45,3 +45,6 @@ yarn.lock
 /app/dist-electron
 # copy to out for sillot-bridge gitmodule
 /app/package/app
+
+# subtree
+/astro
