@@ -1,8 +1,9 @@
-import { expect } from 'chai';
-import { resolveConfig } from 'vite';
-import { cachedFullCompilation } from '../../../dist/vite-plugin-astro/compile.js';
+import * as assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { pathToFileURL } from 'node:url';
 import { init, parse } from 'es-module-lexer';
-import { pathToFileURL } from 'url';
+import { resolveConfig } from 'vite';
+import { compileAstro } from '../../../dist/vite-plugin-astro/compile.js';
 
 const viteConfig = await resolveConfig({ configFile: false }, 'serve');
 
@@ -11,24 +12,21 @@ const viteConfig = await resolveConfig({ configFile: false }, 'serve');
  * @param {string} id
  */
 async function compile(source, id) {
-	return await cachedFullCompilation({
+	return await compileAstro({
 		compileProps: {
-			astroConfig: { root: pathToFileURL('/'), base: '/' },
+			astroConfig: { root: pathToFileURL('/'), base: '/', experimental: {} },
 			viteConfig,
 			filename: id,
 			source,
 		},
-		logging: {
-			level: 'info',
-		},
-		rawId: id,
+		astroFileToCompileMetadata: new Map(),
 	});
 }
 
 describe('astro full compile', () => {
 	it('should compile a single file', async () => {
 		const result = await compile(`<h1>Hello World</h1>`, '/src/components/index.astro');
-		expect(result.code).to.be.ok;
+		assert.ok(result.code);
 	});
 
 	it('should compile typescript', async () => {
@@ -41,7 +39,7 @@ const name: string = 'world'
 <h1>Hello {name}</h1>`,
 			'/src/components/index.astro'
 		);
-		expect(result.code).to.be.ok;
+		assert.ok(result.code);
 	});
 
 	it('should error on invalid js', async () => {
@@ -57,14 +55,9 @@ const name = 'world
 				'/src/components/index.astro'
 			);
 		} catch (e) {
-			expect(e.message).to.include('Unterminated string literal');
+			assert.equal(e.message.includes('Unterminated string literal'), true);
 		}
-		expect(result).to.be.undefined;
-	});
-
-	it('injects hmr code', async () => {
-		const result = await compile(`<h1>Hello World</h1>`, '/src/components/index.astro');
-		expect(result.code).to.include('import.meta.hot');
+		assert.equal(result, undefined);
 	});
 
 	it('has file and url exports for markdwon compat', async () => {
@@ -72,8 +65,8 @@ const name = 'world
 		await init;
 		const [, exports] = parse(result.code);
 		const names = exports.map((e) => e.n);
-		expect(names).to.include('default');
-		expect(names).to.include('file');
-		expect(names).to.include('url');
+		assert.equal(names.includes('default'), true);
+		assert.equal(names.includes('file'), true);
+		assert.equal(names.includes('url'), true);
 	});
 });

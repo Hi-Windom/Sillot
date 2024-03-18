@@ -1,4 +1,4 @@
-import { h, defineComponent } from 'vue';
+import { defineComponent, h } from 'vue';
 
 /**
  * Astro passes `children` as a string of HTML, so we need
@@ -10,10 +10,15 @@ const StaticHtml = defineComponent({
 	props: {
 		value: String,
 		name: String,
+		hydrate: {
+			type: Boolean,
+			default: true,
+		},
 	},
-	setup({ name, value }) {
+	setup({ name, value, hydrate }) {
 		if (!value) return () => null;
-		return () => h('astro-slot', { name, innerHTML: value });
+		let tagName = hydrate ? 'astro-slot' : 'astro-static-slot';
+		return () => h(tagName, { name, innerHTML: value });
 	},
 });
 

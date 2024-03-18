@@ -1,56 +1,60 @@
 import type { Plugin as VitePlugin } from 'vite';
-import type { AstroBuildPlugin } from '../plugin';
-import type { StaticBuildOptions } from '../types';
-
-import { pagesVirtualModuleId, resolvedPagesVirtualModuleId } from '../../app/index.js';
+import { routeIsRedirect } from '../../redirects/index.js';
 import { addRollupInput } from '../add-rollup-input.js';
-import { eachPageData, hasPrerenderedPages, type BuildInternals } from '../internal.js';
+import { type BuildInternals, eachPageFromAllPages } from '../internal.js';
+import type { AstroBuildPlugin } from '../plugin.js';
+import type { StaticBuildOptions } from '../types.js';
+import { RENDERERS_MODULE_ID } from './plugin-renderers.js';
+import { getPathFromVirtualModulePageName, getVirtualModulePageNameFromPath } from './util.js';
 
-export function vitePluginPages(opts: StaticBuildOptions, internals: BuildInternals): VitePlugin {
+export const ASTRO_PAGE_MODULE_ID = '@astro-page:';
+export const ASTRO_PAGE_RESOLVED_MODULE_ID = '\0' + ASTRO_PAGE_MODULE_ID;
+
+export function getVirtualModulePageIdFromPath(path: string) {
+	const name = getVirtualModulePageNameFromPath(ASTRO_PAGE_MODULE_ID, path);
+	return '\x00' + name;
+}
+
+function vitePluginPages(opts: StaticBuildOptions, internals: BuildInternals): VitePlugin {
 	return {
 		name: '@astro/plugin-build-pages',
-
 		options(options) {
-			if (opts.settings.config.output === 'static' || hasPrerenderedPages(internals)) {
-				return addRollupInput(options, [pagesVirtualModuleId]);
+			if (opts.settings.config.output === 'static') {
+				const inputs = new Set<string>();
+
+				for (const [path, pageData] of eachPageFromAllPages(opts.allPages)) {
+					if (routeIsRedirect(pageData.route)) {
+						continue;
+					}
+					inputs.add(getVirtualModulePageNameFromPath(ASTRO_PAGE_MODULE_ID, path));
+				}
+
+				return addRollupInput(options, Array.from(inputs));
 			}
 		},
-
 		resolveId(id) {
-			if (id === pagesVirtualModuleId) {
-				return resolvedPagesVirtualModuleId;
+			if (id.startsWith(ASTRO_PAGE_MODULE_ID)) {
+				return '\0' + id;
 			}
 		},
+		async load(id) {
+			if (id.startsWith(ASTRO_PAGE_RESOLVED_MODULE_ID)) {
+				const imports: string[] = [];
+				const exports: string[] = [];
+				const pageName = getPathFromVirtualModulePageName(ASTRO_PAGE_RESOLVED_MODULE_ID, id);
+				const pageData = internals.pagesByComponent.get(pageName);
+				if (pageData) {
+					const resolvedPage = await this.resolve(pageData.moduleSpecifier);
+					if (resolvedPage) {
+						imports.push(`const page = () => import(${JSON.stringify(pageData.moduleSpecifier)});`);
+						exports.push(`export { page }`);
 
-		load(id) {
-			if (id === resolvedPagesVirtualModuleId) {
-				let importMap = '';
-				let imports = [];
-				let i = 0;
-				for (const pageData of eachPageData(internals)) {
-					const variable = `_page${i}`;
-					imports.push(`import * as ${variable} from ${JSON.stringify(pageData.moduleSpecifier)};`);
-					importMap += `[${JSON.stringify(pageData.component)}, ${variable}],`;
-					i++;
+						imports.push(`import { renderers } from "${RENDERERS_MODULE_ID}";`);
+						exports.push(`export { renderers };`);
+
+						return `${imports.join('\n')}${exports.join('\n')}`;
+					}
 				}
-
-				i = 0;
-				let rendererItems = '';
-				for (const renderer of opts.settings.renderers) {
-					const variable = `_renderer${i}`;
-					// Use unshift so that renderers are imported before user code, in case they set globals
-					// that user code depends on.
-					imports.unshift(`import ${variable} from '${renderer.serverEntrypoint}';`);
-					rendererItems += `Object.assign(${JSON.stringify(renderer)}, { ssr: ${variable} }),`;
-					i++;
-				}
-
-				const def = `${imports.join('\n')}
-
-export const pageMap = new Map([${importMap}]);
-export const renderers = [${rendererItems}];`;
-
-				return def;
 			}
 		},
 	};
@@ -58,7 +62,7 @@ export const renderers = [${rendererItems}];`;
 
 export function pluginPages(opts: StaticBuildOptions, internals: BuildInternals): AstroBuildPlugin {
 	return {
-		build: 'ssr',
+		targets: ['server'],
 		hooks: {
 			'build:before': () => {
 				return {

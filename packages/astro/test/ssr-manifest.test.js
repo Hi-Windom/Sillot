@@ -1,7 +1,8 @@
-import { expect } from 'chai';
-import { loadFixture } from './test-utils.js';
-import testAdapter from './test-adapter.js';
+import assert from 'node:assert/strict';
+import { before, describe, it } from 'node:test';
 import * as cheerio from 'cheerio';
+import testAdapter from './test-adapter.js';
+import { loadFixture } from './test-utils.js';
 
 describe('astro:ssr-manifest', () => {
 	/** @type {import('./test-utils').Fixture} */
@@ -12,6 +13,8 @@ describe('astro:ssr-manifest', () => {
 			root: './fixtures/ssr-manifest/',
 			output: 'server',
 			adapter: testAdapter(),
+			// test suite was authored when inlineStylesheets defaulted to never
+			build: { inlineStylesheets: 'never' },
 		});
 		await fixture.build();
 	});
@@ -23,6 +26,12 @@ describe('astro:ssr-manifest', () => {
 		const html = await response.text();
 
 		const $ = cheerio.load(html);
-		expect($('#assets').text()).to.equal('["/_astro/index.a8a337e4.css"]');
+		assert.match($('#assets').text(), /\["\/_astro\/index.([\w-]{8})\.css"\]/);
+	});
+
+	it('includes compressHTML', async () => {
+		const app = await fixture.loadTestAdapterApp();
+		assert.equal(app.manifest.compressHTML, true);
+		assert.equal(app.manifest.compressHTML, true);
 	});
 });

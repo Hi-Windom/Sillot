@@ -1,76 +1,64 @@
-import type * as http from 'http';
-import type { AddressInfo } from 'net';
-import type { AstroSettings, AstroUserConfig } from '../../@types/astro';
+import type * as http from 'node:http';
+import type { AddressInfo } from 'node:net';
+import type { AstroInlineConfig, AstroSettings } from '../../@types/astro.js';
 
-import nodeFs from 'fs';
+import nodeFs from 'node:fs';
 import * as vite from 'vite';
+import { injectImageEndpoint } from '../../assets/endpoint/config.js';
 import {
 	runHookConfigDone,
 	runHookConfigSetup,
 	runHookServerDone,
 	runHookServerStart,
 } from '../../integrations/index.js';
-import { createDefaultDevSettings, resolveRoot } from '../config/index.js';
 import { createVite } from '../create-vite.js';
-import type { LogOptions } from '../logger/core.js';
-import { nodeLogDestination } from '../logger/node.js';
-import { appendForwardSlash } from '../path.js';
+import type { Logger } from '../logger/core.js';
 import { apply as applyPolyfill } from '../polyfill.js';
-
-const defaultLogging: LogOptions = {
-	dest: nodeLogDestination,
-	level: 'error',
-};
 
 export interface Container {
 	fs: typeof nodeFs;
-	logging: LogOptions;
+	logger: Logger;
 	settings: AstroSettings;
-	viteConfig: vite.InlineConfig;
 	viteServer: vite.ViteDevServer;
-	resolvedRoot: string;
-	configFlag: string | undefined;
-	configFlagPath: string | undefined;
+	inlineConfig: AstroInlineConfig;
 	restartInFlight: boolean; // gross
 	handle: (req: http.IncomingMessage, res: http.ServerResponse) => void;
 	close: () => Promise<void>;
 }
 
 export interface CreateContainerParams {
+	logger: Logger;
+	settings: AstroSettings;
+	inlineConfig?: AstroInlineConfig;
 	isRestart?: boolean;
-	logging?: LogOptions;
-	userConfig?: AstroUserConfig;
-	settings?: AstroSettings;
 	fs?: typeof nodeFs;
-	root?: string | URL;
-	// The string passed to --config and the resolved path
-	configFlag?: string;
-	configFlagPath?: string;
-	disableTelemetry?: boolean;
 }
 
-export async function createContainer(params: CreateContainerParams = {}): Promise<Container> {
-	let {
-		isRestart = false,
-		logging = defaultLogging,
-		settings = await createDefaultDevSettings(params.userConfig, params.root),
-		fs = nodeFs,
-		disableTelemetry,
-	} = params;
-
-	if (disableTelemetry) {
-		settings.forceDisableTelemetry = true;
-	}
-
+export async function createContainer({
+	isRestart = false,
+	logger,
+	inlineConfig,
+	settings,
+	fs = nodeFs,
+}: CreateContainerParams): Promise<Container> {
 	// Initialize
 	applyPolyfill();
 	settings = await runHookConfigSetup({
 		settings,
 		command: 'dev',
-		logging,
+		logger: logger,
 		isRestart,
 	});
-	const { host, headers, open } = settings.config.server;
+
+	settings = injectImageEndpoint(settings, 'dev');
+
+	const {
+		base,
+		server: { host, headers, open: serverOpen },
+	} = settings.config;
+	// Open server to the correct path. We pass the `base` here as we didn't pass the
+	// base to the initial Vite config
+	const open = typeof serverOpen == 'string' ? serverOpen : serverOpen ? base : false;
 
 	// The client entrypoint for renderers. Since these are imported dynamically
 	// we need to tell Vite to preoptimize them.
@@ -86,20 +74,17 @@ export async function createContainer(params: CreateContainerParams = {}): Promi
 				include: rendererClientEntries,
 			},
 		},
-		{ settings, logging, mode: 'dev', command: 'dev', fs }
+		{ settings, logger, mode: 'dev', command: 'dev', fs }
 	);
-	await runHookConfigDone({ settings, logging });
+	await runHookConfigDone({ settings, logger });
 	const viteServer = await vite.createServer(viteConfig);
 
 	const container: Container = {
-		configFlag: params.configFlag,
-		configFlagPath: params.configFlagPath,
+		inlineConfig: inlineConfig ?? {},
 		fs,
-		logging,
-		resolvedRoot: appendForwardSlash(resolveRoot(params.root)),
+		logger,
 		restartInFlight: false,
 		settings,
-		viteConfig,
 		viteServer,
 		handle(req, res) {
 			viteServer.middlewares.handle(req, res, Function.prototype);
@@ -113,18 +98,18 @@ export async function createContainer(params: CreateContainerParams = {}): Promi
 	return container;
 }
 
-async function closeContainer({ viteServer, settings, logging }: Container) {
+async function closeContainer({ viteServer, settings, logger }: Container) {
 	await viteServer.close();
 	await runHookServerDone({
 		config: settings.config,
-		logging,
+		logger,
 	});
 }
 
 export async function startContainer({
 	settings,
 	viteServer,
-	logging,
+	logger,
 }: Container): Promise<AddressInfo> {
 	const { port } = settings.config.server;
 	await viteServer.listen(port);
@@ -132,27 +117,8 @@ export async function startContainer({
 	await runHookServerStart({
 		config: settings.config,
 		address: devServerAddressInfo,
-		logging,
+		logger,
 	});
 
 	return devServerAddressInfo;
-}
-
-export function isStarted(container: Container): boolean {
-	return !!container.viteServer.httpServer?.listening;
-}
-
-/**
- * Only used in tests
- */
-export async function runInContainer(
-	params: CreateContainerParams,
-	callback: (container: Container) => Promise<void> | void
-) {
-	const container = await createContainer({ ...params, disableTelemetry: true });
-	try {
-		await callback(container);
-	} finally {
-		await container.close();
-	}
 }

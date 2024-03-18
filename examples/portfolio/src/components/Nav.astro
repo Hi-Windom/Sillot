@@ -1,6 +1,7 @@
 ---
-import Icon, { Props as IconProps } from './Icon.astro';
+import Icon from './Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import type { iconPaths } from './IconPaths';
 
 /** Main menu items */
 const textLinks: { label: string; href: string }[] = [
@@ -10,7 +11,7 @@ const textLinks: { label: string; href: string }[] = [
 ];
 
 /** Icon links to social media — edit these with links to your profiles! */
-const iconLinks: { label: string; href: string; icon: IconProps['icon'] }[] = [
+const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[] = [
 	{ label: 'Twitter', href: 'https://twitter.com/me', icon: 'twitter-logo' },
 	{ label: 'Twitch', href: 'https://twitch.tv/me', icon: 'twitch-logo' },
 	{ label: 'GitHub', href: 'https://github.com/me', icon: 'github-logo' },
@@ -35,7 +36,45 @@ const iconLinks: { label: string; href: string; icon: IconProps['icon'] }[] = [
 			</template>
 		</menu-button>
 	</div>
-	<div id="menu-content">
+	<noscript>
+		<ul class="nav-items">
+			{
+				textLinks.map(({ label, href }) => (
+					<li>
+						<a
+							aria-current={Astro.url.pathname === href}
+							class:list={[
+								'link',
+								{
+									active:
+										Astro.url.pathname === href ||
+										(href !== '/' && Astro.url.pathname.startsWith(href)),
+								},
+							]}
+							href={href}
+						>
+							{label}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</noscript>
+	<noscript>
+		<div class="menu-footer">
+			<div class="socials">
+				{
+					iconLinks.map(({ href, icon, label }) => (
+						<a href={href} class="social">
+							<span class="sr-only">{label}</span>
+							<Icon icon={icon} />
+						</a>
+					))
+				}
+			</div>
+		</div>
+	</noscript>
+	<div id="menu-content" hidden>
 		<ul class="nav-items">
 			{
 				textLinks.map(({ label, href }) => (
@@ -89,6 +128,8 @@ const iconLinks: { label: string; href: string; icon: IconProps['icon'] }[] = [
 			// Hide menu (shown by default to support no-JS browsers).
 			const menu = document.getElementById('menu-content')!;
 			menu.hidden = true;
+			// Add "menu-content" class in JS to avoid covering content in non-JS browsers.
+			menu.classList.add('menu-content');
 
 			/** Set whether the menu is currently expanded or collapsed. */
 			const setExpanded = (expand: boolean) => {
@@ -168,7 +209,7 @@ const iconLinks: { label: string; href: string; icon: IconProps['icon'] }[] = [
 		z-index: -1;
 	}
 
-	#menu-content {
+	.menu-content {
 		position: absolute;
 		left: 0;
 		right: 0;
@@ -253,7 +294,7 @@ const iconLinks: { label: string; href: string; icon: IconProps['icon'] }[] = [
 			font-size: var(--text-lg);
 		}
 
-		#menu-content {
+		.menu-content {
 			display: contents;
 		}
 
@@ -280,7 +321,9 @@ const iconLinks: { label: string; href: string; icon: IconProps['icon'] }[] = [
 		.link {
 			padding: 0.5rem 1rem;
 			border-radius: 999rem;
-			transition: color var(--theme-transition), background-color var(--theme-transition);
+			transition:
+				color var(--theme-transition),
+				background-color var(--theme-transition);
 		}
 
 		.link:hover,

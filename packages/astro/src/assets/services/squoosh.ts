@@ -1,18 +1,19 @@
 // TODO: Investigate removing this service once sharp lands WASM support, as libsquoosh is deprecated
 
 import type { ImageOutputFormat, ImageQualityPreset } from '../types.js';
+import { imageMetadata } from '../utils/metadata.js';
 import {
-	baseService,
-	parseQuality,
 	type BaseServiceTransform,
 	type LocalImageService,
+	baseService,
+	parseQuality,
 } from './service.js';
 import { processBuffer } from './vendor/squoosh/image-pool.js';
 import type { Operation } from './vendor/squoosh/image.js';
 
 const baseQuality = { low: 25, mid: 50, high: 80, max: 100 };
 const qualityTable: Record<
-	Exclude<ImageOutputFormat, 'png'>,
+	Exclude<ImageOutputFormat, 'png' | 'svg'>,
 	Record<ImageQualityPreset, number>
 > = {
 	avif: {
@@ -28,28 +29,62 @@ const qualityTable: Record<
 	// Squoosh's PNG encoder does not support a quality setting, so we can skip that here
 };
 
+async function getRotationForEXIF(
+	inputBuffer: Uint8Array,
+	src?: string
+): Promise<Operation | undefined> {
+	const meta = await imageMetadata(inputBuffer, src);
+	if (!meta) return undefined;
+
+	// EXIF orientations are a bit hard to read, but the numbers are actually standard. See https://exiftool.org/TagNames/EXIF.html for a list.
+	// Various illustrations can also be found online for a more graphic representation, it's a bit old school.
+	switch (meta.orientation) {
+		case 3:
+		case 4:
+			return { type: 'rotate', numRotations: 2 };
+		case 5:
+		case 6:
+			return { type: 'rotate', numRotations: 1 };
+		case 7:
+		case 8:
+			return { type: 'rotate', numRotations: 3 };
+		default:
+			return undefined;
+	}
+}
+
 const service: LocalImageService = {
 	validateOptions: baseService.validateOptions,
 	getURL: baseService.getURL,
 	parseURL: baseService.parseURL,
 	getHTMLAttributes: baseService.getHTMLAttributes,
+	getSrcSet: baseService.getSrcSet,
 	async transform(inputBuffer, transformOptions) {
 		const transform: BaseServiceTransform = transformOptions as BaseServiceTransform;
 
-		let format = transform.format!;
+		let format = transform.format;
+
+		// Return SVGs as-is
+		if (format === 'svg') return { data: inputBuffer, format: 'svg' };
 
 		const operations: Operation[] = [];
+
+		const rotation = await getRotationForEXIF(inputBuffer, transform.src);
+
+		if (rotation) {
+			operations.push(rotation);
+		}
 
 		// Never resize using both width and height at the same time, prioritizing width.
 		if (transform.height && !transform.width) {
 			operations.push({
 				type: 'resize',
-				height: transform.height,
+				height: Math.round(transform.height),
 			});
 		} else if (transform.width) {
 			operations.push({
 				type: 'resize',
-				width: transform.width,
+				width: Math.round(transform.width),
 			});
 		}
 

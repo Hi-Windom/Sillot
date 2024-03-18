@@ -1,4 +1,4 @@
-import type { SSRResult } from '../../../@types/astro';
+import type { SSRResult } from '../../../@types/astro.js';
 
 import { markHTMLString } from '../escape.js';
 import { renderSlotToString } from './slot.js';
@@ -13,7 +13,7 @@ export async function renderHTMLElement(
 	constructor: typeof HTMLElement,
 	props: any,
 	slots: any
-) {
+): Promise<string> {
 	const name = getHTMLElementName(constructor);
 
 	let attrHTML = '';

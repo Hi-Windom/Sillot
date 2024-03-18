@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-/* eslint-disable no-console */
 'use strict';
 
 // ISOMORPHIC FILE: NO TOP-LEVEL IMPORT/REQUIRE() ALLOWED
 // This file has to run as both ESM and CJS on older Node.js versions
-// Needed for Stackblitz: https://github.com/stackblitz/webcontainer-core/issues/281
 
 const CI_INSTRUCTIONS = {
 	NETLIFY: 'https://docs.netlify.com/configure-builds/manage-dependencies/#node-js-and-javascript',
@@ -14,16 +12,16 @@ const CI_INSTRUCTIONS = {
 };
 
 // Hardcode supported Node.js version so we don't have to read differently in CJS & ESM.
-const engines = '>=16.12.0';
-const skipSemverCheckIfAbove = 16;
+const engines = '>=18.14.1';
+const skipSemverCheckIfAbove = 19;
 
 /** `astro *` */
 async function main() {
 	const version = process.versions.node;
 	// Fast-path for higher Node.js versions
 	if ((parseInt(version) || 0) <= skipSemverCheckIfAbove) {
+		const semver = await import('semver');
 		try {
-			const semver = await import('semver');
 			if (!semver.satisfies(version, engines)) {
 				await errorNodeUnsupported();
 				return;
@@ -32,6 +30,13 @@ async function main() {
 			await errorNodeUnsupported();
 			return;
 		}
+	}
+
+	// windows drive letters can sometimes be lowercase, which vite cannot process
+	if (process.platform === 'win32') {
+		const cwd = process.cwd();
+		const correctedCwd = cwd.slice(0, 1).toUpperCase() + cwd.slice(1);
+		if (correctedCwd !== cwd) process.chdir(correctedCwd);
 	}
 
 	return import('./dist/cli/index.js')
@@ -62,7 +67,7 @@ Please upgrade Node.js to a supported version: "${engines}"\n`);
 		console.log(
 			`${ci.name} CI Environment Detected!\nAdditional steps may be needed to set your Node.js version:`
 		);
-		console.log(`Documentation: https://docs.astro.build/guides/deploy`);
+		console.log(`Documentation: https://docs.astro.build/en/guides/deploy/`);
 		if (CI_INSTRUCTIONS[platform]) {
 			console.log(`${ci.name} Documentation: ${CI_INSTRUCTIONS[platform]}`);
 		}

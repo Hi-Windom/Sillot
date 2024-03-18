@@ -1,7 +1,7 @@
+import os from 'node:os';
 import { isCI, name as ciName } from 'ci-info';
 import isDocker from 'is-docker';
 import isWSL from 'is-wsl';
-import os from 'node:os';
 
 /**
  * Astro Telemetry -- System Info
@@ -39,6 +39,7 @@ export type SystemInfo = {
 	cpuSpeed: number | null;
 	memoryInMb: number;
 	isDocker: boolean;
+	isTTY: boolean;
 	isWSL: boolean;
 	isCI: boolean;
 	ciName: string | null;
@@ -52,7 +53,8 @@ export function getSystemInfo(versions: { viteVersion: string; astroVersion: str
 	}
 
 	const cpus = os.cpus() || [];
-	meta = {
+
+	return {
 		// Version information
 		nodeVersion: process.version.replace(/^v?/, ''),
 		viteVersion: versions.viteVersion,
@@ -68,10 +70,9 @@ export function getSystemInfo(versions: { viteVersion: string; astroVersion: str
 		memoryInMb: Math.trunc(os.totalmem() / Math.pow(1024, 2)),
 		// Environment information
 		isDocker: isDocker(),
+		isTTY: process.stdout.isTTY,
 		isWSL,
 		isCI,
 		ciName,
 	};
-
-	return meta!;
 }

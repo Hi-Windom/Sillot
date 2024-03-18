@@ -1,6 +1,6 @@
-import type { DiagnosticCode } from '@astrojs/compiler/shared/diagnostics.js';
+import type { YAMLException } from 'js-yaml';
+import type { ErrorPayload as ViteErrorPayload } from 'vite';
 import type { SSRError } from '../../@types/astro.js';
-import { AstroErrorData, type AstroErrorCodes, type ErrorData } from './errors-data.js';
 
 /**
  * Get the line and character based on the offset
@@ -71,16 +71,30 @@ function getLineOffsets(text: string) {
 	return lineOffsets;
 }
 
+export function isYAMLException(err: unknown): err is YAMLException {
+	return err instanceof Error && err.name === 'YAMLException';
+}
+
+/** Format YAML exceptions as Vite errors */
+export function formatYAMLException(e: YAMLException): ViteErrorPayload['err'] {
+	return {
+		name: e.name,
+		id: e.mark.name,
+		loc: { file: e.mark.name, line: e.mark.line + 1, column: e.mark.column },
+		message: e.reason,
+		stack: e.stack ?? '',
+	};
+}
+
 /** Coalesce any throw variable to an Error instance. */
 export function createSafeError(err: any): Error {
-	if (err instanceof Error || (err && err.name && err.message)) {
+	if (err instanceof Error || (err?.name && err.message)) {
 		return err;
 	} else {
 		const error = new Error(JSON.stringify(err));
 
-		(
-			error as SSRError
-		).hint = `To get as much information as possible from your errors, make sure to throw Error objects instead of \`${typeof err}\`. See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error for more information.`;
+		(error as SSRError).hint =
+			`To get as much information as possible from your errors, make sure to throw Error objects instead of \`${typeof err}\`. See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error for more information.`;
 
 		return error;
 	}
@@ -88,15 +102,4 @@ export function createSafeError(err: any): Error {
 
 export function normalizeLF(code: string) {
 	return code.replace(/\r\n|\r(?!\n)|\n/g, '\n');
-}
-
-export function getErrorDataByCode(code: AstroErrorCodes | DiagnosticCode) {
-	const entry = Object.entries(AstroErrorData).find((data) => data[1].code === code);
-
-	if (entry) {
-		return {
-			name: entry[0],
-			data: entry[1] as ErrorData,
-		};
-	}
 }

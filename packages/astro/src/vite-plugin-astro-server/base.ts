@@ -1,15 +1,17 @@
 import type * as vite from 'vite';
-import type { AstroSettings } from '../@types/astro';
+import type { AstroSettings } from '../@types/astro.js';
 
-import * as fs from 'fs';
-import { warn, type LogOptions } from '../core/logger/core.js';
+import * as fs from 'node:fs';
+import path from 'node:path';
+import { appendForwardSlash } from '@astrojs/internal-helpers/path';
+import { bold } from 'kleur/colors';
+import type { Logger } from '../core/logger/core.js';
 import notFoundTemplate, { subpathNotUsedTemplate } from '../template/4xx.js';
-import { log404 } from './common.js';
 import { writeHtmlResponse } from './response.js';
 
 export function baseMiddleware(
 	settings: AstroSettings,
-	logging: LogOptions
+	logger: Logger
 ): vite.Connect.NextHandleFunction {
 	const { config } = settings;
 	const site = config.site ? new URL(config.base, config.site) : undefined;
@@ -20,7 +22,13 @@ export function baseMiddleware(
 	return function devBaseMiddleware(req, res, next) {
 		const url = req.url!;
 
-		const pathname = decodeURI(new URL(url, 'http://localhost').pathname);
+		let pathname: string;
+		try {
+			pathname = decodeURI(new URL(url, 'http://localhost').pathname);
+		} catch (e) {
+			/* malform uri */
+			return next(e);
+		}
 
 		if (pathname.startsWith(devRoot)) {
 			req.url = url.replace(devRoot, devRootReplacement);
@@ -28,13 +36,11 @@ export function baseMiddleware(
 		}
 
 		if (pathname === '/' || pathname === '/index.html') {
-			log404(logging, pathname);
 			const html = subpathNotUsedTemplate(devRoot, pathname);
 			return writeHtmlResponse(res, 404, html);
 		}
 
 		if (req.headers.accept?.includes('text/html')) {
-			log404(logging, pathname);
 			const html = notFoundTemplate({
 				statusCode: 404,
 				title: 'Not found',
@@ -48,16 +54,19 @@ export function baseMiddleware(
 		const publicPath = new URL('.' + req.url, config.publicDir);
 		fs.stat(publicPath, (_err, stats) => {
 			if (stats) {
-				const expectedLocation = new URL('.' + url, devRootURL).pathname;
-				warn(
-					logging,
-					'dev',
-					`Requests for items in your public folder must also include your base. ${url} should be ${expectedLocation}. Omitting the base will break in production.`
+				const publicDir = appendForwardSlash(
+					path.posix.relative(config.root.pathname, config.publicDir.pathname)
 				);
-				res.writeHead(301, {
-					Location: expectedLocation,
-				});
-				res.end();
+				const expectedLocation = new URL(devRootURL.pathname + url, devRootURL).pathname;
+
+				logger.error(
+					'router',
+					`Request URLs for ${bold(
+						publicDir
+					)} assets must also include your base. "${expectedLocation}" expected, but received "${url}".`
+				);
+				const html = subpathNotUsedTemplate(devRoot, pathname);
+				return writeHtmlResponse(res, 404, html);
 			} else {
 				next();
 			}

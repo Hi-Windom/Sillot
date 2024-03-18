@@ -1,16 +1,14 @@
 export const prerender = true;
 
 export async function getStaticPaths() {
-    return [
+	return [
         { params: { slug: 'thing1' } },
         { params: { slug: 'thing2' } }
     ];
 }
 
-export async function get() {
-    return {
-        body: JSON.stringify({
-            title: '[slug]'
-        }, null, 4)
-    };
+export async function GET() {
+	return Response.json({
+		title: '[slug]',
+	});
 }

@@ -1,6 +1,5 @@
-import mdx from '@astrojs/mdx';
-
-import { expect } from 'chai';
+import * as assert from 'node:assert/strict';
+import { after, before, describe, it } from 'node:test';
 import { parseHTML } from 'linkedom';
 import { loadFixture } from '../../../astro/test/test-utils.js';
 
@@ -10,6 +9,8 @@ describe('MDX Page', () => {
 	before(async () => {
 		fixture = await loadFixture({
 			root: new URL('./fixtures/mdx-page/', import.meta.url),
+			// test suite was authored when inlineStylesheets defaulted to never
+			build: { inlineStylesheets: 'never' },
 		});
 	});
 
@@ -24,7 +25,7 @@ describe('MDX Page', () => {
 
 			const h1 = document.querySelector('h1');
 
-			expect(h1.textContent).to.equal('Hello page!');
+			assert.equal(h1.textContent, 'Hello page!');
 		});
 
 		it('injects style imports when layout is not applied', async () => {
@@ -33,7 +34,7 @@ describe('MDX Page', () => {
 
 			const stylesheet = document.querySelector('link[rel="stylesheet"]');
 
-			expect(stylesheet).to.not.be.null;
+			assert.notEqual(stylesheet, null);
 		});
 	});
 
@@ -51,14 +52,14 @@ describe('MDX Page', () => {
 		it('works', async () => {
 			const res = await fixture.fetch('/');
 
-			expect(res.status).to.equal(200);
+			assert.equal(res.status, 200);
 
 			const html = await res.text();
 			const { document } = parseHTML(html);
 
 			const h1 = document.querySelector('h1');
 
-			expect(h1.textContent).to.equal('Hello page!');
+			assert.equal(h1.textContent, 'Hello page!');
 		});
 	});
 });

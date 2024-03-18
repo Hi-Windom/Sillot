@@ -1,44 +1,40 @@
+import { createRequire } from 'module';
+import * as fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { PartytownConfig } from '@builder.io/partytown/integration';
 import { partytownSnippet } from '@builder.io/partytown/integration';
 import { copyLibFiles, libDirPath } from '@builder.io/partytown/utils';
-import type { AstroConfig, AstroIntegration } from 'astro';
-import * as fs from 'fs';
-import { createRequire } from 'module';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import type { AstroIntegration } from 'astro';
 import sirv from './sirv.js';
 const resolve = createRequire(import.meta.url).resolve;
 
-type PartytownOptions =
-	| {
-			config?: PartytownConfig;
-	  }
-	| undefined;
+export type PartytownOptions = {
+	config?: PartytownConfig;
+};
 
 function appendForwardSlash(str: string) {
 	return str.endsWith('/') ? str : str + '/';
 }
 
-export default function createPlugin(options: PartytownOptions): AstroIntegration {
-	let config: AstroConfig;
+export default function createPlugin(options?: PartytownOptions): AstroIntegration {
 	let partytownSnippetHtml: string;
 	const partytownEntrypoint = resolve('@builder.io/partytown/package.json');
 	const partytownLibDirectory = path.resolve(partytownEntrypoint, '../lib');
+	const SELF_DESTRUCT_ON_VIEW_TRANSITION = `;((d,s)=>(s=d.currentScript,d.addEventListener('astro:before-swap',()=>s.remove(),{once:true})))(document);`;
 	return {
 		name: '@astrojs/partytown',
 		hooks: {
 			'astro:config:setup': ({ config: _config, command, injectScript }) => {
 				const lib = `${appendForwardSlash(_config.base)}~partytown/`;
 				const partytownConfig = {
-					...options?.config,
 					lib,
+					...options?.config,
 					debug: options?.config?.debug ?? command === 'dev',
 				};
 				partytownSnippetHtml = partytownSnippet(partytownConfig);
+				partytownSnippetHtml += SELF_DESTRUCT_ON_VIEW_TRANSITION;
 				injectScript('head-inline', partytownSnippetHtml);
-			},
-			'astro:config:done': ({ config: _config }) => {
-				config = _config;
 			},
 			'astro:server:setup': ({ server }) => {
 				const lib = `/~partytown/`;

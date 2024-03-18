@@ -1,17 +1,25 @@
-import { Component as BaseComponent, h } from 'preact';
-import render from 'preact-render-to-string';
+import type { AstroComponentMetadata } from 'astro';
+import { Component as BaseComponent, type VNode, h } from 'preact';
+import { render } from 'preact-render-to-string';
+import prepass from 'preact-ssr-prepass';
 import { getContext } from './context.js';
 import { restoreSignalsOnProps, serializeSignals } from './signals.js';
 import StaticHtml from './static-html.js';
-import type { AstroPreactAttrs, RendererContext } from './types';
+import type { AstroPreactAttrs, RendererContext } from './types.js';
 
 const slotName = (str: string) => str.trim().replace(/[-_]([a-z])/g, (_, w) => w.toUpperCase());
 
 let originalConsoleError: typeof console.error;
 let consoleFilterRefs = 0;
 
-function check(this: RendererContext, Component: any, props: Record<string, any>, children: any) {
+async function check(
+	this: RendererContext,
+	Component: any,
+	props: Record<string, any>,
+	children: any
+) {
 	if (typeof Component !== 'function') return false;
+	if (Component.name === 'QwikComponent') return false;
 
 	if (Component.prototype != null && typeof Component.prototype.render === 'function') {
 		return BaseComponent.isPrototypeOf(Component);
@@ -21,15 +29,15 @@ function check(this: RendererContext, Component: any, props: Record<string, any>
 
 	try {
 		try {
-			const { html } = renderToStaticMarkup.call(this, Component, props, children);
+			const { html } = await renderToStaticMarkup.call(this, Component, props, children, undefined);
 			if (typeof html !== 'string') {
 				return false;
 			}
 
 			// There are edge cases (SolidJS) where Preact *might* render a string,
 			// but components would be <undefined></undefined>
-
-			return !/\<undefined\>/.test(html);
+			// It also might render an empty sting.
+			return html == '' ? false : !/<undefined>/.test(html);
 		} catch (err) {
 			return false;
 		}
@@ -38,18 +46,28 @@ function check(this: RendererContext, Component: any, props: Record<string, any>
 	}
 }
 
-function renderToStaticMarkup(
+function shouldHydrate(metadata: AstroComponentMetadata | undefined) {
+	// Adjust how this is hydrated only when the version of Astro supports `astroStaticSlot`
+	return metadata?.astroStaticSlot ? !!metadata.hydrate : true;
+}
+
+async function renderToStaticMarkup(
 	this: RendererContext,
 	Component: any,
 	props: Record<string, any>,
-	{ default: children, ...slotted }: Record<string, any>
+	{ default: children, ...slotted }: Record<string, any>,
+	metadata: AstroComponentMetadata | undefined
 ) {
 	const ctx = getContext(this.result);
 
 	const slots: Record<string, ReturnType<typeof h>> = {};
 	for (const [key, value] of Object.entries(slotted)) {
 		const name = slotName(key);
-		slots[name] = h(StaticHtml, { value, name });
+		slots[name] = h(StaticHtml, {
+			hydrate: shouldHydrate(metadata),
+			value,
+			name,
+		}) as VNode<any>;
 	}
 
 	// Restore signals back onto props so that they will be passed as-is to components
@@ -60,13 +78,20 @@ function renderToStaticMarkup(
 	const attrs: AstroPreactAttrs = {};
 	serializeSignals(ctx, props, attrs, propsMap);
 
-	const html = render(
-		h(Component, newProps, children != null ? h(StaticHtml, { value: children }) : children)
+	const vNode: VNode<any> = h(
+		Component,
+		newProps,
+		children != null
+			? h(StaticHtml, {
+					hydrate: shouldHydrate(metadata),
+					value: children,
+				})
+			: children
 	);
-	return {
-		attrs,
-		html,
-	};
+
+	await prepass(vNode);
+	const html = render(vNode);
+	return { attrs, html };
 }
 
 /**
@@ -81,11 +106,9 @@ function useConsoleFilter() {
 	consoleFilterRefs++;
 
 	if (!originalConsoleError) {
-		// eslint-disable-next-line no-console
 		originalConsoleError = console.error;
 
 		try {
-			// eslint-disable-next-line no-console
 			console.error = filteredConsoleError;
 		} catch (error) {
 			// If we're unable to hook `console.error`, just accept it
@@ -127,4 +150,5 @@ function filteredConsoleError(msg: string, ...rest: any[]) {
 export default {
 	check,
 	renderToStaticMarkup,
+	supportsAstroStaticSlot: true,
 };

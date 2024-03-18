@@ -1,10 +1,9 @@
-import { h, createSSRApp, createApp, Suspense } from 'vue';
-import { setup } from 'virtual:@astrojs/vue/app';
+import { Suspense, createApp, createSSRApp, h } from 'vue';
 import StaticHtml from './static-html.js';
+import { setup } from 'virtual:@astrojs/vue/app';
 
 export default (element) =>
 	async (Component, props, slotted, { client }) => {
-		delete props['class'];
 		if (!element.hasAttribute('ssr')) return;
 
 		// Expose name on host component for Vue devtools
@@ -14,22 +13,24 @@ export default (element) =>
 			slots[key] = () => h(StaticHtml, { value, name: key === 'default' ? undefined : key });
 		}
 
-		let content = h(Component, props, slots);
-		// related to https://github.com/withastro/astro/issues/6549
-		// if the component is async, wrap it in a Suspense component
-		if (isAsync(Component.setup)) {
-			content = h(Suspense, null, content);
-		}
+		const isHydrate = client !== 'only';
+		const bootstrap = isHydrate ? createSSRApp : createApp;
+		const app = bootstrap({
+			name,
+			render() {
+				let content = h(Component, props, slots);
+				// related to https://github.com/withastro/astro/issues/6549
+				// if the component is async, wrap it in a Suspense component
+				if (isAsync(Component.setup)) {
+					content = h(Suspense, null, content);
+				}
+				return content;
+			},
+		});
+		await setup(app);
+		app.mount(element, isHydrate);
 
-		if (client === 'only') {
-			const app = createApp({ name, render: () => content });
-			await setup(app);
-			app.mount(element, false);
-		} else {
-			const app = createSSRApp({ name, render: () => content });
-			await setup(app);
-			app.mount(element, true);
-		}
+		element.addEventListener('astro:unmount', () => app.unmount(), { once: true });
 	};
 
 function isAsync(fn) {

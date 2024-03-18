@@ -1,77 +1,61 @@
+import { fileURLToPath } from 'node:url';
 import type { CreatePreviewServer } from 'astro';
-import type http from 'http';
-import { fileURLToPath } from 'url';
-import { createServer } from './http-server.js';
-import type { createExports } from './server';
+import { AstroError } from 'astro/errors';
+import { logListeningOn } from './log-listening-on.js';
+import type { createExports } from './server.js';
+import { createServer } from './standalone.js';
 
-const preview: CreatePreviewServer = async function ({
-	client,
-	serverEntrypoint,
-	host,
-	port,
-	base,
-}) {
-	type ServerModule = ReturnType<typeof createExports>;
-	type MaybeServerModule = Partial<ServerModule>;
+type ServerModule = ReturnType<typeof createExports>;
+type MaybeServerModule = Partial<ServerModule>;
+
+const createPreviewServer: CreatePreviewServer = async function (preview) {
 	let ssrHandler: ServerModule['handler'];
+	let options: ServerModule['options'];
 	try {
 		process.env.ASTRO_NODE_AUTOSTART = 'disabled';
-		const ssrModule: MaybeServerModule = await import(serverEntrypoint.toString());
+		const ssrModule: MaybeServerModule = await import(preview.serverEntrypoint.toString());
 		if (typeof ssrModule.handler === 'function') {
 			ssrHandler = ssrModule.handler;
+			options = ssrModule.options!;
 		} else {
-			throw new Error(
+			throw new AstroError(
 				`The server entrypoint doesn't have a handler. Are you sure this is the right file?`
 			);
 		}
 	} catch (err) {
 		if ((err as any).code === 'ERR_MODULE_NOT_FOUND') {
-			throw new Error(
+			throw new AstroError(
 				`The server entrypoint ${fileURLToPath(
-					serverEntrypoint
+					preview.serverEntrypoint
 				)} does not exist. Have you ran a build yet?`
 			);
 		} else {
 			throw err;
 		}
 	}
+	const host = preview.host ?? 'localhost';
+	const port = preview.port ?? 4321;
+	const server = createServer(ssrHandler, host, port);
 
-	const handler: http.RequestListener = (req, res) => {
-		ssrHandler(req, res, (ssrErr: any) => {
-			if (ssrErr) {
-				res.writeHead(500);
-				res.end(ssrErr.toString());
-			} else {
-				res.writeHead(404);
-				res.end();
+	// If user specified custom headers append a listener
+	// to the server to add those headers to response
+	if (preview.headers) {
+		server.server.addListener('request', (_, res) => {
+			if (res.statusCode === 200) {
+				for (const [name, value] of Object.entries(preview.headers ?? {})) {
+					if (value) res.setHeader(name, value);
+				}
 			}
 		});
-	};
-
-	const baseWithoutTrailingSlash: string = base.endsWith('/')
-		? base.slice(0, base.length - 1)
-		: base;
-	function removeBase(pathname: string): string {
-		if (pathname.startsWith(base)) {
-			return pathname.slice(baseWithoutTrailingSlash.length);
-		}
-		return pathname;
 	}
 
-	const server = createServer(
-		{
-			client,
-			port,
-			host,
-			removeBase,
-		},
-		handler
-	);
-
-	// eslint-disable-next-line no-console
-	console.log(`Preview server listening on http://${host}:${port}`);
-
+	logListeningOn(preview.logger, server.server, options);
+	await new Promise<void>((resolve, reject) => {
+		server.server.once('listening', resolve);
+		server.server.once('error', reject);
+		server.server.listen(port, host);
+	});
 	return server;
 };
 
-export { preview as default };
+export { createPreviewServer as default };

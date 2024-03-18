@@ -1,6 +1,6 @@
 # Astro Starter Kit: Blog
 
-```
+```sh
 npm create astro@latest -- --template blog
 ```
 
@@ -10,8 +10,7 @@ npm create astro@latest -- --template blog
 
 > 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
 
-
-![blog](https://user-images.githubusercontent.com/4677417/186189140-4ef17aac-c3c9-4918-a8c2-ce86ba1bb394.png)
+![blog](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
 
 Features:
 
@@ -26,7 +25,7 @@ Features:
 
 Inside of your Astro project, you'll see the following folders and files:
 
-```
+```text
 ├── public/
 ├── src/
 │   ├── components/
@@ -54,7 +53,7 @@ All commands are run from the root of the project, from a terminal:
 | Command                   | Action                                           |
 | :------------------------ | :----------------------------------------------- |
 | `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:3000`      |
+| `npm run dev`             | Starts local dev server at `localhost:4321`      |
 | `npm run build`           | Build your production site to `./dist/`          |
 | `npm run preview`         | Preview your build locally, before deploying     |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |

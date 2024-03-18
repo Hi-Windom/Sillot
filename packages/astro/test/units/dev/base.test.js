@@ -1,7 +1,7 @@
-import { expect } from 'chai';
-
-import { runInContainer } from '../../../dist/core/dev/index.js';
-import { createFs, createRequestAndResponse } from '../test-utils.js';
+import * as assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
+import { createFs, createRequestAndResponse, runInContainer } from '../test-utils.js';
 
 const root = new URL('../../fixtures/alias/', import.meta.url);
 
@@ -19,8 +19,8 @@ describe('base configuration', () => {
 				await runInContainer(
 					{
 						fs,
-						root,
-						userConfig: {
+						inlineConfig: {
+							root: fileURLToPath(root),
 							base: '/docs',
 							trailingSlash: 'never',
 						},
@@ -32,7 +32,7 @@ describe('base configuration', () => {
 						});
 						container.handle(req, res);
 						await done;
-						expect(res.statusCode).to.equal(404);
+						assert.equal(res.statusCode, 404);
 					}
 				);
 			});
@@ -48,8 +48,8 @@ describe('base configuration', () => {
 				await runInContainer(
 					{
 						fs,
-						root,
-						userConfig: {
+						inlineConfig: {
+							root: fileURLToPath(root),
 							base: '/docs',
 							trailingSlash: 'never',
 						},
@@ -61,7 +61,7 @@ describe('base configuration', () => {
 						});
 						container.handle(req, res);
 						await done;
-						expect(res.statusCode).to.equal(200);
+						assert.equal(res.statusCode, 200);
 					}
 				);
 			});
@@ -79,8 +79,8 @@ describe('base configuration', () => {
 				await runInContainer(
 					{
 						fs,
-						root,
-						userConfig: {
+						inlineConfig: {
+							root: fileURLToPath(root),
 							base: '/docs',
 							trailingSlash: 'never',
 						},
@@ -92,7 +92,7 @@ describe('base configuration', () => {
 						});
 						container.handle(req, res);
 						await done;
-						expect(res.statusCode).to.equal(404);
+						assert.equal(res.statusCode, 404);
 					}
 				);
 			});
@@ -108,8 +108,8 @@ describe('base configuration', () => {
 				await runInContainer(
 					{
 						fs,
-						root,
-						userConfig: {
+						inlineConfig: {
+							root: fileURLToPath(root),
 							base: '/docs',
 							trailingSlash: 'never',
 						},
@@ -121,7 +121,7 @@ describe('base configuration', () => {
 						});
 						container.handle(req, res);
 						await done;
-						expect(res.statusCode).to.equal(200);
+						assert.equal(res.statusCode, 200);
 					}
 				);
 			});

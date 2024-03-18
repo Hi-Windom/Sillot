@@ -1,34 +1,24 @@
-import fs from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { AstroError, AstroErrorData } from '../../core/errors/index.js';
 import type { ImageInputFormat, ImageMetadata } from '../types.js';
-import imageSize from '../vendor/image-size/index.js';
-
-export interface Metadata extends ImageMetadata {
-	orientation?: number;
-}
+import { lookup as probe } from '../utils/vendor/image-size/lookup.js';
 
 export async function imageMetadata(
-	src: URL | string,
-	data?: Buffer
-): Promise<Metadata | undefined> {
-	let file = data;
-	if (!file) {
-		try {
-			file = await fs.readFile(src);
-		} catch (e) {
-			return undefined;
-		}
+	data: Uint8Array,
+	src?: string
+): Promise<Omit<ImageMetadata, 'src' | 'fsPath'>> {
+	const result = probe(data);
+
+	if (!result.height || !result.width || !result.type) {
+		throw new AstroError({
+			...AstroErrorData.NoImageMetadata,
+			message: AstroErrorData.NoImageMetadata.message(src),
+		});
 	}
 
-	const { width, height, type, orientation } = imageSize(file);
+	const { width, height, type, orientation } = result;
 	const isPortrait = (orientation || 0) >= 5;
 
-	if (!width || !height || !type) {
-		return undefined;
-	}
-
 	return {
-		src: fileURLToPath(src),
 		width: isPortrait ? height : width,
 		height: isPortrait ? width : height,
 		format: type as ImageInputFormat,

@@ -17,10 +17,10 @@ function check(Component, props, children) {
 	// Note: there are packages that do some unholy things to create "components".
 	// Checking the $$typeof property catches most of these patterns.
 	if (typeof Component === 'object') {
-		const $$typeof = Component['$$typeof'];
-		return $$typeof && $$typeof.toString().slice('Symbol('.length).startsWith('react');
+		return Component['$$typeof']?.toString().slice('Symbol('.length).startsWith('react');
 	}
 	if (typeof Component !== 'function') return false;
+	if (Component.name === 'QwikComponent') return false;
 
 	if (Component.prototype != null && typeof Component.prototype.render === 'function') {
 		return React.Component.isPrototypeOf(Component) || React.PureComponent.isPrototypeOf(Component);
@@ -65,11 +65,15 @@ function renderToStaticMarkup(Component, props, { default: children, ...slotted 
 	};
 	const newChildren = children ?? props.children;
 	if (newChildren != null) {
-		newProps.children = React.createElement(StaticHtml, { value: newChildren });
+		newProps.children = React.createElement(StaticHtml, {
+			// Adjust how this is hydrated only when the version of Astro supports `astroStaticSlot`
+			hydrate: metadata.astroStaticSlot ? !!metadata.hydrate : true,
+			value: newChildren,
+		});
 	}
 	const vnode = React.createElement(Component, newProps);
 	let html;
-	if (metadata && metadata.hydrate) {
+	if (metadata?.hydrate) {
 		html = ReactDOM.renderToString(vnode);
 	} else {
 		html = ReactDOM.renderToStaticMarkup(vnode);
@@ -80,4 +84,5 @@ function renderToStaticMarkup(Component, props, { default: children, ...slotted 
 export default {
 	check,
 	renderToStaticMarkup,
+	supportsAstroStaticSlot: true,
 };

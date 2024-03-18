@@ -1,17 +1,19 @@
+import * as assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { pathToFileURL } from 'node:url';
 import { resolveConfig } from 'vite';
-import { expect } from 'chai';
-import { cachedCompilation } from '../../../dist/core/compile/index.js';
+import { compile } from '../../../dist/core/compile/index.js';
 import { AggregateError } from '../../../dist/core/errors/index.js';
-import { pathToFileURL } from 'url';
 
 describe('astro/src/core/compile', () => {
 	describe('Invalid CSS', () => {
 		it('throws an aggregate error with the errors', async () => {
 			let error;
 			try {
-				let r = await cachedCompilation({
+				await compile({
 					astroConfig: {
 						root: pathToFileURL('/'),
+						experimental: {},
 					},
 					viteConfig: await resolveConfig({ configFile: false }, 'serve'),
 					filename: '/src/pages/index.astro',
@@ -34,8 +36,8 @@ describe('astro/src/core/compile', () => {
 				error = err;
 			}
 
-			expect(error).to.be.an.instanceOf(AggregateError);
-			expect(error.errors[0].message).to.contain('expected ")"');
+			assert.equal(error instanceof AggregateError, true);
+			assert.equal(error.errors[0].message.includes('expected ")"'), true);
 		});
 	});
 });

@@ -1,14 +1,19 @@
-/* eslint no-console: 'off' */
-import type { Context } from './context';
+import type { Context } from './context.js';
 
-import { color } from '@astrojs/cli-kit';
-import { downloadTemplate } from 'giget';
 import fs from 'node:fs';
 import path from 'node:path';
-import { error, info, spinner, title } from '../messages.js';
+import { color } from '@astrojs/cli-kit';
+import { downloadTemplate } from 'giget';
+import { error, info, title } from '../messages.js';
 
-export async function template(ctx: Pick<Context, 'template' | 'prompt' | 'dryRun' | 'exit'>) {
-	if (!ctx.template) {
+export async function template(
+	ctx: Pick<Context, 'template' | 'prompt' | 'yes' | 'dryRun' | 'exit' | 'tasks'>
+) {
+	if (!ctx.template && ctx.yes) ctx.template = 'basics';
+
+	if (ctx.template) {
+		await info('tmpl', `Using ${color.reset(ctx.template)}${color.dim(' as project template')}`);
+	} else {
 		const { template: tmpl } = await ctx.prompt({
 			name: 'template',
 			type: 'select',
@@ -22,19 +27,17 @@ export async function template(ctx: Pick<Context, 'template' | 'prompt' | 'dryRu
 			],
 		});
 		ctx.template = tmpl;
-	} else {
-		await info('tmpl', `Using ${color.reset(ctx.template)}${color.dim(' as project template')}`);
 	}
 
 	if (ctx.dryRun) {
 		await info('--dry-run', `Skipping template copying`);
 	} else if (ctx.template) {
-		await spinner({
+		ctx.tasks.push({
+			pending: 'Template',
 			start: 'Template copying...',
 			end: 'Template copied',
 			while: () =>
 				copyTemplate(ctx.template!, ctx as Context).catch((e) => {
-					// eslint-disable-next-line no-console
 					if (e instanceof Error) {
 						error('error', e.message);
 						process.exit(1);
@@ -50,7 +53,7 @@ export async function template(ctx: Pick<Context, 'template' | 'prompt' | 'dryRu
 }
 
 // some files are only needed for online editors when using astro.new. Remove for create-astro installs.
-const FILES_TO_REMOVE = ['sandbox.config.json', 'CHANGELOG.md'];
+const FILES_TO_REMOVE = ['CHANGELOG.md', '.codesandbox'];
 const FILES_TO_UPDATE = {
 	'package.json': (file: string, overrides: { name: string }) =>
 		fs.promises.readFile(file, 'utf-8').then((value) => {
@@ -68,11 +71,18 @@ const FILES_TO_UPDATE = {
 		}),
 };
 
-export default async function copyTemplate(tmpl: string, ctx: Context) {
-	const ref = ctx.ref || 'latest';
+export function getTemplateTarget(tmpl: string, ref = 'latest') {
+	if (tmpl.startsWith('starlight')) {
+		const [, starter = 'basics'] = tmpl.split('/');
+		return `withastro/starlight/examples/${starter}`;
+	}
 	const isThirdParty = tmpl.includes('/');
+	if (isThirdParty) return tmpl;
+	return `github:withastro/astro/examples/${tmpl}#${ref}`;
+}
 
-	const templateTarget = isThirdParty ? tmpl : `github:withastro/astro/examples/${tmpl}#${ref}`;
+export default async function copyTemplate(tmpl: string, ctx: Context) {
+	const templateTarget = getTemplateTarget(tmpl, ctx.ref);
 
 	// Copy
 	if (!ctx.dryRun) {
@@ -84,7 +94,16 @@ export default async function copyTemplate(tmpl: string, ctx: Context) {
 				dir: '.',
 			});
 		} catch (err: any) {
-			fs.rmdirSync(ctx.cwd);
+			// Only remove the directory if it's most likely created by us.
+			if (ctx.cwd !== '.' && ctx.cwd !== './' && !ctx.cwd.startsWith('../')) {
+				try {
+					fs.rmdirSync(ctx.cwd);
+				} catch (_) {
+					// Ignore any errors from removing the directory,
+					// make sure we throw and display the original error.
+				}
+			}
+
 			if (err.message.includes('404')) {
 				throw new Error(`Template ${color.reset(tmpl)} ${color.dim('does not exist!')}`);
 			} else {

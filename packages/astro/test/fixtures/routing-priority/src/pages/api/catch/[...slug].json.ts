@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro';
 
-export const get: APIRoute = async ({ params }) => {
-  return {
-    body: JSON.stringify({
+export const GET: APIRoute = async ({ params }) => {
+  return new Response(
+    JSON.stringify({
       path: params.slug,
-    }),
-  };
+    })
+  );
 };
 
 export function getStaticPaths() {

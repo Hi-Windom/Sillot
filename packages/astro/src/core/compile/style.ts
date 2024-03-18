@@ -1,28 +1,35 @@
+import fs from 'node:fs';
 import type { TransformOptions } from '@astrojs/compiler';
-import fs from 'fs';
-import { preprocessCSS, type ResolvedConfig } from 'vite';
+import { type ResolvedConfig, normalizePath, preprocessCSS } from 'vite';
 import { AstroErrorData, CSSError, positionAt } from '../errors/index.js';
+import type { CompileCssResult } from './types.js';
+
+export type PartialCompileCssResult = Pick<CompileCssResult, 'isGlobal' | 'dependencies'>;
 
 export function createStylePreprocessor({
 	filename,
 	viteConfig,
-	cssDeps,
+	cssPartialCompileResults,
 	cssTransformErrors,
 }: {
 	filename: string;
 	viteConfig: ResolvedConfig;
-	cssDeps: Set<string>;
+	cssPartialCompileResults: Partial<CompileCssResult>[];
 	cssTransformErrors: Error[];
 }): TransformOptions['preprocessStyle'] {
+	let processedStylesCount = 0;
+
 	return async (content, attrs) => {
+		const index = processedStylesCount++;
 		const lang = `.${attrs?.lang || 'css'}`.toLowerCase();
-		const id = `${filename}?astro&type=style&lang${lang}`;
+		const id = `${filename}?astro&type=style&index=${index}&lang${lang}`;
 		try {
 			const result = await preprocessCSS(content, id, viteConfig);
 
-			result.deps?.forEach((dep) => {
-				cssDeps.add(dep);
-			});
+			cssPartialCompileResults[index] = {
+				isGlobal: !!attrs['is:global'],
+				dependencies: result.deps ? [...result.deps].map((dep) => normalizePath(dep)) : [],
+			};
 
 			let map: string | undefined;
 			if (result.map) {
@@ -36,7 +43,7 @@ export function createStylePreprocessor({
 			return { code: result.code, map };
 		} catch (err: any) {
 			try {
-				err = enhanceCSSError(err, filename);
+				err = enhanceCSSError(err, filename, content);
 			} catch {}
 			cssTransformErrors.push(err);
 			return { error: err + '' };
@@ -44,9 +51,9 @@ export function createStylePreprocessor({
 	};
 }
 
-function enhanceCSSError(err: any, filename: string) {
+function enhanceCSSError(err: any, filename: string, cssContent: string) {
 	const fileContent = fs.readFileSync(filename).toString();
-	const styleTagBeginning = fileContent.indexOf(err.input?.source ?? err.code);
+	const styleTagBeginning = fileContent.indexOf(cssContent);
 
 	// PostCSS Syntax Error
 	if (err.name === 'CssSyntaxError') {
@@ -88,7 +95,7 @@ function enhanceCSSError(err: any, filename: string) {
 	errorPosition.line += 1;
 
 	return new CSSError({
-		code: AstroErrorData.UnknownCSSError.code,
+		name: 'CSSError',
 		message: err.message,
 		location: {
 			file: filename,

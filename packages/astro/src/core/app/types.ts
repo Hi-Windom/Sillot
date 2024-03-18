@@ -1,14 +1,20 @@
-import type { MarkdownRenderingOptions } from '@astrojs/markdown-remark';
 import type {
-	ComponentInstance,
+	Locales,
+	MiddlewareHandler,
 	RouteData,
-	SerializedRouteData,
 	SSRComponentMetadata,
 	SSRLoadedRenderer,
 	SSRResult,
-} from '../../@types/astro';
+	SerializedRouteData,
+} from '../../@types/astro.js';
+import type { RoutingStrategies } from '../../i18n/utils.js';
+import type { SinglePageBuiltModule } from '../build/types.js';
 
 export type ComponentPath = string;
+
+export type StylesheetAsset =
+	| { type: 'inline'; content: string }
+	| { type: 'external'; src: string };
 
 export interface RouteInfo {
 	routeData: RouteData;
@@ -20,33 +26,61 @@ export interface RouteInfo {
 		// Hoisted
 		| { type: 'inline' | 'external'; value: string }
 	)[];
+	styles: StylesheetAsset[];
 }
 
 export type SerializedRouteInfo = Omit<RouteInfo, 'routeData'> & {
 	routeData: SerializedRouteData;
 };
 
-export interface SSRManifest {
+export type ImportComponentInstance = () => Promise<SinglePageBuiltModule>;
+
+export type AssetsPrefix =
+	| string
+	| ({
+			fallback: string;
+	  } & Record<string, string>)
+	| undefined;
+
+export type SSRManifest = {
 	adapterName: string;
 	routes: RouteInfo[];
 	site?: string;
-	base?: string;
-	assetsPrefix?: string;
-	markdown: MarkdownRenderingOptions;
-	pageMap: Map<ComponentPath, ComponentInstance>;
+	base: string;
+	trailingSlash: 'always' | 'never' | 'ignore';
+	buildFormat: 'file' | 'directory' | 'preserve';
+	compressHTML: boolean;
+	assetsPrefix?: AssetsPrefix;
 	renderers: SSRLoadedRenderer[];
+	/**
+	 * Map of directive name (e.g. `load`) to the directive script code
+	 */
+	clientDirectives: Map<string, string>;
 	entryModules: Record<string, string>;
+	inlinedScripts: Map<string, string>;
 	assets: Set<string>;
 	componentMetadata: SSRResult['componentMetadata'];
-}
+	pageModule?: SinglePageBuiltModule;
+	pageMap?: Map<ComponentPath, ImportComponentInstance>;
+	i18n: SSRManifestI18n | undefined;
+	middleware: MiddlewareHandler;
+};
 
-export type SerializedSSRManifest = Omit<SSRManifest, 'routes' | 'assets' | 'componentMetadata'> & {
+export type SSRManifestI18n = {
+	fallback?: Record<string, string>;
+	strategy: RoutingStrategies;
+	locales: Locales;
+	defaultLocale: string;
+	domainLookupTable: Record<string, string>;
+};
+
+export type SerializedSSRManifest = Omit<
+	SSRManifest,
+	'middleware' | 'routes' | 'assets' | 'componentMetadata' | 'inlinedScripts' | 'clientDirectives'
+> & {
 	routes: SerializedRouteInfo[];
 	assets: string[];
 	componentMetadata: [string, SSRComponentMetadata][];
+	inlinedScripts: [string, string][];
+	clientDirectives: [string, string][];
 };
-
-export type AdapterCreateExports<T = any> = (
-	manifest: SSRManifest,
-	args?: T
-) => Record<string, any>;

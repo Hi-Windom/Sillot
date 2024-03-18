@@ -1,12 +1,10 @@
 import fs from 'node:fs';
 
-export function get() {
-	return {
-		body: 'ok'
-	};
+export function GET() {
+	return new Response('ok')
 }
 
-export async function post({ request }) {
+export async function POST({ request }) {
 	const data = await request.formData();
 	const file = data.get('file');
 

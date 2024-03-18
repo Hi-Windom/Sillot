@@ -1,7 +1,7 @@
 {
   "name": "@astrojs/preact",
   "description": "Use Preact components within Astro",
-  "version": "2.1.0",
+  "version": "3.1.1",
   "type": "module",
   "types": "./dist/index.d.ts",
   "author": "withastro",
@@ -26,27 +26,35 @@
     "./server.js": "./dist/server.js",
     "./package.json": "./package.json"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "astro-scripts build \"src/**/*.ts\" && tsc",
     "build:ci": "astro-scripts build \"src/**/*.ts\"",
     "dev": "astro-scripts dev \"src/**/*.ts\""
   },
   "dependencies": {
-    "@babel/core": ">=7.0.0-0 <8.0.0",
-    "@babel/plugin-transform-react-jsx": "^7.17.12",
-    "babel-plugin-module-resolver": "^5.0.0",
-    "preact-render-to-string": "^5.2.4",
-    "@preact/signals": "^1.1.0"
+    "@babel/plugin-transform-react-jsx": "^7.22.5",
+    "@babel/plugin-transform-react-jsx-development": "^7.22.5",
+    "@preact/preset-vite": "^2.7.0",
+    "@preact/signals": "^1.2.1",
+    "babel-plugin-transform-hook-names": "^1.0.2",
+    "preact-render-to-string": "~6.3.1",
+    "preact-ssr-prepass": "^1.2.1"
   },
   "devDependencies": {
     "astro": "workspace:*",
     "astro-scripts": "workspace:*",
-    "preact": "^10.7.3"
+    "preact": "^10.19.2"
   },
   "peerDependencies": {
     "preact": "^10.6.5"
   },
   "engines": {
-    "node": ">=16.12.0"
+    "node": ">=18.14.1"
+  },
+  "publishConfig": {
+    "provenance": true
   }
 }

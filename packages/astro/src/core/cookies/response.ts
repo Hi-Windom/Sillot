@@ -1,9 +1,13 @@
-import type { AstroCookies } from './cookies';
+import { AstroCookies } from './cookies.js';
 
 const astroCookiesSymbol = Symbol.for('astro.cookies');
 
-export function attachToResponse(response: Response, cookies: AstroCookies) {
+export function attachCookiesToResponse(response: Response, cookies: AstroCookies) {
 	Reflect.set(response, astroCookiesSymbol, cookies);
+}
+
+export function responseHasCookies(response: Response): boolean {
+	return Reflect.has(response, astroCookiesSymbol);
 }
 
 function getFromResponse(response: Response): AstroCookies | undefined {
@@ -20,7 +24,7 @@ export function* getSetCookiesFromResponse(response: Response): Generator<string
 	if (!cookies) {
 		return [];
 	}
-	for (const headerValue of cookies.headers()) {
+	for (const headerValue of AstroCookies.consume(cookies)) {
 		yield headerValue;
 	}
 

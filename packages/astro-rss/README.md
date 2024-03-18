@@ -17,7 +17,7 @@ pnpm i @astrojs/rss
 
 ## Example usage
 
-The `@astrojs/rss` package provides helpers for generating RSS feeds within [Astro endpoints][astro-endpoints]. This unlocks both static builds _and_ on-demand generation when using an [SSR adapter](https://docs.astro.build/en/guides/server-side-rendering/#enabling-ssr-in-your-project).
+The `@astrojs/rss` package provides helpers for generating RSS feeds within [Astro endpoints][astro-endpoints]. This unlocks both static builds _and_ on-demand generation when using an [SSR adapter](https://docs.astro.build/en/guides/server-side-rendering/).
 
 For instance, say you need to generate an RSS feed for all posts under `src/content/blog/` using content collections.
 
@@ -28,7 +28,7 @@ Start by [adding a `site` to your project's `astro.config` for link generation](
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 
-export async function get(context) {
+export async function GET(context) {
   const posts = await getCollection('blog');
   return rss({
     title: 'Buzz’s Blog',
@@ -36,14 +36,14 @@ export async function get(context) {
     // Pull in your project "site" from the endpoint context
     // https://docs.astro.build/en/reference/api-reference/#contextsite
     site: context.site,
-    items: posts.map(post => ({
+    items: posts.map((post) => ({
       // Assumes all RSS feed item properties are in post frontmatter
       ...post.data,
       // Generate a `url` from each post `slug`
       // This assumes all blog posts are rendered as `/blog/[slug]` routes
       // https://docs.astro.build/en/guides/content-collections/#generating-pages-from-content-collections
       link: `/blog/${post.slug}/`,
-    }))
+    })),
   });
 }
 ```
@@ -55,7 +55,7 @@ Read **[Astro's RSS docs][astro-rss]** for more on using content collections, an
 The `rss` default export offers a number of configuration options. Here's a quick reference:
 
 ```js
-export function get(context) {
+export function GET(context) {
   return rss({
     // `<title>` field in output xml
     title: 'Buzz’s Blog',
@@ -64,9 +64,7 @@ export function get(context) {
     // provide a base URL for RSS <item> links
     site: context.site,
     // list of `<item>`s in output xml
-    items: [...],
-    // include draft posts in the feed (default: false)
-    drafts: true,
+    items: [],
     // (optional) absolute path to XSL stylesheet in your project
     stylesheet: '/rss-styles.xsl',
     // (optional) inject custom xml
@@ -74,7 +72,7 @@ export function get(context) {
     // (optional) add arbitrary metadata to opening <rss> tag
     xmlns: { h: 'http://www.w3.org/TR/html4/' },
     // (optional) add trailing slashes to URLs (default: true)
-    trailingSlash: false
+    trailingSlash: false,
   });
 }
 ```
@@ -100,9 +98,10 @@ The base URL to use when generating RSS item links. We recommend using the [endp
 ```ts
 import rss from '@astrojs/rss';
 
-export const get = (context) => rss({
+export const GET = (context) =>
+  rss({
     site: context.site,
-    ...
+    // ...
   });
 ```
 
@@ -113,12 +112,6 @@ Type: `RSSFeedItem[] (required)`
 A list of formatted RSS feed items. See [Astro's RSS items documentation](https://docs.astro.build/en/guides/rss/#generating-items) for usage examples to choose the best option for you.
 
 When providing a formatted RSS item list, see the [`RSSFeedItem` type reference](#rssfeeditem).
-
-### drafts
-
-Type: `boolean (optional)`
-
-Set `drafts: true` to include [draft posts](https://docs.astro.build/en/guides/markdown-content/#draft-pages) in the feed output. By default, this option is `false` and draft posts are not included.
 
 ### stylesheet
 
@@ -135,7 +128,7 @@ A string of valid XML to be injected between your feed's `<description>` and `<i
 ```js
 import rss from '@astrojs/rss';
 
-export const get = () => rss({
+export const GET = () => rss({
     ...
     customData: '<language>en-us</language>',
   });
@@ -180,9 +173,10 @@ By default, the library will add trailing slashes to the emitted URLs. To preven
 ```js
 import rss from '@astrojs/rss';
 
-export const get = () => rss({
-  trailingSlash: false
-});
+export const GET = () =>
+  rss({
+    trailingSlash: false,
+  });
 ```
 
 ## `RSSFeedItem`
@@ -193,12 +187,13 @@ An example feed item might look like:
 
 ```js
 const item = {
-  title: "Alpha Centauri: so close you can touch it",
-  link: "/blog/alpha-centuari",
-  pubDate: new Date("2023-06-04"),
-  description: "Alpha Centauri is a triple star system, containing Proxima Centauri, the closest star to our sun at only 4.24 light-years away.",
-  categories: ["stars", "space"]
-}
+  title: 'Alpha Centauri: so close you can touch it',
+  link: '/blog/alpha-centuari',
+  pubDate: new Date('2023-06-04'),
+  description:
+    'Alpha Centauri is a triple star system, containing Proxima Centauri, the closest star to our sun at only 4.24 light-years away.',
+  categories: ['stars', 'space'],
+};
 ```
 
 ### `title`
@@ -259,15 +254,16 @@ An object that defines the `title` and `url` of the original feed for items that
 
 ```js
 const item = {
-	title: "Alpha Centauri: so close you can touch it",
-  link: "/blog/alpha-centuari",
-  pubDate: new Date("2023-06-04"),
-  description: "Alpha Centauri is a triple star system, containing Proxima Centauri, the closest star to our sun at only 4.24 light-years away.",
-	source: {
-    title: "The Galactic Times",
-    url: "https://galactictimes.space/feed.xml"
-  }
-}
+  title: 'Alpha Centauri: so close you can touch it',
+  link: '/blog/alpha-centuari',
+  pubDate: new Date('2023-06-04'),
+  description:
+    'Alpha Centauri is a triple star system, containing Proxima Centauri, the closest star to our sun at only 4.24 light-years away.',
+  source: {
+    title: 'The Galactic Times',
+    url: 'https://galactictimes.space/feed.xml',
+  },
+};
 ```
 
 #### `source.title`
@@ -290,16 +286,17 @@ An object to specify properties for an included media source (e.g. a podcast) wi
 
 ```js
 const item = {
-	title: "Alpha Centauri: so close you can touch it",
-  link: "/blog/alpha-centuari",
-  pubDate: new Date("2023-06-04"),
-  description: "Alpha Centauri is a triple star system, containing Proxima Centauri, the closest star to our sun at only 4.24 light-years away.",
-	enclosure: {
-    url: "/media/alpha-centauri.aac",
+  title: 'Alpha Centauri: so close you can touch it',
+  link: '/blog/alpha-centuari',
+  pubDate: new Date('2023-06-04'),
+  description:
+    'Alpha Centauri is a triple star system, containing Proxima Centauri, the closest star to our sun at only 4.24 light-years away.',
+  enclosure: {
+    url: '/media/alpha-centauri.aac',
     length: 124568,
-    type: "audio/aac"
-  }
-}
+    type: 'audio/aac',
+  },
+};
 ```
 
 #### `enclosure.url`
@@ -356,19 +353,37 @@ This function assumes, but does not verify, you are globbing for items inside `s
 // src/pages/rss.xml.js
 import rss, { pagesGlobToRssItems } from '@astrojs/rss';
 
-export async function get(context) {
+export async function GET(context) {
   return rss({
     title: 'Buzz’s Blog',
     description: 'A humble Astronaut’s guide to the stars',
     site: context.site,
-    items: await pagesGlobToRssItems(
-      import.meta.glob('./blog/*.{md,mdx}'),
-    ),
+    items: await pagesGlobToRssItems(import.meta.glob('./blog/*.{md,mdx}')),
   });
 }
 ```
 
----
+## `getRssString()`
+
+As `rss()` returns a `Response`, you can also use `getRssString()` to get the RSS string directly and use it in your own response:
+
+```ts "getRssString"
+// src/pages/rss.xml.js
+import { getRssString } from '@astrojs/rss';
+
+export async function GET(context) {
+  const rssString = await getRssString({
+    title: 'Buzz’s Blog',
+    ...
+  });
+
+  return new Response(rssString, {
+    headers: {
+      'Content-Type': 'application/xml',
+    },
+  });
+}
+```
 
 For more on building with Astro, [visit the Astro docs][astro-rss].
 

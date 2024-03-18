@@ -1,71 +1,11 @@
-import type { RouteData, SSRResult } from '../../../@types/astro';
-import type { ComponentIterable } from './component';
-import type { AstroComponentFactory } from './index';
+import type { RouteData, SSRResult } from '../../../@types/astro.js';
+import { type NonAstroPageComponent, renderComponentToString } from './component.js';
+import type { AstroComponentFactory } from './index.js';
 
-import { AstroError, AstroErrorData } from '../../../core/errors/index.js';
-import { isHTMLString } from '../escape.js';
-import { createResponse } from '../response.js';
-import {
-	isAstroComponentFactory,
-	isAstroComponentInstance,
-	isHeadAndContent,
-	isRenderTemplateResult,
-	renderAstroTemplateResult,
-} from './astro/index.js';
-import { chunkToByteArray, encoder, HTMLParts } from './common.js';
-import { renderComponent } from './component.js';
-import { maybeRenderHead } from './head.js';
-
-const needsHeadRenderingSymbol = Symbol.for('astro.needsHeadRendering');
-
-type NonAstroPageComponent = {
-	name: string;
-	[needsHeadRenderingSymbol]: boolean;
-};
-
-function nonAstroPageNeedsHeadInjection(pageComponent: NonAstroPageComponent): boolean {
-	return needsHeadRenderingSymbol in pageComponent && !!pageComponent[needsHeadRenderingSymbol];
-}
-
-async function iterableToHTMLBytes(
-	result: SSRResult,
-	iterable: ComponentIterable,
-	onDocTypeInjection?: (parts: HTMLParts) => Promise<void>
-): Promise<Uint8Array> {
-	const parts = new HTMLParts();
-	let i = 0;
-	for await (const chunk of iterable) {
-		if (isHTMLString(chunk)) {
-			if (i === 0) {
-				i++;
-				if (!/<!doctype html/i.test(String(chunk))) {
-					parts.append('<!DOCTYPE html>\n', result);
-					if (onDocTypeInjection) {
-						await onDocTypeInjection(parts);
-					}
-				}
-			}
-		}
-		parts.append(chunk, result);
-	}
-	return parts.toArrayBuffer();
-}
-
-// Recursively calls component instances that might have head content
-// to be propagated up.
-async function bufferHeadContent(result: SSRResult) {
-	const iterator = result.propagators.values();
-	while (true) {
-		const { value, done } = iterator.next();
-		if (done) {
-			break;
-		}
-		const returnValue = await value.init(result);
-		if (isHeadAndContent(returnValue)) {
-			result.extraHead.push(returnValue.head);
-		}
-	}
-}
+import { isAstroComponentFactory } from './astro/index.js';
+import { renderToAsyncIterable, renderToReadableStream, renderToString } from './astro/render.js';
+import { encoder } from './common.js';
+import { isNode } from './util.js';
 
 export async function renderPage(
 	result: SSRResult,
@@ -73,50 +13,25 @@ export async function renderPage(
 	props: any,
 	children: any,
 	streaming: boolean,
-	route?: RouteData | undefined
+	route?: RouteData
 ): Promise<Response> {
 	if (!isAstroComponentFactory(componentFactory)) {
 		result._metadata.headInTree =
 			result.componentMetadata.get((componentFactory as any).moduleId)?.containsHead ?? false;
+
 		const pageProps: Record<string, any> = { ...(props ?? {}), 'server:root': true };
 
-		let output: ComponentIterable;
-		let head = '';
-		try {
-			if (nonAstroPageNeedsHeadInjection(componentFactory)) {
-				const parts = new HTMLParts();
-				for await (const chunk of maybeRenderHead(result)) {
-					parts.append(chunk, result);
-				}
-				head = parts.toString();
-			}
+		const str = await renderComponentToString(
+			result,
+			componentFactory.name,
+			componentFactory,
+			pageProps,
+			{},
+			true,
+			route
+		);
 
-			const renderResult = await renderComponent(
-				result,
-				componentFactory.name,
-				componentFactory,
-				pageProps,
-				null
-			);
-			if (isAstroComponentInstance(renderResult)) {
-				output = renderResult.render();
-			} else {
-				output = renderResult;
-			}
-		} catch (e) {
-			if (AstroError.is(e) && !e.loc) {
-				e.setLocation({
-					file: route?.component,
-				});
-			}
-
-			throw e;
-		}
-
-		// Accumulate the HTML string and append the head if necessary.
-		const bytes = await iterableToHTMLBytes(result, output, async (parts) => {
-			parts.append(head, result);
-		});
+		const bytes = encoder.encode(str);
 
 		return new Response(bytes, {
 			headers: new Headers([
@@ -125,81 +40,49 @@ export async function renderPage(
 			]),
 		});
 	}
+
 	// Mark if this page component contains a <head> within its tree. If it does
 	// We avoid implicit head injection entirely.
 	result._metadata.headInTree =
 		result.componentMetadata.get(componentFactory.moduleId!)?.containsHead ?? false;
-	const factoryReturnValue = await componentFactory(result, props, children);
-	const factoryIsHeadAndContent = isHeadAndContent(factoryReturnValue);
-	if (isRenderTemplateResult(factoryReturnValue) || factoryIsHeadAndContent) {
-		// Wait for head content to be buffered up
-		await bufferHeadContent(result);
-		const templateResult = factoryIsHeadAndContent
-			? factoryReturnValue.content
-			: factoryReturnValue;
 
-		let iterable = renderAstroTemplateResult(templateResult);
-		let init = result.response;
-		let headers = new Headers(init.headers);
-		let body: BodyInit;
-
-		if (streaming) {
-			body = new ReadableStream({
-				start(controller) {
-					async function read() {
-						let i = 0;
-						try {
-							for await (const chunk of iterable) {
-								if (isHTMLString(chunk)) {
-									if (i === 0) {
-										if (!/<!doctype html/i.test(String(chunk))) {
-											controller.enqueue(encoder.encode('<!DOCTYPE html>\n'));
-										}
-									}
-								}
-
-								const bytes = chunkToByteArray(result, chunk);
-								controller.enqueue(bytes);
-								i++;
-							}
-							controller.close();
-						} catch (e) {
-							// We don't have a lot of information downstream, and upstream we can't catch the error properly
-							// So let's add the location here
-							if (AstroError.is(e) && !e.loc) {
-								e.setLocation({
-									file: route?.component,
-								});
-							}
-
-							controller.error(e);
-						}
-					}
-					read();
-				},
-			});
+	let body: BodyInit | Response;
+	if (streaming) {
+		if (isNode) {
+			const nodeBody = await renderToAsyncIterable(
+				result,
+				componentFactory,
+				props,
+				children,
+				true,
+				route
+			);
+			// Node.js allows passing in an AsyncIterable to the Response constructor.
+			// This is non-standard so using `any` here to preserve types everywhere else.
+			body = nodeBody as any;
 		} else {
-			body = await iterableToHTMLBytes(result, iterable);
-			headers.set('Content-Length', body.byteLength.toString());
+			body = await renderToReadableStream(result, componentFactory, props, children, true, route);
 		}
-
-		let response = createResponse(body, { ...init, headers });
-		return response;
+	} else {
+		body = await renderToString(result, componentFactory, props, children, true, route);
 	}
 
-	// We double check if the file return a Response
-	if (!(factoryReturnValue instanceof Response)) {
-		throw new AstroError({
-			...AstroErrorData.OnlyResponseCanBeReturned,
-			message: AstroErrorData.OnlyResponseCanBeReturned.message(
-				route?.route,
-				typeof factoryReturnValue
-			),
-			location: {
-				file: route?.component,
-			},
-		});
-	}
+	// If the Astro component returns a Response on init, return that response
+	if (body instanceof Response) return body;
 
-	return factoryReturnValue;
+	// Create final response from body
+	const init = result.response;
+	const headers = new Headers(init.headers);
+	// For non-streaming, convert string to byte array to calculate Content-Length
+	if (!streaming && typeof body === 'string') {
+		body = encoder.encode(body);
+		headers.set('Content-Length', body.byteLength.toString());
+	}
+	// TODO: Revisit if user should manually set charset by themselves in Astro 4
+	// This code preserves the existing behaviour for markdown pages since Astro 2
+	if (route?.component.endsWith('.md')) {
+		headers.set('Content-Type', 'text/html; charset=utf-8');
+	}
+	const response = new Response(body, { ...init, headers });
+	return response;
 }

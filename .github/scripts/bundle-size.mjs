@@ -1,5 +1,5 @@
 import { build } from 'esbuild';
-import { existsSync } from 'fs';
+import { existsSync } from 'node:fs';
 
 const CLIENT_RUNTIME_PATH = 'packages/astro/src/runtime/client/';
 
@@ -23,15 +23,17 @@ export default async function checkBundleSize({ github, context }) {
 		...context.repo,
 		pull_number: PR_NUM,
 	});
-	const clientRuntimeFiles = files.filter(({ filename }) => filename.startsWith(CLIENT_RUNTIME_PATH));
+	const clientRuntimeFiles = files.filter((file) => {
+		return file.filename.startsWith(CLIENT_RUNTIME_PATH) && file.status !== 'removed'
+	});
 	if (clientRuntimeFiles.length === 0) return;
-	
+
 	const table = [
 		'| File | Old Size | New Size | Change |',
 		'| ---- | -------- | -------- | ------ |',
 	];
 	const output = await bundle(clientRuntimeFiles);
-	
+
 	for (let [filename, { oldSize, newSize, sourceFile }] of Object.entries(output)) {
 		filename = ['idle', 'load', 'media', 'only', 'visible'].includes(filename) ? `client:${filename}` : filename;
 		const prefix = (newSize - oldSize) === 0 ? '' : (newSize - oldSize) > 0 ? '+ ' : '- ';
@@ -58,7 +60,7 @@ ${table.join('\n')}`,
 }
 
 async function bundle(files) {
-	
+
 	const { metafile } = await build({
 		entryPoints: [...files.map(({ filename }) => filename), ...files.map(({ filename }) => `main/${filename}`).filter(f => existsSync(f))],
 		bundle: true,
@@ -66,6 +68,7 @@ async function bundle(files) {
 		sourcemap: false,
 		target: ['es2018'],
 		outdir: 'out',
+		external: ['astro:*', 'aria-query', 'axobject-query'],
 		metafile: true,
 	})
 

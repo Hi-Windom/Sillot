@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import * as assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import { AstroCookies } from '../../../dist/core/cookies/index.js';
 import { apply as applyPolyfill } from '../../../dist/core/polyfill.js';
 
@@ -11,8 +12,31 @@ describe('astro/src/core/cookies', () => {
 			let cookies = new AstroCookies(req);
 			cookies.set('foo', 'bar');
 			let headers = Array.from(cookies.headers());
-			expect(headers).to.have.a.lengthOf(1);
-			expect(headers[0]).to.equal('foo=bar');
+			assert.equal(headers.length, 1);
+			assert.equal(headers[0], 'foo=bar');
+		});
+
+		it('Sets a cookie value that can be serialized w/ defaultencodeURIComponent behavior', () => {
+			let req = new Request('http://example.com/');
+			let cookies = new AstroCookies(req);
+			const url = 'http://localhost/path';
+			cookies.set('url', url);
+			let headers = Array.from(cookies.headers());
+			assert.equal(headers.length, 1);
+			// by default cookie value is URI encoded
+			assert.equal(headers[0], `url=${encodeURIComponent(url)}`);
+		});
+
+		it('Sets a cookie value that can be serialized w/ custom encode behavior', () => {
+			let req = new Request('http://example.com/');
+			let cookies = new AstroCookies(req);
+			const url = 'http://localhost/path';
+			// set encode option to the identity function
+			cookies.set('url', url, { encode: (o) => o });
+			let headers = Array.from(cookies.headers());
+			assert.equal(headers.length, 1);
+			// no longer URI encoded
+			assert.equal(headers[0], `url=${url}`);
 		});
 
 		it('Can set cookie options', () => {
@@ -23,8 +47,8 @@ describe('astro/src/core/cookies', () => {
 				path: '/subpath/',
 			});
 			let headers = Array.from(cookies.headers());
-			expect(headers).to.have.a.lengthOf(1);
-			expect(headers[0]).to.equal('foo=bar; Path=/subpath/; HttpOnly');
+			assert.equal(headers.length, 1);
+			assert.equal(headers[0], 'foo=bar; Path=/subpath/; HttpOnly');
 		});
 
 		it('Can pass a JavaScript object that will be serialized', () => {
@@ -32,8 +56,8 @@ describe('astro/src/core/cookies', () => {
 			let cookies = new AstroCookies(req);
 			cookies.set('options', { one: 'two', three: 4 });
 			let headers = Array.from(cookies.headers());
-			expect(headers).to.have.a.lengthOf(1);
-			expect(JSON.parse(decodeURIComponent(headers[0].slice(8))).one).to.equal('two');
+			assert.equal(headers.length, 1);
+			assert.equal(JSON.parse(decodeURIComponent(headers[0].slice(8))).one, 'two');
 		});
 
 		it('Can pass a number', () => {
@@ -41,18 +65,18 @@ describe('astro/src/core/cookies', () => {
 			let cookies = new AstroCookies(req);
 			cookies.set('one', 2);
 			let headers = Array.from(cookies.headers());
-			expect(headers).to.have.a.lengthOf(1);
-			expect(headers[0]).to.equal('one=2');
+			assert.equal(headers.length, 1);
+			assert.equal(headers[0], 'one=2');
 		});
 
 		it('Can pass a boolean', () => {
 			let req = new Request('http://example.com/');
 			let cookies = new AstroCookies(req);
 			cookies.set('admin', true);
-			expect(cookies.get('admin').boolean()).to.equal(true);
+			assert.equal(cookies.get('admin').boolean(), true);
 			let headers = Array.from(cookies.headers());
-			expect(headers).to.have.a.lengthOf(1);
-			expect(headers[0]).to.equal('admin=true');
+			assert.equal(headers.length, 1);
+			assert.equal(headers[0], 'admin=true');
 		});
 
 		it('Can get the value after setting', () => {
@@ -60,7 +84,7 @@ describe('astro/src/core/cookies', () => {
 			let cookies = new AstroCookies(req);
 			cookies.set('foo', 'bar');
 			let r = cookies.get('foo');
-			expect(r.value).to.equal('bar');
+			assert.equal(r.value, 'bar');
 		});
 
 		it('Can get the JavaScript object after setting', () => {
@@ -69,10 +93,10 @@ describe('astro/src/core/cookies', () => {
 			cookies.set('options', { one: 'two', three: 4 });
 			let cook = cookies.get('options');
 			let value = cook.json();
-			expect(value).to.be.an('object');
-			expect(value.one).to.equal('two');
-			expect(value.three).to.be.a('number');
-			expect(value.three).to.equal(4);
+			assert.equal(typeof value, 'object');
+			assert.equal(value.one, 'two');
+			assert.equal(typeof value.three, 'number');
+			assert.equal(value.three, 4);
 		});
 
 		it('Overrides a value in the request', () => {
@@ -82,11 +106,11 @@ describe('astro/src/core/cookies', () => {
 				},
 			});
 			let cookies = new AstroCookies(req);
-			expect(cookies.get('foo').value).to.equal('bar');
+			assert.equal(cookies.get('foo').value, 'bar');
 
 			// Set a new value
 			cookies.set('foo', 'baz');
-			expect(cookies.get('foo').value).to.equal('baz');
+			assert.equal(cookies.get('foo').value, 'baz');
 		});
 	});
 });

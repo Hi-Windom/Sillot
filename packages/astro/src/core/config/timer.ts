@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs';
 
 // Type used by `bench-memory.js`
 export interface Stat {
@@ -18,7 +18,7 @@ interface OngoingStat {
  */
 export class AstroTimer {
 	private enabled: boolean;
-	private ongoingTimers: Map<string, OngoingStat> = new Map();
+	private ongoingTimers = new Map<string, OngoingStat>();
 	private stats: Record<string, Stat> = {};
 
 	constructor() {

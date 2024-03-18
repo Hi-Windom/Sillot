@@ -1,10 +1,9 @@
 import type { PluginObj } from '@babel/core';
 import * as t from '@babel/types';
-import { AstroErrorData } from '../core/errors/errors-data.js';
 import { AstroError } from '../core/errors/errors.js';
+import { AstroErrorData } from '../core/errors/index.js';
 import { resolvePath } from '../core/util.js';
-import { HydrationDirectiveProps } from '../runtime/server/hydration.js';
-import type { PluginMetadata } from '../vite-plugin-astro/types';
+import type { PluginMetadata } from '../vite-plugin-astro/types.js';
 
 const ClientOnlyPlaceholder = 'astro-client-only';
 
@@ -193,7 +192,7 @@ export default function astroJSX(): PluginObj {
 				) {
 					return;
 				}
-				const parent = path.findParent((n) => t.isJSXElement(n))!;
+				const parent = path.findParent((n) => t.isJSXElement(n.node))!;
 				const parentNode = parent.node as t.JSXElement;
 				const tagName = getTagName(parentNode);
 				if (!isComponent(tagName)) return;
@@ -250,9 +249,9 @@ export default function astroJSX(): PluginObj {
 				}
 			},
 			JSXIdentifier(path, state) {
-				const isAttr = path.findParent((n) => t.isJSXAttribute(n));
+				const isAttr = path.findParent((n) => t.isJSXAttribute(n.node));
 				if (isAttr) return;
-				const parent = path.findParent((n) => t.isJSXElement(n))!;
+				const parent = path.findParent((n) => t.isJSXElement(n.node))!;
 				const parentNode = parent.node as t.JSXElement;
 				const tagName = getTagName(parentNode);
 				if (!isComponent(tagName)) return;
@@ -285,7 +284,7 @@ export default function astroJSX(): PluginObj {
 						for (const attr of parentNode.openingElement.attributes) {
 							if (t.isJSXAttribute(attr)) {
 								const name = jsxAttributeToString(attr);
-								if (HydrationDirectiveProps.has(name)) {
+								if (name.startsWith('client:')) {
 									// eslint-disable-next-line
 									console.warn(
 										`You are attempting to render <${displayName} ${name} />, but ${displayName} is an Astro component. Astro components do not render in the client and should not have a hydration directive. Please use a framework component for client rendering.`

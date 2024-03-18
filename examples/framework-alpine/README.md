@@ -1,6 +1,6 @@
 # Astro + AlpineJS Example
 
-```
+```sh
 npm create astro@latest -- --template framework-alpine
 ```
 
@@ -9,4 +9,3 @@ npm create astro@latest -- --template framework-alpine
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/framework-alpine/devcontainer.json)
 
 This example showcases Astro working with [AlpineJS](https://alpinejs.dev/).
-

@@ -1,6 +1,6 @@
-import type { Plugin as VitePlugin, UserConfig } from 'vite';
+import type { Plugin as VitePlugin } from 'vite';
 import type { BuildInternals } from '../internal.js';
-import type { AstroBuildPlugin } from '../plugin';
+import type { AstroBuildPlugin } from '../plugin.js';
 import { normalizeEntryId } from './plugin-component-entry.js';
 
 export function vitePluginInternals(input: Set<string>, internals: BuildInternals): VitePlugin {
@@ -8,19 +8,19 @@ export function vitePluginInternals(input: Set<string>, internals: BuildInternal
 		name: '@astro/plugin-build-internals',
 
 		config(config, options) {
-			const extra: Partial<UserConfig> = {};
-			const noExternal = [],
-				external = [];
 			if (options.command === 'build' && config.build?.ssr) {
-				noExternal.push('astro');
-				external.push('shiki');
+				return {
+					ssr: {
+						// Always bundle Astro runtime when building for SSR
+						noExternal: ['astro'],
+						// Except for these packages as they're not bundle-friendly. Users with strict package installations
+						// need to manually install these themselves if they use the related features.
+						external: [
+							'sharp', // For sharp image service
+						],
+					},
+				};
 			}
-
-			extra.ssr = {
-				external,
-				noExternal,
-			};
-			return extra;
 		},
 
 		async generateBundle(_options, bundle) {
@@ -61,7 +61,7 @@ export function vitePluginInternals(input: Set<string>, internals: BuildInternal
 
 export function pluginInternals(internals: BuildInternals): AstroBuildPlugin {
 	return {
-		build: 'both',
+		targets: ['client', 'server'],
 		hooks: {
 			'build:before': ({ input }) => {
 				return {

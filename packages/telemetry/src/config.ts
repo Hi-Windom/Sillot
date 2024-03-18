@@ -1,9 +1,9 @@
-import dget from 'dlv';
-import { dset } from 'dset';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+import dget from 'dlv';
+import { dset } from 'dset';
 
 export interface ConfigOptions {
 	name: string;
@@ -45,13 +45,15 @@ export class GlobalConfig {
 		if (this._store) return this._store;
 		this.ensureDir();
 		if (fs.existsSync(this.file)) {
-			this._store = JSON.parse(fs.readFileSync(this.file).toString());
-		} else {
-			const store = {};
-			this._store = store;
+			try {
+				this._store = JSON.parse(fs.readFileSync(this.file).toString());
+			} catch {}
+		}
+		if (!this._store) {
+			this._store = {};
 			this.write();
 		}
-		return this._store!;
+		return this._store;
 	}
 	private set store(value: Record<string, any>) {
 		this._store = value;

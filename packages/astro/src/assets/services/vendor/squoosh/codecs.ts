@@ -33,7 +33,7 @@ export interface RotateOptions {
 }
 
 // MozJPEG
-import type { MozJPEGModule as MozJPEGEncodeModule } from './mozjpeg/mozjpeg_enc'
+import type { MozJPEGModule as MozJPEGEncodeModule } from './mozjpeg/mozjpeg_enc.js'
 import mozDec from './mozjpeg/mozjpeg_node_dec.js'
 import mozDecWasm from './mozjpeg/mozjpeg_node_dec.wasm.js'
 
@@ -41,7 +41,7 @@ import mozEnc from './mozjpeg/mozjpeg_node_enc.js'
 import mozEncWasm from './mozjpeg/mozjpeg_node_enc.wasm.js'
 
 // WebP
-import type { WebPModule as WebPEncodeModule } from './webp/webp_enc'
+import type { WebPModule as WebPEncodeModule } from './webp/webp_enc.js'
 import webpDec from './webp/webp_node_dec.js'
 import webpDecWasm from './webp/webp_node_dec.wasm.js'
 
@@ -49,7 +49,7 @@ import webpEnc from './webp/webp_node_enc.js'
 import webpEncWasm from './webp/webp_node_enc.wasm.js'
 
 // AVIF
-import type { AVIFModule as AVIFEncodeModule } from './avif/avif_enc'
+import type { AVIFModule as AVIFEncodeModule } from './avif/avif_enc.js'
 import avifDec from './avif/avif_node_dec.js'
 import avifDecWasm from './avif/avif_node_dec.wasm.js'
 
@@ -291,7 +291,8 @@ export const codecs = {
   avif: {
     name: 'AVIF',
     extension: 'avif',
-    // eslint-disable-next-line no-control-regex
+    // Disable eslint rule to not touch the original code
+    // eslint-disable-next-line no-control-regex, regexp/control-character-escape
     detectors: [/^\x00\x00\x00 ftypavif\x00\x00\x00\x00/],
     dec: () =>
       instantiateEmscriptenWasm(avifDec as DecodeModuleFactory, avifDecWasm),
@@ -322,7 +323,8 @@ export const codecs = {
   oxipng: {
     name: 'OxiPNG',
     extension: 'png',
-    // eslint-disable-next-line no-control-regex
+    // Disable eslint rule to not touch the original code
+    // eslint-disable-next-line no-control-regex, regexp/control-character-escape
     detectors: [/^\x89PNG\x0D\x0A\x1A\x0A/],
     dec: async () => {
       await pngEncDecInit()

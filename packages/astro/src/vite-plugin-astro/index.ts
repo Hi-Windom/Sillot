@@ -1,32 +1,39 @@
 import type { SourceDescription } from 'rollup';
 import type * as vite from 'vite';
-import type { AstroSettings } from '../@types/astro';
-import type { LogOptions } from '../core/logger/core.js';
-import type { PluginMetadata as AstroPluginMetadata } from './types';
+import type { AstroConfig, AstroSettings } from '../@types/astro.js';
+import type { Logger } from '../core/logger/core.js';
+import type {
+	CompileMetadata,
+	PluginCssMetadata as AstroPluginCssMetadata,
+	PluginMetadata as AstroPluginMetadata,
+} from './types.js';
 
 import { normalizePath } from 'vite';
-import {
-	cachedCompilation,
-	getCachedCompileResult,
-	type CompileProps,
-} from '../core/compile/index.js';
-import { isRelativePath } from '../core/path.js';
 import { normalizeFilename } from '../vite-plugin-utils/index.js';
-import { cachedFullCompilation } from './compile.js';
+import { type CompileAstroResult, compileAstro } from './compile.js';
 import { handleHotUpdate } from './hmr.js';
 import { parseAstroRequest } from './query.js';
+import { loadId } from './utils.js';
 export { getAstroMetadata } from './metadata.js';
-export type { AstroPluginMetadata };
+export type { AstroPluginMetadata, AstroPluginCssMetadata };
 
 interface AstroPluginOptions {
 	settings: AstroSettings;
-	logging: LogOptions;
+	logger: Logger;
 }
 
+const astroFileToCompileMetadataWeakMap = new WeakMap<AstroConfig, Map<string, CompileMetadata>>();
+
 /** Transform .astro files for Vite */
-export default function astro({ settings, logging }: AstroPluginOptions): vite.Plugin[] {
+export default function astro({ settings, logger }: AstroPluginOptions): vite.Plugin[] {
 	const { config } = settings;
-	let resolvedConfig: vite.ResolvedConfig;
+	let server: vite.ViteDevServer | undefined;
+	let compile: (code: string, filename: string) => Promise<CompileAstroResult>;
+	// Each Astro file has its own compile metadata so that its scripts and styles virtual module
+	// can retrieve their code from here.
+	// NOTE: We need to initialize a map here and in `buildStart` because our unit tests don't
+	// call `buildStart` (test bug)
+	let astroFileToCompileMetadata = new Map<string, CompileMetadata>();
 
 	// Variables for determining if an id starts with /src...
 	const srcRootWeb = config.srcDir.pathname.slice(config.root.pathname.length - 1);
@@ -35,8 +42,40 @@ export default function astro({ settings, logging }: AstroPluginOptions): vite.P
 	const prePlugin: vite.Plugin = {
 		name: 'astro:build',
 		enforce: 'pre', // run transforms before other plugins can
-		configResolved(_resolvedConfig) {
-			resolvedConfig = _resolvedConfig;
+		configResolved(viteConfig) {
+			// Initialize `compile` function to simplify usage later
+			compile = (code, filename) => {
+				return compileAstro({
+					compileProps: {
+						astroConfig: config,
+						viteConfig,
+						preferences: settings.preferences,
+						filename,
+						source: code,
+					},
+					astroFileToCompileMetadata,
+					logger,
+				});
+			};
+		},
+		configureServer(_server) {
+			server = _server;
+			// Make sure deleted files are removed from the compile metadata to save memory
+			server.watcher.on('unlink', (filename) => {
+				astroFileToCompileMetadata.delete(filename);
+			});
+		},
+		buildStart() {
+			astroFileToCompileMetadata = new Map();
+
+			// Share the `astroFileToCompileMetadata` across the same Astro config as Astro performs
+			// multiple builds and its hoisted scripts analyzer requires the compile metadata from
+			// previous builds. Ideally this should not be needed when we refactor hoisted scripts analysis.
+			if (astroFileToCompileMetadataWeakMap.has(config)) {
+				astroFileToCompileMetadata = astroFileToCompileMetadataWeakMap.get(config)!;
+			} else {
+				astroFileToCompileMetadataWeakMap.set(config, astroFileToCompileMetadata);
+			}
 		},
 		async load(id, opts) {
 			const parsedId = parseAstroRequest(id);
@@ -44,11 +83,27 @@ export default function astro({ settings, logging }: AstroPluginOptions): vite.P
 			if (!query.astro) {
 				return null;
 			}
-			// For CSS / hoisted scripts, the main Astro module should already be cached
+
+			// Astro scripts and styles virtual module code comes from the main Astro compilation
+			// through the metadata from `astroFileToCompileMetadata`. It should always exist as Astro
+			// modules are compiled first, then its virtual modules.
 			const filename = normalizePath(normalizeFilename(parsedId.filename, config.root));
-			const compileResult = getCachedCompileResult(config, filename);
-			if (!compileResult) {
-				return null;
+			let compileMetadata = astroFileToCompileMetadata.get(filename);
+			// If `compileMetadata` doesn't exist in dev, that means the virtual module may have been invalidated.
+			// We try to re-compile the main Astro module (`filename`) first before retrieving the metadata again.
+			if (!compileMetadata && server) {
+				const code = await loadId(server.pluginContainer, filename);
+				// `compile` should re-set `filename` in `astroFileToCompileMetadata`
+				if (code != null) await compile(code, filename);
+				compileMetadata = astroFileToCompileMetadata.get(filename);
+			}
+			// If the metadata still doesn't exist, that means the virtual modules are somehow compiled first,
+			// throw an error and we should investigate it.
+			if (!compileMetadata) {
+				throw new Error(
+					`No cached compile metadata found for "${id}". The main Astro module "${filename}" should have ` +
+						`compiled and filled the metadata first, before its virtual modules can be requested.`
+				);
 			}
 
 			switch (query.type) {
@@ -57,18 +112,27 @@ export default function astro({ settings, logging }: AstroPluginOptions): vite.P
 						throw new Error(`Requests for Astro CSS must include an index.`);
 					}
 
-					const code = compileResult.css[query.index];
-					if (!code) {
+					const result = compileMetadata.css[query.index];
+					if (!result) {
 						throw new Error(`No Astro CSS at index ${query.index}`);
 					}
 
+					// Register dependencies from preprocessing this style
+					result.dependencies?.forEach((dep) => this.addWatchFile(dep));
+
 					return {
-						code,
-						meta: {
-							vite: {
-								isSelfAccepting: true,
-							},
-						},
+						code: result.code,
+						// This metadata is used by `cssScopeToPlugin` to remove this module from the bundle
+						// if the `filename` default export (the Astro component) is unused.
+						meta: result.isGlobal
+							? undefined
+							: ({
+									astroCss: {
+										cssScopeTo: {
+											[filename]: ['default'],
+										},
+									},
+								} satisfies AstroPluginCssMetadata),
 					};
 				}
 				case 'script': {
@@ -82,13 +146,13 @@ export default function astro({ settings, logging }: AstroPluginOptions): vite.P
 						};
 					}
 
-					const hoistedScript = compileResult.scripts[query.index];
+					const hoistedScript = compileMetadata.scripts[query.index];
 					if (!hoistedScript) {
 						throw new Error(`No hoisted script at index ${query.index}`);
 					}
 
 					if (hoistedScript.type === 'external') {
-						const src = hoistedScript.src!;
+						const src = hoistedScript.src;
 						if (src.startsWith('/') && !isBrowserPath(src)) {
 							const publicDir = config.publicDir.pathname.replace(/\/$/, '').split('/').pop() + '/';
 							throw new Error(
@@ -131,30 +195,16 @@ export default function astro({ settings, logging }: AstroPluginOptions): vite.P
 			if (!id.endsWith('.astro') || parsedId.query.astro) {
 				return;
 			}
-			// if we still get a relative path here, vite couldn't resolve the import
-			if (isRelativePath(parsedId.filename)) {
-				return;
-			}
 
-			const compileProps: CompileProps = {
-				astroConfig: config,
-				viteConfig: resolvedConfig,
-				filename: normalizePath(parsedId.filename),
-				source,
-			};
-
-			const transformResult = await cachedFullCompilation({ compileProps, logging });
-
-			for (const dep of transformResult.cssDeps) {
-				this.addWatchFile(dep);
-			}
+			const filename = normalizePath(parsedId.filename);
+			const transformResult = await compile(source, filename);
 
 			const astroMetadata: AstroPluginMetadata['astro'] = {
 				clientOnlyComponents: transformResult.clientOnlyComponents,
 				hydratedComponents: transformResult.hydratedComponents,
 				scripts: transformResult.scripts,
 				containsHead: transformResult.containsHead,
-				propagation: 'none',
+				propagation: transformResult.propagation ? 'self' : 'none',
 				pageOptions: {},
 			};
 
@@ -171,21 +221,8 @@ export default function astro({ settings, logging }: AstroPluginOptions): vite.P
 				},
 			};
 		},
-		async handleHotUpdate(context) {
-			if (context.server.config.isProduction) return;
-			const compileProps: CompileProps = {
-				astroConfig: config,
-				viteConfig: resolvedConfig,
-				filename: context.file,
-				source: await context.read(),
-			};
-			const compile = () => cachedCompilation(compileProps);
-			return handleHotUpdate(context, {
-				config,
-				logging,
-				compile,
-				source: compileProps.source,
-			});
+		async handleHotUpdate(ctx) {
+			return handleHotUpdate(ctx, { logger, astroFileToCompileMetadata });
 		},
 	};
 

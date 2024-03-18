@@ -1,12 +1,37 @@
-import { dim } from 'kleur/colors';
+import { blue, bold, dim, red, yellow } from 'kleur/colors';
 import stringWidth from 'string-width';
 
-interface LogWritable<T> {
+export interface LogWritable<T> {
 	write: (chunk: T) => boolean;
 }
 
 export type LoggerLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent'; // same as Pino
-export type LoggerEvent = 'info' | 'warn' | 'error';
+
+/**
+ * Defined logger labels. Add more as needed, but keep them high-level & reusable,
+ * rather than specific to a single command, function, use, etc. The label will be
+ * shown in the log message to the user, so it should be relevant.
+ */
+export type LoggerLabel =
+	| 'add'
+	| 'build'
+	| 'check'
+	| 'config'
+	| 'content'
+	| 'deprecated'
+	| 'markdown'
+	| 'router'
+	| 'types'
+	| 'vite'
+	| 'watch'
+	| 'middleware'
+	| 'preferences'
+	| 'redirects'
+	| 'toolbar'
+	| 'assets'
+	// SKIP_FORMAT: A special label that tells the logger not to apply any formatting.
+	// Useful for messages that are already formatted, like the server start message.
+	| 'SKIP_FORMAT';
 
 export interface LogOptions {
 	dest: LogWritable<LogMessage>;
@@ -26,12 +51,14 @@ export const dateTimeFormat = new Intl.DateTimeFormat([], {
 	hour: '2-digit',
 	minute: '2-digit',
 	second: '2-digit',
+	hour12: false,
 });
 
 export interface LogMessage {
-	type: string | null;
+	label: string | null;
 	level: LoggerLevel;
 	message: string;
+	newLine: boolean;
 }
 
 export const levels: Record<LoggerLevel, number> = {
@@ -43,36 +70,47 @@ export const levels: Record<LoggerLevel, number> = {
 };
 
 /** Full logging API */
-export function log(opts: LogOptions, level: LoggerLevel, type: string | null, message: string) {
+export function log(
+	opts: LogOptions,
+	level: LoggerLevel,
+	label: string | null,
+	message: string,
+	newLine = true
+) {
 	const logLevel = opts.level;
 	const dest = opts.dest;
 	const event: LogMessage = {
-		type,
+		label,
 		level,
 		message,
+		newLine,
 	};
 
 	// test if this level is enabled or not
-	if (levels[logLevel] > levels[level]) {
+	if (!isLogLevelEnabled(logLevel, level)) {
 		return; // do nothing
 	}
 
 	dest.write(event);
 }
 
+export function isLogLevelEnabled(configuredLogLevel: LoggerLevel, level: LoggerLevel) {
+	return levels[configuredLogLevel] <= levels[level];
+}
+
 /** Emit a user-facing message. Useful for UI and other console messages. */
-export function info(opts: LogOptions, type: string | null, message: string) {
-	return log(opts, 'info', type, message);
+export function info(opts: LogOptions, label: string | null, message: string, newLine = true) {
+	return log(opts, 'info', label, message, newLine);
 }
 
 /** Emit a warning message. Useful for high-priority messages that aren't necessarily errors. */
-export function warn(opts: LogOptions, type: string | null, message: string) {
-	return log(opts, 'warn', type, message);
+export function warn(opts: LogOptions, label: string | null, message: string, newLine = true) {
+	return log(opts, 'warn', label, message, newLine);
 }
 
 /** Emit a error message, Useful when Astro can't recover from some error. */
-export function error(opts: LogOptions, type: string | null, message: string) {
-	return log(opts, 'error', type, message);
+export function error(opts: LogOptions, label: string | null, message: string, newLine = true) {
+	return log(opts, 'error', label, message, newLine);
 }
 
 type LogFn = typeof info | typeof warn | typeof error;
@@ -97,6 +135,35 @@ function padStr(str: string, len: number) {
 	}
 	const spaces = Array.from({ length: len - strLen }, () => ' ').join('');
 	return str + spaces;
+}
+
+/**
+ * Get the prefix for a log message.
+ * This includes the timestamp, log level, and label all properly formatted
+ * with colors. This is shared across different loggers, so it's defined here.
+ */
+export function getEventPrefix({ level, label }: LogMessage) {
+	const timestamp = `${dateTimeFormat.format(new Date())}`;
+	const prefix = [];
+	if (level === 'error' || level === 'warn') {
+		prefix.push(bold(timestamp));
+		prefix.push(`[${level.toUpperCase()}]`);
+	} else {
+		prefix.push(timestamp);
+	}
+	if (label) {
+		prefix.push(`[${label}]`);
+	}
+	if (level === 'error') {
+		return red(prefix.join(' '));
+	}
+	if (level === 'warn') {
+		return yellow(prefix.join(' '));
+	}
+	if (prefix.length === 1) {
+		return dim(prefix[0]);
+	}
+	return dim(prefix[0]) + ' ' + blue(prefix.splice(1).join(' '));
 }
 
 export let defaultLogLevel: LoggerLevel;
@@ -126,4 +193,62 @@ export function timerMessage(message: string, startTime: number = Date.now()) {
 	let timeDisplay =
 		timeDiff < 750 ? `${Math.round(timeDiff)}ms` : `${(timeDiff / 1000).toFixed(1)}s`;
 	return `${message}   ${dim(timeDisplay)}`;
+}
+
+export class Logger {
+	options: LogOptions;
+	constructor(options: LogOptions) {
+		this.options = options;
+	}
+
+	info(label: LoggerLabel | null, message: string, newLine = true) {
+		info(this.options, label, message, newLine);
+	}
+	warn(label: LoggerLabel | null, message: string, newLine = true) {
+		warn(this.options, label, message, newLine);
+	}
+	error(label: LoggerLabel | null, message: string, newLine = true) {
+		error(this.options, label, message, newLine);
+	}
+	debug(label: LoggerLabel, ...messages: any[]) {
+		debug(label, ...messages);
+	}
+
+	level() {
+		return this.options.level;
+	}
+
+	forkIntegrationLogger(label: string) {
+		return new AstroIntegrationLogger(this.options, label);
+	}
+}
+
+export class AstroIntegrationLogger {
+	options: LogOptions;
+	label: string;
+
+	constructor(logging: LogOptions, label: string) {
+		this.options = logging;
+		this.label = label;
+	}
+
+	/**
+	 * Creates a new logger instance with a new label, but the same log options.
+	 */
+	fork(label: string): AstroIntegrationLogger {
+		return new AstroIntegrationLogger(this.options, label);
+	}
+
+	info(message: string) {
+		info(this.options, this.label, message);
+	}
+	warn(message: string) {
+		warn(this.options, this.label, message);
+	}
+	error(message: string) {
+		error(this.options, this.label, message);
+	}
+	debug(message: string) {
+		debug(this.label, message);
+	}
 }

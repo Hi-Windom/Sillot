@@ -1,8 +1,13 @@
-import { expect } from 'chai';
+import * as assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import * as cheerio from 'cheerio';
-
-import { runInContainer } from '../../../dist/core/dev/index.js';
-import { createFs, createRequestAndResponse, triggerFSEvent } from '../test-utils.js';
+import {
+	createFs,
+	createRequestAndResponse,
+	runInContainer,
+	triggerFSEvent,
+} from '../test-utils.js';
 
 const root = new URL('../../fixtures/alias/', import.meta.url);
 
@@ -25,7 +30,7 @@ describe('dev container', () => {
 			root
 		);
 
-		await runInContainer({ fs, root }, async (container) => {
+		await runInContainer({ fs, inlineConfig: { root: fileURLToPath(root) } }, async (container) => {
 			const { req, res, text } = createRequestAndResponse({
 				method: 'GET',
 				url: '/',
@@ -33,8 +38,8 @@ describe('dev container', () => {
 			container.handle(req, res);
 			const html = await text();
 			const $ = cheerio.load(html);
-			expect(res.statusCode).to.equal(200);
-			expect($('h1')).to.have.a.lengthOf(1);
+			assert.equal(res.statusCode, 200);
+			assert.equal($('h1').length, 1);
 		});
 	});
 
@@ -60,7 +65,7 @@ describe('dev container', () => {
 			root
 		);
 
-		await runInContainer({ fs, root }, async (container) => {
+		await runInContainer({ fs, inlineConfig: { root: fileURLToPath(root) } }, async (container) => {
 			let r = createRequestAndResponse({
 				method: 'GET',
 				url: '/',
@@ -68,7 +73,7 @@ describe('dev container', () => {
 			container.handle(r.req, r.res);
 			let html = await r.text();
 			let $ = cheerio.load(html);
-			expect($('body.one')).to.have.a.lengthOf(1);
+			assert.equal($('body.one').length, 1);
 
 			fs.writeFileFromRootSync(
 				'/src/components/Header.astro',
@@ -102,8 +107,8 @@ describe('dev container', () => {
 			container.handle(r.req, r.res);
 			html = await r.text();
 			$ = cheerio.load(html);
-			expect($('body.one')).to.have.a.lengthOf(0);
-			expect($('body.two')).to.have.a.lengthOf(1);
+			assert.equal($('body.one').length, 0);
+			assert.equal($('body.two').length, 1);
 		});
 	});
 
@@ -119,8 +124,8 @@ describe('dev container', () => {
 		await runInContainer(
 			{
 				fs,
-				root,
-				userConfig: {
+				inlineConfig: {
+					root: fileURLToPath(root),
 					output: 'server',
 					integrations: [
 						{
@@ -129,7 +134,7 @@ describe('dev container', () => {
 								'astro:config:setup': ({ injectRoute }) => {
 									injectRoute({
 										pattern: '/another-[slug]',
-										entryPoint: './src/components/test.astro',
+										entrypoint: './src/components/test.astro',
 									});
 								},
 							},
@@ -144,7 +149,7 @@ describe('dev container', () => {
 				});
 				container.handle(r.req, r.res);
 				await r.done;
-				expect(r.res.statusCode).to.equal(200);
+				assert.equal(r.res.statusCode, 200);
 
 				// Try with the injected route
 				r = createRequestAndResponse({
@@ -153,7 +158,69 @@ describe('dev container', () => {
 				});
 				container.handle(r.req, r.res);
 				await r.done;
-				expect(r.res.statusCode).to.equal(200);
+				assert.equal(r.res.statusCode, 200);
+			}
+		);
+	});
+
+	it('Serves injected 404 route for any 404', async () => {
+		const fs = createFs(
+			{
+				'/src/components/404.astro': `<h1>Custom 404</h1>`,
+				'/src/pages/page.astro': `<h1>Regular page</h1>`,
+			},
+			root
+		);
+
+		await runInContainer(
+			{
+				fs,
+				inlineConfig: {
+					root: fileURLToPath(root),
+					output: 'server',
+					integrations: [
+						{
+							name: '@astrojs/test-integration',
+							hooks: {
+								'astro:config:setup': ({ injectRoute }) => {
+									injectRoute({
+										pattern: '/404',
+										entrypoint: './src/components/404.astro',
+									});
+								},
+							},
+						},
+					],
+				},
+			},
+			async (container) => {
+				{
+					// Regular pages are served as expected.
+					const r = createRequestAndResponse({ method: 'GET', url: '/page' });
+					container.handle(r.req, r.res);
+					await r.done;
+					const doc = await r.text();
+					assert.equal(/Regular page/.test(doc), true);
+					assert.equal(r.res.statusCode, 200);
+				}
+				{
+					// `/404` serves the custom 404 page as expected.
+					const r = createRequestAndResponse({ method: 'GET', url: '/404' });
+					container.handle(r.req, r.res);
+					await r.done;
+					const doc = await r.text();
+					assert.equal(/Custom 404/.test(doc), true);
+					assert.equal(r.res.statusCode, 404);
+				}
+				{
+					// A non-existent page also serves the custom 404 page.
+					const r = createRequestAndResponse({ method: 'GET', url: '/other-page' });
+					container.handle(r.req, r.res);
+					await r.done;
+					const doc = await r.text();
+					assert.equal(/Custom 404/.test(doc), true);
+					assert.equal(r.res.statusCode, 404);
+				}
 			}
 		);
 	});
@@ -161,8 +228,8 @@ describe('dev container', () => {
 	it('items in public/ are not available from root when using a base', async () => {
 		await runInContainer(
 			{
-				root,
-				userConfig: {
+				inlineConfig: {
+					root: fileURLToPath(root),
 					base: '/sub/',
 				},
 			},
@@ -176,7 +243,7 @@ describe('dev container', () => {
 				container.handle(r.req, r.res);
 				await r.done;
 
-				expect(r.res.statusCode).to.equal(200);
+				assert.equal(r.res.statusCode, 200);
 
 				// Next try the root path
 				r = createRequestAndResponse({
@@ -187,14 +254,13 @@ describe('dev container', () => {
 				container.handle(r.req, r.res);
 				await r.done;
 
-				expect(r.res.statusCode).to.equal(301);
-				expect(r.res.getHeader('location')).to.equal('/sub/test.txt');
+				assert.equal(r.res.statusCode, 404);
 			}
 		);
 	});
 
 	it('items in public/ are available from root when not using a base', async () => {
-		await runInContainer({ root }, async (container) => {
+		await runInContainer({ inlineConfig: { root: fileURLToPath(root) } }, async (container) => {
 			// Try the root path
 			let r = createRequestAndResponse({
 				method: 'GET',
@@ -204,7 +270,7 @@ describe('dev container', () => {
 			container.handle(r.req, r.res);
 			await r.done;
 
-			expect(r.res.statusCode).to.equal(200);
+			assert.equal(r.res.statusCode, 200);
 		});
 	});
 });

@@ -1,12 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Context } from './context';
+import type { Context } from './context.js';
 
 import { color } from '@astrojs/cli-kit';
-import { execa } from 'execa';
-import { error, info, spinner, title } from '../messages.js';
+import { error, info, title } from '../messages.js';
+import { shell } from '../shell.js';
 
-export async function git(ctx: Pick<Context, 'cwd' | 'git' | 'yes' | 'prompt' | 'dryRun'>) {
+export async function git(
+	ctx: Pick<Context, 'cwd' | 'git' | 'yes' | 'prompt' | 'dryRun' | 'tasks'>
+) {
 	if (fs.existsSync(path.join(ctx.cwd, '.git'))) {
 		await info('Nice!', `Git has already been initialized`);
 		return;
@@ -26,12 +28,12 @@ export async function git(ctx: Pick<Context, 'cwd' | 'git' | 'yes' | 'prompt' | 
 	if (ctx.dryRun) {
 		await info('--dry-run', `Skipping Git initialization`);
 	} else if (_git) {
-		await spinner({
+		ctx.tasks.push({
+			pending: 'Git',
 			start: 'Git initializing...',
 			end: 'Git initialized',
 			while: () =>
 				init({ cwd: ctx.cwd }).catch((e) => {
-					// eslint-disable-next-line no-console
 					error('error', e);
 					process.exit(1);
 				}),
@@ -46,9 +48,9 @@ export async function git(ctx: Pick<Context, 'cwd' | 'git' | 'yes' | 'prompt' | 
 
 async function init({ cwd }: { cwd: string }) {
 	try {
-		await execa('git', ['init'], { cwd, stdio: 'ignore' });
-		await execa('git', ['add', '-A'], { cwd, stdio: 'ignore' });
-		await execa(
+		await shell('git', ['init'], { cwd, stdio: 'ignore' });
+		await shell('git', ['add', '-A'], { cwd, stdio: 'ignore' });
+		await shell(
 			'git',
 			[
 				'commit',

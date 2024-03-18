@@ -1,28 +1,26 @@
-import { polyfill } from '@astrojs/webapi';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execa } from 'execa';
 import fastGlob from 'fast-glob';
-import fs from 'fs';
-import os from 'os';
 import stripAnsi from 'strip-ansi';
-import { fileURLToPath } from 'url';
-import { sync } from '../dist/core/sync/index.js';
-import build from '../dist/core/build/index.js';
-import { openConfig } from '../dist/core/config/config.js';
-import { createSettings } from '../dist/core/config/index.js';
-import dev from '../dist/core/dev/index.js';
-import { nodeLogDestination } from '../dist/core/logger/node.js';
-import preview from '../dist/core/preview/index.js';
 import { check } from '../dist/cli/check/index.js';
+import build from '../dist/core/build/index.js';
+import { RESOLVED_SPLIT_MODULE_ID } from '../dist/core/build/plugins/plugin-ssr.js';
+import { getVirtualModulePageNameFromPath } from '../dist/core/build/plugins/util.js';
+import { makeSplitEntryPointFileName } from '../dist/core/build/static-build.js';
+import { mergeConfig, resolveConfig } from '../dist/core/config/index.js';
+import { dev, preview } from '../dist/core/index.js';
+import { nodeLogDestination } from '../dist/core/logger/node.js';
+import sync from '../dist/core/sync/index.js';
 
-// polyfill WebAPIs to globalThis for Node v12, Node v14, and Node v16
-polyfill(globalThis, {
-	exclude: 'window document',
-});
+// Disable telemetry when running tests
+process.env.ASTRO_TELEMETRY_DISABLED = true;
 
 /**
- * @typedef {import('undici').Response} Response
- * @typedef {import('../src/core/dev/dev').DedvServer} DevServer
- * @typedef {import('../src/@types/astro').AstroConfig} AstroConfig
+ * @typedef {import('../src/core/dev/dev').DevServer} DevServer
+ * @typedef {import('../src/@types/astro').AstroInlineConfig & { root?: string | URL }} AstroInlineConfig
  * @typedef {import('../src/core/preview/index').PreviewServer} PreviewServer
  * @typedef {import('../src/core/app/index').App} App
  * @typedef {import('../src/cli/check/index').AstroChecker} AstroChecker
@@ -32,17 +30,19 @@ polyfill(globalThis, {
  * @typedef {Object} Fixture
  * @property {typeof build} build
  * @property {(url: string) => string} resolveUrl
+ * @property {(path: string) => Promise<boolean>} pathExists
  * @property {(url: string, opts: Parameters<typeof fetch>[1]) => Promise<Response>} fetch
  * @property {(path: string) => Promise<string>} readFile
  * @property {(path: string, updater: (content: string) => string) => Promise<void>} writeFile
  * @property {(path: string) => Promise<string[]>} readdir
  * @property {(pattern: string) => Promise<string[]>} glob
- * @property {() => Promise<DevServer>} startDevServer
- * @property {() => Promise<PreviewServer>} preview
+ * @property {typeof dev} startDevServer
+ * @property {typeof preview} preview
  * @property {() => Promise<void>} clean
  * @property {() => Promise<App>} loadTestAdapterApp
  * @property {() => Promise<void>} onNextChange
- * @property {(opts: CheckPayload) => Promise<AstroChecker>} check
+ * @property {typeof check} check
+ * @property {typeof sync} sync
  *
  * This function returns an instance of the Check
  *
@@ -76,7 +76,7 @@ export const silentLogging = {
 
 /**
  * Load Astro fixture
- * @param {AstroConfig} inlineConfig Astro config partial (note: must specify `root`)
+ * @param {AstroInlineConfig} inlineConfig Astro config partial (note: must specify `root`)
  * @returns {Promise<Fixture>} The fixture. Has the following properties:
  *   .config     - Returns the final config. Will be automatically passed to the methods below:
  *
@@ -95,54 +95,32 @@ export const silentLogging = {
  *   .clean()          - Async. Removes the project’s dist folder.
  */
 export async function loadFixture(inlineConfig) {
-	if (!inlineConfig || !inlineConfig.root)
-		throw new Error("Must provide { root: './fixtures/...' }");
+	if (!inlineConfig?.root) throw new Error("Must provide { root: './fixtures/...' }");
 
-	// load config
-	let cwd = inlineConfig.root;
-	delete inlineConfig.root;
-	if (typeof cwd === 'string') {
-		try {
-			cwd = new URL(cwd.replace(/\/?$/, '/'));
-		} catch (err1) {
-			cwd = new URL(cwd.replace(/\/?$/, '/'), import.meta.url);
-		}
+	// Silent by default during tests to not pollute the console output
+	inlineConfig.logLevel = 'silent';
+	inlineConfig.vite ??= {};
+	inlineConfig.vite.logLevel = 'silent';
+
+	let root = inlineConfig.root;
+	// Handle URL, should already be absolute so just convert to path
+	if (typeof root !== 'string') {
+		root = fileURLToPath(root);
 	}
-
-	/** @type {import('../src/core/logger/core').LogOptions} */
-	const logging = defaultLogging;
-
+	// Handle "file:///C:/Users/fred", convert to "C:/Users/fred"
+	else if (root.startsWith('file://')) {
+		root = fileURLToPath(new URL(root));
+	}
+	// Handle "./fixtures/...", convert to absolute path
+	else if (!path.isAbsolute(root)) {
+		root = fileURLToPath(new URL(root, import.meta.url));
+	}
+	inlineConfig = { ...inlineConfig, root };
 	// Load the config.
-	let { astroConfig: config } = await openConfig({
-		cwd: fileURLToPath(cwd),
-		logging,
-		cmd: 'dev',
-	});
-	config = merge(config, { ...inlineConfig, root: cwd });
-
-	// HACK: the inline config doesn't run through config validation where these normalizations usually occur
-	if (typeof inlineConfig.site === 'string') {
-		config.site = new URL(inlineConfig.site);
-	}
-	if (inlineConfig.base && !inlineConfig.base.endsWith('/')) {
-		config.base = inlineConfig.base + '/';
-	}
-	let settings = createSettings(config, fileURLToPath(cwd));
-	if (config.integrations.find((integration) => integration.name === '@astrojs/mdx')) {
-		// Enable default JSX integration. It needs to come first, so unshift rather than push!
-		const { default: jsxRenderer } = await import('astro/jsx/renderer.js');
-		settings.renderers.unshift(jsxRenderer);
-	}
-
-	/** @type {import('@astrojs/telemetry').AstroTelemetry} */
-	const telemetry = {
-		record() {
-			return Promise.resolve();
-		},
-	};
+	const { astroConfig: config } = await resolveConfig(inlineConfig, 'dev');
 
 	const resolveUrl = (url) =>
-		`http://${config.server.host}:${config.server.port}${url.replace(/^\/?/, '/')}`;
+		`http://${config.server.host || 'localhost'}:${config.server.port}${url.replace(/^\/?/, '/')}`;
 
 	// A map of files that have been edited.
 	let fileEdits = new Map();
@@ -170,31 +148,41 @@ export async function loadFixture(inlineConfig) {
 	let devServer;
 
 	return {
-		build: (opts = {}) => {
+		build: async (extraInlineConfig = {}) => {
 			process.env.NODE_ENV = 'production';
-			return build(settings, { logging, telemetry, ...opts });
+			return build(mergeConfig(inlineConfig, extraInlineConfig), { teardownCompiler: false });
 		},
-		sync: (opts) => sync(settings, { logging, fs, ...opts }),
+		sync: async (extraInlineConfig = {}, opts) => {
+			return sync(mergeConfig(inlineConfig, extraInlineConfig), opts);
+		},
 		check: async (opts) => {
-			return await check(settings, { logging, ...opts });
+			return await check(opts);
 		},
-		startDevServer: async (opts = {}) => {
+		startDevServer: async (extraInlineConfig = {}) => {
 			process.env.NODE_ENV = 'development';
-			devServer = await dev(settings, { logging, telemetry, ...opts });
+			devServer = await dev(mergeConfig(inlineConfig, extraInlineConfig));
 			config.server.host = parseAddressToHost(devServer.address.address); // update host
 			config.server.port = devServer.address.port; // update port
 			return devServer;
 		},
 		config,
 		resolveUrl,
-		fetch: (url, init) => fetch(resolveUrl(url), init),
-		preview: async (opts = {}) => {
+		fetch: async (url, init) => {
+			const resolvedUrl = resolveUrl(url);
+			try {
+				return await fetch(resolvedUrl, init);
+			} catch (err) {
+				// node fetch throws a vague error when it fails, so we log the url here to easily debug it
+				if (err.message?.includes('fetch failed')) {
+					console.error(`[astro test] failed to fetch ${resolvedUrl}`);
+					console.error(err);
+				}
+				throw err;
+			}
+		},
+		preview: async (extraInlineConfig = {}) => {
 			process.env.NODE_ENV = 'production';
-			const previewServer = await preview(settings, {
-				logging,
-				telemetry,
-				...opts,
-			});
+			const previewServer = await preview(mergeConfig(inlineConfig, extraInlineConfig));
 			config.server.host = parseAddressToHost(previewServer.host); // update host
 			config.server.port = previewServer.port; // update port
 			return previewServer;
@@ -216,9 +204,26 @@ export async function loadFixture(inlineConfig) {
 				recursive: true,
 				force: true,
 			});
+			const contentCache = new URL('./node_modules/.astro/content', config.root);
+			if (fs.existsSync(contentCache)) {
+				await fs.promises.rm(contentCache, {
+					maxRetries: 10,
+					recursive: true,
+					force: true,
+				});
+			}
 		},
 		loadTestAdapterApp: async (streaming) => {
 			const url = new URL(`./server/entry.mjs?id=${fixtureId}`, config.outDir);
+			const { createApp, manifest } = await import(url);
+			const app = createApp(streaming);
+			app.manifest = manifest;
+			return app;
+		},
+		loadEntryPoint: async (pagePath, routes, streaming) => {
+			const virtualModule = getVirtualModulePageNameFromPath(RESOLVED_SPLIT_MODULE_ID, pagePath);
+			const filePath = makeSplitEntryPointFileName(virtualModule, routes);
+			const url = new URL(`./server/${filePath}?id=${fixtureId}`, config.outDir);
 			const { createApp, manifest } = await import(url);
 			const app = createApp(streaming);
 			app.manifest = manifest;
@@ -256,32 +261,6 @@ function parseAddressToHost(address) {
 		return `[${address}]`;
 	}
 	return address;
-}
-
-/**
- * Basic object merge utility. Returns new copy of merged Object.
- * @param {Object} a
- * @param {Object} b
- * @returns {Object}
- */
-function merge(a, b) {
-	const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
-	const c = {};
-	for (const k of allKeys) {
-		const needsObjectMerge =
-			typeof a[k] === 'object' &&
-			typeof b[k] === 'object' &&
-			(Object.keys(a[k]).length || Object.keys(b[k]).length) &&
-			!Array.isArray(a[k]) &&
-			!Array.isArray(b[k]);
-		if (needsObjectMerge) {
-			c[k] = merge(a[k] || {}, b[k] || {});
-			continue;
-		}
-		c[k] = a[k];
-		if (b[k] !== undefined) c[k] = b[k];
-	}
-	return c;
 }
 
 const cliPath = fileURLToPath(new URL('../astro.js', import.meta.url));
@@ -323,7 +302,7 @@ export async function parseCliDevStart(proc) {
 	const messages = stdout
 		.split('\n')
 		.filter((ln) => !!ln.trim())
-		.map((ln) => ln.replace(/[🚀┃]/g, '').replace(/\s+/g, ' ').trim());
+		.map((ln) => ln.replace(/[🚀┃]/gu, '').replace(/\s+/g, ' ').trim());
 
 	return { messages };
 }

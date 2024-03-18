@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import * as assert from 'node:assert/strict';
+import { before, describe, it } from 'node:test';
 import * as cheerio from 'cheerio';
 import { loadFixture } from './test-utils.js';
 
@@ -8,6 +9,8 @@ describe('CSS ordering - import order with layouts', () => {
 	before(async () => {
 		fixture = await loadFixture({
 			root: './fixtures/css-order-layout/',
+			// test suite was authored when inlineStylesheets defaulted to never
+			build: { inlineStylesheets: 'never' },
 		});
 	});
 
@@ -55,8 +58,8 @@ describe('CSS ordering - import order with layouts', () => {
 				}
 			}
 
-			expect(globalCSS).to.equal(0, 'global css sorted on top');
-			expect(specialButtonCSS).to.equal(1, 'component level css sorted last');
+			assert.equal(globalCSS, 0, 'global css sorted on top');
+			assert.equal(specialButtonCSS, 1, 'component level css sorted last');
 		});
 	});
 });

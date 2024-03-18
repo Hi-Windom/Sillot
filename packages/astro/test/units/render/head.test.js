@@ -1,31 +1,31 @@
-import { expect } from 'chai';
-
+import * as assert from 'node:assert/strict';
+import { before, describe, it } from 'node:test';
+import * as cheerio from 'cheerio';
+import { RenderContext } from '../../../dist/core/render-context.js';
 import {
+	Fragment,
 	createComponent,
+	maybeRenderHead,
 	render,
 	renderComponent,
-	renderSlot,
-	maybeRenderHead,
 	renderHead,
-	Fragment,
+	renderSlot,
 } from '../../../dist/runtime/server/index.js';
-import {
-	createBasicEnvironment,
-	createRenderContext,
-	renderPage,
-} from '../../../dist/core/render/index.js';
-import { defaultLogging as logging } from '../../test-utils.js';
-import * as cheerio from 'cheerio';
+import { createBasicPipeline } from '../test-utils.js';
 
 const createAstroModule = (AstroComponent) => ({ default: AstroComponent });
 
 describe('core/render', () => {
 	describe('Injected head contents', () => {
-		let env;
+		let pipeline;
 		before(async () => {
-			env = createBasicEnvironment({
-				logging,
-				renderers: [],
+			pipeline = createBasicPipeline();
+			pipeline.headElements = () => ({
+				links: new Set([
+					{ name: 'link', props: { rel: 'stylesheet', href: '/main.css' }, children: '' },
+				]),
+				scripts: new Set(),
+				styles: new Set(),
 			});
 		});
 
@@ -72,7 +72,7 @@ describe('core/render', () => {
 				`;
 			});
 
-			const Page = createComponent((result, _props) => {
+			const Page = createComponent((result) => {
 				return render`${renderComponent(
 					result,
 					'PageLayout',
@@ -95,19 +95,22 @@ describe('core/render', () => {
 				)}`;
 			});
 
-			const ctx = createRenderContext({
-				request: new Request('http://example.com/'),
-				links: [{ name: 'link', props: { rel: 'stylesheet', href: '/main.css' }, children: '' }],
-			});
 			const PageModule = createAstroModule(Page);
-
-			const response = await renderPage(PageModule, ctx, env);
+			const request = new Request('http://example.com/');
+			const routeData = {
+				type: 'page',
+				pathname: '/index',
+				component: 'src/pages/index.astro',
+				params: {},
+			};
+			const renderContext = RenderContext.create({ pipeline, request, routeData });
+			const response = await renderContext.render(PageModule);
 
 			const html = await response.text();
 			const $ = cheerio.load(html);
 
-			expect($('head link')).to.have.a.lengthOf(1);
-			expect($('body link')).to.have.a.lengthOf(0);
+			assert.equal($('head link').length, 1);
+			assert.equal($('body link').length, 0);
 		});
 
 		it('Multi-level layouts and head injection, without explicit head', async () => {
@@ -150,7 +153,7 @@ describe('core/render', () => {
 				`;
 			});
 
-			const Page = createComponent((result, _props) => {
+			const Page = createComponent((result) => {
 				return render`${renderComponent(
 					result,
 					'PageLayout',
@@ -173,19 +176,22 @@ describe('core/render', () => {
 				)}`;
 			});
 
-			const ctx = createRenderContext({
-				request: new Request('http://example.com/'),
-				links: [{ name: 'link', props: { rel: 'stylesheet', href: '/main.css' }, children: '' }],
-			});
 			const PageModule = createAstroModule(Page);
-
-			const response = await renderPage(PageModule, ctx, env);
+			const request = new Request('http://example.com/');
+			const routeData = {
+				type: 'page',
+				pathname: '/index',
+				component: 'src/pages/index.astro',
+				params: {},
+			};
+			const renderContext = RenderContext.create({ pipeline, request, routeData });
+			const response = await renderContext.render(PageModule);
 
 			const html = await response.text();
 			const $ = cheerio.load(html);
 
-			expect($('head link')).to.have.a.lengthOf(1);
-			expect($('body link')).to.have.a.lengthOf(0);
+			assert.equal($('head link').length, 1);
+			assert.equal($('body link').length, 0);
 		});
 
 		it('Multi-level layouts and head injection, without any content in layouts', async () => {
@@ -206,7 +212,7 @@ describe('core/render', () => {
 				`;
 			});
 
-			const Page = createComponent((result, _props) => {
+			const Page = createComponent((result) => {
 				return render`${renderComponent(
 					result,
 					'PageLayout',
@@ -218,18 +224,21 @@ describe('core/render', () => {
 				)}`;
 			});
 
-			const ctx = createRenderContext({
-				request: new Request('http://example.com/'),
-				links: [{ name: 'link', props: { rel: 'stylesheet', href: '/main.css' }, children: '' }],
-			});
 			const PageModule = createAstroModule(Page);
-
-			const response = await renderPage(PageModule, ctx, env);
+			const request = new Request('http://example.com/');
+			const routeData = {
+				type: 'page',
+				pathname: '/index',
+				component: 'src/pages/index.astro',
+				params: {},
+			};
+			const renderContext = RenderContext.create({ pipeline, request, routeData });
+			const response = await renderContext.render(PageModule);
 
 			const html = await response.text();
 			const $ = cheerio.load(html);
 
-			expect($('link')).to.have.a.lengthOf(1);
+			assert.equal($('link').length, 1);
 		});
 	});
 });

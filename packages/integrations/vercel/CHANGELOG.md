@@ -1,5 +1,840 @@
 # @astrojs/vercel
 
+## 7.3.6
+
+### Patch Changes
+
+- Updated dependencies [[`1ea0a25b94125e4f6f2ac82b42f638e22d7bdffd`](https://github.com/withastro/astro/commit/1ea0a25b94125e4f6f2ac82b42f638e22d7bdffd)]:
+  - @astrojs/internal-helpers@0.3.0
+
+## 7.3.5
+
+### Patch Changes
+
+- [#10336](https://github.com/withastro/astro/pull/10336) [`f2e60a96754ed1d86001fe4d5d3a0c0ef657408d`](https://github.com/withastro/astro/commit/f2e60a96754ed1d86001fe4d5d3a0c0ef657408d) Thanks [@FredKSchott](https://github.com/FredKSchott)! - Fixes an issue that was preventing the use of `sharp` in some cases and causing a runtime error
+
+## 7.3.4
+
+### Patch Changes
+
+- [#10231](https://github.com/withastro/astro/pull/10231) [`ae2a10e1a768e31d243194694222932ffafb54cc`](https://github.com/withastro/astro/commit/ae2a10e1a768e31d243194694222932ffafb54cc) Thanks [@mingjunlu](https://github.com/mingjunlu)! - Fixes an issue where functions were also created for prerendered routes with `functionPerRoute` enabled.
+
+## 7.3.3
+
+### Patch Changes
+
+- [#10215](https://github.com/withastro/astro/pull/10215) [`a013182d322a3969e39d647aad75ec10f8bd1ed7`](https://github.com/withastro/astro/commit/a013182d322a3969e39d647aad75ec10f8bd1ed7) Thanks [@matthewp](https://github.com/matthewp)! - Fixes edge middleware calling nested routes
+
+## 7.3.2
+
+### Patch Changes
+
+- [#10194](https://github.com/withastro/astro/pull/10194) [`3cc20109277813ccb9578ca87a8b0d680a73c35c`](https://github.com/withastro/astro/commit/3cc20109277813ccb9578ca87a8b0d680a73c35c) Thanks [@matthewp](https://github.com/matthewp)! - Fix loading client-scripts in dev with ISR
+
+## 7.3.1
+
+### Patch Changes
+
+- [#10082](https://github.com/withastro/astro/pull/10082) [`2ffc5721bc22631c44d90ac43ec27fdb0b5b2d1b`](https://github.com/withastro/astro/commit/2ffc5721bc22631c44d90ac43ec27fdb0b5b2d1b) Thanks [@florian-lefebvre](https://github.com/florian-lefebvre)! - Prevents infinite redirects when Astro `trailingSlash` configuration is set to `"always"` and "vercel.json" `trailingSlash` configuration is set to `true`
+
+## 7.3.0
+
+### Minor Changes
+
+- [#9987](https://github.com/withastro/astro/pull/9987) [`0699f34d5c4481c027c4d29d73944f79f97008df`](https://github.com/withastro/astro/commit/0699f34d5c4481c027c4d29d73944f79f97008df) Thanks [@lilnasy](https://github.com/lilnasy)! - Implements verification for edge middleware. This is a security measure to ensure that your serverless functions are only ever called by your edge middleware and not a third party.
+
+  When `edgeMiddleware` is enabled, the serverless function will now respond with `403 Forbidden` for requests that are not verified to have come from the generated edge middleware. No user action is necessary.
+
+## 7.2.0
+
+### Minor Changes
+
+- [#9714](https://github.com/withastro/astro/pull/9714) [`e2fe51c828dc7ea8204788e59e3953fe36c97836`](https://github.com/withastro/astro/commit/e2fe51c828dc7ea8204788e59e3953fe36c97836) Thanks [@lilnasy](https://github.com/lilnasy)! - Introduces a new config option, `isr`, that allows you to deploy your project as an ISR function. [ISR (Incremental Static Regeneration)](https://vercel.com/docs/incremental-static-regeneration) caches your on-demand rendered pages in the same way as prerendered pages after first request.
+
+  To enable this feature, set `isr` to true in your Vercel adapter configuration in `astro.config.mjs`:
+
+  ```js
+  export default defineConfig({
+    output: 'server',
+    adapter: vercel({ isr: true }),
+  });
+  ```
+
+  ## Cache invalidation options
+
+  By default, ISR responses are cached for the duration of your deployment. You can further control caching by setting an `expiration` time or prevent caching entirely for certain routes.
+
+  ### Time-based invalidation
+
+  You can change the length of time to cache routes this by configuring an `expiration` value in seconds:
+
+  ```js
+  export default defineConfig({
+    output: 'server',
+    adapter: vercel({
+      isr: {
+        // caches all pages on first request and saves for 1 day
+        expiration: 60 * 60 * 24,
+      },
+    }),
+  });
+  ```
+
+  ### Manual invalidation
+
+  To implement Vercel's [Draft mode](https://vercel.com/docs/build-output-api/v3/features#draft-mode), or [On-Demand Incremental Static Regeneration (ISR)](https://vercel.com/docs/build-output-api/v3/features#on-demand-incremental-static-regeneration-isr), you can create a bypass token and provide it to the `isr` config along with the paths to exclude from caching:
+
+  ```js
+  export default defineConfig({
+    output: 'server',
+    adapter: vercel({
+      isr: {
+        // A secret random string that you create.
+        bypassToken: '005556d774a8',
+        // Paths that will always be served fresh.
+        exclude: ['/api/invalidate'],
+      },
+    }),
+  });
+  ```
+
+## 7.1.1
+
+### Patch Changes
+
+- [#9955](https://github.com/withastro/astro/pull/9955) [`bc1742df9423ba66e33dcbf65fbebf67a236175d`](https://github.com/withastro/astro/commit/bc1742df9423ba66e33dcbf65fbebf67a236175d) Thanks [@matthewp](https://github.com/matthewp)! - Fix regression with bundling of @libsql/client
+
+## 7.1.0
+
+### Minor Changes
+
+- [#9143](https://github.com/withastro/astro/pull/9143) [`041fdd5c89920f7ccf944b095f29e451f78b0e28`](https://github.com/withastro/astro/commit/041fdd5c89920f7ccf944b095f29e451f78b0e28) Thanks [@ematipico](https://github.com/ematipico)! - Adds experimental support for internationalization domains
+
+### Patch Changes
+
+- [#9885](https://github.com/withastro/astro/pull/9885) [`49e0c24d7f90d00e986533fcf546665967540ce7`](https://github.com/withastro/astro/commit/49e0c24d7f90d00e986533fcf546665967540ce7) Thanks [@matthewp](https://github.com/matthewp)! - Better ignores for Vercel file-tracer
+
+  The Vercel adapter has a file-tracer it uses to detect which files should be moved over to the `dist/` folder. When it's done, it prints warnings for things that it detected that maybe should be moved.
+
+  This change expands how we do ignores so that:
+
+  - Ignores happen within dot folders like `.pnpm`.
+  - `@libsql/client` is ignored, a package we know is not bundled.
+
+## 7.0.2
+
+### Patch Changes
+
+- [#9809](https://github.com/withastro/astro/pull/9809) [`3435b7f1e1ca38fdee8f3b89e2d2667f125d01b5`](https://github.com/withastro/astro/commit/3435b7f1e1ca38fdee8f3b89e2d2667f125d01b5) Thanks [@lilnasy](https://github.com/lilnasy)! - Fixes an issue where the serverless function ignored cookies added using Astro.cookies.
+
+## 7.0.1
+
+### Patch Changes
+
+- [#9585](https://github.com/withastro/astro/pull/9585) [`05adaaa2d217a3ecb34244d9b40603f35cef4a37`](https://github.com/withastro/astro/commit/05adaaa2d217a3ecb34244d9b40603f35cef4a37) Thanks [@lilnasy](https://github.com/lilnasy)! - Fixes an issue where edge middleware did not work.
+
+## 7.0.0
+
+### Major Changes
+
+- [#9661](https://github.com/withastro/astro/pull/9661) [`d6edc7540864cf5d294d7b881eb886a3804f6d05`](https://github.com/withastro/astro/commit/d6edc7540864cf5d294d7b881eb886a3804f6d05) Thanks [@ematipico](https://github.com/ematipico)! - **Breaking**: Minimum required Astro version is now 4.2.0.
+  Reorganizes internals to be more maintainable.
+  ***
+
+## 6.1.4
+
+### Patch Changes
+
+- [#9648](https://github.com/withastro/astro/pull/9648) [`d7f1903cded3e864b392d1dd7502672d37936f11`](https://github.com/withastro/astro/commit/d7f1903cded3e864b392d1dd7502672d37936f11) Thanks [@lilnasy](https://github.com/lilnasy)! - Fixes an issue where the serverless function could not respond with a prerendered 404 page.
+
+## 6.1.3
+
+### Patch Changes
+
+- [#9591](https://github.com/withastro/astro/pull/9591) [`22a5405b4a4b7948458ad170b0a7bde6954058c1`](https://github.com/withastro/astro/commit/22a5405b4a4b7948458ad170b0a7bde6954058c1) Thanks [@lilnasy](https://github.com/lilnasy)! - Fixes an issue where 404.astro was not used in static mode.
+
+- [#9598](https://github.com/withastro/astro/pull/9598) [`bd8fa7acd23ba6e7afa2c435807bd5fd6b24f505`](https://github.com/withastro/astro/commit/bd8fa7acd23ba6e7afa2c435807bd5fd6b24f505) Thanks [@lilnasy](https://github.com/lilnasy)! - Marks the `speedInsights` configuration as deprecated. Vercel has migrated features of the Speed Insights API into a framework-agnostic library with `@vercel/speed-insights`. See [Vercel Speed Insights Quickstart](https://vercel.com/docs/speed-insights/quickstart) for instructions on how to use the library instead.
+
+## 6.1.2
+
+### Patch Changes
+
+- [#9550](https://github.com/withastro/astro/pull/9550) [`7b586a6e23e25653814db9adea9674ec3a9bd535`](https://github.com/withastro/astro/commit/7b586a6e23e25653814db9adea9674ec3a9bd535) Thanks [@lilnasy](https://github.com/lilnasy)! - Fixes an issue where a build could not complete on Node 21.
+
+## 6.1.1
+
+### Patch Changes
+
+- [#9479](https://github.com/withastro/astro/pull/9479) [`1baf0b0d3cbd0564954c2366a7278794fad6726e`](https://github.com/withastro/astro/commit/1baf0b0d3cbd0564954c2366a7278794fad6726e) Thanks [@sarah11918](https://github.com/sarah11918)! - Updates README
+
+## 6.1.0
+
+### Minor Changes
+
+- [#9413](https://github.com/withastro/astro/pull/9413) [`836ab6214`](https://github.com/withastro/astro/commit/836ab6214e5ef778ef2db2c079f49e87ce70d711) Thanks [@jacobdalamb](https://github.com/jacobdalamb)! - Adds support for Node 20 (currently in `beta` on Vercel).
+
+### Patch Changes
+
+- [#9289](https://github.com/withastro/astro/pull/9289) [`8aeb0b579`](https://github.com/withastro/astro/commit/8aeb0b5797853c2eee7630b572d6abc503d59c6f) Thanks [@lilnasy](https://github.com/lilnasy)! - Fixes an issue where dots in redirects were incorrectly handled.
+
+## 6.0.2
+
+### Patch Changes
+
+- [#9287](https://github.com/withastro/astro/pull/9287) [`1e342e34e`](https://github.com/withastro/astro/commit/1e342e34eb9cef465b838654cea7bb4b0d24e602) Thanks [@lilnasy](https://github.com/lilnasy)! - Fixes an issue where redirects did not work with the static adapter.
+
+- [#9383](https://github.com/withastro/astro/pull/9383) [`bebf5cf22`](https://github.com/withastro/astro/commit/bebf5cf22d0d842670825aa961529e8b342e2b26) Thanks [@sarah11918](https://github.com/sarah11918)! - Fixes some incorrect code examples in the README documentation.
+
+- [#9334](https://github.com/withastro/astro/pull/9334) [`dfbc70790`](https://github.com/withastro/astro/commit/dfbc7079081d3346713cb536358a3854362a2c95) Thanks [@Geo25rey](https://github.com/Geo25rey)! - Allows the edge middleware to be an async function.
+
+## 6.0.1
+
+### Patch Changes
+
+- [#9348](https://github.com/withastro/astro/pull/9348) [`1685cc42b`](https://github.com/withastro/astro/commit/1685cc42b51603eb98b5ba3e072cf2d3953339f2) Thanks [@matthewp](https://github.com/matthewp)! - Uses the latest astro as the peerDependency
+
+## 6.0.0
+
+### Major Changes
+
+- [#9199](https://github.com/withastro/astro/pull/9199) [`49aa215a0`](https://github.com/withastro/astro/commit/49aa215a01ee1c4805316c85bb0aea6cfbc25a31) Thanks [@lilnasy](https://github.com/lilnasy)! - The internals of the integration have been updated to support Astro 4.0. Make sure to upgrade your Astro version as Astro 3.0 is no longer supported.
+
+- [#9184](https://github.com/withastro/astro/pull/9184) [`a145ac07e`](https://github.com/withastro/astro/commit/a145ac07e75927e13af62e28d13bc8217a362b8e) Thanks [@bluwy](https://github.com/bluwy)! - Removes deprecated `analytics` option. Use the `webAnalytics` option instead.
+
+- [#9263](https://github.com/withastro/astro/pull/9263) [`3cbd8ea75`](https://github.com/withastro/astro/commit/3cbd8ea7534910e3beae396dcfa93ce87dcdd91f) Thanks [@bluwy](https://github.com/bluwy)! - Removes the deprecated `@astrojs/vercel/edge` export. You should use `@astrojs/vercel/serverless` instead with the `edgeMiddleware` option.
+
+## 6.0.0-beta.2
+
+### Major Changes
+
+- [#9263](https://github.com/withastro/astro/pull/9263) [`3cbd8ea75`](https://github.com/withastro/astro/commit/3cbd8ea7534910e3beae396dcfa93ce87dcdd91f) Thanks [@bluwy](https://github.com/bluwy)! - Removes the deprecated `@astrojs/vercel/edge` export. You should use `@astrojs/vercel/serverless` instead with the `edgeMiddleware` option.
+
+## 6.0.0-beta.1
+
+### Major Changes
+
+- [#9199](https://github.com/withastro/astro/pull/9199) [`49aa215a0`](https://github.com/withastro/astro/commit/49aa215a01ee1c4805316c85bb0aea6cfbc25a31) Thanks [@lilnasy](https://github.com/lilnasy)! - The internals of the integration have been updated to support Astro 4.0. Make sure to upgrade your Astro version as Astro 3.0 is no longer supported.
+
+## 6.0.0-beta.0
+
+### Major Changes
+
+- [#9184](https://github.com/withastro/astro/pull/9184) [`a145ac07e`](https://github.com/withastro/astro/commit/a145ac07e75927e13af62e28d13bc8217a362b8e) Thanks [@bluwy](https://github.com/bluwy)! - Removes deprecated `analytics` option. Use the `webAnalytics` option instead.
+
+### Patch Changes
+
+- Updated dependencies [[`abf601233`](https://github.com/withastro/astro/commit/abf601233f8188d118a8cb063c777478d8d9f1a3), [`6201bbe96`](https://github.com/withastro/astro/commit/6201bbe96c2a083fb201e4a43a9bd88499821a3e), [`cdabf6ef0`](https://github.com/withastro/astro/commit/cdabf6ef02be7220fd2b6bdcef924ceca089381e), [`1c48ed286`](https://github.com/withastro/astro/commit/1c48ed286538ab9e354eca4e4dcd7c6385c96721), [`37697a2c5`](https://github.com/withastro/astro/commit/37697a2c5511572dc29c0a4ea46f90c2f62be8e6), [`bd0c2e9ae`](https://github.com/withastro/astro/commit/bd0c2e9ae3389a9d3085050c1e8134ae98dff299), [`0fe3a7ed5`](https://github.com/withastro/astro/commit/0fe3a7ed5d7bb1a9fce1623e84ba14104b51223c), [`710be505c`](https://github.com/withastro/astro/commit/710be505c9ddf416e77a75343d8cae9c497d72c6), [`153a5abb9`](https://github.com/withastro/astro/commit/153a5abb905042ac68b712514dc9ec387d3e6b17)]:
+  - astro@4.0.0-beta.0
+
+## 5.2.0
+
+### Minor Changes
+
+- [#8879](https://github.com/withastro/astro/pull/8879) [`754e4fd31`](https://github.com/withastro/astro/commit/754e4fd31ce49eadb2cf4951e941a48d11d10e73) Thanks [@lilnasy](https://github.com/lilnasy)! - The Vercel adapter now streams responses!
+
+  This brings better performance to your visitors by showing them content as it is rendered. The browser can also start loading the required stylesheets and scripts much sooner, which ultimately results in faster full page loads.
+
+## 5.1.0
+
+### Minor Changes
+
+- [#8867](https://github.com/withastro/astro/pull/8867) [`b209e5335`](https://github.com/withastro/astro/commit/b209e533584521c55f88b929f28ea9d5189045f9) Thanks [@lilnasy](https://github.com/lilnasy)! - You can now configure how long your functions can run before timing out.
+
+  ```diff
+  export default defineConfig({
+      output: "server",
+      adapter: vercel({
+  +       maxDuration: 60
+      }),
+  });
+  ```
+
+### Patch Changes
+
+- [#8896](https://github.com/withastro/astro/pull/8896) [`5dd1ed50b`](https://github.com/withastro/astro/commit/5dd1ed50b2f9428946b0b273e0ce8f13c19aa3b5) Thanks [@bluwy](https://github.com/bluwy)! - Prevents the Vercel serverless adapter from generating static redirect pages in hybrid mode
+
+- Updated dependencies [[`26b77b8fe`](https://github.com/withastro/astro/commit/26b77b8fef0e03bfc5550aecaa1f56a4fc1cd297)]:
+  - astro@3.3.4
+
+## 5.0.2
+
+### Patch Changes
+
+- [#8737](https://github.com/withastro/astro/pull/8737) [`6f60da805`](https://github.com/withastro/astro/commit/6f60da805e0014bc50dd07bef972e91c73560c3c) Thanks [@ematipico](https://github.com/ematipico)! - Add provenance statement when publishing the library from CI
+
+- Updated dependencies [[`6f60da805`](https://github.com/withastro/astro/commit/6f60da805e0014bc50dd07bef972e91c73560c3c), [`d78806dfe`](https://github.com/withastro/astro/commit/d78806dfe0301ea7ffe6c7c1f783bd415ac7cda9), [`d1c75fe15`](https://github.com/withastro/astro/commit/d1c75fe158839699c59728cf3a83888e8c72a459), [`aa265d730`](https://github.com/withastro/astro/commit/aa265d73024422967c1b1c68ad268c419c6c798f), [`78adbc443`](https://github.com/withastro/astro/commit/78adbc4433208458291e36713909762e148e1e5d), [`21e0757ea`](https://github.com/withastro/astro/commit/21e0757ea22a57d344c934045ca19db93b684436), [`357270f2a`](https://github.com/withastro/astro/commit/357270f2a3d0bf2aa634ba7e52e9d17618eff4a7)]:
+  - @astrojs/internal-helpers@0.2.1
+  - astro@3.2.3
+
+## 5.0.1
+
+### Patch Changes
+
+- [#8581](https://github.com/withastro/astro/pull/8581) [`d0e513f21`](https://github.com/withastro/astro/commit/d0e513f214fe3cb30bab6d98936cda796477f2f8) Thanks [@rishi-raj-jain](https://github.com/rishi-raj-jain)! - log only once in serverless adapter
+
+- Updated dependencies [[`8d361169b`](https://github.com/withastro/astro/commit/8d361169b8e487933d671ce347f0ce74922c80cc), [`95b5f6280`](https://github.com/withastro/astro/commit/95b5f6280d124f8d6f866dc3286406c272ee91bf), [`0586e20e8`](https://github.com/withastro/astro/commit/0586e20e8338e077b8eb1a3a96bdd19f5950c22f)]:
+  - astro@3.1.1
+
+## 5.0.0
+
+### Major Changes
+
+- [#8445](https://github.com/withastro/astro/pull/8445) [`91380378c`](https://github.com/withastro/astro/commit/91380378cef545656d2c085117fc5f38c9ce4589) Thanks [@Princesseuh](https://github.com/Princesseuh)! - Adds a configuration option `devImageService` to choose which of the built-in image services to use in development. Defaults to `sharp`.
+
+- [#8546](https://github.com/withastro/astro/pull/8546) [`b79e11f3c`](https://github.com/withastro/astro/commit/b79e11f3c480e8e165d5b102adb1f2f8a089f29d) Thanks [@matthewp](https://github.com/matthewp)! - Turn off `functionPerRoute` by default
+
+  In the previous version of `@astrojs/vercel`, the default for `functionPerRoute` was changed to `true`. While this option has several advantages, if you're a free tier user you are likely to run into the limit of 12 functions per deployment. This will result in an error when you attempt to deploy.
+
+  For this reason, the `functionPerRoute` option is now back to defaulting to `false`. It's still a useful option if you have a paid plan and have previously run into issues with your single function exceeding the size limits.
+
+### Minor Changes
+
+- [#8021](https://github.com/withastro/astro/pull/8021) [`2e8726fee`](https://github.com/withastro/astro/commit/2e8726feec2e0d6ba8bd4db941009986e8e34141) Thanks [@chriswdmr](https://github.com/chriswdmr)! - Enable Vercel Speed Insights and Vercel Web Analytics individually.
+  Deprecates the `analytics` property in `astro.config.mjs` in favor of `speedInsights` and `webAnalytics`.
+
+  If you're using the `analytics` property, you'll need to update your config to use the new properties:
+
+  ```diff
+  // astro.config.mjs
+  export default defineConfig({
+  	adapter: vercel({
+  -		analytics: true,
+  +		webAnalytics: {
+  +			enabled: true
+  +		},
+  +		speedInsights: {
+  +			enabled: true
+  +		}
+  	})
+  });
+  ```
+
+  Allow configuration of Web Analytics with all available configuration options.
+  Bumps @vercel/analytics package to the latest version.
+
+### Patch Changes
+
+- Updated dependencies [[`7522bb491`](https://github.com/withastro/astro/commit/7522bb4914f2f9e8b8f3c743bc9c941fd3aca644), [`ecc65abbf`](https://github.com/withastro/astro/commit/ecc65abbf9e086c5bbd1973cd4a820082b4e0dc5), [`2c4fc878b`](https://github.com/withastro/astro/commit/2c4fc878bece36b7fcf1470419c7ce6f1e1e95d0), [`c92e0acd7`](https://github.com/withastro/astro/commit/c92e0acd715171b3f4c3294099780e21576648c8), [`f95febf96`](https://github.com/withastro/astro/commit/f95febf96bb97babb28d78994332f5e47f5f637d), [`b85c8a78a`](https://github.com/withastro/astro/commit/b85c8a78a116dbbddc901438bc0b7a1917dc0238), [`45364c345`](https://github.com/withastro/astro/commit/45364c345267429e400baecd1fbc290503f8b13a)]:
+  - astro@3.1.0
+
+## 4.0.5
+
+### Patch Changes
+
+- [#8452](https://github.com/withastro/astro/pull/8452) [`7ea32c7fb`](https://github.com/withastro/astro/commit/7ea32c7fbf4fc74a3c0fa7319561243c4e262e99) Thanks [@Princesseuh](https://github.com/Princesseuh)! - Fix Astro's `domains` and `remotePatterns` not being used by Vercel when using Vercel Image Optimization
+
+- Updated dependencies [[`f66053a1e`](https://github.com/withastro/astro/commit/f66053a1ea0a4e3bdb0b0df12bb1bf56e1ea2618), [`0fa483283`](https://github.com/withastro/astro/commit/0fa483283e54c94f173838cd558dc0dbdd11e699)]:
+  - astro@3.0.11
+
+## 4.0.4
+
+### Patch Changes
+
+- [#8408](https://github.com/withastro/astro/pull/8408) [`9ffa1a84e`](https://github.com/withastro/astro/commit/9ffa1a84e81f52d55ffe07826b8b1f10fc023ee9) Thanks [@slawekkolodziej](https://github.com/slawekkolodziej)! - Fix serverless function naming conflicts for routes with identical filenames but different directory structures
+
+- Updated dependencies [[`7d95bd9ba`](https://github.com/withastro/astro/commit/7d95bd9baaf755239fd7d35e4813861b2dbccf42), [`1947ef7a9`](https://github.com/withastro/astro/commit/1947ef7a99ce3d1d6ea797842edd31d5edffa5de), [`61ad70fdc`](https://github.com/withastro/astro/commit/61ad70fdc52035964c43ecdb4cf7468f6c2b61e7), [`d2f2a11cd`](https://github.com/withastro/astro/commit/d2f2a11cdb42b0de79be21c798eda8e7e7b2a277), [`5126c6a40`](https://github.com/withastro/astro/commit/5126c6a40f88bff66ee5d3c3a21eea8c4a44ce7a), [`48ff7855b`](https://github.com/withastro/astro/commit/48ff7855b238536a3df17cb29335c90029fc41a4), [`923a443cb`](https://github.com/withastro/astro/commit/923a443cb060a0e936a0e1cc87c0360232f77914), [`8935b3b46`](https://github.com/withastro/astro/commit/8935b3b4672d6c54c7b79e6c4575298f75eeb9f4)]:
+  - astro@3.0.9
+
+## 4.0.3
+
+### Patch Changes
+
+- [#8348](https://github.com/withastro/astro/pull/8348) [`5f2c55bb5`](https://github.com/withastro/astro/commit/5f2c55bb54bb66693d278b7cd705c198aecc0331) Thanks [@ematipico](https://github.com/ematipico)! - - Cache result during bundling, to speed up the process of multiple functions;
+
+  - Avoid creating multiple symbolic links of the dependencies when building the project with `functionPerRoute` enabled;
+
+- [#8354](https://github.com/withastro/astro/pull/8354) [`0eb09dbab`](https://github.com/withastro/astro/commit/0eb09dbab1674a57d23ac97950a527d2e5a9c9fb) Thanks [@Princesseuh](https://github.com/Princesseuh)! - Fix unnecessary warning about Sharp showing while building
+
+- Updated dependencies [[`d3a6f9f83`](https://github.com/withastro/astro/commit/d3a6f9f836e35932a950e40ba69eff63d7db7eed), [`f21599671`](https://github.com/withastro/astro/commit/f21599671a90c3327307eb6d2f4d5c02e9137207)]:
+  - astro@3.0.6
+
+## 4.0.2
+
+### Patch Changes
+
+- [#8318](https://github.com/withastro/astro/pull/8318) [`c58472756`](https://github.com/withastro/astro/commit/c58472756ea30d2496592b2bde390cf858c1876f) Thanks [@ematipico](https://github.com/ematipico)! - Add astro feature map and adapter features to the static adapter. This will remove the warning emitted by Astro.
+
+- Updated dependencies [[`5f3a44aee`](https://github.com/withastro/astro/commit/5f3a44aeeff3c5f31a8063b6005abb90343a817e), [`b21038c19`](https://github.com/withastro/astro/commit/b21038c193fd30351235a1b241a4a0aaf4e692f2), [`7a894eec3`](https://github.com/withastro/astro/commit/7a894eec3e6d2670632ca8cdb592cf5649a22d3e), [`af41b03d0`](https://github.com/withastro/astro/commit/af41b03d05f8a561990de42ccc93663343da2c0d)]:
+  - astro@3.0.5
+
+## 4.0.1
+
+### Patch Changes
+
+- [#8328](https://github.com/withastro/astro/pull/8328) [`8fff0e9ae`](https://github.com/withastro/astro/commit/8fff0e9aebec5ff8c2516ed6dbcccb307c20ce45) Thanks [@matthewp](https://github.com/matthewp)! - Update verbiage of Vercel warning
+
+- [#8319](https://github.com/withastro/astro/pull/8319) [`dc29e0f79`](https://github.com/withastro/astro/commit/dc29e0f797398678d16a3a7154443e0f2dd48077) Thanks [@ematipico](https://github.com/ematipico)! - Add warning when `functionPerRoute` is set to `true`
+
+- Updated dependencies [[`0752cf368`](https://github.com/withastro/astro/commit/0752cf3688eaac535ceda1ebcd22ccaf20b2171f)]:
+  - astro@3.0.4
+
+## 4.0.0
+
+### Major Changes
+
+- [#8188](https://github.com/withastro/astro/pull/8188) [`d0679a666`](https://github.com/withastro/astro/commit/d0679a666f37da0fca396d42b9b32bbb25d29312) Thanks [@ematipico](https://github.com/ematipico)! - Remove support for Node 16. The lowest supported version by Astro and all integrations is now v18.14.1. As a reminder, Node 16 will be deprecated on the 11th September 2023.
+
+- [#8179](https://github.com/withastro/astro/pull/8179) [`6011d52d3`](https://github.com/withastro/astro/commit/6011d52d38e43c3e3d52bc3bc41a60e36061b7b7) Thanks [@matthewp](https://github.com/matthewp)! - Astro 3.0 Release Candidate
+
+- [#8188](https://github.com/withastro/astro/pull/8188) [`7511a4980`](https://github.com/withastro/astro/commit/7511a4980fd36536464c317de33a5190427f430a) Thanks [@ematipico](https://github.com/ematipico)! - When using an adapter that supports neither Squoosh or Sharp, Astro will now automatically use an image service that does not support processing, but still provides the other benefits of `astro:assets` such as enforcing `alt`, no CLS etc to users
+
+- [#8015](https://github.com/withastro/astro/pull/8015) [`9cc4e48e6`](https://github.com/withastro/astro/commit/9cc4e48e6a858d3a12e6373a5e287b32d24a1c5a) Thanks [@matthewp](https://github.com/matthewp)! - Remove the Vercel Edge adapter
+
+  `@astrojs/vercel/serverless` now supports Edge middleware, so a separate adapter for Edge itself (deploying your entire app to the edge) is no longer necessary. Please update your Astro config to reflect this change:
+
+  ```diff
+  // astro.config.mjs
+  import { defineConfig } from 'astro/config';
+  - import vercel from '@astrojs/vercel/edge';
+  + import vercel from '@astrojs/vercel/serverless';
+
+  export default defineConfig({
+   output: 'server',
+   adapter: vercel({
+  +    edgeMiddleware: true
+   }),
+  });
+  ```
+
+  This adapter had several known limitations and compatibility issues that prevented many people from using it in production. To reduce maintenance costs and because we have a better story with Serveless + Edge Middleware, we are removing the Edge adapter.
+
+- [#8239](https://github.com/withastro/astro/pull/8239) [`52f0837bd`](https://github.com/withastro/astro/commit/52f0837bdeca0b54e07cbf76a7570bd042b98922) Thanks [@matthewp](https://github.com/matthewp)! - Vercel adapter now defaults to `functionPerRoute`.
+
+  With this change, `@astrojs/vercel/serverless` now splits each route into its own function. By doing this, the size of each function is reduced and startup time is faster.
+
+  You can disable this option, which will cause the code to be bundled into a single function, by setting `functionPerRoute` to `false`.
+
+- [#8188](https://github.com/withastro/astro/pull/8188) [`148e61d24`](https://github.com/withastro/astro/commit/148e61d2492456811f8a3c8daaab1c3429a2ffdc) Thanks [@ematipico](https://github.com/ematipico)! - Reduced the amount of polyfills provided by Astro. Astro will no longer provide (no-op) polyfills for several web apis such as HTMLElement, Image or Document. If you need access to those APIs on the server, we recommend using more proper polyfills available on npm.
+
+### Minor Changes
+
+- [#8188](https://github.com/withastro/astro/pull/8188) [`cd2d7e769`](https://github.com/withastro/astro/commit/cd2d7e76981ef9b9013453aa2629838e1e9fd422) Thanks [@ematipico](https://github.com/ematipico)! - Introduced the concept of feature map. A feature map is a list of features that are built-in in Astro, and an Adapter
+  can tell Astro if it can support it.
+
+  ```ts
+  import { AstroIntegration } from './astro';
+
+  function myIntegration(): AstroIntegration {
+    return {
+      name: 'astro-awesome-list',
+      // new feature map
+      supportedAstroFeatures: {
+        hybridOutput: 'experimental',
+        staticOutput: 'stable',
+        serverOutput: 'stable',
+        assets: {
+          supportKind: 'stable',
+          isSharpCompatible: false,
+          isSquooshCompatible: false,
+        },
+      },
+    };
+  }
+  ```
+
+- [#8188](https://github.com/withastro/astro/pull/8188) [`80f1494cd`](https://github.com/withastro/astro/commit/80f1494cdaf72e58a420adb4f7c712d4089e1923) Thanks [@ematipico](https://github.com/ematipico)! - The `build.split` and `build.excludeMiddleware` configuration options are deprecated and have been replaced by options in the adapter config.
+
+  If your config includes the `build.excludeMiddleware` option, replace it with `edgeMiddleware` in your adapter options:
+
+  ```diff
+  import { defineConfig } from "astro/config";
+  import vercel from "@astrojs/vercel/serverless";
+
+  export default defineConfig({
+       build: {
+  -        excludeMiddleware: true
+       },
+       adapter: vercel({
+  +        edgeMiddleware: true
+       }),
+  });
+  ```
+
+  If your config includes the `build.split` option, replace it with `functionPerRoute` in your adapter options:
+
+  ```diff
+  import { defineConfig } from "astro/config";
+  import vercel from "@astrojs/vercel/serverless";
+
+  export default defineConfig({
+       build: {
+  -        split: true
+       },
+       adapter: vercel({
+  +        functionPerRoute: true
+       }),
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`d0679a666`](https://github.com/withastro/astro/commit/d0679a666f37da0fca396d42b9b32bbb25d29312), [`db39206cb`](https://github.com/withastro/astro/commit/db39206cbb85b034859ac416179f141184bb2bff), [`2aa6d8ace`](https://github.com/withastro/astro/commit/2aa6d8ace398a41c2dec5473521d758816b08191), [`adf9fccfd`](https://github.com/withastro/astro/commit/adf9fccfdda107c2224558f1c2e6a77847ac0a8a), [`0c7b42dc6`](https://github.com/withastro/astro/commit/0c7b42dc6780e687e416137539f55a3a427d1d10), [`46c4c0e05`](https://github.com/withastro/astro/commit/46c4c0e053f830585b9ef229ce1c259df00a80f8), [`364d861bd`](https://github.com/withastro/astro/commit/364d861bd527b8511968e2837728148f090bedef), [`2484dc408`](https://github.com/withastro/astro/commit/2484dc4080e5cd84b9a53648a1de426d7c907be2), [`81545197a`](https://github.com/withastro/astro/commit/81545197a32fd015d763fc386c8b67e0e08b7393), [`6011d52d3`](https://github.com/withastro/astro/commit/6011d52d38e43c3e3d52bc3bc41a60e36061b7b7), [`c2c71d90c`](https://github.com/withastro/astro/commit/c2c71d90c264a2524f99e0373ab59015f23ad4b1), [`cd2d7e769`](https://github.com/withastro/astro/commit/cd2d7e76981ef9b9013453aa2629838e1e9fd422), [`80f1494cd`](https://github.com/withastro/astro/commit/80f1494cdaf72e58a420adb4f7c712d4089e1923), [`e45f30293`](https://github.com/withastro/astro/commit/e45f3029340db718b6ed7e91b5d14f5cf14cd71d), [`c0de7a7b0`](https://github.com/withastro/astro/commit/c0de7a7b0f042cd49cbea4f4ac1b2ab6f9fef644), [`65c354969`](https://github.com/withastro/astro/commit/65c354969e6fe0ef6d622e8f4c545e2f717ce8c6), [`3c3100851`](https://github.com/withastro/astro/commit/3c31008519ce68b5b1b1cb23b71fbe0a2d506882), [`34cb20021`](https://github.com/withastro/astro/commit/34cb2002161ba88df6bcb72fecfd12ed867c134b), [`a824863ab`](https://github.com/withastro/astro/commit/a824863ab1c451f4068eac54f28dd240573e1cba), [`44f7a2872`](https://github.com/withastro/astro/commit/44f7a28728c56c04ac377b6e917329f324874043), [`1048aca55`](https://github.com/withastro/astro/commit/1048aca550769415e528016e42b358ffbfd44b61), [`be6bbd2c8`](https://github.com/withastro/astro/commit/be6bbd2c86b9bf5268e765bb937dda00ff15781a), [`9e021a91c`](https://github.com/withastro/astro/commit/9e021a91c57d10809f588dd47968fc0e7f8b4d5c), [`7511a4980`](https://github.com/withastro/astro/commit/7511a4980fd36536464c317de33a5190427f430a), [`c37632a20`](https://github.com/withastro/astro/commit/c37632a20d06164fb97a4c2fc48df6d960398832), [`acf652fc1`](https://github.com/withastro/astro/commit/acf652fc1d5db166231e87e22d0d50444f5556d8), [`42785c7b7`](https://github.com/withastro/astro/commit/42785c7b784b151e6d582570e5d74482129e8eb8), [`8450379db`](https://github.com/withastro/astro/commit/8450379db854fb1eaa9f38f21d65db240bc616cd), [`dbc97b121`](https://github.com/withastro/astro/commit/dbc97b121f42583728f1cdfdbf14575fda943f5b), [`7d2f311d4`](https://github.com/withastro/astro/commit/7d2f311d428e3d1c8c13b9bf2a708d6435713fc2), [`2540feedb`](https://github.com/withastro/astro/commit/2540feedb06785d5a20eecc3668849f147d778d4), [`ea7ff5177`](https://github.com/withastro/astro/commit/ea7ff5177dbcd7b2508cb1eef1b22b8ee1f47079), [`68efd4a8b`](https://github.com/withastro/astro/commit/68efd4a8b29f248397667801465b3152dc98e9a7), [`7bd1b86f8`](https://github.com/withastro/astro/commit/7bd1b86f85c06fdde0a1ed9146d01bac69990671), [`036388f66`](https://github.com/withastro/astro/commit/036388f66dab68ad54b895ed86f9176958dd83c8), [`519a1c4e8`](https://github.com/withastro/astro/commit/519a1c4e8407c7abcb8d879b67a9f4b960652cae), [`1f58a7a1b`](https://github.com/withastro/astro/commit/1f58a7a1bea6888868b689dac94801d554319b02), [`2ae9d37f0`](https://github.com/withastro/astro/commit/2ae9d37f0a9cb21ab288d3c30aecb6d84db87788), [`a8f35777e`](https://github.com/withastro/astro/commit/a8f35777e7e322068a4e2f520c2c9e43ade19e58), [`70f34f5a3`](https://github.com/withastro/astro/commit/70f34f5a355f42526ee9e5355f3de8e510002ea2), [`5208a3c8f`](https://github.com/withastro/astro/commit/5208a3c8fefcec7694857fb344af351f4631fc34), [`84af8ed9d`](https://github.com/withastro/astro/commit/84af8ed9d1e6401c6ebc9c60fe8cddb44d5044b0), [`f003e7364`](https://github.com/withastro/astro/commit/f003e7364317cafdb8589913b26b28e928dd07c9), [`ffc9e2d3d`](https://github.com/withastro/astro/commit/ffc9e2d3de46049bf3d82140ef018f524fb03187), [`732111cdc`](https://github.com/withastro/astro/commit/732111cdce441639db31f40f621df48442d00969), [`0f637c71e`](https://github.com/withastro/astro/commit/0f637c71e511cb4c51712128d217a26c8eee4d40), [`33b8910cf`](https://github.com/withastro/astro/commit/33b8910cfdce5713891c50a84a0a8fe926311710), [`8a5b0c1f3`](https://github.com/withastro/astro/commit/8a5b0c1f3a4be6bb62db66ec70144109ff5b4c59), [`148e61d24`](https://github.com/withastro/astro/commit/148e61d2492456811f8a3c8daaab1c3429a2ffdc), [`e79e3779d`](https://github.com/withastro/astro/commit/e79e3779df0ad35253abcdb931d622847d9adb12), [`632579dc2`](https://github.com/withastro/astro/commit/632579dc2094cc342929261c89e689f0dd358284), [`3674584e0`](https://github.com/withastro/astro/commit/3674584e02b161a698b429ceb66723918fdc56ac), [`1db4e92c1`](https://github.com/withastro/astro/commit/1db4e92c12ed73681217f5cefd39f2f47542f961), [`e7f872e91`](https://github.com/withastro/astro/commit/e7f872e91e852b901cf221a5151077dec64305bf), [`16f09dfff`](https://github.com/withastro/astro/commit/16f09dfff7722fda99dd0412e3006a7a39c80829), [`4477bb41c`](https://github.com/withastro/astro/commit/4477bb41c8ed688785c545731ef5b184b629f4e5), [`55c10d1d5`](https://github.com/withastro/astro/commit/55c10d1d564e805efc3c1a7c48e0d9a1cdf0c7ed), [`3e834293d`](https://github.com/withastro/astro/commit/3e834293d47ab2761a7aa013916e8371871efb7f), [`96beb883a`](https://github.com/withastro/astro/commit/96beb883ad87f8bbf5b2f57e14a743763d2a6f58), [`997a0db8a`](https://github.com/withastro/astro/commit/997a0db8a4e3851edd69384cf5eadbb969e1d547), [`80f1494cd`](https://github.com/withastro/astro/commit/80f1494cdaf72e58a420adb4f7c712d4089e1923), [`0f0625504`](https://github.com/withastro/astro/commit/0f0625504145f18cba7dc6cf20291cb2abddc5a9), [`e1ae56e72`](https://github.com/withastro/astro/commit/e1ae56e724d0f83db1230359e06cd6bc26f5fa26), [`f32d093a2`](https://github.com/withastro/astro/commit/f32d093a280faafff024228c12bb438156ec34d7), [`f01eb585e`](https://github.com/withastro/astro/commit/f01eb585e7c972d940761309b1595f682b6922d2), [`b76c166bd`](https://github.com/withastro/astro/commit/b76c166bdd8e28683f62806aef968d1e0c3b06d9), [`a87cbe400`](https://github.com/withastro/astro/commit/a87cbe400314341d5f72abf86ea264e6b47c091f), [`866ed4098`](https://github.com/withastro/astro/commit/866ed4098edffb052239cdb26e076cf8db61b1d9), [`767eb6866`](https://github.com/withastro/astro/commit/767eb68666eb777965baa0d6ade20bbafecf95bf), [`32669cd47`](https://github.com/withastro/astro/commit/32669cd47555e9c7433c3998a2b6e624dfb2d8e9)]:
+  - astro@3.0.0
+  - @astrojs/internal-helpers@0.2.0
+
+## 4.0.0-rc.5
+
+### Major Changes
+
+- [#8239](https://github.com/withastro/astro/pull/8239) [`52f0837bd`](https://github.com/withastro/astro/commit/52f0837bdeca0b54e07cbf76a7570bd042b98922) Thanks [@matthewp](https://github.com/matthewp)! - Vercel adapter now defaults to `functionPerRoute`.
+
+  With this change, `@astrojs/vercel/serverless` now splits each route into its own function. By doing this, the size of each function is reduced and startup time is faster.
+
+  You can disable this option, which will cause the code to be bundled into a single function, by setting `functionPerRoute` to `false`.
+
+### Patch Changes
+
+- Updated dependencies [[`46c4c0e05`](https://github.com/withastro/astro/commit/46c4c0e053f830585b9ef229ce1c259df00a80f8), [`1048aca55`](https://github.com/withastro/astro/commit/1048aca550769415e528016e42b358ffbfd44b61), [`ffc9e2d3d`](https://github.com/withastro/astro/commit/ffc9e2d3de46049bf3d82140ef018f524fb03187), [`3674584e0`](https://github.com/withastro/astro/commit/3674584e02b161a698b429ceb66723918fdc56ac)]:
+  - astro@3.0.0-rc.8
+
+## 4.0.0-rc.4
+
+### Major Changes
+
+- [#8179](https://github.com/withastro/astro/pull/8179) [`6011d52d3`](https://github.com/withastro/astro/commit/6011d52d38e43c3e3d52bc3bc41a60e36061b7b7) Thanks [@matthewp](https://github.com/matthewp)! - Astro 3.0 Release Candidate
+
+### Patch Changes
+
+- Updated dependencies [[`adf9fccfd`](https://github.com/withastro/astro/commit/adf9fccfdda107c2224558f1c2e6a77847ac0a8a), [`582132328`](https://github.com/withastro/astro/commit/5821323285646aee7ff9194a505f708028e4db57), [`81545197a`](https://github.com/withastro/astro/commit/81545197a32fd015d763fc386c8b67e0e08b7393), [`6011d52d3`](https://github.com/withastro/astro/commit/6011d52d38e43c3e3d52bc3bc41a60e36061b7b7), [`be6bbd2c8`](https://github.com/withastro/astro/commit/be6bbd2c86b9bf5268e765bb937dda00ff15781a), [`42785c7b7`](https://github.com/withastro/astro/commit/42785c7b784b151e6d582570e5d74482129e8eb8), [`95120efbe`](https://github.com/withastro/astro/commit/95120efbe817163663492181cbeb225849354493), [`2ae9d37f0`](https://github.com/withastro/astro/commit/2ae9d37f0a9cb21ab288d3c30aecb6d84db87788), [`f003e7364`](https://github.com/withastro/astro/commit/f003e7364317cafdb8589913b26b28e928dd07c9), [`732111cdc`](https://github.com/withastro/astro/commit/732111cdce441639db31f40f621df48442d00969), [`33b8910cf`](https://github.com/withastro/astro/commit/33b8910cfdce5713891c50a84a0a8fe926311710), [`e79e3779d`](https://github.com/withastro/astro/commit/e79e3779df0ad35253abcdb931d622847d9adb12), [`179796405`](https://github.com/withastro/astro/commit/179796405e053b559d83f84507e5a465861a029a), [`a87cbe400`](https://github.com/withastro/astro/commit/a87cbe400314341d5f72abf86ea264e6b47c091f), [`767eb6866`](https://github.com/withastro/astro/commit/767eb68666eb777965baa0d6ade20bbafecf95bf)]:
+  - astro@3.0.0-rc.5
+  - @astrojs/internal-helpers@0.2.0-rc.2
+
+## 4.0.0-beta.3
+
+### Patch Changes
+
+- [#7778](https://github.com/withastro/astro/pull/7778) [`d6b494376`](https://github.com/withastro/astro/commit/d6b4943764989c0e89df2d6875cd19691566dfb3) Thanks [@y-nk](https://github.com/y-nk)! - Update image support to work with latest version of Astro
+
+- Updated dependencies [[`2484dc408`](https://github.com/withastro/astro/commit/2484dc4080e5cd84b9a53648a1de426d7c907be2), [`c2c71d90c`](https://github.com/withastro/astro/commit/c2c71d90c264a2524f99e0373ab59015f23ad4b1), [`7177f7579`](https://github.com/withastro/astro/commit/7177f7579b6e866f0fd895b3fd079d8ba330b1a9), [`097a8e4e9`](https://github.com/withastro/astro/commit/097a8e4e916c7df18eafdaa6c8d6ce2991c17ab6), [`dbc97b121`](https://github.com/withastro/astro/commit/dbc97b121f42583728f1cdfdbf14575fda943f5b), [`2540feedb`](https://github.com/withastro/astro/commit/2540feedb06785d5a20eecc3668849f147d778d4), [`ea7ff5177`](https://github.com/withastro/astro/commit/ea7ff5177dbcd7b2508cb1eef1b22b8ee1f47079), [`68efd4a8b`](https://github.com/withastro/astro/commit/68efd4a8b29f248397667801465b3152dc98e9a7), [`0e0fa605d`](https://github.com/withastro/astro/commit/0e0fa605d109cc91e08a1ae1cc560ea240fe631b), [`5208a3c8f`](https://github.com/withastro/astro/commit/5208a3c8fefcec7694857fb344af351f4631fc34), [`8a5b0c1f3`](https://github.com/withastro/astro/commit/8a5b0c1f3a4be6bb62db66ec70144109ff5b4c59), [`d6b494376`](https://github.com/withastro/astro/commit/d6b4943764989c0e89df2d6875cd19691566dfb3), [`4477bb41c`](https://github.com/withastro/astro/commit/4477bb41c8ed688785c545731ef5b184b629f4e5), [`3e834293d`](https://github.com/withastro/astro/commit/3e834293d47ab2761a7aa013916e8371871efb7f), [`b76c166bd`](https://github.com/withastro/astro/commit/b76c166bdd8e28683f62806aef968d1e0c3b06d9)]:
+  - astro@3.0.0-beta.3
+
+## 4.0.0-beta.2
+
+### Patch Changes
+
+- Updated dependencies [[`2aa6d8ace`](https://github.com/withastro/astro/commit/2aa6d8ace398a41c2dec5473521d758816b08191)]:
+  - @astrojs/internal-helpers@0.2.0-beta.1
+  - astro@3.0.0-beta.2
+
+## 4.0.0-beta.1
+
+### Major Changes
+
+- [#8015](https://github.com/withastro/astro/pull/8015) [`9cc4e48e6`](https://github.com/withastro/astro/commit/9cc4e48e6a858d3a12e6373a5e287b32d24a1c5a) Thanks [@matthewp](https://github.com/matthewp)! - Remove the Vercel Edge adapter
+
+  `@astrojs/vercel/serverless` now supports Edge middleware, so a separate adapter for Edge itself (deploying your entire app to the edge) is no longer necessary. Please update your Astro config to reflect this change:
+
+  ```diff
+  // astro.config.mjs
+  import { defineConfig } from 'astro/config';
+  - import vercel from '@astrojs/vercel/edge';
+  + import vercel from '@astrojs/vercel/serverless';
+
+  export default defineConfig({
+   output: 'server',
+   adapter: vercel({
+  +    edgeMiddleware: true
+   }),
+  });
+  ```
+
+  This adapter had several known limitations and compatibility issues that prevented many people from using it in production. To reduce maintenance costs and because we have a better story with Serveless + Edge Middleware, we are removing the Edge adapter.
+
+### Patch Changes
+
+- Updated dependencies [[`65c354969`](https://github.com/withastro/astro/commit/65c354969e6fe0ef6d622e8f4c545e2f717ce8c6), [`3c3100851`](https://github.com/withastro/astro/commit/3c31008519ce68b5b1b1cb23b71fbe0a2d506882), [`34cb20021`](https://github.com/withastro/astro/commit/34cb2002161ba88df6bcb72fecfd12ed867c134b), [`7bd1b86f8`](https://github.com/withastro/astro/commit/7bd1b86f85c06fdde0a1ed9146d01bac69990671), [`519a1c4e8`](https://github.com/withastro/astro/commit/519a1c4e8407c7abcb8d879b67a9f4b960652cae), [`70f34f5a3`](https://github.com/withastro/astro/commit/70f34f5a355f42526ee9e5355f3de8e510002ea2), [`0f637c71e`](https://github.com/withastro/astro/commit/0f637c71e511cb4c51712128d217a26c8eee4d40), [`866ed4098`](https://github.com/withastro/astro/commit/866ed4098edffb052239cdb26e076cf8db61b1d9), [`5b1e39ef6`](https://github.com/withastro/astro/commit/5b1e39ef6ec6dcebea96584f95d9530bd9aa715d)]:
+  - astro@3.0.0-beta.1
+
+## 4.0.0-beta.0
+
+### Major Changes
+
+- [`1eae2e3f7`](https://github.com/withastro/astro/commit/1eae2e3f7d693c9dfe91c8ccfbe606d32bf2fb81) Thanks [@Princesseuh](https://github.com/Princesseuh)! - Remove support for Node 16. The lowest supported version by Astro and all integrations is now v18.14.1. As a reminder, Node 16 will be deprecated on the 11th September 2023.
+
+- [`c022a4217`](https://github.com/withastro/astro/commit/c022a4217a805d223c1494e9eda4e48bbf810388) Thanks [@Princesseuh](https://github.com/Princesseuh)! - When using an adapter that supports neither Squoosh or Sharp, Astro will now automatically use an image service that does not support processing, but still provides the other benefits of `astro:assets` such as enforcing `alt`, no CLS etc to users
+
+- [`3dc1ca2fa`](https://github.com/withastro/astro/commit/3dc1ca2fac8d9965cc5085a5d09e72ed87b4281a) Thanks [@Princesseuh](https://github.com/Princesseuh)! - Reduced the amount of polyfills provided by Astro. Astro will no longer provide (no-op) polyfills for several web apis such as HTMLElement, Image or Document. If you need access to those APIs on the server, we recommend using more proper polyfills available on npm.
+
+### Minor Changes
+
+- [`9b4f70a62`](https://github.com/withastro/astro/commit/9b4f70a629f55e461759ba46f68af7097a2e9215) Thanks [@ematipico](https://github.com/ematipico)! - Introduced the concept of feature map. A feature map is a list of features that are built-in in Astro, and an Adapter
+  can tell Astro if it can support it.
+
+  ```ts
+  import { AstroIntegration } from './astro';
+
+  function myIntegration(): AstroIntegration {
+    return {
+      name: 'astro-awesome-list',
+      // new feature map
+      supportedAstroFeatures: {
+        hybridOutput: 'experimental',
+        staticOutput: 'stable',
+        serverOutput: 'stable',
+        assets: {
+          supportKind: 'stable',
+          isSharpCompatible: false,
+          isSquooshCompatible: false,
+        },
+      },
+    };
+  }
+  ```
+
+- [`3fdf509b2`](https://github.com/withastro/astro/commit/3fdf509b2731a9b2f972d89291e57cf78d62c769) Thanks [@ematipico](https://github.com/ematipico)! - The `build.split` and `build.excludeMiddleware` configuration options are deprecated and have been replaced by options in the adapter config.
+
+  If your config includes the `build.excludeMiddleware` option, replace it with `edgeMiddleware` in your adapter options:
+
+  ```diff
+  import { defineConfig } from "astro/config";
+  import vercel from "@astrojs/vercel/serverless";
+
+  export default defineConfig({
+       build: {
+  -        excludeMiddleware: true
+       },
+       adapter: vercel({
+  +        edgeMiddleware: true
+       }),
+  });
+  ```
+
+  If your config includes the `build.split` option, replace it with `functionPerRoute` in your adapter options:
+
+  ```diff
+  import { defineConfig } from "astro/config";
+  import vercel from "@astrojs/vercel/serverless";
+
+  export default defineConfig({
+       build: {
+  -        split: true
+       },
+       adapter: vercel({
+  +        functionPerRoute: true
+       }),
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`1eae2e3f7`](https://github.com/withastro/astro/commit/1eae2e3f7d693c9dfe91c8ccfbe606d32bf2fb81), [`76ddef19c`](https://github.com/withastro/astro/commit/76ddef19ccab6e5f7d3a5740cd41acf10e334b38), [`9b4f70a62`](https://github.com/withastro/astro/commit/9b4f70a629f55e461759ba46f68af7097a2e9215), [`3fdf509b2`](https://github.com/withastro/astro/commit/3fdf509b2731a9b2f972d89291e57cf78d62c769), [`2f951cd40`](https://github.com/withastro/astro/commit/2f951cd403dfcc2c3ca6aae618ae3e1409516e32), [`c022a4217`](https://github.com/withastro/astro/commit/c022a4217a805d223c1494e9eda4e48bbf810388), [`67becaa58`](https://github.com/withastro/astro/commit/67becaa580b8f787df58de66b7008b7098f1209c), [`bc37331d8`](https://github.com/withastro/astro/commit/bc37331d8154e3e95a8df9131e4e014e78a7a9e7), [`dfc2d93e3`](https://github.com/withastro/astro/commit/dfc2d93e3c645995379358fabbdfa9aab99f43d8), [`3dc1ca2fa`](https://github.com/withastro/astro/commit/3dc1ca2fac8d9965cc5085a5d09e72ed87b4281a), [`1be84dfee`](https://github.com/withastro/astro/commit/1be84dfee3ce8e6f5cc624f99aec4e980f6fde37), [`35f01df79`](https://github.com/withastro/astro/commit/35f01df797d23315f2bee2fc3fd795adb0559c58), [`3fdf509b2`](https://github.com/withastro/astro/commit/3fdf509b2731a9b2f972d89291e57cf78d62c769), [`78de801f2`](https://github.com/withastro/astro/commit/78de801f21fd4ca1653950027d953bf08614566b), [`59d6e569f`](https://github.com/withastro/astro/commit/59d6e569f63e175c97e82e94aa7974febfb76f7c), [`7723c4cc9`](https://github.com/withastro/astro/commit/7723c4cc93298c2e6530e55da7afda048f22cf81), [`fb5cd6b56`](https://github.com/withastro/astro/commit/fb5cd6b56dc27a71366ed5e1ab8bfe9b8f96bac5), [`631b9c410`](https://github.com/withastro/astro/commit/631b9c410d5d66fa384674027ba95d69ebb5063f)]:
+  - astro@3.0.0-beta.0
+  - @astrojs/internal-helpers@0.2.0-beta.0
+
+## 3.8.2
+
+### Patch Changes
+
+- [#7778](https://github.com/withastro/astro/pull/7778) [`d6b494376`](https://github.com/withastro/astro/commit/d6b4943764989c0e89df2d6875cd19691566dfb3) Thanks [@y-nk](https://github.com/y-nk)! - Update image support to work with latest version of Astro
+
+- Updated dependencies [[`b12c8471f`](https://github.com/withastro/astro/commit/b12c8471f413c0291de4a9c444bfe3079a192034), [`7177f7579`](https://github.com/withastro/astro/commit/7177f7579b6e866f0fd895b3fd079d8ba330b1a9), [`fa6b68a77`](https://github.com/withastro/astro/commit/fa6b68a776c5b3cc8167fc042b7d305234ebcff9), [`097a8e4e9`](https://github.com/withastro/astro/commit/097a8e4e916c7df18eafdaa6c8d6ce2991c17ab6), [`1f6497c33`](https://github.com/withastro/astro/commit/1f6497c3341231ee76fc4538cfe7624cf4721d56), [`0e0fa605d`](https://github.com/withastro/astro/commit/0e0fa605d109cc91e08a1ae1cc560ea240fe631b), [`b290f0a99`](https://github.com/withastro/astro/commit/b290f0a99778a9b9c1045f3cd06b6aee934d7c03), [`d6b494376`](https://github.com/withastro/astro/commit/d6b4943764989c0e89df2d6875cd19691566dfb3), [`da6e3da1c`](https://github.com/withastro/astro/commit/da6e3da1ce00bed625fc568cfe4693713448e93f)]:
+  - astro@2.10.10
+
+## 3.8.1
+
+### Patch Changes
+
+- [#8039](https://github.com/withastro/astro/pull/8039) [`6b57628d1`](https://github.com/withastro/astro/commit/6b57628d128779290db3344bbb6de7282196fb97) Thanks [@matthewp](https://github.com/matthewp)! - Prevent Vercel NFT from scanning /dev
+
+- Updated dependencies [[`1b8d30209`](https://github.com/withastro/astro/commit/1b8d3020990130dabfaaf753db73a32c6e0c896a), [`405913cdf`](https://github.com/withastro/astro/commit/405913cdf20b26407aa351c090f0a0859a4e6f54), [`87d4b1843`](https://github.com/withastro/astro/commit/87d4b18437c7565c48cad4bea81831c2a244ebb8), [`c23377caa`](https://github.com/withastro/astro/commit/c23377caafbc75deb91c33b9678c1b6868ad40ea), [`86bee2812`](https://github.com/withastro/astro/commit/86bee2812185df6e14025e5962a335f51853587b)]:
+  - astro@2.10.6
+
+## 3.8.0
+
+### Minor Changes
+
+- [#7729](https://github.com/withastro/astro/pull/7729) [`560d0dab1`](https://github.com/withastro/astro/commit/560d0dab1cc7510e5d01f38955c13b329ebf66ff) Thanks [@soilSpoon](https://github.com/soilSpoon)! - Add cache headers to assets in Vercel adapter
+
+### Patch Changes
+
+- Updated dependencies [[`41afb8405`](https://github.com/withastro/astro/commit/41afb84057f606b0e7f9a73c1e40487068e43948), [`c00b6f0c4`](https://github.com/withastro/astro/commit/c00b6f0c49027125ea3026e89b21fef84380d187), [`1f0ee494a`](https://github.com/withastro/astro/commit/1f0ee494a5190356d130282f1f51ba2a5e6ea63f), [`00cb28f49`](https://github.com/withastro/astro/commit/00cb28f4964a60bc609770108d491acc277997b9), [`c264be349`](https://github.com/withastro/astro/commit/c264be3497db4aa8b3bcce0d2f79a26e35b8e91e), [`e1e958a75`](https://github.com/withastro/astro/commit/e1e958a75860292688569e82b4617fc141056202)]:
+  - astro@2.10.0
+
+## 3.7.5
+
+### Patch Changes
+
+- [#7754](https://github.com/withastro/astro/pull/7754) [`298dbb89f`](https://github.com/withastro/astro/commit/298dbb89f2963a547370b6e65cafd2650fdb1b27) Thanks [@natemoo-re](https://github.com/natemoo-re)! - Improve `404` behavior for `serverless` and `edge`
+
+- Updated dependencies [[`298dbb89f`](https://github.com/withastro/astro/commit/298dbb89f2963a547370b6e65cafd2650fdb1b27), [`9e2203847`](https://github.com/withastro/astro/commit/9e22038472c8be05ed7a72620534b88324dce793), [`5c5da8d2f`](https://github.com/withastro/astro/commit/5c5da8d2fbb37830f3ee81830d4c9afcd2c1a3e3), [`0b8375fe8`](https://github.com/withastro/astro/commit/0b8375fe82a15bfff3f517f98de6454adb2779f1), [`89d015db6`](https://github.com/withastro/astro/commit/89d015db6ce4d15b5b1140f0eb6bfbef187d6ad7), [`ebf7ebbf7`](https://github.com/withastro/astro/commit/ebf7ebbf7ae767625d736fad327954cfb853837e)]:
+  - astro@2.9.7
+
+## 3.7.4
+
+### Patch Changes
+
+- [#7718](https://github.com/withastro/astro/pull/7718) [`35a0b6c8a`](https://github.com/withastro/astro/commit/35a0b6c8a909623d802523006cb3c65e4e70c88f) Thanks [@lilnasy](https://github.com/lilnasy)! - The vercel adapter now Warns when using a deprecated version of Node, and switches to 18 when using an unsupported version.
+
+- Updated dependencies [[`274e67532`](https://github.com/withastro/astro/commit/274e6753281edde72fcb4af1cf8a9f892ee46127), [`e52852628`](https://github.com/withastro/astro/commit/e528526289dd9fba98e254743ded47a5c6d418a8), [`c2d6cfd0c`](https://github.com/withastro/astro/commit/c2d6cfd0c26f4ebb81c715389347de1c3bf5f3e6), [`201d32dcf`](https://github.com/withastro/astro/commit/201d32dcfc58ca82468ac9be43b07cdc60abad88)]:
+  - astro@2.9.1
+
+## 3.7.3
+
+### Patch Changes
+
+- [#7677](https://github.com/withastro/astro/pull/7677) [`1f0d0b586`](https://github.com/withastro/astro/commit/1f0d0b5863750104fc93cbbbd54ebae9c65143f7) Thanks [@bluwy](https://github.com/bluwy)! - Fix build error when passing `includeFiles`
+
+- Updated dependencies [[`cc8e9de88`](https://github.com/withastro/astro/commit/cc8e9de88179d2ed4b70980c60b41448db393429), [`1a6f833c4`](https://github.com/withastro/astro/commit/1a6f833c404ba2e64e3497929b64c863b5a348c8), [`cc0f81c04`](https://github.com/withastro/astro/commit/cc0f81c040e912cff0c09e89327ef1655f96b67d)]:
+  - astro@2.8.4
+
+## 3.7.2
+
+### Patch Changes
+
+- [#7659](https://github.com/withastro/astro/pull/7659) [`57a5eff5c`](https://github.com/withastro/astro/commit/57a5eff5cee9852dca1e328e233949581edc5fb9) Thanks [@natemoo-re](https://github.com/natemoo-re)! - Fix critical build regression. `@vercel/nft` is excluded from the bundle automatically.
+
+## 3.7.1
+
+### Patch Changes
+
+- [#7621](https://github.com/withastro/astro/pull/7621) [`2ddf34262`](https://github.com/withastro/astro/commit/2ddf3426268847d87c24ba1dc0adff20d3046035) Thanks [@ematipico](https://github.com/ematipico)! - Improve file detection of the middleware file handler
+
+- Updated dependencies [[`86e19c7cf`](https://github.com/withastro/astro/commit/86e19c7cf8696e065c1ccdc2eb841ad0a2b61ede)]:
+  - astro@2.8.2
+
+## 3.7.0
+
+### Minor Changes
+
+- [#7532](https://github.com/withastro/astro/pull/7532) [`9e5fafa2b`](https://github.com/withastro/astro/commit/9e5fafa2b25b5128084c7072aa282642fcfbb14b) Thanks [@ematipico](https://github.com/ematipico)! - Support for Vercel Edge Middleware via Astro middleware.
+
+  When a project uses the new option Astro `build.excludeMiddleware`, the
+  `@astrojs/vercel/serverless` adapter will automatically create a Vercel Edge Middleware
+  that will automatically communicate with the Astro Middleware.
+
+  Check the [documentation](https://github.com/withastro/astro/blob/main/packages/integrations/vercel/README.md##vercel-edge-middleware-with-astro-middleware) for more details.
+
+### Patch Changes
+
+- Updated dependencies [[`9e5fafa2b`](https://github.com/withastro/astro/commit/9e5fafa2b25b5128084c7072aa282642fcfbb14b), [`9e5fafa2b`](https://github.com/withastro/astro/commit/9e5fafa2b25b5128084c7072aa282642fcfbb14b), [`9e5fafa2b`](https://github.com/withastro/astro/commit/9e5fafa2b25b5128084c7072aa282642fcfbb14b), [`6e9c29579`](https://github.com/withastro/astro/commit/6e9c295799cb6524841adbcbec21ff628d8d19c8), [`9e5fafa2b`](https://github.com/withastro/astro/commit/9e5fafa2b25b5128084c7072aa282642fcfbb14b), [`9e5fafa2b`](https://github.com/withastro/astro/commit/9e5fafa2b25b5128084c7072aa282642fcfbb14b)]:
+  - astro@2.8.0
+
+## 3.6.0
+
+### Minor Changes
+
+- [#7514](https://github.com/withastro/astro/pull/7514) [`154af8f5e`](https://github.com/withastro/astro/commit/154af8f5ead25b3cf100cfd445329bd1d3fe876a) Thanks [@matthewp](https://github.com/matthewp)! - Split support in Vercel Serverless
+
+  The Vercel adapter builds to a single function by default. Astro 2.7 added support for splitting your build into separate entry points per page. If you use this configuration the Vercel adapter will generate a separate function for each page. This can help reduce the size of each function so they are only bundling code used on that page.
+
+  ```js
+  // astro.config.mjs
+  import { defineConfig } from 'astro/config';
+  import vercel from '@astrojs/vercel/serverless';
+
+  export default defineConfig({
+    output: 'server',
+    adapter: vercel(),
+    build: {
+      split: true,
+    },
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`9e2426f75`](https://github.com/withastro/astro/commit/9e2426f75637a6318961f483de90b635f3fdadeb), [`cdc28326c`](https://github.com/withastro/astro/commit/cdc28326cf21f305924363e9c8c02ce54b6ff895), [`19c2d43ea`](https://github.com/withastro/astro/commit/19c2d43ea41efdd8741007de0774e7e394f174b0), [`2172dd4f0`](https://github.com/withastro/astro/commit/2172dd4f0dd8f87d1adbc5ae90f44724e66eb964), [`1170877b5`](https://github.com/withastro/astro/commit/1170877b51aaa13203e8c488dcf4e39d1b5553ee)]:
+  - astro@2.7.3
+
+## 3.5.1
+
+### Patch Changes
+
+- [#7447](https://github.com/withastro/astro/pull/7447) [`32bde967f`](https://github.com/withastro/astro/commit/32bde967f4b21648b1e11dbfa7964bf7f348f7b9) Thanks [@bluwy](https://github.com/bluwy)! - Fix redirects for root page when using `trailingSlash: "always"`
+
+- Updated dependencies [[`601403744`](https://github.com/withastro/astro/commit/60140374418ff0ee80899615be8e718ae57f791a), [`869197aaf`](https://github.com/withastro/astro/commit/869197aafd9802d059dd8db1ef23794fdd938a91), [`2b7539952`](https://github.com/withastro/astro/commit/2b75399520bebfc537cca8204e483f0df3373904), [`478cd9d8f`](https://github.com/withastro/astro/commit/478cd9d8fa9452466a73e0981863ef6e82f87238), [`57e603038`](https://github.com/withastro/astro/commit/57e603038fa51f5cf023c086705e2ced67434b38), [`2b7539952`](https://github.com/withastro/astro/commit/2b75399520bebfc537cca8204e483f0df3373904), [`f359d77b1`](https://github.com/withastro/astro/commit/f359d77b1844335ceeb103b9d3753eb2f440ed5f)]:
+  - astro@2.7.1
+  - @astrojs/internal-helpers@0.1.1
+
+## 3.5.0
+
+### Minor Changes
+
+- [#7067](https://github.com/withastro/astro/pull/7067) [`57f8d14c0`](https://github.com/withastro/astro/commit/57f8d14c027c30919363e12c664ccff4ed64d0fc) Thanks [@matthewp](https://github.com/matthewp)! - Support for experimental redirects
+
+  This adds support for the redirects RFC in the Vercel adapter. No changes are necessary, simply use configured redirects and the adapter will output the vercel.json file with the configuration values.
+
+### Patch Changes
+
+- [#7260](https://github.com/withastro/astro/pull/7260) [`39403c32f`](https://github.com/withastro/astro/commit/39403c32faea58399c61d3344b770f195be60d5b) Thanks [@natemoo-re](https://github.com/natemoo-re)! - Unflags support for `output: 'hybrid'` mode, which enables pre-rendering by default. The additional `experimental.hybridOutput` flag can be safely removed from your configuration.
+
+- Updated dependencies [[`57f8d14c0`](https://github.com/withastro/astro/commit/57f8d14c027c30919363e12c664ccff4ed64d0fc), [`414eb19d2`](https://github.com/withastro/astro/commit/414eb19d2fcb55758f9d053076773b11b62f4c97), [`a7e2b37ff`](https://github.com/withastro/astro/commit/a7e2b37ff73871c46895c615846a86a539f45330), [`dd1a6b6c9`](https://github.com/withastro/astro/commit/dd1a6b6c941aeb7af934bd12db22412af262f5a1), [`d72cfa7ca`](https://github.com/withastro/astro/commit/d72cfa7cad758192163712ceb269405659fd14bc), [`144813f73`](https://github.com/withastro/astro/commit/144813f7308dcb9de64ebe3f0f2c6cba9ad81eb1), [`b5213654b`](https://github.com/withastro/astro/commit/b5213654b1b7f3ba573a48d3be688b2bdde7870f), [`e3b8c6296`](https://github.com/withastro/astro/commit/e3b8c62969d680d1915a122c610d281d6711aa63), [`890a2bc98`](https://github.com/withastro/astro/commit/890a2bc9891a2449ab99b01b65468f6dddba6b12), [`39403c32f`](https://github.com/withastro/astro/commit/39403c32faea58399c61d3344b770f195be60d5b), [`101f03209`](https://github.com/withastro/astro/commit/101f032098148b3daaac8d46ff1e535b79232e43)]:
+  - astro@2.6.0
+
+## 3.4.1
+
+### Patch Changes
+
+- [#7208](https://github.com/withastro/astro/pull/7208) [`f5a8cffac`](https://github.com/withastro/astro/commit/f5a8cffac22c9e33fad6f47f7d166b55c86ad87b) Thanks [@Princesseuh](https://github.com/Princesseuh)! - Fix `imagesConfig` being wrongly spelt as `imageConfig` in the README
+
+- Updated dependencies [[`8b041bf57`](https://github.com/withastro/astro/commit/8b041bf57c76830c4070330270521e05d8e58474), [`6c7df28ab`](https://github.com/withastro/astro/commit/6c7df28ab34b756b8426443bf6976e24d4611a62), [`bf63f615f`](https://github.com/withastro/astro/commit/bf63f615fc1b97d6fb84db55f7639084e3ada5af), [`ee2aca80a`](https://github.com/withastro/astro/commit/ee2aca80a71afe843af943b11966fcf77f556cfb), [`7851f9258`](https://github.com/withastro/astro/commit/7851f9258fae2f54795470253df9ce4bcd5f9cb0), [`bef3a75db`](https://github.com/withastro/astro/commit/bef3a75dbc48d584daff9f7f3d5a8937b0356170), [`52af9ad18`](https://github.com/withastro/astro/commit/52af9ad18840ffa4e2996386c82cbe34d9fd076a), [`f5063d0a0`](https://github.com/withastro/astro/commit/f5063d0a01e3179da902fdc0a2b22f88cb3c95c7), [`cf621340b`](https://github.com/withastro/astro/commit/cf621340b00fda441f4ef43196c0363d09eae70c), [`2bda7fb0b`](https://github.com/withastro/astro/commit/2bda7fb0bce346f7725086980e1648e2636bbefb), [`af3c5a2e2`](https://github.com/withastro/astro/commit/af3c5a2e25bd3e7b2a3f7f08e41ee457093c8cb1), [`f2f18b440`](https://github.com/withastro/astro/commit/f2f18b44055c6334a39d6379de88fe41e518aa1e)]:
+  - astro@2.5.6
+  - @astrojs/webapi@2.2.0
+
+## 3.4.0
+
+### Minor Changes
+
+- [#7103](https://github.com/withastro/astro/pull/7103) [`c91e837e9`](https://github.com/withastro/astro/commit/c91e837e961043e92253148f0f4291856653b993) Thanks [@bluwy](https://github.com/bluwy)! - Add `edge-light` and `worker` import condition for worker bundling
+
+### Patch Changes
+
+- [#6876](https://github.com/withastro/astro/pull/6876) [`06ca3702f`](https://github.com/withastro/astro/commit/06ca3702f88ed18a063d2abbbb231615f9f97154) Thanks [@nblackburn](https://github.com/nblackburn)! - Correctly handle analytics id where present
+
+- [#6991](https://github.com/withastro/astro/pull/6991) [`719002ca5`](https://github.com/withastro/astro/commit/719002ca5b128744fb4316d4a52c5dcd46a42759) Thanks [@MoustaphaDev](https://github.com/MoustaphaDev)! - Enable experimental support for hybrid SSR with pre-rendering enabled by default
+
+  **astro.config.mjs**
+
+  ```js
+  import { defineConfig } from 'astro/config';
+  export default defineConfig({
+    output: 'hybrid',
+    experimental: {
+      hybridOutput: true,
+    },
+  });
+  ```
+
+  Then add `export const prerender =  false` to any page or endpoint you want to opt-out of pre-rendering.
+
+  **src/pages/contact.astro**
+
+  ```astro
+  ---
+  export const prerender = false;
+
+  if (Astro.request.method === 'POST') {
+    // handle form submission
+  }
+  ---
+
+  <form method="POST">
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <button type="submit">Submit</button>
+  </form>
+  ```
+
+- [#7101](https://github.com/withastro/astro/pull/7101) [`2994bc52d`](https://github.com/withastro/astro/commit/2994bc52d360bf7ca3681c5f6976e64577cf5209) Thanks [@bluwy](https://github.com/bluwy)! - Add missing esbuild dependency
+
+- [#7101](https://github.com/withastro/astro/pull/7101) [`2994bc52d`](https://github.com/withastro/astro/commit/2994bc52d360bf7ca3681c5f6976e64577cf5209) Thanks [@bluwy](https://github.com/bluwy)! - Always build edge/worker runtime with Vite `webworker` SSR target
+
+- [#7104](https://github.com/withastro/astro/pull/7104) [`826e02890`](https://github.com/withastro/astro/commit/826e0289005f645b902375b98d5549c6a95ccafa) Thanks [@bluwy](https://github.com/bluwy)! - Specify `"files"` field to only publish necessary files
+
+- Updated dependencies [[`4516d7b22`](https://github.com/withastro/astro/commit/4516d7b22c5979cde4537f196b53ae2826ba9561), [`e186ecc5e`](https://github.com/withastro/astro/commit/e186ecc5e292de8c6a2c441a2d588512c0813068), [`c6d7ebefd`](https://github.com/withastro/astro/commit/c6d7ebefdd554a9ef29cfeb426ac55cab80d6473), [`914c439bc`](https://github.com/withastro/astro/commit/914c439bccee9fec002c6d92beaa501c398e62ac), [`e9fc2c221`](https://github.com/withastro/astro/commit/e9fc2c2213036d47cd30a47a6cdad5633481a0f8), [`075eee08f`](https://github.com/withastro/astro/commit/075eee08f2e2b0baea008b97f3523f2cb937ee44), [`719002ca5`](https://github.com/withastro/astro/commit/719002ca5b128744fb4316d4a52c5dcd46a42759), [`fc52681ba`](https://github.com/withastro/astro/commit/fc52681ba2f8fe8bcd92eeedf3c6a52fd86a390e), [`fb84622af`](https://github.com/withastro/astro/commit/fb84622af04f795de8d17f24192de105f70fe910), [`cada10a46`](https://github.com/withastro/astro/commit/cada10a466f81f8edb0aa664f9cffdb6b5b8f307), [`cd410c5eb`](https://github.com/withastro/astro/commit/cd410c5eb71f825259279c27c4c39d0ad282c3f0), [`73ec6f6c1`](https://github.com/withastro/astro/commit/73ec6f6c16cadb71dafe9f664f0debde072c3173), [`410428672`](https://github.com/withastro/astro/commit/410428672ed97bba7ca0b3352c1a7ee564921462), [`763ff2d1e`](https://github.com/withastro/astro/commit/763ff2d1e44f54b899d7c65386f1b4b877c95737), [`c1669c001`](https://github.com/withastro/astro/commit/c1669c0011eecfe65a459d727848c18c189a54ca), [`3d525efc9`](https://github.com/withastro/astro/commit/3d525efc95cfb2deb5d9e04856d02965d66901c9)]:
+  - astro@2.5.0
+
+## 3.3.0
+
+### Minor Changes
+
+- [#6845](https://github.com/withastro/astro/pull/6845) [`6063f5657`](https://github.com/withastro/astro/commit/6063f5657392a74b6ffc4d5e0de5463c217a8563) Thanks [@Princesseuh](https://github.com/Princesseuh)! - Add support for using the Vercel Image Optimization API through `astro:assets`
+
+### Patch Changes
+
+- Updated dependencies [[`a8a319aef`](https://github.com/withastro/astro/commit/a8a319aef744a64647ee16c7d558d74de6864c6c), [`a695e44ae`](https://github.com/withastro/astro/commit/a695e44aed6e2f5d32cb950d4237be6e5657ba98), [`367e61776`](https://github.com/withastro/astro/commit/367e61776196a17d61c28daa4dfbabb6244e040c), [`77270cc2c`](https://github.com/withastro/astro/commit/77270cc2cd06c942d7abf1d882e36d9163edafa5), [`895fa07d8`](https://github.com/withastro/astro/commit/895fa07d8b4b8359984e048daca5437e40f44390), [`72c6bf01f`](https://github.com/withastro/astro/commit/72c6bf01fe49b331ca8ad9206a7506b15caf5b8d), [`e5bd084c0`](https://github.com/withastro/astro/commit/e5bd084c01e4f60a157969b50c05ce002f7b63d2)]:
+  - astro@2.3.4
+
 ## 3.2.5
 
 ### Patch Changes

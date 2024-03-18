@@ -1,52 +1,49 @@
-import type { AstroTelemetry } from '@astrojs/telemetry';
-import { cyan } from 'kleur/colors';
-import { createRequire } from 'module';
-import { pathToFileURL } from 'url';
-import type { Arguments } from 'yargs-parser';
-import type { AstroSettings, PreviewModule, PreviewServer } from '../../@types/astro';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import type { AstroInlineConfig, PreviewModule, PreviewServer } from '../../@types/astro.js';
+import { AstroIntegrationLogger } from '../../core/logger/core.js';
+import { telemetry } from '../../events/index.js';
+import { eventCliSession } from '../../events/session.js';
 import { runHookConfigDone, runHookConfigSetup } from '../../integrations/index.js';
-import type { LogOptions } from '../logger/core';
-import { printHelp } from '../messages.js';
+import { resolveConfig } from '../config/config.js';
+import { createNodeLogger } from '../config/logging.js';
+import { createSettings } from '../config/settings.js';
+import { apply as applyPolyfills } from '../polyfill.js';
+import { ensureProcessNodeEnv } from '../util.js';
 import createStaticPreviewServer from './static-preview-server.js';
 import { getResolvedHostForHttpServer } from './util.js';
 
-interface PreviewOptions {
-	logging: LogOptions;
-	telemetry: AstroTelemetry;
-	flags?: Arguments;
-}
+/**
+ * Starts a local server to serve your static dist/ directory. This command is useful for previewing
+ * your build locally, before deploying it. It is not designed to be run in production.
+ *
+ * @experimental The JavaScript API is experimental
+ */
+export default async function preview(inlineConfig: AstroInlineConfig): Promise<PreviewServer> {
+	applyPolyfills();
+	ensureProcessNodeEnv('production');
+	const logger = createNodeLogger(inlineConfig);
+	const { userConfig, astroConfig } = await resolveConfig(inlineConfig ?? {}, 'preview');
+	telemetry.record(eventCliSession('preview', userConfig));
 
-/** The primary dev action */
-export default async function preview(
-	_settings: AstroSettings,
-	{ logging, flags }: PreviewOptions
-): Promise<PreviewServer | undefined> {
-	if (flags?.help || flags?.h) {
-		printHelp({
-			commandName: 'astro preview',
-			usage: '[...flags]',
-			tables: {
-				Flags: [
-					['--open', 'Automatically open the app in the browser on server start'],
-					['--help (-h)', 'See all available flags.'],
-				],
-			},
-			description: `Starts a local server to serve your static dist/ directory. Check ${cyan(
-				'https://docs.astro.build/en/reference/cli-reference/#astro-preview'
-			)} for more information.`,
-		});
-		return;
-	}
+	const _settings = await createSettings(astroConfig, fileURLToPath(astroConfig.root));
 
 	const settings = await runHookConfigSetup({
 		settings: _settings,
 		command: 'preview',
-		logging: logging,
+		logger: logger,
 	});
-	await runHookConfigDone({ settings: settings, logging: logging });
+	await runHookConfigDone({ settings: settings, logger: logger });
 
 	if (settings.config.output === 'static') {
-		const server = await createStaticPreviewServer(settings, logging);
+		if (!fs.existsSync(settings.config.outDir)) {
+			const outDirPath = fileURLToPath(settings.config.outDir);
+			throw new Error(
+				`[preview] The output directory ${outDirPath} does not exist. Did you run \`astro build\`?`
+			);
+		}
+		const server = await createStaticPreviewServer(settings, logger);
 		return server;
 	}
 	if (!settings.adapter) {
@@ -77,6 +74,8 @@ export default async function preview(
 		host: getResolvedHostForHttpServer(settings.config.server.host),
 		port: settings.config.server.port,
 		base: settings.config.base,
+		logger: new AstroIntegrationLogger(logger.options, settings.adapter.name),
+		headers: settings.config.server.headers,
 	});
 
 	return server;

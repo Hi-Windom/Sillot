@@ -1,7 +1,7 @@
 {
   "name": "@astrojs/tailwind",
   "description": "Use Tailwind CSS to style your Astro site",
-  "version": "3.1.1",
+  "version": "5.1.0",
   "type": "module",
   "types": "./dist/index.d.ts",
   "author": "withastro",
@@ -22,32 +22,32 @@
     "./base.css": "./base.css",
     "./package.json": "./package.json"
   },
+  "files": [
+    "dist",
+    "base.css"
+  ],
   "scripts": {
     "build": "astro-scripts build \"src/**/*.ts\" && tsc",
     "build:ci": "astro-scripts build \"src/**/*.ts\"",
-    "dev": "astro-scripts dev \"src/**/*.ts\""
+    "dev": "astro-scripts dev \"src/**/*.ts\"",
+    "test": "astro-scripts test \"test/**/*.test.js\""
   },
   "dependencies": {
-    "@proload/core": "^0.3.2",
-    "autoprefixer": "^10.4.7",
-    "postcss": "^8.4.14",
-    "postcss-load-config": "^4.0.1"
+    "autoprefixer": "^10.4.15",
+    "postcss": "^8.4.35",
+    "postcss-load-config": "^4.0.2"
   },
   "devDependencies": {
     "astro": "workspace:*",
     "astro-scripts": "workspace:*",
-    "tailwindcss": "^3.0.24",
-    "vite": "^4.3.1"
+    "tailwindcss": "^3.3.5",
+    "vite": "^5.1.4"
   },
   "peerDependencies": {
-    "astro": "workspace:^2.3.2",
+    "astro": "^3.0.0 || ^4.0.0",
     "tailwindcss": "^3.0.24"
   },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "postcss"
-      ]
-    }
+  "publishConfig": {
+    "provenance": true
   }
 }

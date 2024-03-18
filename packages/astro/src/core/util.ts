@@ -1,12 +1,12 @@
-import fs from 'fs';
-import path from 'path';
-import slash from 'slash';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { normalizePath } from 'vite';
-import type { AstroConfig, AstroSettings, RouteType } from '../@types/astro';
+import type { AstroConfig, AstroSettings, RouteType } from '../@types/astro.js';
+import { isServerLikeOutput } from '../prerender/utils.js';
 import { SUPPORTED_MARKDOWN_FILE_EXTENSIONS } from './constants.js';
-import type { ModuleLoader } from './module-loader';
-import { prependForwardSlash, removeTrailingForwardSlash } from './path.js';
+import type { ModuleLoader } from './module-loader/index.js';
+import { prependForwardSlash, removeTrailingForwardSlash, slash } from './path.js';
 
 /** Returns true if argument is an object of any prototype/class (but not null). */
 export function isObject(value: unknown): value is Record<string, any> {
@@ -36,7 +36,7 @@ export function padMultilineString(source: string, n = 2) {
 	return lines.map((l) => ` `.repeat(n) + l).join(`\n`);
 }
 
-const REGEXP_404_OR_500_ROUTE = /(404)|(500)\/?$/;
+const STATUS_CODE_PAGES = new Set(['/404', '/500']);
 
 /**
  * Get the correct output filename for a route, based on your config.
@@ -50,7 +50,7 @@ export function getOutputFilename(astroConfig: AstroConfig, name: string, type: 
 	if (name === '/' || name === '') {
 		return path.posix.join(name, 'index.html');
 	}
-	if (astroConfig.build.format === 'file' || REGEXP_404_OR_500_ROUTE.test(name)) {
+	if (astroConfig.build.format === 'file' || STATUS_CODE_PAGES.has(name)) {
 		return `${removeTrailingForwardSlash(name || 'index')}.html`;
 	}
 	return path.posix.join(name, 'index.html');
@@ -89,15 +89,18 @@ export function parseNpmName(
  *   Windows:    C:/Users/astro/code/my-project/src/pages/index.astro
  */
 export function viteID(filePath: URL): string {
-	return slash(fileURLToPath(filePath) + filePath.search).replace(/\\/g, '/');
+	return slash(fileURLToPath(filePath) + filePath.search);
 }
 
 export const VALID_ID_PREFIX = `/@id/`;
+export const NULL_BYTE_PLACEHOLDER = `__x00__`;
 
-// Strip valid id prefix. This is prepended to resolved Ids that are
-// not valid browser import specifiers by the importAnalysis plugin.
+// Strip valid id prefix and replace null byte placeholder. Both are prepended to resolved ids
+// as they are not valid browser import specifiers (by the Vite's importAnalysis plugin)
 export function unwrapId(id: string): string {
-	return id.startsWith(VALID_ID_PREFIX) ? id.slice(VALID_ID_PREFIX.length) : id;
+	return id.startsWith(VALID_ID_PREFIX)
+		? id.slice(VALID_ID_PREFIX.length).replace(NULL_BYTE_PLACEHOLDER, '\0')
+		: id;
 }
 
 export function resolvePages(config: AstroConfig) {
@@ -107,6 +110,14 @@ export function resolvePages(config: AstroConfig) {
 function isInPagesDir(file: URL, config: AstroConfig): boolean {
 	const pagesDir = resolvePages(config);
 	return file.toString().startsWith(pagesDir.toString());
+}
+
+function isInjectedRoute(file: URL, settings: AstroSettings) {
+	let fileURL = file.toString();
+	for (const route of settings.resolvedInjectedRoutes) {
+		if (route.resolvedEntryPoint && fileURL === route.resolvedEntryPoint.toString()) return true;
+	}
+	return false;
 }
 
 function isPublicRoute(file: URL, config: AstroConfig): boolean {
@@ -126,7 +137,7 @@ function endsWithPageExt(file: URL, settings: AstroSettings): boolean {
 }
 
 export function isPage(file: URL, settings: AstroSettings): boolean {
-	if (!isInPagesDir(file, settings.config)) return false;
+	if (!isInPagesDir(file, settings.config) && !isInjectedRoute(file, settings)) return false;
 	if (!isPublicRoute(file, settings.config)) return false;
 	return endsWithPageExt(file, settings);
 }
@@ -138,7 +149,7 @@ export function isEndpoint(file: URL, settings: AstroSettings): boolean {
 }
 
 export function isModeServerWithNoAdapter(settings: AstroSettings): boolean {
-	return settings.config.output === 'server' && !settings.adapter;
+	return isServerLikeOutput(settings.config) && !settings.adapter;
 }
 
 export function relativeToSrcDir(config: AstroConfig, idOrUrl: URL | string) {
@@ -151,7 +162,11 @@ export function relativeToSrcDir(config: AstroConfig, idOrUrl: URL | string) {
 	return id.slice(slash(fileURLToPath(config.srcDir)).length);
 }
 
-export function rootRelativePath(root: URL, idOrUrl: URL | string) {
+export function rootRelativePath(
+	root: URL,
+	idOrUrl: URL | string,
+	shouldPrependForwardSlash = true
+) {
 	let id: string;
 	if (typeof idOrUrl !== 'string') {
 		id = unwrapId(viteID(idOrUrl));
@@ -162,7 +177,7 @@ export function rootRelativePath(root: URL, idOrUrl: URL | string) {
 	if (id.startsWith(normalizedRoot)) {
 		id = id.slice(normalizedRoot.length);
 	}
-	return prependForwardSlash(id);
+	return shouldPrependForwardSlash ? prependForwardSlash(id) : id;
 }
 
 export function emoji(char: string, fallback: string) {
@@ -174,7 +189,6 @@ export function emoji(char: string, fallback: string) {
  * through a script tag or a dynamic import as-is.
  */
 // NOTE: `/@id/` should only be used when the id is fully resolved
-// TODO: Export a helper util from Vite
 export async function resolveIdToUrl(loader: ModuleLoader, id: string, root?: URL) {
 	let resultId = await loader.resolveId(id, undefined);
 	// Try resolve jsx to tsx
@@ -215,5 +229,14 @@ export function resolvePath(specifier: string, importer: string) {
 		return resolveJsToTs(normalizePath(absoluteSpecifier));
 	} else {
 		return specifier;
+	}
+}
+
+/**
+ * Set a default NODE_ENV so Vite doesn't set an incorrect default when loading the Astro config
+ */
+export function ensureProcessNodeEnv(defaultNodeEnv: string) {
+	if (!process.env.NODE_ENV) {
+		process.env.NODE_ENV = defaultNodeEnv;
 	}
 }

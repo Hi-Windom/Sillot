@@ -1,13 +1,13 @@
-import * as fs from 'fs';
-import { getHighlighter } from 'shiki';
-import { fileURLToPath } from 'url';
+import * as fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { codeToHtml, createCssVariablesTheme } from 'shiki';
 import type { ErrorPayload } from 'vite';
 import type { ModuleLoader } from '../../module-loader/index.js';
-import { AstroErrorData } from '../errors-data.js';
+import { FailedToLoadModuleSSR, InvalidGlob, MdxIntegrationMissingError } from '../errors-data.js';
 import { AstroError, type ErrorWithMetadata } from '../errors.js';
 import { createSafeError } from '../utils.js';
 import type { SSRLoadedRenderer } from './../../../@types/astro.js';
-import { renderErrorMarkdown } from './utils.js';
+import { getDocsForError, renderErrorMarkdown } from './utils.js';
 
 export function enhanceViteSSRError({
 	error,
@@ -41,11 +41,10 @@ export function enhanceViteSSRError({
 		// https://github.com/vitejs/vite/blob/ee7c28a46a6563d54b828af42570c55f16b15d2c/packages/vite/src/node/ssr/ssrModuleLoader.ts#L91
 		let importName: string | undefined;
 		if ((importName = safeError.message.match(/Failed to load url (.*?) \(resolved id:/)?.[1])) {
-			safeError.title = AstroErrorData.FailedToLoadModuleSSR.title;
+			safeError.title = FailedToLoadModuleSSR.title;
 			safeError.name = 'FailedToLoadModuleSSR';
-			safeError.message = AstroErrorData.FailedToLoadModuleSSR.message(importName);
-			safeError.hint = AstroErrorData.FailedToLoadModuleSSR.hint;
-			safeError.code = AstroErrorData.FailedToLoadModuleSSR.code;
+			safeError.message = FailedToLoadModuleSSR.message(importName);
+			safeError.hint = FailedToLoadModuleSSR.hint;
 			const line = lns.findIndex((ln) => ln.includes(importName!));
 
 			if (line !== -1) {
@@ -69,8 +68,8 @@ export function enhanceViteSSRError({
 			fileId?.match(/\.mdx$/)
 		) {
 			safeError = new AstroError({
-				...AstroErrorData.MdxIntegrationMissingError,
-				message: AstroErrorData.MdxIntegrationMissingError.message(JSON.stringify(fileId)),
+				...MdxIntegrationMissingError,
+				message: MdxIntegrationMissingError.message(JSON.stringify(fileId)),
 				location: safeError.loc,
 				stack: safeError.stack,
 			}) as ErrorWithMetadata;
@@ -81,11 +80,9 @@ export function enhanceViteSSRError({
 			const globPattern = safeError.message.match(/glob: "(.+)" \(/)?.[1];
 
 			if (globPattern) {
-				safeError.message = AstroErrorData.InvalidGlob.message(globPattern);
+				safeError.message = InvalidGlob.message(globPattern);
 				safeError.name = 'InvalidGlob';
-				safeError.hint = AstroErrorData.InvalidGlob.hint;
-				safeError.code = AstroErrorData.InvalidGlob.code;
-				safeError.title = AstroErrorData.InvalidGlob.title;
+				safeError.title = InvalidGlob.title;
 
 				const line = lns.findIndex((ln) => ln.includes(globPattern));
 
@@ -113,7 +110,7 @@ export interface AstroErrorPayload {
 		hint?: string;
 		docslink?: string;
 		highlightedCode?: string;
-		loc: {
+		loc?: {
 			file?: string;
 			line?: number;
 			column?: number;
@@ -127,6 +124,11 @@ export interface AstroErrorPayload {
 const ALTERNATIVE_JS_EXTS = ['cjs', 'mjs'];
 const ALTERNATIVE_MD_EXTS = ['mdoc'];
 
+let _cssVariablesTheme: ReturnType<typeof createCssVariablesTheme>;
+const cssVariablesTheme = () =>
+	_cssVariablesTheme ??
+	(_cssVariablesTheme = createCssVariablesTheme({ variablePrefix: '--astro-code-' }));
+
 /**
  * Generate a payload for Vite's error overlay
  */
@@ -139,22 +141,8 @@ export async function getViteErrorPayload(err: ErrorWithMetadata): Promise<Astro
 	const message = renderErrorMarkdown(err.message.trim(), 'html');
 	const hint = err.hint ? renderErrorMarkdown(err.hint.trim(), 'html') : undefined;
 
-	const hasDocs =
-		(err.type &&
-			err.name && [
-				'AstroError',
-				'AggregateError',
-				/* 'CompilerError' ,*/
-				'CSSError',
-				'MarkdownError',
-			]) ||
-		['FailedToLoadModuleSSR', 'InvalidGlob'].includes(err.name);
+	const docslink = getDocsForError(err);
 
-	const docslink = hasDocs
-		? `https://docs.astro.build/en/reference/errors/${getKebabErrorName(err.name)}/`
-		: undefined;
-
-	const highlighter = await getHighlighter({ theme: 'css-variables' });
 	let highlighterLang = err.loc?.file?.split('.').pop();
 	if (ALTERNATIVE_JS_EXTS.includes(highlighterLang ?? '')) {
 		highlighterLang = 'js';
@@ -163,10 +151,12 @@ export async function getViteErrorPayload(err: ErrorWithMetadata): Promise<Astro
 		highlighterLang = 'md';
 	}
 	const highlightedCode = err.fullCode
-		? highlighter.codeToHtml(err.fullCode, {
+		? await codeToHtml(err.fullCode, {
+				// @ts-expect-error always assume that shiki can accept the lang string
 				lang: highlighterLang,
+				theme: cssVariablesTheme(),
 				lineOptions: err.loc?.line ? [{ line: err.loc.line, classes: ['error-line'] }] : undefined,
-		  })
+			})
 		: undefined;
 
 	return {
@@ -190,12 +180,4 @@ export async function getViteErrorPayload(err: ErrorWithMetadata): Promise<Astro
 			cause: err.cause,
 		},
 	};
-
-	/**
-	 * The docs has kebab-case urls for errors, so we need to convert the error name
-	 * @param errorName
-	 */
-	function getKebabErrorName(errorName: string): string {
-		return errorName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-	}
 }

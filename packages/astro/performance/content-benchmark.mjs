@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
+import { bold, cyan, dim } from 'kleur/colors';
+import yargs from 'yargs-parser';
 import { loadFixture } from '../test/test-utils.js';
 import { generatePosts } from './scripts/generate-posts.mjs';
-import yargs from 'yargs-parser';
-import { cyan, bold, dim } from 'kleur/colors';
 
 // Skip nonessential remark / rehype plugins for a fair comparison.
 // This includes heading ID generation, syntax highlighting, GFM, and Smartypants.
@@ -44,14 +44,14 @@ async function benchmark({ fixtures, templates, numPosts }) {
 		const test = Array.isArray(flags.test)
 			? flags.test
 			: typeof flags.test === 'string'
-			? [flags.test]
-			: ['simple', 'with-astro-components', 'with-react-components'];
+				? [flags.test]
+				: ['simple', 'with-astro-components', 'with-react-components'];
 
 		const formats = Array.isArray(flags.format)
 			? flags.format
 			: typeof flags.format === 'string'
-			? [flags.format]
-			: ['md', 'mdx', 'mdoc'];
+				? [flags.format]
+				: ['md', 'mdx', 'mdoc'];
 
 		const numPosts = flags.numPosts || 1000;
 

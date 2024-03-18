@@ -1,6 +1,6 @@
+import { cpus } from 'node:os';
+import { fileURLToPath } from 'node:url';
 import { isMainThread } from 'node:worker_threads';
-import { cpus } from 'os';
-import { fileURLToPath } from 'url';
 import type { ImageOutputFormat } from '../../../types.js';
 import { getModuleURL } from './emscripten-utils.js';
 import type { Operation } from './image.js';
@@ -19,7 +19,7 @@ const getWorker = execOnce(() => {
 
 type DecodeParams = {
 	operation: 'decode';
-	buffer: Buffer;
+	buffer: Uint8Array;
 };
 type ResizeParams = {
 	operation: 'resize';
@@ -86,7 +86,7 @@ function handleJob(params: JobMessage) {
 }
 
 export async function processBuffer(
-	buffer: Buffer,
+	buffer: Uint8Array,
 	operations: Operation[],
 	encoding: ImageOutputFormat,
 	quality?: number

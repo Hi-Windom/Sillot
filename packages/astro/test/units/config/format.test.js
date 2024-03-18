@@ -1,11 +1,7 @@
-import { expect } from 'chai';
-import * as cheerio from 'cheerio';
-import { fileURLToPath } from 'url';
-
-import { runInContainer } from '../../../dist/core/dev/index.js';
-import { openConfig, createSettings } from '../../../dist/core/config/index.js';
-import { createFs } from '../test-utils.js';
-import { defaultLogging } from '../../test-utils.js';
+import * as assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
+import { createFs, runInContainer } from '../test-utils.js';
 
 const root = new URL('../../fixtures/tailwindcss-ts/', import.meta.url);
 
@@ -23,17 +19,9 @@ describe('Astro config formats', () => {
 			root
 		);
 
-		const { astroConfig } = await openConfig({
-			cwd: root,
-			flags: {},
-			cmd: 'dev',
-			logging: defaultLogging,
-			fsMod: fs,
-		});
-		const settings = createSettings(astroConfig);
-
-		await runInContainer({ fs, root, settings }, () => {
-			expect(true).to.equal(
+		await runInContainer({ fs, inlineConfig: { root: fileURLToPath(root) } }, () => {
+			assert.equal(
+				true,
 				true,
 				'We were able to get into the container which means the config loaded.'
 			);

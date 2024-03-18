@@ -1,14 +1,15 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import httpMocks from 'node-mocks-http';
 import { loadFixture as baseLoadFixture } from '../../../astro/test/test-utils.js';
 
+process.env.ASTRO_NODE_AUTOSTART = 'disabled';
+process.env.ASTRO_NODE_LOGGING = 'disabled';
 /**
  * @typedef {import('../../../astro/test/test-utils').Fixture} Fixture
  */
 
 export function loadFixture(inlineConfig) {
-	if (!inlineConfig || !inlineConfig.root)
-		throw new Error("Must provide { root: './fixtures/...' }");
+	if (!inlineConfig?.root) throw new Error("Must provide { root: './fixtures/...' }");
 
 	// resolve the relative root (i.e. "./fixtures/tailwindcss") to a full filepath
 	// without this, the main `loadFixture` helper will resolve relative to `packages/astro/test`
@@ -62,4 +63,12 @@ export function buffersToString(buffers) {
 		str += decoder.decode(buffer);
 	}
 	return str;
+}
+
+export function waitServerListen(server) {
+	return new Promise((resolve) => {
+		server.on('listening', () => {
+			resolve();
+		});
+	});
 }

@@ -1,9 +1,28 @@
+import { exec } from 'node:child_process';
 /* eslint no-console: 'off' */
 import { color, label, say as houston, spinner as load } from '@astrojs/cli-kit';
 import { align, sleep } from '@astrojs/cli-kit/utils';
-import { exec } from 'node:child_process';
-import { get } from 'node:https';
 import stripAnsi from 'strip-ansi';
+import { shell } from './shell.js';
+
+// Users might lack access to the global npm registry, this function
+// checks the user's project type and will return the proper npm registry
+//
+// A copy of this function also exists in the astro package
+let _registry: string;
+async function getRegistry(packageManager: string): Promise<string> {
+	if (_registry) return _registry;
+	const fallback = 'https://registry.npmjs.org';
+	try {
+		const { stdout } = await shell(packageManager, ['config', 'get', 'registry']);
+		_registry = stdout?.trim()?.replace(/\/$/, '') || fallback;
+		// Detect cases where the shell command returned a non-URL (e.g. a warning)
+		if (!new URL(_registry).host) _registry = fallback;
+	} catch (e) {
+		_registry = fallback;
+	}
+	return _registry;
+}
 
 let stdout = process.stdout;
 /** @internal Used to mock `process.stdout.write` for testing purposes */
@@ -11,13 +30,14 @@ export function setStdout(writable: typeof process.stdout) {
 	stdout = writable;
 }
 
-export async function say(messages: string | string[], { clear = false, hat = '' } = {}) {
-	return houston(messages, { clear, hat, stdout });
+export async function say(messages: string | string[], { clear = false, hat = '', tie = '' } = {}) {
+	return houston(messages, { clear, hat, tie, stdout });
 }
 
 export async function spinner(args: {
 	start: string;
 	end: string;
+	onError?: (error: any) => void;
 	while: (...args: any) => Promise<any>;
 }) {
 	await load(args, { stdout });
@@ -25,34 +45,13 @@ export async function spinner(args: {
 
 export const title = (text: string) => align(label(text), 'end', 7) + ' ';
 
-export const welcome = [
-	`Let's claim your corner of the internet.`,
-	`I'll be your assistant today.`,
-	`Let's build something awesome!`,
-	`Let's build something great!`,
-	`Let's build something fast!`,
-	`Let's build the web we want.`,
-	`Let's make the web weird!`,
-	`Let's make the web a better place!`,
-	`Let's create a new project!`,
-	`Let's create something unique!`,
-	`Time to build a new website.`,
-	`Time to build a faster website.`,
-	`Time to build a sweet new website.`,
-	`We're glad to have you on board.`,
-	`Keeping the internet weird since 2021.`,
-	`Initiating launch sequence...`,
-	`Initiating launch sequence... right... now!`,
-	`Awaiting further instructions.`,
-];
-
 export const getName = () =>
 	new Promise<string>((resolve) => {
-		exec('git config user.name', { encoding: 'utf-8' }, (_1, gitName, _2) => {
+		exec('git config user.name', { encoding: 'utf-8' }, (_1, gitName) => {
 			if (gitName.trim()) {
 				return resolve(gitName.split(' ')[0].trim());
 			}
-			exec('whoami', { encoding: 'utf-8' }, (_3, whoami, _4) => {
+			exec('whoami', { encoding: 'utf-8' }, (_3, whoami) => {
 				if (whoami.trim()) {
 					return resolve(whoami.split(' ')[0].trim());
 				}
@@ -61,28 +60,26 @@ export const getName = () =>
 		});
 	});
 
-let v: string;
-export const getVersion = () =>
-	new Promise<string>((resolve) => {
-		if (v) return resolve(v);
-		get('https://registry.npmjs.org/astro/latest', (res) => {
-			let body = '';
-			res.on('data', (chunk) => (body += chunk));
-			res.on('end', () => {
-				const { version } = JSON.parse(body);
-				v = version;
-				resolve(version);
-			});
-		});
+export const getVersion = (packageManager: string, packageName: string, fallback = '') =>
+	new Promise<string>(async (resolve) => {
+		let registry = await getRegistry(packageManager);
+		const { version } = await fetch(`${registry}/${packageName}/latest`, {
+			redirect: 'follow',
+		})
+			.then((res) => res.json())
+			.catch(() => ({ version: fallback }));
+		return resolve(version);
 	});
 
 export const log = (message: string) => stdout.write(message + '\n');
-export const banner = async (version: string) =>
-	log(
-		`\n${label('astro', color.bgGreen, color.black)}  ${color.green(
-			color.bold(`v${version}`)
-		)} ${color.bold('Launch sequence initiated.')}`
-	);
+export const banner = () => {
+	const prefix = `astro`;
+	const suffix = `Launch sequence initiated.`;
+	log(`${label(prefix, color.bgGreen, color.black)}  ${suffix}`);
+};
+
+export const bannerAbort = () =>
+	log(`\n${label('astro', color.bgRed)} ${color.bold('Launch sequence aborted.')}`);
 
 export const info = async (prefix: string, text: string) => {
 	await sleep(100);
@@ -93,7 +90,6 @@ export const info = async (prefix: string, text: string) => {
 		log(`${' '.repeat(5)} ${color.cyan('◼')}  ${color.cyan(prefix)} ${color.dim(text)}`);
 	}
 };
-
 export const error = async (prefix: string, text: string) => {
 	if (stdout.columns < 80) {
 		log(`${' '.repeat(5)} ${color.red('▲')}  ${color.red(prefix)}`);

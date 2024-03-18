@@ -1,7 +1,7 @@
-import { promises as fs, readFileSync } from 'fs';
-import { posix } from 'path';
 import arg from 'arg';
 import { globby as glob } from 'globby';
+import { promises as fs, readFileSync } from 'node:fs';
+import { posix } from 'node:path';
 import tar from 'tar';
 
 const { resolve, dirname, sep, join } = posix;
@@ -65,7 +65,7 @@ export default async function copy() {
 			const dest = resolve(file.replace(/^[^/]+/, 'dist'));
 			return fs
 				.mkdir(dirname(dest), { recursive: true })
-				.then(() => fs.copyFile(resolve(file), dest));
+				.then(() => fs.copyFile(resolve(file), dest, fs.constants.COPYFILE_FICLONE));
 		})
 	);
 }

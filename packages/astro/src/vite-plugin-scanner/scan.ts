@@ -1,6 +1,8 @@
+import type { AstroSettings } from '../@types/astro.js';
+import type { PageOptions } from '../vite-plugin-astro/types.js';
+
 import * as eslexer from 'es-module-lexer';
 import { AstroError, AstroErrorData } from '../core/errors/index.js';
-import type { PageOptions } from '../vite-plugin-astro/types.js';
 
 const BOOLEAN_EXPORTS = new Set(['prerender']);
 
@@ -34,17 +36,23 @@ function isFalsy(value: string) {
 
 let didInit = false;
 
-export async function scan(code: string, id: string): Promise<PageOptions> {
+export async function scan(
+	code: string,
+	id: string,
+	settings?: AstroSettings
+): Promise<PageOptions> {
 	if (!includesExport(code)) return {};
 	if (!didInit) {
 		await eslexer.init;
 		didInit = true;
 	}
 
-	const [_, exports] = eslexer.parse(code, id);
+	const [, exports] = eslexer.parse(code, id);
+
 	let pageOptions: PageOptions = {};
 	for (const _export of exports) {
 		const { n: name, le: endOfLocalName } = _export;
+		// mark that a `prerender` export was found
 		if (BOOLEAN_EXPORTS.has(name)) {
 			// For a given export, check the value of the local declaration
 			// Basically extract the `const` from the statement `export const prerender = true`
@@ -57,11 +65,15 @@ export async function scan(code: string, id: string): Promise<PageOptions> {
 				.trim();
 			// For a given export, check the value of the first non-whitespace token.
 			// Basically extract the `true` from the statement `export const prerender = true`
-			const suffix = code.slice(endOfLocalName).trim().replace(/\=/, '').trim().split(/[;\n]/)[0];
+			const suffix = code.slice(endOfLocalName).trim().replace(/=/, '').trim().split(/[;\n]/)[0];
 			if (prefix !== 'const' || !(isTruthy(suffix) || isFalsy(suffix))) {
 				throw new AstroError({
 					...AstroErrorData.InvalidPrerenderExport,
-					message: AstroErrorData.InvalidPrerenderExport.message(prefix, suffix),
+					message: AstroErrorData.InvalidPrerenderExport.message(
+						prefix,
+						suffix,
+						settings?.config.output === 'hybrid'
+					),
 					location: { file: id },
 				});
 			} else {
@@ -69,5 +81,6 @@ export async function scan(code: string, id: string): Promise<PageOptions> {
 			}
 		}
 	}
+
 	return pageOptions;
 }

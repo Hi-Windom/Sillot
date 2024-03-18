@@ -1,33 +1,30 @@
-import { expect } from 'chai';
-
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import { projectName } from '../dist/index.js';
 import { setup } from './utils.js';
 
-describe('project name', () => {
+describe('project name', async () => {
 	const fixture = setup();
 
 	it('pass in name', async () => {
 		const context = { projectName: '', cwd: './foo/bar/baz', prompt: () => {} };
 		await projectName(context);
-
-		expect(context.cwd).to.eq('./foo/bar/baz');
-		expect(context.projectName).to.eq('baz');
+		assert.equal(context.cwd, './foo/bar/baz');
+		assert.equal(context.projectName, 'baz');
 	});
 
 	it('dot', async () => {
 		const context = { projectName: '', cwd: '.', prompt: () => ({ name: 'foobar' }) };
 		await projectName(context);
-
-		expect(fixture.hasMessage('"." is not empty!')).to.be.true;
-		expect(context.projectName).to.eq('foobar');
+		assert.ok(fixture.hasMessage('"." is not empty!'));
+		assert.equal(context.projectName, 'foobar');
 	});
 
 	it('dot slash', async () => {
 		const context = { projectName: '', cwd: './', prompt: () => ({ name: 'foobar' }) };
 		await projectName(context);
-
-		expect(fixture.hasMessage('"./" is not empty!')).to.be.true;
-		expect(context.projectName).to.eq('foobar');
+		assert.ok(fixture.hasMessage('"./" is not empty!'));
+		assert.equal(context.projectName, 'foobar');
 	});
 
 	it('empty', async () => {
@@ -37,9 +34,8 @@ describe('project name', () => {
 			prompt: () => ({ name: 'foobar' }),
 		};
 		await projectName(context);
-
-		expect(fixture.hasMessage('"./test/fixtures/empty" is not empty!')).to.be.false;
-		expect(context.projectName).to.eq('empty');
+		assert.ok(!fixture.hasMessage('"./test/fixtures/empty" is not empty!'));
+		assert.equal(context.projectName, 'empty');
 	});
 
 	it('not empty', async () => {
@@ -49,39 +45,80 @@ describe('project name', () => {
 			prompt: () => ({ name: 'foobar' }),
 		};
 		await projectName(context);
-
-		expect(fixture.hasMessage('"./test/fixtures/not-empty" is not empty!')).to.be.true;
-		expect(context.projectName).to.eq('foobar');
+		assert.ok(fixture.hasMessage('"./test/fixtures/not-empty" is not empty!'));
+		assert.equal(context.projectName, 'foobar');
 	});
 
 	it('basic', async () => {
 		const context = { projectName: '', cwd: '', prompt: () => ({ name: 'foobar' }) };
 		await projectName(context);
+		assert.equal(context.cwd, 'foobar');
+		assert.equal(context.projectName, 'foobar');
+	});
 
-		expect(context.cwd).to.eq('foobar');
-		expect(context.projectName).to.eq('foobar');
+	it('blank space', async () => {
+		const context = { projectName: '', cwd: '', prompt: () => ({ name: 'foobar' }) };
+		await projectName(context);
+		assert.equal(context.cwd, 'foobar');
+		assert.equal(context.projectName, 'foobar');
 	});
 
 	it('normalize', async () => {
 		const context = { projectName: '', cwd: '', prompt: () => ({ name: 'Invalid Name' }) };
 		await projectName(context);
-
-		expect(context.cwd).to.eq('Invalid Name');
-		expect(context.projectName).to.eq('invalid-name');
+		assert.equal(context.cwd, 'Invalid Name');
+		assert.equal(context.projectName, 'invalid-name');
 	});
 
 	it('remove leading/trailing dashes', async () => {
 		const context = { projectName: '', cwd: '', prompt: () => ({ name: '(invalid)' }) };
 		await projectName(context);
-
-		expect(context.projectName).to.eq('invalid');
+		assert.equal(context.projectName, 'invalid');
 	});
 
 	it('handles scoped packages', async () => {
 		const context = { projectName: '', cwd: '', prompt: () => ({ name: '@astro/site' }) };
 		await projectName(context);
+		assert.equal(context.cwd, '@astro/site');
+		assert.equal(context.projectName, '@astro/site');
+	});
 
-		expect(context.cwd).to.eq('@astro/site');
-		expect(context.projectName).to.eq('@astro/site');
+	it('--yes', async () => {
+		const context = { projectName: '', cwd: './foo/bar/baz', yes: true, prompt: () => {} };
+		await projectName(context);
+		assert.equal(context.projectName, 'baz');
+	});
+
+	it('dry run with name', async () => {
+		const context = {
+			projectName: '',
+			cwd: './foo/bar/baz',
+			dryRun: true,
+			prompt: () => {},
+		};
+		await projectName(context);
+		assert.equal(context.projectName, 'baz');
+	});
+
+	it('dry run with dot', async () => {
+		const context = {
+			projectName: '',
+			cwd: '.',
+			dryRun: true,
+			prompt: () => ({ name: 'foobar' }),
+		};
+		await projectName(context);
+		assert.equal(context.projectName, 'foobar');
+	});
+
+	it('dry run with empty', async () => {
+		const context = {
+			projectName: '',
+			cwd: './test/fixtures/empty',
+			dryRun: true,
+			prompt: () => ({ name: 'foobar' }),
+		};
+		await projectName(context);
+		assert.equal(context.projectName, 'empty');
 	});
 });

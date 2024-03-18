@@ -1,4 +1,6 @@
+// Separate import from the rest so it doesn't get re-organized after other imports
 import './server-shim.js';
+
 import { LitElementRenderer } from '@lit-labs/ssr/lib/lit-element-renderer.js';
 import * as parse5 from 'parse5';
 
@@ -17,10 +19,10 @@ function getCustomElementConstructor(name) {
 
 async function isLitElement(Component) {
 	const Ctr = getCustomElementConstructor(Component);
-	return !!(Ctr && Ctr._$litElement$);
+	return !!Ctr?._$litElement$;
 }
 
-async function check(Component, _props, _children) {
+async function check(Component) {
 	// Lit doesn't support getting a tagName from a Constructor at this time.
 	// So this must be a string at the moment.
 	return !!(await isLitElement(Component));
@@ -62,7 +64,7 @@ function* render(Component, attrs, slots) {
 	const shadowContents = instance.renderShadow({
 		elementRenderers: [LitElementRenderer],
 		customElementInstanceStack: [instance],
-		customElementHostStack: [],
+		customElementHostStack: [instance],
 		deferHydration: false,
 	});
 	if (shadowContents !== undefined) {

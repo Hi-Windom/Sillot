@@ -1,12 +1,9 @@
-import type { DiagnosticCode } from '@astrojs/compiler/shared/diagnostics.js';
-import type { AstroErrorCodes } from './errors-data.js';
+import type { ZodError } from 'zod';
 import { codeFrame } from './printer.js';
-import { getErrorDataByCode } from './utils.js';
 
 interface ErrorProperties {
-	code: AstroErrorCodes | DiagnosticCode;
 	title?: string;
-	name?: string;
+	name: string;
 	message?: string;
 	location?: ErrorLocation;
 	hint?: string;
@@ -22,17 +19,18 @@ export interface ErrorLocation {
 
 type ErrorTypes =
 	| 'AstroError'
+	| 'AstroUserError'
 	| 'CompilerError'
 	| 'CSSError'
 	| 'MarkdownError'
 	| 'InternalError'
 	| 'AggregateError';
 
+export function isAstroError(e: unknown): e is AstroError {
+	return e instanceof AstroError;
+}
+
 export class AstroError extends Error {
-	// NOTE: If this property is named `code`, Rollup will use it to fill the `pluginCode` property downstream
-	// This cause issues since we expect `pluginCode` to be a string containing code
-	// @see https://github.com/rollup/rollup/blob/9a741639f69f204ded8ea404675f725b8d56adca/src/utils/error.ts#L725
-	public errorCode: AstroErrorCodes | DiagnosticCode;
 	public loc: ErrorLocation | undefined;
 	public title: string | undefined;
 	public hint: string | undefined;
@@ -40,29 +38,19 @@ export class AstroError extends Error {
 
 	type: ErrorTypes = 'AstroError';
 
-	constructor(props: ErrorProperties, ...params: any) {
-		super(...params);
+	constructor(props: ErrorProperties, options?: ErrorOptions) {
+		const { name, title, message, stack, location, hint, frame } = props;
+		super(message, options);
 
-		const { code, name, title, message, stack, location, hint, frame } = props;
-
-		this.errorCode = code;
-		if (name && name !== 'Error') {
-			this.name = name;
-		} else {
-			// If we don't have a name, let's generate one from the code
-			this.name = getErrorDataByCode(this.errorCode)?.name ?? 'UnknownError';
-		}
 		this.title = title;
+		this.name = name;
+
 		if (message) this.message = message;
 		// Only set this if we actually have a stack passed, otherwise uses Error's
 		this.stack = stack ? stack : this.stack;
 		this.loc = location;
 		this.hint = hint;
 		this.frame = frame;
-	}
-
-	public setErrorCode(errorCode: AstroErrorCodes) {
-		this.errorCode = errorCode;
 	}
 
 	public setLocation(location: ErrorLocation): void {
@@ -85,7 +73,7 @@ export class AstroError extends Error {
 		this.frame = codeFrame(source, location);
 	}
 
-	static is(err: Error | unknown): err is AstroError {
+	static is(err: unknown): err is AstroError {
 		return (err as AstroError).type === 'AstroError';
 	}
 }
@@ -93,13 +81,11 @@ export class AstroError extends Error {
 export class CompilerError extends AstroError {
 	type: ErrorTypes = 'CompilerError';
 
-	constructor(props: Omit<ErrorProperties, 'code'> & { code: DiagnosticCode }, ...params: any) {
-		super(props, ...params);
-
-		this.name = 'CompilerError';
+	constructor(props: ErrorProperties, options?: ErrorOptions) {
+		super(props, options);
 	}
 
-	static is(err: Error | unknown): err is CompilerError {
+	static is(err: unknown): err is CompilerError {
 		return (err as CompilerError).type === 'CompilerError';
 	}
 }
@@ -107,7 +93,7 @@ export class CompilerError extends AstroError {
 export class CSSError extends AstroError {
 	type: ErrorTypes = 'CSSError';
 
-	static is(err: Error | unknown): err is CSSError {
+	static is(err: unknown): err is CSSError {
 		return (err as CSSError).type === 'CSSError';
 	}
 }
@@ -115,7 +101,7 @@ export class CSSError extends AstroError {
 export class MarkdownError extends AstroError {
 	type: ErrorTypes = 'MarkdownError';
 
-	static is(err: Error | unknown): err is MarkdownError {
+	static is(err: unknown): err is MarkdownError {
 		return (err as MarkdownError).type === 'MarkdownError';
 	}
 }
@@ -123,7 +109,7 @@ export class MarkdownError extends AstroError {
 export class InternalError extends AstroError {
 	type: ErrorTypes = 'InternalError';
 
-	static is(err: Error | unknown): err is InternalError {
+	static is(err: unknown): err is InternalError {
 		return (err as InternalError).type === 'InternalError';
 	}
 }
@@ -134,15 +120,32 @@ export class AggregateError extends AstroError {
 
 	// Despite being a collection of errors, AggregateError still needs to have a main error attached to it
 	// This is because Vite expects every thrown errors handled during HMR to be, well, Error and have a message
-	constructor(props: ErrorProperties & { errors: AstroError[] }, ...params: any) {
-		super(props, ...params);
+	constructor(props: ErrorProperties & { errors: AstroError[] }, options?: ErrorOptions) {
+		super(props, options);
 
 		this.errors = props.errors;
 	}
 
-	static is(err: Error | unknown): err is AggregateError {
+	static is(err: unknown): err is AggregateError {
 		return (err as AggregateError).type === 'AggregateError';
 	}
+}
+
+const astroConfigZodErrors = new WeakSet<ZodError>();
+
+/**
+ * Check if an error is a ZodError from an AstroConfig validation.
+ * Used to suppress formatting a ZodError if needed.
+ */
+export function isAstroConfigZodError(error: unknown): error is ZodError {
+	return astroConfigZodErrors.has(error as ZodError);
+}
+
+/**
+ * Track that a ZodError comes from an AstroConfig validation.
+ */
+export function trackAstroConfigZodError(error: ZodError): void {
+	astroConfigZodErrors.add(error);
 }
 
 /**
@@ -156,7 +159,6 @@ export interface ErrorWithMetadata {
 	type?: ErrorTypes;
 	message: string;
 	stack: string;
-	errorCode?: number;
 	hint?: string;
 	id?: string;
 	frame?: string;
@@ -169,4 +171,26 @@ export interface ErrorWithMetadata {
 		column?: number;
 	};
 	cause?: any;
+}
+
+/**
+ * Special error that is exposed to users.
+ * Compared to AstroError, it contains a subset of information.
+ */
+export class AstroUserError extends Error {
+	type: ErrorTypes = 'AstroUserError';
+	/**
+	 * A message that explains to the user how they can fix the error.
+	 */
+	hint: string | undefined;
+	name = 'AstroUserError';
+	constructor(message: string, hint?: string) {
+		super();
+		this.message = message;
+		this.hint = hint;
+	}
+
+	static is(err: unknown): err is AstroUserError {
+		return (err as AstroUserError).type === 'AstroUserError';
+	}
 }

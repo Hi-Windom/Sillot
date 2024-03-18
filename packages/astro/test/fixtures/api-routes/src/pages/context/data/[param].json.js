@@ -14,11 +14,11 @@ export function getStaticPaths() {
 	]
 }
 
-export function get({ params, request }) {
-	return {
-		body: JSON.stringify({
+export function GET({ params, request }) {
+	return new Response(
+		JSON.stringify({
 			param: params.param,
 			pathname: new URL(request.url).pathname
 		})
-	};
+	);
 }

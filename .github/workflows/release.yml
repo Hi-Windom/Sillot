@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - "1-legacy"
+      - "2-legacy"
+      - "3-legacy"
+      - next
 
 defaults:
   run:
@@ -20,16 +23,19 @@ jobs:
     name: Changelog PR or Release
     if: ${{ github.repository_owner == 'withastro' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup PNPM
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 18
           cache: "pnpm"
 
       - name: Install dependencies
@@ -53,16 +59,17 @@ jobs:
           # Needs access to publish to npm
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Generate Notification
-        id: notification
+      - name: Generate Announcement
+        id: message
         if: steps.changesets.outputs.published == 'true'
-        run: message=$(node scripts/notify/index.js '${{ steps.changesets.outputs.publishedPackages }}') && echo ::set-output name=message::${message//$'\n'/'%0A'}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: node .github/scripts/announce.mjs '${{ steps.changesets.outputs.publishedPackages }}'
 
-      - name: Discord Notification
+      - name: Send message on Discord
         if: steps.changesets.outputs.published == 'true'
-        id: discord-notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@0.3.2
         with:
-          args: ${{ steps.notification.outputs.message }}
+          args: "${{ steps.message.outputs.DISCORD_MESSAGE }}"

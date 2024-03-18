@@ -1,9 +1,7 @@
 import { getHeadings } from './with-layout.md';
 
-export async function get() {
-	return {
-		body: JSON.stringify({
-			headings: getHeadings(),
-		}),
-	}
+export async function GET() {
+	return Response.json({
+		headings: getHeadings(),
+	});
 }

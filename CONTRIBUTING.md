@@ -2,16 +2,15 @@
 
 We welcome contributions of any size and skill level. As an open source project, we believe in giving back to our contributors and are happy to help with guidance on PRs, technical writing, and turning any feature idea into a reality.
 
-> **Tip for new contributors:**
-> Take a look at [https://github.com/firstcontributions/first-contributions](https://github.com/firstcontributions/first-contributions) for helpful information on contributing
+> [!Tip] > **For new contributors:** Take a look at [https://github.com/firstcontributions/first-contributions](https://github.com/firstcontributions/first-contributions) for helpful information on contributing
 
 ## Quick Guide
 
 ### Prerequisites
 
 ```shell
-node: "^>=16.12.0"
-pnpm: "^8.2.0"
+node: "^>=18.14.1"
+pnpm: "^8.6.12"
 # otherwise, your build will fail
 ```
 
@@ -46,7 +45,8 @@ To get started, create a codespace for this repository by clicking this 👇
 
 Your new codespace will open in a web-based version of Visual Studio Code. All development dependencies will be preinstalled, and the tests will run automatically ensuring you've got a green base from which to start working.
 
-**Note**: Dev containers is now an open spec which is supported by [GitHub Codespaces](https://github.com/codespaces) and [other supporting tools](https://containers.dev/supporting).
+> [!Note]
+> Dev containers is now an open spec which is supported by [GitHub Codespaces](https://github.com/codespaces) and [other supporting tools](https://containers.dev/supporting).
 
 ### Development
 
@@ -88,11 +88,23 @@ DEBUG=vite:[name] astro dev   # debug specific process, e.g. "vite:deps" or "vit
 # run this in the top-level project root to run all tests
 pnpm run test
 # run only a few tests in the `astro` package, great for working on a single feature
-# (example - `pnpm run test:match "cli"` runs `cli.test.js`)
+# (example - `pnpm run test:match "cli"` runs tests with "cli" in the name)
 pnpm run test:match "$STRING_MATCH"
 # run tests on another package
 # (example - `pnpm --filter @astrojs/rss run test` runs `packages/astro-rss/test/rss.test.js`)
 pnpm --filter $STRING_MATCH run test
+```
+
+Most tests use [`mocha`](https://mochajs.org) as the test runner. We're slowly migrating to use [`node:test`](https://nodejs.org/api/test.html) instead through the custom [`astro-scripts test`](./scripts/cmd/test.js) command. For packages that use `node:test`, you can run these commands in their directories:
+
+```shell
+# run all of the package's tests
+pnpm run test
+# run only a few tests in the package
+# (example - `pnpm run test -m "cli"` runs tests with "cli" in the name)
+pnpm run test -m "$STRING_MATCH"
+# run a single test file, you can use `node --test` directly
+node --test ./test/foo.test.js
 ```
 
 #### E2E tests
@@ -187,7 +199,7 @@ Understanding in which environment code runs, and at which stage in the process,
 
 Active Astro development happens on the [`main`](https://github.com/withastro/astro/tree/main) branch. `main` always reflects the latest code.
 
-> **Note:**
+> [!Note]
 > During certain periods, we put `main` into a [**prerelease**](https://github.com/changesets/changesets/blob/main/docs/prereleases.md#prereleases) state. Read more about [Releasing Astro](#releasing-astro).
 
 ### `latest`
@@ -198,7 +210,8 @@ By default, `create-astro` and [astro.new](https://astro.new) point to this bran
 
 ## Releasing Astro
 
-_Note: Only [core maintainers (L3+)](https://github.com/withastro/.github/blob/main/GOVERNANCE.md#level-3-l3---core) can release new versions of Astro._
+> [!Note]
+> Only [core maintainers (L3+)](https://github.com/withastro/.github/blob/main/GOVERNANCE.md#level-3-l3---core) can release new versions of Astro.
 
 The repo is set up with automatic releases, using the changeset GitHub action & bot.
 
@@ -247,7 +260,7 @@ If you have gotten permission from the core contributors, you can enter into pre
 - Run: `pnpm exec changeset pre enter next` in the project root
 - Create a new PR from the changes created by this command
 - Review, approve, and more the PR to enter prerelease mode.
-- If successful, The "Version Packages" PR (if one exists) will now say "Version Packages (next)".
+- If successful, The "[ci] release" PR (if one exists) will now say "[ci] release (next)".
 
 ### Exiting prerelease mode
 
@@ -256,7 +269,7 @@ Exiting prerelease mode should happen once an experimental release is ready to g
 - Run: `pnpm exec changeset pre exit` in the project root
 - Create a new PR from the changes created by this command.
 - Review, approve, and more the PR to enter prerelease mode.
-- If successful, The "Version Packages (next)" PR (if one exists) will now say "Version Packages".
+- If successful, The "[ci] release (next)" PR (if one exists) will now say "[ci] release".
 
 ### Releasing `astro@latest` while in prerelease mode
 

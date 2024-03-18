@@ -1,9 +1,10 @@
-import { defineConfig } from 'astro/config';
+import mdx from '@astrojs/mdx';
 import preact from '@astrojs/preact';
+import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	integrations: [preact()],
+	integrations: [preact(), mdx()],
 	// make sure CLI flags have precedence
-  server: () => ({ port: 3000 })
+  server: () => ({ port: 4321 })
 });

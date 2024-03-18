@@ -1,5 +1,5 @@
 import { deserializeRouteData } from '../routing/manifest/serialization.js';
-import type { RouteInfo, SerializedSSRManifest, SSRManifest } from './types';
+import type { RouteInfo, SSRManifest, SerializedSSRManifest } from './types.js';
 
 export function deserializeManifest(serializedManifest: SerializedSSRManifest): SSRManifest {
 	const routes: RouteInfo[] = [];
@@ -15,11 +15,19 @@ export function deserializeManifest(serializedManifest: SerializedSSRManifest): 
 
 	const assets = new Set<string>(serializedManifest.assets);
 	const componentMetadata = new Map(serializedManifest.componentMetadata);
+	const inlinedScripts = new Map(serializedManifest.inlinedScripts);
+	const clientDirectives = new Map(serializedManifest.clientDirectives);
 
 	return {
+		// in case user middleware exists, this no-op middleware will be reassigned (see plugin-ssr.ts)
+		middleware(_, next) {
+			return next();
+		},
 		...serializedManifest,
 		assets,
 		componentMetadata,
+		inlinedScripts,
+		clientDirectives,
 		routes,
 	};
 }

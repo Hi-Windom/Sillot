@@ -1,17 +1,19 @@
-import { expect } from 'chai';
+import * as assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import * as cheerio from 'cheerio';
-import { fileURLToPath } from 'url';
 
 import {
 	createContainerWithAutomaticRestart,
-	isStarted,
 	startContainer,
 } from '../../../dist/core/dev/index.js';
 import { createFs, createRequestAndResponse, triggerFSEvent } from '../test-utils.js';
-import { createSettings, openConfig } from '../../../dist/core/config/index.js';
-import { defaultLogging } from '../../test-utils.js';
 
 const root = new URL('../../fixtures/alias/', import.meta.url);
+
+function isStarted(container) {
+	return !!container.viteServer.httpServer?.listening;
+}
 
 describe('dev container restarts', () => {
 	it('Surfaces config errors on restarts', async () => {
@@ -26,14 +28,15 @@ describe('dev container restarts', () => {
 				</html>
 			`,
 				'/astro.config.mjs': `
-				
+
 				`,
 			},
 			root
 		);
 
-		let restart = await createContainerWithAutomaticRestart({
-			params: { fs, root },
+		const restart = await createContainerWithAutomaticRestart({
+			fs,
+			inlineConfig: { root: fileURLToPath(root), logLevel: 'silent' },
 		});
 
 		try {
@@ -44,8 +47,8 @@ describe('dev container restarts', () => {
 			restart.container.handle(r.req, r.res);
 			let html = await r.text();
 			const $ = cheerio.load(html);
-			expect(r.res.statusCode).to.equal(200);
-			expect($('h1')).to.have.a.lengthOf(1);
+			assert.equal(r.res.statusCode, 200);
+			assert.equal($('h1').length, 1);
 
 			// Create an error
 			let restartComplete = restart.restarted();
@@ -59,7 +62,7 @@ describe('dev container restarts', () => {
 
 			// Wait for the restart to finish
 			let hmrError = await restartComplete;
-			expect(hmrError).to.not.be.a('undefined');
+			assert.notEqual(typeof hmrError, 'undefined');
 
 			// Do it a second time to make sure we are still watching
 
@@ -73,7 +76,7 @@ describe('dev container restarts', () => {
 			);
 
 			hmrError = await restartComplete;
-			expect(hmrError).to.not.be.a('undefined');
+			assert.notEqual(typeof hmrError, 'undefined');
 		} finally {
 			await restart.container.close();
 		}
@@ -95,11 +98,12 @@ describe('dev container restarts', () => {
 			root
 		);
 
-		let restart = await createContainerWithAutomaticRestart({
-			params: { fs, root },
+		const restart = await createContainerWithAutomaticRestart({
+			fs,
+			inlineConfig: { root: fileURLToPath(root), logLevel: 'silent' },
 		});
 		await startContainer(restart.container);
-		expect(isStarted(restart.container)).to.equal(true);
+		assert.equal(isStarted(restart.container), true);
 
 		try {
 			// Trigger a change
@@ -107,7 +111,7 @@ describe('dev container restarts', () => {
 			triggerFSEvent(restart.container, fs, '/astro.config.mjs', 'change');
 			await restartComplete;
 
-			expect(isStarted(restart.container)).to.equal(true);
+			assert.equal(isStarted(restart.container), true);
 		} finally {
 			await restart.container.close();
 		}
@@ -123,19 +127,12 @@ describe('dev container restarts', () => {
 			troot
 		);
 
-		const { astroConfig } = await openConfig({
-			cwd: troot,
-			flags: {},
-			cmd: 'dev',
-			logging: defaultLogging,
-		});
-		const settings = createSettings(astroConfig);
-
-		let restart = await createContainerWithAutomaticRestart({
-			params: { fs, root, settings },
+		const restart = await createContainerWithAutomaticRestart({
+			fs,
+			inlineConfig: { root: fileURLToPath(root), logLevel: 'silent' },
 		});
 		await startContainer(restart.container);
-		expect(isStarted(restart.container)).to.equal(true);
+		assert.equal(isStarted(restart.container), true);
 
 		try {
 			// Trigger a change
@@ -143,7 +140,7 @@ describe('dev container restarts', () => {
 			triggerFSEvent(restart.container, fs, '/astro.config.ts', 'change');
 			await restartComplete;
 
-			expect(isStarted(restart.container)).to.equal(true);
+			assert.equal(isStarted(restart.container), true);
 		} finally {
 			await restart.container.close();
 		}
@@ -157,19 +154,12 @@ describe('dev container restarts', () => {
 			root
 		);
 
-		const { astroConfig } = await openConfig({
-			cwd: root,
-			flags: {},
-			cmd: 'dev',
-			logging: defaultLogging,
-		});
-		const settings = createSettings(astroConfig, fileURLToPath(root));
-
-		let restart = await createContainerWithAutomaticRestart({
-			params: { fs, root, settings },
+		const restart = await createContainerWithAutomaticRestart({
+			fs,
+			inlineConfig: { root: fileURLToPath(root), logLevel: 'silent' },
 		});
 		await startContainer(restart.container);
-		expect(isStarted(restart.container)).to.equal(true);
+		assert.equal(isStarted(restart.container), true);
 
 		try {
 			let restartComplete = restart.restarted();
@@ -189,19 +179,12 @@ describe('dev container restarts', () => {
 			root
 		);
 
-		const { astroConfig } = await openConfig({
-			cwd: root,
-			flags: {},
-			cmd: 'dev',
-			logging: defaultLogging,
-		});
-		const settings = createSettings(astroConfig, fileURLToPath(root));
-
-		let restart = await createContainerWithAutomaticRestart({
-			params: { fs, root, settings },
+		const restart = await createContainerWithAutomaticRestart({
+			fs,
+			inlineConfig: { root: fileURLToPath(root), logLevel: 'silent' },
 		});
 		await startContainer(restart.container);
-		expect(isStarted(restart.container)).to.equal(true);
+		assert.equal(isStarted(restart.container), true);
 
 		try {
 			let restartComplete = restart.restarted();

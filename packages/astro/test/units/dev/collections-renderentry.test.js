@@ -1,16 +1,17 @@
-import { expect } from 'chai';
+import * as assert from 'node:assert/strict';
+import os from 'node:os';
+import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import * as cheerio from 'cheerio';
 
-import { runInContainer } from '../../../dist/core/dev/index.js';
-import { createFsWithFallback, createRequestAndResponse } from '../test-utils.js';
-import { isWindows } from '../../test-utils.js';
-import mdx from '../../../../integrations/mdx/dist/index.js';
 import { attachContentServerListeners } from '../../../dist/content/server-listeners.js';
+import { createFsWithFallback, createRequestAndResponse, runInContainer } from '../test-utils.js';
 
 const root = new URL('../../fixtures/content/', import.meta.url);
 
-const describe = isWindows ? global.describe.skip : global.describe;
+const _describe = os.platform() === 'win32' ? describe.skip : describe;
 
+/** @type {typeof runInContainer} */
 async function runInContainerWithContentListeners(params, callback) {
 	return await runInContainer(params, async (container) => {
 		await attachContentServerListeners(container);
@@ -18,7 +19,7 @@ async function runInContainerWithContentListeners(params, callback) {
 	});
 }
 
-describe('Content Collections - render()', () => {
+_describe('Content Collections - render()', () => {
 	it('can be called in a page component', async () => {
 		const fs = createFsWithFallback(
 			{
@@ -56,9 +57,8 @@ describe('Content Collections - render()', () => {
 		await runInContainerWithContentListeners(
 			{
 				fs,
-				root,
-				userConfig: {
-					integrations: [mdx()],
+				inlineConfig: {
+					root: fileURLToPath(root),
 					vite: { server: { middlewareMode: true } },
 				},
 			},
@@ -73,10 +73,10 @@ describe('Content Collections - render()', () => {
 
 				const $ = cheerio.load(html);
 				// Rendered the content
-				expect($('ul li')).to.have.a.lengthOf(3);
+				assert.equal($('ul li').length, 3);
 
 				// Rendered the styles
-				expect($('style')).to.have.a.lengthOf(1);
+				assert.equal($('style').length, 1);
 			}
 		);
 	});
@@ -129,9 +129,8 @@ description: Astro is launching this week!
 		await runInContainerWithContentListeners(
 			{
 				fs,
-				root,
-				userConfig: {
-					integrations: [mdx()],
+				inlineConfig: {
+					root: fileURLToPath(root),
 					vite: { server: { middlewareMode: true } },
 				},
 			},
@@ -146,10 +145,10 @@ description: Astro is launching this week!
 
 				const $ = cheerio.load(html);
 				// Rendered the content
-				expect($('ul li')).to.have.a.lengthOf(3);
+				assert.equal($('ul li').length, 3);
 
 				// Rendered the styles
-				expect($('style')).to.have.a.lengthOf(1);
+				assert.equal($('style').length, 1);
 			}
 		);
 	});
@@ -200,9 +199,8 @@ description: Astro is launching this week!
 		await runInContainerWithContentListeners(
 			{
 				fs,
-				root,
-				userConfig: {
-					integrations: [mdx()],
+				inlineConfig: {
+					root: fileURLToPath(root),
 					vite: { server: { middlewareMode: true } },
 				},
 			},
@@ -217,10 +215,10 @@ description: Astro is launching this week!
 
 				const $ = cheerio.load(html);
 				// Rendered the content
-				expect($('ul li')).to.have.a.lengthOf(3);
+				assert.equal($('ul li').length, 3);
 
 				// Rendered the styles
-				expect($('style')).to.have.a.lengthOf(1);
+				assert.equal($('style').length, 1);
 			}
 		);
 	});
@@ -270,9 +268,8 @@ description: Astro is launching this week!
 		await runInContainerWithContentListeners(
 			{
 				fs,
-				root,
-				userConfig: {
-					integrations: [mdx()],
+				inlineConfig: {
+					root: fileURLToPath(root),
 					vite: { server: { middlewareMode: true } },
 				},
 			},
@@ -287,10 +284,10 @@ description: Astro is launching this week!
 
 				const $ = cheerio.load(html);
 				// Rendered the content
-				expect($('ul li')).to.have.a.lengthOf(3);
+				assert.equal($('ul li').length, 3);
 
 				// Rendered the styles
-				expect($('style')).to.have.a.lengthOf(1);
+				assert.equal($('style').length, 1);
 			}
 		);
 	});

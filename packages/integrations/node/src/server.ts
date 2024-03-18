@@ -1,18 +1,18 @@
-import { polyfill } from '@astrojs/webapi';
 import type { SSRManifest } from 'astro';
-import { NodeApp } from 'astro/app/node';
-import middleware from './middleware.js';
+import { NodeApp, applyPolyfills } from 'astro/app/node';
+import createMiddleware from './middleware.js';
+import { createStandaloneHandler } from './standalone.js';
 import startServer from './standalone.js';
-import type { Options } from './types';
+import type { Options } from './types.js';
 
-polyfill(globalThis, {
-	exclude: 'window document',
-});
-
+applyPolyfills();
 export function createExports(manifest: SSRManifest, options: Options) {
 	const app = new NodeApp(manifest);
+	options.trailingSlash = manifest.trailingSlash;
 	return {
-		handler: middleware(app, options.mode),
+		options: options,
+		handler:
+			options.mode === 'middleware' ? createMiddleware(app) : createStandaloneHandler(app, options),
 		startServer: () => startServer(app, options),
 	};
 }

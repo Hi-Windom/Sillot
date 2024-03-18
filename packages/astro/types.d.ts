@@ -1,5 +1,6 @@
 import './astro-jsx';
-import { AstroBuiltinAttributes } from './dist/@types/astro';
+import type { AstroBuiltinAttributes } from './dist/@types/astro.js';
+import type { Simplify } from './dist/type-utils.js';
 
 /** Any supported HTML or SVG element name, as defined by the HTML specification */
 export type HTMLTag = keyof astroHTML.JSX.DefinedIntrinsicElements;
@@ -9,6 +10,16 @@ export type HTMLAttributes<Tag extends HTMLTag> = Omit<
 	keyof Omit<AstroBuiltinAttributes, 'class:list'>
 >;
 
-// TODO: Enable generic/polymorphic types once compiler output stabilizes in the Language Server
-// type PolymorphicAttributes<P extends { as: HTMLTag }> = Omit<(P & HTMLAttributes<P['as']>), 'as'> & { as?: P['as'] };
-// export type Polymorphic<P extends { as: HTMLTag }> = PolymorphicAttributes<Omit<P, 'as'> & { as: NonNullable<P['as']>}>;
+/**
+ * All the CSS properties available, as defined by the CSS specification
+ */
+export type CSSProperty = keyof astroHTML.JSX.KebabCSSDOMProperties;
+
+type PolymorphicAttributes<P extends { as: HTMLTag }> = Omit<P & HTMLAttributes<P['as']>, 'as'> & {
+	as?: P['as'];
+};
+export type Polymorphic<P extends { as: HTMLTag }> = PolymorphicAttributes<
+	Omit<P, 'as'> & { as: NonNullable<P['as']> }
+>;
+
+export type ComponentProps<T extends (args: any) => any> = Simplify<Parameters<T>[0]>;

@@ -1,17 +1,17 @@
-import { fileURLToPath } from 'node:url';
 import nodeFS from 'node:fs';
 import path from 'node:path';
-import slash from 'slash';
-
-import { runInContainer } from '../../../dist/core/dev/index.js';
+import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { attachContentServerListeners } from '../../../dist/content/index.js';
-import { createFs, triggerFSEvent } from '../test-utils.js';
+import { createFs, runInContainer, triggerFSEvent } from '../test-utils.js';
 
 const root = new URL('../../fixtures/alias/', import.meta.url);
 
 function getTypesDts() {
-	const typesdtsURL = new URL('../../../src/content/template/types.d.ts', import.meta.url);
-	const relpath = slash(path.relative(fileURLToPath(root), fileURLToPath(typesdtsURL)));
+	const typesdtsURL = new URL('../../../content-types.template.d.ts', import.meta.url);
+	const relpath = path
+		.relative(fileURLToPath(root), fileURLToPath(typesdtsURL))
+		.replace(/\\/g, '/');
 	return {
 		[relpath]: nodeFS.readFileSync(typesdtsURL, 'utf-8'),
 	};
@@ -52,7 +52,7 @@ describe('frontmatter', () => {
 			root
 		);
 
-		await runInContainer({ fs, root }, async (container) => {
+		await runInContainer({ fs, inlineConfig: { root: fileURLToPath(root) } }, async (container) => {
 			await attachContentServerListeners(container);
 
 			fs.writeFileFromRootSync(

@@ -1,73 +1,66 @@
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import slash from 'slash';
-import type { AstroConfig, AstroSettings } from '../../@types/astro';
-import { imageMetadata, type Metadata } from './metadata.js';
+import { prependForwardSlash, slash } from '../../core/path.js';
+import type { ImageMetadata } from '../types.js';
+import { imageMetadata } from './metadata.js';
 
 export async function emitESMImage(
 	id: string | undefined,
 	watchMode: boolean,
-	fileEmitter: any,
-	settings: Pick<AstroSettings, 'config'>
-): Promise<Metadata | undefined> {
+	fileEmitter: any
+): Promise<ImageMetadata | undefined> {
 	if (!id) {
 		return undefined;
 	}
 
 	const url = pathToFileURL(id);
-	const meta = await imageMetadata(url);
-
-	if (!meta) {
+	let fileData: Buffer;
+	try {
+		fileData = await fs.readFile(url);
+	} catch (err) {
 		return undefined;
 	}
+
+	const fileMetadata = await imageMetadata(fileData, id);
+
+	const emittedImage: Omit<ImageMetadata, 'fsPath'> = {
+		src: '',
+		...fileMetadata,
+	};
+
+	// Private for now, we generally don't want users to rely on filesystem paths, but we need it so that we can maybe remove the original asset from the build if it's unused.
+	Object.defineProperty(emittedImage, 'fsPath', {
+		enumerable: false,
+		writable: false,
+		value: id,
+	});
 
 	// Build
 	if (!watchMode) {
 		const pathname = decodeURI(url.pathname);
-		const filename = path.basename(pathname, path.extname(pathname) + `.${meta.format}`);
+		const filename = path.basename(pathname, path.extname(pathname) + `.${fileMetadata.format}`);
 
 		const handle = fileEmitter({
 			name: filename,
-			source: await fs.promises.readFile(url),
+			source: await fs.readFile(url),
 			type: 'asset',
 		});
 
-		meta.src = `__ASTRO_ASSET_IMAGE__${handle}__`;
+		emittedImage.src = `__ASTRO_ASSET_IMAGE__${handle}__`;
 	} else {
 		// Pass the original file information through query params so we don't have to load the file twice
-		url.searchParams.append('origWidth', meta.width.toString());
-		url.searchParams.append('origHeight', meta.height.toString());
-		url.searchParams.append('origFormat', meta.format);
+		url.searchParams.append('origWidth', fileMetadata.width.toString());
+		url.searchParams.append('origHeight', fileMetadata.height.toString());
+		url.searchParams.append('origFormat', fileMetadata.format);
 
-		meta.src = rootRelativePath(settings.config, url);
+		emittedImage.src = `/@fs` + prependForwardSlash(fileURLToNormalizedPath(url));
 	}
 
-	return meta;
-}
-
-/**
- * Utilities inlined from `packages/astro/src/core/util.ts`
- * Avoids ESM / CJS bundling failures when accessed from integrations
- * due to Vite dependencies in core.
- */
-
-function rootRelativePath(config: Pick<AstroConfig, 'root'>, url: URL): string {
-	const basePath = fileURLToNormalizedPath(url);
-	const rootPath = fileURLToNormalizedPath(config.root);
-	return prependForwardSlash(basePath.slice(rootPath.length));
-}
-
-function prependForwardSlash(filePath: string): string {
-	return filePath[0] === '/' ? filePath : '/' + filePath;
+	return emittedImage as ImageMetadata;
 }
 
 function fileURLToNormalizedPath(filePath: URL): string {
-	// Uses `slash` package instead of Vite's `normalizePath`
-	// to avoid CJS bundling issues.
+	// Uses `slash` instead of Vite's `normalizePath` to avoid CJS bundling issues.
 	return slash(fileURLToPath(filePath) + filePath.search).replace(/\\/g, '/');
-}
-
-export function emoji(char: string, fallback: string): string {
-	return process.platform !== 'win32' ? char : fallback;
 }

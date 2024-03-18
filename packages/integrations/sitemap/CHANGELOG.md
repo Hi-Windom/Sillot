@@ -1,5 +1,142 @@
 # @astrojs/sitemap
 
+## 3.1.1
+
+### Patch Changes
+
+- [#10179](https://github.com/withastro/astro/pull/10179) [`6343f6a438d790fa16a0dd268f4a51def4fa0f33`](https://github.com/withastro/astro/commit/6343f6a438d790fa16a0dd268f4a51def4fa0f33) Thanks [@ematipico](https://github.com/ematipico)! - Revert https://github.com/withastro/astro/pull/9846
+
+  The feature to customize the file name of the sitemap was reverted due to some internal issues with one of the dependencies. With an non-deterministic behaviour, the sitemap file was sometime emitted with incorrect syntax.
+
+- [#9975](https://github.com/withastro/astro/pull/9975) [`ec7d2ebbd96b8c2dfdadaf076bbf7953007536ed`](https://github.com/withastro/astro/commit/ec7d2ebbd96b8c2dfdadaf076bbf7953007536ed) Thanks [@moose96](https://github.com/moose96)! - Fixes URL generation for routes that rest parameters and start with `/`
+
+## 3.1.0
+
+### Minor Changes
+
+- [#9846](https://github.com/withastro/astro/pull/9846) [`9b78c992750cdb99c40a89a00ea2a0d1c00877d7`](https://github.com/withastro/astro/commit/9b78c992750cdb99c40a89a00ea2a0d1c00877d7) Thanks [@ktym4a](https://github.com/ktym4a)! - Adds a new configuration option `prefix` that allows you to change the default `sitemap-*.xml` file name.
+
+  By default, running `astro build` creates both `sitemap-index.xml` and `sitemap-0.xml` in your output directory.
+
+  To change the names of these files (e.g. to `astrosite-index.xml` and `astrosite-0.xml`), set the `prefix` option in your `sitemap` integration configuration:
+
+  ```
+  import { defineConfig } from 'astro/config';
+  import sitemap from '@astrojs/sitemap';
+  export default defineConfig({
+    site: 'https://example.com',
+    integrations: [
+      sitemap({
+        prefix: 'astrosite-',
+      }),
+    ],
+  });
+  ```
+
+  This option is useful when Google Search Console is unable to fetch your default sitemap files, but can read renamed files.
+
+## 3.0.5
+
+### Patch Changes
+
+- [#9704](https://github.com/withastro/astro/pull/9704) [`b325fada567892b63ecae87c1ff845c8514457ba`](https://github.com/withastro/astro/commit/b325fada567892b63ecae87c1ff845c8514457ba) Thanks [@andremralves](https://github.com/andremralves)! - Fixes generated URLs when using a `base` with a SSR adapter
+
+## 3.0.4
+
+### Patch Changes
+
+- [#9479](https://github.com/withastro/astro/pull/9479) [`1baf0b0d3cbd0564954c2366a7278794fad6726e`](https://github.com/withastro/astro/commit/1baf0b0d3cbd0564954c2366a7278794fad6726e) Thanks [@sarah11918](https://github.com/sarah11918)! - Updates README
+
+## 3.0.3
+
+### Patch Changes
+
+- [#8762](https://github.com/withastro/astro/pull/8762) [`35cd810f0`](https://github.com/withastro/astro/commit/35cd810f0f988010fbb8e6d7ab205de5d816e2b2) Thanks [@evadecker](https://github.com/evadecker)! - Upgrades Zod to 3.22.4
+
+## 3.0.2
+
+### Patch Changes
+
+- [#8824](https://github.com/withastro/astro/pull/8824) [`10b103820`](https://github.com/withastro/astro/commit/10b103820e22e51dcfb0592c542cdf2c5eeb2f52) Thanks [@silent1mezzo](https://github.com/silent1mezzo)! - Display output directory in the sitemap build result
+
+## 3.0.1
+
+### Patch Changes
+
+- [#8737](https://github.com/withastro/astro/pull/8737) [`6f60da805`](https://github.com/withastro/astro/commit/6f60da805e0014bc50dd07bef972e91c73560c3c) Thanks [@ematipico](https://github.com/ematipico)! - Add provenance statement when publishing the library from CI
+
+## 3.0.0
+
+### Major Changes
+
+- [#8188](https://github.com/withastro/astro/pull/8188) [`d0679a666`](https://github.com/withastro/astro/commit/d0679a666f37da0fca396d42b9b32bbb25d29312) Thanks [@ematipico](https://github.com/ematipico)! - Remove support for Node 16. The lowest supported version by Astro and all integrations is now v18.14.1. As a reminder, Node 16 will be deprecated on the 11th September 2023.
+
+- [#8179](https://github.com/withastro/astro/pull/8179) [`6011d52d3`](https://github.com/withastro/astro/commit/6011d52d38e43c3e3d52bc3bc41a60e36061b7b7) Thanks [@matthewp](https://github.com/matthewp)! - Astro 3.0 Release Candidate
+
+## 3.0.0-rc.1
+
+### Major Changes
+
+- [#8179](https://github.com/withastro/astro/pull/8179) [`6011d52d3`](https://github.com/withastro/astro/commit/6011d52d38e43c3e3d52bc3bc41a60e36061b7b7) Thanks [@matthewp](https://github.com/matthewp)! - Astro 3.0 Release Candidate
+
+## 3.0.0-beta.0
+
+### Major Changes
+
+- [`1eae2e3f7`](https://github.com/withastro/astro/commit/1eae2e3f7d693c9dfe91c8ccfbe606d32bf2fb81) Thanks [@Princesseuh](https://github.com/Princesseuh)! - Remove support for Node 16. The lowest supported version by Astro and all integrations is now v18.14.1. As a reminder, Node 16 will be deprecated on the 11th September 2023.
+
+## 2.0.2
+
+### Patch Changes
+
+- [#8063](https://github.com/withastro/astro/pull/8063) [`bee284cb7`](https://github.com/withastro/astro/commit/bee284cb7741ee594e8b38b1a618763e9058740b) Thanks [@martrapp](https://github.com/martrapp)! - docs: fix github search link in README.md
+
+## 2.0.1
+
+### Patch Changes
+
+- [#7722](https://github.com/withastro/astro/pull/7722) [`77ffcc8f8`](https://github.com/withastro/astro/commit/77ffcc8f8b0ca9f8b9da29525f03028e666fd8df) Thanks [@natemoo-re](https://github.com/natemoo-re)! - Ensure nested 404 and 500 pages are always excluded
+
+## 2.0.0
+
+### Major Changes
+
+- [#7656](https://github.com/withastro/astro/pull/7656) [`dd931a780`](https://github.com/withastro/astro/commit/dd931a78065a9f46ade0588b35dcc2ea7dbed974) Thanks [@natemoo-re](https://github.com/natemoo-re)! - Sitemap only includes `page` routes (generated by `.astro` files) rather than all routes (pages, endpoints, or redirects). This behavior matches our existing documentation, but is a breaking change nonetheless.
+
+### Patch Changes
+
+- [#7656](https://github.com/withastro/astro/pull/7656) [`dd931a780`](https://github.com/withastro/astro/commit/dd931a78065a9f46ade0588b35dcc2ea7dbed974) Thanks [@natemoo-re](https://github.com/natemoo-re)! - Ensure trailing slash is only added to page routes
+
+## 1.4.0
+
+### Minor Changes
+
+- [#7655](https://github.com/withastro/astro/pull/7655) [`c258492b7`](https://github.com/withastro/astro/commit/c258492b7218cc7e5b7be38f48ec1bb1296292d5) Thanks [@natemoo-re](https://github.com/natemoo-re)! - Ensure sitemap only excludes numerical pages matching `/404` and `/500` exactly
+
+## 1.3.3
+
+### Patch Changes
+
+- [#7263](https://github.com/withastro/astro/pull/7263) [`dff0d0dda`](https://github.com/withastro/astro/commit/dff0d0dda2f20c02901594739a654834d3451c8e) Thanks [@andremralves](https://github.com/andremralves)! - Fix sitemap does not filter pages
+
+## 1.3.2
+
+### Patch Changes
+
+- [#7028](https://github.com/withastro/astro/pull/7028) [`6ca3b5a9e`](https://github.com/withastro/astro/commit/6ca3b5a9e8b9aa19a9436043f8ead41e7938c32e) Thanks [@alexanderniebuhr](https://github.com/alexanderniebuhr)! - exported enum type to support typescript > 5.0
+
+## 1.3.1
+
+### Patch Changes
+
+- [#7029](https://github.com/withastro/astro/pull/7029) [`1b90a7a5d`](https://github.com/withastro/astro/commit/1b90a7a5d5f16e3e1fa0329b509c6c6e76248181) Thanks [@TheOtterlord](https://github.com/TheOtterlord)! - Fix generation for static dynamic routes
+
+## 1.3.0
+
+### Minor Changes
+
+- [#6534](https://github.com/withastro/astro/pull/6534) [`ad907196c`](https://github.com/withastro/astro/commit/ad907196cb42f21d9540ae0d77aa742bf7adf030) Thanks [@atilafassina](https://github.com/atilafassina)! - Adds support to SSR routes to sitemap generation.
+
 ## 1.2.2
 
 ### Patch Changes

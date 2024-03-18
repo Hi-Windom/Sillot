@@ -1,14 +1,15 @@
-import { h, render, type JSX } from 'preact';
+import { h, hydrate, render } from 'preact';
 import StaticHtml from './static-html.js';
-import type { SignalLike } from './types';
+import type { SignalLike } from './types.js';
 
-const sharedSignalMap: Map<string, SignalLike> = new Map();
+const sharedSignalMap = new Map<string, SignalLike>();
 
 export default (element: HTMLElement) =>
 	async (
 		Component: any,
 		props: Record<string, any>,
-		{ default: children, ...slotted }: Record<string, any>
+		{ default: children, ...slotted }: Record<string, any>,
+		{ client }: Record<string, string>
 	) => {
 		if (!element.hasAttribute('ssr')) return;
 		for (const [key, value] of Object.entries(slotted)) {
@@ -17,7 +18,7 @@ export default (element: HTMLElement) =>
 		let signalsRaw = element.dataset.preactSignals;
 		if (signalsRaw) {
 			const { signal } = await import('@preact/signals');
-			let signals: Record<string, string> = JSON.parse(element.dataset.preactSignals as string);
+			let signals: Record<string, string> = JSON.parse(element.dataset.preactSignals!);
 			for (const [propName, signalId] of Object.entries(signals)) {
 				if (!sharedSignalMap.has(signalId)) {
 					const signalValue = signal(props[propName]);
@@ -27,23 +28,13 @@ export default (element: HTMLElement) =>
 			}
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-shadow
-		function Wrapper({ children }: { children: JSX.Element }) {
-			let attrs = Object.fromEntries(
-				Array.from(element.attributes).map((attr) => [attr.name, attr.value])
-			);
-			return h(element.localName, attrs, children);
-		}
+		const bootstrap = client !== 'only' ? hydrate : render;
 
-		let parent = element.parentNode as Element;
-
-		render(
-			h(
-				Wrapper,
-				null,
-				h(Component, props, children != null ? h(StaticHtml, { value: children }) : children)
-			),
-			parent,
+		bootstrap(
+			h(Component, props, children != null ? h(StaticHtml, { value: children }) : children),
 			element
 		);
+
+		// Preact has no "unmount" option, but you can use `render(null, element)`
+		element.addEventListener('astro:unmount', () => render(null, element), { once: true });
 	};

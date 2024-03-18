@@ -1,4 +1,4 @@
-import type { RendererContext } from './types';
+import type { RendererContext } from './types.js';
 
 type Context = {
 	id: string;
@@ -11,7 +11,7 @@ export function getContext(result: RendererContext['result']): Context {
 	if (contexts.has(result)) {
 		return contexts.get(result)!;
 	}
-	let ctx = {
+	let ctx: Context = {
 		c: 0,
 		get id() {
 			return 's' + this.c.toString();

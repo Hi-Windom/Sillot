@@ -1,10 +1,30 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
+import realFS from 'node:fs';
+import npath from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Volume } from 'memfs';
 import httpMocks from 'node-mocks-http';
-import realFS from 'node:fs';
-import npath from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { getDefaultClientDirectives } from '../../dist/core/client-directive/index.js';
+import { resolveConfig } from '../../dist/core/config/index.js';
+import { createBaseSettings } from '../../dist/core/config/settings.js';
+import { createContainer } from '../../dist/core/dev/container.js';
+import { Logger } from '../../dist/core/logger/core.js';
+import { nodeLogDestination } from '../../dist/core/logger/node.js';
+import { Pipeline } from '../../dist/core/render/index.js';
+import { RouteCache } from '../../dist/core/render/route-cache.js';
 import { unixify } from './correct-path.js';
+
+/** @type {import('../../src/core/logger/core').Logger} */
+export const defaultLogger = new Logger({
+	dest: nodeLogDestination,
+	level: 'error',
+});
+
+/** @type {import('../../src/core/logger/core').LogOptions} */
+export const silentLogging = {
+	dest: nodeLogDestination,
+	level: 'error',
+};
 
 class VirtualVolume extends Volume {
 	#root = '';
@@ -58,6 +78,14 @@ class VirtualVolumeWithFallback extends VirtualVolume {
 			}
 		});
 	}
+
+	readFileSync(p, ...args) {
+		try {
+			return super.readFileSync(p, ...args);
+		} catch (e) {
+			return realFS.readFileSync(p, ...args);
+		}
+	}
 }
 
 export function createFs(json, root, VolumeImpl = VirtualVolume) {
@@ -83,7 +111,7 @@ export function createFsWithFallback(json, root) {
 /**
  *
  * @param {import('../../src/core/dev/container').Container} container
- * @param {typeof import('fs')} fs
+ * @param {typeof import('node:fs')} fs
  * @param {string} shortPath
  * @param {'change'} eventType
  */
@@ -151,3 +179,70 @@ export function buffersToString(buffers) {
 
 // A convenience method for creating an astro module from a component
 export const createAstroModule = (AstroComponent) => ({ default: AstroComponent });
+
+/**
+ * @param {Partial<Pipeline>} options
+ * @returns {Pipeline}
+ */
+export function createBasicPipeline(options = {}) {
+	const mode = options.mode ?? 'development';
+	const pipeline = new Pipeline(
+		options.logger ?? defaultLogger,
+		options.manifest ?? {},
+		options.mode ?? 'development',
+		options.renderers ?? [],
+		options.resolve ?? ((s) => Promise.resolve(s)),
+		options.serverLike ?? true,
+		options.streaming ?? true,
+		options.adapterName,
+		options.clientDirectives ?? getDefaultClientDirectives(),
+		options.inlinedScripts ?? [],
+		options.compressHTML,
+		options.i18n,
+		options.middleware,
+		options.routeCache ?? new RouteCache(options.logging, mode),
+		options.site
+	);
+	pipeline.headElements = () => ({ scripts: new Set(), styles: new Set(), links: new Set() });
+	pipeline.componentMetadata = () => new Map();
+	return pipeline;
+}
+
+/**
+ * @param {import('../../src/@types/astro.js').AstroInlineConfig} inlineConfig
+ * @returns {Promise<import('../../src/@types/astro.js').AstroSettings>}
+ */
+export async function createBasicSettings(inlineConfig = {}) {
+	if (!inlineConfig.root) {
+		inlineConfig.root = fileURLToPath(new URL('.', import.meta.url));
+	}
+	const { astroConfig } = await resolveConfig(inlineConfig, 'dev');
+	return createBaseSettings(astroConfig);
+}
+
+/**
+ * @typedef {{
+ * 	fs?: typeof realFS,
+ * 	inlineConfig?: import('../../src/@types/astro.js').AstroInlineConfig,
+ *  logging?: import('../../src/core/logger/core').LogOptions,
+ * }} RunInContainerOptions
+ */
+
+/**
+ * @param {RunInContainerOptions} options
+ * @param {(container: import('../../src/core/dev/container.js').Container) => Promise<void> | void} callback
+ */
+export async function runInContainer(options = {}, callback) {
+	const settings = await createBasicSettings(options.inlineConfig ?? {});
+	const container = await createContainer({
+		fs: options?.fs ?? realFS,
+		settings,
+		inlineConfig: options.inlineConfig ?? {},
+		logger: defaultLogger,
+	});
+	try {
+		await callback(container);
+	} finally {
+		await container.close();
+	}
+}

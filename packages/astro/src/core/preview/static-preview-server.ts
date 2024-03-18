@@ -1,11 +1,9 @@
-import type http from 'http';
+import type http from 'node:http';
+import { fileURLToPath } from 'node:url';
 import { performance } from 'perf_hooks';
-import enableDestroy from 'server-destroy';
-import { fileURLToPath } from 'url';
-import { preview, type PreviewServer as VitePreviewServer } from 'vite';
-import type { AstroSettings } from '../../@types/astro';
-import type { LogOptions } from '../logger/core';
-import { error, info } from '../logger/core.js';
+import { type PreviewServer as VitePreviewServer, preview } from 'vite';
+import type { AstroSettings } from '../../@types/astro.js';
+import type { Logger } from '../logger/core.js';
 import * as msg from '../messages.js';
 import { getResolvedHostForHttpServer } from './util.js';
 import { vitePluginAstroPreview } from './vite-plugin-astro-preview.js';
@@ -20,7 +18,7 @@ export interface PreviewServer {
 
 export default async function createStaticPreviewServer(
 	settings: AstroSettings,
-	logging: LogOptions
+	logger: Logger
 ): Promise<PreviewServer> {
 	const startServerTime = performance.now();
 
@@ -43,20 +41,17 @@ export default async function createStaticPreviewServer(
 		});
 	} catch (err) {
 		if (err instanceof Error) {
-			error(logging, 'astro', err.stack || err.message);
+			logger.error(null, err.stack || err.message);
 		}
 		throw err;
 	}
 
-	enableDestroy(previewServer.httpServer);
-
 	// Log server start URLs
-	info(
-		logging,
-		null,
+	logger.info(
+		'SKIP_FORMAT',
 		msg.serverStart({
 			startupTime: performance.now() - startServerTime,
-			resolvedUrls: previewServer.resolvedUrls,
+			resolvedUrls: previewServer.resolvedUrls ?? { local: [], network: [] },
 			host: settings.config.server.host,
 			base: settings.config.base,
 		})
@@ -74,11 +69,7 @@ export default async function createStaticPreviewServer(
 		host: getResolvedHostForHttpServer(settings.config.server.host),
 		port: settings.config.server.port,
 		closed,
-		server: previewServer.httpServer,
-		stop: async () => {
-			await new Promise((resolve, reject) => {
-				previewServer.httpServer.destroy((err) => (err ? reject(err) : resolve(undefined)));
-			});
-		},
+		server: previewServer.httpServer as http.Server,
+		stop: previewServer.close.bind(previewServer),
 	};
 }

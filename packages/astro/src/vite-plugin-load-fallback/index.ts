@@ -1,7 +1,8 @@
-import nodeFs from 'fs';
-import npath from 'path';
-import slashify from 'slash';
+import nodeFs from 'node:fs';
+import npath from 'node:path';
 import type * as vite from 'vite';
+import { slash } from '../core/path.js';
+import { cleanUrl } from '../vite-plugin-utils/index.js';
 
 type NodeFileSystemModule = typeof nodeFs;
 
@@ -15,7 +16,7 @@ export default function loadFallbackPlugin({
 	root,
 }: LoadFallbackPluginParams): vite.Plugin[] | false {
 	// Only add this plugin if a custom fs implementation is provided.
-	// Also check for `fs.default` because `import * as fs from 'fs'` will
+	// Also check for `fs.default` because `import * as fs from 'node:fs'` will
 	// export as so, which only it's `.default` would === `nodeFs`.
 	// @ts-expect-error check default
 	if (!fs || fs === nodeFs || fs.default === nodeFs) {
@@ -47,7 +48,7 @@ export default function loadFallbackPlugin({
 			async resolveId(id, parent) {
 				// See if this can be loaded from our fs
 				if (parent) {
-					const candidateId = npath.posix.join(npath.posix.dirname(slashify(parent)), id);
+					const candidateId = npath.posix.join(npath.posix.dirname(slash(parent)), id);
 					try {
 						// Check to see if this file exists and is not a directory.
 						const stats = await fs.promises.stat(candidateId);
@@ -77,8 +78,3 @@ export default function loadFallbackPlugin({
 		},
 	];
 }
-
-const queryRE = /\?.*$/s;
-const hashRE = /#.*$/s;
-
-const cleanUrl = (url: string): string => url.replace(hashRE, '').replace(queryRE, '');

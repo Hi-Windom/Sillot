@@ -1,10 +1,11 @@
-import type { Plugin as VitePlugin } from 'vite';
-import type { AstroSettings } from '../../../@types/astro';
+import type { BuildOptions, Plugin as VitePlugin } from 'vite';
+import type { AstroSettings } from '../../../@types/astro.js';
 import { viteID } from '../../util.js';
 import type { BuildInternals } from '../internal.js';
 import { getPageDataByViteID } from '../internal.js';
-import type { AstroBuildPlugin } from '../plugin';
-import type { StaticBuildOptions } from '../types';
+import type { AstroBuildPlugin } from '../plugin.js';
+import type { OutputChunk, StaticBuildOptions } from '../types.js';
+import { shouldInlineAsset } from './util.js';
 
 function virtualHoistedEntry(id: string) {
 	return id.startsWith('/astro/hoisted.js?q=');
@@ -14,8 +15,14 @@ export function vitePluginHoistedScripts(
 	settings: AstroSettings,
 	internals: BuildInternals
 ): VitePlugin {
+	let assetsInlineLimit: NonNullable<BuildOptions['assetsInlineLimit']>;
+
 	return {
 		name: '@astro/rollup-plugin-astro-hoisted-scripts',
+
+		configResolved(config) {
+			assetsInlineLimit = config.build.assetsInlineLimit;
+		},
 
 		resolveId(id) {
 			if (virtualHoistedEntry(id)) {
@@ -42,52 +49,53 @@ export function vitePluginHoistedScripts(
 		},
 
 		async generateBundle(_options, bundle) {
-			let assetInlineLimit = 4096;
-			if (
-				settings.config.vite?.build &&
-				settings.config.vite.build.assetsInlineLimit !== undefined
-			) {
-				assetInlineLimit = settings.config.vite?.build.assetsInlineLimit;
-			}
+			const considerInlining = new Map<string, OutputChunk>();
+			const importedByOtherScripts = new Set<string>();
 
 			// Find all page entry points and create a map of the entry point to the hashed hoisted script.
 			// This is used when we render so that we can add the script to the head.
-			for (const [id, output] of Object.entries(bundle)) {
+			Object.entries(bundle).forEach(([id, output]) => {
 				if (
 					output.type === 'chunk' &&
 					output.facadeModuleId &&
 					virtualHoistedEntry(output.facadeModuleId)
 				) {
-					const canBeInlined =
-						output.imports.length === 0 &&
-						output.dynamicImports.length === 0 &&
-						Buffer.byteLength(output.code) <= assetInlineLimit;
-					let removeFromBundle = false;
-					const facadeId = output.facadeModuleId!;
-					const pages = internals.hoistedScriptIdToPagesMap.get(facadeId)!;
-					for (const pathname of pages) {
-						const vid = viteID(new URL('.' + pathname, settings.config.root));
-						const pageInfo = getPageDataByViteID(internals, vid);
-						if (pageInfo) {
-							if (canBeInlined) {
-								pageInfo.hoistedScript = {
-									type: 'inline',
-									value: output.code,
-								};
-								removeFromBundle = true;
-							} else {
-								pageInfo.hoistedScript = {
-									type: 'external',
-									value: id,
-								};
-							}
+					considerInlining.set(id, output);
+					output.imports.forEach((imported) => importedByOtherScripts.add(imported));
+				}
+			});
+
+			for (const [id, output] of considerInlining.entries()) {
+				const canBeInlined =
+					importedByOtherScripts.has(output.fileName) === false &&
+					output.imports.length === 0 &&
+					output.dynamicImports.length === 0 &&
+					shouldInlineAsset(output.code, output.fileName, assetsInlineLimit);
+				let removeFromBundle = false;
+				const facadeId = output.facadeModuleId!;
+				const pages = internals.hoistedScriptIdToPagesMap.get(facadeId)!;
+				for (const pathname of pages) {
+					const vid = viteID(new URL('.' + pathname, settings.config.root));
+					const pageInfo = getPageDataByViteID(internals, vid);
+					if (pageInfo) {
+						if (canBeInlined) {
+							pageInfo.hoistedScript = {
+								type: 'inline',
+								value: output.code,
+							};
+							removeFromBundle = true;
+						} else {
+							pageInfo.hoistedScript = {
+								type: 'external',
+								value: id,
+							};
 						}
 					}
+				}
 
-					// Remove the bundle if it was inlined
-					if (removeFromBundle) {
-						delete bundle[id];
-					}
+				// Remove the bundle if it was inlined
+				if (removeFromBundle) {
+					delete bundle[id];
 				}
 			}
 		},
@@ -99,7 +107,7 @@ export function pluginHoistedScripts(
 	internals: BuildInternals
 ): AstroBuildPlugin {
 	return {
-		build: 'client',
+		targets: ['client'],
 		hooks: {
 			'build:before': () => {
 				return {

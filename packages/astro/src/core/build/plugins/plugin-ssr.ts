@@ -1,247 +1,123 @@
+import { join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { Plugin as VitePlugin } from 'vite';
-import type { AstroAdapter } from '../../../@types/astro';
-import type { SerializedRouteInfo, SerializedSSRManifest } from '../../app/types';
-import type { BuildInternals } from '../internal.js';
-import type { StaticBuildOptions } from '../types';
-
-import glob from 'fast-glob';
-import { fileURLToPath } from 'url';
-import { runHookBuildSsr } from '../../../integrations/index.js';
-import { BEFORE_HYDRATION_SCRIPT_ID, PAGE_SCRIPT_ID } from '../../../vite-plugin-scripts/index.js';
-import { pagesVirtualModuleId } from '../../app/index.js';
-import { joinPaths, prependForwardSlash } from '../../path.js';
-import { serializeRouteData } from '../../routing/index.js';
+import type { AstroAdapter } from '../../../@types/astro.js';
+import { isFunctionPerRouteEnabled } from '../../../integrations/index.js';
+import { isServerLikeOutput } from '../../../prerender/utils.js';
+import { routeIsRedirect } from '../../redirects/index.js';
 import { addRollupInput } from '../add-rollup-input.js';
-import { getOutFile, getOutFolder } from '../common.js';
-import { eachPrerenderedPageData, eachServerPageData, sortedCSS } from '../internal.js';
-import type { AstroBuildPlugin } from '../plugin';
+import type { BuildInternals } from '../internal.js';
+import { eachPageFromAllPages } from '../internal.js';
+import type { AstroBuildPlugin } from '../plugin.js';
+import type { StaticBuildOptions } from '../types.js';
+import { SSR_MANIFEST_VIRTUAL_MODULE_ID } from './plugin-manifest.js';
+import { MIDDLEWARE_MODULE_ID } from './plugin-middleware.js';
+import { ASTRO_PAGE_MODULE_ID } from './plugin-pages.js';
+import { RENDERERS_MODULE_ID } from './plugin-renderers.js';
+import { getPathFromVirtualModulePageName, getVirtualModulePageNameFromPath } from './util.js';
 
-export const virtualModuleId = '@astrojs-ssr-virtual-entry';
-const resolvedVirtualModuleId = '\0' + virtualModuleId;
-const manifestReplace = '@@ASTRO_MANIFEST_REPLACE@@';
-const replaceExp = new RegExp(`['"](${manifestReplace})['"]`, 'g');
+export const SSR_VIRTUAL_MODULE_ID = '@astrojs-ssr-virtual-entry';
+export const RESOLVED_SSR_VIRTUAL_MODULE_ID = '\0' + SSR_VIRTUAL_MODULE_ID;
 
-export function vitePluginSSR(internals: BuildInternals, adapter: AstroAdapter): VitePlugin {
+function vitePluginSSR(
+	internals: BuildInternals,
+	adapter: AstroAdapter,
+	options: StaticBuildOptions
+): VitePlugin {
 	return {
-		name: '@astrojs/vite-plugin-astro-ssr',
+		name: '@astrojs/vite-plugin-astro-ssr-server',
 		enforce: 'post',
 		options(opts) {
-			return addRollupInput(opts, [virtualModuleId]);
+			return addRollupInput(opts, [SSR_VIRTUAL_MODULE_ID]);
 		},
 		resolveId(id) {
-			if (id === virtualModuleId) {
-				return resolvedVirtualModuleId;
+			if (id === SSR_VIRTUAL_MODULE_ID) {
+				return RESOLVED_SSR_VIRTUAL_MODULE_ID;
 			}
 		},
-		load(id) {
-			if (id === resolvedVirtualModuleId) {
-				return `import * as adapter from '${adapter.serverEntrypoint}';
-import * as _main from '${pagesVirtualModuleId}';
-import { deserializeManifest as _deserializeManifest } from 'astro/app';
-import { _privateSetManifestDontUseThis } from 'astro:ssr-manifest';
-const _manifest = Object.assign(_deserializeManifest('${manifestReplace}'), {
-	pageMap: _main.pageMap,
-	renderers: _main.renderers
-});
-_privateSetManifestDontUseThis(_manifest);
-const _args = ${adapter.args ? JSON.stringify(adapter.args) : 'undefined'};
-export * from '${pagesVirtualModuleId}';
-${
-	adapter.exports
-		? `const _exports = adapter.createExports(_manifest, _args);
-${adapter.exports
-	.map((name) => {
-		if (name === 'default') {
-			return `const _default = _exports['default'];
-export { _default as default };`;
-		} else {
-			return `export const ${name} = _exports['${name}'];`;
-		}
-	})
-	.join('\n')}
-`
-		: ''
-}
-const _start = 'start';
-if(_start in adapter) {
-	adapter[_start](_manifest, _args);
-}`;
+		async load(id) {
+			if (id === RESOLVED_SSR_VIRTUAL_MODULE_ID) {
+				const { allPages } = options;
+				const imports: string[] = [];
+				const contents: string[] = [];
+				const exports: string[] = [];
+				let i = 0;
+				const pageMap: string[] = [];
+
+				for (const [path, pageData] of eachPageFromAllPages(allPages)) {
+					if (routeIsRedirect(pageData.route)) {
+						continue;
+					}
+					const virtualModuleName = getVirtualModulePageNameFromPath(ASTRO_PAGE_MODULE_ID, path);
+					let module = await this.resolve(virtualModuleName);
+					if (module) {
+						const variable = `_page${i}`;
+						// we need to use the non-resolved ID in order to resolve correctly the virtual module
+						imports.push(`const ${variable} = () => import("${virtualModuleName}");`);
+
+						const pageData2 = internals.pagesByComponent.get(path);
+						if (pageData2) {
+							pageMap.push(`[${JSON.stringify(pageData2.component)}, ${variable}]`);
+						}
+						i++;
+					}
+				}
+				contents.push(`const pageMap = new Map([\n    ${pageMap.join(',\n    ')}\n]);`);
+				exports.push(`export { pageMap }`);
+				const middleware = await this.resolve(MIDDLEWARE_MODULE_ID);
+				const ssrCode = generateSSRCode(adapter, middleware!.id);
+				imports.push(...ssrCode.imports);
+				contents.push(...ssrCode.contents);
+				return [...imports, ...contents, ...exports].join('\n');
 			}
 			return void 0;
 		},
 		async generateBundle(_opts, bundle) {
 			// Add assets from this SSR chunk as well.
-			for (const [_chunkName, chunk] of Object.entries(bundle)) {
+			for (const [, chunk] of Object.entries(bundle)) {
 				if (chunk.type === 'asset') {
 					internals.staticFiles.add(chunk.fileName);
 				}
 			}
 
-			for (const [chunkName, chunk] of Object.entries(bundle)) {
+			for (const [, chunk] of Object.entries(bundle)) {
 				if (chunk.type === 'asset') {
 					continue;
 				}
-				if (chunk.modules[resolvedVirtualModuleId]) {
+				if (chunk.modules[RESOLVED_SSR_VIRTUAL_MODULE_ID]) {
 					internals.ssrEntryChunk = chunk;
-					delete bundle[chunkName];
 				}
 			}
 		},
 	};
-}
-
-export async function injectManifest(buildOpts: StaticBuildOptions, internals: BuildInternals) {
-	if (!internals.ssrEntryChunk) {
-		throw new Error(`Did not generate an entry chunk for SSR`);
-	}
-
-	// Add assets from the client build.
-	const clientStatics = new Set(
-		await glob('**/*', {
-			cwd: fileURLToPath(buildOpts.buildConfig.client),
-		})
-	);
-	for (const file of clientStatics) {
-		internals.staticFiles.add(file);
-	}
-
-	const staticFiles = internals.staticFiles;
-	const manifest = buildManifest(buildOpts, internals, Array.from(staticFiles));
-	await runHookBuildSsr({
-		config: buildOpts.settings.config,
-		manifest,
-		logging: buildOpts.logging,
-	});
-
-	const chunk = internals.ssrEntryChunk;
-	const code = chunk.code;
-
-	return code.replace(replaceExp, () => {
-		return JSON.stringify(manifest);
-	});
-}
-
-function buildManifest(
-	opts: StaticBuildOptions,
-	internals: BuildInternals,
-	staticFiles: string[]
-): SerializedSSRManifest {
-	const { settings } = opts;
-
-	const routes: SerializedRouteInfo[] = [];
-	const entryModules = Object.fromEntries(internals.entrySpecifierToBundleMap.entries());
-	if (settings.scripts.some((script) => script.stage === 'page')) {
-		staticFiles.push(entryModules[PAGE_SCRIPT_ID]);
-	}
-
-	const prefixAssetPath = (pth: string) => {
-		if (settings.config.build.assetsPrefix) {
-			return joinPaths(settings.config.build.assetsPrefix, pth);
-		} else {
-			return prependForwardSlash(joinPaths(settings.config.base, pth));
-		}
-	};
-
-	for (const pageData of eachPrerenderedPageData(internals)) {
-		if (!pageData.route.pathname) continue;
-
-		const outFolder = getOutFolder(
-			opts.settings.config,
-			pageData.route.pathname!,
-			pageData.route.type
-		);
-		const outFile = getOutFile(
-			opts.settings.config,
-			outFolder,
-			pageData.route.pathname!,
-			pageData.route.type
-		);
-		const file = outFile.toString().replace(opts.settings.config.build.client.toString(), '');
-		routes.push({
-			file,
-			links: [],
-			scripts: [],
-			routeData: serializeRouteData(pageData.route, settings.config.trailingSlash),
-		});
-		staticFiles.push(file);
-	}
-
-	for (const pageData of eachServerPageData(internals)) {
-		const scripts: SerializedRouteInfo['scripts'] = [];
-		if (pageData.hoistedScript) {
-			const hoistedValue = pageData.hoistedScript.value;
-			const value = hoistedValue.endsWith('.js') ? prefixAssetPath(hoistedValue) : hoistedValue;
-			scripts.unshift(
-				Object.assign({}, pageData.hoistedScript, {
-					value,
-				})
-			);
-		}
-		if (settings.scripts.some((script) => script.stage === 'page')) {
-			const src = entryModules[PAGE_SCRIPT_ID];
-
-			scripts.push({
-				type: 'external',
-				value: prefixAssetPath(src),
-			});
-		}
-
-		const links = sortedCSS(pageData).map((pth) => prefixAssetPath(pth));
-
-		routes.push({
-			file: '',
-			links,
-			scripts: [
-				...scripts,
-				...settings.scripts
-					.filter((script) => script.stage === 'head-inline')
-					.map(({ stage, content }) => ({ stage, children: content })),
-			],
-			routeData: serializeRouteData(pageData.route, settings.config.trailingSlash),
-		});
-	}
-
-	// HACK! Patch this special one.
-	if (!(BEFORE_HYDRATION_SCRIPT_ID in entryModules)) {
-		// Set this to an empty string so that the runtime knows not to try and load this.
-		entryModules[BEFORE_HYDRATION_SCRIPT_ID] = '';
-	}
-
-	const ssrManifest: SerializedSSRManifest = {
-		adapterName: opts.settings.adapter!.name,
-		routes,
-		site: settings.config.site,
-		base: settings.config.base,
-		assetsPrefix: settings.config.build.assetsPrefix,
-		markdown: settings.config.markdown,
-		pageMap: null as any,
-		componentMetadata: Array.from(internals.componentMetadata),
-		renderers: [],
-		entryModules,
-		assets: staticFiles.map(prefixAssetPath),
-	};
-
-	return ssrManifest;
 }
 
 export function pluginSSR(
 	options: StaticBuildOptions,
 	internals: BuildInternals
 ): AstroBuildPlugin {
-	const ssr = options.settings.config.output === 'server';
+	const ssr = isServerLikeOutput(options.settings.config);
+	const functionPerRouteEnabled = isFunctionPerRouteEnabled(options.settings.adapter);
 	return {
-		build: 'ssr',
+		targets: ['server'],
 		hooks: {
 			'build:before': () => {
-				let vitePlugin = ssr ? vitePluginSSR(internals, options.settings.adapter!) : undefined;
+				let vitePlugin =
+					ssr && functionPerRouteEnabled === false
+						? vitePluginSSR(internals, options.settings.adapter!, options)
+						: undefined;
 
 				return {
 					enforce: 'after-user-plugins',
 					vitePlugin,
 				};
 			},
-			'build:post': async ({ mutate }) => {
+			'build:post': async () => {
 				if (!ssr) {
+					return;
+				}
+
+				if (functionPerRouteEnabled) {
 					return;
 				}
 
@@ -250,10 +126,177 @@ export function pluginSSR(
 				}
 				// Mutate the filename
 				internals.ssrEntryChunk.fileName = options.settings.config.build.serverEntry;
-
-				const code = await injectManifest(options, internals);
-				mutate(internals.ssrEntryChunk, 'server', code);
 			},
 		},
 	};
+}
+
+export const SPLIT_MODULE_ID = '@astro-page-split:';
+export const RESOLVED_SPLIT_MODULE_ID = '\0@astro-page-split:';
+
+function vitePluginSSRSplit(
+	internals: BuildInternals,
+	adapter: AstroAdapter,
+	options: StaticBuildOptions
+): VitePlugin {
+	const functionPerRouteEnabled = isFunctionPerRouteEnabled(options.settings.adapter);
+	return {
+		name: '@astrojs/vite-plugin-astro-ssr-split',
+		enforce: 'post',
+		options(opts) {
+			if (functionPerRouteEnabled) {
+				const inputs = new Set<string>();
+
+				for (const [path, pageData] of eachPageFromAllPages(options.allPages)) {
+					if (routeIsRedirect(pageData.route)) {
+						continue;
+					}
+					inputs.add(getVirtualModulePageNameFromPath(SPLIT_MODULE_ID, path));
+				}
+
+				return addRollupInput(opts, Array.from(inputs));
+			}
+		},
+		resolveId(id) {
+			if (id.startsWith(SPLIT_MODULE_ID)) {
+				return '\0' + id;
+			}
+		},
+		async load(id) {
+			if (id.startsWith(RESOLVED_SPLIT_MODULE_ID)) {
+				const imports: string[] = [];
+				const contents: string[] = [];
+				const exports: string[] = [];
+
+				const path = getPathFromVirtualModulePageName(RESOLVED_SPLIT_MODULE_ID, id);
+				const virtualModuleName = getVirtualModulePageNameFromPath(ASTRO_PAGE_MODULE_ID, path);
+				let module = await this.resolve(virtualModuleName);
+				if (module) {
+					// we need to use the non-resolved ID in order to resolve correctly the virtual module
+					imports.push(`import * as pageModule from "${virtualModuleName}";`);
+				}
+				const middleware = await this.resolve(MIDDLEWARE_MODULE_ID);
+				const ssrCode = generateSSRCode(adapter, middleware!.id);
+				imports.push(...ssrCode.imports);
+				contents.push(...ssrCode.contents);
+
+				exports.push('export { pageModule }');
+
+				return [...imports, ...contents, ...exports].join('\n');
+			}
+			return void 0;
+		},
+		async generateBundle(_opts, bundle) {
+			// Add assets from this SSR chunk as well.
+			for (const [, chunk] of Object.entries(bundle)) {
+				if (chunk.type === 'asset') {
+					internals.staticFiles.add(chunk.fileName);
+				}
+			}
+
+			for (const [, chunk] of Object.entries(bundle)) {
+				if (chunk.type === 'asset') {
+					continue;
+				}
+				for (const moduleKey of Object.keys(chunk.modules)) {
+					if (moduleKey.startsWith(RESOLVED_SPLIT_MODULE_ID)) {
+						internals.ssrSplitEntryChunks.set(moduleKey, chunk);
+						storeEntryPoint(moduleKey, options, internals, chunk.fileName);
+					}
+				}
+			}
+		},
+	};
+}
+
+export function pluginSSRSplit(
+	options: StaticBuildOptions,
+	internals: BuildInternals
+): AstroBuildPlugin {
+	const ssr = isServerLikeOutput(options.settings.config);
+	const functionPerRouteEnabled = isFunctionPerRouteEnabled(options.settings.adapter);
+
+	return {
+		targets: ['server'],
+		hooks: {
+			'build:before': () => {
+				let vitePlugin =
+					ssr && functionPerRouteEnabled
+						? vitePluginSSRSplit(internals, options.settings.adapter!, options)
+						: undefined;
+
+				return {
+					enforce: 'after-user-plugins',
+					vitePlugin,
+				};
+			},
+		},
+	};
+}
+
+function generateSSRCode(adapter: AstroAdapter, middlewareId: string) {
+	const edgeMiddleware = adapter?.adapterFeatures?.edgeMiddleware ?? false;
+	const pageMap = isFunctionPerRouteEnabled(adapter) ? 'pageModule' : 'pageMap';
+
+	const imports = [
+		`import { renderers } from '${RENDERERS_MODULE_ID}';`,
+		`import { manifest as defaultManifest } from '${SSR_MANIFEST_VIRTUAL_MODULE_ID}';`,
+		`import * as serverEntrypointModule from '${adapter.serverEntrypoint}';`,
+		edgeMiddleware ? `` : `import { onRequest as middleware } from '${middlewareId}';`,
+	];
+
+	const contents = [
+		edgeMiddleware ? `const middleware = (_, next) => next()` : '',
+		`const _manifest = Object.assign(defaultManifest, {`,
+		`    ${pageMap},`,
+		`    renderers,`,
+		`    middleware`,
+		`});`,
+		`const _args = ${adapter.args ? JSON.stringify(adapter.args, null, 4) : 'undefined'};`,
+		adapter.exports
+			? `const _exports = serverEntrypointModule.createExports(_manifest, _args);`
+			: '',
+		...(adapter.exports?.map((name) => {
+			if (name === 'default') {
+				return `export default _exports.default;`;
+			} else {
+				return `export const ${name} = _exports['${name}'];`;
+			}
+		}) ?? []),
+		// NOTE: This is intentionally obfuscated!
+		// Do NOT simplify this to something like `serverEntrypointModule.start?.(_manifest, _args)`
+		// They are NOT equivalent! Some bundlers will throw if `start` is not exported, but we
+		// only want to silently ignore it... hence the dynamic, obfuscated weirdness.
+		`const _start = 'start';
+if (_start in serverEntrypointModule) {
+	serverEntrypointModule[_start](_manifest, _args);
+}`,
+	];
+
+	return {
+		imports,
+		contents,
+	};
+}
+
+/**
+ * Because we delete the bundle from rollup at the end of this function,
+ *  we can't use `writeBundle` hook to get the final file name of the entry point written on disk.
+ *  We use this hook instead.
+ *
+ *  We retrieve the {@link RouteData} that belongs the current moduleKey
+ */
+function storeEntryPoint(
+	moduleKey: string,
+	options: StaticBuildOptions,
+	internals: BuildInternals,
+	fileName: string
+) {
+	const componentPath = getPathFromVirtualModulePageName(RESOLVED_SPLIT_MODULE_ID, moduleKey);
+	for (const [page, pageData] of eachPageFromAllPages(options.allPages)) {
+		if (componentPath == page) {
+			const publicPath = fileURLToPath(options.settings.config.build.server);
+			internals.entryPoints.set(pageData.route, pathToFileURL(join(publicPath, fileName)));
+		}
+	}
 }

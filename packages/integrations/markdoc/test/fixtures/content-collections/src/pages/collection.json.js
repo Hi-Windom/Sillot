@@ -1,10 +1,8 @@
-import { getCollection } from 'astro:content';
 import { stringify } from 'devalue';
 import { stripAllRenderFn } from '../../utils.js';
+import { getCollection } from 'astro:content';
 
-export async function get() {
+export async function GET() {
 	const posts = await getCollection('blog');
-	return {
-		body: stringify(stripAllRenderFn(posts))
-	};
+	return new Response(stringify(stripAllRenderFn(posts)));
 }

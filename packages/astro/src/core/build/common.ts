@@ -1,6 +1,6 @@
-import npath from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
-import type { AstroConfig, RouteType } from '../../@types/astro';
+import npath from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import type { AstroConfig, RouteData } from '../../@types/astro.js';
 import { appendForwardSlash } from '../../core/path.js';
 
 const STATUS_CODE_PAGES = new Set(['/404', '/500']);
@@ -17,15 +17,18 @@ function getOutRoot(astroConfig: AstroConfig): URL {
 export function getOutFolder(
 	astroConfig: AstroConfig,
 	pathname: string,
-	routeType: RouteType
+	routeData: RouteData
 ): URL {
 	const outRoot = getOutRoot(astroConfig);
+	const routeType = routeData.type;
 
 	// This is the root folder to write to.
 	switch (routeType) {
 		case 'endpoint':
 			return new URL('.' + appendForwardSlash(npath.dirname(pathname)), outRoot);
+		case 'fallback':
 		case 'page':
+		case 'redirect':
 			switch (astroConfig.build.format) {
 				case 'directory': {
 					if (STATUS_CODE_PAGES.has(pathname)) {
@@ -37,6 +40,17 @@ export function getOutFolder(
 					const d = pathname === '' ? pathname : npath.dirname(pathname);
 					return new URL('.' + appendForwardSlash(d), outRoot);
 				}
+				case 'preserve': {
+					let dir;
+					// If the pathname is '' then this is the root index.html
+					// If this is an index route, the folder should be the pathname, not the parent
+					if (pathname === '' || routeData.isIndex) {
+						dir = pathname;
+					} else {
+						dir = npath.dirname(pathname);
+					}
+					return new URL('.' + appendForwardSlash(dir), outRoot);
+				}
 			}
 	}
 }
@@ -45,12 +59,15 @@ export function getOutFile(
 	astroConfig: AstroConfig,
 	outFolder: URL,
 	pathname: string,
-	routeType: RouteType
+	routeData: RouteData
 ): URL {
+	const routeType = routeData.type;
 	switch (routeType) {
 		case 'endpoint':
 			return new URL(npath.basename(pathname), outFolder);
 		case 'page':
+		case 'fallback':
+		case 'redirect':
 			switch (astroConfig.build.format) {
 				case 'directory': {
 					if (STATUS_CODE_PAGES.has(pathname)) {
@@ -62,6 +79,15 @@ export function getOutFile(
 				case 'file': {
 					const baseName = npath.basename(pathname);
 					return new URL('./' + (baseName || 'index') + '.html', outFolder);
+				}
+				case 'preserve': {
+					let baseName = npath.basename(pathname);
+					// If there is no base name this is the root route.
+					// If this is an index route, the name should be `index.html`.
+					if (!baseName || routeData.isIndex) {
+						baseName = 'index';
+					}
+					return new URL(`./${baseName}.html`, outFolder);
 				}
 			}
 	}

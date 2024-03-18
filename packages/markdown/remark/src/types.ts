@@ -1,11 +1,13 @@
 import type * as hast from 'hast';
 import type * as mdast from 'mdast';
+import type { Options as RemarkRehypeOptions } from 'remark-rehype';
 import type {
-	all as Handlers,
-	one as Handler,
-	Options as RemarkRehypeOptions,
-} from 'remark-rehype';
-import type { ILanguageRegistration, IThemeRegistration, Theme } from 'shiki';
+	BuiltinTheme,
+	LanguageRegistration,
+	ShikiTransformer,
+	ThemeRegistration,
+	ThemeRegistrationRaw,
+} from 'shiki';
 import type * as unified from 'unified';
 import type { VFile } from 'vfile';
 
@@ -29,19 +31,19 @@ export type RehypePlugin<PluginParameters extends any[] = any[]> = unified.Plugi
 
 export type RehypePlugins = (string | [string, any] | RehypePlugin | [RehypePlugin, any])[];
 
-export type RemarkRehype = Omit<RemarkRehypeOptions, 'handlers' | 'unknownHandler'> & {
-	handlers?: typeof Handlers;
-	handler?: typeof Handler;
-};
+export type RemarkRehype = RemarkRehypeOptions;
+
+export type ThemePresets = BuiltinTheme | 'css-variables';
 
 export interface ShikiConfig {
-	langs?: ILanguageRegistration[];
-	theme?: Theme | IThemeRegistration;
+	langs?: LanguageRegistration[];
+	theme?: ThemePresets | ThemeRegistration | ThemeRegistrationRaw;
+	themes?: Record<string, ThemePresets | ThemeRegistration | ThemeRegistrationRaw>;
 	wrap?: boolean | null;
+	transformers?: ShikiTransformer[];
 }
 
 export interface AstroMarkdownOptions {
-	drafts?: boolean;
 	syntaxHighlight?: 'shiki' | 'prism' | false;
 	shikiConfig?: ShikiConfig;
 	remarkPlugins?: RemarkPlugins;
@@ -58,17 +60,32 @@ export interface ImageMetadata {
 	type: string;
 }
 
-export interface MarkdownRenderingOptions extends AstroMarkdownOptions {
+export interface MarkdownProcessor {
+	render: (
+		content: string,
+		opts?: MarkdownProcessorRenderOptions
+	) => Promise<MarkdownProcessorRenderResult>;
+}
+
+export interface MarkdownProcessorRenderOptions {
 	/** @internal */
 	fileURL?: URL;
-	/** @internal */
-	$?: {
-		scopedClassName: string | null;
-	};
 	/** Used for frontmatter injection plugins */
 	frontmatter?: Record<string, any>;
-	experimentalAssets?: boolean;
 }
+
+export interface MarkdownProcessorRenderResult {
+	code: string;
+	metadata: {
+		headings: MarkdownHeading[];
+		imagePaths: Set<string>;
+		frontmatter: Record<string, any>;
+	};
+}
+
+export interface MarkdownRenderingOptions
+	extends AstroMarkdownOptions,
+		MarkdownProcessorRenderOptions {}
 
 export interface MarkdownHeading {
 	depth: number;

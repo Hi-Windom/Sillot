@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import assert from 'node:assert/strict';
+import { before, describe, it } from 'node:test';
 import * as cheerio from 'cheerio';
 import { loadFixture } from './test-utils.js';
 
@@ -8,6 +9,8 @@ describe('srcDir', () => {
 	before(async () => {
 		fixture = await loadFixture({
 			root: './fixtures/root-srcdir-css/',
+			// test suite was authored when inlineStylesheets defaulted to never
+			build: { inlineStylesheets: 'never' },
 		});
 		await fixture.build();
 	});
@@ -18,6 +21,6 @@ describe('srcDir', () => {
 
 		const relPath = $('link').attr('href');
 		const css = await fixture.readFile(relPath);
-		expect(css).to.match(/body{color:green}/);
+		assert.match(css, /body\{color:green\}/);
 	});
 });

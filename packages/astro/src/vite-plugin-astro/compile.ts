@@ -1,15 +1,18 @@
-import { transformWithEsbuild, type ESBuildTransformResult } from 'vite';
-import type { AstroConfig } from '../@types/astro';
-import { cachedCompilation, type CompileProps, type CompileResult } from '../core/compile/index.js';
-import type { LogOptions } from '../core/logger/core.js';
+import { type ESBuildTransformResult, transformWithEsbuild } from 'vite';
+import type { AstroConfig } from '../@types/astro.js';
+import { type CompileProps, type CompileResult, compile } from '../core/compile/index.js';
+import type { Logger } from '../core/logger/core.js';
 import { getFileInfo } from '../vite-plugin-utils/index.js';
+import type { CompileMetadata } from './types.js';
+import { frontmatterRE } from './utils.js';
 
-interface CachedFullCompilation {
+interface CompileAstroOption {
 	compileProps: CompileProps;
-	logging: LogOptions;
+	astroFileToCompileMetadata: Map<string, CompileMetadata>;
+	logger: Logger;
 }
 
-interface FullCompileResult extends Omit<CompileResult, 'map'> {
+export interface CompileAstroResult extends Omit<CompileResult, 'map'> {
 	map: ESBuildTransformResult['map'];
 }
 
@@ -18,20 +21,19 @@ interface EnhanceCompilerErrorOptions {
 	id: string;
 	source: string;
 	config: AstroConfig;
-	logging: LogOptions;
+	logger: Logger;
 }
 
-const FRONTMATTER_PARSE_REGEXP = /^\-\-\-(.*)^\-\-\-/ms;
-
-export async function cachedFullCompilation({
+export async function compileAstro({
 	compileProps,
-	logging,
-}: CachedFullCompilation): Promise<FullCompileResult> {
+	astroFileToCompileMetadata,
+	logger,
+}: CompileAstroOption): Promise<CompileAstroResult> {
 	let transformResult: CompileResult;
 	let esbuildResult: ESBuildTransformResult;
 
 	try {
-		transformResult = await cachedCompilation(compileProps);
+		transformResult = await compile(compileProps);
 		// Compile all TypeScript to JavaScript.
 		// Also, catches invalid JS/TS in the compiled output before returning.
 		esbuildResult = await transformWithEsbuild(transformResult.code, compileProps.filename, {
@@ -41,6 +43,7 @@ export async function cachedFullCompilation({
 			tsconfigRaw: {
 				compilerOptions: {
 					// Ensure client:only imports are treeshaken
+					verbatimModuleSyntax: false,
 					importsNotUsedAsValues: 'remove',
 				},
 			},
@@ -51,7 +54,7 @@ export async function cachedFullCompilation({
 			id: compileProps.filename,
 			source: compileProps.source,
 			config: compileProps.astroConfig,
-			logging: logging,
+			logger: logger,
 		});
 		throw err;
 	}
@@ -75,10 +78,12 @@ export async function cachedFullCompilation({
 		}
 	}
 
-	// Prefer live reload to HMR in `.astro` files
-	if (!compileProps.viteConfig.isProduction) {
-		SUFFIX += `\nif (import.meta.hot) { import.meta.hot.decline() }`;
-	}
+	// Attach compile metadata to map for use by virtual modules
+	astroFileToCompileMetadata.set(compileProps.filename, {
+		originalCode: compileProps.source,
+		css: transformResult.css,
+		scripts: transformResult.scripts,
+	});
 
 	return {
 		...transformResult,
@@ -91,8 +96,6 @@ async function enhanceCompileError({
 	err,
 	id,
 	source,
-	config,
-	logging,
 }: EnhanceCompilerErrorOptions): Promise<void> {
 	const lineText = (err as any).loc?.lineText;
 	// Verify frontmatter: a common reason that this plugin fails is that
@@ -103,7 +106,7 @@ async function enhanceCompileError({
 	// Before throwing, it is better to verify the frontmatter here, and
 	// let esbuild throw a more specific exception if the code is invalid.
 	// If frontmatter is valid or cannot be parsed, then continue.
-	const scannedFrontmatter = FRONTMATTER_PARSE_REGEXP.exec(source);
+	const scannedFrontmatter = frontmatterRE.exec(source);
 	if (scannedFrontmatter) {
 		// Top-level return is not supported, so replace `return` with throw
 		const frontmatter = scannedFrontmatter[1].replace(/\breturn\b/g, 'throw');
@@ -120,7 +123,7 @@ async function enhanceCompileError({
 		} catch (frontmatterErr: any) {
 			// Improve the error by replacing the phrase "unexpected end of file"
 			// with "unexpected end of frontmatter" in the esbuild error message.
-			if (frontmatterErr && frontmatterErr.message) {
+			if (frontmatterErr?.message) {
 				frontmatterErr.message = frontmatterErr.message.replace(
 					'end of file',
 					'end of frontmatter'

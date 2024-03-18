@@ -1,6 +1,7 @@
-import { expect } from 'chai';
-import { loadFixture } from './test-utils.js';
+import assert from 'node:assert/strict';
+import { before, describe, it } from 'node:test';
 import { viteID } from '../dist/core/util.js';
+import { loadFixture } from './test-utils.js';
 
 describe('Integration buildConfig hook', () => {
 	/** @type {import('./test-utils').Fixture} */
@@ -47,6 +48,7 @@ describe('Integration buildConfig hook', () => {
 							name: 'my-ssr-adapter',
 							serverEntrypoint: '@my-ssr',
 							exports: ['manifest', 'createApp'],
+							supportedAstroFeatures: {},
 						});
 					},
 				},
@@ -57,11 +59,11 @@ describe('Integration buildConfig hook', () => {
 
 	it('Puts client files in the client folder', async () => {
 		let data = await fixture.readFile('/.root/client/cars.json');
-		expect(data).to.not.be.undefined;
+		assert.notEqual(data, undefined);
 	});
 
 	it('Puts the server entry into the server folder', async () => {
 		let data = await fixture.readFile('/.root/server/entry.mjs');
-		expect(data).to.not.be.undefined;
+		assert.notEqual(data, undefined);
 	});
 });

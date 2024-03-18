@@ -1,3 +1,7 @@
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import type { SSRManifest } from 'astro';
+import type { NodeApp } from 'astro/app/node';
+
 export interface UserOptions {
 	/**
 	 * Specifies the mode that the adapter builds to.
@@ -13,4 +17,23 @@ export interface Options extends UserOptions {
 	port: number;
 	server: string;
 	client: string;
+	assets: string;
+	trailingSlash?: SSRManifest['trailingSlash'];
 }
+
+export interface CreateServerOptions {
+	app: NodeApp;
+	assets: string;
+	client: URL;
+	port: number;
+	host: string | undefined;
+	removeBase: (pathname: string) => string;
+}
+
+export type RequestHandler = (...args: RequestHandlerParams) => void | Promise<void>;
+export type RequestHandlerParams = [
+	req: IncomingMessage,
+	res: ServerResponse,
+	next?: (err?: unknown) => void,
+	locals?: object,
+];

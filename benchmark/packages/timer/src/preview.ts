@@ -1,5 +1,5 @@
+import { createServer } from 'node:http';
 import type { CreatePreviewServer } from 'astro';
-import { createServer } from 'http';
 import enableDestroy from 'server-destroy';
 
 const preview: CreatePreviewServer = async function ({ serverEntrypoint, host, port }) {

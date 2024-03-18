@@ -1,10 +1,8 @@
-import { getEntryBySlug } from 'astro:content';
 import { stringify } from 'devalue';
 import { stripRenderFn } from '../../utils.js';
+import { getEntryBySlug } from 'astro:content';
 
-export async function get() {
+export async function GET() {
 	const post = await getEntryBySlug('blog', 'post-1');
-	return {
-		body: stringify(stripRenderFn(post)),
-	};
+	return new Response(stringify(stripRenderFn(post)));
 }

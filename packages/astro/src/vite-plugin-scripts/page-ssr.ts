@@ -1,5 +1,5 @@
 import MagicString from 'magic-string';
-import { normalizePath, type Plugin as VitePlugin } from 'vite';
+import { type Plugin as VitePlugin, normalizePath } from 'vite';
 import type { AstroSettings } from '../@types/astro.js';
 import { isPage } from '../core/util.js';
 import { PAGE_SSR_SCRIPT_ID } from './index.js';
@@ -35,7 +35,7 @@ export default function astroScriptsPostPlugin({
 
 			return {
 				code: s.toString(),
-				map: s.generateMap(),
+				map: s.generateMap({ hires: 'boundary' }),
 			};
 		},
 	};

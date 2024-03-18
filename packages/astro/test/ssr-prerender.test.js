@@ -1,7 +1,8 @@
-import { expect } from 'chai';
+import assert from 'node:assert/strict';
+import { before, describe, it } from 'node:test';
 import * as cheerio from 'cheerio';
-import { loadFixture } from './test-utils.js';
 import testAdapter from './test-adapter.js';
+import { loadFixture } from './test-utils.js';
 
 describe('SSR: prerender', () => {
 	/** @type {import('./test-utils').Fixture} */
@@ -12,9 +13,6 @@ describe('SSR: prerender', () => {
 			root: './fixtures/ssr-prerender/',
 			output: 'server',
 			adapter: testAdapter(),
-			experimental: {
-				prerender: true,
-			},
 		});
 		await fixture.build();
 	});
@@ -26,15 +24,14 @@ describe('SSR: prerender', () => {
 			const app = await fixture.loadTestAdapterApp();
 			const request = new Request('http://example.com/static');
 			const response = await app.render(request);
-			expect(response.status).to.equal(404);
+			assert.equal(response.status, 404);
 		});
 
 		it('includes prerendered pages in the asset manifest', async () => {
 			const app = await fixture.loadTestAdapterApp();
 			/** @type {Set<string>} */
 			const assets = app.manifest.assets;
-			expect(assets.size).to.equal(1);
-			expect(Array.from(assets)[0].endsWith('static/index.html')).to.be.true;
+			assert.equal(assets.has('/static/index.html'), true);
 		});
 	});
 
@@ -43,10 +40,10 @@ describe('SSR: prerender', () => {
 			const app = await fixture.loadTestAdapterApp();
 			const request = new Request('http://example.com/users/houston');
 			const response = await app.render(request);
-			expect(response.status).to.equal(200);
+			assert.equal(response.status, 200);
 			const html = await response.text();
 			const $ = cheerio.load(html);
-			expect($('.user').text()).to.equal('houston');
+			assert.equal($('.user').text(), 'houston');
 		});
 	});
 
@@ -56,10 +53,55 @@ describe('SSR: prerender', () => {
 			const app = await fixture.loadTestAdapterApp();
 			const request = new Request('http://example.com/some');
 			const response = await app.render(request);
-			expect(response.status).to.equal(200);
+			assert.equal(response.status, 200);
 			const html = await response.text();
 			const $ = cheerio.load(html);
-			expect($('p').text()).to.include('not give 404');
+			assert.equal($('p').text().includes('not give 404'), true);
 		});
+	});
+});
+
+describe('Integrations can hook into the prerendering decision', () => {
+	/** @type {import('./test-utils').Fixture} */
+	let fixture;
+
+	const testIntegration = {
+		name: 'test prerendering integration',
+		hooks: {
+			['astro:build:setup']({ pages, target }) {
+				if (target !== 'client') return;
+				// this page has `export const prerender = true`
+				pages.get('src/pages/static.astro').route.prerender = false;
+
+				// this page does not
+				pages.get('src/pages/not-prerendered.astro').route.prerender = true;
+			},
+		},
+	};
+
+	before(async () => {
+		fixture = await loadFixture({
+			root: './fixtures/ssr-prerender/',
+			output: 'server',
+			integrations: [testIntegration],
+			adapter: testAdapter(),
+		});
+		await fixture.build();
+	});
+
+	it('An integration can override the prerender flag', async () => {
+		// test adapter only hosts dynamic routes
+		// /static is expected to become dynamic
+		const app = await fixture.loadTestAdapterApp();
+		const request = new Request('http://example.com/static');
+		const response = await app.render(request);
+		assert.equal(response.status, 200);
+	});
+
+	it('An integration can turn a normal page to a prerendered one', async () => {
+		const app = await fixture.loadTestAdapterApp();
+		const request = new Request('http://example.com/not-prerendered');
+		const response = await app.render(request);
+		assert.equal(response.status, 404);
 	});
 });

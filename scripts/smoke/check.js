@@ -1,8 +1,9 @@
 // @ts-check
 
-import { spawn } from 'child_process';
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
-import * as path from 'path';
+import { spawn } from 'node:child_process';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import * as path from 'node:path';
+import pLimit from 'p-limit';
 import { tsconfigResolverSync } from 'tsconfig-resolver';
 
 function checkExamples() {
@@ -11,38 +12,54 @@ function checkExamples() {
 
 	console.log(`Running astro check on ${examples.length} examples...`);
 
-	Promise.all(
-		examples.map(
-			(example) =>
-				new Promise((resolve) => {
-					const originalConfig = prepareExample(example.name);
-					let data = '';
-					const child = spawn('node', ['../../packages/astro/astro.js', 'check'], {
-						cwd: path.join('./examples', example.name),
-						env: { ...process.env, FORCE_COLOR: 'true' },
-					});
+	// Run astro check in parallel with 5 at most
+	const checkPromises = [];
+	const limit = pLimit(5);
 
-					child.stdout.on('data', function (buffer) {
-						data += buffer.toString();
-					});
+	for (const example of examples) {
+		checkPromises.push(
+			limit(
+				() =>
+					new Promise((resolve) => {
+						// Sometimes some examples may get deleted, but after a `git pull` the directory still exists.
+						// This can stall the process time as it'll typecheck the entire monorepo, so do a quick exist
+						// check here before typechecking this directory.
+						if (!existsSync(path.join('./examples/', example.name, 'package.json'))) {
+							resolve(0);
+							return;
+						}
 
-					child.on('exit', (code) => {
-						if (code !== 0) {
-							console.error(data);
-						}
-						if (originalConfig) {
-							resetExample(example.name, originalConfig);
-						}
-						resolve(code);
-					});
-				})
-		)
-	).then((codes) => {
+						const originalConfig = prepareExample(example.name);
+						let data = '';
+						const child = spawn('node', ['../../packages/astro/astro.js', 'check'], {
+							cwd: path.join('./examples', example.name),
+							env: { ...process.env, FORCE_COLOR: 'true' },
+						});
+
+						child.stdout.on('data', function (buffer) {
+							data += buffer.toString();
+						});
+
+						child.on('exit', (code) => {
+							if (code !== 0) {
+								console.error(data);
+							}
+							if (originalConfig) {
+								resetExample(example.name, originalConfig);
+							}
+							resolve(code);
+						});
+					})
+			)
+		);
+	}
+
+	Promise.all(checkPromises).then((codes) => {
 		if (codes.some((code) => code !== 0)) {
 			process.exit(1);
 		}
 
-		console.log("No errors found!");
+		console.log('No errors found!');
 	});
 }
 
@@ -67,7 +84,9 @@ function prepareExample(examplePath) {
 		});
 	}
 
-	writeFileSync(tsconfigPath, JSON.stringify(tsconfig.config));
+	if (tsconfig.config) {
+		writeFileSync(tsconfigPath, JSON.stringify(tsconfig.config));
+	}
 
 	return originalConfig;
 }

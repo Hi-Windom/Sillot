@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import type { WithRequired } from '../type-utils.js';
 import type { VALID_INPUT_FORMATS, VALID_OUTPUT_FORMATS } from './consts.js';
 import type { ImageService } from './services/service.js';
 
@@ -7,24 +8,59 @@ export type ImageQuality = ImageQualityPreset | number;
 export type ImageInputFormat = (typeof VALID_INPUT_FORMATS)[number];
 export type ImageOutputFormat = (typeof VALID_OUTPUT_FORMATS)[number] | (string & {});
 
+export type AssetsGlobalStaticImagesList = Map<
+	string,
+	{
+		originalSrcPath: string;
+		transforms: Map<string, { finalPath: string; transform: ImageTransform }>;
+	}
+>;
+
 declare global {
 	// eslint-disable-next-line no-var
 	var astroAsset: {
 		imageService?: ImageService;
-		addStaticImage?: ((options: ImageTransform) => string) | undefined;
-		staticImages?: Map<string, { path: string; options: ImageTransform }>;
+		addStaticImage?:
+			| ((options: ImageTransform, hashProperties: string[], fsPath: string) => string)
+			| undefined;
+		staticImages?: AssetsGlobalStaticImagesList;
+		referencedImages?: Set<string>;
 	};
 }
 
 /**
- * Type returned by ESM imports of images and direct calls to imageMetadata
+ * Type returned by ESM imports of images
  */
 export interface ImageMetadata {
 	src: string;
 	width: number;
 	height: number;
 	format: ImageInputFormat;
+	orientation?: number;
+	/** @internal */
+	fsPath: string;
 }
+
+/**
+ * A yet to be completed with an url `SrcSetValue`. Other hooks will only see a resolved value, where the URL of the image has been added.
+ */
+export type UnresolvedSrcSetValue = {
+	transform: ImageTransform;
+	descriptor?: string;
+	attributes?: Record<string, any>;
+};
+
+export type SrcSetValue = UnresolvedSrcSetValue & {
+	url: string;
+};
+
+/**
+ * A yet to be resolved image transform. Used by `getImage`
+ */
+export type UnresolvedImageTransform = Omit<ImageTransform, 'src'> & {
+	src: ImageMetadata | string | Promise<{ default: ImageMetadata }>;
+	inferSize?: boolean;
+};
 
 /**
  * Options accepted by the image transformation service.
@@ -32,6 +68,8 @@ export interface ImageMetadata {
 export type ImageTransform = {
 	src: ImageMetadata | string;
 	width?: number | undefined;
+	widths?: number[] | undefined;
+	densities?: (number | `${number}x`)[] | undefined;
 	height?: number | undefined;
 	quality?: ImageQuality | undefined;
 	format?: ImageOutputFormat | undefined;
@@ -42,15 +80,18 @@ export interface GetImageResult {
 	rawOptions: ImageTransform;
 	options: ImageTransform;
 	src: string;
+	srcSet: {
+		values: SrcSetValue[];
+		attribute: string;
+	};
 	attributes: Record<string, any>;
 }
 
-type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 type ImageSharedProps<T> = T & {
 	/**
 	 * Width of the image, the value of this property will be used to assign the `width` property on the final `img` element.
 	 *
-	 * For local images, this value will additionally be used to resize the image to the desired width, taking into account the original aspect ratio of the image.
+	 * This value will additionally be used to resize the image to the desired width, taking into account the original aspect ratio of the image.
 	 *
 	 * **Example**:
 	 * ```astro
@@ -77,7 +118,26 @@ type ImageSharedProps<T> = T & {
 	 * ```
 	 */
 	height?: number | `${number}`;
-};
+} & (
+		| {
+				/**
+				 * A list of widths to generate images for. The value of this property will be used to assign the `srcset` property on the final `img` element.
+				 *
+				 * This attribute is incompatible with `densities`.
+				 */
+				widths?: number[];
+				densities?: never;
+		  }
+		| {
+				/**
+				 * A list of pixel densities to generate images for. The value of this property will be used to assign the `srcset` property on the final `img` element.
+				 *
+				 * This attribute is incompatible with `widths`.
+				 */
+				densities?: (number | `${number}x`)[];
+				widths?: never;
+		  }
+	);
 
 export type LocalImageProps<T> = ImageSharedProps<T> & {
 	/**
@@ -85,14 +145,14 @@ export type LocalImageProps<T> = ImageSharedProps<T> & {
 	 *
 	 * **Example**:
 	 * ```js
-	 * import myImage from "~/assets/my_image.png";
+	 * import myImage from "../assets/my_image.png";
 	 * ```
 	 * And then refer to the image, like so:
 	 * ```astro
 	 *	<Image src={myImage} alt="..."></Image>
 	 * ```
 	 */
-	src: ImageMetadata;
+	src: ImageMetadata | Promise<{ default: ImageMetadata }>;
 	/**
 	 * Desired output format for the image. Defaults to `webp`.
 	 *
@@ -117,16 +177,38 @@ export type LocalImageProps<T> = ImageSharedProps<T> & {
 	quality?: ImageQuality;
 };
 
-export type RemoteImageProps<T> = WithRequired<ImageSharedProps<T>, 'width' | 'height'> & {
-	/**
-	 * URL of a remote image. Can start with a protocol (ex: `https://`) or alternatively `/`, or `Astro.url`, for images in the `public` folder
-	 *
-	 * Remote images are not optimized, and require both `width` and `height` to be set.
-	 *
-	 * **Example**:
-	 * ```
-	 * <Image src="https://example.com/image.png" width={450} height={300} alt="..." />
-	 * ```
-	 */
-	src: string;
-};
+export type RemoteImageProps<T> =
+	| (ImageSharedProps<T> & {
+			/**
+			 * URL of a remote image. Can start with a protocol (ex: `https://`) or alternatively `/`, or `Astro.url`, for images in the `public` folder
+			 *
+			 * Remote images are not optimized, and require both `width` and `height` to be set.
+			 *
+			 * **Example**:
+			 * ```
+			 * <Image src="https://example.com/image.png" width={450} height={300} alt="..." />
+			 * ```
+			 */
+			src: string;
+			/**
+			 * When inferSize is true width and height are not required
+			 */
+			inferSize: true;
+	  })
+	| (WithRequired<ImageSharedProps<T>, 'width' | 'height'> & {
+			/**
+			 * URL of a remote image. Can start with a protocol (ex: `https://`) or alternatively `/`, or `Astro.url`, for images in the `public` folder
+			 *
+			 * Remote images are not optimized, and require both `width` and `height` to be set.
+			 *
+			 * **Example**:
+			 * ```
+			 * <Image src="https://example.com/image.png" width={450} height={300} alt="..." />
+			 * ```
+			 */
+			src: string;
+			/**
+			 * When inferSize is false or undefined width and height are required
+			 */
+			inferSize?: false | undefined;
+	  });

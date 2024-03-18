@@ -1,33 +1,41 @@
-import { expect } from 'chai';
+import assert from 'node:assert/strict';
+import { after, before, describe, it } from 'node:test';
 import * as cheerio from 'cheerio';
 import { loadFixture } from './test-utils.js';
 
 describe('Preact compat component', () => {
+	/** @type {import('./test-utils.js').Fixture} */
+	let fixture;
+
+	before(async () => {
+		fixture = await loadFixture({
+			root: './fixtures/preact-compat-component/',
+		});
+	});
+
 	describe('Development', () => {
-		let fixture;
+		/** @type {import('./test-utils.js').DevServer} */
+		let devServer;
 
 		before(async () => {
-			fixture = await loadFixture({
-				root: './fixtures/preact-compat-component/',
-			});
-			await fixture.startDevServer();
+			devServer = await fixture.startDevServer();
+		});
+
+		after(async () => {
+			await devServer.stop();
 		});
 
 		it('Can load Counter', async () => {
-			const html = await fixture.fetch('/').then((res) => res.text());
+			const res = await fixture.fetch('/');
+			const html = await res.text();
 			const $ = cheerio.load(html);
 
-			expect($('#counter-text').text()).to.be.eq('0');
+			assert.equal($('#counter-text').text(), '0');
 		});
 	});
 
 	describe('Build', () => {
-		let fixture;
-
 		before(async () => {
-			fixture = await loadFixture({
-				root: './fixtures/preact-compat-component/',
-			});
 			await fixture.build();
 		});
 
@@ -35,7 +43,7 @@ describe('Preact compat component', () => {
 			const html = await fixture.readFile('/index.html');
 			const $ = cheerio.load(html);
 
-			expect($('#counter-text').text()).to.be.eq('0');
+			assert.equal($('#counter-text').text(), '0');
 		});
 	});
 });

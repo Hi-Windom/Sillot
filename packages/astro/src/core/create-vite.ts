@@ -1,37 +1,46 @@
-import type { AstroSettings } from '../@types/astro';
-import type { LogOptions } from './logger/core';
-
-import nodeFs from 'fs';
-import { fileURLToPath } from 'url';
+import nodeFs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import glob from 'fast-glob';
 import * as vite from 'vite';
 import { crawlFrameworkPkgs } from 'vitefu';
+import type { AstroSettings } from '../@types/astro.js';
+import { getAssetsPrefix } from '../assets/utils/getAssetsPrefix.js';
 import astroAssetsPlugin from '../assets/vite-plugin-assets.js';
 import {
 	astroContentAssetPropagationPlugin,
 	astroContentImportPlugin,
 	astroContentVirtualModPlugin,
 } from '../content/index.js';
+import astroInternationalization from '../i18n/vite-plugin-i18n.js';
+import astroPrefetch from '../prefetch/vite-plugin-prefetch.js';
+import astroTransitions from '../transitions/vite-plugin-transitions.js';
 import astroPostprocessVitePlugin from '../vite-plugin-astro-postprocess/index.js';
 import { vitePluginAstroServer } from '../vite-plugin-astro-server/index.js';
 import astroVitePlugin from '../vite-plugin-astro/index.js';
 import configAliasVitePlugin from '../vite-plugin-config-alias/index.js';
+import astroDevToolbar from '../vite-plugin-dev-toolbar/vite-plugin-dev-toolbar.js';
 import envVitePlugin from '../vite-plugin-env/index.js';
+import vitePluginFileURL from '../vite-plugin-fileurl/index.js';
 import astroHeadPlugin from '../vite-plugin-head/index.js';
 import htmlVitePlugin from '../vite-plugin-html/index.js';
 import { astroInjectEnvTsPlugin } from '../vite-plugin-inject-env-ts/index.js';
 import astroIntegrationsContainerPlugin from '../vite-plugin-integrations-container/index.js';
-import jsxVitePlugin from '../vite-plugin-jsx/index.js';
 import astroLoadFallbackPlugin from '../vite-plugin-load-fallback/index.js';
 import markdownVitePlugin from '../vite-plugin-markdown/index.js';
+import mdxVitePlugin from '../vite-plugin-mdx/index.js';
 import astroScannerPlugin from '../vite-plugin-scanner/index.js';
 import astroScriptsPlugin from '../vite-plugin-scripts/index.js';
 import astroScriptsPageSSRPlugin from '../vite-plugin-scripts/page-ssr.js';
 import { vitePluginSSRManifest } from '../vite-plugin-ssr-manifest/index.js';
+import type { Logger } from './logger/core.js';
+import { createViteLogger } from './logger/vite.js';
+import { vitePluginMiddleware } from './middleware/vite-plugin.js';
 import { joinPaths } from './path.js';
+import { isObject } from './util.js';
 
 interface CreateViteOptions {
 	settings: AstroSettings;
-	logging: LogOptions;
+	logger: Logger;
 	mode: 'dev' | 'build' | string;
 	// will be undefined when using `getViteConfig`
 	command?: 'dev' | 'build';
@@ -54,16 +63,16 @@ const ALWAYS_NOEXTERNAL = [
 // pipeline, which Vite doesn't support in development time. This hardcoded list temporarily
 // fixes things until Vite can properly handle them, or when they support ESM.
 const ONLY_DEV_EXTERNAL = [
-	// Imported by `<Code/>` which is processed by Vite
-	'shiki',
 	// Imported by `@astrojs/prism` which exposes `<Prism/>` that is processed by Vite
 	'prismjs/components/index.js',
+	// Imported by `astro/assets` -> `packages/astro/src/core/logger/core.ts`
+	'string-width',
 ];
 
 /** Return a common starting point for all Vite actions */
 export async function createVite(
 	commandConfig: vite.InlineConfig,
-	{ settings, logging, mode, command, fs = nodeFs }: CreateViteOptions
+	{ settings, logger, mode, command, fs = nodeFs }: CreateViteOptions
 ): Promise<vite.InlineConfig> {
 	const astroPkgsConfig = await crawlFrameworkPkgs({
 		root: fileURLToPath(settings.config.root),
@@ -84,7 +93,7 @@ export async function createVite(
 				pkgJson.keywords?.includes('astro') ||
 				pkgJson.keywords?.includes('astro-component') ||
 				// Attempt: package is named `astro-something` or `@scope/astro-something`. ✅ Likely a community package
-				/^(@[^\/]+\/)?astro\-/.test(pkgJson.name)
+				/^(?:@[^/]+\/)?astro-/.test(pkgJson.name)
 			);
 		},
 		isFrameworkPkgByName(pkgName) {
@@ -97,47 +106,63 @@ export async function createVite(
 		},
 	});
 
+	const srcDirPattern = glob.convertPathToPattern(fileURLToPath(settings.config.srcDir));
+
 	// Start with the Vite configuration that Astro core needs
 	const commonConfig: vite.InlineConfig = {
+		// Tell Vite not to combine config from vite.config.js with our provided inline config
+		configFile: false,
 		cacheDir: fileURLToPath(new URL('./node_modules/.vite/', settings.config.root)), // using local caches allows Astro to be used in monorepos, etc.
 		clearScreen: false, // we want to control the output, not Vite
-		logLevel: 'warn', // log warnings and errors only
+		customLogger: createViteLogger(logger, settings.config.vite.logLevel),
 		appType: 'custom',
 		optimizeDeps: {
-			entries: ['src/**/*'],
+			// Scan all files within `srcDir` except for known server-code (e.g endpoints)
+			entries: [
+				`${srcDirPattern}!(pages)/**/*`, // All files except for pages
+				`${srcDirPattern}pages/**/!(*.js|*.mjs|*.ts|*.mts)`, // All pages except for endpoints
+				`${srcDirPattern}pages/**/_*.{js,mjs,ts,mts}`, // Remaining JS/TS files prefixed with `_` (not endpoints)
+				`${srcDirPattern}pages/**/_*/**/*.{js,mjs,ts,mts}`, // Remaining JS/TS files within directories prefixed with `_` (not endpoints)
+			],
 			exclude: ['astro', 'node-fetch'],
 		},
 		plugins: [
 			configAliasVitePlugin({ settings }),
 			astroLoadFallbackPlugin({ fs, root: settings.config.root }),
-			astroVitePlugin({ settings, logging }),
+			astroVitePlugin({ settings, logger }),
 			astroScriptsPlugin({ settings }),
 			// The server plugin is for dev only and having it run during the build causes
 			// the build to run very slow as the filewatcher is triggered often.
-			mode !== 'build' && vitePluginAstroServer({ settings, logging, fs }),
+			mode !== 'build' && vitePluginAstroServer({ settings, logger, fs }),
 			envVitePlugin({ settings }),
-			markdownVitePlugin({ settings, logging }),
+			markdownVitePlugin({ settings, logger }),
 			htmlVitePlugin(),
-			jsxVitePlugin({ settings, logging }),
-			astroPostprocessVitePlugin({ settings }),
-			mode === 'dev' && astroIntegrationsContainerPlugin({ settings, logging }),
+			mdxVitePlugin({ settings, logger }),
+			astroPostprocessVitePlugin(),
+			astroIntegrationsContainerPlugin({ settings, logger }),
 			astroScriptsPageSSRPlugin({ settings }),
-			astroHeadPlugin({ settings }),
-			astroScannerPlugin({ settings }),
-			astroInjectEnvTsPlugin({ settings, logging, fs }),
-			astroContentVirtualModPlugin({ settings }),
+			astroHeadPlugin(),
+			astroScannerPlugin({ settings, logger }),
+			astroInjectEnvTsPlugin({ settings, logger, fs }),
+			astroContentVirtualModPlugin({ fs, settings }),
 			astroContentImportPlugin({ fs, settings }),
 			astroContentAssetPropagationPlugin({ mode, settings }),
+			vitePluginMiddleware({ settings }),
 			vitePluginSSRManifest(),
-			settings.config.experimental.assets ? [astroAssetsPlugin({ settings, logging, mode })] : [],
+			astroAssetsPlugin({ settings, logger, mode }),
+			astroPrefetch({ settings }),
+			astroTransitions({ settings }),
+			astroDevToolbar({ settings, logger }),
+			vitePluginFileURL({}),
+			astroInternationalization({ settings }),
 		],
 		publicDir: fileURLToPath(settings.config.publicDir),
 		root: fileURLToPath(settings.config.root),
 		envPrefix: settings.config.vite?.envPrefix ?? 'PUBLIC_',
 		define: {
-			'import.meta.env.SITE': settings.config.site
-				? JSON.stringify(settings.config.site)
-				: 'undefined',
+			'import.meta.env.SITE': stringifyForDefine(settings.config.site),
+			'import.meta.env.BASE_URL': stringifyForDefine(settings.config.base),
+			'import.meta.env.ASSETS_PREFIX': stringifyForDefine(settings.config.build.assetsPrefix),
 		},
 		server: {
 			hmr:
@@ -164,7 +189,15 @@ export async function createVite(
 				{
 					// Typings are imported from 'astro' (e.g. import { Type } from 'astro')
 					find: /^astro$/,
-					replacement: fileURLToPath(new URL('../@types/astro', import.meta.url)),
+					replacement: fileURLToPath(new URL('../@types/astro.js', import.meta.url)),
+				},
+				{
+					find: 'astro:middleware',
+					replacement: 'astro/virtual-modules/middleware.js',
+				},
+				{
+					find: 'astro:components',
+					replacement: 'astro/components',
 				},
 			],
 			conditions: ['astro'],
@@ -183,9 +216,9 @@ export async function createVite(
 	const assetsPrefix = settings.config.build.assetsPrefix;
 	if (assetsPrefix) {
 		commonConfig.experimental = {
-			renderBuiltUrl(filename, { type }) {
+			renderBuiltUrl(filename, { type, hostType }) {
 				if (type === 'asset') {
-					return joinPaths(assetsPrefix, filename);
+					return joinPaths(getAssetsPrefix(`.${hostType}`, assetsPrefix), filename);
 				}
 			},
 		};
@@ -230,35 +263,8 @@ export async function createVite(
 		result = vite.mergeConfig(result, settings.config.vite || {});
 	}
 	result = vite.mergeConfig(result, commandConfig);
-	if (result.plugins) {
-		sortPlugins(result.plugins);
-	}
-
-	result.customLogger = vite.createLogger(result.logLevel ?? 'warn');
 
 	return result;
-}
-
-function isVitePlugin(plugin: vite.PluginOption): plugin is vite.Plugin {
-	return Boolean(plugin?.hasOwnProperty('name'));
-}
-
-function findPluginIndexByName(pluginOptions: vite.PluginOption[], name: string): number {
-	return pluginOptions.findIndex(function (pluginOption) {
-		// Use isVitePlugin to ignore nulls, booleans, promises, and arrays
-		// CAUTION: could be a problem if a plugin we're searching for becomes async!
-		return isVitePlugin(pluginOption) && pluginOption.name === name;
-	});
-}
-
-function sortPlugins(pluginOptions: vite.PluginOption[]) {
-	// HACK: move mdxPlugin to top because it needs to run before internal JSX plugin
-	const mdxPluginIndex = findPluginIndexByName(pluginOptions, '@mdx-js/rollup');
-	if (mdxPluginIndex === -1) return;
-	const jsxPluginIndex = findPluginIndexByName(pluginOptions, 'astro:jsx');
-	const mdxPlugin = pluginOptions[mdxPluginIndex];
-	pluginOptions.splice(mdxPluginIndex, 1);
-	pluginOptions.splice(jsxPluginIndex, 0, mdxPlugin);
 }
 
 const COMMON_DEPENDENCIES_NOT_ASTRO = [
@@ -314,11 +320,6 @@ function isCommonNotAstro(dep: string): boolean {
 	);
 }
 
-interface PkgJSON {
-	name: string;
-	dependencies?: Record<string, string>;
-	devDependencies?: Record<string, string>;
-	peerDependencies?: Record<string, string>;
-	keywords?: string[];
-	[key: string]: any;
+function stringifyForDefine(value: string | undefined | object): string {
+	return typeof value === 'string' || isObject(value) ? JSON.stringify(value) : 'undefined';
 }

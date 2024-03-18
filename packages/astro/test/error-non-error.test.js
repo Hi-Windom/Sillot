@@ -1,5 +1,6 @@
-import { expect } from 'chai';
-import { loadFixture, silentLogging } from './test-utils.js';
+import assert from 'node:assert/strict';
+import { after, before, describe, it } from 'node:test';
+import { loadFixture } from './test-utils.js';
 
 describe('Can handle errors that are not instanceof Error', () => {
 	/** @type {import('./test-utils').Fixture} */
@@ -12,9 +13,7 @@ describe('Can handle errors that are not instanceof Error', () => {
 		fixture = await loadFixture({
 			root: './fixtures/error-non-error',
 		});
-		devServer = await fixture.startDevServer({
-			logging: silentLogging,
-		});
+		devServer = await fixture.startDevServer();
 	});
 
 	after(async () => {
@@ -25,11 +24,10 @@ describe('Can handle errors that are not instanceof Error', () => {
 		let res = await fixture.fetch('/');
 		let html = await res.text();
 
-		expect(html).to.include('Error');
-
+		assert.equal(html.includes('Error'), true);
 		res = await fixture.fetch('/');
 		await res.text();
 
-		expect(html).to.include('Error');
+		assert.equal(html.includes('Error'), true);
 	});
 });

@@ -1,7 +1,8 @@
-import { TLSSocket } from 'tls';
+import * as assert from 'node:assert/strict';
+import { before, describe, it } from 'node:test';
+import { TLSSocket } from 'node:tls';
 import nodejs from '../dist/index.js';
-import { loadFixture, createRequestAndResponse } from './test-utils.js';
-import { expect } from 'chai';
+import { createRequestAndResponse, loadFixture } from './test-utils.js';
 
 describe('URL protocol', () => {
 	/** @type {import('./test-utils').Fixture} */
@@ -26,7 +27,7 @@ describe('URL protocol', () => {
 		req.send();
 
 		const html = await text();
-		expect(html).to.include('http:');
+		assert.equal(html.includes('http:'), true);
 	});
 
 	it('return https when secure', async () => {
@@ -40,7 +41,7 @@ describe('URL protocol', () => {
 		req.send();
 
 		const html = await text();
-		expect(html).to.include('https:');
+		assert.equal(html.includes('https:'), true);
 	});
 
 	it('return http when the X-Forwarded-Proto header is set to http', async () => {
@@ -54,7 +55,7 @@ describe('URL protocol', () => {
 		req.send();
 
 		const html = await text();
-		expect(html).to.include('http:');
+		assert.equal(html.includes('http:'), true);
 	});
 
 	it('return https when the X-Forwarded-Proto header is set to https', async () => {
@@ -68,6 +69,6 @@ describe('URL protocol', () => {
 		req.send();
 
 		const html = await text();
-		expect(html).to.include('https:');
+		assert.equal(html.includes('https:'), true);
 	});
 });

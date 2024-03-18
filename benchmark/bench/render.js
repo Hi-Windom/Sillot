@@ -1,18 +1,16 @@
-import fs from 'fs/promises';
-import http from 'http';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { execaCommand } from 'execa';
-import { waitUntilBusy } from 'port-authority';
 import { markdownTable } from 'markdown-table';
-import { renderFiles } from '../make-project/render-default.js';
-import { astroBin } from './_util.js';
+import fs from 'node:fs/promises';
+import http from 'node:http';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { waitUntilBusy } from 'port-authority';
+import { calculateStat, astroBin } from './_util.js';
+import { renderPages } from '../make-project/render-default.js';
 
 const port = 4322;
 
 export const defaultProject = 'render-default';
-
-/** @typedef {{ avg: number, stdev: number, max: number }} Stat */
 
 /**
  * @param {URL} projectDir
@@ -59,7 +57,7 @@ export async function run(projectDir, outputFile) {
 async function benchmarkRenderTime() {
 	/** @type {Record<string, number[]>} */
 	const result = {};
-	for (const fileName of Object.keys(renderFiles)) {
+	for (const fileName of renderPages) {
 		// Render each file 100 times and push to an array
 		for (let i = 0; i < 100; i++) {
 			const pathname = '/' + fileName.slice(0, -path.extname(fileName).length);
@@ -68,22 +66,17 @@ async function benchmarkRenderTime() {
 			result[pathname].push(renderTime);
 		}
 	}
-	/** @type {Record<string, Stat>} */
+	/** @type {Record<string, import('./_util.js').Stat>} */
 	const processedResult = {};
 	for (const [pathname, times] of Object.entries(result)) {
 		// From the 100 results, calculate average, standard deviation, and max value
-		const avg = times.reduce((a, b) => a + b, 0) / times.length;
-		const stdev = Math.sqrt(
-			times.map((x) => Math.pow(x - avg, 2)).reduce((a, b) => a + b, 0) / times.length
-		);
-		const max = Math.max(...times);
-		processedResult[pathname] = { avg, stdev, max };
+		processedResult[pathname] = calculateStat(times);
 	}
 	return processedResult;
 }
 
 /**
- * @param {Record<string, Stat>} result
+ * @param {Record<string, import('./_util.js').Stat>} result
  */
 function printResult(result) {
 	return markdownTable(

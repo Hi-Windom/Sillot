@@ -1,5 +1,73 @@
 # @astrojs/lit
 
+## 4.0.1
+
+### Patch Changes
+
+- [#9479](https://github.com/withastro/astro/pull/9479) [`1baf0b0d3cbd0564954c2366a7278794fad6726e`](https://github.com/withastro/astro/commit/1baf0b0d3cbd0564954c2366a7278794fad6726e) Thanks [@sarah11918](https://github.com/sarah11918)! - Updates README
+
+## 4.0.0
+
+### Major Changes
+
+- [#8822](https://github.com/withastro/astro/pull/8822) [`b0a71946f`](https://github.com/withastro/astro/commit/b0a71946f4320d4e76f31e990fe5821f823f0e12) Thanks [@Geoffrey-Pliez](https://github.com/Geoffrey-Pliez)! - Upgrade to Lit 3.0
+
+## 3.0.3
+
+### Patch Changes
+
+- [#9018](https://github.com/withastro/astro/pull/9018) [`23c9a30ad`](https://github.com/withastro/astro/commit/23c9a30ad859398d62a013d639b5b2716b583331) Thanks [@augustjk](https://github.com/augustjk)! - Fix hydration ordering of nested custom elements. Child components will now wait for their parents to hydrate before hydrating themselves.
+
+## 3.0.2
+
+### Patch Changes
+
+- [#8826](https://github.com/withastro/astro/pull/8826) [`754c40f6e`](https://github.com/withastro/astro/commit/754c40f6ed941a61362d221915568c04ae85d6ad) Thanks [@lilnasy](https://github.com/lilnasy)! - Fixed an issue where an incompatible version of lit was installed.
+
+## 3.0.1
+
+### Patch Changes
+
+- [#8737](https://github.com/withastro/astro/pull/8737) [`6f60da805`](https://github.com/withastro/astro/commit/6f60da805e0014bc50dd07bef972e91c73560c3c) Thanks [@ematipico](https://github.com/ematipico)! - Add provenance statement when publishing the library from CI
+
+## 3.0.0
+
+### Major Changes
+
+- [#8188](https://github.com/withastro/astro/pull/8188) [`d0679a666`](https://github.com/withastro/astro/commit/d0679a666f37da0fca396d42b9b32bbb25d29312) Thanks [@ematipico](https://github.com/ematipico)! - Remove support for Node 16. The lowest supported version by Astro and all integrations is now v18.14.1. As a reminder, Node 16 will be deprecated on the 11th September 2023.
+
+- [#8179](https://github.com/withastro/astro/pull/8179) [`6011d52d3`](https://github.com/withastro/astro/commit/6011d52d38e43c3e3d52bc3bc41a60e36061b7b7) Thanks [@matthewp](https://github.com/matthewp)! - Astro 3.0 Release Candidate
+
+## 3.0.0-rc.1
+
+### Major Changes
+
+- [#8179](https://github.com/withastro/astro/pull/8179) [`6011d52d3`](https://github.com/withastro/astro/commit/6011d52d38e43c3e3d52bc3bc41a60e36061b7b7) Thanks [@matthewp](https://github.com/matthewp)! - Astro 3.0 Release Candidate
+
+## 3.0.0-beta.0
+
+### Major Changes
+
+- [`1eae2e3f7`](https://github.com/withastro/astro/commit/1eae2e3f7d693c9dfe91c8ccfbe606d32bf2fb81) Thanks [@Princesseuh](https://github.com/Princesseuh)! - Remove support for Node 16. The lowest supported version by Astro and all integrations is now v18.14.1. As a reminder, Node 16 will be deprecated on the 11th September 2023.
+
+## 2.1.1
+
+### Patch Changes
+
+- [#7985](https://github.com/withastro/astro/pull/7985) [`ec06dd9bb`](https://github.com/withastro/astro/commit/ec06dd9bbb29cc38e891517fbf884cb7083b3240) Thanks [@delucis](https://github.com/delucis)! - Fix formatting in Lit README
+
+## 2.1.0
+
+### Minor Changes
+
+- [#7373](https://github.com/withastro/astro/pull/7373) [`0986a44dd`](https://github.com/withastro/astro/commit/0986a44ddd2b48edbe318f6fceb7f4ce4670ce05) Thanks [@matthewp](https://github.com/matthewp)! - Upgrade lit dependencies
+
+## 2.0.2
+
+### Patch Changes
+
+- [#7104](https://github.com/withastro/astro/pull/7104) [`826e02890`](https://github.com/withastro/astro/commit/826e0289005f645b902375b98d5549c6a95ccafa) Thanks [@bluwy](https://github.com/bluwy)! - Specify `"files"` field to only publish necessary files
+
 ## 2.0.1
 
 ### Patch Changes

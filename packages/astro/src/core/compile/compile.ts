@@ -1,34 +1,41 @@
 import type { TransformResult } from '@astrojs/compiler';
 import type { ResolvedConfig } from 'vite';
-import type { AstroConfig } from '../../@types/astro';
+import type { AstroConfig } from '../../@types/astro.js';
 
+import { fileURLToPath } from 'node:url';
 import { transform } from '@astrojs/compiler';
-import { fileURLToPath } from 'url';
 import { normalizePath } from 'vite';
-import { AggregateError, AstroError, CompilerError } from '../errors/errors.js';
+import type { AstroPreferences } from '../../preferences/index.js';
+import type { AstroError } from '../errors/errors.js';
+import { AggregateError, CompilerError } from '../errors/errors.js';
 import { AstroErrorData } from '../errors/index.js';
 import { resolvePath } from '../util.js';
-import { createStylePreprocessor } from './style.js';
+import { type PartialCompileCssResult, createStylePreprocessor } from './style.js';
+import type { CompileCssResult } from './types.js';
 
 export interface CompileProps {
 	astroConfig: AstroConfig;
 	viteConfig: ResolvedConfig;
+	preferences: AstroPreferences;
 	filename: string;
 	source: string;
 }
 
-export interface CompileResult extends TransformResult {
-	cssDeps: Set<string>;
-	source: string;
+export interface CompileResult extends Omit<TransformResult, 'css'> {
+	css: CompileCssResult[];
 }
 
 export async function compile({
 	astroConfig,
 	viteConfig,
+	preferences,
 	filename,
 	source,
 }: CompileProps): Promise<CompileResult> {
-	const cssDeps = new Set<string>();
+	// Because `@astrojs/compiler` can't return the dependencies for each style transformed,
+	// we need to use an external array to track the dependencies whenever preprocessing is called,
+	// and we'll rebuild the final `css` result after transformation.
+	const cssPartialCompileResults: PartialCompileCssResult[] = [];
 	const cssTransformErrors: AstroError[] = [];
 	let transformResult: TransformResult;
 
@@ -37,16 +44,27 @@ export async function compile({
 		// use `sourcemap: "both"` so that sourcemap is included in the code
 		// result passed to esbuild, but also available in the catch handler.
 		transformResult = await transform(source, {
+			compact: astroConfig.compressHTML,
 			filename,
 			normalizedFilename: normalizeFilename(filename, astroConfig.root),
 			sourcemap: 'both',
-			internalURL: 'astro/server/index.js',
+			internalURL: 'astro/compiler-runtime',
+			// TODO: this is no longer neccessary for `Astro.site`
+			// but it somehow allows working around caching issues in content collections for some tests
 			astroGlobalArgs: JSON.stringify(astroConfig.site),
+			scopedStyleStrategy: astroConfig.scopedStyleStrategy,
 			resultScopedSlot: true,
+			transitionsAnimationURL: 'astro/components/viewtransitions.css',
+			annotateSourceFile:
+				viteConfig.command === 'serve' &&
+				astroConfig.devToolbar &&
+				astroConfig.devToolbar.enabled &&
+				(await preferences.get('devToolbar.enabled')),
+			renderScript: astroConfig.experimental.directRenderScript,
 			preprocessStyle: createStylePreprocessor({
 				filename,
 				viteConfig,
-				cssDeps,
+				cssPartialCompileResults,
 				cssTransformErrors,
 			}),
 			async resolvePath(specifier) {
@@ -70,17 +88,21 @@ export async function compile({
 
 	return {
 		...transformResult,
-		cssDeps,
-		source,
+		css: transformResult.css.map((code, i) => ({
+			...cssPartialCompileResults[i],
+			code,
+		})),
 	};
 }
 
 function handleCompileResultErrors(result: TransformResult, cssTransformErrors: AstroError[]) {
+	// TODO: Export the DiagnosticSeverity enum from @astrojs/compiler?
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 	const compilerError = result.diagnostics.find((diag) => diag.severity === 1);
 
 	if (compilerError) {
 		throw new CompilerError({
-			code: compilerError.code,
+			name: 'CompilerError',
 			message: compilerError.text,
 			location: {
 				line: compilerError.location.line,
@@ -95,16 +117,11 @@ function handleCompileResultErrors(result: TransformResult, cssTransformErrors: 
 		case 0:
 			break;
 		case 1: {
-			const error = cssTransformErrors[0];
-			if (!error.errorCode) {
-				error.errorCode = AstroErrorData.UnknownCSSError.code;
-			}
 			throw cssTransformErrors[0];
 		}
 		default: {
 			throw new AggregateError({
 				...cssTransformErrors[0],
-				code: cssTransformErrors[0].errorCode,
 				errors: cssTransformErrors,
 			});
 		}

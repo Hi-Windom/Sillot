@@ -9,6 +9,8 @@
  * Adapted from React’s TypeScript definition from DefinitelyTyped.
  * @see https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react/index.d.ts
  */
+// BUG! Prettier 3.0 removes `declare`: https://github.com/prettier/prettier/issues/15207
+// prettier-ignore
 declare namespace astroHTML.JSX {
 	export type Child = Node | Node[] | string | number | boolean | null | undefined | unknown;
 	export type Children = Child | Child[];
@@ -18,18 +20,23 @@ declare namespace astroHTML.JSX {
 		children: {};
 	}
 
-	interface IntrinsicAttributes extends AstroBuiltinProps, AstroBuiltinAttributes {
+	interface IntrinsicAttributes
+		extends AstroBuiltinProps,
+			AstroBuiltinAttributes,
+			AstroClientDirectives {
 		slot?: string;
 		children?: Children;
 	}
 
 	type AstroBuiltinProps = import('./dist/@types/astro.js').AstroBuiltinProps;
+	type AstroClientDirectives = import('./dist/@types/astro.js').AstroClientDirectives;
 	type AstroBuiltinAttributes = import('./dist/@types/astro.js').AstroBuiltinAttributes;
 	type AstroDefineVarsAttribute = import('./dist/@types/astro.js').AstroDefineVarsAttribute;
 	type AstroScriptAttributes = import('./dist/@types/astro.js').AstroScriptAttributes &
 		AstroDefineVarsAttribute;
 	type AstroStyleAttributes = import('./dist/@types/astro.js').AstroStyleAttributes &
 		AstroDefineVarsAttribute;
+	type AstroSlotAttributes = import('./dist/@types/astro.js').AstroSlotAttributes;
 
 	// This is an unfortunate use of `any`, but unfortunately we can't make a type that works for every framework
 	// without importing every single framework's types (which comes with its own set of problems).
@@ -465,6 +472,42 @@ declare namespace astroHTML.JSX {
 		| 'treegrid'
 		| 'treeitem';
 
+	type CssProperty = keyof Omit<
+		CSSStyleDeclaration,
+		| 'item'
+		| 'setProperty'
+		| 'removeProperty'
+		| 'getPropertyValue'
+		| 'getPropertyPriority'
+		| 'parentRule'
+		| 'length'
+		| 'cssFloat'
+		| 'cssText'
+		| typeof Symbol.iterator
+		| number
+	>;
+
+	type KebabCSSDOMProperties = import('./dist/type-utils.js').KebabKeys<DOMCSSProperties>;
+
+	type DOMCSSProperties = {
+		[key in CssProperty]?: string | number | null | undefined;
+	};
+	type AllCSSProperties = {
+		[key: string]: string | number | null | undefined;
+	};
+	type StyleObject = import('./dist/type-utils.js').Simplify<
+		KebabCSSDOMProperties & DOMCSSProperties & AllCSSProperties
+	>;
+
+	interface CSSProperties extends StyleObject {
+		/**
+		 * Extend namespace to add properties or an index signature of your own.
+		 *
+		 * For more information, visit:
+		 * https://docs.astro.build/en/guides/typescript/#built-in-html-attributes
+		 */
+	}
+
 	interface HTMLAttributes extends AriaAttributes, DOMAttributes, AstroBuiltinAttributes {
 		// Standard HTML Attributes
 		accesskey?: string | undefined | null;
@@ -483,7 +526,8 @@ declare namespace astroHTML.JSX {
 			| 'search'
 			| 'send'
 			| undefined
-			| null;
+		| null;
+		exportparts?: string | undefined | null;
 		hidden?: boolean | string | undefined | null;
 		id?: string | undefined | null;
 		inert?: boolean | string | undefined | null;
@@ -499,18 +543,23 @@ declare namespace astroHTML.JSX {
 			| undefined
 			| null;
 		is?: string | undefined | null;
+
+		// Microdata API
 		itemid?: string | undefined | null;
 		itemprop?: string | undefined | null;
 		itemref?: string | undefined | null;
 		itemscope?: boolean | string | undefined | null;
 		itemtype?: string | undefined | null;
+
 		lang?: string | undefined | null;
+		part?: string | undefined | null;
+		popover?: boolean | string | undefined | null;
 		slot?: string | undefined | null;
 		spellcheck?: 'true' | 'false' | boolean | undefined | null;
-		style?: string | Record<string, any> | undefined | null;
+		style?: string | CSSProperties | undefined | null;
 		tabindex?: number | string | undefined | null;
 		title?: string | undefined | null;
-		translate?: 'yes' | 'no' | undefined | null;
+		translate?: 'yes' | 'no' | '' | undefined | null;
 
 		// <command>, <menuitem>
 		radiogroup?: string | undefined | null;
@@ -587,6 +636,7 @@ declare namespace astroHTML.JSX {
 	}
 
 	interface ButtonHTMLAttributes extends HTMLAttributes {
+		autocomplete?: string | undefined | null;
 		disabled?: boolean | string | undefined | null;
 		form?: string | undefined | null;
 		formaction?: string | undefined | null;
@@ -597,6 +647,7 @@ declare namespace astroHTML.JSX {
 		name?: string | undefined | null;
 		type?: 'submit' | 'reset' | 'button' | undefined | null;
 		value?: string | string[] | number | undefined | null;
+		popovertarget?: string | undefined | null;
 	}
 
 	interface CanvasHTMLAttributes extends HTMLAttributes {
@@ -619,6 +670,7 @@ declare namespace astroHTML.JSX {
 
 	interface DetailsHTMLAttributes extends HTMLAttributes {
 		open?: boolean | string | undefined | null;
+		name?: string | undefined | null;
 	}
 
 	interface DelHTMLAttributes extends HTMLAttributes {
@@ -761,6 +813,7 @@ declare namespace astroHTML.JSX {
 		type?: HTMLInputTypeAttribute | undefined | null;
 		value?: string | string[] | number | undefined | null;
 		width?: number | string | undefined | null;
+		popovertarget?: string | undefined | null;
 	}
 
 	interface KeygenHTMLAttributes extends HTMLAttributes {
@@ -897,6 +950,7 @@ declare namespace astroHTML.JSX {
 		crossorigin?: string | undefined | null;
 		defer?: boolean | string | undefined | null;
 		fetchpriority?: 'auto' | 'high' | 'low' | undefined | null;
+		referrerpolicy?: HTMLAttributeReferrerPolicy | undefined | null;
 		integrity?: string | undefined | null;
 		nomodule?: boolean | string | undefined | null;
 		nonce?: string | undefined | null;
@@ -1381,7 +1435,7 @@ declare namespace astroHTML.JSX {
 		ruby: HTMLAttributes;
 		s: HTMLAttributes;
 		samp: HTMLAttributes;
-		slot: SlotHTMLAttributes;
+		slot: SlotHTMLAttributes & AstroSlotAttributes;
 		script: ScriptHTMLAttributes & AstroScriptAttributes;
 		section: HTMLAttributes;
 		select: SelectHTMLAttributes;

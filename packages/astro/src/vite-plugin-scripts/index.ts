@@ -48,9 +48,10 @@ export default function astroScriptsPlugin({ settings }: { settings: AstroSettin
 			}
 			return null;
 		},
-		buildStart(options) {
+		buildStart() {
 			const hasHydrationScripts = settings.scripts.some((s) => s.stage === 'before-hydration');
-			if (hasHydrationScripts && env?.command === 'build' && !env?.ssrBuild) {
+			const isSsrBuild = env?.isSsrBuild;
+			if (hasHydrationScripts && env?.command === 'build' && !isSsrBuild) {
 				this.emitFile({
 					type: 'chunk',
 					id: BEFORE_HYDRATION_SCRIPT_ID,

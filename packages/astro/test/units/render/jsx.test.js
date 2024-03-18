@@ -1,30 +1,25 @@
-import { expect } from 'chai';
-
+import * as assert from 'node:assert/strict';
+import { before, describe, it } from 'node:test';
+import { RenderContext } from '../../../dist/core/render-context.js';
+import { loadRenderer } from '../../../dist/core/render/index.js';
+import { jsx } from '../../../dist/jsx-runtime/index.js';
+import { createAstroJSXComponent, renderer as jsxRenderer } from '../../../dist/jsx/index.js';
 import {
 	createComponent,
 	render,
 	renderComponent,
 	renderSlot,
 } from '../../../dist/runtime/server/index.js';
-import { jsx } from '../../../dist/jsx-runtime/index.js';
-import {
-	createBasicEnvironment,
-	createRenderContext,
-	renderPage,
-	loadRenderer,
-} from '../../../dist/core/render/index.js';
-import { createAstroJSXComponent, renderer as jsxRenderer } from '../../../dist/jsx/index.js';
-import { defaultLogging as logging } from '../../test-utils.js';
+import { createBasicPipeline } from '../test-utils.js';
 
 const createAstroModule = (AstroComponent) => ({ default: AstroComponent });
-const loadJSXRenderer = () => loadRenderer(jsxRenderer, (s) => import(s));
+const loadJSXRenderer = () => loadRenderer(jsxRenderer, { import: (s) => import(s) });
 
 describe('core/render', () => {
 	describe('Astro JSX components', () => {
-		let env;
+		let pipeline;
 		before(async () => {
-			env = createBasicEnvironment({
-				logging,
+			pipeline = createBasicPipeline({
 				renderers: [await loadJSXRenderer()],
 			});
 		});
@@ -46,13 +41,21 @@ describe('core/render', () => {
 				});
 			});
 
-			const ctx = createRenderContext({ request: new Request('http://example.com/') });
-			const response = await renderPage(createAstroModule(Page), ctx, env);
+			const mod = createAstroModule(Page);
+			const request = new Request('http://example.com/');
+			const routeData = {
+				type: 'page',
+				pathname: '/index',
+				component: 'src/pages/index.mdx',
+				params: {},
+			};
+			const renderContext = RenderContext.create({ pipeline, request, routeData });
+			const response = await renderContext.render(mod);
 
-			expect(response.status).to.equal(200);
+			assert.equal(response.status, 200);
 
 			const html = await response.text();
-			expect(html).to.include('<div><p class="n">works</p></div>');
+			assert.equal(html.includes('<div><p class="n">works</p></div>'), true);
 		});
 
 		it('Can render slots with a dash in the name', async () => {
@@ -85,14 +88,25 @@ describe('core/render', () => {
 				});
 			});
 
-			const ctx = createRenderContext({ request: new Request('http://example.com/') });
-			const response = await renderPage(createAstroModule(Page), ctx, env);
+			const mod = createAstroModule(Page);
+			const request = new Request('http://example.com/');
+			const routeData = {
+				type: 'page',
+				pathname: '/index',
+				component: 'src/pages/index.mdx',
+				params: {},
+			};
+			const renderContext = RenderContext.create({ pipeline, request, routeData });
+			const response = await renderContext.render(mod);
 
-			expect(response.status).to.equal(200);
+			assert.equal(response.status, 200);
 
 			const html = await response.text();
-			expect(html).to.include(
-				'<main><div><p class="n">works</p></div><div><p class="p">works</p></div></main>'
+			assert.equal(
+				html.includes(
+					'<main><div><p class="n">works</p></div><div><p class="p">works</p></div></main>'
+				),
+				true
 			);
 		});
 
@@ -101,18 +115,26 @@ describe('core/render', () => {
 				throw new Error('uh oh');
 			});
 
-			const Page = createComponent((result, _props) => {
+			const Page = createComponent((result) => {
 				return render`<div>${renderComponent(result, 'Component', Component, {})}</div>`;
 			});
 
-			const ctx = createRenderContext({ request: new Request('http://example.com/') });
-			const response = await renderPage(createAstroModule(Page), ctx, env);
+			const mod = createAstroModule(Page);
+			const request = new Request('http://example.com/');
+			const routeData = {
+				type: 'page',
+				pathname: '/index',
+				component: 'src/pages/index.mdx',
+				params: {},
+			};
+			const renderContext = RenderContext.create({ pipeline, request, routeData });
+			const response = await renderContext.render(mod);
 
 			try {
 				await response.text();
-				expect(false).to.equal(true, 'should not have been successful');
+				assert.equal(false, true, 'should not have been successful');
 			} catch (err) {
-				expect(err.message).to.equal('uh oh');
+				assert.equal(err.message, 'uh oh');
 			}
 		});
 	});

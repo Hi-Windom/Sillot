@@ -1,3 +1,4 @@
+import { AstroError } from '../core/errors/errors.js';
 import { AstroJSX, jsx } from '../jsx-runtime/index.js';
 import { renderJSX } from '../runtime/server/jsx.js';
 
@@ -17,7 +18,20 @@ export async function check(
 	try {
 		const result = await Component({ ...props, ...slots, children });
 		return result[AstroJSX];
-	} catch (e) {}
+	} catch (e) {
+		const error = e as Error;
+		// if the exception is from an mdx component
+		// throw an error
+		if (Component[Symbol.for('mdx-component')]) {
+			throw new AstroError({
+				message: error.message,
+				title: error.name,
+				hint: `This issue often occurs when your MDX component encounters runtime errors.`,
+				name: error.name,
+				stack: error.stack,
+			});
+		}
+	}
 	return false;
 }
 

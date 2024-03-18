@@ -1,6 +1,6 @@
 import type { PluginContext } from 'rollup';
 import type { Plugin as VitePlugin } from 'vite';
-import type { PluginMetadata as AstroPluginMetadata } from '../../../vite-plugin-astro/types';
+import type { PluginMetadata as AstroPluginMetadata } from '../../../vite-plugin-astro/types.js';
 import type { BuildInternals } from '../internal.js';
 import type { AstroBuildPlugin } from '../plugin.js';
 
@@ -8,6 +8,7 @@ import { PROPAGATED_ASSET_FLAG } from '../../../content/consts.js';
 import { prependForwardSlash } from '../../../core/path.js';
 import { getTopLevelPages, moduleIsTopLevelPage, walkParentInfos } from '../graph.js';
 import { getPageDataByViteID, trackClientOnlyPageDatas } from '../internal.js';
+import type { StaticBuildOptions } from '../types.js';
 
 function isPropagatedAsset(id: string) {
 	try {
@@ -17,7 +18,10 @@ function isPropagatedAsset(id: string) {
 	}
 }
 
-export function vitePluginAnalyzer(internals: BuildInternals): VitePlugin {
+export function vitePluginAnalyzer(
+	options: StaticBuildOptions,
+	internals: BuildInternals
+): VitePlugin {
 	function hoistedScriptScanner() {
 		const uniqueHoistedIds = new Map<string, string>();
 		const pageScripts = new Map<
@@ -29,7 +33,11 @@ export function vitePluginAnalyzer(internals: BuildInternals): VitePlugin {
 		>();
 
 		return {
-			scan(this: PluginContext, scripts: AstroPluginMetadata['astro']['scripts'], from: string) {
+			async scan(
+				this: PluginContext,
+				scripts: AstroPluginMetadata['astro']['scripts'],
+				from: string
+			) {
 				const hoistedScripts = new Set<string>();
 				for (let i = 0; i < scripts.length; i++) {
 					const hid = `${from.replace('/@fs', '')}?astro&type=script&index=${i}&lang.ts`;
@@ -120,13 +128,15 @@ export function vitePluginAnalyzer(internals: BuildInternals): VitePlugin {
 	return {
 		name: '@astro/rollup-plugin-astro-analyzer',
 		async generateBundle() {
-			const hoistScanner = hoistedScriptScanner();
+			const hoistScanner = options.settings.config.experimental.directRenderScript
+				? { scan: async () => {}, finalize: () => {} }
+				: hoistedScriptScanner();
 
 			const ids = this.getModuleIds();
 
 			for (const id of ids) {
 				const info = this.getModuleInfo(id);
-				if (!info || !info.meta?.astro) continue;
+				if (!info?.meta?.astro) continue;
 
 				const astro = info.meta.astro as AstroPluginMetadata['astro'];
 
@@ -146,7 +156,7 @@ export function vitePluginAnalyzer(internals: BuildInternals): VitePlugin {
 				}
 
 				// Scan hoisted scripts
-				hoistScanner.scan.call(this, astro.scripts, id);
+				await hoistScanner.scan.call(this, astro.scripts, id);
 
 				if (astro.clientOnlyComponents.length) {
 					const clientOnlys: string[] = [];
@@ -174,6 +184,16 @@ export function vitePluginAnalyzer(internals: BuildInternals): VitePlugin {
 						trackClientOnlyPageDatas(internals, newPageData, clientOnlys);
 					}
 				}
+
+				// When directly rendering scripts, we don't need to group them together when bundling,
+				// each script module is its own entrypoint, so we directly assign each script modules to
+				// `discoveredScripts` here, which will eventually be passed as inputs of the client build.
+				if (options.settings.config.experimental.directRenderScript && astro.scripts.length) {
+					for (let i = 0; i < astro.scripts.length; i++) {
+						const hid = `${id.replace('/@fs', '')}?astro&type=script&index=${i}&lang.ts`;
+						internals.discoveredScripts.add(hid);
+					}
+				}
 			}
 
 			// Finalize hoisting
@@ -182,13 +202,16 @@ export function vitePluginAnalyzer(internals: BuildInternals): VitePlugin {
 	};
 }
 
-export function pluginAnalyzer(internals: BuildInternals): AstroBuildPlugin {
+export function pluginAnalyzer(
+	options: StaticBuildOptions,
+	internals: BuildInternals
+): AstroBuildPlugin {
 	return {
-		build: 'ssr',
+		targets: ['server'],
 		hooks: {
 			'build:before': () => {
 				return {
-					vitePlugin: vitePluginAnalyzer(internals),
+					vitePlugin: vitePluginAnalyzer(options, internals),
 				};
 			},
 		},

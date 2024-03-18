@@ -1,11 +1,17 @@
-import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
 import preact from '@astrojs/preact';
+import react from '@astrojs/react';
 import solid from '@astrojs/solid-js';
 import svelte from '@astrojs/svelte';
 import vue from '@astrojs/vue';
+import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	integrations: [react(), preact(), solid(), svelte(), vue()],
+	integrations: [
+		react({ include: ['**/react/*'] }),
+		preact({ include: ['**/preact/*'] }),
+		solid({ include: ['**/solid/*'] }),
+		svelte(),
+		vue(),
+	],
 });

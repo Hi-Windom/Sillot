@@ -4,7 +4,17 @@ import { viteID } from '../dist/core/util.js';
  *
  * @returns {import('../src/@types/astro').AstroIntegration}
  */
-export default function ({ provideAddress = true, extendAdapter } = { provideAddress: true }) {
+export default function (
+	{
+		provideAddress = true,
+		extendAdapter,
+		setEntryPoints = undefined,
+		setMiddlewareEntryPoint = undefined,
+		setRoutes = undefined,
+	} = {
+		provideAddress: true,
+	}
+) {
 	return {
 		name: 'my-ssr-adapter',
 		hooks: {
@@ -34,7 +44,7 @@ export default function ({ provideAddress = true, extendAdapter } = { provideAdd
 													this.#manifest = manifest;
 												}
 
-												async render(request, routeData) {
+												async render(request, routeData, locals) {
 													const url = new URL(request.url);
 													if(this.#manifest.assets.has(url.pathname)) {
 														const filePath = new URL('../client/' + this.removeBase(url.pathname), import.meta.url);
@@ -43,14 +53,15 @@ export default function ({ provideAddress = true, extendAdapter } = { provideAdd
 													}
 
 													${provideAddress ? `request[Symbol.for('astro.clientAddress')] = '0.0.0.0';` : ''}
-													return super.render(request, routeData);
+													return super.render(request, routeData, locals);
 												}
 											}
-											
+
 											export function createExports(manifest) {
 												return {
 													manifest,
 													createApp: (streaming) => new MyApp(manifest, streaming)
+
 												};
 											}
 										`;
@@ -66,8 +77,24 @@ export default function ({ provideAddress = true, extendAdapter } = { provideAdd
 					name: 'my-ssr-adapter',
 					serverEntrypoint: '@my-ssr',
 					exports: ['manifest', 'createApp'],
+					supportedAstroFeatures: {
+						serverOutput: 'stable',
+					},
 					...extendAdapter,
 				});
+			},
+			'astro:build:ssr': ({ entryPoints, middlewareEntryPoint }) => {
+				if (setEntryPoints) {
+					setEntryPoints(entryPoints);
+				}
+				if (setMiddlewareEntryPoint) {
+					setMiddlewareEntryPoint(middlewareEntryPoint);
+				}
+			},
+			'astro:build:done': ({ routes }) => {
+				if (setRoutes) {
+					setRoutes(routes);
+				}
 			},
 		},
 	};

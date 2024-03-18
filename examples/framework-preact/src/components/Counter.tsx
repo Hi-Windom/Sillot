@@ -1,7 +1,17 @@
-import { h, Fragment } from 'preact';
+import type { ComponentChildren } from 'preact';
+import type { Signal } from '@preact/signals';
+import { lazy, Suspense } from 'preact/compat';
 import './Counter.css';
 
-export default function Counter({ children, count }) {
+const Message = lazy(async () => import('./Message'));
+const Fallback = () => <p>Loading...</p>;
+
+type Props = {
+	children: ComponentChildren;
+	count: Signal<number>;
+};
+
+export default function Counter({ children, count }: Props) {
 	const add = () => count.value++;
 	const subtract = () => count.value--;
 
@@ -12,7 +22,9 @@ export default function Counter({ children, count }) {
 				<pre>{count}</pre>
 				<button onClick={add}>+</button>
 			</div>
-			<div class="counter-message">{children}</div>
+			<Suspense fallback={Fallback}>
+				<Message>{children}</Message>
+			</Suspense>
 		</>
 	);
 }

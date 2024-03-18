@@ -1,4 +1,4 @@
-import type { AstroConfig, RouteData, SerializedRouteData } from '../../../@types/astro';
+import type { AstroConfig, RouteData, SerializedRouteData } from '../../../@types/astro.js';
 
 import { getRouteGenerator } from './generator.js';
 
@@ -10,6 +10,12 @@ export function serializeRouteData(
 		...routeData,
 		generate: undefined,
 		pattern: routeData.pattern.source,
+		redirectRoute: routeData.redirectRoute
+			? serializeRouteData(routeData.redirectRoute, trailingSlash)
+			: undefined,
+		fallbackRoutes: routeData.fallbackRoutes.map((fallbackRoute) => {
+			return serializeRouteData(fallbackRoute, trailingSlash);
+		}),
 		_meta: { trailingSlash },
 	};
 }
@@ -25,5 +31,13 @@ export function deserializeRouteData(rawRouteData: SerializedRouteData): RouteDa
 		pathname: rawRouteData.pathname || undefined,
 		segments: rawRouteData.segments,
 		prerender: rawRouteData.prerender,
+		redirect: rawRouteData.redirect,
+		redirectRoute: rawRouteData.redirectRoute
+			? deserializeRouteData(rawRouteData.redirectRoute)
+			: undefined,
+		fallbackRoutes: rawRouteData.fallbackRoutes.map((fallback) => {
+			return deserializeRouteData(fallback);
+		}),
+		isIndex: rawRouteData.isIndex,
 	};
 }

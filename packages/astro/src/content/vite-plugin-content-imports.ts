@@ -1,30 +1,38 @@
-import * as devalue from 'devalue';
 import type fsMod from 'node:fs';
 import { extname } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import * as devalue from 'devalue';
 import type { PluginContext } from 'rollup';
-import { pathToFileURL } from 'url';
 import type { Plugin } from 'vite';
-import type { AstroSettings, ContentEntryModule, ContentEntryType } from '../@types/astro.js';
-import { AstroErrorData } from '../core/errors/errors-data.js';
+import type {
+	AstroConfig,
+	AstroSettings,
+	ContentEntryModule,
+	ContentEntryType,
+	DataEntryModule,
+	DataEntryType,
+} from '../@types/astro.js';
+import { getProxyCode } from '../assets/utils/proxy.js';
 import { AstroError } from '../core/errors/errors.js';
-import { escapeViteEnvReferences, getFileInfo } from '../vite-plugin-utils/index.js';
-import { CONTENT_FLAG } from './consts.js';
+import { AstroErrorData } from '../core/errors/index.js';
+import { isServerLikeOutput } from '../prerender/utils.js';
+import { CONTENT_FLAG, DATA_FLAG } from './consts.js';
 import {
+	type ContentConfig,
 	getContentEntryExts,
+	getContentEntryIdAndSlug,
 	getContentPaths,
+	getDataEntryExts,
+	getDataEntryId,
+	getEntryCollectionName,
+	getEntryConfigByExtMap,
 	getEntryData,
-	getEntryInfo,
-	getEntrySlug,
 	getEntryType,
 	globalContentConfigObserver,
-	NoCollectionError,
-	type ContentConfig,
+	hasContentFlag,
+	parseEntrySlug,
+	reloadContentConfigObserver,
 } from './utils.js';
-
-function isContentFlagImport(viteId: string) {
-	const flags = new URLSearchParams(viteId.split('?')[1]);
-	return flags.has(CONTENT_FLAG);
-}
 
 function getContentRendererByViteId(
 	viteId: string,
@@ -44,6 +52,13 @@ function getContentRendererByViteId(
 }
 
 const CHOKIDAR_MODIFIED_EVENTS = ['add', 'unlink', 'change'];
+/**
+ * If collection entries change, import modules need to be invalidated.
+ * Reasons why:
+ * - 'config' - content imports depend on the config file for parsing schemas
+ * - 'data' | 'content' - the config may depend on collection entries via `reference()`
+ */
+const COLLECTION_TYPES_TO_INVALIDATE_ON = ['data', 'content', 'config'];
 
 export function astroContentImportPlugin({
 	fs,
@@ -54,59 +69,95 @@ export function astroContentImportPlugin({
 }): Plugin[] {
 	const contentPaths = getContentPaths(settings.config, fs);
 	const contentEntryExts = getContentEntryExts(settings);
+	const dataEntryExts = getDataEntryExts(settings);
 
-	const contentEntryExtToParser: Map<string, ContentEntryType> = new Map();
-	for (const entryType of settings.contentEntryTypes) {
-		for (const ext of entryType.extensions) {
-			contentEntryExtToParser.set(ext, entryType);
-		}
-	}
+	const contentEntryConfigByExt = getEntryConfigByExtMap(settings.contentEntryTypes);
+	const dataEntryConfigByExt = getEntryConfigByExtMap(settings.dataEntryTypes);
+	const { contentDir } = contentPaths;
 
 	const plugins: Plugin[] = [
 		{
 			name: 'astro:content-imports',
 			async transform(_, viteId) {
-				if (isContentFlagImport(viteId)) {
-					const fileId = viteId.split('?')[0];
-					const { id, slug, collection, body, data, _internal } = await setContentEntryModuleCache({
+				if (hasContentFlag(viteId, DATA_FLAG)) {
+					const fileId = viteId.split('?')[0] ?? viteId;
+					// Data collections don't need to rely on the module cache.
+					// This cache only exists for the `render()` function specific to content.
+					const { id, data, collection, _internal } = await getDataEntryModule({
 						fileId,
+						entryConfigByExt: dataEntryConfigByExt,
+						contentDir,
+						config: settings.config,
+						fs,
 						pluginContext: this,
 					});
 
-					const code = escapeViteEnvReferences(`
+					const code = `
+export const id = ${JSON.stringify(id)};
+export const collection = ${JSON.stringify(collection)};
+export const data = ${stringifyEntryData(data, isServerLikeOutput(settings.config))};
+export const _internal = {
+	type: 'data',
+	filePath: ${JSON.stringify(_internal.filePath)},
+	rawData: ${JSON.stringify(_internal.rawData)},
+};
+`;
+					return code;
+				} else if (hasContentFlag(viteId, CONTENT_FLAG)) {
+					const fileId = viteId.split('?')[0];
+					const { id, slug, collection, body, data, _internal } = await getContentEntryModule({
+						fileId,
+						entryConfigByExt: contentEntryConfigByExt,
+						contentDir,
+						config: settings.config,
+						fs,
+						pluginContext: this,
+					});
+
+					const code = `
 						export const id = ${JSON.stringify(id)};
 						export const collection = ${JSON.stringify(collection)};
 						export const slug = ${JSON.stringify(slug)};
 						export const body = ${JSON.stringify(body)};
-						export const data = ${devalue.uneval(data) /* TODO: reuse astro props serializer */};
+						export const data = ${stringifyEntryData(data, isServerLikeOutput(settings.config))};
 						export const _internal = {
+							type: 'content',
 							filePath: ${JSON.stringify(_internal.filePath)},
 							rawData: ${JSON.stringify(_internal.rawData)},
-						};`);
+						};`;
 
 					return { code, map: { mappings: '' } };
 				}
 			},
 			configureServer(viteServer) {
 				viteServer.watcher.on('all', async (event, entry) => {
-					if (
-						CHOKIDAR_MODIFIED_EVENTS.includes(event) &&
-						getEntryType(
-							entry,
-							contentPaths,
-							contentEntryExts,
-							settings.config.experimental.assets
-						) === 'config'
-					) {
-						// Content modules depend on config, so we need to invalidate them.
+					if (CHOKIDAR_MODIFIED_EVENTS.includes(event)) {
+						const entryType = getEntryType(entry, contentPaths, contentEntryExts, dataEntryExts);
+						if (!COLLECTION_TYPES_TO_INVALIDATE_ON.includes(entryType)) return;
+
+						// The content config could depend on collection entries via `reference()`.
+						// Reload the config in case of changes.
+						if (entryType === 'content' || entryType === 'data') {
+							await reloadContentConfigObserver({ fs, settings, viteServer });
+						}
+
+						// Invalidate all content imports and `render()` modules.
+						// TODO: trace `reference()` calls for fine-grained invalidation.
 						for (const modUrl of viteServer.moduleGraph.urlToModuleMap.keys()) {
 							if (
-								isContentFlagImport(modUrl) ||
+								hasContentFlag(modUrl, CONTENT_FLAG) ||
+								hasContentFlag(modUrl, DATA_FLAG) ||
 								Boolean(getContentRendererByViteId(modUrl, settings))
 							) {
-								const mod = await viteServer.moduleGraph.getModuleByUrl(modUrl);
-								if (mod) {
-									viteServer.moduleGraph.invalidateModule(mod);
+								try {
+									const mod = await viteServer.moduleGraph.getModuleByUrl(modUrl);
+									if (mod) {
+										viteServer.moduleGraph.invalidateModule(mod);
+									}
+								} catch (e: any) {
+									// The server may be closed due to a restart caused by this file change
+									if (e.code === 'ERR_CLOSED_SERVER') break;
+									throw e;
 								}
 							}
 						}
@@ -119,145 +170,149 @@ export function astroContentImportPlugin({
 	if (settings.contentEntryTypes.some((t) => t.getRenderModule)) {
 		plugins.push({
 			name: 'astro:content-render-imports',
-			async load(viteId) {
+			async transform(contents, viteId) {
 				const contentRenderer = getContentRendererByViteId(viteId, settings);
 				if (!contentRenderer) return;
 
-				const { fileId } = getFileInfo(viteId, settings.config);
-				const entry = await getContentEntryModuleFromCache(fileId);
-				if (!entry) {
-					// Cached entry must exist (or be in-flight) when importing the module via content collections.
-					// This is ensured by the `astro:content-imports` plugin.
-					throw new AstroError({
-						...AstroErrorData.UnknownContentCollectionError,
-						message: `Unable to render ${JSON.stringify(
-							fileId
-						)}. Did you import this module directly without using a content collection query?`,
-					});
-				}
-
-				return contentRenderer.bind(this)({ entry, viteId });
+				const fileId = viteId.split('?')[0];
+				return contentRenderer.bind(this)({ viteId, contents, fileUrl: pathToFileURL(fileId) });
 			},
 		});
 	}
 
-	/**
-	 * There are two content collection plugins that depend on the same entry data:
-	 * - `astro:content-imports` - creates module containing the `getCollection()` result.
-	 * - `astro:content-render-imports` - creates module containing the `collectionEntry.render()` result.
-	 *
-	 * We could run the same transforms to generate the slug and parsed data in each plugin,
-	 * though this would run the user's collection schema _twice_ for each entry.
-	 *
-	 * Instead, we've implemented a cache for all content entry data. To avoid race conditions,
-	 * this may store either the module itself or a queue of promises awaiting this module.
-	 * See the implementations of `getContentEntryModuleFromCache` and `setContentEntryModuleCache`.
-	 */
-	const contentEntryModuleByIdCache = new Map<
-		string,
-		ContentEntryModule | AwaitingCacheResultQueue
-	>();
-	type AwaitingCacheResultQueue = {
-		awaitingQueue: ((val: ContentEntryModule) => void)[];
-	};
-	function isAwaitingQueue(
-		cacheEntry: ReturnType<typeof contentEntryModuleByIdCache.get>
-	): cacheEntry is AwaitingCacheResultQueue {
-		return typeof cacheEntry === 'object' && cacheEntry != null && 'awaitingQueue' in cacheEntry;
-	}
-
-	function getContentEntryModuleFromCache(id: string): Promise<ContentEntryModule | undefined> {
-		const cacheEntry = contentEntryModuleByIdCache.get(id);
-		// It's possible to request an entry while `setContentEntryModuleCache` is still
-		// setting that entry. In this case, queue a promise for `setContentEntryModuleCache`
-		// to resolve once it is complete.
-		if (isAwaitingQueue(cacheEntry)) {
-			return new Promise<ContentEntryModule>((resolve, reject) => {
-				cacheEntry.awaitingQueue.push(resolve);
-			});
-		} else if (cacheEntry) {
-			return Promise.resolve(cacheEntry);
-		}
-		return Promise.resolve(undefined);
-	}
-
-	async function setContentEntryModuleCache({
-		fileId,
-		pluginContext,
-	}: {
-		fileId: string;
-		pluginContext: PluginContext;
-	}): Promise<ContentEntryModule> {
-		// Create a queue so, if `getContentEntryModuleFromCache` is called
-		// while this function is running, we can resolve all requests
-		// in the `awaitingQueue` with the result.
-		contentEntryModuleByIdCache.set(fileId, { awaitingQueue: [] });
-
-		const contentConfig = await getContentConfigFromGlobal();
-		const rawContents = await fs.promises.readFile(fileId, 'utf-8');
-		const fileExt = extname(fileId);
-		if (!contentEntryExtToParser.has(fileExt)) {
-			throw new AstroError({
-				...AstroErrorData.UnknownContentCollectionError,
-				message: `No parser found for content entry ${JSON.stringify(
-					fileId
-				)}. Did you apply an integration for this file type?`,
-			});
-		}
-		const contentEntryParser = contentEntryExtToParser.get(fileExt)!;
-		const {
-			rawData,
-			body,
-			slug: unvalidatedSlug,
-			data: unvalidatedData,
-		} = await contentEntryParser.getEntryInfo({
-			fileUrl: pathToFileURL(fileId),
-			contents: rawContents,
-		});
-		const entryInfoResult = getEntryInfo({
-			entry: pathToFileURL(fileId),
-			contentDir: contentPaths.contentDir,
-		});
-		if (entryInfoResult instanceof NoCollectionError) throw entryInfoResult;
-
-		const { id, slug: generatedSlug, collection } = entryInfoResult;
-
-		const _internal = { filePath: fileId, rawData: rawData };
-		// TODO: move slug calculation to the start of the build
-		// to generate a performant lookup map for `getEntryBySlug`
-		const slug = getEntrySlug({ id, collection, slug: generatedSlug, unvalidatedSlug });
-
-		const collectionConfig = contentConfig?.collections[collection];
-		let data = collectionConfig
-			? await getEntryData(
-					{ id, collection, slug, _internal, unvalidatedData },
-					collectionConfig,
-					pluginContext,
-					settings
-			  )
-			: unvalidatedData;
-
-		const contentEntryModule: ContentEntryModule = {
-			id,
-			slug,
-			collection,
-			data,
-			body,
-			_internal,
-		};
-
-		const cacheEntry = contentEntryModuleByIdCache.get(fileId);
-		// Pass the entry to all promises awaiting this result
-		if (isAwaitingQueue(cacheEntry)) {
-			for (const resolve of cacheEntry.awaitingQueue) {
-				resolve(contentEntryModule);
-			}
-		}
-		contentEntryModuleByIdCache.set(fileId, contentEntryModule);
-		return contentEntryModule;
-	}
-
 	return plugins;
+}
+
+type GetEntryModuleParams<TEntryType extends ContentEntryType | DataEntryType> = {
+	fs: typeof fsMod;
+	fileId: string;
+	contentDir: URL;
+	pluginContext: PluginContext;
+	entryConfigByExt: Map<string, TEntryType>;
+	config: AstroConfig;
+};
+
+async function getContentEntryModule(
+	params: GetEntryModuleParams<ContentEntryType>
+): Promise<ContentEntryModule> {
+	const { fileId, contentDir, pluginContext } = params;
+	const { collectionConfig, entryConfig, entry, rawContents, collection } =
+		await getEntryModuleBaseInfo(params);
+
+	const {
+		rawData,
+		data: unvalidatedData,
+		body,
+		slug: frontmatterSlug,
+	} = await entryConfig.getEntryInfo({
+		fileUrl: pathToFileURL(fileId),
+		contents: rawContents,
+	});
+	const _internal = { filePath: fileId, rawData };
+	const { id, slug: generatedSlug } = getContentEntryIdAndSlug({ entry, contentDir, collection });
+
+	const slug = parseEntrySlug({
+		id,
+		collection,
+		generatedSlug,
+		frontmatterSlug,
+	});
+
+	const data = collectionConfig
+		? await getEntryData(
+				{ id, collection, _internal, unvalidatedData },
+				collectionConfig,
+				pluginContext
+			)
+		: unvalidatedData;
+
+	const contentEntryModule: ContentEntryModule = {
+		id,
+		slug,
+		collection,
+		data,
+		body,
+		_internal,
+	};
+
+	return contentEntryModule;
+}
+
+async function getDataEntryModule(
+	params: GetEntryModuleParams<DataEntryType>
+): Promise<DataEntryModule> {
+	const { fileId, contentDir, pluginContext } = params;
+	const { collectionConfig, entryConfig, entry, rawContents, collection } =
+		await getEntryModuleBaseInfo(params);
+
+	const { rawData = '', data: unvalidatedData } = await entryConfig.getEntryInfo({
+		fileUrl: pathToFileURL(fileId),
+		contents: rawContents,
+	});
+	const _internal = { filePath: fileId, rawData };
+	const id = getDataEntryId({ entry, contentDir, collection });
+
+	const data = collectionConfig
+		? await getEntryData(
+				{ id, collection, _internal, unvalidatedData },
+				collectionConfig,
+				pluginContext
+			)
+		: unvalidatedData;
+
+	const dataEntryModule: DataEntryModule = {
+		id,
+		collection,
+		data,
+		_internal,
+	};
+
+	return dataEntryModule;
+}
+
+// Shared logic for `getContentEntryModule` and `getDataEntryModule`
+// Extracting to a helper was easier that conditionals and generics :)
+async function getEntryModuleBaseInfo<TEntryType extends ContentEntryType | DataEntryType>({
+	fileId,
+	entryConfigByExt,
+	contentDir,
+	fs,
+}: GetEntryModuleParams<TEntryType>) {
+	const contentConfig = await getContentConfigFromGlobal();
+	let rawContents;
+	try {
+		rawContents = await fs.promises.readFile(fileId, 'utf-8');
+	} catch (e) {
+		throw new AstroError({
+			...AstroErrorData.UnknownContentCollectionError,
+			message: `Unexpected error reading entry ${JSON.stringify(fileId)}.`,
+			stack: e instanceof Error ? e.stack : undefined,
+		});
+	}
+	const fileExt = extname(fileId);
+	const entryConfig = entryConfigByExt.get(fileExt);
+
+	if (!entryConfig) {
+		throw new AstroError({
+			...AstroErrorData.UnknownContentCollectionError,
+			message: `No parser found for data entry ${JSON.stringify(
+				fileId
+			)}. Did you apply an integration for this file type?`,
+		});
+	}
+	const entry = pathToFileURL(fileId);
+	const collection = getEntryCollectionName({ entry, contentDir });
+	if (collection === undefined) throw new AstroError(AstroErrorData.UnknownContentCollectionError);
+
+	const collectionConfig = contentConfig?.collections[collection];
+
+	return {
+		collectionConfig,
+		entry,
+		entryConfig,
+		collection,
+		rawContents,
+	};
 }
 
 async function getContentConfigFromGlobal() {
@@ -295,4 +350,36 @@ async function getContentConfigFromGlobal() {
 	}
 
 	return contentConfig;
+}
+
+/** Stringify entry `data` at build time to be used as a Vite module */
+function stringifyEntryData(data: Record<string, any>, isSSR: boolean): string {
+	try {
+		return devalue.uneval(data, (value) => {
+			// Add support for URL objects
+			if (value instanceof URL) {
+				return `new URL(${JSON.stringify(value.href)})`;
+			}
+
+			// For Astro assets, add a proxy to track references
+			if (typeof value === 'object' && 'ASTRO_ASSET' in value) {
+				const { ASTRO_ASSET, ...asset } = value;
+				asset.fsPath = ASTRO_ASSET;
+				return getProxyCode(asset, isSSR);
+			}
+		});
+	} catch (e) {
+		if (e instanceof Error) {
+			throw new AstroError({
+				...AstroErrorData.UnsupportedConfigTransformError,
+				message: AstroErrorData.UnsupportedConfigTransformError.message(e.message),
+				stack: e.stack,
+			});
+		} else {
+			throw new AstroError({
+				name: 'PluginContentImportsError',
+				message: 'Unexpected error processing content collection data.',
+			});
+		}
+	}
 }

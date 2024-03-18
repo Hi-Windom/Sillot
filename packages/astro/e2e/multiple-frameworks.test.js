@@ -15,7 +15,7 @@ test.afterAll(async () => {
 
 test.skip('Multiple frameworks', () => {
 	test.skip('React counter', async ({ page }) => {
-		await page.goto('/');
+		await page.goto(astro.resolveUrl('/'));
 
 		const counter = page.locator('#react-counter');
 		await expect(counter, 'component is visible').toBeVisible();
@@ -30,7 +30,7 @@ test.skip('Multiple frameworks', () => {
 	});
 
 	test('Preact counter', async ({ page }) => {
-		await page.goto('/');
+		await page.goto(astro.resolveUrl('/'));
 
 		const counter = page.locator('#preact-counter');
 		await expect(counter, 'component is visible').toBeVisible();
@@ -45,7 +45,7 @@ test.skip('Multiple frameworks', () => {
 	});
 
 	test.skip('Solid counter', async ({ page }) => {
-		await page.goto('/');
+		await page.goto(astro.resolveUrl('/'));
 
 		const counter = page.locator('#solid-counter');
 		await expect(counter, 'component is visible').toBeVisible();
@@ -60,7 +60,7 @@ test.skip('Multiple frameworks', () => {
 	});
 
 	test('Vue counter', async ({ page }) => {
-		await page.goto('/');
+		await page.goto(astro.resolveUrl('/'));
 
 		const counter = page.locator('#vue-counter');
 		await expect(counter, 'component is visible').toBeVisible();
@@ -75,7 +75,7 @@ test.skip('Multiple frameworks', () => {
 	});
 
 	test('Svelte counter', async ({ page }) => {
-		await page.goto('/');
+		await page.goto(astro.resolveUrl('/'));
 
 		const counter = page.locator('#svelte-counter');
 		await expect(counter, 'component is visible').toBeVisible();
@@ -90,7 +90,7 @@ test.skip('Multiple frameworks', () => {
 	});
 
 	test('Astro components', async ({ page }) => {
-		await page.goto('/');
+		await page.goto(astro.resolveUrl('/'));
 
 		const aComponent = page.locator('#astro-a');
 		await expect(aComponent, 'component is visible').toBeVisible();
@@ -103,7 +103,7 @@ test.skip('Multiple frameworks', () => {
 
 	test.describe('HMR', () => {
 		test('Page template', async ({ astro, page }) => {
-			await page.goto('/');
+			await page.goto(astro.resolveUrl('/'));
 
 			const slot = page.locator('#preact-counter + .counter-message');
 			await expect(slot, 'initial slot content').toHaveText('Hello Preact!');
@@ -116,7 +116,7 @@ test.skip('Multiple frameworks', () => {
 		});
 
 		test('React component', async ({ astro, page }) => {
-			await page.goto('/');
+			await page.goto(astro.resolveUrl('/'));
 
 			const count = page.locator('#react-counter pre');
 			await expect(count, 'initial count updated to 0').toHaveText('0');
@@ -129,7 +129,7 @@ test.skip('Multiple frameworks', () => {
 		});
 
 		test('Preact component', async ({ astro, page }) => {
-			await page.goto('/');
+			await page.goto(astro.resolveUrl('/'));
 
 			const count = page.locator('#preact-counter pre');
 			await expect(count, 'initial count updated to 0').toHaveText('0');
@@ -142,7 +142,7 @@ test.skip('Multiple frameworks', () => {
 		});
 
 		test('Solid component', async ({ astro, page }) => {
-			await page.goto('/');
+			await page.goto(astro.resolveUrl('/'));
 
 			const count = page.locator('#solid-counter pre');
 			await expect(count, 'initial count updated to 0').toHaveText('0');
@@ -154,10 +154,8 @@ test.skip('Multiple frameworks', () => {
 			await expect(count, 'initial count updated to 5').toHaveText('5');
 		});
 
-		// TODO: re-enable this test when #3559 is fixed
-		// https://github.com/withastro/astro/issues/3559
-		test.skip('Vue component', async ({ astro, page }) => {
-			await page.goto('/');
+		test('Vue component', async ({ astro, page }) => {
+			await page.goto(astro.resolveUrl('/'));
 
 			const count = page.locator('#vue-counter pre');
 			await expect(count, 'initial count updated to 0').toHaveText('0');
@@ -169,10 +167,8 @@ test.skip('Multiple frameworks', () => {
 			await expect(count, 'initial count updated to 5').toHaveText('5');
 		});
 
-		// TODO: track down a reliability issue in this test
-		// It seems to lost connection to the vite server in CI
-		test.skip('Svelte component', async ({ astro, page }) => {
-			await page.goto('/');
+		test('Svelte component', async ({ astro, page }) => {
+			await page.goto(astro.resolveUrl('/'));
 
 			const count = page.locator('#svelte-counter pre');
 			await expect(count, 'initial count is 0').toHaveText('0');
