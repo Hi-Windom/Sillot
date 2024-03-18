@@ -106,20 +106,20 @@ jobs:
             goos: "linux"
             goarch: "amd64"
             suffix: "linux.tar.gz"
-          - os: macos-latest
-            kernel_path: "../app/kernel-darwin/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
-            electron_args: "dist-darwin"
-            goos: "darwin"
-            goarch: "amd64"
-            suffix: "mac.dmg"
-          - os: macos-latest
-            kernel_path: "../app/kernel-darwin-arm64/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
-            electron_args: "dist-darwin-arm64"
-            goos: "darwin"
-            goarch: "arm64"
-            suffix: "mac-arm64.dmg"
+          # - os: macos-latest
+          #   kernel_path: "../app/kernel-darwin/SiYuan-Sillot-Kernel"
+          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+          #   electron_args: "dist-darwin"
+          #   goos: "darwin"
+          #   goarch: "amd64"
+          #   suffix: "mac.dmg"
+          # - os: macos-latest
+          #   kernel_path: "../app/kernel-darwin-arm64/SiYuan-Sillot-Kernel"
+          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+          #   electron_args: "dist-darwin-arm64"
+          #   goos: "darwin"
+          #   goarch: "arm64"
+          #   suffix: "mac-arm64.dmg"
           - os: windows-latest
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
             build_args: "-s -w -H=windowsgui -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
@@ -173,12 +173,15 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install Node pnpm
         run: npm install -g pnpm
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
 
+      - name: Change NPMRC File
+        run: pnpm config set registry https://registry.npmjs.org/ --location project
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
       - name: Install Node Dependencies
         run: pnpm install --no-frozen-lockfile
         working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
@@ -202,15 +205,15 @@ jobs:
         with:
           path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/kernel
 
-      - name: Remove Kernel Directory for macOS
-        uses: JesseTG/rm@v1.0.2
-        with:
-          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/kernel-darwin
+      # - name: Remove Kernel Directory for macOS
+      #   uses: JesseTG/rm@v1.0.2
+      #   with:
+      #     path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/kernel-darwin
 
-      - name: Remove Kernel Directory for macOS ARM64
-        uses: JesseTG/rm@v1.0.2
-        with:
-          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/kernel-darwin-arm64
+      # - name: Remove Kernel Directory for macOS ARM64
+      #   uses: JesseTG/rm@v1.0.2
+      #   with:
+      #     path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/kernel-darwin-arm64
 
       - name: Generate Icon Resource and Properties/Version Info For Windows
         run: ${{ github.workspace }}\go\${{ matrix.config.gobin }}\goversioninfo -platform-specific=true -icon="resource\icon.ico" -manifest="resource\goversioninfo.exe.manifest"
@@ -317,9 +320,9 @@ jobs:
           alias: ${{ secrets.APK_SIGN_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.APK_SIGN_KEY_JKS_PW }}
           keyPassword: ${{ secrets.APK_SIGN_KEY_PW }}
-        # env:
-        #   # override default build-tools version (29.0.3) -- optional
-        #   BUILD_TOOLS_VERSION: "30.0.3"
+        env:
+          # override default build-tools version -- optional
+          BUILD_TOOLS_VERSION: "30.0.3"
 
       - name: Upload APK to release
         uses: actions/upload-release-asset@v1

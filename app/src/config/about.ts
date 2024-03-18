@@ -214,15 +214,15 @@ ${
         }
         if(isAppMode()) {
             const tokenElement = about.element.querySelector("#token") as HTMLInputElement;
-            tokenElement.addEventListener("click", () => {
+        tokenElement.addEventListener("click", () => {
                 tokenElement.select();
             });
-        }
         tokenElement.addEventListener("change", () => {
             fetchPost("/api/system/setAPIToken", {token: tokenElement.value}, () => {
                 window.siyuan.config.api.token = tokenElement.value;
             });
         });
+    }
         about.element.querySelector("#exportLog").addEventListener("click", () => {
             fetchPost("/api/system/exportLog", {}, (response) => {
                 openByMobile(response.data.zip);

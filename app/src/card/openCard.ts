@@ -275,7 +275,7 @@ export const bindCardEvent = async (options: {
             if (moreElement) {
                 event.stopPropagation();
                 event.preventDefault();
-                if (filterElement.getAttribute("data-cardtype") === "all") {
+                if (filterElement.getAttribute("data-cardtype") === "all" && filterElement.getAttribute("data-id")) {
                     showMessage(window.siyuan.languages.noSupportTip);
                     return;
                 }
@@ -390,10 +390,6 @@ export const bindCardEvent = async (options: {
     <div class="fn__flex-1">${window.siyuan.languages.forgetCount}</div>
     <div class="fn__space"></div>
     <div>${currentCard.lapses}</div>
-</div><div class="fn__flex${currentCard.lastReview > 0 ? "" : " fn__none"}">
-    <div class="fn__flex-1">${window.siyuan.languages.lastReviewTime}</div>
-    <div class="fn__space"></div>
-    <div>${format(currentCard.lastReview, 'yyyy-MM-dd')}</div>
 </div><div class="fn__flex">
     <div class="fn__flex-1">${window.siyuan.languages.revisionCount}</div>
     <div class="fn__space"></div>
@@ -402,6 +398,10 @@ export const bindCardEvent = async (options: {
     <div class="fn__flex-1">${window.siyuan.languages.cardStatus}</div>
     <div class="fn__space"></div>
     <div class="${currentCard.state === 0 ? "ft__primary" : "ft__success"}">${currentCard.state === 0 ? window.siyuan.languages.flashcardNewCard : window.siyuan.languages.flashcardReviewCard}</div>
+</div><div class="fn__flex${currentCard.lastReview > 0 ? "" : " fn__none"}">
+    <div class="fn__flex-1">${window.siyuan.languages.lastReviewTime}</div>
+    <div class="fn__space"></div>
+    <div>${dayjs(currentCard.lastReview).format("YYYY-MM-DD")}</div>
 </div>`,
                 });
                 /// #if MOBILE
