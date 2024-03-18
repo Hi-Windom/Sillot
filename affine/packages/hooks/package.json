@@ -1,8 +1,0 @@
-{
-  "name": "@toeverything/hooks",
-  "exports": {
-    "./*": "./src/*"
-  },
-  "private": true,
-  "version": "0.5.4-canary.12"
-}
