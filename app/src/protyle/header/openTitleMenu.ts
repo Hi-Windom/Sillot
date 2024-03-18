@@ -40,6 +40,7 @@ export const openTitleMenu = (protyle: IProtyle, position: IPosition) => {
     fetchPost("/api/block/getDocInfo", {
         id: protyle.block.rootID
     }, (response) => {
+        console.log(response.data);
         window.siyuan.menus.menu.remove();
         window.siyuan.menus.menu.element.setAttribute("data-name", "titleMenu");
         window.siyuan.menus.menu.append(new MenuItem({
@@ -278,7 +279,7 @@ export const openTitleMenu = (protyle: IProtyle, position: IPosition) => {
             iconHTML: "",
             type: "readonly",
             // 不能换行，否则移动端间距过大
-            label: `${window.siyuan.languages.modifiedAt} ${format(new Date(response.data.ial.updated), 'yyyy-MM-dd HH:mm')}<br>${window.siyuan.languages.createdAt} ${format(response.data.ial.id.substr(0, 14), 'yyyy-MM-dd HH:mm')}`
+            label: `${window.siyuan.languages.modifiedAt} ${response.data.ial.updated.replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1-$2-$3 $4:$5:$6')}<br>${window.siyuan.languages.createdAt} ${response.data.ial.id.substr(0, 14).replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1-$2-$3 $4:$5:$6')}`
         }).element);
         /// #if MOBILE
         window.siyuan.menus.menu.fullscreen();
