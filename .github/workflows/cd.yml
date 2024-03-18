@@ -173,7 +173,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install Node pnpm
         run: npm install -g pnpm
@@ -320,9 +320,9 @@ jobs:
           alias: ${{ secrets.APK_SIGN_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.APK_SIGN_KEY_JKS_PW }}
           keyPassword: ${{ secrets.APK_SIGN_KEY_PW }}
-        # env:
-        #   # override default build-tools version (29.0.3) -- optional
-        #   BUILD_TOOLS_VERSION: "30.0.3"
+        env:
+          # override default build-tools version -- optional
+          BUILD_TOOLS_VERSION: "30.0.3"
 
       - name: Upload APK to release
         uses: actions/upload-release-asset@v1
