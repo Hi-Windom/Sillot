@@ -6,14 +6,19 @@
   "homepage": "https://github.com/Hi-Windom/Sillot",
   "repository": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
+  "engines": {
+    "node": ">=17.7.1",
+    "pnpm": ">=8.2.0"
+  },
   "packageManager": "pnpm@8.14.1",
   "scripts": {
     "cli": "node ./package.cli.mjs",
+    "v": "pnpm version && echo '\npnpm:' && pnpm --version && echo '\n'",
     "git:tag": "git push origin --tags",
     "git:proxy": "git config --global http.proxy http://127.0.0.1:7890 && git config --global https.proxy http://127.0.0.1:7890",
     "check": "NPM_CHECK_INSTALLER=pnpm npm-check -u",
     "check:electron": "pnpm install electron@alpha",
-    "gentpl": "pnpm run '/gentpl:.*/'",
+    "gentpl": "echo '危险操作警告：生成替换前请确认版本合并冲突已解决' && pause && pnpm run '/gentpl:.*/'",
     "gentpl:app": "node ./scripts/genAppIndex.tpl.js && node ./scripts/genAppWindow.tpl.js",
     "gentpl:docker": "node ./scripts/genDockerIndex.tpl.js",
     "gentpl:desktop": "node ./scripts/genDesktopIndex.tpl.js",
