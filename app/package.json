@@ -7,13 +7,13 @@
   "repository": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
   "engines": {
-    "node": ">=20",
-    "pnpm": ">=8.2.0"
+    "node": ">=20.11.1",
+    "pnpm": ">=8.15.5"
   },
-  "packageManager": "pnpm@8.14.1",
+  "packageManager": "pnpm@9.0.0-alpha.8",
   "scripts": {
     "cli": "node ./package.cli.mjs",
-    "v": "pnpm version && echo '\npnpm:' && pnpm --version && echo '\n'",
+    "v": "pnpm version && echo '\npnpm:' && pnpm -v && echo '\n'",
     "git:tag": "git push origin --tags",
     "git:proxy": "git config --global http.proxy http://127.0.0.1:7890 && git config --global https.proxy http://127.0.0.1:7890",
     "check": "NPM_CHECK_INSTALLER=pnpm npm-check -u",
