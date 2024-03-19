@@ -52,7 +52,7 @@ def find_milestone(repo, title, lastestRelease):
 
     Returns:
         The milestone which title matches the given argument.
-        If no milestone matches, it will return None
+        If no milestone matches, it will return None or lookup str
     """
     pat = re.search("v([0-9.]+)", title)
     thisRelease = title.split("/")[-1]
@@ -74,6 +74,7 @@ def find_milestone(repo, title, lastestRelease):
     for milestone in repo.get_milestones():
         if version in milestone.title:
             return milestone
+    return version
 
 
 def get_issue_first_label(issue):
