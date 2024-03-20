@@ -28,6 +28,7 @@ export const setAccessAuthCode = () => {
     });
     btnsElement[1].addEventListener("click", () => {
         fetchPost("/api/system/setAccessAuthCode", {accessAuthCode: inputElement.value});
+				if (window.JSAndroid) { window.JSAndroid.setMMKV("accessAuthCode", inputElement.value)}
     });
 };
 

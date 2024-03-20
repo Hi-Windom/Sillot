@@ -150,7 +150,7 @@ window.reconnectWebSocket = () => {
     window.siyuan.ws.send("ping", {});
     window.siyuan.mobile.files.send("ping", {});
     window.siyuan.mobile.editor.protyle.ws.send("ping", {});
-    window.siyuan.mobile.popEditor.protyle.ws.send("ping", {});
+    window.siyuan.mobile.popEditor?.protyle.ws.send("ping", {});
 };
 window.goBack = goBack;
 window.showKeyboardToolbar = (height) => {

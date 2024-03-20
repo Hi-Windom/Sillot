@@ -22,6 +22,12 @@ import (
 )
 
 func ServeAPI(ginServer *gin.Engine) {
+
+	// 汐洛扩展
+	ginServer.Handle("GET", "/api/sillot/getAppConfigesStore", getAppConfigesStore)
+	ginServer.Handle("POST", "/api/sillot/getConfigesStore", getConfigesStore)
+	ginServer.Handle("POST", "/api/sillot/setConfigesStore", setConfigesStore)
+
 	// 不需要鉴权
 
 	ginServer.Handle("GET", "/api/system/bootProgress", bootProgress)
@@ -397,12 +403,6 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/snippet/getSnippet", model.CheckAuth, getSnippet)
 	ginServer.Handle("POST", "/api/snippet/setSnippet", model.CheckAuth, model.CheckReadonly, setSnippet)
 	ginServer.Handle("POST", "/api/snippet/removeSnippet", model.CheckAuth, model.CheckReadonly, removeSnippet)
-
-	// 汐洛扩展
-	ginServer.Handle("GET", "/api/sillot/getAppConfigesStore", getAppConfigesStore)
-	ginServer.Handle("POST", "/api/sillot/getConfigesStore", getConfigesStore)
-	ginServer.Handle("POST", "/api/sillot/setConfigesStore", setConfigesStore)
-
 	ginServer.Handle("POST", "/api/av/renderAttributeView", model.CheckAuth, renderAttributeView)
 	ginServer.Handle("POST", "/api/av/renderHistoryAttributeView", model.CheckAuth, renderHistoryAttributeView)
 	ginServer.Handle("POST", "/api/av/renderSnapshotAttributeView", model.CheckAuth, renderSnapshotAttributeView)

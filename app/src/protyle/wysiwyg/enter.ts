@@ -1,5 +1,5 @@
 import {genEmptyElement, insertEmptyBlock} from "../../block/util";
-import {getSelectionOffset, focusByWbr, setLastNodeRange, focusBlock, focusByRange} from "../util/selection";
+import {focusBlock, focusByRange, focusByWbr, getSelectionOffset, setLastNodeRange} from "../util/selection";
 import {
     getContenteditableElement,
     getTopEmptyElement,
@@ -84,9 +84,9 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
                     setStorageVal(Constants.LOCAL_CODELANG, window.siyuan.storage[Constants.LOCAL_CODELANG]);
                 }
                 if (Constants.SIYUAN_RENDER_CODE_LANGUAGES.includes(languageElement.textContent)) {
-                    blockElement.dataset.content = ""
-                    blockElement.dataset.subtype = languageElement.textContent
-                    blockElement.className = "render-node"
+                    blockElement.dataset.content = "";
+                    blockElement.dataset.subtype = languageElement.textContent;
+                    blockElement.className = "render-node";
                     blockElement.innerHTML = `<div spin="1"></div><div class="protyle-attr" contenteditable="false">${Constants.ZWSP}</div>`;
                     protyle.toolbar.showRender(protyle, blockElement);
                     processRender(blockElement);
@@ -219,7 +219,9 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
     // 回车之前的块为 1\n\n2 时会产生多个块
     Array.from(enterElement.children).forEach((item: HTMLElement) => {
         if (item.dataset.nodeId === id) {
-            editableElement.innerHTML = item.querySelector('[contenteditable="true"]').innerHTML;
+            const previousElement = blockElement.previousElementSibling;
+            blockElement.outerHTML = item.outerHTML;
+            blockElement = (previousElement?.nextElementSibling || protyle.wysiwyg.element.firstElementChild) as HTMLElement;
             doOperation.push({
                 action: "update",
                 data: blockElement.outerHTML,

@@ -164,8 +164,13 @@ interface Window {
         scale?: number
     }) => Promise<any>;
     JSAndroid: {
-        returnDesktop(): void
+				// sillot extend
+				setMMKV(key: string, value: string): void
+				showBiometricPrompt(): void
+				requestPermission(p: string): void
         exitSillotAndroid(): void
+				// sillot extend end
+        returnDesktop(): void
         openExternal(url: string): void
         changeStatusBarColor(color: string, mode: number): void
         writeClipboard(text: string): void
@@ -739,6 +744,8 @@ interface IConfig {
             apiKey: string
             apiModel: string
             apiMaxTokens: number
+            apiTemperature: number
+            apiMaxContexts: number
             apiProxy: string
             apiTimeout: number
         },

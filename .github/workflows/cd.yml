@@ -16,10 +16,10 @@ jobs:
       version: ${{ steps.version.outputs.value }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - run: pip install PyGithub
@@ -132,13 +132,13 @@ jobs:
 
     steps:
       - name: Checkout repository and submodules
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot
 
       - name: Checkout subtree PSP
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: K-Sillot/sillot-plugin-system
           path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/PSP
@@ -291,7 +291,7 @@ jobs:
           path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
 
       - name: Checkout android repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: contains( matrix.config.goos, 'windows')
         with:
           repository: Hi-Windom/Sillot-android
