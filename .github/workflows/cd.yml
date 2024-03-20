@@ -155,7 +155,7 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: "1.21"
 
@@ -171,7 +171,7 @@ jobs:
           GOARCH: ${{ matrix.config.goarch }}
 
       - name: Set up Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -278,7 +278,7 @@ jobs:
           distribution: 'zulu'
           overwrite-settings: true
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3.2.0
       - name: Install Android NDK
         uses: nttld/setup-ndk@v1
         with:
