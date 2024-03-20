@@ -89,18 +89,9 @@ export const about = {
     <button data-type="open" data-url="http://${window.siyuan.config.system.networkServe ? window.siyuan.config.localIPs[0] : "127.0.0.1"}:${location.port}" class="b3-button b3-button--outline fn__size200 fn__flex-center">
         <svg><use xlink:href="#iconLink"></use></svg>${window.siyuan.languages.about4}
     </button>
-</label>
+</div>
 ${
-    isAppMode(true) ? `<label class="b3-label fn__flex config__item">
-<div class="fn__flex-1">
-    ${window.siyuan.languages.about5}
-    <div class="b3-label__text">${window.siyuan.languages.about6}</div>
-</div>
-<div class="fn__space"></div>
-<button class="fn__flex-center b3-button b3-button--outline fn__size200" id="authCode">
-    <svg><use xlink:href="#iconLock"></use></svg>${window.siyuan.languages.config}
-</button>
-</div>
+	isAppMode(true) ? `
 <div class="b3-label fn__flex config__item">
 <div class="fn__flex-1 fn__flex-center">
     ${window.siyuan.languages.dataRepoKey}

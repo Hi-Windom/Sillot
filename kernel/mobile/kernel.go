@@ -101,3 +101,10 @@ func SetTimezone(container, appDir, timezoneID string) {
 	}
 	time.Local = z
 }
+
+// Sillot extend
+func SetBiometricPass(code string) {
+	util.BiometricPass = code
+}
+
+// Sillot extend end
