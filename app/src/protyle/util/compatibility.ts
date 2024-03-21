@@ -31,9 +31,21 @@ export const openByMobile = (uri: string) => {
 
 							// 更新"data-uri"值
 							toolbarOpenBy.setAttribute("data-uri", uri);
+							if (!toolbarOpenBy.classList.contains("flash-blue")) {
+									toolbarOpenBy.classList.add("flash-blue");
+									setTimeout(() => {
+											toolbarOpenBy.classList.remove("flash-blue");
+									}, 200);
+							}
 					} else {
 							// 更新"data-uri"值
 							toolbarOpenBy.setAttribute("data-uri", uri);
+							if (!toolbarOpenBy.classList.contains("flash-blue")) {
+									toolbarOpenBy.classList.add("flash-blue");
+									setTimeout(() => {
+											toolbarOpenBy.classList.remove("flash-blue");
+									}, 200);
+							}
 					}
 			} else {
 					// 如果找不到元素，则直接调用
