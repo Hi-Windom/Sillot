@@ -367,6 +367,7 @@ func GetBlockAttributeViewKeys(blockID string) (ret []*BlockAttributeViewKeys) {
 				for _, blockValue := range destAv.GetBlockKeyValues().Values {
 					blocks[blockValue.BlockID] = blockValue
 				}
+				kv.Values[0].Relation.Contents = nil // 先清空 https://github.com/siyuan-note/siyuan/issues/10670
 				for _, bID := range kv.Values[0].Relation.BlockIDs {
 					kv.Values[0].Relation.Contents = append(kv.Values[0].Relation.Contents, blocks[bID])
 				}
@@ -723,7 +724,7 @@ func renderAttributeView(attrView *av.AttributeView, viewID, query string, page,
 	}
 
 	viewable.FilterRows(attrView)
-	viewable.SortRows()
+	viewable.SortRows(attrView)
 	viewable.CalcCols()
 
 	// 分页
@@ -2009,7 +2010,7 @@ func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID string,
 	if nil != view && 0 < len(view.Table.Filters) && !ignoreFillFilter {
 		viewable, _ := renderAttributeViewTable(attrView, view, "")
 		viewable.FilterRows(attrView)
-		viewable.SortRows()
+		viewable.SortRows(attrView)
 
 		var nearRow *av.TableRow
 		if 0 < len(viewable.Rows) {

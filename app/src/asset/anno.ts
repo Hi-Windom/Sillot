@@ -1,8 +1,6 @@
 import {fetchPost} from "../util/fetch";
 import {setPosition} from "../util/setPosition";
 import {hasClosestByAttribute, hasClosestByClassName} from "../protyle/util/hasClosest";
-// import * as dayjs from "dayjs";
-import {format} from "date-fns";
 import {setStorageVal, writeText} from "../protyle/util/compatibility";
 import {getAllModels} from "../layout/getAll";
 import {focusByRange} from "../protyle/util/selection";
@@ -532,8 +530,7 @@ const getHightlightCoordsByRect = (pdf: any, color: string, rectResizeElement: H
         }];
 
     const id = Lute.NewNodeID();
-    const content = pdf.appConfig.file.replace(location.origin, "").substring(8).replace(/-\d{14}-\w{7}.pdf$/, "") +
-        `-P${startPage.id}-${format(new Date(), 'yyyyMMddHHmmss')}`;
+    const content = `${pdf.appConfig.file.replace(location.origin, "").substr(8).replace(/-\d{14}-\w{7}.pdf$/, "")}-P${startPage.id}-${id}`;
     const result = [{
         index: startPage.id - 1,
         coords: [startSelected],
@@ -722,6 +719,7 @@ const copyAnno = (idPath: string, fileName: string, pdf: any) => {
                     const formData = new FormData();
                     const imageName = content + ".png";
                     formData.append("file[]", blob, imageName);
+                    formData.append("skipIfDuplicated", "true");
                     fetchPost(Constants.UPLOAD_ADDRESS, formData, (response) => {
                         writeText(`<<${idPath} "${content}">>
 ![](${response.data.succMap[imageName]})`);

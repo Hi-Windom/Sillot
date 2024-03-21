@@ -22,12 +22,90 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/88250/gulu"
 	"github.com/siyuan-note/siyuan/kernel/util"
 
 	"github.com/siyuan-note/siyuan/kernel/bazaar"
 )
+
+func UpdatedPackages(frontend string) (plugins []*bazaar.Plugin, widgets []*bazaar.Widget, icons []*bazaar.Icon, themes []*bazaar.Theme, templates []*bazaar.Template) {
+	wg := &sync.WaitGroup{}
+	wg.Add(5)
+	go func() {
+		defer wg.Done()
+		tmp := InstalledPlugins(frontend, "")
+		for _, plugin := range tmp {
+			if plugin.Outdated {
+				plugins = append(plugins, plugin)
+			}
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		tmp := InstalledWidgets("")
+		for _, widget := range tmp {
+			if widget.Outdated {
+				widgets = append(widgets, widget)
+			}
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		tmp := InstalledIcons("")
+		for _, icon := range tmp {
+			if icon.Outdated {
+				icons = append(icons, icon)
+			}
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		tmp := InstalledThemes("")
+		for _, theme := range tmp {
+			if theme.Outdated {
+				themes = append(themes, theme)
+			}
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		tmp := InstalledTemplates("")
+		for _, template := range tmp {
+			if template.Outdated {
+				templates = append(templates, template)
+			}
+		}
+	}()
+
+	wg.Wait()
+
+	if 1 > len(plugins) {
+		plugins = []*bazaar.Plugin{}
+	}
+
+	if 1 > len(widgets) {
+		widgets = []*bazaar.Widget{}
+	}
+
+	if 1 > len(icons) {
+		icons = []*bazaar.Icon{}
+	}
+
+	if 1 > len(themes) {
+		themes = []*bazaar.Theme{}
+	}
+
+	if 1 > len(templates) {
+		templates = []*bazaar.Template{}
+	}
+	return
+}
 
 func GetPackageREADME(repoURL, repoHash, packageType string) (ret string) {
 	ret = bazaar.GetPackageREADME(repoURL, repoHash, packageType)
