@@ -169,6 +169,7 @@ interface Window {
 				showBiometricPrompt(): void
 				requestPermission(p: string): void
         exitSillotAndroid(): void
+        savePictureByURL(contentHeight: number): void
 				// sillot extend end
         returnDesktop(): void
         openExternal(url: string): void

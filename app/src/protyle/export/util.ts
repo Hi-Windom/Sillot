@@ -75,6 +75,7 @@ export const exportImage = (id: string) => {
                         formData.append("type", "image/png");
                         fetchPost("/api/export/exportAsFile", formData, (response) => {
                             openByMobile(response.data.file);
+                            window.JSAndroid.savePictureByURL(response.data.file);
                         });
                         hideMessage(msgId);
                         exportDialog.destroy();
