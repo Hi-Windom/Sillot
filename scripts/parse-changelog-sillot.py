@@ -101,7 +101,7 @@ def get_issue_first_label(issue):
 def generate_msg(desc_mapping):
     """Print changelogs from direction."""
     print()
-    print('## [@Sillot](https://github.com/Hi-Windom/Sillot)\n')
+    print('# [@Sillot](https://github.com/Hi-Windom/Sillot)\n')
     for header in docmap:
         if not desc_mapping[header]:
             continue

@@ -32,11 +32,11 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
 
     gh = github.Github(token, base_url=f"https://{hostname}")
     repo = gh.get_repo(repo_name)
-    print('## [@SiYuan](https://github.com/siyuan-note/siyuan)\n')
+    print('# [@SiYuan](https://github.com/siyuan-note/siyuan)\n')
     for v in [tag_name, lastestRelease]:
-      print(f'''---
+      print(f'''
 
-### v{v}
+## {v}
 
 ''')
       desc_mapping = defaultdict(list)
