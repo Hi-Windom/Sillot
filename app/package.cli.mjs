@@ -19,6 +19,20 @@ if (!shell.which("go")) {
 }
 
 const spinner = ora("正在执行, 请稍后...\n");
+let startTime = new Date().getTime();
+
+function updateSpinnerText() {
+    const currentTime = new Date().getTime();
+    const elapsedTime = currentTime - startTime;
+    const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+    const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+
+    spinner.text = `正在执行, 请稍后...\n\n\n\t\t\t已用时 ${hours}时${minutes}分${seconds}秒\n\n\n`;
+}
+
+// 每秒更新一次spinner文本
+const intervalId = setInterval(updateSpinnerText, 1000);
 const works = {
   a: { a01: "构建 build", a02: "检查 check", a03: "开发 dev" },
   a01: { a0101: "Win App 构建", a0102: "安卓构建" },
@@ -67,6 +81,7 @@ function exeHandler(cmds, silent) {
     cmds,
     { encoding: silent ? "base64" : "utf8", silent: silent },
     function (code, stdout, stderr) {
+      clearInterval(intervalId); // 停止更新spinner文本
       console.log("Exit code:", code);
       console.log(
         "Program output:",
@@ -98,7 +113,7 @@ function doit(obj) {
       },
     ])
     .then((answers) => {
-      console.warn("建议暂时退出杀毒软件，避免弹窗影响体验");
+      console.warn("\n建议暂时退出杀毒软件，避免弹窗影响体验\n");
       switch (answers.b) {
         case works.a01.a0101:
           exeHandler("cd .. && .\\scripts\\sillot-win-build.bat", true);
