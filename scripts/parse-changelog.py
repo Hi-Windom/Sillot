@@ -71,7 +71,11 @@ def find_milestone(repo, title, lastestRelease):
 # ---
 
 # ''')
-    for milestone in repo.get_milestones(state="all"):
+    for milestone in repo.get_milestones(state="open"):
+        if version in milestone.title:
+            return milestone
+    # 相比 state="all" ，先从 open（state参数默认值）里面找，找不到再找 closed 的做法用代码量换时间
+    for milestone in repo.get_milestones(state="closed"):
         if version in milestone.title:
             return milestone
 
