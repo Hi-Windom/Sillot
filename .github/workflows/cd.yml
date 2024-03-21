@@ -62,10 +62,14 @@ jobs:
         run: |
           echo "release_title=$(git show --format=%s --no-patch | head -1)" >> $GITHUB_OUTPUT
           echo "release_version=v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}" >> $GITHUB_OUTPUT
-          changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} -b ${{ steps.thislatestR.outputs.release }} Hi-Windom/Sillot)
+          changelog1=$(python scripts/parse-changelog-HEAD.py -t ${{ github.ref }} -b ${{ steps.thislatestR.outputs.release }} Hi-Windom/Sillot)
+          changelog2=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} Hi-Windom/Sillot)
+          changelog3=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} Hi-Windom/Sillot-android)
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "release_body_sillot<<$EOF" >> $GITHUB_ENV
-          echo "$changelog" >> $GITHUB_ENV
+          echo "$changelog1" >> $GITHUB_ENV
+          echo "$changelog2" >> $GITHUB_ENV
+          echo "$changelog3" >> $GITHUB_ENV
           echo "$EOF" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
