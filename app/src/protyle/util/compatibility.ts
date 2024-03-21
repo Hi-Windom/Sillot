@@ -9,7 +9,36 @@ export const openByMobile = (uri: string) => {
     if (window.siyuan.config.system.container === "ios") {
         window.location.href = uri;
     } else if (isInAndroid()) {
-        window.JSAndroid.openExternal(uri);
+				const toolbarOpenBy = document.querySelector("#toolbarOpenBy");
+				const toolbarConsole = document.querySelector("#toolbarConsole");
+				if (toolbarOpenBy && toolbarConsole) {
+					const existingUri = toolbarOpenBy.getAttribute("data-uri");
+
+					// 只有在首次调用时才更新uri和绑定事件
+					if (!existingUri) {
+							toolbarConsole.classList.add("fn__none");
+							toolbarOpenBy.classList.remove("fn__none");
+
+							toolbarOpenBy.addEventListener("click", () => {
+									toolbarOpenBy.classList.add("fn__none");
+									toolbarConsole.classList.remove("fn__none");
+									const updatedUri = toolbarOpenBy.getAttribute("data-uri");
+									if (updatedUri) {
+											window.JSAndroid.openExternal(updatedUri);
+											toolbarOpenBy.removeAttribute("data-uri");
+									}
+							});
+
+							// 更新"data-uri"值
+							toolbarOpenBy.setAttribute("data-uri", uri);
+					} else {
+							// 更新"data-uri"值
+							toolbarOpenBy.setAttribute("data-uri", uri);
+					}
+			} else {
+					// 如果找不到元素，则直接调用
+					window.JSAndroid.openExternal(uri);
+			}
     } else {
         window.open(uri);
     }
