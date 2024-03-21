@@ -18,7 +18,7 @@ docmap = {
 }
 
 
-def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
+def generate_msg_from_repo(repo_name, tag_name):
     """Generate changelog messages from repository and tag name.
 
     Envs:
@@ -36,7 +36,7 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
 
     gh = github.Github(token, base_url=f"https://{hostname}")
     repo = gh.get_repo(repo_name)
-    milestone = find_milestone(repo, tag_name, lastestRelease)
+    milestone = find_milestone(repo, tag_name)
 
     for issue in repo.get_issues(state="closed", milestone=milestone): # type: ignore
         # REF https://pygithub.readthedocs.io/en/latest/github_objects/Issue.html#github.Issue.Issue
@@ -102,6 +102,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        generate_msg_from_repo(args.repo, args.tag, args.lastestRelease)
+        generate_msg_from_repo(args.repo, args.tag)
     except AssertionError:
         print(args.tag)
