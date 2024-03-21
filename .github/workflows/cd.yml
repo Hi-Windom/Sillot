@@ -279,8 +279,10 @@ jobs:
           overwrite-settings: true
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3.2.0
+        if: contains( matrix.config.goos, 'windows')
       - name: Install Android NDK
         uses: nttld/setup-ndk@v1
+        if: contains( matrix.config.goos, 'windows')
         with:
           ndk-version: r25b
           add-to-path: true

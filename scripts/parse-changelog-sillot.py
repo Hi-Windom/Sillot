@@ -81,11 +81,14 @@ def find_milestone(repo, title, lastestRelease):
 ---
 
 ''')
-    for milestone in repo.get_milestones(state="all"):
-      # REF https://docs.github.com/en/rest/issues/milestones?apiVersion=2022-11-28#list-milestones
+    # REF https://docs.github.com/en/rest/issues/milestones?apiVersion=2022-11-28#list-milestones
+    for milestone in repo.get_milestones():
         if version in milestone.title:
             return milestone
-
+    # 别问为什么不用 state="all" ，先从 open（state参数默认值）里面找，问就是代码按行算（doge
+    for milestone in repo.get_milestones(state="closed"):
+        if version in milestone.title:
+            return milestone
 
 def get_issue_first_label(issue):
     """Get the first label from issue, if no labels, return empty string."""
