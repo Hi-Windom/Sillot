@@ -81,7 +81,7 @@ def find_milestone(repo, title, lastestRelease):
 ---
 
 ''')
-    for milestone in repo.get_milestones(state=all):
+    for milestone in repo.get_milestones(state="all"):
       # REF https://docs.github.com/en/rest/issues/milestones?apiVersion=2022-11-28#list-milestones
         if version in milestone.title:
             return milestone
