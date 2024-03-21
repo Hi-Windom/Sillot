@@ -71,10 +71,9 @@ def find_milestone(repo, title, lastestRelease):
 # ---
 
 # ''')
-    for milestone in repo.get_milestones():
+    for milestone in repo.get_milestones(state=all):
         if version in milestone.title:
             return milestone
-    return version
 
 
 def get_issue_first_label(issue):
