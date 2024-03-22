@@ -140,6 +140,9 @@ const mergePluginHotkey = (plugin: Plugin) => {
     }
     Object.keys(plugin.docks).forEach(dockKey => {
         const dock = plugin.docks[dockKey];
+        if (!dock.config.hotkey) {
+            return;
+        }
         if (!window.siyuan.config.keymap.plugin[plugin.name]) {
             window.siyuan.config.keymap.plugin[plugin.name] = {
                 [dockKey]: {
@@ -222,7 +225,7 @@ export const afterLoadPlugin = (plugin: Plugin) => {
     });
     Object.keys(plugin.docks).forEach(key => {
         const dock = plugin.docks[key];
-        const hotkey = window.siyuan.config.keymap.plugin[plugin.name][key].custom;
+        const hotkey = window.siyuan.config.keymap.plugin[plugin.name] ? window.siyuan.config.keymap.plugin[plugin.name][key]?.custom : undefined;
         if (dock.config.position.startsWith("Left")) {
             window.siyuan.layout.leftDock.genButton([{
                 type: key,

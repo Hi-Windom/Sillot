@@ -770,6 +770,7 @@ export class Gutter {
                     });
                 });
                 copyPlainText(html.trimEnd());
+                focusBlock(selectsElement[0]);
             }
         }, {
             label: window.siyuan.languages.duplicate,
@@ -1269,6 +1270,7 @@ export class Gutter {
                     text += item.textContent + "\n";
                 });
                 copyPlainText(text.trimEnd());
+                focusBlock(nodeElement);
             }
         }, {
             label: window.siyuan.languages.duplicate,
