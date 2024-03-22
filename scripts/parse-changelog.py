@@ -6,12 +6,12 @@ from collections import defaultdict
 import github  # pip install PyGithub
 # ensure the milestone is open before run this
 docmap = {
-    "Feature": "Feature",
-    "Enhancement": "Enhancement",
-    "Bug": "Bugfix",
-    "Document": "Document",
-    "Refactor": "Refactor",
-    "Abolishment": "Abolishment",
+    "Feature": "引入特性 | Feature",
+    "Enhancement": "改进功能 | Enhancement",
+    "Bug": "修复错误 | Bugfix",
+    "Document": "文档相关 | Document",
+    "Refactor": "开发重构 | Refactor",
+    "Abolishment": "移除废止 | Abolishment",
     "Development": "Development",
 }
 
@@ -36,7 +36,7 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
     for v in [tag_name, lastestRelease]:
       print(f'''
 
-## {v}
+## ⚓ [{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v})
 
 ''')
       desc_mapping = defaultdict(list)
