@@ -381,4 +381,4 @@ export const insertRows = (blockElement: HTMLElement, protyle: IProtyle, count: 
     }]);
     insertAttrViewBlockAnimation(protyle, blockElement, srcIDs, previousID, avID);
     blockElement.setAttribute("updated", newUpdated);
-}
+};

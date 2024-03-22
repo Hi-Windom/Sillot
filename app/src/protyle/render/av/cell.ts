@@ -830,4 +830,4 @@ export const addDragFill = (cellElement: Element) => {
     }
     cellElement.classList.add("av__cell--active");
     cellElement.insertAdjacentHTML("beforeend", `<div aria-label="${window.siyuan.languages.dragFill}" class="av__drag-fill ariaLabel"></div>`);
-}
+};

@@ -275,24 +275,30 @@ interface ISearchOption {
     idPath: string[]
     k: string
     r: string
-    types: {
-        mathBlock: boolean
-        table: boolean
-        blockquote: boolean
-        superBlock: boolean
-        paragraph: boolean
-        document: boolean
-        heading: boolean
-        list: boolean
-        listItem: boolean
-        codeBlock: boolean
-        htmlBlock: boolean
-        embedBlock: boolean
-        databaseBlock: boolean
-    },
+    types: ISearchType,
     replaceTypes: {
         [key: string]: boolean;
     },
+}
+
+interface ISearchType {
+    audioBlock: boolean
+    videoBlock: boolean
+    iFrameBlock: boolean
+    widgetBlock: boolean
+    mathBlock: boolean
+    table: boolean
+    blockquote: boolean
+    superBlock: boolean
+    paragraph: boolean
+    document: boolean
+    heading: boolean
+    list: boolean
+    listItem: boolean
+    codeBlock: boolean
+    htmlBlock: boolean
+    embedBlock: boolean
+    databaseBlock: boolean
 }
 
 interface ITextOption {
@@ -830,20 +836,7 @@ interface IConfig {
     tag: {
         sort: number
     }
-    search: {
-        databaseBlock: boolean
-        embedBlock: boolean
-        htmlBlock: boolean
-        document: boolean
-        heading: boolean
-        list: boolean
-        listItem: boolean
-        codeBlock: boolean
-        mathBlock: boolean
-        table: boolean
-        blockquote: boolean
-        superBlock: boolean
-        paragraph: boolean
+    search: ISearchType & {
         name: boolean
         alias: boolean
         memo: boolean

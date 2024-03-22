@@ -592,7 +592,7 @@ func FindReplace(keyword, replacement string, replaceTypes map[string]bool, ids 
 					} else if n.IsTextMarkType("a") {
 						if replaceTypes["aText"] {
 							if 0 == method {
-								if bytes.Contains(n.Tokens, []byte(keyword)) {
+								if strings.Contains(n.TextMarkTextContent, keyword) {
 									n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, keyword, replacement)
 								}
 							} else if 3 == method {
@@ -971,6 +971,10 @@ func buildTypeFilter(types map[string]bool) string {
 		s.HTMLBlock = types["htmlBlock"]
 		s.EmbedBlock = types["embedBlock"]
 		s.DatabaseBlock = types["databaseBlock"]
+		s.AudioBlock = types["audioBlock"]
+		s.VideoBlock = types["videoBlock"]
+		s.IFrameBlock = types["iFrameBlock"]
+		s.WidgetBlock = types["widgetBlock"]
 	} else {
 		s.Document = Conf.Search.Document
 		s.Heading = Conf.Search.Heading
@@ -985,6 +989,10 @@ func buildTypeFilter(types map[string]bool) string {
 		s.HTMLBlock = Conf.Search.HTMLBlock
 		s.EmbedBlock = Conf.Search.EmbedBlock
 		s.DatabaseBlock = Conf.Search.DatabaseBlock
+		s.AudioBlock = Conf.Search.AudioBlock
+		s.VideoBlock = Conf.Search.VideoBlock
+		s.IFrameBlock = Conf.Search.IFrameBlock
+		s.WidgetBlock = Conf.Search.WidgetBlock
 	}
 	return s.TypeFilter()
 }
