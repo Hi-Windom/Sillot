@@ -34,7 +34,7 @@ import {moveResize} from "../../dialog/moveResize";
 import {fetchPost} from "../../util/fetch";
 import {isArrayEqual, isMobile} from "../../util/functions";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {insertEmptyBlock} from "../../block/util";
 import {matchHotKey} from "../util/hotKey";
 import {hideElements} from "../ui/hideElements";
@@ -745,7 +745,7 @@ export class Toolbar {
                 this.range.collapse(false);
             }
         }
-        nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+        nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
         updateTransaction(protyle, nodeElement.getAttribute("data-node-id"), nodeElement.outerHTML, html);
         const wbrElement = nodeElement.querySelector("wbr");
         if (wbrElement) {
@@ -1105,7 +1105,7 @@ export class Toolbar {
                 nodeElement.querySelector("wbr")?.remove();
             }
 
-            nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+            nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
             // HTML 块中包含多个 <pre> 时只能保存第一个 https://github.com/siyuan-note/siyuan/issues/5732
             if (types.includes("NodeHTMLBlock")) {
                 const tempElement = document.createElement("template");
@@ -1159,7 +1159,7 @@ export class Toolbar {
             editElement.removeAttribute("data-render");
             highlightRender(nodeElement);
         }
-        nodeElement.setAttribute("updated", dayjs().format("YYYYMMDDHHmmss"));
+        nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
         updateTransaction(protyle, id, nodeElement.outerHTML, oldHtml);
         this.subElement.classList.add("fn__none");
         focusByRange(this.range);

@@ -7,7 +7,7 @@ import {objEquals} from "../../../util/functions";
 import {fetchPost} from "../../../util/fetch";
 import {focusBlock, focusByRange} from "../../util/selection";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {unicode2Emoji} from "../../../emoji";
 import {getColIconByType} from "./col";
 import {genAVValueHTML} from "./blockAttr";
@@ -565,7 +565,7 @@ export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, va
         doOperations.push({
             action: "doUpdateUpdated",
             id,
-            data: format(new Date(), 'yyyyMMddHHmmss'),
+            data: formatDate(new Date(), 'yyyyMMddHHmmss'),
         });
         undoOperations.push({
             action: "doUpdateUpdated",
@@ -624,17 +624,17 @@ export const renderCell = (cellValue: IAVCellValue) => {
         const dataValue = cellValue ? cellValue.date : null;
         text = `<span class="av__celltext" data-value='${JSON.stringify(dataValue)}'>`;
         if (dataValue && dataValue.isNotEmpty) {
-            text += format(dataValue.content, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
+            text += formatDate(dataValue.content, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
         }
         if (dataValue && dataValue.hasEndDate && dataValue.isNotEmpty && dataValue.isNotEmpty2) {
-            text += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${format(dataValue.content2, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
+            text += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${formatDate(dataValue.content2, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
         }
         text += "</span>";
     } else if (["created", "updated"].includes(cellValue.type)) {
         const dataValue = cellValue ? cellValue[cellValue.type as "date"] : null;
         text = `<span class="av__celltext" data-value='${JSON.stringify(dataValue)}'>`;
         if (dataValue && dataValue.isNotEmpty) {
-            text += format(dataValue.content, "yyyy-MM-dd HH:mm");
+            text += formatDate(dataValue.content, "yyyy-MM-dd HH:mm");
         }
         text += "</span>";
     } else if (cellValue.type === "mAsset") {
@@ -698,10 +698,10 @@ const renderRollup = (cellValue: IAVCellValue) => {
     } else if (cellValue.type === "date") {
         const dataValue = cellValue ? cellValue.date : null;
         if (dataValue && dataValue.isNotEmpty) {
-            text += format(dataValue.content, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
+            text += formatDate(dataValue.content, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
         }
         if (dataValue && dataValue.hasEndDate && dataValue.isNotEmpty && dataValue.isNotEmpty2) {
-            text += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${format(dataValue.content2, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
+            text += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${formatDate(dataValue.content2, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
         }
         if (text) {
             text = `<span class="av__celltext">${text}</span>`;

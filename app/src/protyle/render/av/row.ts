@@ -6,7 +6,7 @@ import {genCellValueByElement, getTypeByCellElement, popTextCell, renderCell, re
 import {fetchPost} from "../../../util/fetch";
 import {showMessage} from "../../../dialog/message";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 
 export const selectRow = (checkElement: Element, type: "toggle" | "select" | "unselect" | "unselectAll") => {
     const rowElement = hasClosestByClassName(checkElement, "av__row");
@@ -329,7 +329,7 @@ export const deleteRow = (blockElement: HTMLElement, protyle: IProtyle) => {
             blockID: blockElement.dataset.nodeId
         });
     });
-    const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+    const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
     undoOperations.push({
         action: "doUpdateUpdated",
         id: blockElement.dataset.nodeId,
@@ -358,7 +358,7 @@ export const insertRows = (blockElement: HTMLElement, protyle: IProtyle, count: 
     new Array(count).fill(0).forEach(() => {
         srcIDs.push(Lute.NewNodeID());
     });
-    const newUpdated = dayjs().format("YYYYMMDDHHmmss");
+    const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
     transaction(protyle, [{
         action: "insertAttrViewBlock",
         avID,

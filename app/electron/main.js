@@ -38,13 +38,13 @@ const remote = require("@electron/remote/main");
 process.noAsar = true;
 const appDir = path.dirname(app.getAppPath());
 const isDevEnv = process.env.NODE_ENV === "development";
-const appVer = app.getVersion();
-// const branchVer = app.getVersion();
+let appVer = app.getVersion();
 try { require("electron-reloader")(module); } catch {}
 
 let pkg = {};
 if (isDevEnv) {
   pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json")).toString());
+  if (pkg.version) { appVer = pkg.version;}
 } else {
   pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString());
 }
@@ -70,7 +70,7 @@ try {
     }
 } catch (e) {
     console.error(e);
-    require("electron").dialog.showErrorBox("创建配置目录失败 Failed to create config directory", "思源需要在用户家目录下创建配置文件夹（~/.config/siyuan），请确保该路径具有写入权限。\n\nSiYuan needs to create a configuration folder (~/.config/siyuan) in the user's home directory. Please make sure that the path has write permissions.");
+    require("electron").dialog.showErrorBox("创建配置目录失败 Failed to create config directory", "思源（汐洛）需要在用户家目录下创建配置文件夹（~/.config/sillot），请确保该路径具有写入权限。\n\nSiYuan needs to create a configuration folder (~/.config/sillot) in the user's home directory. Please make sure that the path has write permissions.");
     app.exit();
 }
 
@@ -203,6 +203,11 @@ const showErrorWindow = (title, content) => {
             icon: path.join(appDir, "stage", "icon-large.png"),
         },
     });
+    errWindow.webContents.on('did-finish-load', () => {
+      errWindow.webContents.executeJavaScript(`
+          const { ipcRenderer } = require('electron');
+      `);
+  });
     errWindow.show();
     return errWindow.id;
 };
@@ -775,6 +780,16 @@ app.whenReady().then(() => {
     };
 
     ipcMain.on("siyuan-open-folder", (event, filePath) => {
+        if (filePath === "openAppLogFolder") {
+          filePath = path.join(confDir, "app.log");
+        }
+        if (filePath === "openWorkspacesLogFolder") {
+          let ws = JSON.parse(fs.readFileSync(path.join(confDir, "workspace.json")).toString());
+          ws.forEach((workspacePath) => {
+            shell.showItemInFolder(path.join(workspacePath, "temp", "siyuan.log"));
+          });
+          return;
+        }
         shell.showItemInFolder(filePath);
     });
     ipcMain.on("siyuan-first-quit", () => {

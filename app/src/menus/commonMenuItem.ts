@@ -16,7 +16,7 @@ import {openAsset, openBy} from "../editor/util";
 /// #endif
 import {rename, replaceFileName} from "../editor/rename";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {Constants} from "../constants";
 import {exportImage} from "../protyle/export/util";
 import {App} from "../index";
@@ -38,7 +38,7 @@ export const openWechatNotify = (nodeElement: Element) => {
     const reminder = nodeElement.getAttribute(Constants.CUSTOM_REMINDER_WECHAT);
     let reminderFormat = "";
     if (reminder) {
-        reminderFormat = format(new Date(~~reminder), 'yyyy-MM-dd HH:mm');
+        reminderFormat = formatDate(new Date(~~reminder), 'yyyy-MM-dd HH:mm');
     }
     const dialog = new Dialog({
         width: isMobile() ? "92vw" : "50vw",
@@ -86,7 +86,7 @@ export const openWechatNotify = (nodeElement: Element) => {
                 return;
             }
             btnsElement[2].setAttribute("disabled", "disabled");
-            const timed = format(new Date(~~date), 'yyyyMMddHHmmss');
+            const timed = formatDate(new Date(~~date), 'yyyyMMddHHmmss');
             fetchPost("/api/block/setBlockReminder", {id, timed}, () => {
                 nodeElement.setAttribute(Constants.CUSTOM_REMINDER_WECHAT, timed);
                 dialog.destroy();
@@ -104,7 +104,7 @@ export const openFileWechatNotify = (protyle: IProtyle) => {
         const reminder = response.data.ial[Constants.CUSTOM_REMINDER_WECHAT];
         let reminderFormat = "";
         if (reminder) {
-            reminderFormat = format(new Date(~~reminder), 'yyyy-MM-dd HH:mm');
+            reminderFormat = formatDate(new Date(~~reminder), 'yyyy-MM-dd HH:mm');
         }
         const dialog = new Dialog({
             width: isMobile() ? "92vw" : "50vw",
@@ -142,7 +142,7 @@ export const openFileWechatNotify = (protyle: IProtyle) => {
                 }
                 fetchPost("/api/block/setBlockReminder", {
                     id: protyle.block.rootID,
-                    timed: format(new Date(~~date), 'yyyyMMddHHmmss')
+                    timed: formatDate(new Date(~~date), 'yyyyMMddHHmmss')
                 }, () => {
                     dialog.destroy();
                 });
@@ -166,7 +166,7 @@ export const openFileAttr = (attrs: IObject, focusName = "bookmark", protyle?: I
             notifyHTML = `<label class="b3-label b3-label--noborder">
     ${window.siyuan.languages.wechatReminder}
     <div class="fn__hr"></div>
-    <input class="b3-text-field fn__block" type="datetime-local" max="9999-12-31 23:59" readonly data-name="${item}" value="${format(new Date(~~attrs[item]), 'yyyy-MM-dd HH:mm')}">
+    <input class="b3-text-field fn__block" type="datetime-local" max="9999-12-31 23:59" readonly data-name="${item}" value="${formatDate(new Date(~~attrs[item]), 'yyyy-MM-dd HH:mm')}">
 </label>`;
         } else if (item.indexOf("custom-av") > -1) {
             hasAV = true;

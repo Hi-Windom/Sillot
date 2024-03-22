@@ -32,7 +32,7 @@ import {
     zoomOut
 } from "../../menus/protyle";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {dropEvent} from "../util/editorCommonEvent";
 import {input} from "./input";
 import {
@@ -1456,7 +1456,7 @@ export class WYSIWYG {
                         editableElement.innerHTML = "";
                     }
                 }
-                nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+                nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
                 if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
                     range.insertNode(document.createElement("wbr"));
                     getContenteditableElement(nodeElement).removeAttribute("data-render");
@@ -2350,7 +2350,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                                     actionElement.querySelector("use").setAttribute("xlink:href", "#iconCheck");
                                     actionElement.parentElement.classList.add("protyle-task--done");
                                 }
-                                actionElement.parentElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+                                actionElement.parentElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
                                 updateTransaction(protyle, actionId, actionElement.parentElement.outerHTML, html);
                             }
                         } else if (window.siyuan.config.editor.listItemDotNumberClickFocus) {

@@ -29,7 +29,7 @@ import {openAsset, openBy} from "../../../editor/util";
 import {getSearch} from "../../../util/functions";
 import {unicode2Emoji} from "../../../emoji";
 import {selectRow} from "./row";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {openCalcMenu} from "./calc";
 import {avRender} from "./render";
 import {addView, openViewMenu} from "./view";
@@ -414,7 +414,7 @@ export const updateAVName = (protyle: IProtyle, blockElement: Element) => {
     if (newData === nameElement.dataset.title.trim()) {
         return;
     }
-    const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+    const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
     transaction(protyle, [{
         action: "setAttrViewName",
         id: avId,

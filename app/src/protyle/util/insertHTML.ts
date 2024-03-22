@@ -1,6 +1,6 @@
 import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName, hasClosestByMatchTag} from "./hasClosest";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {transaction, updateTransaction} from "../wysiwyg/transaction";
 import {getContenteditableElement} from "../wysiwyg/getBlock";
 import {fixTableRange, focusBlock, focusByWbr, getEditorRange} from "./selection";
@@ -112,7 +112,7 @@ const processAV = (range: Range, html: string, protyle: IProtyle, blockElement: 
             doOperations.push({
                 action: "doUpdateUpdated",
                 id,
-                data: format(new Date(), 'yyyyMMddHHmmss'),
+                data: formatDate(new Date(), 'yyyyMMddHHmmss'),
             });
             undoOperations.push({
                 action: "doUpdateUpdated",
@@ -187,7 +187,7 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
         } else {
             focusByWbr(blockElement, range);
         }
-        blockElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+        blockElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
         updateTransaction(protyle, id, blockElement.outerHTML, oldHTML);
         setTimeout(() => {
             scrollCenter(protyle, blockElement, false, "smooth");
@@ -302,7 +302,7 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
                 liElement.setAttribute("data-subtype", item.getAttribute("data-subtype"));
                 liElement.setAttribute("data-node-id", addId);
                 liElement.setAttribute("data-type", "NodeList");
-                liElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+                liElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
                 liElement.classList.add("list");
                 liElement.append(item);
                 item = liElement;

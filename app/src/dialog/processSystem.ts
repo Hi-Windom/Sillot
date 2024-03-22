@@ -180,7 +180,28 @@ export const kernelError = () => {
     }
 };
 
+// 在退出时禁用整个 HTML 页面的交互
+function disableInteractions() {
+  // 创建一个遮罩层
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  overlay.style.zIndex = '9999'; // 确保在最上层
+  document.body.appendChild(overlay);
+
+  // 禁用遮罩层上的点击事件
+  overlay.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+  });
+}
+
 export const exitSiYuan = () => {
+    disableInteractions();
     exportIDB().then(() => {
     hideAllElements(["util"]);
     /// #if MOBILE

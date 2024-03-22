@@ -6,7 +6,7 @@ import { HotToast } from "./react-hot-toast";
 import * as React from "react"; // 兼容性好
 import * as ReactDOM from "react-dom"; // 兼容性好
 import Swal from "sweetalert2";
-import exSout from 'sout/console'
+import {sout} from 'sofill/core'
 import { MusicPlayer } from "./react-music-player";
 import {
   focusBlock,
@@ -18,7 +18,7 @@ import { bS } from "./bridge";
 
 export class SillotEnv {
   constructor() {
-    exSout();
+    window.sout = sout();
     window.Sillot = {
       status: { IDBloaded: false, disableDocSetPadding: false },
       funs: { hljsRender: highlightRender },

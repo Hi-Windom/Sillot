@@ -16,7 +16,7 @@ import {onGet} from "../util/onGet";
 import {Constants} from "../../constants";
 // import * as dayjs from "dayjs";
 import {net2LocalAssets} from "../breadcrumb/action";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 
 export const commonHotkey = (protyle: IProtyle, event: KeyboardEvent, nodeElement?: HTMLElement) => {
     if (matchHotKey(window.siyuan.config.keymap.editor.general.copyHPath.custom, event)) {
@@ -261,7 +261,7 @@ export const goEnd = (protyle: IProtyle) => {
 };
 
 export const alignImgCenter = (protyle: IProtyle, nodeElement: Element, assetElements: Element[], id: string, html: string) => {
-    nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+    nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
     assetElements.forEach((item: HTMLElement) => {
         item.style.display = "block";
         let nextSibling = item.nextSibling;
@@ -291,7 +291,7 @@ export const alignImgCenter = (protyle: IProtyle, nodeElement: Element, assetEle
 };
 
 export const alignImgLeft = (protyle: IProtyle, nodeElement: Element, assetElements: Element[], id: string, html: string) => {
-    nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+    nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
     assetElements.forEach((item: HTMLElement) => {
         item.style.display = "";
         if (!hasNextSibling(item)) {

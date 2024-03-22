@@ -10,7 +10,7 @@ import {getCalcValue} from "./calc";
 import {renderAVAttribute} from "./blockAttr";
 import {showMessage} from "../../../dialog/message";
 import {addClearButton} from "../../../util/addClearButton";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 
 export const avRender = (element: Element, protyle: IProtyle, cb?: () => void, viewID?: string) => {
     let avElements: Element[] = [];

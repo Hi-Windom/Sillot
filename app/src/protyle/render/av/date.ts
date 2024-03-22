@@ -1,5 +1,5 @@
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {hasClosestByClassName} from "../../util/hasClosest";
 import {updateCellsValue} from "./cell";
 
@@ -29,20 +29,20 @@ export const getDateHTML = (data: IAVTable, cellElements: HTMLElement[]) => {
     let value = "";
     const currentDate = new Date().getTime();
     if (cellValue?.value?.date?.isNotEmpty) {
-        value = format(new Date(cellValue.value.date.content), isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
+        value = formatDate(new Date(cellValue.value.date.content), isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
     } else {
-        value = format(currentDate, isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
+        value = formatDate(currentDate, isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
     }
     let value2 = "";
     if (cellValue?.value?.date?.isNotEmpty2) {
-        value2 = format(new Date(cellValue.value.date.content2), isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
+        value2 = formatDate(new Date(cellValue.value.date.content2), isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
     } else if (hasEndDate) {
-        value2 = format(currentDate, isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
+        value2 = formatDate(currentDate, isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
     }
     return `<div class="b3-menu__items">
 <div>
-    <input type="${isNotTime ? "date" : "datetime-local"}" max="${isNotTime ? "9999-12-31" : "9999-12-31 23:59"}" value="${value}" data-value="${format(new Date(cellValue?.value?.date?.content || currentDate), "yyyy-MM-dd HH:mm")}" class="b3-text-field fn__size200" style="margin-top: 4px;"><br>
-    <input type="${isNotTime ? "date" : "datetime-local"}" max="${isNotTime ? "9999-12-31" : "9999-12-31 23:59"}" value="${value2}" data-value="${cellValue?.value?.date?.isNotEmpty2 ? format(new Date(cellValue.value.date.content2), "yyyy-MM-dd HH:mm") : ""}" style="margin-top: 8px;margin-bottom: 4px" class="b3-text-field fn__size200${hasEndDate ? "" : " fn__none"}">
+    <input type="${isNotTime ? "date" : "datetime-local"}" max="${isNotTime ? "9999-12-31" : "9999-12-31 23:59"}" value="${value}" data-value="${formatDate(new Date(cellValue?.value?.date?.content || currentDate), "yyyy-MM-dd HH:mm")}" class="b3-text-field fn__size200" style="margin-top: 4px;"><br>
+    <input type="${isNotTime ? "date" : "datetime-local"}" max="${isNotTime ? "9999-12-31" : "9999-12-31 23:59"}" value="${value2}" data-value="${cellValue?.value?.date?.isNotEmpty2 ? formatDate(new Date(cellValue.value.date.content2), "yyyy-MM-dd HH:mm") : ""}" style="margin-top: 8px;margin-bottom: 4px" class="b3-text-field fn__size200${hasEndDate ? "" : " fn__none"}">
     <button class="b3-menu__separator"></button>
     <label class="b3-menu__item">
         <span class="fn__flex-center">${window.siyuan.languages.endDate}</span>
@@ -81,8 +81,8 @@ export const bindDateEvent = (options: {
         if (inputElements[2].checked) {
             if (!inputElements[1].dataset.value) {
                 const currentDate = new Date().getTime();
-                inputElements[1].dataset.value = format(currentDate, "yyyy-MM-dd HH:mm");
-                inputElements[1].value = format(currentDate, inputElements[3].checked ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd");
+                inputElements[1].dataset.value = formatDate(currentDate, "yyyy-MM-dd HH:mm");
+                inputElements[1].value = formatDate(currentDate, inputElements[3].checked ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd");
             }
             inputElements[1].classList.remove("fn__none");
         } else {

@@ -12,7 +12,7 @@ import {toggleUpdateRelationBtn} from "./relation";
 import {bindRollupData, getRollupHTML} from "./rollup";
 import {Constants} from "../../../constants";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 
 export const duplicateCol = (options: {
     protyle: IProtyle,
@@ -31,7 +31,7 @@ export const duplicateCol = (options: {
     } else {
         options.newValue = `${options.newValue} (1)`;
     }
-    const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+    const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
     const blockId = options.blockElement.getAttribute("data-node-id");
     if (["select", "mSelect", "rollup"].includes(options.type)) {
         fetchPost("/api/av/renderAttributeView", {
@@ -789,7 +789,7 @@ export const showColMenu = (protyle: IProtyle, blockElement: Element, cellElemen
             icon: "iconTrashcan",
             label: window.siyuan.languages.delete,
             click() {
-                const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+                const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
                 transaction(protyle, [{
                     action: "removeAttrViewCol",
                     id: colId,
@@ -871,7 +871,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.text,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.text,
@@ -908,7 +908,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.number,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.number,
@@ -945,7 +945,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.select,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.select,
@@ -982,7 +982,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.multiSelect,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.multiSelect,
@@ -1019,7 +1019,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.date,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.date,
@@ -1056,7 +1056,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.assets,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.assets,
@@ -1093,7 +1093,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.checkbox,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.checkbox,
@@ -1130,7 +1130,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.link,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.link,
@@ -1167,7 +1167,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.email,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.email,
@@ -1204,7 +1204,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.phone,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.phone,
@@ -1241,7 +1241,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.template,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.template,
@@ -1278,7 +1278,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.relation,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.relation,
@@ -1315,7 +1315,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.rollup,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.rollup,
@@ -1352,7 +1352,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.createdTime,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.createdTime,
@@ -1389,7 +1389,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.updatedTime,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.updatedTime,

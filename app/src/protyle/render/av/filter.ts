@@ -6,7 +6,7 @@ import {setPosition} from "../../../util/setPosition";
 import {objEquals} from "../../../util/functions";
 import {genCellValue} from "./cell";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {unicode2Emoji} from "../../../emoji";
 import {openMenuPanel} from "./openMenuPanel";
 import {fetchSyncPost} from "../../../util/fetch";
@@ -374,7 +374,7 @@ export const setFilter = async (options: {
     </div>
     <div class="fn__hr"></div>
     <div class="fn__size200 ${options.filter.relativeDate ? "fn__none" : ""}">
-        <input value="${(dateValue && (dateValue.isNotEmpty || filterValue.type !== "date")) ? format(new Date(dateValue.content), "yyyy-MM-dd") : ""}" type="date" max="9999-12-31" class="b3-text-field fn__block">
+        <input value="${(dateValue && (dateValue.isNotEmpty || filterValue.type !== "date")) ? formatDate(new Date(dateValue.content), "yyyy-MM-dd") : ""}" type="date" max="9999-12-31" class="b3-text-field fn__block">
     </div>
     <div class="fn__flex fn__size200 ${options.filter.relativeDate ? "" : "fn__none"}">
         <select class="b3-select" data-type="dataDirection">
@@ -397,7 +397,7 @@ export const setFilter = async (options: {
 <div data-type="filter2 fn__none">
     <div class="fn__hr--small"></div>
     <div class="fn__size200 ${options.filter.relativeDate2 ? "fn__none" : ""}">
-        <input value="${(dateValue && dateValue.isNotEmpty2) ? format(new Date(dateValue.content2), "yyyy-MM-dd") : ""}" type="date" max="9999-12-31" class="b3-text-field fn__block">
+        <input value="${(dateValue && dateValue.isNotEmpty2) ? formatDate(new Date(dateValue.content2), "yyyy-MM-dd") : ""}" type="date" max="9999-12-31" class="b3-text-field fn__block">
     </div>
     <div class="fn__flex fn__size200 ${options.filter.relativeDate2 ? "" : "fn__none"}">
         <select class="b3-select" data-type="dataDirection">
@@ -587,8 +587,8 @@ export const getFiltersHTML = (data: IAVTable) => {
  ${window.siyuan.languages[["day", "week", "month", "year"][filter.relativeDate2.unit]]}`;
                         }
                     } else if (filterValue && filterValue[filterValue.type as "date"]?.content) {
-                        dateValue = format(filterValue[filterValue.type as "date"].content, "yyyy-MM-dd");
-                        dateValue2 = format(filterValue[filterValue.type as "date"].content2, "yyyy-MM-dd");
+                        dateValue = formatDate(filterValue[filterValue.type as "date"].content, "yyyy-MM-dd");
+                        dateValue2 = formatDate(filterValue[filterValue.type as "date"].content2, "yyyy-MM-dd");
                     }
                     if (dateValue) {
                         if (filter.operator === "Is between") {

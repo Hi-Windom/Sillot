@@ -13,7 +13,7 @@ import {Constants} from "../../constants";
 import {matchHotKey} from "../util/hotKey";
 import {isMac, readText, writeText} from "../util/compatibility";
 // import * as dayjs from "dayjs";
-import {format,parse} from "date-fns";
+import {formatDate,parseDate} from "sofill/mid";
 import {setPanelFocus} from "../../layout/util";
 import {openFileById, updatePanelByEditor} from "../../editor/util";
 import {setTitle} from "../../dialog/processSystem";
@@ -309,7 +309,7 @@ export class Title {
             this.element.querySelector(".protyle-attr").insertAdjacentHTML("beforeend", `<div class="protyle-attr--refcount popover__block" data-defids='${JSON.stringify([protyle.block.rootID])}' data-id='${JSON.stringify(response.data.refIDs)}'>${response.data.refCount}</div>`);
         }
         // 存在设置新建文档名模板，不能使用 Untitled 进行判断，https://ld246.com/article/1649301009888
-        if (new Date().getTime() - parse(response.data.id.split("-")[0],"yyyyMMdd",new Date()).getTime() < 2000) {
+        if (new Date().getTime() - parseDate(response.data.id.split("-")[0],"yyyyMMdd",new Date()).getTime() < 2000) {
             const range = this.editElement.ownerDocument.createRange();
             range.selectNodeContents(this.editElement);
             focusByRange(range);

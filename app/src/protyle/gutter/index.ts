@@ -26,6 +26,7 @@ import {blockRender} from "../render/blockRender";
 import {removeEmbed} from "../wysiwyg/removeEmbed";
 import {getContenteditableElement, getTopAloneElement, isNotEditBlock} from "../wysiwyg/getBlock";
 // import * as dayjs from "dayjs";
+import {formatDate} from "sofill/mid";
 import { parseNumber2FormatString } from "../../sillot/util/date";
 import {fetchPost, fetchSyncPost} from "../../util/fetch";
 import {cancelSB, genEmptyElement, insertEmptyBlock, jumpToParentNext} from "../../block/util";
@@ -231,7 +232,7 @@ export class Gutter {
                     const avID = blockElement.getAttribute("data-av-id");
                     const srcIDs = [Lute.NewNodeID()];
                     const previousID = event.altKey ? (rowElement.previousElementSibling.getAttribute("data-id") || "") : buttonElement.dataset.rowId;
-                    const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+                    const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
                     transaction(protyle, [{
                         action: "insertAttrViewBlock",
                         avID,
@@ -843,7 +844,7 @@ export class Gutter {
                     }, {
                         action: "doUpdateUpdated",
                         id: listItemElement.dataset.blockId,
-                        data: format(new Date(), 'yyyyMMddHHmmss'),
+                        data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                     }], [{
                         action: "removeAttrViewBlock",
                         srcIDs: sourceIds,
@@ -1334,7 +1335,7 @@ export class Gutter {
                         }, {
                             action: "doUpdateUpdated",
                             id: listItemElement.dataset.blockId,
-                            data: format(new Date(), 'yyyyMMddHHmmss'),
+                            data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                         }], [{
                             action: "removeAttrViewBlock",
                             srcIDs: sourceIds,
