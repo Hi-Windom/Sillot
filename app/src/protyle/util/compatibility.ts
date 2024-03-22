@@ -10,8 +10,8 @@ export const openByMobile = (uri: string, from?: string) => {
         window.location.href = uri;
     } else if (isInAndroid()) {
         console.warn(uri);
-        if (["exportLog", "exportData"].includes(from)) {
-          // 在设置界面没有顶栏打开图标，直接调用
+        if (from?.startsWith("export")) {
+          // 特殊情况直接调用
           window.JSAndroid.openExternal(uri);
           return;
         }

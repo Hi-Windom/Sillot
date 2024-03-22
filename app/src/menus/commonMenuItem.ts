@@ -520,7 +520,7 @@ export const exportMd = (id: string) => {
                     id,
                 }, response => {
                     hideMessage(msgId);
-                    openByMobile(response.data.zip);
+                    openByMobile(response.data.zip, "exportMd");
                 });
             }
         }, {
@@ -532,7 +532,7 @@ export const exportMd = (id: string) => {
                     id,
                 }, response => {
                     hideMessage(msgId);
-                    openByMobile(response.data.zip);
+                    openByMobile(response.data.zip, "exportSY");
                 });
             }
         }, {
