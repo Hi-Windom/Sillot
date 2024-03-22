@@ -167,9 +167,9 @@ interface Window {
 				// sillot extend
 				setMMKV(key: string, value: string): void
 				showBiometricPrompt(): void
-				requestPermission(p: string): void
+				requestPermission(p: string, Msg: string): void
         exitSillotAndroid(): void
-        savePictureByURL(contentHeight: number): void
+        savePictureByURL(uri: string): void
 				// sillot extend end
         returnDesktop(): void
         openExternal(url: string): void

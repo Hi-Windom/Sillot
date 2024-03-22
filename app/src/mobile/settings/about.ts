@@ -244,14 +244,14 @@ export const initAbout = () => {
                         break;
                     } else if (target.id === "exportData") {
                         fetchPost("/api/export/exportData", {}, response => {
-                            openByMobile(response.data.zip);
+                            openByMobile(response.data.zip, "exportData");
                         });
                         event.preventDefault();
                         event.stopPropagation();
                         break;
                     } else if (target.id === "exportLog") {
                         fetchPost("/api/system/exportLog", {}, (response) => {
-                            openByMobile(response.data.zip);
+                            openByMobile(response.data.zip, "exportLog");
                         });
                         event.preventDefault();
                         event.stopPropagation();
@@ -363,11 +363,10 @@ export const initAbout = () => {
             networkServeElement.addEventListener("change", () => {
                 fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
                     if(networkServeElement.checked){
-                        const _r = window.JSAndroid.requestPermission("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
+                        const _r = window.JSAndroid.requestPermission("Battery","注意：后台稳定伺服会消耗额外电量");
                         console.warn(_r);
-                    } else {
-                        exitSiYuan();
                     }
+                    exitSiYuan();
                 });
             });
             const tokenElement = modelMainElement.querySelector("#token") as HTMLInputElement;

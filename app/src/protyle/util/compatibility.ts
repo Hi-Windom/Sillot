@@ -2,13 +2,19 @@ import {focusByRange} from "./selection";
 import {fetchPost} from "../../util/fetch";
 import {Constants} from "../../constants";
 
-export const openByMobile = (uri: string) => {
+export const openByMobile = (uri: string, from?: string) => {
     if (!uri) {
         return;
     }
     if (window.siyuan.config.system.container === "ios") {
         window.location.href = uri;
     } else if (isInAndroid()) {
+        console.warn(uri);
+        if (["exportLog", "exportData"].includes(from)) {
+          // 在设置界面没有顶栏打开图标，直接调用
+          window.JSAndroid.openExternal(uri);
+          return;
+        }
 				const toolbarOpenBy = document.querySelector("#toolbarOpenBy");
 				const toolbarConsole = document.querySelector("#toolbarConsole");
 				if (toolbarOpenBy && toolbarConsole) {
