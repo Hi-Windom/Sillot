@@ -165,9 +165,11 @@ interface Window {
     }) => Promise<any>;
     JSAndroid: {
 				// sillot extend
+        showWifi(): void
 				setMMKV(key: string, value: string): void
 				showBiometricPrompt(): void
-				requestPermission(p: string, Msg: string): void
+				requestPermissionActivity(id: string, Msg: string): void
+        requestPermission(id: string, Msg: string): boolean
         exitSillotAndroid(): void
         savePictureByURL(uri: string): void
 				// sillot extend end

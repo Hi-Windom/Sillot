@@ -360,11 +360,13 @@ export const initAbout = () => {
                 fetchPost("/api/import/importData", formData);
             });
             const networkServeElement = modelMainElement.querySelector("#networkServe") as HTMLInputElement;
+            if(networkServeElement.checked){
+                window.JSAndroid?.showWifi();
+            }
             networkServeElement.addEventListener("change", () => {
                 fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
                     if(networkServeElement.checked){
-                        const _r = window.JSAndroid.requestPermission("Battery","注意：后台稳定伺服会消耗额外电量");
-                        console.warn(_r);
+                        window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量");
                     }
                     exitSiYuan();
                 });
