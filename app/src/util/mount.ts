@@ -97,12 +97,6 @@ export const mountHelp = () => {
     fetchPost("/api/notebook/removeNotebook", {notebook: notebookId, callback: Constants.CB_MOUNT_REMOVE}, () => {
         fetchPost("/api/notebook/openNotebook", {
             notebook: notebookId
-        }, () => {
-            fetchPost("/api/notebook/removeNotebook", {notebook: Constants.HELP_PATH.zh_CN_Sillot, callback: Constants.CB_MOUNT_REMOVE}, () => {
-                fetchPost("/api/notebook/openNotebook", {
-                    notebook: Constants.HELP_PATH.zh_CN_Sillot
-                });
-            });
         });
     });
 };
