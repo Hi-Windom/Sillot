@@ -3,7 +3,12 @@ title: 汐洛
 description: Get started building your docs site with Starlight.
 template: splash
 hero:
-  tagline: 为新彖务服务
+  tagline: |
+    为新彖务服务
+    <div class="roller">
+        <span id="pre_text">Born for</span>
+        <span id="changing_text">InfoSec Professionals.</span>
+      </div>
   image:
     file: ../../assets/houston.webp
   actions:
@@ -17,9 +22,13 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
-import  SpeedInsights  from "@vercel/speed-insights/astro"
+import  SpeedInsights  from "@vercel/speed-insights/astro";
+import ScriptWorkaround from "/src/components/ScriptWorkaround.astro";
+import StatusComponent from "/src/components/StatusComponent.astro";
 
-## Next steps
+<StatusComponent />
+
+{/* ## Next steps
 
 <CardGrid stagger>
 	<Card title="Update content" icon="pencil">
@@ -34,5 +43,7 @@ import  SpeedInsights  from "@vercel/speed-insights/astro"
 	<Card title="Read the docs" icon="open-book">
 		Learn more in [the Starlight Docs](https://starlight.astro.build/).
 	</Card>
-</CardGrid>
+</CardGrid> */}
+
 <SpeedInsights/>
+<ScriptWorkaround />

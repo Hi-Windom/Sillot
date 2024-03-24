@@ -1,10 +1,17 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightLinksValidator from 'starlight-links-validator'
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://sillot.db.sc.cn',
   prefetch: true, // REF https://docs.astro.build/zh-cn/guides/prefetch/
+  plugins: [
+    starlightLinksValidator({
+      errorOnFallbackPages: false, // 未翻译的页面不会报错
+      errorOnRelativeLinks: false,
+    }),
+  ],
 	integrations: [
     // [src/content/docs/] 将由 starlight 负责样式，[src/pages/] 则不受影响，在自定义页面中使用 Starlight 布局，请使用 <StarlightPage /> 组件包装页面内容。
     // REF https://starlight.astro.build/zh-cn/guides/pages/
@@ -19,6 +26,7 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/Hi-Windom/Sillot/edit/master/docs/starlight',
       },
+      lastUpdated: true,
       defaultLocale: 'root', // 可选
       locales: {
         root: {
@@ -55,4 +63,7 @@ export default defineConfig({
 			],
 		}),
 	],
+  components: {
+    FeedbackComponent: "./src/components/FeedbackComponent.astro"
+  }
 });

@@ -13,19 +13,29 @@ importers:
         version: 0.5.10(typescript@5.4.3)
       '@astrojs/starlight':
         specifier: ^0.21.2
-        version: 0.21.2(astro@4.5.9(typescript@5.4.3))
+        version: 0.21.2(astro@4.5.9(sass@1.72.0)(typescript@5.4.3))
       '@vercel/speed-insights':
         specifier: ^1.0.10
         version: 1.0.10
       astro:
         specifier: ^4.3.5
-        version: 4.5.9(typescript@5.4.3)
+        version: 4.5.9(sass@1.72.0)(typescript@5.4.3)
+      astro-feelback:
+        specifier: ^0.3.4
+        version: 0.3.4
       sharp:
         specifier: ^0.32.5
         version: 0.32.6
+      starlight-links-validator:
+        specifier: ^0.6.0
+        version: 0.6.0(@astrojs/starlight@0.21.2(astro@4.5.9(sass@1.72.0)(typescript@5.4.3)))(astro@4.5.9(sass@1.72.0)(typescript@5.4.3))
       typescript:
         specifier: ^5.4.3
         version: 5.4.3
+    devDependencies:
+      sass:
+        specifier: ^1.72.0
+        version: 1.72.0
 
 packages:
 
@@ -490,6 +500,9 @@ packages:
   '@expressive-code/plugin-text-markers@0.33.5':
     resolution: {integrity: sha512-JxSHL1MGrJAPNaUMjFXex3K+9NJDbfew9H6PmX8LQ+fm9VNQdtBYTAz/x7nqOk7bkTrtAZK5RfDqUfb8U5M+2A==}
 
+  '@feelback/js@0.3.4':
+    resolution: {integrity: sha512-xr7gTqSJcVUYQlELs1TntYovCBjMcYUr/hGKTnDoF64/lig5CbX4bOmqLoF50IImCy5q3oIwg9w+TSFvtBwsIA==}
+
   '@jridgewell/gen-mapping@0.3.5':
     resolution: {integrity: sha512-IzL8ZoEDIBRWEzlCcRhOaCupYyN5gdIK+Q6fbFdPDg6HqX6jpkItn7DFIpW9LQzXG6Df9sA7+OKnq0qlz/GaQg==}
     engines: {node: '>=6.0.0'}
@@ -794,6 +807,9 @@ packages:
     resolution: {integrity: sha512-9JAyllueMUN8JTl/h/yTdbKinNmfalEWcV11s3lSf/UJQbAZfWJuy+IlGcArZDI/CmD21GXhFHLqYthpdY33ug==}
     peerDependencies:
       astro: ^4.0.0-beta || ^3.3.0
+
+  astro-feelback@0.3.4:
+    resolution: {integrity: sha512-ra69QTsdyjzQKdYeu+qngNcPOgspaWOFJLDFdpA/JryGo55uruw76455UVt2rf3NsZulBnYHS6+upPIO5O7t7A==}
 
   astro@4.5.9:
     resolution: {integrity: sha512-GheU72Goz7dYQNKaqTxB2H49cNvHfahGSbNkTvMXk+gyHf/g633qadqlO2ZQbTUacoUWmDzvS5fhMZt2/w4naQ==}
@@ -1295,6 +1311,9 @@ packages:
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
+  immutable@4.3.5:
+    resolution: {integrity: sha512-8eabxkth9gZatlwl5TBuJnCsoTADlL6ftEr7A4qgdaTsPyreilDSnUk57SO+jfKcNtxPa22U5KK6DSeAYhpBJw==}
+
   import-meta-resolve@4.0.0:
     resolution: {integrity: sha512-okYUR7ZQPH+efeuMJGlq4f8ubUgO50kByRPyt/Cy1Io4PSRsPjxME+YlVaCOx+NIToW7hCsZNFJyTPFFKepRSA==}
 
@@ -1309,6 +1328,10 @@ packages:
 
   inline-style-parser@0.2.2:
     resolution: {integrity: sha512-EcKzdTHVe8wFVOGEYXiW9WmJXPjqi1T+234YpJr98RiFYKHV3cdy1+3mkTE+KHTHxFFLH51SfaGOoUdW+v7ViQ==}
+
+  is-absolute-url@4.0.1:
+    resolution: {integrity: sha512-/51/TKE88Lmm7Gc4/8btclNXWS+g50wXhYJq8HWIBAGUBnoAdRu1aXeh364t/O7wXDAcTJDP8PNuNKWUDWie+A==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   is-alphabetical@2.0.1:
     resolution: {integrity: sha512-FWyyY60MeTNyeSRpkM2Iry0G9hpr7/9kD40mD/cGQEuilcZYS4okz8SN2Q6rLCJ8gbCt6fN+rC+6tMGS99LaxQ==}
@@ -1938,6 +1961,11 @@ packages:
   safe-buffer@5.2.1:
     resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
 
+  sass@1.72.0:
+    resolution: {integrity: sha512-Gpczt3WA56Ly0Mn8Sl21Vj94s1axi9hDIzDFn9Ph9x3C3p4nNyvsqJoQyVXKou6cBlfFWEgRW4rT8Tb4i3XnVA==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
+
   sax@1.3.0:
     resolution: {integrity: sha512-0s+oAmw9zLl1V1cS9BtZN7JAd0cW5e0QH4W3LWEK6a4LaLEA2OTpGYWDY+6XasBLtz6wkm3u1xRw95mRuJ59WA==}
 
@@ -2006,6 +2034,13 @@ packages:
 
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
+
+  starlight-links-validator@0.6.0:
+    resolution: {integrity: sha512-YXzKKZHM79ccBTO61l2WSmgdCG3406gldpVM6J2LhqZ5CeXsOgj6lho2xMLkc/p5nWcNSuYI2qNzsNUrLTmR5w==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.15.0'
+      astro: '>=4.0.0'
 
   stdin-discarder@0.1.0:
     resolution: {integrity: sha512-xhV7w8S+bUwlPTb4bAOUQhv8/cSS5offJuX8GQGq32ONF0ZtDWKfkdomM3HMRA+LhX6um/FZ0COqlwsjD53LeQ==}
@@ -2477,12 +2512,12 @@ snapshots:
       - supports-color
     dev: false
 
-  '@astrojs/mdx@2.2.1(astro@4.5.9(typescript@5.4.3))':
+  '@astrojs/mdx@2.2.1(astro@4.5.9(sass@1.72.0)(typescript@5.4.3))':
     dependencies:
       '@astrojs/markdown-remark': 4.3.1
       '@mdx-js/mdx': 3.0.1
       acorn: 8.11.3
-      astro: 4.5.9(typescript@5.4.3)
+      astro: 4.5.9(sass@1.72.0)(typescript@5.4.3)
       es-module-lexer: 1.4.2
       estree-util-visit: 2.0.0
       github-slugger: 2.0.0
@@ -2510,15 +2545,15 @@ snapshots:
       zod: 3.22.4
     dev: false
 
-  '@astrojs/starlight@0.21.2(astro@4.5.9(typescript@5.4.3))':
+  '@astrojs/starlight@0.21.2(astro@4.5.9(sass@1.72.0)(typescript@5.4.3))':
     dependencies:
-      '@astrojs/mdx': 2.2.1(astro@4.5.9(typescript@5.4.3))
+      '@astrojs/mdx': 2.2.1(astro@4.5.9(sass@1.72.0)(typescript@5.4.3))
       '@astrojs/sitemap': 3.1.1
       '@pagefind/default-ui': 1.0.4
       '@types/hast': 3.0.4
       '@types/mdast': 4.0.3
-      astro: 4.5.9(typescript@5.4.3)
-      astro-expressive-code: 0.33.5(astro@4.5.9(typescript@5.4.3))
+      astro: 4.5.9(sass@1.72.0)(typescript@5.4.3)
+      astro-expressive-code: 0.33.5(astro@4.5.9(sass@1.72.0)(typescript@5.4.3))
       bcp-47: 2.1.0
       hast-util-from-html: 2.0.1
       hast-util-select: 6.0.2
@@ -2949,6 +2984,9 @@ snapshots:
       unist-util-visit-parents: 5.1.3
     dev: false
 
+  '@feelback/js@0.3.4':
+    dev: false
+
   '@jridgewell/gen-mapping@0.3.5':
     dependencies:
       '@jridgewell/set-array': 1.2.1
@@ -3291,7 +3329,6 @@ snapshots:
     dependencies:
       normalize-path: 3.0.0
       picomatch: 2.3.1
-    dev: false
 
   arg@5.0.2:
     dev: false
@@ -3315,14 +3352,19 @@ snapshots:
   astring@1.8.6:
     dev: false
 
-  astro-expressive-code@0.33.5(astro@4.5.9(typescript@5.4.3)):
+  astro-expressive-code@0.33.5(astro@4.5.9(sass@1.72.0)(typescript@5.4.3)):
     dependencies:
-      astro: 4.5.9(typescript@5.4.3)
+      astro: 4.5.9(sass@1.72.0)(typescript@5.4.3)
       hast-util-to-html: 8.0.4
       remark-expressive-code: 0.33.5
     dev: false
 
-  astro@4.5.9(typescript@5.4.3):
+  astro-feelback@0.3.4:
+    dependencies:
+      '@feelback/js': 0.3.4
+    dev: false
+
+  astro@4.5.9(sass@1.72.0)(typescript@5.4.3):
     dependencies:
       '@astrojs/compiler': 2.7.0
       '@astrojs/internal-helpers': 0.3.0
@@ -3380,8 +3422,8 @@ snapshots:
       tsconfck: 3.0.3(typescript@5.4.3)
       unist-util-visit: 5.0.0
       vfile: 6.0.1
-      vite: 5.2.6
-      vitefu: 0.2.5(vite@5.2.6)
+      vite: 5.2.6(sass@1.72.0)
+      vitefu: 0.2.5(vite@5.2.6(sass@1.72.0))
       which-pm: 2.1.1
       yargs-parser: 21.1.1
       zod: 3.22.4
@@ -3450,8 +3492,7 @@ snapshots:
       is-decimal: 2.0.1
     dev: false
 
-  binary-extensions@2.3.0:
-    dev: false
+  binary-extensions@2.3.0: {}
 
   bl@4.1.0:
     dependencies:
@@ -3485,7 +3526,6 @@ snapshots:
   braces@3.0.2:
     dependencies:
       fill-range: 7.0.1
-    dev: false
 
   browserslist@4.23.0:
     dependencies:
@@ -3549,7 +3589,6 @@ snapshots:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.3
-    dev: false
 
   chownr@1.1.4:
     dev: false
@@ -3873,7 +3912,6 @@ snapshots:
   fill-range@7.0.1:
     dependencies:
       to-regex-range: 5.0.1
-    dev: false
 
   find-up@4.1.0:
     dependencies:
@@ -3900,7 +3938,6 @@ snapshots:
     dev: false
 
   fsevents@2.3.3:
-    dev: false
     optional: true
 
   function-bind@1.1.2:
@@ -3927,7 +3964,6 @@ snapshots:
   glob-parent@5.1.2:
     dependencies:
       is-glob: 4.0.3
-    dev: false
 
   globals@11.12.0:
     dev: false
@@ -4208,6 +4244,8 @@ snapshots:
   ieee754@1.2.1:
     dev: false
 
+  immutable@4.3.5: {}
+
   import-meta-resolve@4.0.0:
     dev: false
 
@@ -4221,6 +4259,9 @@ snapshots:
     dev: false
 
   inline-style-parser@0.2.2:
+    dev: false
+
+  is-absolute-url@4.0.1:
     dev: false
 
   is-alphabetical@2.0.1:
@@ -4238,7 +4279,6 @@ snapshots:
   is-binary-path@2.1.0:
     dependencies:
       binary-extensions: 2.3.0
-    dev: false
 
   is-buffer@2.0.5:
     dev: false
@@ -4257,8 +4297,7 @@ snapshots:
   is-extendable@0.1.1:
     dev: false
 
-  is-extglob@2.1.1:
-    dev: false
+  is-extglob@2.1.1: {}
 
   is-fullwidth-code-point@3.0.0:
     dev: false
@@ -4266,7 +4305,6 @@ snapshots:
   is-glob@4.0.3:
     dependencies:
       is-extglob: 2.1.1
-    dev: false
 
   is-hexadecimal@2.0.1:
     dev: false
@@ -4279,8 +4317,7 @@ snapshots:
   is-interactive@2.0.0:
     dev: false
 
-  is-number@7.0.0:
-    dev: false
+  is-number@7.0.0: {}
 
   is-plain-obj@4.1.0:
     dev: false
@@ -4952,8 +4989,7 @@ snapshots:
   node-releases@2.0.14:
     dev: false
 
-  normalize-path@3.0.0:
-    dev: false
+  normalize-path@3.0.0: {}
 
   not@0.1.0:
     dev: false
@@ -5097,8 +5133,7 @@ snapshots:
   picocolors@1.0.0:
     dev: false
 
-  picomatch@2.3.1:
-    dev: false
+  picomatch@2.3.1: {}
 
   pify@4.0.1:
     dev: false
@@ -5193,7 +5228,6 @@ snapshots:
   readdirp@3.6.0:
     dependencies:
       picomatch: 2.3.1
-    dev: false
 
   rehype-parse@9.0.0:
     dependencies:
@@ -5375,6 +5409,12 @@ snapshots:
   safe-buffer@5.2.1:
     dev: false
 
+  sass@1.72.0:
+    dependencies:
+      chokidar: 3.6.0
+      immutable: 4.3.5
+      source-map-js: 1.2.0
+
   sax@1.3.0:
     dev: false
 
@@ -5449,8 +5489,7 @@ snapshots:
       sax: 1.3.0
     dev: false
 
-  source-map-js@1.2.0:
-    dev: false
+  source-map-js@1.2.0: {}
 
   source-map@0.7.4:
     dev: false
@@ -5459,6 +5498,19 @@ snapshots:
     dev: false
 
   sprintf-js@1.0.3:
+    dev: false
+
+  starlight-links-validator@0.6.0(@astrojs/starlight@0.21.2(astro@4.5.9(sass@1.72.0)(typescript@5.4.3)))(astro@4.5.9(sass@1.72.0)(typescript@5.4.3)):
+    dependencies:
+      '@astrojs/starlight': 0.21.2(astro@4.5.9(sass@1.72.0)(typescript@5.4.3))
+      astro: 4.5.9(sass@1.72.0)(typescript@5.4.3)
+      github-slugger: 2.0.0
+      hast-util-from-html: 2.0.1
+      hast-util-has-property: 3.0.0
+      is-absolute-url: 4.0.1
+      kleur: 4.1.5
+      mdast-util-to-string: 4.0.0
+      unist-util-visit: 5.0.0
     dev: false
 
   stdin-discarder@0.1.0:
@@ -5592,7 +5644,6 @@ snapshots:
   to-regex-range@5.0.1:
     dependencies:
       is-number: 7.0.0
-    dev: false
 
   trim-lines@3.0.1:
     dev: false
@@ -5789,18 +5840,19 @@ snapshots:
       vfile-message: 4.0.2
     dev: false
 
-  vite@5.2.6:
+  vite@5.2.6(sass@1.72.0):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
       rollup: 4.13.0
+      sass: 1.72.0
     optionalDependencies:
       fsevents: 2.3.3
     dev: false
 
-  vitefu@0.2.5(vite@5.2.6):
+  vitefu@0.2.5(vite@5.2.6(sass@1.72.0)):
     dependencies:
-      vite: 5.2.6
+      vite: 5.2.6(sass@1.72.0)
     dev: false
 
   volar-service-css@0.0.34(@volar/language-service@2.1.5):
