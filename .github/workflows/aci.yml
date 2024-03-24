@@ -1,4 +1,4 @@
-name: afterCI
+name: afterCI change release
 
 on:
   # workflow_run:
@@ -19,7 +19,7 @@ jobs:
     # - uses: actions/checkout@v4
     # - uses: actions/setup-node@v4
     #   with:
-    #       node-version: 16
+    #       node-version: 20
     - name: Get Latest Release Assets
       id: latest_release
       uses: actions/github-script@v6
