@@ -22,7 +22,9 @@
     "tyriar.vscode-terminal-here",
     "symbolk.somanyconflicts",
     "shardulm94.trailing-spaces",
-    "xboxyan.tree-generator"
+    "xboxyan.tree-generator",
+    "unifiedjs.vscode-mdx",
+    "astro-build.astro-vscode"
   ],
   "unwantedRecommendations": []
 }
