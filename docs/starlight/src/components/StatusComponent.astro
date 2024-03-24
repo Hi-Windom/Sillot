@@ -23,11 +23,11 @@ import { Icon } from '@astrojs/starlight/components';
 </div>
 
 <script>
-const closeIcon = document.querySelector('.close-icon');
-
-closeIcon.addEventListener('click', function(event) {
-    notificationContainer.style.display = 'none';
-    event.stopPropagation(); // Prevent triggering the container's click event
-});
+    const closeIcon = document.querySelector('.close-icon');
+    closeIcon?.addEventListener('click', function(event) {
+        const notificationContainer = document.querySelector('#notificationContainer') as HTMLDivElement;
+        notificationContainer.style.display = 'none';
+        event.stopPropagation(); // Prevent triggering the container's click event
+    });
 
 </script>
