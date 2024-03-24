@@ -2481,7 +2481,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     protyle.toolbar.range = newRange;
                 }
                 /// #endif
-                if (!protyle.wysiwyg.element.querySelector(".protyle-wysiwyg--select")) {
+                if (!protyle.wysiwyg?.element.querySelector(".protyle-wysiwyg--select")) {
                     countSelectWord(newRange, protyle.block.rootID);
                 }
                 if (getSelection().rangeCount === 0) {
@@ -2568,7 +2568,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                         this.shiftStartElement = undefined;
                     } else {
                         const ids: string[] = [];
-                        if (!protyle.wysiwyg.element.querySelector(".protyle-wysiwyg--select") && protyle.scroll && !protyle.scroll.element.classList.contains("fn__none") && !protyle.scroll.keepLazyLoad &&
+                        if (!protyle?.wysiwyg.element.querySelector(".protyle-wysiwyg--select") && protyle.scroll && !protyle.scroll.element.classList.contains("fn__none") && !protyle.scroll.keepLazyLoad &&
                             (startElement.getBoundingClientRect().top < -protyle.contentElement.clientHeight * 2 || endElement.getBoundingClientRect().bottom > protyle.contentElement.clientHeight * 2)) {
                             showMessage(window.siyuan.languages.crossKeepLazyLoad);
                         }

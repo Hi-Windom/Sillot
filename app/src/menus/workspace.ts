@@ -432,7 +432,7 @@ export const workspaceMenu = (app: App, rect: DOMRect) => {
             label: "vConsole",
             icon: "iconBug",
             click: () => {
-                window.vConsole.show();
+                window.vConsole?.show();
             }
         }).element);
         window.siyuan.menus.menu.popup({x: rect.left, y: rect.bottom});

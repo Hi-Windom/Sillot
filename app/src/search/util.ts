@@ -1296,7 +1296,7 @@ export const inputEvent = (element: Element, config: ISearchOption, edit: Protyl
         element.querySelector("#searchList").scrollTo(0, 0);
         const previousElement = element.querySelector('[data-type="previous"]');
         const nextElement = element.querySelector('[data-type="next"]');
-        edit.protyle?.app.plugins.forEach(item => {
+        edit?.protyle?.app?.plugins.forEach(item => {
             item.eventBus.emit("input-search", {
                 protyle: edit,
                 config,

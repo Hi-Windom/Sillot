@@ -8,6 +8,7 @@ import * as ReactDOM from "react-dom"; // 兼容性好
 import Swal from "sweetalert2";
 import {sout} from 'sofill/core'
 import { MusicPlayer } from "./react-music-player";
+import VConsole from 'vconsole';
 import {
   focusBlock,
   focusByOffset,
@@ -44,5 +45,22 @@ export class SillotEnv {
       bS: new bS(),
       ///#endif
     };
+    window.vConsole = new VConsole({ theme: 'dark' });
+    window.vConsole.hideSwitch();
+
+    // 接下来即可照常使用 `console` 等方法
+    console.log(window.vConsole.version);
+    document.querySelector("#toolbarConsole")?.addEventListener("click", () => {
+      if (document.querySelector("#toolbarConsole")?.getAttribute("data-mode") === "0") {
+        window.vConsole?.showSwitch();
+        document.querySelector("#toolbarConsole")?.setAttribute("data-mode", "1");
+      } else {
+        window.vConsole?.hideSwitch();
+        document.querySelector("#toolbarConsole")?.setAttribute("data-mode", "0");
+      }
+    });
+    // 结束调试后，可移除掉
+    // window.vConsole.destroy();
+
   }
 }

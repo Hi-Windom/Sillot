@@ -31,6 +31,17 @@ function updateSpinnerText() {
     spinner.text = `正在执行, 请稍后...\n\n\n\t\t\t已用时 ${hours}时${minutes}分${seconds}秒\n\n\n`;
 }
 
+function getCurrentDateTime() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hour = String(now.getHours()).padStart(2, '0');
+  const minute = String(now.getMinutes()).padStart(2, '0');
+  const second = String(now.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}
+
 // 每秒更新一次spinner文本
 const intervalId = setInterval(updateSpinnerText, 1000);
 const works = {
@@ -92,8 +103,7 @@ function exeHandler(cmds, silent) {
         silent ? iconv.decode(iconv.encode(stderr, "base64"), "gb2312") : stderr
       );
       if (code === 0) {
-        // console.log("cli work done.");
-        spinner.succeed("Sillot mini cli work done.");
+        spinner.succeed("Sillot mini cli work done. \t" + getCurrentDateTime());
       } else {
         spinner.fail("Sillot mini cli work failed.");
       }

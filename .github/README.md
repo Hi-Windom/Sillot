@@ -12,21 +12,21 @@
 
 <p align="center">
 <br><br>
-<a href="README_zh_CN.md">思源（SiYuan）</a>&emsp;|&emsp;<a href="README_Sillot.md">汐洛（Sillot）</a>
+<a href="../README_zh_CN.md">思源（SiYuan）</a> | <a href="README_Sillot.md">汐洛（Sillot）</a>
 </p>
 
 <p align="center">
 <br><br><br><br><br>
-<img alt="split" src="./.github/split.png"/>
+<img alt="split" src="./split.png"/>
 </p>
 
 ## 浏览器兼容性
 
-<img src="screenshots/sillot/es2022.png"/>
+<img src="../screenshots/sillot/es2022.png"/>
 
 <p align="center">
 <br><br><br><br><br>
-<img alt="split" src="./.github/split.png"/>
+<img alt="split" src="./split.png"/>
 </p>
 
 ## 🛠️ Contributors
@@ -37,7 +37,7 @@
 
 <p align="center">
 <br><br><br><br><br>
-<img alt="split" src="./.github/split.png"/>
+<img alt="split" src="./split.png"/>
 </p>
 
 ## 🔭 Roadmap

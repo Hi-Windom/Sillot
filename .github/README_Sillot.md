@@ -1,9 +1,9 @@
 <p align="center">
-<img alt="Sillot" src="./app/stage/icon.png">
+<img alt="Sillot" src="../app/stage/icon.png">
 </p>
 
 <p align="center">
-<a href="README_zh_CN.md">思源（SiYuan）</a> | 汐洛（Sillot）
+<a href="../README_zh_CN.md">思源（SiYuan）</a> | 汐洛（Sillot）
 
 </p>
 
@@ -33,7 +33,7 @@
 汐洛始终代表先进恣产力，始终拥护全球先进开源力量，坚定不移推动新彖乄面向未来持续发展。
 
 <p align="center">
-<img alt="framework" src="./screenshots/sillot/framework.png">
+<img alt="framework" src="../screenshots/sillot/framework.png">
 </p>
 
 ## 极致优雅
@@ -45,7 +45,7 @@
 汐洛始终坚持精品路线，从不在任何一个细节上妥协。专注于为目标用户提供最好的使用体验，这是实现极致优雅的必由之路。汐洛尊重非目标用户的声音，但并不关心。
 
 <p align="center">
-<img alt="framework" src="./screenshots/sillot/booting1.png">
+<img alt="framework" src="../screenshots/sillot/booting1.png">
 </p>
 
 ## 开发者友好
@@ -64,7 +64,6 @@ go install github.com/ofabry/go-callvis
 
 然后在新终端 `go-callvis main.go`
 
-
 ### 合并冲突
 
 注意事项：
@@ -72,5 +71,5 @@ go install github.com/ofabry/go-callvis
 1. tpl 模板直接合并冲突没有作用，汐洛是通过 JS 生成的 tpl ，因此需要修改 genTPLData.js 等 JS 文件
 
 <p align="center">
-<img alt="split" src="./.github/split.png">
+<img alt="split" src="./split.png">
 </p>

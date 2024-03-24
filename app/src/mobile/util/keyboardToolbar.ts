@@ -412,7 +412,7 @@ export const showKeyboardToolbar = () => {
     if (editor?.protyle.wysiwyg.element.contains(range.startContainer)) {
         editor.protyle.element.parentElement.style.paddingBottom = "42px";
     }
-    getCurrentEditor().protyle.app.plugins.forEach(item => {
+    getCurrentEditor()?.protyle?.app.plugins.forEach(item => {
         item.eventBus.emit("mobile-keyboard-show");
     });
     setTimeout(() => {
@@ -450,7 +450,7 @@ export const hideKeyboardToolbar = () => {
     if (modelElement.style.transform === "translateY(0px)") {
         modelElement.style.paddingBottom = "";
     }
-    getCurrentEditor().protyle.app.plugins.forEach(item => {
+    getCurrentEditor()?.protyle?.app.plugins.forEach(item => {
         item.eventBus.emit("mobile-keyboard-hide");
     });
 };
