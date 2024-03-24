@@ -1,4 +1,4 @@
-name: afterCI
+name: afterCI change release
 
 on:
   # workflow_run:
