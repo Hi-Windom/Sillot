@@ -1,0 +1,33 @@
+---
+import "../styles/bulletin.scss";
+import { Icon } from '@astrojs/starlight/components';
+---
+
+<div class="container not-content" id="notificationContainer">
+	<div class="rectangle">
+		<div class="notification-content">
+			<div class="icon-title">
+				<div class="info-group">
+					<Icon name="information" />
+					<h4>公告栏</h4>
+				</div>
+				<Icon class="close-icon" name="close" />
+			</div>
+			<ul class="notification-list">
+				<li>
+					新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~新建文件夹，嘿嘿~
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<script>
+    const closeIcon = document.querySelector('.close-icon');
+    closeIcon?.addEventListener('click', function(event) {
+        const notificationContainer = document.querySelector('#notificationContainer') as HTMLDivElement;
+        notificationContainer.style.display = 'none';
+        event.stopPropagation(); // Prevent triggering the container's click event
+    });
+
+</script>
