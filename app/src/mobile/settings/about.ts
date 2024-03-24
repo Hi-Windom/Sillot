@@ -244,14 +244,14 @@ export const initAbout = () => {
                         break;
                     } else if (target.id === "exportData") {
                         fetchPost("/api/export/exportData", {}, response => {
-                            openByMobile(response.data.zip);
+                            openByMobile(response.data.zip, "exportData");
                         });
                         event.preventDefault();
                         event.stopPropagation();
                         break;
                     } else if (target.id === "exportLog") {
                         fetchPost("/api/system/exportLog", {}, (response) => {
-                            openByMobile(response.data.zip);
+                            openByMobile(response.data.zip, "exportLog");
                         });
                         event.preventDefault();
                         event.stopPropagation();
@@ -360,14 +360,15 @@ export const initAbout = () => {
                 fetchPost("/api/import/importData", formData);
             });
             const networkServeElement = modelMainElement.querySelector("#networkServe") as HTMLInputElement;
+            if(networkServeElement.checked){
+                window.JSAndroid?.showWifi();
+            }
             networkServeElement.addEventListener("change", () => {
                 fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
                     if(networkServeElement.checked){
-                        const _r = window.JSAndroid.requestPermission("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
-                        console.warn(_r);
-                    } else {
-                        exitSiYuan();
+                        window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量");
                     }
+                    exitSiYuan();
                 });
             });
             const tokenElement = modelMainElement.querySelector("#token") as HTMLInputElement;

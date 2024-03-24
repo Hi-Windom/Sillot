@@ -6,7 +6,7 @@ import {renderAssetsPreview} from "../asset/renderAssets";
 import {Protyle} from "../protyle";
 import {disabledProtyle, onGet} from "../protyle/util/onGet";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {fetchPost} from "../util/fetch";
 import {escapeAttr, escapeHtml} from "../util/escape";
 import {isMobile} from "../util/functions";
@@ -70,7 +70,7 @@ const renderDoc = (element: HTMLElement, currentPage: number) => {
         response.data.histories.forEach((item: string) => {
             logsHTML += `<li class="b3-list-item" data-type="toggle" data-created="${item}">
     <span class="b3-list-item__toggle b3-list-item__toggle--hl"><svg class="b3-list-item__arrow"><use xlink:href="#iconRight"></use></svg></span>
-    <span style="padding-left: 4px" class="b3-list-item__text">${format(parseInt(item) * 1000, 'yyyy-MM-dd HH:mm:ss')}</span>
+    <span style="padding-left: 4px" class="b3-list-item__text">${formatDate(parseInt(item) * 1000, 'yyyy-MM-dd HH:mm:ss')}</span>
 </li>`;
         });
         element.lastElementChild.firstElementChild.innerHTML = logsHTML;
@@ -713,7 +713,7 @@ const bindEvent = (app: App, element: Element, dialog?: Dialog) => {
                 const genTagDialog = new Dialog({
                     title: window.siyuan.languages.tagSnapshot,
                     content: `<div class="b3-dialog__content">
-    <input class="b3-text-field fn__block" value="${format(new Date(), 'yyyyMMddHHmmss')}" placeholder="${window.siyuan.languages.tagSnapshotTip}">
+    <input class="b3-text-field fn__block" value="${formatDate(new Date(), 'yyyyMMddHHmmss')}" placeholder="${window.siyuan.languages.tagSnapshotTip}">
 </div>
 <div class="b3-dialog__action">
     <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>

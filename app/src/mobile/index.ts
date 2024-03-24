@@ -23,7 +23,6 @@ import {openChangelog} from "../boot/openChangelog";
 import {registerServiceWorker} from "../util/serviceWorker";
 import {loadPlugins} from "../plugin/loader";
 import { SillotEnv } from "../sillot";
-import VConsole from 'vconsole';
 import {saveScroll} from "../protyle/scroll/saveScroll";
 import {removeBlock} from "../protyle/wysiwyg/remove";
 import {isNotEditBlock} from "../protyle/wysiwyg/getBlock";
@@ -78,10 +77,10 @@ class App {
             }
         });
         window.addEventListener("beforeunload", () => {
-            saveScroll(window.siyuan.mobile.editor.protyle);
+            saveScroll(window.siyuan.mobile.editor?.protyle);
         }, false);
         window.addEventListener("pagehide", () => {
-            saveScroll(window.siyuan.mobile.editor.protyle);
+            saveScroll(window.siyuan.mobile.editor?.protyle);
         }, false);
         // 判断手机横竖屏状态
         window.matchMedia("(orientation:portrait)").addEventListener("change", () => {
@@ -105,9 +104,10 @@ class App {
                         fetchPost("/api/system/getEmojiConf", {}, emojiResponse => {
                             window.siyuan.emojis = emojiResponse.data as IEmoji[];
                             setNoteBook(() => {
+                                initRightMenu(this); // 前置避免 initFramework crash 影响
+                                console.log("initRightMenu() resolved");
                                 initFramework(this, confResponse.data.start);
-                            console.log("initFramework() invoked");
-                                initRightMenu(this);
+                                console.log("initFramework() resolved");
                                 openChangelog();
                             });
                         });
@@ -149,7 +149,7 @@ const siyuanApp = new App();
 window.reconnectWebSocket = () => {
     window.siyuan.ws.send("ping", {});
     window.siyuan.mobile.files.send("ping", {});
-    window.siyuan.mobile.editor.protyle.ws.send("ping", {});
+    window.siyuan.mobile.editor?.protyle.ws.send("ping", {});
     window.siyuan.mobile.popEditor?.protyle.ws.send("ping", {});
 };
 window.goBack = goBack;
@@ -166,23 +166,3 @@ window.openFileByURL = (openURL) => {
     }
     return false;
 };
-
-
-window.vConsole = new VConsole({ theme: 'dark' });
-window.vConsole.hideSwitch();
-
-// 接下来即可照常使用 `console` 等方法
-console.log(window.vConsole.version);
-const toolbarConsole = document.querySelector("#toolbarConsole");
-toolbarConsole?.addEventListener("click", () => {
-  if (toolbarConsole.getAttribute("data-mode") === "0") {
-    window.vConsole.showSwitch();
-    toolbarConsole.setAttribute("data-mode", "1");
-  } else {
-    window.vConsole.hideSwitch();
-    toolbarConsole.setAttribute("data-mode", "0");
-  }
-});
-
-// 结束调试后，可移除掉
-// window.vConsole.destroy();

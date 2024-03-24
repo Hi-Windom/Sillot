@@ -1,0 +1,12 @@
+.flash-blue {
+	animation: flash 0.1s infinite alternate;
+}
+
+@keyframes flash {
+	from {
+			background-color: transparent;
+	}
+	to {
+			background-color: rgba(56, 83, 218, 0.83);
+	}
+}

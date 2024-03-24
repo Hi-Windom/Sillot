@@ -28,7 +28,7 @@ import {hideElements} from "../ui/hideElements";
 import {insertAttrViewBlockAnimation} from "../render/av/row";
 import {dragUpload} from "../render/av/asset";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 
 const moveToNew = (protyle: IProtyle, sourceElements: Element[], targetElement: Element, newSourceElement: Element,
                    isSameDoc: boolean, isBottom: boolean, isCopy: boolean) => {
@@ -892,7 +892,7 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
                             });
                             transaction(protyle, doOperations, undoOperations);
                         } else {
-                            const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+                            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
                             transaction(protyle, [{
                                 action: "insertAttrViewBlock",
                                 avID,
@@ -963,7 +963,7 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
                         previousID = targetElement.previousElementSibling?.getAttribute("data-id") || "";
                     }
                     const avID = blockElement.getAttribute("data-av-id");
-                    const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+                    const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
                     transaction(protyle, [{
                         action: "insertAttrViewBlock",
                         avID,

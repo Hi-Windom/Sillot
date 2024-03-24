@@ -14,7 +14,7 @@ import {escapeHtml} from "../util/escape";
 import {openFile} from "../editor/util";
 /// #endif
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {getDisplayName, movePathTo} from "../util/pathName";
 import {App} from "../index";
 import {resize} from "../protyle/util/resize";
@@ -311,7 +311,7 @@ export const bindCardEvent = async (options: {
                             fetchPost("/api/riff/batchSetRiffCardsDueTime", {
                                 cardDues: [{
                                     id: currentCard.cardID,
-                                    due: format(parseInt(inputElement.value) * 1000, 'yyyyMMddHHmmss')
+                                    due: formatDate(parseInt(inputElement.value) * 1000, 'yyyyMMddHHmmss')
                                 }]
                             }, () => {
                                 actionElements[0].classList.add("fn__none");
@@ -401,7 +401,7 @@ export const bindCardEvent = async (options: {
 </div><div class="fn__flex${currentCard.lastReview > 0 ? "" : " fn__none"}">
     <div class="fn__flex-1">${window.siyuan.languages.lastReviewTime}</div>
     <div class="fn__space"></div>
-    <div>${dayjs(currentCard.lastReview).format("YYYY-MM-DD")}</div>
+    <div>${formatDate(new Date(currentCard.lastReview), 'yyyy-MM-dd')}</div>
 </div>`,
                 });
                 /// #if MOBILE

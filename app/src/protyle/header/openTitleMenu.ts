@@ -19,7 +19,7 @@ import {viewCards} from "../../card/viewCards";
 import {getDisplayName, getNotebookName, pathPosix, showFileInFolder} from "../../util/pathName";
 import {makeCard, quickMakeCard} from "../../card/makeCard";
 import {emitOpenMenu} from "../../plugin/EventBus";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {hideTooltip} from "../../dialog/tooltip";
 import {popSearch} from "../../mobile/menu/search";
 import {openSearch} from "../../search/spread";
@@ -69,7 +69,7 @@ export const openTitleMenu = (protyle: IProtyle, position: IPosition) => {
                         }, {
                             action: "doUpdateUpdated",
                             id: listItemElement.dataset.nodeId,
-                            data: format(new Date(), 'yyyyMMddHHmmss'),
+                            data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                         }], [{
                             action: "removeAttrViewBlock",
                             srcIDs: sourceIds,

@@ -25,11 +25,13 @@ export const getIdZoomInByPath = () => {
     let isZoomIn = false;
     if (/^web\+siyuan:\/\/blocks\/\d{14}-\w{7}/.test(PWAURL)) {
         // PWA 捕获 web+siyuan://blocks/20221031001313-rk7sd0e?focus=1
+        console.log("getIdZoomInByPath()->PWAURL: ", PWAURL, "\tsubstring p: (20, 20 + 22)");
         id = PWAURL.substring(20, 20 + 22);
         isZoomIn = getSearch("focus", PWAURL) === "1";
     } else if (window.JSAndroid) {
         // PAD 通过思源协议打开
         const SYURL = window.JSAndroid.getBlockURL();
+        console.log("getIdZoomInByPath()->SYURL: ", SYURL);
         id = getIdFromSYProtocol(SYURL);
         isZoomIn = getSearch("focus", SYURL) === "1";
     } else {
@@ -37,6 +39,7 @@ export const getIdZoomInByPath = () => {
         id = searchParams.get("id");
         isZoomIn = searchParams.get("focus") === "1";
     }
+    console.log("getIdZoomInByPath()->id, isZoomIn: ", id, isZoomIn);
     return {
         id, isZoomIn
     };
@@ -47,6 +50,7 @@ export const isSYProtocol = (url: string) => {
 };
 
 export const getIdFromSYProtocol = (url: string) => {
+    console.log("getIdFromSYProtocol()->url: ", url, "\tsubstring p: (16, 16 + 22)");
     return url.substring(16, 16 + 22);
 };
 
@@ -74,12 +78,14 @@ export const getDisplayName = (filePath: string, basename = true, removeSY = fal
         name = pathPosix().basename(filePath);
     }
     if (removeSY && name.endsWith(".sy")) {
+        console.log("getDisplayName()->name: ", name, "\tsubstring p: (0, name.length - 3)");
         name = name.substring(0, name.length - 3);
     }
     return name;
 };
 
 export const getAssetName = (assetPath: string) => {
+    console.log("getAssetName()->assetPath: ", name, "\tsubstring p: (7, assetPath.length - pathPosix().extname(assetPath).length - 23 + 7)");
     return assetPath.substring(7, assetPath.length - pathPosix().extname(assetPath).length - 23 + 7);
 };
 

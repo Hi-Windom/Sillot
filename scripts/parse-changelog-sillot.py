@@ -18,7 +18,7 @@ docmap = {
 }
 
 
-def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
+def generate_msg_from_repo(repo_name, tag_name):
     """Generate changelog messages from repository and tag name.
 
     Envs:
@@ -29,13 +29,14 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
         repo_name (str): The repository name
         tag_name (str): the tag name
     """
+    print(f'# [@{repo_name.split("/")[-1]}](https://github.com/{repo_name})\n')
     hostname = os.getenv("GITHUB_HOST") or "api.github.com"
     token = os.getenv("GITHUB_TOKEN")
     desc_mapping = defaultdict(list)
 
     gh = github.Github(token, base_url=f"https://{hostname}")
     repo = gh.get_repo(repo_name)
-    milestone = find_milestone(repo, tag_name, lastestRelease)
+    milestone = find_milestone(repo, tag_name)
 
     for issue in repo.get_issues(state="closed", milestone=milestone): # type: ignore
         # REF https://pygithub.readthedocs.io/en/latest/github_objects/Issue.html#github.Issue.Issue
@@ -45,7 +46,7 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
     generate_msg(desc_mapping)
 
 
-def find_milestone(repo, title, lastestRelease):
+def find_milestone(repo, title):
     """Find the milestone in a repository that is similar to milestone title
 
     Args:
@@ -61,30 +62,15 @@ def find_milestone(repo, title, lastestRelease):
     if not pat:
         return None
     version = ".".join(pat.group(1).split(".")[:2])
-    print(f'''
----
-<p align="center">
-<a href="https://github.com/Hi-Windom/Sillot/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Hi-Windom/Sillot/ci.yml?event=push&label=ci.yml%20Action&logo=github" style="cursor:pointer;height: 30px;margin: 3px auto;"/></a>
-<a href="https://github.com/Hi-Windom/Sillot/releases/{thisRelease}/"><img src="https://img.shields.io/github/downloads/Hi-Windom/Sillot/{thisRelease}/total?logo=github" style="cursor:pointer;height: 30px;margin: 3px auto;"/></a>
-<img alt="GitHub commits difference between two branches/tags/commits" src="https://img.shields.io/github/commits-difference/Hi-Windom/Sillot?base={lastestRelease}&head={thisRelease}&logo=git" style="cursor:pointer;height: 30px;margin: 3px auto;"/>
-</p>
 
-⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
-❤️ 欢迎共建汐洛 694357845@qq.com
-🚧 [Sillot is currently in active development](https://github.com/orgs/Hi-Windom/projects/2/views/2)
-
-🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)  📱 [Android application package](https://github.com/Hi-Windom/Sillot-android/releases)  📦 [Chromium Browser Extension](https://github.com/K-Sillot/Sillot-Be/releases)
-<span>
-<img src="https://img.shields.io/badge/Chromium 94+-black?logo=Google Chrome&logoColor=white" alt="" title=""/><img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 11+-black?logo=android" title=""/>
-</span>
-
----
-
-''')
+    # REF https://docs.github.com/en/rest/issues/milestones?apiVersion=2022-11-28#list-milestones
     for milestone in repo.get_milestones():
         if version in milestone.title:
             return milestone
-
+    # 别问为什么不用 state="all" ，先从 open（state参数默认值）里面找，问就是代码按行算（doge
+    for milestone in repo.get_milestones(state="closed"):
+        if version in milestone.title:
+            return milestone
 
 def get_issue_first_label(issue):
     """Get the first label from issue, if no labels, return empty string."""
@@ -97,7 +83,6 @@ def get_issue_first_label(issue):
 def generate_msg(desc_mapping):
     """Print changelogs from direction."""
     print()
-    print('## [@Sillot](https://github.com/Hi-Windom/Sillot)\n')
     for header in docmap:
         if not desc_mapping[header]:
             continue
@@ -117,6 +102,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        generate_msg_from_repo(args.repo, args.tag, args.lastestRelease)
+        generate_msg_from_repo(args.repo, args.tag)
     except AssertionError:
         print(args.tag)

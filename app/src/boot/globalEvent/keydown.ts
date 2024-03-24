@@ -77,7 +77,7 @@ import {historyKeydown} from "../../history/keydown";
 import {zoomOut} from "../../menus/protyle";
 import {openSearchAV} from "../../protyle/render/av/relation";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 
 const switchDialogEvent = (app: App, event: MouseEvent) => {
     event.preventDefault();
@@ -323,7 +323,7 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
                 }, {
                     action: "doUpdateUpdated",
                     id: listItemElement.dataset.nodeId,
-                    data: format(new Date(), 'yyyyMMddHHmmss'),
+                    data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                 }], [{
                     action: "removeAttrViewBlock",
                     srcIDs: sourceIds,
@@ -357,7 +357,7 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
                 }, {
                     action: "doUpdateUpdated",
                     id: listItemElement.dataset.blockId,
-                    data: format(new Date(), 'yyyyMMddHHmmss'),
+                    data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                 }], [{
                     action: "removeAttrViewBlock",
                     srcIDs: sourceIds,

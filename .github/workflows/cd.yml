@@ -36,6 +36,12 @@ jobs:
         with:
           cmd: "jq .syv app/package.json -r"
 
+      - name: Extract SiYuan version from package.json
+        uses: sergeysova/jq-action@v2
+        id: sypv
+        with:
+            cmd: "jq .sypv app/package.json -r"
+
       - id: thislatestR
         uses: pozetroninc/github-action-get-latest-release@master
         with:
@@ -56,10 +62,14 @@ jobs:
         run: |
           echo "release_title=$(git show --format=%s --no-patch | head -1)" >> $GITHUB_OUTPUT
           echo "release_version=v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}" >> $GITHUB_OUTPUT
-          changelog=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} -b ${{ steps.thislatestR.outputs.release }} Hi-Windom/Sillot)
+          changelog1=$(python scripts/parse-changelog-HEAD.py -t ${{ github.ref }} -b ${{ steps.thislatestR.outputs.release }} Hi-Windom/Sillot)
+          changelog2=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} Hi-Windom/Sillot)
+          changelog3=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} Hi-Windom/Sillot-android)
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "release_body_sillot<<$EOF" >> $GITHUB_ENV
-          echo "$changelog" >> $GITHUB_ENV
+          echo "$changelog1" >> $GITHUB_ENV
+          echo "$changelog2" >> $GITHUB_ENV
+          echo "$changelog3" >> $GITHUB_ENV
           echo "$EOF" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -67,7 +77,7 @@ jobs:
       - name: Gather SiYuan Release Information
         id: release_info_siyuan
         run: |
-          changelog=$(python scripts/parse-changelog.py -t v${{ steps.syv.outputs.value }} siyuan-note/siyuan)
+          changelog=$(python scripts/parse-changelog.py -t v${{ steps.syv.outputs.value }} -b v${{ steps.sypv.outputs.value }} siyuan-note/siyuan)
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "release_body_siyuan<<$EOF" >> $GITHUB_ENV
           echo "$changelog" >> $GITHUB_ENV
@@ -155,7 +165,7 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: "1.21"
 
@@ -171,7 +181,7 @@ jobs:
           GOARCH: ${{ matrix.config.goarch }}
 
       - name: Set up Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -278,9 +288,11 @@ jobs:
           distribution: 'zulu'
           overwrite-settings: true
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3.2.0
+        if: contains( matrix.config.goos, 'windows')
       - name: Install Android NDK
         uses: nttld/setup-ndk@v1
+        if: contains( matrix.config.goos, 'windows')
         with:
           ndk-version: r25b
           add-to-path: true

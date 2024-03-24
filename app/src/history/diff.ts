@@ -6,7 +6,7 @@ import {disabledProtyle, onGet} from "../protyle/util/onGet";
 import {hasClosestByClassName} from "../protyle/util/hasClosest";
 import {escapeAttr, escapeHtml} from "../util/escape";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {isMobile} from "../util/functions";
 import {App} from "../index";
 import {pathPosix} from "../util/pathName";
@@ -102,7 +102,7 @@ const renderCompare = (app: App, element: HTMLElement) => {
                 action: [Constants.CB_GET_HISTORY, Constants.CB_GET_HTML],
             });
         }
-        leftElement.querySelector(".history__date").textContent = format(new Date(response.data.updated), 'yyyy-MM-dd HH:mm');
+        leftElement.querySelector(".history__date").textContent = formatDate(new Date(response.data.updated), 'yyyy-MM-dd HH:mm');
     });
     const id2 = element.getAttribute("data-id2");
     if (id2) {
@@ -131,7 +131,7 @@ const renderCompare = (app: App, element: HTMLElement) => {
                     action: [Constants.CB_GET_HISTORY, Constants.CB_GET_HTML],
                 });
             }
-            rightElement.querySelector(".history__date").textContent = format(new Date(response.data.updated), 'yyyy-MM-dd HH:mm');
+            rightElement.querySelector(".history__date").textContent = formatDate(new Date(response.data.updated), 'yyyy-MM-dd HH:mm');
         });
     } else {
         rightElement.classList.add("fn__none");
@@ -216,13 +216,13 @@ const genHTML = (left: string, right: string, dialog: Dialog, direct: string) =>
     <span class="fn__flex-1"></span>
     <code class="fn__code${isPhone ? " fn__none" : ""}" data-snapshot="${left}">${left.substring(0, 7)}</code>
     ${isPhone ? "" : '<span class="fn__space"></span>'}
-    ${format(new Date(response.data.left.created), 'yyyy-MM-dd HH:mm')}
+    ${formatDate(new Date(response.data.left.created), 'yyyy-MM-dd HH:mm')}
     <span class="fn__space"></span>
     <span class="block__icon block__icon--show b3-tooltips b3-tooltips__s" aria-label="${window.siyuan.languages.switchDirect}" data-direct="${direct}"><svg><use xlink:href="#iconScrollHoriz"></use></svg></span>
     <span class="fn__space"></span>
     <code class="fn__code${isPhone ? " fn__none" : ""}" data-snapshot="${right}">${right.substring(0, 7)}</code>
     ${isPhone ? "" : '<span class="fn__space"></span>'}
-    ${format(new Date(response.data.right.created), 'yyyy-MM-dd HH:mm')}
+    ${formatDate(new Date(response.data.right.created), 'yyyy-MM-dd HH:mm')}
     <span class="fn__flex-1"></span>
 </div>`;
         headElement.nextElementSibling.innerHTML = `<div class="fn__flex history__panel" style="height: 100%">
@@ -260,13 +260,13 @@ const genHTML = (left: string, right: string, dialog: Dialog, direct: string) =>
     </div>
     <div class="fn__flex-1 fn__flex">
         <div class="fn__none fn__flex-1 fn__flex-column">
-            <div class="history__date">${format(response.data.left.created, 'yyyy-MM-dd HH:mm')}</div>
+            <div class="history__date">${formatDate(response.data.left.created, 'yyyy-MM-dd HH:mm')}</div>
             <div class="ft__center"></div>
             <textarea class="history__text fn__none fn__flex-1" readonly></textarea>
             <div class="fn__flex-1"></div>
         </div>
         <div class="fn__none fn__flex-1 fn__flex-column" style="border-left: 1px solid var(--b3-border-color);">
-            <div class="history__date">${format(response.data.right.created, 'yyyy-MM-dd HH:mm')}</div>
+            <div class="history__date">${formatDate(response.data.right.created, 'yyyy-MM-dd HH:mm')}</div>
             <div class="ft__center"></div>
             <textarea class="history__text fn__none fn__flex-1" readonly></textarea>
             <div class="fn__flex-1"></div>

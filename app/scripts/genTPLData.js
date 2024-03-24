@@ -38,6 +38,9 @@ exports.default = {
           <svg id="toolbarConsole" class="toolbar__icon" data-mode="0">
               <use xlink:href="#iconBug"></use>
           </svg>
+					<svg id="toolbarOpenBy" class="toolbar__icon fn__none" data-mode="0">
+              <use xlink:href="#iconOpen"></use>
+          </svg>
           <svg id="toolbarMore" class="toolbar__icon">
               <use xlink:href="#iconMore"></use>
           </svg>

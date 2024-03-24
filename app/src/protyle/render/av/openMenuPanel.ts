@@ -31,7 +31,7 @@ import {bindRollupData, getRollupHTML, goSearchRollupCol} from "./rollup";
 import {updateCellsValue} from "./cell";
 import {openCalcMenu} from "./calc";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 
 export const openMenuPanel = (options: {
     protyle: IProtyle,
@@ -1034,7 +1034,7 @@ export const openMenuPanel = (options: {
                             return true;
                         }
                     });
-                    const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+                    const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
                     transaction(options.protyle, [{
                         action: "removeAttrViewCol",
                         id: colId,

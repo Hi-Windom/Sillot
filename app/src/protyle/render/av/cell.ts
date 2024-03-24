@@ -7,7 +7,7 @@ import {objEquals} from "../../../util/functions";
 import {fetchPost} from "../../../util/fetch";
 import {focusBlock, focusByRange} from "../../util/selection";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {unicode2Emoji} from "../../../emoji";
 import {getColIconByType} from "./col";
 import {genAVValueHTML} from "./blockAttr";
@@ -341,6 +341,7 @@ export const popTextCell = (protyle: IProtyle, cellElements: HTMLElement[], type
         }
         if (!hasClosestByClassName(cellElements[0], "custom-attr")) {
             cellElements[0].classList.add("av__cell--select");
+            addDragFill(cellElements[0]);
         }
         return;
     }
@@ -380,6 +381,7 @@ export const popTextCell = (protyle: IProtyle, cellElements: HTMLElement[], type
                     protyle.toolbar.range.selectNodeContents(cellElements[0].lastChild);
                     focusByRange(protyle.toolbar.range);
                     cellElements[0].classList.add("av__cell--select");
+                    addDragFill(cellElements[0]);
                     hintRef(inputElement.value.substring(2), protyle, "av");
                     avMaskElement?.remove();
                     event.preventDefault();
@@ -454,6 +456,7 @@ const updateCellValueByInput = (protyle: IProtyle, type: TAVCol, blockElement: H
     if (cellElements[0] // 兼容新增行后台隐藏
         && !hasClosestByClassName(cellElements[0], "custom-attr")) {
         cellElements[0].classList.add("av__cell--select");
+        addDragFill(cellElements[0]);
     }
     //  单元格编辑中 ctrl+p 光标定位
     if (!document.querySelector(".b3-dialog")) {
@@ -471,7 +474,7 @@ export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, va
     const avID = nodeElement.dataset.avId;
     const id = nodeElement.dataset.nodeId;
     let text = "";
-    const json: IAVCellValue[] = [];
+    const json: IAVCellValue[][] = [];
     let cellElements: Element[];
     if (cElements?.length > 0) {
         cellElements = cElements;
@@ -509,7 +512,10 @@ export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, va
 
         text += getCellText(item) + ((cellElements[elementIndex + 1] && item.nextElementSibling && item.nextElementSibling.isSameNode(cellElements[elementIndex + 1])) ? "\t" : "\n\n");
         const oldValue = genCellValueByElement(type, item);
-        json.push(oldValue);
+        if (elementIndex === 0 || !cellElements[elementIndex - 1].isSameNode(item.previousElementSibling)) {
+           json.push([]);
+        }
+        json[json.length - 1].push(oldValue);
         // relation 为全部更新，以下类型为添加
         if (type === "mAsset") {
             if (Array.isArray(value)) {
@@ -562,7 +568,7 @@ export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, va
         doOperations.push({
             action: "doUpdateUpdated",
             id,
-            data: format(new Date(), 'yyyyMMddHHmmss'),
+            data: formatDate(new Date(), 'yyyyMMddHHmmss'),
         });
         undoOperations.push({
             action: "doUpdateUpdated",
@@ -621,17 +627,17 @@ export const renderCell = (cellValue: IAVCellValue) => {
         const dataValue = cellValue ? cellValue.date : null;
         text = `<span class="av__celltext" data-value='${JSON.stringify(dataValue)}'>`;
         if (dataValue && dataValue.isNotEmpty) {
-            text += format(dataValue.content, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
+            text += formatDate(dataValue.content, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
         }
         if (dataValue && dataValue.hasEndDate && dataValue.isNotEmpty && dataValue.isNotEmpty2) {
-            text += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${format(dataValue.content2, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
+            text += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${formatDate(dataValue.content2, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
         }
         text += "</span>";
     } else if (["created", "updated"].includes(cellValue.type)) {
         const dataValue = cellValue ? cellValue[cellValue.type as "date"] : null;
         text = `<span class="av__celltext" data-value='${JSON.stringify(dataValue)}'>`;
         if (dataValue && dataValue.isNotEmpty) {
-            text += format(dataValue.content, "yyyy-MM-dd HH:mm");
+            text += formatDate(dataValue.content, "yyyy-MM-dd HH:mm");
         }
         text += "</span>";
     } else if (cellValue.type === "mAsset") {
@@ -695,10 +701,10 @@ const renderRollup = (cellValue: IAVCellValue) => {
     } else if (cellValue.type === "date") {
         const dataValue = cellValue ? cellValue.date : null;
         if (dataValue && dataValue.isNotEmpty) {
-            text += format(dataValue.content, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
+            text += formatDate(dataValue.content, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
         }
         if (dataValue && dataValue.hasEndDate && dataValue.isNotEmpty && dataValue.isNotEmpty2) {
-            text += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${format(dataValue.content2, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
+            text += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${formatDate(dataValue.content2, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
         }
         if (text) {
             text = `<span class="av__celltext">${text}</span>`;
@@ -819,4 +825,12 @@ export const dragFillCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, 
     if (doOperations.length > 0) {
         transaction(protyle, doOperations, undoOperations);
     }
+};
+
+export const addDragFill = (cellElement: Element) => {
+    if (!cellElement) {
+        return;
+    }
+    cellElement.classList.add("av__cell--active");
+    cellElement.insertAdjacentHTML("beforeend", `<div aria-label="${window.siyuan.languages.dragFill}" class="av__drag-fill ariaLabel"></div>`);
 };

@@ -17,7 +17,7 @@ import {isBrowser, isWindow} from "../util/functions";
 import {Menu} from "../plugin/Menu";
 import {fetchPost} from "../util/fetch";
 import {needSubscribe} from "../util/needSubscribe";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {commandPanel} from "../plugin/commandPanel";
 import {exportLayout} from "./util";
 
@@ -230,7 +230,7 @@ export const initBar = (app: App) => {
             if (!window.siyuan.config.sync.enabled || (0 === window.siyuan.config.sync.provider && needSubscribe(""))) {
                 html = response.data.stat;
             } else {
-                html = window.siyuan.languages._kernel[82].replace("%s", format(new Date(response.data.synced), 'yyyy-MM-dd HH:mm')) + "<br>";
+                html = window.siyuan.languages._kernel[82].replace("%s", formatDate(new Date(response.data.synced), 'yyyy-MM-dd HH:mm')) + "<br>";
                 html += "&emsp;" + response.data.stat;
                 if (response.data.kernels.length > 0) {
                     html += "<br>";

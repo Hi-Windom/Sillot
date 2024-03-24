@@ -6,7 +6,7 @@ import {Constants} from "../../constants";
 import {setStorageVal} from "../util/compatibility";
 
 export const saveScroll = (protyle: IProtyle, getObject = false) => {
-    if (!protyle.wysiwyg.element.firstElementChild || window.siyuan.config.readonly) {
+    if (!protyle.wysiwyg?.element.firstElementChild || window.siyuan.config.readonly) {
         // 报错或者空白页面
         return undefined;
     }
@@ -20,7 +20,7 @@ export const saveScroll = (protyle: IProtyle, getObject = false) => {
     if (getSelection().rangeCount > 0) {
         range = getSelection().getRangeAt(0);
     }
-    if (!range || !protyle.wysiwyg.element.contains(range.startContainer)) {
+    if (!range || !protyle.wysiwyg?.element.contains(range.startContainer)) {
         range = protyle.toolbar.range;
     }
     if (range && protyle.wysiwyg.element.contains(range.startContainer)) {

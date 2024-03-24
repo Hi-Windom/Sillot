@@ -2,7 +2,7 @@ import {fetchPost} from "../../../util/fetch";
 import {addCol, getColIconByType} from "./col";
 import {escapeAttr} from "../../../util/escape";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {popTextCell} from "./cell";
 import {hasClosestBlock, hasClosestByClassName} from "../../util/hasClosest";
 import {unicode2Emoji} from "../../../emoji";
@@ -27,10 +27,10 @@ const genAVRollupHTML = (value: IAVCellValue) => {
             break;
         case "date":
             if (value[value.type] && value[value.type].isNotEmpty) {
-                html = format(value[value.type].content, value[value.type].isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
+                html = formatDate(value[value.type].content, value[value.type].isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
             }
             if (value[value.type] && value[value.type].hasEndDate && value[value.type].isNotEmpty && value[value.type].isNotEmpty2) {
-                html += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${format(value[value.type].content2, value[value.type].isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
+                html += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${formatDate(value[value.type].content2, value[value.type].isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
             }
             if (html) {
                 html = `<span class="av__celltext">${html}</span>`;
@@ -79,10 +79,10 @@ export const genAVValueHTML = (value: IAVCellValue) => {
         case "date":
             html = `<span class="av__celltext" data-value='${JSON.stringify(value[value.type])}'>`;
             if (value[value.type] && value[value.type].isNotEmpty) {
-                html += format(new Date(value[value.type].content), value[value.type].isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
+                html += formatDate(new Date(value[value.type].content), value[value.type].isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
             }
             if (value[value.type] && value[value.type].hasEndDate && value[value.type].isNotEmpty && value[value.type].isNotEmpty2) {
-                html += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${format(new Date(value[value.type].content2), value[value.type].isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
+                html += `<svg class="av__cellicon"><use xlink:href="#iconForward"></use></svg>${formatDate(new Date(value[value.type].content2), value[value.type].isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")}`;
             }
             html += "</span>";
             break;

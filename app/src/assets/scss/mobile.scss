@@ -29,7 +29,8 @@
 @import "business/search";
 
 // sillot extend start
-@import "sillot/logic";
+@import "sillot/base_logic";
+@import "sillot/base_motion";
 @import "sillot/mobile_slider";
 @import "sillot/mobile_menu";
 // sillot extend end

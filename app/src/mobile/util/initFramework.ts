@@ -60,8 +60,11 @@ const openDockMenu = (app: App) => {
 
 export const initFramework = (app: App, isStart: boolean) => {
     setInlineStyle();
+    console.log("initFramework()->setInlineStyle() resolved");
     renderSnippet();
+    console.log("initFramework()->renderSnippet() resolved");
     initKeyboardToolbar();
+    console.log("initFramework()->initKeyboardToolbar() resolved");
     const sidebarElement = document.getElementById("sidebar");
     let outline: MobileOutline;
     let backlink: MobileBacklinks;
@@ -164,11 +167,13 @@ export const initFramework = (app: App, isStart: boolean) => {
         closeModel();
     });
     initEditorName();
+    console.log("initFramework()->initEditorName() resolved");
     if (getOpenNotebookCount() > 0) {
         if (window.JSAndroid && window.openFileByURL(window.JSAndroid.getBlockURL())) {
             return;
         }
         const idZoomIn = getIdZoomInByPath();
+        console.log("initFramework()->getIdZoomInByPath() resolved");
         if (idZoomIn.id) {
             openMobileFileById(app, idZoomIn.id,
                 idZoomIn.isZoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);

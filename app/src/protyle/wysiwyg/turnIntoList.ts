@@ -1,7 +1,7 @@
 import {transaction, updateTransaction} from "./transaction";
 import {focusByWbr} from "../util/selection";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 
 export const turnIntoTaskList = (protyle: IProtyle, type: string, blockElement: HTMLElement, editElement: HTMLElement, range: Range) => {
     if (type !== "NodeCodeBlock" &&
@@ -22,7 +22,7 @@ export const turnIntoTaskList = (protyle: IProtyle, type: string, blockElement: 
                 const liElement = blockElement.parentElement.parentElement;
                 const oldHTML = liElement.outerHTML;
                 liElement.setAttribute("data-subtype", "t");
-                liElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+                liElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
                 blockElement.parentElement.setAttribute("data-subtype", "t");
                 if (isDone) {
                     blockElement.parentElement.classList.add("protyle-task--done");

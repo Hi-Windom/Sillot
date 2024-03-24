@@ -6,7 +6,7 @@ import {genCellValueByElement, getTypeByCellElement, popTextCell, renderCell, re
 import {fetchPost} from "../../../util/fetch";
 import {showMessage} from "../../../dialog/message";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 
 export const selectRow = (checkElement: Element, type: "toggle" | "select" | "unselect" | "unselectAll") => {
     const rowElement = hasClosestByClassName(checkElement, "av__row");
@@ -172,7 +172,7 @@ ${(item.getAttribute("data-block-id") || item.dataset.dtype === "block") ? ' dat
             if (hideTextCell) {
                 currentRow.remove();
                 showMessage(window.siyuan.languages.insertRowTip);
-            } else {
+            } else if (srcIDs.length === 1) {
                 popTextCell(protyle, [currentRow.querySelector('.av__cell[data-detached="true"]')], "block");
             }
             setPage(blockElement);
@@ -329,7 +329,7 @@ export const deleteRow = (blockElement: HTMLElement, protyle: IProtyle) => {
             blockID: blockElement.dataset.nodeId
         });
     });
-    const newUpdated = format(new Date(), 'yyyyMMddHHmmss');
+    const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
     undoOperations.push({
         action: "doUpdateUpdated",
         id: blockElement.dataset.nodeId,
@@ -349,5 +349,36 @@ export const deleteRow = (blockElement: HTMLElement, protyle: IProtyle) => {
     });
     stickyRow(blockElement, protyle.contentElement.getBoundingClientRect(), "all");
     updateHeader(blockElement.querySelector(".av__row"));
+    blockElement.setAttribute("updated", newUpdated);
+};
+
+export const insertRows = (blockElement: HTMLElement, protyle: IProtyle, count: number, previousID: string) => {
+    const avID = blockElement.getAttribute("data-av-id");
+    const srcIDs: string[] = [];
+    new Array(count).fill(0).forEach(() => {
+        srcIDs.push(Lute.NewNodeID());
+    });
+    const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
+    transaction(protyle, [{
+        action: "insertAttrViewBlock",
+        avID,
+        previousID,
+        srcIDs,
+        isDetached: true,
+        blockID: blockElement.dataset.nodeId,
+    }, {
+        action: "doUpdateUpdated",
+        id: blockElement.dataset.nodeId,
+        data: newUpdated,
+    }], [{
+        action: "removeAttrViewBlock",
+        srcIDs,
+        avID,
+    }, {
+        action: "doUpdateUpdated",
+        id: blockElement.dataset.nodeId,
+        data: blockElement.getAttribute("updated")
+    }]);
+    insertAttrViewBlockAnimation(protyle, blockElement, srcIDs, previousID, avID);
     blockElement.setAttribute("updated", newUpdated);
 };

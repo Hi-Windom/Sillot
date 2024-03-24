@@ -36,7 +36,8 @@
 @import "business/av";
 
 // sillot extend start
-@import "sillot/logic";
+@import "sillot/base_logic";
+@import "sillot/base_motion";
 // sillot extend end
 
 /*
@@ -374,6 +375,10 @@ html {
   &--right {
     width: 32px;
     text-align: right;
+  }
+
+  &--bg {
+    background-color: var(--b3-theme-surface);
   }
 }
 

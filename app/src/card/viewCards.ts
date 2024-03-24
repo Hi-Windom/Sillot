@@ -1,4 +1,4 @@
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {Protyle} from "../protyle";
 import {fetchPost} from "../util/fetch";
 import {Dialog} from "../dialog";
@@ -171,7 +171,7 @@ export const viewCards = (app: App, deckID: string, title: string, deckType: "Tr
                         id: deckID,
                         blockIDs: [target.getAttribute("data-id")],
                     }, () => {
-                        target.parentElement.querySelector(".ariaLabel.b3-list-item__meta").textContent = format(new Date(), 'yyyy-MM-dd');
+                        target.parentElement.querySelector(".ariaLabel.b3-list-item__meta").textContent = formatDate(new Date(), 'yyyy-MM-dd');
                     });
                     event.stopPropagation();
                     event.preventDefault();
@@ -185,7 +185,7 @@ export const viewCards = (app: App, deckID: string, title: string, deckType: "Tr
                                 id: deckID,
                             }, () => {
                                 dialog.element.querySelectorAll(".ariaLabel.b3-list-item__meta").forEach(item => {
-                                    item.textContent = format(new Date(), 'yyyy-MM-dd');
+                                    item.textContent = formatDate(new Date(), 'yyyy-MM-dd');
                                 });
                             });
                         });
@@ -260,7 +260,7 @@ ${unicode2Emoji(item.ial.icon, "b3-list-item__graphic", true)}
 <span class="b3-list-item__text">${item.content || Constants.ZWSP}</span>
 <span class="${(isMobile() || !hPath) ? "fn__none " : ""}b3-list-item__meta b3-list-item__meta--ellipsis" title="${escapeAttr(hPath)}">${escapeHtml(hPath)}</span>
 <span data-position="parentE" aria-label="${window.siyuan.languages.revisionCount}" class="ariaLabel counter${item.riffCard?.reps === 0 ? " fn__none" : ""}">${item.riffCard?.reps}</span>
-<span data-position="parentE" aria-label="${window.siyuan.languages.nextDue}" class="ariaLabel b3-list-item__meta${!item.riffCard?.due ? " fn__none" : ""}">${format(new Date(item.riffCard?.due), 'yyyy-MM-dd')}</span>
+<span data-position="parentE" aria-label="${window.siyuan.languages.nextDue}" class="ariaLabel b3-list-item__meta${!item.riffCard?.due ? " fn__none" : ""}">${formatDate(new Date(item.riffCard?.due), 'yyyy-MM-dd')}</span>
 <span data-position="parentE" data-type="reset" data-id="${item.id}" class="b3-list-item__action ariaLabel" aria-label="${window.siyuan.languages.reset}">
     <svg><use xlink:href="#iconUndo"></use></svg>
 </span>

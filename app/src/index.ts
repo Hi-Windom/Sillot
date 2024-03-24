@@ -200,8 +200,6 @@ window.openFileByURL = (openURL) => {
     return false;
 };
 
-window.vConsole = new VConsole({ theme: 'dark' });
-window.vConsole.hideSwitch();
 
 /// #if BROWSER
 window.showKeyboardToolbar = () => {

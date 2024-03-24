@@ -2,7 +2,7 @@ import {log} from "../util/log";
 import {focusBlock, focusByWbr} from "../util/selection";
 import {Constants} from "../../constants";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {transaction, updateTransaction} from "./transaction";
 import {mathRender} from "../render/mathRender";
 import {highlightRender} from "../render/highlightRender";
@@ -46,7 +46,7 @@ export const input = async (protyle: IProtyle, blockElement: HTMLElement, range:
         focusByWbr(blockElement, range);
         return;
     }
-    blockElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+    blockElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
     const wbrElement = document.createElement("wbr");
     range.insertNode(wbrElement);
     const id = blockElement.getAttribute("data-node-id");

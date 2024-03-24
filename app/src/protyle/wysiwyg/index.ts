@@ -32,7 +32,7 @@ import {
     zoomOut
 } from "../../menus/protyle";
 // import * as dayjs from "dayjs";
-import {format} from "date-fns";
+import {formatDate} from "sofill/mid";
 import {dropEvent} from "../util/editorCommonEvent";
 import {input} from "./input";
 import {
@@ -83,6 +83,7 @@ import {openViewMenu} from "../render/av/view";
 import {avRender} from "../render/av/render";
 import {checkFold} from "../../util/noRelyPCFunction";
 import {
+    addDragFill,
     dragFillCellsValue,
     genCellValueByElement,
     getCellText,
@@ -308,7 +309,13 @@ export class WYSIWYG {
                     html = "[";
                     cellElements.forEach((item: HTMLElement, index) => {
                         const cellText = getCellText(item);
+                        if (index === 0 || !cellElements[index - 1].isSameNode(item.previousElementSibling)) {
+                            html += "[";
+                        }
                         html += JSON.stringify(genCellValueByElement(getTypeByCellElement(item), item)) + ",";
+                        if (index === cellElements.length - 1 || !cellElements[index + 1].isSameNode(item.nextElementSibling)) {
+                            html = html.substring(0, html.length - 1) + "],";
+                        }
                         textPlain += cellText + ((cellElements[index + 1] && item.nextElementSibling && item.nextElementSibling.isSameNode(cellElements[index + 1])) ? "\t" : "\n\n");
                     });
                     textPlain = textPlain.substring(0, textPlain.length - 2);
@@ -518,7 +525,7 @@ export class WYSIWYG {
                     documentSelf.onselect = null;
                     if (lastCellElement) {
                         dragFillCellsValue(protyle, nodeElement, originData, originCellIds);
-                        lastCellElement.insertAdjacentHTML("beforeend", `<div aria-label="${window.siyuan.languages.dragFill}" class="av__drag-fill ariaLabel"></div>`);
+                        addDragFill(lastCellElement);
                     }
                     return false;
                 };
@@ -590,7 +597,7 @@ export class WYSIWYG {
                     if (lastCellElement) {
                         selectRow(nodeElement.querySelector(".av__firstcol"), "unselectAll");
                         focusBlock(nodeElement);
-                        lastCellElement.insertAdjacentHTML("beforeend", `<div aria-label="${window.siyuan.languages.dragFill}" class="av__drag-fill ariaLabel"></div>`);
+                        addDragFill(lastCellElement);
                         this.preventClick = true;
                     }
                     return false;
@@ -876,11 +883,17 @@ export class WYSIWYG {
                     return;
                 }
                 let firstBlockElement = hasClosestBlock(firstElement);
+                if (!firstBlockElement && firstElement.classList.contains("protyle-breadcrumb__bar")) {
+                    firstBlockElement = firstElement.nextElementSibling as HTMLElement;
+                }
                 if (moveEvent.clientY > y) {
                     if (!startFirstElement) {
                         // 向上选择导致滚动条滚动到顶部再向下选择至 > y 时，firstBlockElement 为 undefined https://ld246.com/article/1705233964097
                         if (!firstBlockElement) {
                             firstBlockElement = protyle.wysiwyg.element.firstElementChild as HTMLElement;
+                            if (firstBlockElement.classList.contains("protyle-breadcrumb__bar")) {
+                                firstBlockElement = firstBlockElement.nextElementSibling as HTMLElement;
+                            }
                         }
                         startFirstElement = firstBlockElement;
                     }
@@ -888,6 +901,9 @@ export class WYSIWYG {
                     // https://github.com/siyuan-note/siyuan/issues/7580
                     moveEvent.clientY < protyle.wysiwyg.element.lastElementChild.getBoundingClientRect().bottom) {
                     firstBlockElement = protyle.wysiwyg.element.firstElementChild as HTMLElement;
+                    if (firstBlockElement.classList.contains("protyle-breadcrumb__bar")) {
+                        firstBlockElement = firstBlockElement.nextElementSibling as HTMLElement;
+                    }
                 }
                 let selectElements: Element[] = [];
                 let currentElement: Element | boolean = firstBlockElement;
@@ -916,7 +932,9 @@ export class WYSIWYG {
                                     hasJump = true;
                                 }
                             } else {
-                                selectElements.push(currentElement);
+                                if (!currentElement.classList.contains("protyle-breadcrumb__bar")) {
+                                    selectElements.push(currentElement);
+                                }
                                 currentElement = currentElement.nextElementSibling;
                             }
                         } else if (currentElement.parentElement.classList.contains("sb")) {
@@ -1444,7 +1462,7 @@ export class WYSIWYG {
                         editableElement.innerHTML = "";
                     }
                 }
-                nodeElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+                nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
                 if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
                     range.insertNode(document.createElement("wbr"));
                     getContenteditableElement(nodeElement).removeAttribute("data-render");
@@ -2338,7 +2356,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                                     actionElement.querySelector("use").setAttribute("xlink:href", "#iconCheck");
                                     actionElement.parentElement.classList.add("protyle-task--done");
                                 }
-                                actionElement.parentElement.setAttribute("updated", format(new Date(), 'yyyyMMddHHmmss'));
+                                actionElement.parentElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
                                 updateTransaction(protyle, actionId, actionElement.parentElement.outerHTML, html);
                             }
                         } else if (window.siyuan.config.editor.listItemDotNumberClickFocus) {
@@ -2463,7 +2481,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     protyle.toolbar.range = newRange;
                 }
                 /// #endif
-                if (!protyle.wysiwyg.element.querySelector(".protyle-wysiwyg--select")) {
+                if (!protyle.wysiwyg?.element.querySelector(".protyle-wysiwyg--select")) {
                     countSelectWord(newRange, protyle.block.rootID);
                 }
                 if (getSelection().rangeCount === 0) {
@@ -2550,7 +2568,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                         this.shiftStartElement = undefined;
                     } else {
                         const ids: string[] = [];
-                        if (!protyle.wysiwyg.element.querySelector(".protyle-wysiwyg--select") && protyle.scroll && !protyle.scroll.element.classList.contains("fn__none") && !protyle.scroll.keepLazyLoad &&
+                        if (!protyle?.wysiwyg.element.querySelector(".protyle-wysiwyg--select") && protyle.scroll && !protyle.scroll.element.classList.contains("fn__none") && !protyle.scroll.keepLazyLoad &&
                             (startElement.getBoundingClientRect().top < -protyle.contentElement.clientHeight * 2 || endElement.getBoundingClientRect().bottom > protyle.contentElement.clientHeight * 2)) {
                             showMessage(window.siyuan.languages.crossKeepLazyLoad);
                         }

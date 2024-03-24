@@ -1,4 +1,11 @@
 {
+  "video": "视频",
+  "audio": "音频",
+  "updateAll": "全部更新",
+  "confirmUpdateAll": "确定全部更新吗？",
+  "confirmUpdate": "确定更新吗？",
+  "insertRowBefore": "在上方插入${x}行",
+  "insertRowAfter": "在下方插入${x}行",
   "setDueTime": "设置到期时间",
   "showCardDay": "要在多少天后显示卡片？",
   "forgetCount": "遗忘次数",
@@ -314,14 +321,6 @@
   "aiContinueWrite": "续写",
   "aiTranslate": "翻译",
   "aiExtractSummary": "提取摘要",
-  "aiTranslate_zh_Hans": "简体中文",
-  "aiTranslate_zh_Hant": "繁体中文",
-  "aiTranslate_ja_JP": "日文",
-  "aiTranslate_ko_KR": "韩文",
-  "aiTranslate_en_US": "英文",
-  "aiTranslate_es_ES": "西班牙文",
-  "aiTranslate_fr_FR": "法文",
-  "aiTranslate_de_DE": "德文",
   "aiBrainStorm": "头脑风暴",
   "aiFixGrammarSpell": "修正语法、拼写和错别字",
   "aiCustomAction": "自定义操作...",
@@ -1448,6 +1447,10 @@
     "231": "正在删除云端存储未引用数据对象...",
     "232": "云端数据存储清理完毕，已删除 [%d] 个快照和 [%d] 个数据对象，共释放 [%s] 磁盘空间",
     "233": "正在关闭用户指南...",
-    "234": "[%d/%d] 已经更新 [%d] 个文档的可读路径 [%s]"
+    "234": "[%d/%d] 已经更新 [%d] 个文档的可读路径 [%s]",
+    "235": "[%d/%d] 正在更新集市包...",
+    "236": "[%d/%d] 正在更新集市包 [%s]...",
+    "237": "[%d] 个集市包已经全部更新成功",
+    "238": "集市包 [%s] 更新失败，请稍后再试"
   }
 }
