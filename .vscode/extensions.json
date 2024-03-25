@@ -24,7 +24,8 @@
     "shardulm94.trailing-spaces",
     "xboxyan.tree-generator",
     "unifiedjs.vscode-mdx",
-    "astro-build.astro-vscode"
+    "astro-build.astro-vscode",
+    "golang.go"
   ],
   "unwantedRecommendations": []
 }

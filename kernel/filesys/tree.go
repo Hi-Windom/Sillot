@@ -40,7 +40,7 @@ func LoadTree(boxID, p string, luteEngine *lute.Lute) (ret *parse.Tree, err erro
 	filePath := filepath.Join(util.DataDir, boxID, p)
 	data, err := filelock.ReadFile(filePath)
 	if nil != err {
-		logging.LogErrorf("load tree [%s] failed: %s", p, err)
+		logging.LogErrorf("LoadTree() load tree [%s] failed: %s", p, err)
 		return
 	}
 
@@ -49,10 +49,13 @@ func LoadTree(boxID, p string, luteEngine *lute.Lute) (ret *parse.Tree, err erro
 }
 
 func LoadTreeByData(data []byte, boxID, p string, luteEngine *lute.Lute) (ret *parse.Tree, err error) {
+	if !strings.HasPrefix(string(data), "{") || !strings.HasSuffix(string(data), "}") { // 非法JSON
+		data = []byte("{}")
+	}
 	ret = parseJSON2Tree(boxID, p, data, luteEngine)
 	if nil == ret {
-		logging.LogErrorf("parse tree [%s] failed", p)
-		err = errors.New("parse tree failed")
+		logging.LogErrorf("LoadTreeByData() parse tree [%s] failed", p)
+		err = errors.New("<- LoadTreeByData() parse tree failed")
 		return
 	}
 	ret.Path = p
@@ -85,13 +88,13 @@ func LoadTreeByData(data []byte, boxID, p string, luteEngine *lute.Lute) (ret *p
 				// 子文档缺失父文档时自动补全 https://github.com/siyuan-note/siyuan/issues/7376
 				parentTree := treenode.NewTree(boxID, parentPath, hPathBuilder.String()+"Untitled", "Untitled")
 				if writeErr := WriteTree(parentTree); nil != writeErr {
-					logging.LogErrorf("rebuild parent tree [%s] failed: %s", parentAbsPath, writeErr)
+					logging.LogErrorf("LoadTreeByData() rebuild parent tree [%s] failed: %s", parentAbsPath, writeErr)
 				} else {
-					logging.LogInfof("rebuilt parent tree [%s]", parentAbsPath)
+					logging.LogInfof("LoadTreeByData() rebuilt parent tree [%s]", parentAbsPath)
 					treenode.IndexBlockTree(parentTree)
 				}
 			} else {
-				logging.LogWarnf("read parent tree data [%s] failed: %s", parentAbsPath, readErr)
+				logging.LogWarnf("LoadTreeByData() read parent tree data [%s] failed: %s", parentAbsPath, readErr)
 			}
 			hPathBuilder.WriteString("Untitled/")
 			continue
@@ -175,7 +178,7 @@ func parseJSON2Tree(boxID, p string, jsonData []byte, luteEngine *lute.Lute) (re
 	var needFix bool
 	ret, needFix, err = ParseJSON(jsonData, luteEngine.ParseOptions)
 	if nil != err {
-		logging.LogErrorf("parse json [%s] to tree failed: %s", boxID+p, err)
+		logging.LogErrorf("parse json file [%s] to tree failed: %s", boxID+p, err)
 		return
 	}
 

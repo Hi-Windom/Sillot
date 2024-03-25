@@ -38,6 +38,7 @@ const remote = require("@electron/remote/main");
 process.noAsar = true;
 const appDir = path.dirname(app.getAppPath());
 const isDevEnv = process.env.NODE_ENV === "development";
+const DevMode = process.env.MODE === "dlv" ? "dlv" : "exec";
 let appVer = app.getVersion();
 try { require("electron-reloader")(module); } catch {}
 
@@ -474,14 +475,16 @@ const initKernel = (workspace, port, lang) => {
 
         const kernelName = "win32" === process.platform ? "SiYuan-Sillot-Kernel.exe" : "SiYuan-Sillot-Kernel";
         // const kernelPath = path.join(appDir, "kernel", kernelName);
-    let kernelPath;
-    if (!isDevEnv) {
-      kernelPath = path.join(appDir, "kernel", kernelName);
-    } else {
-      kernelPath = path.join(appDir,"app", "kernel", kernelName);
-    }
-    console.log("debug: $kernelPath = " + kernelPath);
-        if (!fs.existsSync(kernelPath)) {
+        let kernelPath;
+        if (DevMode === "dlv") {
+          kernelPath = "dlv";
+        } else if (!isDevEnv) {
+          kernelPath = path.join(appDir, "kernel", kernelName);
+        } else {
+          kernelPath = path.join(appDir,"app", "kernel", kernelName);
+        }
+        console.log("debug: $kernelPath = " + kernelPath);
+        if (!fs.existsSync(kernelPath) && DevMode === "exec") {
             showErrorWindow("⚠️ 内核程序丢失 Kernel program is missing", `<div>内核程序丢失，请重新安装思源，并将思源内核程序加入杀毒软件信任列表。</div><div>The kernel program is not found, please reinstall SiYuan and add SiYuan Kernel prgram into the trust list of your antivirus software.</div><div><i>${kernelPath}</i></div>`);
             bootWindow.destroy();
             resolve(false);
@@ -529,8 +532,7 @@ const initKernel = (workspace, port, lang) => {
         if (lang && "" !== lang) {
             cmds.push("--lang", lang);
         }
-        const cmd = `ui version [${appVer}], booting kernel [${kernelPath} ${cmds.join(" ")}]`;
-        writeLog(cmd);
+        writeLog(`ui version [${appVer}], booting kernel [${kernelPath} ${cmds.join(" ")}]`);
         if (!isDevEnv || workspaces.length > 0) {
             const cp = require("child_process");
             const kernelProcess = cp.spawn(kernelPath, cmds, {
@@ -663,7 +665,7 @@ function setProtocol(agreement) {
   } else {
     isSet = app.setAsDefaultProtocolClient(agreement);
   }
-  console.log(`${agreement}是否注册成功：`, isSet);
+  console.log(`${agreement} protocol set : `, isSet);
 }
 
 setProtocol("siyuan");
@@ -725,7 +727,7 @@ app.whenReady().then(() => {
             },
         }, {
             label: lang.officialWebsite, click: () => {
-                shell.openExternal("https://yy-ac.github.io/Hi-Windom/Sillot/");
+                shell.openExternal("https://sillot.db.sc.cn");
             },
         }, {
             label: lang.openSource, click: () => {

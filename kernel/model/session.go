@@ -374,3 +374,30 @@ func ControlConcurrency(c *gin.Context) {
 	defer mutex.Unlock()
 	c.Next()
 }
+
+// Ready 中间件，它检查IP是否已经处理过该请求
+func Ready(c *gin.Context) {
+	// 获取请求的IP
+	ip := c.ClientIP()
+
+	// 检查IP是否已经处理过该请求
+	isReady, exists := readyStates[ip]
+	if exists && isReady {
+		// 如果IP已经处理过请求，返回错误
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "The API is currently processing. Please try again later."})
+		c.Abort()
+		return
+	}
+
+	// 设置IP为处理中
+	readyStates[ip] = true
+
+	// 调用下一个中间件或处理器
+	c.Next()
+
+	// 任务完成后，清除IP的处理中状态
+	readyStates[ip] = false
+}
+
+// 定义一个用于存储处理状态的map
+var readyStates = make(map[string]bool)
