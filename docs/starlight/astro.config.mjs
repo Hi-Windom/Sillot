@@ -34,16 +34,9 @@ export default defineConfig({
           lang: 'zh-CN', // lang 是 root 语言必须的
         },
         // 英文文档在 `src/content/docs/en/` 中。
-        en: {
-          label: 'English',
-          lang: 'en',
-        },
+        en: { label: 'English', lang: 'en', },
         ja: { label: '日本語', lang: 'ja' },
-        de: { label: 'Deutsch', lang: 'de' },
         es: { label: 'Español', lang: 'es' },
-        fr: { label: 'Français', lang: 'fr' },
-        it: { label: 'Italiano', lang: 'it' },
-        ko: { label: '한국어', lang: 'ko' },
         ru: { label: 'Русский', lang: 'ru' },
       },
 			sidebar: [ // REF https://starlight.astro.build/zh-cn/guides/sidebar/
