@@ -20,7 +20,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/K-Sillot/httpclient"
+	"github.com/siyuan-note/httpclient"
 	"github.com/siyuan-note/logging"
 )
 

@@ -22,10 +22,6 @@ github.com/ConradIrwin/font v0.0.0-20210318200717-ce8d41cc0732 h1:0EDePskeF4vNFC
 github.com/ConradIrwin/font v0.0.0-20210318200717-ce8d41cc0732/go.mod h1:krTLO7JWu6g8RMxG8sl+T1Hf8W93XQacBKJmqFZ2MFY=
 github.com/JalfResi/justext v0.0.0-20221106200834-be571e3e3052 h1:8T2zMbhLBbH9514PIQVHdsGhypMrsB4CxwbldKA9sBA=
 github.com/JalfResi/justext v0.0.0-20221106200834-be571e3e3052/go.mod h1:0SURuH1rsE8aVWvutuMZghRNrNrYEUzibzJfhEYR8L0=
-github.com/K-Sillot/encryption v0.0.1 h1:AiqNTMRouBR38A5DF3ZC88+8n3ouvnONj8ot+8sKp4c=
-github.com/K-Sillot/encryption v0.0.1/go.mod h1:vmtrEZRHqOEdLKJcYfPDu66pE55GB+W7gNSW3j9uQ5M=
-github.com/K-Sillot/httpclient v0.0.1 h1:jgEGwkcF39z5PmykI/tere7HriDefXuVqWRAnbLYeNk=
-github.com/K-Sillot/httpclient v0.0.1/go.mod h1:bpmYNgAvwSwwElk+BeHNWkeIitDCCvjQBbmdzJWLvDM=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
 github.com/Masterminds/goutils v1.1.1/go.mod h1:8cTjp+g8YejhMuvIA5y2vz3BpJxksy863GQaJW2MFNU=
 github.com/Masterminds/semver/v3 v3.2.0/go.mod h1:qvl/7zhW3nngYb5+80sSMF+FG2BjYrf8m9wsX0PNOMQ=

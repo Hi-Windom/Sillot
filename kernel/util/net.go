@@ -25,7 +25,6 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
-	"github.com/K-Sillot/httpclient"
 	"github.com/gin-gonic/gin"
 	"github.com/imroc/req/v3"
 	"github.com/siyuan-note/httpclient"
