@@ -138,12 +138,18 @@ func getUpdatePkg() (downloadPkgURLs []string, checksum string, err error) {
 	}
 	pkg := "/Sillot-" + result["name"].(string) + "-" + suffix
 
-	// b3logURL := "https://release.b3log.org/siyuan/" + pkg
+	b3logURL := "https://release.liuyun.io/siyuan/" + pkg
 	// downloadPkgURLs = append(downloadPkgURLs, b3logURL)
 	githubURL := "https://github.com/Hi-Windom/Sillot/releases/download/" + ver.(string) + pkg
 	ghproxyURL := "https://mirror.ghproxy.com/" + githubURL
-	downloadPkgURLs = append(downloadPkgURLs, ghproxyURL)
-	downloadPkgURLs = append(downloadPkgURLs, githubURL)
+	if util.IsChinaCloud() {
+		downloadPkgURLs = append(downloadPkgURLs, b3logURL)
+		downloadPkgURLs = append(downloadPkgURLs, ghproxyURL)
+		downloadPkgURLs = append(downloadPkgURLs, githubURL)
+	} else {
+		downloadPkgURLs = append(downloadPkgURLs, githubURL)
+		downloadPkgURLs = append(downloadPkgURLs, b3logURL)
+	}
 
 	checksums := result["checksums"].(map[string]interface{})
 	checksum = checksums[pkg].(string)
