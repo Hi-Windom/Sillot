@@ -1,4 +1,5 @@
 {
+  "removeCol": "¿Está seguro de que desea eliminar la columna ${x} en la base de datos?",
   "vídeo": "Vídeo",
   "audio": "Audio",
   "updateAll": "Actualizar todo",
@@ -1208,7 +1209,8 @@
   },
   "_attrView": {
     "tabla": "Tabla",
-    "clave": "Clave principal"
+    "key": "Clave principal",
+    "select": "Selección"
   },
   "_kernel": {
     "0": "Consulta al cuaderno de notas fallido",
@@ -1316,7 +1318,7 @@
     "102": "Procesamiento completado",
     "103": "El paquete de instalación de la actualización se ha descargado automáticamente en segundo plano. Al salir, se le preguntará si desea instalar la nueva versión",
     "104": "El paquete de instalación de la actualización no se pudo descargar, verifique la conexión de red",
-    "105": "TODO",
+    "105": "Sin título",
     "106": "La longitud máxima está limitada a 512 caracteres",
     "107": "Documento movido [%s]",
     "108": "La sincronizaci\u00f3n de datos encontr\u00f3 en conflictos, puede ver el contenido del conflicto generado en [Historial de datos]",

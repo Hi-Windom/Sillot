@@ -27,10 +27,10 @@ import (
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute"
-	"github.com/K-Sillot/httpclient"
 	"github.com/araddon/dateparse"
 	"github.com/imroc/req/v3"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/httpclient"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 	"golang.org/x/mod/semver"

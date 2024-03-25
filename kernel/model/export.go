@@ -21,7 +21,6 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"github.com/88250/pdfcpu/pkg/font"
 	"net/http"
 	"net/url"
 	"os"
@@ -34,6 +33,8 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/88250/pdfcpu/pkg/font"
+
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/editor"
@@ -42,11 +43,11 @@ import (
 	"github.com/88250/lute/render"
 	"github.com/88250/pdfcpu/pkg/api"
 	"github.com/88250/pdfcpu/pkg/pdfcpu"
-	"github.com/K-Sillot/httpclient"
 	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/emirpasic/gods/stacks/linkedliststack"
 	"github.com/imroc/req/v3"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/httpclient"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/riff"
 	"github.com/siyuan-note/siyuan/kernel/av"
@@ -76,7 +77,7 @@ func ExportAv2CSV(avID, blockID string) (zipPath string, err error) {
 
 	name := util.FilterFileName(attrView.Name)
 	if "" == name {
-		name = "Untitled"
+		name = Conf.language(105)
 	}
 
 	table, err := renderAttributeViewTable(attrView, view, "")
@@ -1375,7 +1376,7 @@ func BatchExportMarkdown(boxID, folderPath string) (zipPath string) {
 		baseFolderName = path.Base(block.HPath)
 	}
 	if "" == baseFolderName {
-		baseFolderName = "Untitled"
+		baseFolderName = Conf.language(105)
 	}
 
 	docFiles := box.ListFiles(folderPath)

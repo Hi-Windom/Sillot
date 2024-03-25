@@ -185,12 +185,12 @@ export class Gutter {
                                     doOperations.push({
                                         action: "setAttrs",
                                         id: listId,
-                                        data: JSON.stringify({fold: hasFold ? "0" : "1"})
+                                        data: JSON.stringify({fold: hasFold ? "" : "1"})
                                     });
                                     undoOperations.push({
                                         action: "setAttrs",
                                         id: listId,
-                                        data: JSON.stringify({fold: hasFold ? "1" : "0"})
+                                        data: JSON.stringify({fold: hasFold ? "1" : ""})
                                     });
                                 }
                             });
@@ -200,9 +200,9 @@ export class Gutter {
                     buttonElement.removeAttribute("disabled");
                 } else {
                     const foldStatus = setFold(protyle, foldElement);
-                    if (foldStatus === "1") {
+                    if (foldStatus === 1) {
                         (buttonElement.firstElementChild as HTMLElement).style.transform = "";
-                    } else if (foldStatus === "0") {
+                    } else if (foldStatus === 0) {
                         (buttonElement.firstElementChild as HTMLElement).style.transform = "rotate(90deg)";
                     }
                 }
@@ -304,12 +304,12 @@ export class Gutter {
                             doOperations.push({
                                 action: "setAttrs",
                                 id: listId,
-                                data: JSON.stringify({fold: hasFold ? "0" : "1"})
+                                data: JSON.stringify({fold: hasFold ? "" : "1"})
                             });
                             undoOperations.push({
                                 action: "setAttrs",
                                 id: listId,
-                                data: JSON.stringify({fold: hasFold ? "1" : "0"})
+                                data: JSON.stringify({fold: hasFold ? "1" : ""})
                             });
                         }
                     });

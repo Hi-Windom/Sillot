@@ -24,12 +24,14 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
     if not pat:
         return None
 
+    repo_name = "Hi-Windom/Sillot"
+    action_file = "cd.yml"
     print(f'''
 ---
 <p align="center">
-<a href="https://github.com/Hi-Windom/Sillot/actions/workflows/cd.yml"><img src="https://img.shields.io/github/actions/workflow/status/Hi-Windom/Sillot/CI/CD?event=push&label=ci.yml%20Action&logo=github" style="cursor:pointer;height: 30px;margin: 3px auto;"/></a>
-<a href="https://github.com/Hi-Windom/Sillot/releases/{thisRelease}/"><img src="https://img.shields.io/github/downloads/Hi-Windom/Sillot/{thisRelease}/total?logo=github" style="cursor:pointer;height: 30px;margin: 3px auto;"/></a>
-<img alt="GitHub commits difference between two branches/tags/commits" src="https://img.shields.io/github/commits-difference/Hi-Windom/Sillot?base={lastestRelease}&head={thisRelease}&logo=git" style="cursor:pointer;height: 30px;margin: 3px auto;"/>
+<a href="https://github.com/{repo_name}/actions/workflows/{action_file}"><img src="https://img.shields.io/github/actions/workflow/status/{repo_name}/{action_file}?logo=github&label={action_file}%20Action" style="cursor:pointer;height: 30px;margin: 3px auto;"/></a>
+<a href="https://github.com/{repo_name}/releases/{thisRelease}/"><img src="https://img.shields.io/github/downloads/{repo_name}/{thisRelease}/total?logo=github" style="cursor:pointer;height: 30px;margin: 3px auto;"/></a>
+<img alt="GitHub commits difference between two branches/tags/commits" src="https://img.shields.io/github/commits-difference/{repo_name}?base={lastestRelease}&head={thisRelease}&logo=git" style="cursor:pointer;height: 30px;margin: 3px auto;"/>
 </p>
 
 ⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节

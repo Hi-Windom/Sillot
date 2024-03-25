@@ -34,10 +34,10 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/httpclient"
 	figure "github.com/common-nighthawk/go-figure"
 	"github.com/gofrs/flock"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/httpclient"
 	"github.com/siyuan-note/logging"
 )
 

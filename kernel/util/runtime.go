@@ -31,10 +31,10 @@ import (
 	"time"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/httpclient"
 	"github.com/denisbrodbeck/machineid"
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
+	"github.com/siyuan-note/httpclient"
 	"github.com/siyuan-note/logging"
 )
 

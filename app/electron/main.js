@@ -38,6 +38,7 @@ const remote = require("@electron/remote/main");
 process.noAsar = true;
 const appDir = path.dirname(app.getAppPath());
 const isDevEnv = process.env.NODE_ENV === "development";
+const DevMode = process.env.MODE === "dlv" ? "dlv" : "exec";
 let appVer = app.getVersion();
 try { require("electron-reloader")(module); } catch {}
 
@@ -474,14 +475,16 @@ const initKernel = (workspace, port, lang) => {
 
         const kernelName = "win32" === process.platform ? "SiYuan-Sillot-Kernel.exe" : "SiYuan-Sillot-Kernel";
         // const kernelPath = path.join(appDir, "kernel", kernelName);
-    let kernelPath;
-    if (!isDevEnv) {
-      kernelPath = path.join(appDir, "kernel", kernelName);
-    } else {
-      kernelPath = path.join(appDir,"app", "kernel", kernelName);
-    }
-    console.log("debug: $kernelPath = " + kernelPath);
-        if (!fs.existsSync(kernelPath)) {
+        let kernelPath;
+        if (DevMode === "dlv") {
+          kernelPath = "dlv";
+        } else if (!isDevEnv) {
+          kernelPath = path.join(appDir, "kernel", kernelName);
+        } else {
+          kernelPath = path.join(appDir,"app", "kernel", kernelName);
+        }
+        console.log("debug: $kernelPath = " + kernelPath);
+        if (!fs.existsSync(kernelPath) && DevMode === "exec") {
             showErrorWindow("⚠️ 内核程序丢失 Kernel program is missing", `<div>内核程序丢失，请重新安装思源，并将思源内核程序加入杀毒软件信任列表。</div><div>The kernel program is not found, please reinstall SiYuan and add SiYuan Kernel prgram into the trust list of your antivirus software.</div><div><i>${kernelPath}</i></div>`);
             bootWindow.destroy();
             resolve(false);
@@ -529,8 +532,7 @@ const initKernel = (workspace, port, lang) => {
         if (lang && "" !== lang) {
             cmds.push("--lang", lang);
         }
-        const cmd = `ui version [${appVer}], booting kernel [${kernelPath} ${cmds.join(" ")}]`;
-        writeLog(cmd);
+        writeLog(`ui version [${appVer}], booting kernel [${kernelPath} ${cmds.join(" ")}]`);
         if (!isDevEnv || workspaces.length > 0) {
             const cp = require("child_process");
             const kernelProcess = cp.spawn(kernelPath, cmds, {
@@ -663,7 +665,7 @@ function setProtocol(agreement) {
   } else {
     isSet = app.setAsDefaultProtocolClient(agreement);
   }
-  console.log(`${agreement}是否注册成功：`, isSet);
+  console.log(`${agreement} protocol set : `, isSet);
 }
 
 setProtocol("siyuan");
@@ -725,7 +727,7 @@ app.whenReady().then(() => {
             },
         }, {
             label: lang.officialWebsite, click: () => {
-                shell.openExternal("https://yy-ac.github.io/Hi-Windom/Sillot/");
+                shell.openExternal("https://sillot.db.sc.cn");
             },
         }, {
             label: lang.openSource, click: () => {
@@ -776,7 +778,11 @@ app.whenReady().then(() => {
         resetTrayMenu(tray, lang, mainWindow);
     };
     const getWindowByContentId = (id) => {
-        return BrowserWindow.fromId(BrowserWindow.getAllWindows().find((win) => win.webContents.id === id).id);
+        const wnd = BrowserWindow.getAllWindows().find((win) => win.webContents.id === id);
+        if (!wnd) {
+            return null;
+        }
+        return BrowserWindow.fromId(wnd.id);
     };
 
     ipcMain.on("siyuan-open-folder", (event, filePath) => {
@@ -799,6 +805,9 @@ app.whenReady().then(() => {
         if (data.cmd === "showOpenDialog") {
             return dialog.showOpenDialog(data);
         }
+        if (data.cmd === "getCurrentWindowId") {
+            return event.sender.id;
+        }
         if (data.cmd === "setProxy") {
             return setProxy(data.proxyURL, event.sender);
         }
@@ -806,10 +815,18 @@ app.whenReady().then(() => {
             return dialog.showSaveDialog(data);
         }
         if (data.cmd === "isFullScreen") {
-            return getWindowByContentId(event.sender.id).isFullScreen();
+            const wnd = getWindowByContentId(event.sender.id);
+            if (!wnd) {
+                return false;
+            }
+            return wnd.isFullScreen();
         }
         if (data.cmd === "isMaximized") {
-            return getWindowByContentId(event.sender.id).isMaximized();
+            const wnd = getWindowByContentId(event.sender.id);
+            if (!wnd) {
+                return false;
+            }
+            return wnd.isMaximized();
         }
         if (data.cmd === "getMicrophone") {
             return systemPreferences.getMediaAccessStatus("microphone");
@@ -846,6 +863,9 @@ app.whenReady().then(() => {
         }
         initEventId.push(event.sender.id);
         const currentWindow = getWindowByContentId(event.sender.id);
+        if (!currentWindow) {
+            return;
+        }
         currentWindow.on("focus", () => {
             event.sender.send("siyuan-event", "focus");
         });
@@ -885,18 +905,33 @@ app.whenReady().then(() => {
                 globalShortcut.unregisterAll();
                 break;
             case "show":
+                if (!currentWindow) {
+                    return;
+                }
                 showWindow(currentWindow);
                 break;
             case "hide":
+                if (!currentWindow) {
+                    return;
+                }
                 currentWindow.hide();
                 break;
             case "minimize":
+                if (!currentWindow) {
+                    return;
+                }
                 currentWindow.minimize();
                 break;
             case "maximize":
+                if (!currentWindow) {
+                    return;
+                }
                 currentWindow.maximize();
                 break;
             case "restore":
+                if (!currentWindow) {
+                    return;
+                }
                 if (currentWindow.isFullScreen()) {
                     currentWindow.setFullScreen(false);
                 } else {
@@ -904,12 +939,21 @@ app.whenReady().then(() => {
                 }
                 break;
             case "focus":
+                if (!currentWindow) {
+                    return;
+                }
                 currentWindow.focus();
                 break;
             case "setAlwaysOnTopFalse":
+                if (!currentWindow) {
+                    return;
+                }
                 currentWindow.setAlwaysOnTop(false);
                 break;
             case "setAlwaysOnTopTrue":
+                if (!currentWindow) {
+                    return;
+                }
                 currentWindow.setAlwaysOnTop(true);
                 break;
             case "clearCache":
@@ -922,9 +966,15 @@ app.whenReady().then(() => {
                 event.sender.undo();
                 break;
             case "destroy":
+                if (!currentWindow) {
+                    return;
+                }
                 currentWindow.destroy();
                 break;
             case "closeButtonBehavior":
+                if (!currentWindow) {
+                    return;
+                }
                 if (currentWindow.isFullScreen()) {
                     currentWindow.once("leave-full-screen", () => {
                         currentWindow.hide();
@@ -969,31 +1019,15 @@ app.whenReady().then(() => {
             }
             data.filePaths = result.filePaths;
             data.webContentsId = event.sender.id;
-            const wnd = getWindowByContentId(event.sender.id);
-            if (!wnd) {
-                // 文档已经被删除的情况下关闭窗口，下同
-                event.sender.destroy();
-                return;
-            }
-            const parentWnd = wnd.getParentWindow();
-            if (!parentWnd) {
-                event.sender.destroy();
-                return;
-            }
-            parentWnd.send("siyuan-export-pdf", data);
+            getWindowByContentId(data.parentWindowId).send("siyuan-export-pdf", data);
         });
     });
     ipcMain.on("siyuan-export-newwindow", (event, data) => {
-        const parentWnd = getWindowByContentId(event.sender.id);
-        const parentWndBounds = parentWnd.getBounds();
-        const parentWndScreen = screen.getDisplayNearestPoint({x: parentWndBounds.x, y: parentWndBounds.y});
-        parentWndScreen.size.width;
-
         // The PDF/Word export preview window automatically adjusts according to the size of the main window https://github.com/siyuan-note/siyuan/issues/10554
         const printWin = new BrowserWindow({
             show: true,
-            width: parentWndScreen.size.width * 0.9,
-            height: parentWndScreen.size.height * 0.9,
+            width: Math.floor(screen.getPrimaryDisplay().size.width * 0.8),
+            height: Math.floor(screen.getPrimaryDisplay().workAreaSize.height * 0.8),
             resizable: true,
             frame: "darwin" === process.platform,
             icon: path.join(appDir, "stage", "icon-large.png"),
@@ -1102,6 +1136,9 @@ app.whenReady().then(() => {
             tray = new Tray(path.join(appDir, "stage", "icon-large.png"));
             tray.setToolTip(`{{ ${path.basename(data.workspaceDir)} }} <<< Sillot v${appVer}`);
             const mainWindow = getWindowByContentId(event.sender.id);
+            if (!mainWindow) {
+                return;
+            }
             resetTrayMenu(tray, data.languages, mainWindow);
             tray.on("click", () => {
                 showHideWindow(tray, data.languages, mainWindow);

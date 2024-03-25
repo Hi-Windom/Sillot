@@ -20,7 +20,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/K-Sillot/httpclient"
+	"github.com/siyuan-note/httpclient"
 	"github.com/siyuan-note/logging"
 )
 
@@ -53,18 +53,24 @@ func GetRhyResult(force bool) (map[string]interface{}, error) {
 }
 
 func GetSillotReleasesResult(force bool) (map[string]interface{}, error) {
-
 	now := time.Now().Unix()
+
+	// 检查是否需要从缓存中获取数据
 	if 3600 >= now-rhyResultCacheTime && !force && 0 < len(cachedRhyResult) {
 		return cachedRhyResult, nil
 	}
 
+	// 创建新的 HTTP 请求
 	request := httpclient.NewCloudRequest30s()
 	_, err := request.SetSuccessResult(&cachedRhyResult).Get("https://api.github.com/repos/Hi-Windom/Sillot/releases/latest")
-	if nil != err {
+	if err != nil {
+		// 记录错误并返回空的 map，而不是 nil
 		logging.LogErrorf("get version info failed: %s", err)
-		return nil, err
+		return map[string]interface{}{}, err
 	}
+
+	// 更新缓存时间
 	rhyResultCacheTime = now
+
 	return cachedRhyResult, nil
 }

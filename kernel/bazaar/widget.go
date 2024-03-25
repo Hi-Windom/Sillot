@@ -25,10 +25,10 @@ import (
 	"sync"
 
 	"github.com/88250/gulu"
-	"github.com/K-Sillot/httpclient"
 	"github.com/dustin/go-humanize"
 	ants "github.com/panjf2000/ants/v2"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/httpclient"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )

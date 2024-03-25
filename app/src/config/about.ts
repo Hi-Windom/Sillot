@@ -362,7 +362,7 @@ ${
         });
         /// #endif
         about.element.querySelector("#aboutConfirm").addEventListener("click", () => {
-            const scheme = (about.element.querySelector("#aboutScheme") as HTMLInputElement).value;
+            const scheme = (about.element.querySelector("#aboutScheme") as HTMLInputElement).value as Config.TSystemNetworkProxyScheme;
             const host = (about.element.querySelector("#aboutHost") as HTMLInputElement).value;
             const port = (about.element.querySelector("#aboutPort") as HTMLInputElement).value;
             fetchPost("/api/system/setNetworkProxy", {scheme, host, port}, async () => {
