@@ -368,7 +368,7 @@ export const initAbout = () => {
                     if(networkServeElement.checked){
                         window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量");
                     }
-                    exitSiYuan();
+                    window.JSAndroid?.restartSillotAndroid();
                 });
             });
             const tokenElement = modelMainElement.querySelector("#token") as HTMLInputElement;

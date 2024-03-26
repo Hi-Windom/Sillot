@@ -23,7 +23,6 @@ import (
 )
 
 var WrongAuthCount int
-var BiometricPass string
 
 func NeedCaptcha() bool {
 	return 3 < WrongAuthCount
