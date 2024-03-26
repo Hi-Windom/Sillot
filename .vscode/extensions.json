@@ -25,7 +25,8 @@
     "xboxyan.tree-generator",
     "unifiedjs.vscode-mdx",
     "astro-build.astro-vscode",
-    "golang.go"
+    "golang.go",
+    "github.vscode-github-actions"
   ],
   "unwantedRecommendations": []
 }
