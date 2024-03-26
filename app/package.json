@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.27.25",
+  "version": "0.27.26",
   "syv": "3.0.5",
   "sypv": "3.0.4",
   "description": "Build Your Eternal Digital Garden",
@@ -57,11 +57,6 @@
     "note-taking",
     "notebook"
   ],
-  "author": {
-    "name": "Yunnan Liandi Technology Co., Ltd.",
-    "email": "845765@qq.com",
-    "url": "https://ld246.com"
-  },
   "maintainers": [
     {
       "name": "Liang Ding",
