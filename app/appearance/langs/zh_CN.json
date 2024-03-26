@@ -1399,7 +1399,7 @@
     "181": "已分享文档到社区，<a href=\"%s\" target=\"_blank\">点击查看</a>",
     "182": "正在分享文档，请稍等...",
     "183": "正在校验索引文档树 [%d/%d %s]",
-    "184": "由<a href=\"https://b3log.org/siyuan\" target=\"_blank\">思源笔记（汐洛）</a>强力驱动",
+    "184": "由 <a href=\"https://b3log.org/siyuan\" target=\"_blank\">思源笔记</a><a href=\"https://sillot.db.sc.cn\" target=\"_blank\">（汐洛）</a>强力驱动",
     "185": "索引校验完毕",
     "186": "正在锁定云端同步目录",
     "187": "正在解锁云端同步目录",
