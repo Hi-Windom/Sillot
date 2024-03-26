@@ -58,9 +58,11 @@ jobs:
           docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:${{ github.event.inputs.image_tag }}-sillot .
 
       - name: Update Docker Hub Description
-        uses: peter-evans/dockerhub-description@v3
+        uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PWD }}
-          repository: soltus/sillot
-          readme-filepath: ./README_Sillot_Docker.md
+          repository: soltus/sillot # 这是 docker hub 的不是 github 的
+          readme-filepath: ./.github/README.md
+          short-description: ${{ github.event.repository.description }}
+          enable-url-completion: true
