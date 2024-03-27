@@ -36,10 +36,9 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
 
 #  
 # ❤️ 欢迎共建汐洛 694357845@qq.com
-# ⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
 # 🚧 汐洛仅用于开发者测试，不要用来存储重要数据！
 
-🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)  📱 [Android application package](https://www.pgyer.com/sillot)  📦 [Chromium Browser Extension](https://github.com/K-Sillot/Sillot-Be/releases)
+🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)   📦 [Chromium Browser Extension](https://github.com/K-Sillot/Sillot-Be/releases)
 <span>
 <img src="https://img.shields.io/badge/Chromium 94+-black?logo=Google Chrome&logoColor=white" alt="" title=""/><img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 11+-black?logo=android" title=""/>
 </span>
