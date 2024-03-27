@@ -48,7 +48,7 @@ const works = {
   a: { a01: "构建 build", a03: "开发 dev", a02: "检查 check" },
   a01: { a0101: "Win App 构建", a0102: "安卓构建", a0103: "生成本地版本 changelog" },
   a02: { a0201: "升级 npm 包", a0202: "eslint（暂不支持）" },
-  a03: { a0301: "electron 调试", a0302: "electron 调试（使用@electron-forge/cli）"},
+  a03: { a0301: "electron 调试", a0302: "electron 调试（使用 dlv 和 @electron-forge/cli）"},
 };
 inquirer
   .prompt([
@@ -194,12 +194,10 @@ function doit(obj) {
           console.warn("敬请期待");
           break;
         case works.a03.a0301:
-          console.warn("\n注意：dlv debug 是否在独立终端运行中（需要在dlv里执行continue）？没有请先启动（终端工作路径是 kernel/main.go 所在目录），不需要内核调试则应该运行 pnpm run dev 命令\n");
-          exeHandlerWindow("set MODE=dlv && pnpm start");
+          console.warn("\n请手动执行 pnpm start 命令\n\n注意：内核可执行文件是否已经正确拉起\n");
           break;
         case works.a03.a0302:
-          console.warn("\n注意：dlv debug 是否在独立终端运行中（需要在dlv里执行continue）？没有请先启动（终端工作路径是 kernel/main.go 所在目录），不需要内核调试则应该运行 pnpm run dev 命令\n");
-          exeHandlerWindow("set MODE=dlv && electron-forge start");
+          console.warn("\n请手动执行 pnpm dlv 命令\n\n注意：dlv debug 是否在独立终端运行中（需要在dlv里执行continue）？没有请先启动（终端工作路径是 kernel/main.go 所在目录），不需要内核调试则应该运行 pnpm run dev 命令\n");
           break;
       }
     })

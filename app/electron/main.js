@@ -35,11 +35,20 @@ const remote = require("@electron/remote/main");
 
 process.noAsar = true;
 const appDir = path.dirname(app.getAppPath());
-// const isDevEnv = process.env.NODE_ENV === "development";
+const isDevEnv = process.env.NODE_ENV === "development";
 const DevMode = process.env.MODE === "dlv" ? "dlv" : "exec";
+if (isDevEnv) {
+  appIcon = path.join(appDir, "app", "stage", "icon-large.png");
+} else {
+  appIcon = path.join(appDir, "stage", "icon-large.png");
+}
+console.log("isDevEnv: ", isDevEnv)
+console.log("DevMode: ", DevMode)
+console.log("appDir: ", appDir)
+console.log("appIcon: ", appIcon)
 try { require("electron-reloader")(module); } catch {}
-
-const logFile = path.join(appDir, 'electron-main.log');
+const logFileName = 'electron-main.log';
+const logFile = path.join(appDir, logFileName);
 const originalLog = console.log;
 const originalError = console.error;
 const originalWarn = console.warn;
@@ -55,6 +64,16 @@ const formatTimestamp = () => {
 };
 // 不重写 console.debug，配合使用 debugtron 查看. REF https://github.com/pd4d10/debugtron
 console.log = function(...args) {
+  originalLog.apply(console, args);
+  const timestamp = formatTimestamp();
+  const message = `I ${timestamp} main.js ${args.join(' ')}\n`;
+  fs.appendFile(logFile, message, (err) => {
+    if (err) {
+      originalError('Unable to write to log file:', err);
+    }
+  });
+};
+console.info = function(...args) {
   originalLog.apply(console, args);
   const timestamp = formatTimestamp();
   const message = `I ${timestamp} main.js ${args.join(' ')}\n`;
@@ -86,21 +105,19 @@ console.warn = function(...args) {
 };
 
 let pkg = {};
+appVer = app.getVersion();
 try {
   pkg = JSON.parse(
     fs.readFileSync(path.join(appDir, "app", "package.json")).toString()
   );
-  appVer = app.getVersion();
-  isDevEnv = false;
 } catch {
   pkg = JSON.parse(
     fs.readFileSync(path.join(appDir, "package.json")).toString()
   );
-  appVer = pkg.version;
-  isDevEnv = true;
 }
-console.log("appVer: ", appVer)
-console.log("isDevEnv: ", isDevEnv)
+if (isDevEnv) {
+  appVer = pkg.version;
+}
 console.log("appVer: ", appVer)
 const VerSY = pkg.syv;
 const confDir = path.join(app.getPath("home"), ".config", "sillot");
@@ -243,7 +260,7 @@ const showErrorWindow = (title, content) => {
         width: Math.floor(screen.getPrimaryDisplay().size.width * 0.5),
         height: Math.floor(screen.getPrimaryDisplay().workAreaSize.height * 0.8),
         frame: false,
-        icon: path.join(appDir, "stage", "icon-large.png"),
+        icon: appIcon,
         webPreferences: {
             nodeIntegration: true, webviewTag: true, webSecurity: false, contextIsolation: false,
         },
@@ -254,7 +271,7 @@ const showErrorWindow = (title, content) => {
             v: appVer,
             title: title,
             content: content,
-            icon: path.join(appDir, "stage", "icon-large.png"),
+            icon: appIcon,
         },
     });
     errWindow.webContents.on('did-finish-load', () => {
@@ -371,7 +388,7 @@ const boot = () => {
         },
         frame: "darwin" === process.platform,
         titleBarStyle: "hidden",
-        icon: path.join(appDir, "stage", "icon-large.png"),
+        icon: appIcon,
     });
     remote.enable(currentWindow.webContents);
 
@@ -516,7 +533,7 @@ const initKernel = (workspace, port, lang) => {
             height: Math.floor(screen.getPrimaryDisplay().workAreaSize.height / 2),
             frame: false,
             backgroundColor: "#1e1e1e",
-            icon: path.join(appDir, "stage", "icon-large.png"),
+            icon: appIcon,
         });
         let bootIndex = path.join(appDir, "app", "electron", "boot.html");
         if (isDevEnv) {
@@ -846,7 +863,7 @@ app.whenReady().then(() => {
     });
     ipcMain.on("siyuan-open-file", (event, filePath) => {
       if (filePath === "openAppLog") {
-        shell.openPath(path.join(appDir, "electron-main.log"), (error) => {
+        shell.openPath(path.join(appDir, logFileName), (error) => {
           if (error) {
             console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
           }
@@ -1101,7 +1118,7 @@ app.whenReady().then(() => {
             height: Math.floor(wndScreen.size.height * 0.8),
             resizable: true,
             frame: "darwin" === process.platform,
-            icon: path.join(appDir, "stage", "icon-large.png"),
+            icon: appIcon,
             titleBarStyle: "hidden",
             webPreferences: {
                 contextIsolation: false,
@@ -1138,7 +1155,7 @@ app.whenReady().then(() => {
             minHeight: 376,
             fullscreenable: true,
             frame: "darwin" === process.platform,
-            icon: path.join(appDir, "stage", "icon-large.png"),
+            icon: appIcon,
             titleBarStyle: "hidden",
             webPreferences: {
                 contextIsolation: false,
@@ -1205,7 +1222,7 @@ app.whenReady().then(() => {
         let tray;
         if ("win32" === process.platform || "linux" === process.platform) {
             // 系统托盘
-            tray = new Tray(path.join(appDir, "stage", "icon-large.png"));
+            tray = new Tray(appIcon);
             tray.setToolTip(`{{ ${path.basename(data.workspaceDir)} }} <<< Sillot v${appVer}`);
             const mainWindow = getWindowByContentId(event.sender.id);
             if (!mainWindow) {
@@ -1288,7 +1305,7 @@ app.whenReady().then(() => {
             width: Math.floor(screen.getPrimaryDisplay().size.width * 0.6),
             height: Math.floor(screen.getPrimaryDisplay().workAreaSize.height * 0.8),
             frame: false,
-            icon: path.join(appDir, "stage", "icon-large.png"),
+            icon: appIcon,
             webPreferences: {
                 nodeIntegration: true, webviewTag: true, webSecurity: false, contextIsolation: false,
             },
@@ -1306,7 +1323,7 @@ app.whenReady().then(() => {
                 lang: language,
                 home: app.getPath("home"),
                 v: appVer,
-                icon: path.join(appDir, "stage", "icon-large.png"),
+                icon: appIcon,
             },
         });
         firstOpenWindow.show();
