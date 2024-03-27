@@ -90,8 +90,8 @@ const renderPDF = async (id: string) => {
         themeStyle = `<link rel="stylesheet" type="text/css" id="themeStyle" href="${servePath}/appearance/themes/${window.siyuan.config.appearance.themeLight}/theme.d.pdf.css?${Constants.SIYUAN_VERSION}"/>`;
     }
     const currentWindowId = await ipcRenderer.invoke(Constants.SIYUAN_GET, {
-        cmd: "getCurrentWindowId",
-    })
+        cmd: "getContentsId",
+    });
     // data-theme-mode="light" https://github.com/siyuan-note/siyuan/issues/7379
     const html = /*html*/ `<!DOCTYPE html>
 <html lang="${window.siyuan.config.appearance.lang}" data-theme-mode="light" data-light-theme="${window.siyuan.config.appearance.themeLight}" data-dark-theme="${window.siyuan.config.appearance.themeDark}">
@@ -384,7 +384,7 @@ const renderPDF = async (id: string) => {
         })
     }
     const renderPreview = (data) => {
-        previewElement.innerHTML = '<div style="padding:0" class="protyle-wysiwyg${window.siyuan.config.editor.displayBookmarkIcon ? " protyle-wysiwyg--attr" : ""}">' + data.content + '</div>';
+        previewElement.innerHTML = '<div style="padding:6px 0 0 0" class="protyle-wysiwyg${window.siyuan.config.editor.displayBookmarkIcon ? " protyle-wysiwyg--attr" : ""}">' + data.content + '</div>';
         const wysElement = previewElement.querySelector(".protyle-wysiwyg");
         wysElement.setAttribute("data-doc-type", data.type || "NodeDocument");
         if (data.attrs.memo) {

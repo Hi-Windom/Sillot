@@ -1583,7 +1583,9 @@ export class WYSIWYG {
             }
             const avCellHeaderElement = hasClosestByClassName(target, "av__cell--header");
             if (avCellHeaderElement) {
-                showColMenu(protyle, nodeElement, avCellHeaderElement);
+                if (!protyle.disabled) {
+                    showColMenu(protyle, nodeElement, avCellHeaderElement);
+                }
                 event.stopPropagation();
                 event.preventDefault();
                 return;
