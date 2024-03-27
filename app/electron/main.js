@@ -37,11 +37,13 @@ process.noAsar = true;
 const appDir = path.dirname(app.getAppPath());
 const isDevEnv = process.env.NODE_ENV === "development";
 const DevMode = process.env.MODE === "dlv" ? "dlv" : "exec";
+const appVer = app.getVersion();
 if (isDevEnv) {
   appIcon = path.join(appDir, "app", "stage", "icon-large.png");
 } else {
   appIcon = path.join(appDir, "stage", "icon-large.png");
 }
+console.log("appVer: ", appVer)
 console.log("isDevEnv: ", isDevEnv)
 console.log("DevMode: ", DevMode)
 console.log("appDir: ", appDir)
@@ -104,22 +106,6 @@ console.warn = function(...args) {
   });
 };
 
-let pkg = {};
-appVer = app.getVersion();
-try {
-  pkg = JSON.parse(
-    fs.readFileSync(path.join(appDir, "app", "package.json")).toString()
-  );
-} catch {
-  pkg = JSON.parse(
-    fs.readFileSync(path.join(appDir, "package.json")).toString()
-  );
-}
-if (isDevEnv) {
-  appVer = pkg.version;
-}
-console.log("appVer: ", appVer)
-const VerSY = pkg.syv;
 const confDir = path.join(app.getPath("home"), ".config", "sillot");
 const windowStatePath = path.join(confDir, "windowState.json");
 let bootWindow;
@@ -131,6 +117,7 @@ let resetWindowStateOnRestart = false;
 remote.initialize();
 
 if (!app.requestSingleInstanceLock()) {
+    app.clearRecentDocuments();
     app.quit();
 }
 
@@ -174,7 +161,7 @@ const hotKey2Electron = (key) => {
 const exitApp = (port, errorWindowId) => {
     let tray;
     let mainWindow;
-
+    app.clearRecentDocuments()
     // 关闭端口相同的所有非主窗口
     BrowserWindow.getAllWindows().forEach((item) => {
         try {
@@ -690,6 +677,7 @@ const initKernel = (workspace, port, lang) => {
                     try {
                         const progressResult = await net.fetch(getServer() + "/api/system/bootProgress");
                         const progressData = await progressResult.json();
+                        bootWindow.setProgressBar(progressData.data.progress/100);
                         if (progressData.data.progress >= 100) {
                             resolve(true);
                             progressing = true;
@@ -708,6 +696,7 @@ const initKernel = (workspace, port, lang) => {
                         progressing = true;
                     }
                 }
+                bootWindow.setProgressBar(-1);
             }
         } else {
             writeLog(`get kernel version failed: ${apiData.code}, ${apiData.msg}`);
@@ -855,7 +844,9 @@ app.whenReady().then(() => {
         if (filePath === "openWorkspacesLogFolder") {
           const ws = JSON.parse(fs.readFileSync(path.join(confDir, "workspace.json")).toString());
           ws.forEach((workspacePath) => {
-            shell.showItemInFolder(path.join(workspacePath, "temp", "siyuan.log"));
+            const file = path.join(workspacePath, "temp", "siyuan.log");
+            shell.showItemInFolder(file);
+            app.addRecentDocument(file);
           });
           return;
         }
@@ -866,11 +857,15 @@ app.whenReady().then(() => {
         shell.openPath(path.join(appDir, logFileName), (error) => {
           if (error) {
             console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
+          } else {
+            app.addRecentDocument(path.join(appDir, logFileName));
           }
         });
         shell.openPath(path.join(confDir, "app.log"), (error) => {
           if (error) {
             console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
+          } else {
+            app.addRecentDocument(path.join(confDir, "app.log"));
           }
         });
         return;
