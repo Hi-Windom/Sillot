@@ -89,9 +89,10 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          release_name: ${{ steps.release_info.outputs.release_version }}
-          tag_name: ${{ github.ref }}
+          name: ${{ steps.release_info.outputs.release_version }}
+          tag: ${{ github.ref }}
           body: "${{ env.release_body_sillot }}\n---\n${{ env.release_body_siyuan }}"
+          generateReleaseNotes: true
           draft: false
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
