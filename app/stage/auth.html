@@ -487,6 +487,7 @@
             return response.json()
         }).then((response) => {
             if (0 === response.code) {
+                window.JSAndroid?.setMMKV("AppCheckInState","unlockScreen")
                 const url = new URL(window.location)
                 window.location.href = url.searchParams.get("to") || "/"
                 return
