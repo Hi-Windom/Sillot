@@ -20,6 +20,7 @@ const T = `<!DOCTYPE html>
 <%- ndom.SiYuan.status %>
 <%- ndom.SiYuan.commonMenu %>
 <%- ndom.SiYuan.message %>
+<%- ndom.Sillot.SillotOverlay %>
 <%- ndom.ReactApp.app1 %>
 <%- ndom.ReactApp.app3 %>
 <%- ndom.ReactApp.app5 %>

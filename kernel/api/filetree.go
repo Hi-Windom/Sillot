@@ -30,6 +30,7 @@ import (
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/gin-gonic/gin"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -156,7 +157,7 @@ func upsertIndexes(c *gin.Context) {
 func removeIndexes(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
-
+	logging.LogDebugf("[%s] (API) removeIndexes invoked", c.ClientIP())
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
 		return
@@ -168,6 +169,7 @@ func removeIndexes(c *gin.Context) {
 		paths = append(paths, p.(string))
 	}
 	model.RemoveIndexes(paths)
+	logging.LogDebugf("[%s] (model) RemoveIndexes invoked", c.ClientIP())
 }
 
 func refreshFiletree(c *gin.Context) {
@@ -450,7 +452,7 @@ func moveDocs(c *gin.Context) {
 func removeDoc(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
-
+	logging.LogDebugf("[%s] (API) removeDoc invoked", c.ClientIP())
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
 		return
@@ -463,12 +465,13 @@ func removeDoc(c *gin.Context) {
 
 	p := arg["path"].(string)
 	model.RemoveDoc(notebook, p)
+	logging.LogDebugf("[%s] (model) removeDoc invoked", c.ClientIP())
 }
 
 func removeDocs(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
-
+	logging.LogDebugf("[%s] (API) removeDocs invoked", c.ClientIP())
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
 		return
@@ -480,6 +483,7 @@ func removeDocs(c *gin.Context) {
 		paths = append(paths, path.(string))
 	}
 	model.RemoveDocs(paths)
+	logging.LogDebugf("[%s] (model) RemoveDocs invoked", c.ClientIP())
 }
 
 func renameDoc(c *gin.Context) {

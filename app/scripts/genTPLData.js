@@ -116,6 +116,17 @@ exports.default = {
       },
       Sillot: {
         SillotDrawer: /*html*/ `<div id="SillotDrawer" style="position: fixed;bottom: 0;right: 0;z-index: 9999;"></div>`,
+        SillotOverlay: /*html*/ `<div id="SillotOverlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: none;
+    "></div>
+    `,
       },
       ReactApp: {
         app1: /*html*/ `<div id="app1" data-bind="react" data-lib="react-toastify"></div>`,

@@ -292,7 +292,7 @@ func renameFile(c *gin.Context) {
 func removeFile(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
-
+	logging.LogDebugf("[%s] (API) removeFile invoked", c.ClientIP())
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
 		c.JSON(http.StatusOK, ret)
@@ -324,6 +324,7 @@ func removeFile(c *gin.Context) {
 		ret.Msg = err.Error()
 		return
 	}
+	logging.LogDebugf("[%s] (github.com/siyuan-note/filelock) filelock.Remove invoked", c.ClientIP())
 }
 
 func putFile(c *gin.Context) {

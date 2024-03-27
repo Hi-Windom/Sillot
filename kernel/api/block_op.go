@@ -214,7 +214,7 @@ func moveBlock(c *gin.Context) {
 	if !ok {
 		return
 	}
-	logging.LogDebugf("moveBlock invoked")
+	logging.LogDebugf("[%s] moveBlock invoked", c.ClientIP())
 
 	id := arg["id"].(string)
 	if util.InvalidIDPattern(id, ret) {
