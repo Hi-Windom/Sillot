@@ -6,6 +6,7 @@ import inquirer from "inquirer";
 import ora from "ora";
 import fs from "fs";
 import path from "path";
+import { spawn } from 'child_process';
 const shell = (await import("shelljs")).default;
 const iconv = (await import("iconv-lite")).default;
 import pkg from "./package.json" assert { type: "json" };
@@ -44,10 +45,10 @@ function getCurrentDateTime() {
 
 const intervalId = setInterval(updateSpinnerText, 1000); // 每秒更新一次spinner文本
 const works = {
-  a: { a01: "构建 build", a02: "检查 check", a03: "开发 dev" },
+  a: { a01: "构建 build", a03: "开发 dev", a02: "检查 check" },
   a01: { a0101: "Win App 构建", a0102: "安卓构建", a0103: "生成本地版本 changelog" },
   a02: { a0201: "升级 npm 包", a0202: "eslint（暂不支持）" },
-  a03: { a0301: "敬请期待" },
+  a03: { a0301: "electron 调试", a0302: "electron 调试（使用@electron-forge/cli）"},
 };
 inquirer
   .prompt([
@@ -108,6 +109,23 @@ function exeHandler(cmds, silent) {
       }
     }
   );
+}
+
+
+function exeHandlerWindow(cmds) {
+  spinner.start();
+  // 使用 spawn 创建一个新的进程
+  const child = spawn(cmds, [], { shell: true, detached: true });
+
+  child.on('exit', (code) => {
+    clearInterval(intervalId); // 停止更新spinner文本
+    console.log("Exit code:", code);
+    if (code === 0) {
+      spinner.succeed("Sillot mini cli work done. \t" + getCurrentDateTime());
+    } else {
+      spinner.fail("Sillot mini cli work failed.");
+    }
+  });
 }
 
 function doit(obj) {
@@ -176,7 +194,12 @@ function doit(obj) {
           console.warn("敬请期待");
           break;
         case works.a03.a0301:
-          console.warn("敬请期待");
+          console.warn("\n注意：dlv debug 是否在独立终端运行中（需要在dlv里执行continue）？没有请先启动（终端工作路径是 kernel/main.go 所在目录），不需要内核调试则应该运行 pnpm run dev 命令\n");
+          exeHandlerWindow("set MODE=dlv && pnpm start");
+          break;
+        case works.a03.a0302:
+          console.warn("\n注意：dlv debug 是否在独立终端运行中（需要在dlv里执行continue）？没有请先启动（终端工作路径是 kernel/main.go 所在目录），不需要内核调试则应该运行 pnpm run dev 命令\n");
+          exeHandlerWindow("set MODE=dlv && electron-forge start");
           break;
       }
     })

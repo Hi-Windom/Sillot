@@ -15,8 +15,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-// 此文件中的控制台输出，可以使用 debugtron 查看
-// https://github.com/pd4d10/debugtron
 
 const {
     net, app,
@@ -37,18 +35,73 @@ const remote = require("@electron/remote/main");
 
 process.noAsar = true;
 const appDir = path.dirname(app.getAppPath());
-const isDevEnv = process.env.NODE_ENV === "development";
+// const isDevEnv = process.env.NODE_ENV === "development";
 const DevMode = process.env.MODE === "dlv" ? "dlv" : "exec";
-let appVer = app.getVersion();
 try { require("electron-reloader")(module); } catch {}
 
+const logFile = path.join(appDir, 'electron-main.log');
+const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
+const formatTimestamp = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${year}/${month}/${day}${hours}:${minutes}:${seconds}`;
+};
+// 不重写 console.debug，配合使用 debugtron 查看. REF https://github.com/pd4d10/debugtron
+console.log = function(...args) {
+  originalLog.apply(console, args);
+  const timestamp = formatTimestamp();
+  const message = `I ${timestamp} main.js ${args.join(' ')}\n`;
+  fs.appendFile(logFile, message, (err) => {
+    if (err) {
+      originalError('Unable to write to log file:', err);
+    }
+  });
+};
+console.error = function(...args) {
+  originalError.apply(console, args);
+  const timestamp = formatTimestamp();
+  const message = `E ${timestamp} main.js ${args.join(' ')}\n`;
+  fs.appendFile(logFile, message, (err) => {
+    if (err) {
+      originalError('Unable to write to log file:', err);
+    }
+  });
+};
+console.warn = function(...args) {
+  originalWarn.apply(console, args);
+  const timestamp = formatTimestamp();
+  const message = `W ${timestamp} main.js ${args.join(' ')}\n`;
+  fs.appendFile(logFile, message, (err) => {
+    if (err) {
+      originalError('Unable to write to log file:', err);
+    }
+  });
+};
+
 let pkg = {};
-if (isDevEnv) {
-  pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json")).toString());
-  if (pkg.version) { appVer = pkg.version;}
-} else {
-  pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString());
+try {
+  pkg = JSON.parse(
+    fs.readFileSync(path.join(appDir, "app", "package.json")).toString()
+  );
+  appVer = app.getVersion();
+  isDevEnv = false;
+} catch {
+  pkg = JSON.parse(
+    fs.readFileSync(path.join(appDir, "package.json")).toString()
+  );
+  appVer = pkg.version;
+  isDevEnv = true;
 }
+console.log("appVer: ", appVer)
+console.log("isDevEnv: ", isDevEnv)
+console.log("appVer: ", appVer)
 const VerSY = pkg.syv;
 const confDir = path.join(app.getPath("home"), ".config", "sillot");
 const windowStatePath = path.join(confDir, "windowState.json");
@@ -480,7 +533,7 @@ const initKernel = (workspace, port, lang) => {
         } else if (!isDevEnv) {
           kernelPath = path.join(appDir, "kernel", kernelName);
         } else {
-          kernelPath = path.join(appDir,"app", "kernel", kernelName);
+          kernelPath = path.join(appDir, "app", "kernel", kernelName);
         }
         console.log("debug: $kernelPath = " + kernelPath);
         if (!fs.existsSync(kernelPath) && DevMode === "exec") {
@@ -783,7 +836,7 @@ app.whenReady().then(() => {
 
     ipcMain.on("siyuan-open-folder", (event, filePath) => {
         if (filePath === "openWorkspacesLogFolder") {
-          let ws = JSON.parse(fs.readFileSync(path.join(confDir, "workspace.json")).toString());
+          const ws = JSON.parse(fs.readFileSync(path.join(confDir, "workspace.json")).toString());
           ws.forEach((workspacePath) => {
             shell.showItemInFolder(path.join(workspacePath, "temp", "siyuan.log"));
           });
@@ -793,14 +846,24 @@ app.whenReady().then(() => {
     });
     ipcMain.on("siyuan-open-file", (event, filePath) => {
       if (filePath === "openAppLog") {
-        filePath = path.join(confDir, "app.log");
+        shell.openPath(path.join(appDir, "electron-main.log"), (error) => {
+          if (error) {
+            console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
+          }
+        });
+        shell.openPath(path.join(confDir, "app.log"), (error) => {
+          if (error) {
+            console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
+          }
+        });
+        return;
       }
+      // 默认处理
       shell.openPath(filePath, (error) => {
         if (error) {
-          // 如果有错误，返回错误信息
           console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
         } else {
-          // 如果成功，返回空字符串
+          console.log(filePath, " opened by siyuan-open-file")
         }
       });
     });

@@ -173,7 +173,7 @@ export const uploadLocalFiles = (files: string[], protyle: IProtyle, isUpload: b
 };
 
 export const uploadFiles = (protyle: IProtyle, files: FileList | DataTransferItemList | File[], element?: HTMLInputElement, successCB?: (res: string) => void) => {
-    console.log("uploadFiles invoked <- "+protyle?.block.rootID+protyle.id);
+    console.log("(web) uploadFiles invoked -> "+protyle?.block.rootID);
     // 文档书中点开属性->数据库后的变更操作
     if (!protyle) {
         const formData = new FormData();
