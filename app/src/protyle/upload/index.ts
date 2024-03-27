@@ -208,7 +208,11 @@ export const uploadFiles = (protyle: IProtyle, files: FileList | DataTransferIte
         }
         if (0 === fileItem.size && "" === fileItem.type && -1 === fileItem.name.indexOf(".")) {
             // 文件夹
+            /// #if !BROWSER
             uploadLocalFiles([fileItem.path], protyle, false);
+            /// #else
+            showMessage("不支持文件夹上传");
+            /// #endif
         } else {
             fileList.push(fileItem);
         }
