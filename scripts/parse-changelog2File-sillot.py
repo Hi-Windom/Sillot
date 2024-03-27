@@ -26,12 +26,12 @@ docmap_sillot = {
     "Shinning": "闪亮之名 | Shinning",
 }
 docmap_siyuan = {
-    "Feature": "Feature",
-    "Enhancement": "Enhancement",
-    "Bug": "Bugfix",
-    "Document": "Document",
-    "Refactor": "Refactor",
-    "Abolishment": "Abolishment",
+    "Feature": "引入特性 | Feature",
+    "Enhancement": "改进功能 | Enhancement",
+    "Bug": "修复错误 | Bugfix",
+    "Document": "文档相关 | Document",
+    "Refactor": "开发重构 | Refactor",
+    "Abolishment": "移除废止 | Abolishment",
     "Development": "Development",
 }
 
@@ -95,15 +95,13 @@ def find_milestone(repo, title):
         with open(outputDst, **outputOptions) as file:
             file.write(f'''# Sillot {thisRelease}
 
-⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
-❤️ 欢迎共建汐洛 694357845@qq.com
-🚧 [Sillot is currently in active development](https://github.com/orgs/Hi-Windom/projects/2/views/2)
+# ❤️ 欢迎共建汐洛 694357845@qq.com
+# 🚧 汐洛仅用于开发者测试，不要用来存储重要数据！
 
-🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)  📱 [Android application package](https://github.com/Hi-Windom/Sillot-android/releases)  📦 [Chromium Browser Extension](https://github.com/K-Sillot/Sillot-Be/releases)
-
-<p align="center">
-<img src="https://img.shields.io/badge/Chromium 94+-black?logo=Google Chrome&logoColor=white" alt="" title=""/><img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/macOS-black?logo=apple" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 11+-black?logo=android" title=""/>
-</p>
+🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)   📦 [Chromium Browser Extension](https://github.com/K-Sillot/Sillot-Be/releases)
+<span>
+<img src="https://img.shields.io/badge/Chromium 94+-black?logo=Google Chrome&logoColor=white" alt="" title=""/><img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 11+-black?logo=android" title=""/>
+</span>
 
 ---
 
@@ -114,8 +112,8 @@ def find_milestone(repo, title):
         if not pat:
             return None
         version = pat.group(1)
-    print(f"use {version} to find milestone")
-    for milestone in repo.get_milestones():
+    print(f"use {version} to find milestone of {repo}")
+    for milestone in repo.get_milestones(state="all"):
         if version in milestone.title:
             return milestone
 

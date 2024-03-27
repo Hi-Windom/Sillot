@@ -42,13 +42,12 @@ function getCurrentDateTime() {
   return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 }
 
-// 每秒更新一次spinner文本
-const intervalId = setInterval(updateSpinnerText, 1000);
+const intervalId = setInterval(updateSpinnerText, 1000); // 每秒更新一次spinner文本
 const works = {
   a: { a01: "构建 build", a02: "检查 check", a03: "开发 dev" },
-  a01: { a0101: "Win App 构建", a0102: "安卓构建" },
+  a01: { a0101: "Win App 构建", a0102: "安卓构建", a0103: "生成本地版本 changelog" },
   a02: { a0201: "升级 npm 包", a0202: "eslint（暂不支持）" },
-  a03: { a0301: "生成本地版本 changelog" },
+  a03: { a0301: "敬请期待" },
 };
 inquirer
   .prompt([
@@ -131,6 +130,45 @@ function doit(obj) {
         case works.a01.a0102:
           exeHandler("cd .. && .\\scripts\\sillot-android-build.bat", true);
           break;
+        case works.a01.a0103:
+          inquirer.prompt([
+                {
+                  name: "b",
+                  type: "list",
+                  message: "从何处获取思源更新",
+                  choices: [
+                    { name: "Github milestone" },
+                    { name: "local changelog zh_CN.md（未正式发布的版本无该文件）" },
+                    { name: "local changelog.md（未正式发布的版本无该文件）" },
+                  ],
+                },
+              ])
+              .then((answers) => {
+                switch (answers.b) {
+                  case "Github milestone":
+                    exeHandler(
+                      `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w github`,
+                      true
+                    );
+                    break;
+                  case "local changelog":
+                    exeHandler(
+                      `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w local`,
+                      true
+                    );
+                    break;
+                  default:
+                    exeHandler(
+                      `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w local_zh`,
+                      true
+                    );
+                    break;
+                }
+              })
+              .catch((e) => {
+                eCatcher(e);
+              });
+          break;
         case works.a02.a0201:
           exeHandler("set NPM_CHECK_INSTALLER=pnpm && npm-check -y", false);
           break;
@@ -138,44 +176,7 @@ function doit(obj) {
           console.warn("敬请期待");
           break;
         case works.a03.a0301:
-          inquirer
-            .prompt([
-              {
-                name: "b",
-                type: "list",
-                message: "从何处获取思源更新",
-                choices: [
-                  { name: "Github milestone" },
-                  { name: "local changelog zh_CN" },
-                  { name: "local changelog" },
-                ],
-              },
-            ])
-            .then((answers) => {
-              switch (answers.b) {
-                case "Github milestone":
-                  exeHandler(
-                    `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w github`,
-                    true
-                  );
-                  break;
-                case "local changelog":
-                  exeHandler(
-                    `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w local`,
-                    true
-                  );
-                  break;
-                default:
-                  exeHandler(
-                    `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w local_zh`,
-                    true
-                  );
-                  break;
-              }
-            })
-            .catch((e) => {
-              eCatcher(e);
-            });
+          console.warn("敬请期待");
           break;
       }
     })
