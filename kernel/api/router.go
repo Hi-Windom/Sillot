@@ -257,9 +257,9 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/clipboard/readFilePaths", model.CheckAuth, readFilePaths)
 
 	ginServer.Handle("POST", "/api/asset/uploadCloud", model.CheckAuth, model.CheckReadonly, uploadCloud)
-	ginServer.Handle("POST", "/api/asset/insertLocalAssets", model.CheckAuth, model.CheckReadonly, insertLocalAssets)
+	ginServer.Handle("POST", "/api/asset/insertLocalAssets", model.CheckAuth, model.CheckReadonly, insertLocalAssets, model.Ready)
 	ginServer.Handle("POST", "/api/asset/resolveAssetPath", model.CheckAuth, resolveAssetPath)
-	ginServer.Handle("POST", "/api/asset/upload", model.CheckAuth, model.CheckReadonly, model.Upload)
+	ginServer.Handle("POST", "/api/asset/upload", model.CheckAuth, model.CheckReadonly, model.Upload, model.Ready)
 	ginServer.Handle("POST", "/api/asset/setFileAnnotation", model.CheckAuth, model.CheckReadonly, setFileAnnotation)
 	ginServer.Handle("POST", "/api/asset/getFileAnnotation", model.CheckAuth, getFileAnnotation)
 	ginServer.Handle("POST", "/api/asset/getUnusedAssets", model.CheckAuth, getUnusedAssets)
