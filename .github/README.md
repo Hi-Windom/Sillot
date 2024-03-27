@@ -23,7 +23,6 @@
 	<img src="https://img.shields.io/badge/sharp-99CC00.svg?style=flat&logo=sharp&logoColor=white" alt="sharp">
 	<img src="https://img.shields.io/badge/Webpack-8DD6F9.svg?style=flat&logo=Webpack&logoColor=black" alt="Webpack">
 	<img src="https://img.shields.io/badge/Vite-646CFF.svg?style=flat&logo=Vite&logoColor=white" alt="Vite">
-	<br>
 	<img src="https://img.shields.io/badge/React-61DAFB.svg?style=flat&logo=React&logoColor=black" alt="React">
 	<img src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&logo=Axios&logoColor=white" alt="Axios">
 	<img src="https://img.shields.io/badge/ESLint-4B32C3.svg?style=flat&logo=ESLint&logoColor=white" alt="ESLint">
@@ -39,6 +38,7 @@
 	<img src="https://img.shields.io/badge/Go-00ADD8.svg?style=flat&logo=Go&logoColor=white" alt="Go">
 	<img src="https://img.shields.io/badge/JSON-000000.svg?style=flat&logo=JSON&logoColor=white" alt="JSON">
 </p>
+
 <p align="center">
 <a href="https://app.codacy.com/gh/Hi-Windom/Sillot/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"><img src="https://app.codacy.com/project/badge/Grade/3106acfdbc5041118d800c5b4f2f935d" style="cursor:pointer;height: 25px;margin: 1px auto;"/></a>
 <a href="https://www.codefactor.io/repository/github/hi-windom/sillot"><img src="https://www.codefactor.io/repository/github/hi-windom/sillot/badge" alt="CodeFactor" style="cursor:pointer;height: 25px;margin: 1px auto;"/></a>
