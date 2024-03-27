@@ -28,6 +28,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/gin-gonic/gin"
 	"github.com/siyuan-note/filelock"
+	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/model"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -235,7 +236,7 @@ func resolveFileAnnotationAbsPath(assetRelPath string) (ret string, err error) {
 func removeUnusedAsset(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
-
+	logging.LogDebugf("[%s] (API) removeUnusedAsset invoked", c.ClientIP())
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
 		return
@@ -246,16 +247,18 @@ func removeUnusedAsset(c *gin.Context) {
 	ret.Data = map[string]interface{}{
 		"path": asset,
 	}
+	logging.LogDebugf("[%s] (model) removeUnusedAsset invoked", c.ClientIP())
 }
 
 func removeUnusedAssets(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
-
+	logging.LogDebugf("[%s] (API) removeUnusedAssets invoked", c.ClientIP())
 	paths := model.RemoveUnusedAssets()
 	ret.Data = map[string]interface{}{
 		"paths": paths,
 	}
+	logging.LogDebugf("[%s] (model) removeUnusedAssets invoked", c.ClientIP())
 }
 
 func getUnusedAssets(c *gin.Context) {

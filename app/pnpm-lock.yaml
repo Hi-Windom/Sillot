@@ -13,7 +13,7 @@ importers:
     dependencies:
       '@electron/remote':
         specifier: ^2.1.0
-        version: 2.1.2(electron@30.0.0-alpha.7)
+        version: 2.1.2(electron@30.0.0-beta.2)
       '@monaco-editor/loader':
         specifier: ^1.4.0
         version: 1.4.0(monaco-editor@0.47.0)
@@ -139,8 +139,8 @@ importers:
         specifier: ^3.1.9
         version: 3.1.9
       electron:
-        specifier: 30.0.0-alpha.7
-        version: 30.0.0-alpha.7
+        specifier: 30.0.0-beta.2
+        version: 30.0.0-beta.2
       electron-builder:
         specifier: ^24.13.3
         version: 24.13.3(electron-builder-squirrel-windows@24.13.3(dmg-builder@24.13.3))
@@ -2969,8 +2969,8 @@ packages:
   electron-to-chromium@1.4.710:
     resolution: {integrity: sha512-w+9yAVHoHhysCa+gln7AzbO9CdjFcL/wN/5dd+XW/Msl2d/4+WisEaCF1nty0xbAKaxdaJfgLB2296U7zZB7BA==}
 
-  electron@30.0.0-alpha.7:
-    resolution: {integrity: sha512-j4AlbNWMYRKSBlIJeWZL7FPFxhdFaZLc1/R12Aq8Kulw7abcT+L5me2j3dkRsqk6rTzxdeSuZUpZIH3+pUR0xA==}
+  electron@30.0.0-beta.2:
+    resolution: {integrity: sha512-jTBM8RJotaroZLGuWbp/lWWysSbXG/8YSNF5rXwtM1Q3r//IfhA4EFnQC4VgTAaADyFPIXyQgoIRYjukElcPlQ==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -7216,9 +7216,9 @@ snapshots:
       - supports-color
     dev: true
 
-  '@electron/remote@2.1.2(electron@30.0.0-alpha.7)':
+  '@electron/remote@2.1.2(electron@30.0.0-beta.2)':
     dependencies:
-      electron: 30.0.0-alpha.7
+      electron: 30.0.0-beta.2
     dev: false
 
   '@electron/universal@1.5.1':
@@ -9918,7 +9918,7 @@ snapshots:
   electron-to-chromium@1.4.710:
     dev: true
 
-  electron@30.0.0-alpha.7:
+  electron@30.0.0-beta.2:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.11.30

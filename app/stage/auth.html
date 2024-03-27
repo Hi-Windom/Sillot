@@ -429,6 +429,7 @@
             const {ipcRenderer} = require('electron')
             ipcRenderer.send('siyuan-quit', window.location.port)
         } catch (e) {
+            window.JSAndroid?.exitSillotAndroid()
             if ((window.webkit && window.webkit.messageHandlers) || window.JSAndroid) {
                 window.location.href = 'siyuan://api/system/exit'
             } else {
@@ -538,7 +539,7 @@
         try {
             const {ipcRenderer} = require('electron')
             ipcRenderer.on('siyuan-save-close', (event, close) => {
-                exitSiYuan()
+                window.JSAndroid ? exitSillotAndroid() : exitSiYuan()
             })
             await ipcRenderer.invoke("siyuan-init", {
                 languages: {{.trayMenuLangs}},

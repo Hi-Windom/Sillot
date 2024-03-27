@@ -153,7 +153,7 @@ func ReportFileSysFatalError(err error) {
 		lines := strings.Split(output, "\n")
 		output = strings.Join(lines[5:], "\n")
 	}
-	logging.LogErrorf("check file system status failed: %s, %s", err, output)
+	logging.LogErrorf("check file system status failed: %s  [output]  %s", err, output)
 	os.Exit(logging.ExitCodeFileSysErr)
 }
 

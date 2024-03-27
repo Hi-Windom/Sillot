@@ -218,6 +218,7 @@ func (box *Box) SaveConf(conf *conf.BoxConf) {
 }
 
 func (box *Box) saveConf0(data []byte) {
+	logging.LogDebugf("(model) saveConf0 invoked")
 	confPath := filepath.Join(util.DataDir, box.ID, ".siyuan/conf.json")                      // 这个不要改为 .sillot
 	if err := os.MkdirAll(filepath.Join(util.DataDir, box.ID, ".siyuan"), 0755); nil != err { // 这个不要改为 .sillot
 		logging.LogErrorf("save box conf [%s] failed: %s", confPath, err)

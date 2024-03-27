@@ -786,9 +786,6 @@ app.whenReady().then(() => {
     };
 
     ipcMain.on("siyuan-open-folder", (event, filePath) => {
-        if (filePath === "openAppLogFolder") {
-          filePath = path.join(confDir, "app.log");
-        }
         if (filePath === "openWorkspacesLogFolder") {
           let ws = JSON.parse(fs.readFileSync(path.join(confDir, "workspace.json")).toString());
           ws.forEach((workspacePath) => {
@@ -797,6 +794,19 @@ app.whenReady().then(() => {
           return;
         }
         shell.showItemInFolder(filePath);
+    });
+    ipcMain.on("siyuan-open-file", (event, filePath) => {
+      if (filePath === "openAppLog") {
+        filePath = path.join(confDir, "app.log");
+      }
+      shell.openPath(filePath, (error) => {
+        if (error) {
+          // 如果有错误，返回错误信息
+          console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
+        } else {
+          // 如果成功，返回空字符串
+        }
+      });
     });
     ipcMain.on("siyuan-first-quit", () => {
         app.exit();

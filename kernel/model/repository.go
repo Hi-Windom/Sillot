@@ -521,6 +521,13 @@ func PurgeRepo() (err error) {
 		return
 	}
 
+	if stat == nil {
+		stat = &entity.PurgeStat{} // 避免 stat.Indexes 空指针导致崩溃
+		logging.LogErrorf("stat is nil after repo.Purge")
+		// return err
+		// return errors.New("stat is nil after repo.Purge")
+	}
+
 	deletedIndexes := stat.Indexes
 	deletedObjects := stat.Objects
 	deletedSize := humanize.Bytes(uint64(stat.Size))

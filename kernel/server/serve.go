@@ -214,12 +214,12 @@ func serveAppearance(ginServer *gin.Engine) {
 
 		if strings.Contains(userAgentHeader, "Electron") {
 			location.Path = "/stage/build/app/"
+		} else if util.ContainerDocker == util.Container {
+			location.Path = "/stage/build/docker/"
 		} else if strings.Contains(userAgentHeader, "Pad") ||
 			(strings.ContainsAny(userAgentHeader, "Android") && !strings.Contains(userAgentHeader, "Mobile")) {
 			// Improve detecting Pad device, treat it as desktop device https://github.com/siyuan-note/siyuan/issues/8435 https://github.com/siyuan-note/siyuan/issues/8497
 			location.Path = "/stage/build/desktop/"
-		} else if util.ContainerDocker == util.Container {
-			location.Path = "/stage/build/docker/"
 		} else {
 			if idx := strings.Index(userAgentHeader, "Mozilla/"); 0 < idx {
 				userAgentHeader = userAgentHeader[idx:]

@@ -77,6 +77,17 @@
 <div id="status" class="status status--hide"></div>
 <div id="keyboardToolbar" class="keyboard fn__none"></div>
 <div class="side-mask fn__none"></div>
+<div id="SillotOverlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: none;
+    "></div>
+    
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
 <div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
 <div id="app5" data-bind="react" data-lib="joyUI"></div>

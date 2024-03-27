@@ -2,5 +2,6 @@
   "vue.features.codeActions.enable": false,
   "files.associations": {
     "*.sy": "json"
-  }
+  },
+  "workbench.editor.wrapTabs": true
 }

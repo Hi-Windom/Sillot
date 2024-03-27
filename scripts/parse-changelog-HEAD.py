@@ -34,11 +34,11 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
 <img alt="GitHub commits difference between two branches/tags/commits" src="https://img.shields.io/github/commits-difference/{repo_name}?base={lastestRelease}&head={thisRelease}&logo=git" style="cursor:pointer;height: 30px;margin: 3px auto;"/>
 </p>
 
-⚠️ 这是自动构建的开发者版本！数据无价，请勿用于生产环节
-❤️ 欢迎共建汐洛 694357845@qq.com
-🚧 [{repo_name} is currently in active development](https://github.com/orgs/Hi-Windom/projects/2/views/2)
+#  
+# ❤️ 欢迎共建汐洛 694357845@qq.com
+# 🚧 汐洛仅用于开发者测试，不要用来存储重要数据！
 
-🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)  📱 [Android application package](https://github.com/Hi-Windom/Sillot-android/releases)  📦 [Chromium Browser Extension](https://github.com/K-Sillot/Sillot-Be/releases)
+🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)   📦 [Chromium Browser Extension](https://github.com/K-Sillot/Sillot-Be/releases)
 <span>
 <img src="https://img.shields.io/badge/Chromium 94+-black?logo=Google Chrome&logoColor=white" alt="" title=""/><img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title=""/><img src="https://img.shields.io/badge/Docker-black?logo=docker" title=""/><img src="https://img.shields.io/badge/Android 11+-black?logo=android" title=""/>
 </span>

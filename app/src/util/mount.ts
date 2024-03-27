@@ -93,11 +93,13 @@ export const newDailyNote = (app: App) => {
 };
 
 export const mountHelp = () => {
+    const overlay = document.querySelector('#SillotOverlay') as HTMLElement;
+    overlay.style.display = "block";
     const notebookId = Constants.HELP_PATH[window.siyuan.config.appearance.lang as "zh_CN" | "en_US"];
     fetchPost("/api/notebook/removeNotebook", {notebook: notebookId, callback: Constants.CB_MOUNT_REMOVE}, () => {
         fetchPost("/api/notebook/openNotebook", {
             notebook: notebookId
-        });
+        }, () => { const overlay = document.querySelector('#SillotOverlay') as HTMLElement; overlay.style.display = 'none'; });
     });
 };
 

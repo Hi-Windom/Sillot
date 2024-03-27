@@ -27,6 +27,7 @@ const T = `<!DOCTYPE html>
 <%- ndom.SiYuan.mobile.status %>
 <%- ndom.SiYuan.mobile.keyboardToolbar %>
 <%- ndom.SiYuan.mobile.sideMask %>
+<%- ndom.Sillot.SillotOverlay %>
 <%- ndom.ReactApp.app1 %>
 <%- ndom.ReactApp.app3 %>
 <%- ndom.ReactApp.app5 %>

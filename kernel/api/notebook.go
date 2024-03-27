@@ -92,7 +92,7 @@ func renameNotebook(c *gin.Context) {
 func removeNotebook(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
-
+	logging.LogDebugf("[%s] removeNotebook invoked", c.ClientIP())
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
 		return
@@ -125,6 +125,7 @@ func removeNotebook(c *gin.Context) {
 	}
 	evt.Callback = arg["callback"]
 	util.PushEvent(evt)
+	logging.LogDebugf("[%s] removeNotebook done", c.ClientIP())
 }
 
 func createNotebook(c *gin.Context) {
@@ -173,7 +174,7 @@ func createNotebook(c *gin.Context) {
 func openNotebook(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
-
+	logging.LogDebugf("[%s] openNotebook invoked", c.ClientIP())
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
 		return
@@ -216,6 +217,7 @@ func openNotebook(c *gin.Context) {
 	}
 	evt.Callback = arg["callback"]
 	util.PushEvent(evt)
+	logging.LogDebugf("[%s] openNotebook done", c.ClientIP())
 }
 
 func closeNotebook(c *gin.Context) {
@@ -265,7 +267,7 @@ func getNotebookConf(c *gin.Context) {
 func setNotebookConf(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
-
+	logging.LogDebugf("[%s] (API) setNotebookConf invoked", c.ClientIP())
 	arg, ok := util.JsonArg(c, ret)
 	if !ok {
 		return
@@ -336,13 +338,14 @@ func setNotebookConf(c *gin.Context) {
 
 	box.SaveConf(boxConf)
 	ret.Data = boxConf
+	logging.LogDebugf("[%s] (...) setNotebookConf done", c.ClientIP())
 }
 
 func lsNotebooks(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
-	logging.LogDebugf("lsNotebooks invoked")
+	logging.LogDebugf("[%s] (API) lsNotebooks invoked", c.ClientIP())
 	flashcard := false
 
 	// 兼容旧版接口，不能直接使用 util.JsonArg()
@@ -359,6 +362,7 @@ func lsNotebooks(c *gin.Context) {
 	} else {
 		var err error
 		notebooks, err = model.ListNotebooks()
+		logging.LogDebugf("[%s] (model) lsNotebooks done", c.ClientIP())
 		if nil != err {
 			logging.LogDebugf("lsNotebooks model.ListNotebooks() failed")
 			return

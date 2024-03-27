@@ -268,7 +268,7 @@ func CheckUpdate(showMsg bool) {
 
 	_ver := strings.ReplaceAll(ver, "-sillot", "")
 	_ver = strings.ReplaceAll(_ver, "v", "")
-	release := "https://yy-ac.github.io/Hi-Windom/Sillot/release/v" + _ver
+	release := "https://github.com/Hi-Windom/Sillot/releases/tag/" + ver
 	var msg string
 	var timeout int
 	if isVersionUpToDate(_ver) {
