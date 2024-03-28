@@ -165,7 +165,7 @@ interface Window {
         showWifi(): void
         setMMKV(key: string, value: string): void
         showBiometricPrompt(): void
-        requestPermissionActivity(id: string, Msg: string, cb: string): void
+        requestPermissionActivity(id: string, Msg: string, cb: string): boolean
         requestPermission(id: string, Msg: string): boolean
         exitSillotAndroid(): void
         restartSillotAndroid(): void
