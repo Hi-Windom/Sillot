@@ -570,7 +570,7 @@
             this.src = `/api/system/getCaptcha?v=${new Date().getTime()}`
         })
 
-				if (!window.JSAndroid) {
+				if (!window.JSAndroid || !document.getElementById("sidebar")) {
 					Biometric.style.display = 'none'
 					tip.style.display = 'none'
 				}
