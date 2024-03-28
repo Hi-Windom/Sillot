@@ -10,6 +10,7 @@ import {pathPosix} from "../../util/pathName";
 import {openModel} from "../menu/model";
 import {setKey} from "../../sync/syncGuide";
 import {isBrowser} from "../../util/functions";
+import {isAppMode} from "sofill/env"
 
 export const initAbout = () => {
     if (!window.siyuan.config.localIPs || window.siyuan.config.localIPs.length === 0 ||
@@ -20,7 +21,7 @@ export const initAbout = () => {
     openModel({
         title: window.siyuan.languages.about,
         icon: "iconInfo",
-        html: `<div>
+        html: /*html*/ `${ isAppMode(true) ? `<div>
 <label class="b3-label fn__flex${window.siyuan.config.readonly ? " fn__none" : ""}">
     <div class="fn__flex-1">
         ${window.siyuan.languages.about11}
@@ -33,6 +34,10 @@ export const initAbout = () => {
         ${window.siyuan.languages.about2}
         <div class="fn__hr"></div>
         <input class="b3-text-field fn__block" readonly value="http://${window.siyuan.config.system.networkServe ? window.siyuan.config.localIPs[0] : "127.0.0.1"}:${location.port}">
+        <div class="fn__hr"></div>
+    <button data-url="http://${window.siyuan.config.system.networkServe ? window.siyuan.config.localIPs[0] : "127.0.0.1"}:${location.port}" class="b3-button b3-button--outline fn__block" onclick="javascript:window.JSAndroid.openURL(this.getAttribute('data-url'))">
+        <svg><use xlink:href="#iconLink"></use></svg>${window.siyuan.languages.about4}
+    </button>
         <div class="b3-label__text">${window.siyuan.languages.about3.replace("${port}", location.port)}</div>
         <div class="fn__hr"></div>
         <div class="b3-label__text"><code class="fn__code">${window.siyuan.config.localIPs.filter(ip => !(ip.startsWith("[") && ip.endsWith("]"))).join("</code> <code class='fn__code'>")}</code></div>
@@ -84,6 +89,9 @@ export const initAbout = () => {
     </button>
     <div class="b3-label__text">${window.siyuan.languages.dataRepoPurgeTip}</div>
 </div>
+
+`:""}
+
 <div class="b3-label">
     ${window.siyuan.languages.systemLog}
     <div class="fn__hr"></div>
@@ -101,6 +109,9 @@ export const initAbout = () => {
     <div class="fn__hr"></div>
     <div class="b3-label__text">${window.siyuan.languages.exportDataTip}</div>
 </div>
+
+${
+  isAppMode(true) ? `
 <div class="b3-label${window.siyuan.config.readonly ? " fn__none" : ""}">
     <div class="fn__flex">
         ${window.siyuan.languages.import} Data
@@ -133,6 +144,10 @@ export const initAbout = () => {
     </div>
     <div class="b3-label__text">${window.siyuan.languages.about14}</div>
 </div>
+
+` : ""
+}
+
 <div class="b3-label">
     <div class="config-about__logo">
         <img src="/stage/icon.png">
