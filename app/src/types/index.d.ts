@@ -160,16 +160,17 @@ interface Window {
         scale?: number
     }) => Promise<any>;
     JSAndroid: {
-				// sillot extend
+        // sillot extend
+        openURLuseDefaultApp(): void
         showWifi(): void
-				setMMKV(key: string, value: string): void
-				showBiometricPrompt(): void
-				requestPermissionActivity(id: string, Msg: string): void
+        setMMKV(key: string, value: string): void
+        showBiometricPrompt(): void
+        requestPermissionActivity(id: string, Msg: string, cb: string): void
         requestPermission(id: string, Msg: string): boolean
         exitSillotAndroid(): void
         restartSillotAndroid(): void
         savePictureByURL(uri: string): void
-				// sillot extend end
+        // sillot extend end
         returnDesktop(): void
         openExternal(url: string): void
         changeStatusBarColor(color: string, mode: number): void

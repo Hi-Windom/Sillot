@@ -381,9 +381,10 @@ ${
             networkServeElement.addEventListener("change", () => {
                 fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
                     if(networkServeElement.checked){
-                        window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量");
+                        window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量","coldRestart");
+                    } else {
+                        window.JSAndroid?.restartSillotAndroid();
                     }
-                    window.JSAndroid?.restartSillotAndroid();
                 });
             });
             const tokenElement = modelMainElement.querySelector("#token") as HTMLInputElement;
