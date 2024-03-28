@@ -314,10 +314,16 @@ ${
         const networkServeElement = about.element.querySelector("#networkServe") as HTMLInputElement;
         networkServeElement.addEventListener("change", () => {
             fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
-                exportLayout({
+                if (window.JSAndroid && networkServeElement.checked) {
+                    window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量","coldRestart");
+                } else if (window.JSAndroid) {
+                    window.JSAndroid?.restartSillotAndroid();
+                } else {
+                    exportLayout({
                     errorExit: true,
                     cb: exitSiYuan
-                });
+                    });
+                }
             });
         });
         const lockScreenModeElement = about.element.querySelector("#lockScreenMode") as HTMLInputElement;
