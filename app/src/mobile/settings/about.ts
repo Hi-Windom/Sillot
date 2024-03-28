@@ -35,7 +35,7 @@ export const initAbout = () => {
         <div class="fn__hr"></div>
         <input class="b3-text-field fn__block" readonly value="http://${window.siyuan.config.system.networkServe ? window.siyuan.config.localIPs[0] : "127.0.0.1"}:${location.port}">
         <div class="fn__hr"></div>
-    <button data-url="http://${window.siyuan.config.system.networkServe ? window.siyuan.config.localIPs[0] : "127.0.0.1"}:${location.port}" class="b3-button b3-button--outline fn__block" onclick="javascript:window.JSAndroid.openURL(this.getAttribute('data-url'))">
+    <button data-url="http://${window.siyuan.config.system.networkServe ? window.siyuan.config.localIPs[0] : "127.0.0.1"}:${location.port}" class="b3-button b3-button--outline fn__block ${window.siyuan.config.system.networkServe ? "" : " fn__none"}" onclick="javascript:window.JSAndroid.openURLuseDefaultApp(this.getAttribute('data-url'))">
         <svg><use xlink:href="#iconLink"></use></svg>${window.siyuan.languages.about4}
     </button>
         <div class="b3-label__text">${window.siyuan.languages.about3.replace("${port}", location.port)}</div>
