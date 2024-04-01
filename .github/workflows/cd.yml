@@ -323,7 +323,7 @@ jobs:
         run: ./gradlew assembleAction --quiet --stacktrace
         continue-on-error: false
 
-      - uses: r0adkll/sign-android-release@v1
+      - uses: noriban/sign-android-release@v5
         if: contains( matrix.config.goos, 'windows')
         name: Sign APK
         id: sign_app
@@ -335,7 +335,7 @@ jobs:
           keyPassword: ${{ secrets.APK_SIGN_KEY_PW }}
         env:
           # override default build-tools version -- optional
-          BUILD_TOOLS_VERSION: "30.0.3"
+          BUILD_TOOLS_VERSION: "34.0.0"
 
       - name: Upload APK to release
         uses: actions/upload-release-asset@v1
