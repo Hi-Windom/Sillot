@@ -4,15 +4,15 @@ from argparse import ArgumentParser
 from collections import defaultdict
 
 import github  # pip install PyGithub
-# ensure the milestone is open before run this
+# 注释掉了不需要关系的部分
 docmap = {
     "Feature": "引入特性 | Feature",
     "Enhancement": "改进功能 | Enhancement",
-    "Bug": "修复错误 | Bugfix",
-    "Document": "文档相关 | Document",
+    # "Bug": "修复错误 | Bugfix",
+    # "Document": "文档相关 | Document",
     "Refactor": "开发重构 | Refactor",
     "Abolishment": "移除废止 | Abolishment",
-    "Development": "Development",
+    # "Development": "Development",
 }
 
 
