@@ -33,6 +33,7 @@ import {openCalcMenu} from "./calc";
 // import * as dayjs from "dayjs";
 import {formatDate} from "sofill/mid";
 import {confirmDialog} from "../../../dialog/confirmDialog";
+import {escapeAttr} from "../../../util/escape";
 
 export const openMenuPanel = (options: {
     protyle: IProtyle,
@@ -1075,7 +1076,11 @@ export const openMenuPanel = (options: {
                     event.stopPropagation();
                     break;
                 } else if (type === "addColOptionOrCell") {
-                    addColOptionOrCell(options.protyle, data, options.cellElements, target, menuElement, options.blockElement);
+                    if (target.querySelector(".b3-menu__checked")) {
+                        removeCellOption(options.protyle, data, options.cellElements,  menuElement.querySelector(`.b3-chips .b3-chip[data-content="${escapeAttr(target.dataset.name)}"]`), options.blockElement);
+                    } else {
+                        addColOptionOrCell(options.protyle, data, options.cellElements, target, menuElement, options.blockElement);
+                    }
                     window.siyuan.menus.menu.remove();
                     event.preventDefault();
                     event.stopPropagation();

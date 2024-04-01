@@ -418,52 +418,54 @@ func insertBlock(c *gin.Context) {
 	if nil != arg["parentID"] {
 		parentID = arg["parentID"].(string)
 		if "" != parentID && util.InvalidIDPattern(parentID, ret) {
-			return
+			if "" != parentID && util.InvalidIDPattern(parentID, ret) {
+				return
+			}
 		}
-	}
-	if nil != arg["previousID"] {
-		previousID = arg["previousID"].(string)
-		if "" != previousID && util.InvalidIDPattern(parentID, ret) {
-			return
+		if nil != arg["previousID"] {
+			previousID = arg["previousID"].(string)
+			if "" != previousID && util.InvalidIDPattern(previousID, ret) {
+				return
+			}
 		}
-	}
-	if nil != arg["nextID"] {
-		nextID = arg["nextID"].(string)
-		if "" != nextID && util.InvalidIDPattern(parentID, ret) {
-			return
+		if nil != arg["nextID"] {
+			nextID = arg["nextID"].(string)
+			if "" != nextID && util.InvalidIDPattern(nextID, ret) {
+				return
+			}
 		}
-	}
 
-	if "markdown" == dataType {
-		luteEngine := util.NewLute()
-		var err error
-		data, err = dataBlockDOM(data, luteEngine)
-		if nil != err {
-			ret.Code = -1
-			ret.Msg = "data block DOM failed: " + err.Error()
-			return
+		if "markdown" == dataType {
+			luteEngine := util.NewLute()
+			var err error
+			data, err = dataBlockDOM(data, luteEngine)
+			if nil != err {
+				ret.Code = -1
+				ret.Msg = "data block DOM failed: " + err.Error()
+				return
+			}
 		}
-	}
 
-	transactions := []*model.Transaction{
-		{
-			DoOperations: []*model.Operation{
-				{
-					Action:     "insert",
-					Data:       data,
-					ParentID:   parentID,
-					PreviousID: previousID,
-					NextID:     nextID,
+		transactions := []*model.Transaction{
+			{
+				DoOperations: []*model.Operation{
+					{
+						Action:     "insert",
+						Data:       data,
+						ParentID:   parentID,
+						PreviousID: previousID,
+						NextID:     nextID,
+					},
 				},
 			},
-		},
+		}
+
+		model.PerformTransactions(&transactions)
+		model.WaitForWritingFiles()
+
+		ret.Data = transactions
+		broadcastTransactions(transactions)
 	}
-
-	model.PerformTransactions(&transactions)
-	model.WaitForWritingFiles()
-
-	ret.Data = transactions
-	broadcastTransactions(transactions)
 }
 
 func updateBlock(c *gin.Context) {
