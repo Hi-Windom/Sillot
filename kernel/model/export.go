@@ -307,7 +307,8 @@ func Export2Liandi(id string) (err error) {
 }
 
 func ExportSystemLog() (zipPath string) {
-	exportFolder := filepath.Join(util.TempDir, "export", "system-log")
+	exportFolder := filepath.Join(util.TempDir, "export", "sillot-system-log")
+	logging.LogDebugf("(model) New ExportSystemLog() involved -> %s.zip", zipPath)
 	os.RemoveAll(exportFolder)
 	if err := os.MkdirAll(exportFolder, 0755); nil != err {
 		logging.LogErrorf("create export temp folder failed: %s", err)

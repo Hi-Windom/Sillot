@@ -25,6 +25,7 @@ interface ISillot {
     hljsRender: any;
   };
   lute: Lute;
+  androidRestartSiYuan: ()=>void;
 }
 
 interface ISout {

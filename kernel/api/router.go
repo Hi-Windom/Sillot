@@ -28,6 +28,7 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("GET", "/api/sillot/getAppConfigesStore", getAppConfigesStore)
 	ginServer.Handle("POST", "/api/sillot/getConfigesStore", getConfigesStore)
 	ginServer.Handle("POST", "/api/sillot/setConfigesStore", setConfigesStore)
+	ginServer.Handle("POST", "/api/sillot/androidReboot", androidReboot, model.Ready)
 
 	// 不需要鉴权
 

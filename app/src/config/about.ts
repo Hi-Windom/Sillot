@@ -314,10 +314,10 @@ ${
         const networkServeElement = about.element.querySelector("#networkServe") as HTMLInputElement;
         networkServeElement.addEventListener("change", () => {
             fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
-                if (window.JSAndroid && networkServeElement.checked) {
+                if (window.JSAndroid && networkServeElement.checked) { // 安卓平板
                     window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量","coldRestart");
                 } else if (window.JSAndroid) {
-                    window.JSAndroid?.restartSillotAndroid();
+                    window.Sillot?.androidRestartSiYuan();
                 } else {
                     exportLayout({
                     errorExit: true,

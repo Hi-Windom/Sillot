@@ -504,3 +504,31 @@ func exit(c *gin.Context) {
 		ret.Data = map[string]interface{}{"closeTimeout": 0}
 	}
 }
+
+func androidReboot(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	forceArg := arg["force"]
+	var force bool
+	if nil != forceArg {
+		force = forceArg.(bool)
+	}
+
+	exitCode := model.Close2(force, true)
+	ret.Code = exitCode
+	switch exitCode {
+	case 0:
+	case 1: // 同步执行失败
+		ret.Msg = model.Conf.Language(96) + "<div class=\"fn__space\"></div><button class=\"b3-button b3-button--white\">" + model.Conf.Language(97) + "</button>"
+		ret.Data = map[string]interface{}{"closeTimeout": 0}
+	case 2: // 提示新安装包
+		ret.Msg = model.Conf.Language(61)
+		ret.Data = map[string]interface{}{"closeTimeout": 0}
+	}
+}

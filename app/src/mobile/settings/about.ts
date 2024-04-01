@@ -303,6 +303,7 @@ ${
                                     fetchPost("/api/system/setWorkspaceDir", {
                                         path: openPath
                                     }, () => {
+                                        console.warn(`(mobile) initAbout ${btnsElement[1]}.onClick -> exitSiYuan() involved (openWorkspace)`);
                                         exitSiYuan();
                                     });
                                 });
@@ -357,6 +358,7 @@ ${
                             fetchPost("/api/system/setWorkspaceDir", {
                                 path: target.getAttribute("data-path")
                             }, () => {
+                                console.warn("(mobile) initAbout confirmDialog -> exitSiYuan() involved (creatWorkspace)");
                                 exitSiYuan();
                             });
                         });
@@ -383,7 +385,7 @@ ${
                     if(networkServeElement.checked){
                         window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量","coldRestart");
                     } else {
-                        window.JSAndroid?.restartSillotAndroid();
+                        window.Sillot?.androidRestartSiYuan();
                     }
                 });
             });

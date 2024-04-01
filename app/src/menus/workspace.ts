@@ -175,6 +175,7 @@ export const workspaceMenu = (app: App, rect: DOMRect) => {
                                 fetchPost("/api/system/setWorkspaceDir", {
                                     path: openPath
                                 }, () => {
+                                    console.warn(`workspaceMenu -> exitSiYuan() involved (${window.siyuan.languages.openBy})`);
                                     exitSiYuan();
                                 });
                             });
@@ -205,6 +206,7 @@ export const workspaceMenu = (app: App, rect: DOMRect) => {
                                 fetchPost("/api/system/setWorkspaceDir", {
                                     path: item.path
                                 }, () => {
+                                    console.warn(`workspaceMenu -> exitSiYuan() involved (${pathPosix().basename(item.path)})`);
                                     exitSiYuan();
                                 });
                             });

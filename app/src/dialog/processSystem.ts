@@ -152,6 +152,10 @@ export const kernelError = () => {
     if (document.querySelector("#errorLog")) {
         return;
     }
+    if (window.JSAndroid) {
+        window.JSAndroid.androidReboot();
+        return;
+    }
     let iosReStart = "";
     if (isInIOS()) {
         iosReStart = `<div class="fn__hr"></div><div class="fn__flex"><div class="fn__flex-1"></div><button class="b3-button">${window.siyuan.languages.retry}</button></div>`;
@@ -268,6 +272,7 @@ export const transactionError = () => {
     dialog.element.setAttribute("data-key", Constants.DIALOG_STATEEXCEPTED);
     const btnsElement = dialog.element.querySelectorAll(".b3-button");
     btnsElement[0].addEventListener("click", () => {
+        console.warn(`transactionError ${btnsElement[0]}.onClick -> exitSiYuan() involved`);
         /// #if MOBILE
         exitSiYuan();
         /// #else

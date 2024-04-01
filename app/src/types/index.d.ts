@@ -169,6 +169,7 @@ interface Window {
         requestPermission(id: string, Msg: string): boolean
         exitSillotAndroid(): void
         restartSillotAndroid(): void
+        androidReboot(): void
         savePictureByURL(uri: string): void
         // sillot extend end
         returnDesktop(): void
