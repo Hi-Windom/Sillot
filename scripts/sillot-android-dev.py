@@ -1,15 +1,17 @@
 import shutil
 import os
+import tempfile
 cwd = os.getcwd()
-temp = 'C:\\tmpSillotA' # 非必要不建议更改层级，可以修改 tmpSillotA 文件夹名
+temp_dir = tempfile.mkdtemp()
 name_zip = 'app.zip'
 name_aar = 'kernel.aar'
-android_baseRoot = ["SillotAndroid",
+name_root = 'Sillot-android' # 注意：该文件夹需要与此项目根目录（Sillot）平级（即位于同一个父文件夹）
+android_baseRoot = [name_root,
                     "app",
                     "src",
                     "main",
                     "assets"]  # 根据实际路径更改此项
-android_kernelRoot = ["SillotAndroid",
+android_kernelRoot = [name_root,
                       "app",
                       "libs"]  # 根据实际路径更改此项
 targetRoot = os.path.join(os.path.dirname(
@@ -23,14 +25,14 @@ dir_list = [os.path.join(appRoot, "appearance"),
 kernel_src = os.path.join(cwd, "kernel", name_aar)
 kernel_dst = os.path.join(os.path.dirname(
     cwd), *android_kernelRoot)
-if os.path.exists(temp):
-    print('remove old temp dir', temp)
-    shutil.rmtree(temp)
-else:
-    print('create temp dir', temp)
-    os.mkdir(temp)
+if not os.path.exists(targetRoot):
+    print('create dir ', targetRoot)
+    os.mkdir(targetRoot)
+if not os.path.exists(kernel_dst):
+    print('create dir ', kernel_dst)
+    os.mkdir(kernel_dst)
 for d in dir_list:
-    t = os.path.join(temp, os.path.basename(d))
+    t = os.path.join(temp_dir, os.path.basename(d))
     print(d, ' -> ', t)
     shutil.copytree(d, t)
 if os.path.exists(target):
@@ -39,7 +41,7 @@ if os.path.exists(target):
 
 print('make achive app.zip to ', target)
 base_name = os.path.join(targetRoot, 'app')  # 完整路径（不包含扩展名）
-root_dir = temp  # 要压缩的目录或文件
+root_dir = temp_dir  # 要压缩的目录或文件
 shutil.make_archive(base_name, "zip", root_dir)
 print(kernel_src, ' -> ', os.path.join(kernel_dst, name_aar))
 shutil.copy(kernel_src, kernel_dst)

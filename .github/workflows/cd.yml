@@ -280,7 +280,7 @@ jobs:
 
 
       # Manual setup is required when the built-in version does not work correctly in windows2022
-      - name: Setup JDK 11
+      - name: Setup JDK
         uses: actions/setup-java@v3
         if: contains( matrix.config.goos, 'windows')
         continue-on-error: true
