@@ -27,10 +27,10 @@ kernel_dst = os.path.join(os.path.dirname(
     cwd), *android_kernelRoot)
 if not os.path.exists(targetRoot):
     print('create dir ', targetRoot)
-    os.mkdir(targetRoot)
+    os.makedirs(targetRoot, exist_ok=True)
 if not os.path.exists(kernel_dst):
     print('create dir ', kernel_dst)
-    os.mkdir(kernel_dst)
+    os.makedirs(kernel_dst, exist_ok=True)
 for d in dir_list:
     t = os.path.join(temp_dir, os.path.basename(d))
     print(d, ' -> ', t)

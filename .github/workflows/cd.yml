@@ -102,6 +102,8 @@ jobs:
     needs: create_release
     strategy:
       matrix:
+        string:
+          - repo_name_android: "Sillot-android"
         config:
           - os: ubuntu-20.04
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
@@ -301,14 +303,14 @@ jobs:
         uses: JesseTG/rm@v1.0.2
         if: contains( matrix.config.goos, 'windows')
         with:
-          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/${{ matrix.string.repo_name_android }}
 
       - name: Checkout android repo
         uses: actions/checkout@v4
         if: contains( matrix.config.goos, 'windows')
         with:
           repository: Hi-Windom/Sillot-android
-          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
+          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/${{ matrix.string.repo_name_android }}
 
       - name: Before android build
         if: contains( matrix.config.goos, 'windows')
@@ -319,7 +321,7 @@ jobs:
 
       - name: Build with Gradle
         if: contains( matrix.config.goos, 'windows')
-        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid
+        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/${{ matrix.string.repo_name_android }}
         run: ./gradlew assembleAction --quiet --stacktrace
         continue-on-error: false
 
@@ -328,7 +330,7 @@ jobs:
         name: Sign APK
         id: sign_app
         with:
-          releaseDirectory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/SillotAndroid/app/build/outputs/apk/action
+          releaseDirectory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/${{ matrix.string.repo_name_android }}/app/build/outputs/apk/action
           signingKeyBase64: ${{ secrets.APK_SIGN_KEY_JKS_BASE64 }}
           alias: ${{ secrets.APK_SIGN_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.APK_SIGN_KEY_JKS_PW }}
