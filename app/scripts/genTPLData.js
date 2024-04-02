@@ -135,6 +135,14 @@ exports.default = {
         app4: /*html*/ `<div id="app4" data-bind="react" data-lib="react-music-player"></div>`,
         app5: /*html*/ `<div id="app5" data-bind="react" data-lib="joyUI"></div>`,
       },
+      PAG: /*html*/ `<canvas class="canvas" id="tencent-pag" style="position:absolute;display:none;"></canvas>
+      <script src="https://cdn.jsdelivr.net/npm/libpag@latest/lib/libpag.min.js"></script>
+      <script>
+        window.onload = async () => {
+            // 实例化 PAG
+            window.PAG = await window.libpag.PAGInit();
+        };
+       </script>`
     },
     styles: {
       editorFontSize: /*html*/ `<style id="editorFontSize" type="text/css"></style>`,
