@@ -36,7 +36,7 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
     for v in [tag_name, lastestRelease]:
       print(f'''
 
-## ⚓ [{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v})
+## ⚓ [{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v}) 主要变化
 
 ''')
       desc_mapping = defaultdict(list)

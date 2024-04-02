@@ -243,23 +243,36 @@ jobs:
 
       - name: Upload Release Asset via REST API
         run: |
-            asset_name="Sillot-${{ needs.create_release.outputs.release_version }}-${{ matrix.config.suffix }}"
-            asset_path="${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/build/Sillot-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}"
-            upload_url="{{ needs.create_release.outputs.upload_url }}"
-            # Calculate the asset size
-            asset_size=$(stat -c%s "$asset_path")
-            # Generate the POST URL with asset name
-            post_url="$upload_url?name=$asset_name"
-            # Send the POST request with asset data
-            curl \
-              -X POST \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              -H "Content-Type: application/octet-stream" \
-              --data-binary "@$asset_path" \
-              -H "Content-Length: $asset_size" \
-              "$post_url"
+                asset_name="Sillot-${{ needs.create_release.outputs.release_version }}-${{ matrix.config.suffix }}"
+                asset_path="${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app/build/Sillot-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}"
+                upload_url="{{ needs.create_release.outputs.upload_url }}"
+                # Calculate the asset size
+                if [[ "$RUNNER_OS" == "Linux" ]]; then
+                  asset_size=$(stat -c%s "$asset_path")
+                else
+                  asset_size=$(Get-Item$asset_path).Length
+                fi
+                # Generate the POST URL with asset name
+                post_url="$upload_url?name=$asset_name"
+                # Send the POST request with asset data
+                if [[ "$RUNNER_OS" == "Linux" ]]; then
+                  curl \
+                    -X POST \
+                    -H "Authorization: token $GITHUB_TOKEN" \
+                    -H "Content-Type: application/octet-stream" \
+                    --data-binary "@$asset_path" \
+                    -H "Content-Length: $asset_size" \
+                    "$post_url"
+                else
+                  Invoke-WebRequest -Uri $post_url -Method Post -Headers @{
+                    "Authorization" = "token $env:GITHUB_TOKEN";
+                    "Content-Type" = "application/octet-stream";
+                    "Content-Length" = $asset_size
+                  } -InFile $asset_path
+                fi
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: sh # 在 Windows 上会使用 PowerShell Core 来执行脚本， 兼容大多数 sh 脚本命令
 
       - name: zip WinPortable
         uses: thedoctor0/zip-release@0.7.1
@@ -274,22 +287,22 @@ jobs:
       - name: Upload WinPortable to release via REST API
         if: contains(matrix.config.goos, 'windows')
         run: |
-            asset_name="Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip"
-            asset_path="Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip"
-            # Calculate the asset size
-            asset_size=$(stat -c%s "$asset_path")
-            # Generate the POST URL with asset name
-            post_url="${{ needs.create_release.outputs.upload_url }}?name=$asset_name"
-            # Send the POST request with asset data
-            curl \
-              -X POST \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              -H "Content-Type: application/octet-stream" \
-              --data-binary "@$asset_path" \
-              -H "Content-Length: $asset_size" \
-              "$post_url"
+              $asset_name = "Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip"
+              $asset_path = "Sillot-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip"
+              $upload_url = "${{ needs.create_release.outputs.upload_url }}"
+              # Calculate the asset size
+              $asset_size = (Get-Item$asset_path).Length
+              # Generate the POST URL with asset name
+              $post_url = "$upload_url?name=$asset_name"
+              # Send the POST request with asset data
+              Invoke-WebRequest -Uri $post_url -Method Post -Headers @{
+                "Authorization" = "token $env:GITHUB_TOKEN";
+                "Content-Type" = "application/octet-stream";
+                "Content-Length" = $asset_size
+              } -InFile $asset_path
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
 
 
       # Manual setup is required when the built-in version does not work correctly in windows2022
@@ -353,20 +366,19 @@ jobs:
       - name: Upload APK to release via REST API
         if: contains(matrix.config.goos, 'windows')
         run: |
-            asset_name="Sillot-${{ needs.create_release.outputs.release_version }}-debug.apk"
-            asset_path="${{steps.sign_app.outputs.signedReleaseFile}}"
-            upload_url="{{ needs.create_release.outputs.upload_url }}"
-            # Calculate the asset size
-            asset_size=$(stat -c%s "$asset_path")
-            # Generate the POST URL with asset name
-            post_url="$upload_url?name=$asset_name"
-            # Send the POST request with asset data
-            curl \
-              -X POST \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              -H "Content-Type: application/vnd.android.package-archive" \
-              --data-binary "@$asset_path" \
-              -H "Content-Length: $asset_size" \
-              "$post_url"
+              $asset_name = "Sillot-${{ needs.create_release.outputs.release_version }}-debug.apk"
+              $asset_path = "${{steps.sign_app.outputs.signedReleaseFile}}"
+              $upload_url = "${{ needs.create_release.outputs.upload_url }}"
+              # Calculate the asset size
+              $asset_size = (Get-Item$asset_path).Length
+              # Generate the POST URL with asset name
+              $post_url = "$upload_url?name=$asset_name"
+              # Send the POST request with asset data
+              Invoke-WebRequest -Uri $post_url -Method Post -Headers @{
+                "Authorization" = "token $env:GITHUB_TOKEN";
+                "Content-Type" = "application/vnd.android.package-archive";
+                "Content-Length" = $asset_size
+              } -InFile $asset_path
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
