@@ -16,6 +16,7 @@ let xDiff: number;
 let yDiff: number;
 let time: number;
 let firstDirection: "toLeft" | "toRight";
+let firstXY: "x" | "y";
 let lastClientX: number;    // 和起始方向不一致时，记录最后一次的 clientX
 let scrollBlock: boolean;
 
@@ -36,7 +37,7 @@ export const handleTouchEnd = (event: TouchEvent, app: App) => {
         return;
     }
     const target = event.target as HTMLElement;
-    if (!clientX || !clientY || typeof yDiff === "undefined" ||
+    if (!clientY || typeof yDiff === "undefined" ||
         target.tagName === "AUDIO" ||
         hasClosestByClassName(target, "b3-dialog", true) ||
         (window.siyuan.mobile.editor && !window.siyuan.mobile.editor.protyle.toolbar.subElement.classList.contains("fn__none")) ||
@@ -143,6 +144,7 @@ export const handleTouchStart = (event: TouchEvent) => {
     xDiff = undefined;
     yDiff = undefined;
     lastClientX = undefined;
+    firstXY = undefined;
     if (isIPhone() ||
         (event.touches[0].clientX > 8 && event.touches[0].clientX < window.innerWidth - 8)) {
         clientX = event.touches[0].clientX;
@@ -158,6 +160,7 @@ export const handleTouchStart = (event: TouchEvent) => {
 };
 
 let previousClientX: number;
+const sideMaskElement = document.querySelector(".side-mask") as HTMLElement
 export const handleTouchMove = (event: TouchEvent) => {
     const target = event.target as HTMLElement;
     if (!clientX || !clientY ||
@@ -166,7 +169,7 @@ export const handleTouchMove = (event: TouchEvent) => {
         (window.siyuan.mobile.editor && !window.siyuan.mobile.editor.protyle.toolbar.subElement.classList.contains("fn__none")) ||
         hasClosestByClassName(target, "keyboard") ||
         hasClosestByClassName(target, "viewer-container") ||
-        hasClosestByAttribute(target, "id", "commonMenu")
+        hasClosestByAttribute(target, "id", "commonMenu") || firstXY === "y"
     ) {
         return;
     }
@@ -182,6 +185,21 @@ export const handleTouchMove = (event: TouchEvent) => {
     yDiff = Math.floor(clientY - event.touches[0].clientY);
     if (!firstDirection) {
         firstDirection = xDiff > 0 ? "toLeft" : "toRight";
+    }
+    // 上下滚动防止左右滑动
+    if (!firstXY) {
+        if (Math.abs(xDiff) > Math.abs(yDiff)) {
+            firstXY = "x"
+        } else {
+            firstXY = "y"
+        }
+        if (firstXY === "x") {
+            if ((hasClosestByAttribute(target, "id", "menu") && firstDirection === "toLeft") ||
+                (hasClosestByAttribute(target, "id", "sidebar") && firstDirection === "toRight")) {
+                firstXY = "y"
+                yDiff = undefined
+            }
+        }
     }
     if (previousClientX) {
         if (firstDirection === "toRight") {
@@ -260,11 +278,12 @@ export const handleTouchMove = (event: TouchEvent) => {
             }
             return;
         }
+
         if (firstDirection === "toRight") {
-            document.getElementById("sidebar").style.transform = `translateX(${-xDiff - windowWidth}px)`;
+            document.getElementById("sidebar").style.transform = `translateX(${Math.min(-xDiff - windowWidth, 0)}px)`;
             transformMask((windowWidth + xDiff) / windowWidth);
         } else {
-            document.getElementById("menu").style.transform = `translateX(${windowWidth - xDiff}px)`;
+            document.getElementById("menu").style.transform = `translateX(${Math.max(windowWidth - xDiff, 0)}px)`;
             transformMask((windowWidth - xDiff) / windowWidth);
         }
         activeBlur();
@@ -276,7 +295,6 @@ export const handleTouchMove = (event: TouchEvent) => {
 };
 
 const transformMask = (opacity: number) => {
-    const maskElement = document.querySelector(".side-mask") as HTMLElement;
-    maskElement.classList.remove("fn__none");
-    maskElement.style.opacity = Math.min((1 - opacity), 0.68).toString();
+    sideMaskElement.classList.remove("fn__none");
+    sideMaskElement.style.opacity = Math.min((1 - opacity), 0.68).toString();
 };

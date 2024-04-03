@@ -10,6 +10,7 @@ import {pathPosix} from "../../util/pathName";
 import {openModel} from "../menu/model";
 import {setKey} from "../../sync/syncGuide";
 import {isBrowser} from "../../util/functions";
+import {isAppMode} from "sofill/env"
 
 export const initAbout = () => {
     if (!window.siyuan.config.localIPs || window.siyuan.config.localIPs.length === 0 ||
@@ -20,7 +21,7 @@ export const initAbout = () => {
     openModel({
         title: window.siyuan.languages.about,
         icon: "iconInfo",
-        html: `<div>
+        html: /*html*/ `${ isAppMode(true) ? `<div>
 <label class="b3-label fn__flex${window.siyuan.config.readonly ? " fn__none" : ""}">
     <div class="fn__flex-1">
         ${window.siyuan.languages.about11}
@@ -33,6 +34,10 @@ export const initAbout = () => {
         ${window.siyuan.languages.about2}
         <div class="fn__hr"></div>
         <input class="b3-text-field fn__block" readonly value="http://${window.siyuan.config.system.networkServe ? window.siyuan.config.localIPs[0] : "127.0.0.1"}:${location.port}">
+        <div class="fn__hr"></div>
+    <button data-url="http://${window.siyuan.config.system.networkServe ? window.siyuan.config.localIPs[0] : "127.0.0.1"}:${location.port}" class="b3-button b3-button--outline fn__block ${window.siyuan.config.system.networkServe ? "" : " fn__none"}" onclick="javascript:window.JSAndroid.openURLuseDefaultApp(this.getAttribute('data-url'))">
+        <svg><use xlink:href="#iconLink"></use></svg>${window.siyuan.languages.about4}
+    </button>
         <div class="b3-label__text">${window.siyuan.languages.about3.replace("${port}", location.port)}</div>
         <div class="fn__hr"></div>
         <div class="b3-label__text"><code class="fn__code">${window.siyuan.config.localIPs.filter(ip => !(ip.startsWith("[") && ip.endsWith("]"))).join("</code> <code class='fn__code'>")}</code></div>
@@ -84,6 +89,9 @@ export const initAbout = () => {
     </button>
     <div class="b3-label__text">${window.siyuan.languages.dataRepoPurgeTip}</div>
 </div>
+
+`:""}
+
 <div class="b3-label">
     ${window.siyuan.languages.systemLog}
     <div class="fn__hr"></div>
@@ -98,9 +106,11 @@ export const initAbout = () => {
     <button class="b3-button b3-button--outline fn__block" id="exportData">
        <svg><use xlink:href="#iconUpload"></use></svg>${window.siyuan.languages.export}
     </button>
-    <div class="fn__hr"></div>
     <div class="b3-label__text">${window.siyuan.languages.exportDataTip}</div>
 </div>
+
+${
+  isAppMode(true) ? `
 <div class="b3-label${window.siyuan.config.readonly ? " fn__none" : ""}">
     <div class="fn__flex">
         ${window.siyuan.languages.import} Data
@@ -110,7 +120,6 @@ export const initAbout = () => {
         <input id="importData" class="b3-form__upload" type="file">
         <svg><use xlink:href="#iconDownload"></use></svg> ${window.siyuan.languages.import}
     </button>
-    <div class="fn__hr"></div>
     <div class="b3-label__text">${window.siyuan.languages.importDataTip}</div>
 </div>
 <div class="b3-label${(!window.siyuan.config.readonly && (isInAndroid() || isInIOS())) ? "" : " fn__none"}">
@@ -131,8 +140,12 @@ export const initAbout = () => {
             <svg><use xlink:href="#iconCopy"></use></svg>${window.siyuan.languages.copy}
         </button>
     </div>
-    <div class="b3-label__text">${window.siyuan.languages.about14}</div>
+    <div class="b3-label__text" id="tokenTip">${window.siyuan.languages.about14.replace("${token}", window.siyuan.config.api.token)}</div>
 </div>
+
+` : ""
+}
+
 <div class="b3-label">
     <div class="config-about__logo">
         <img src="/stage/icon.png">
@@ -288,6 +301,7 @@ export const initAbout = () => {
                                     fetchPost("/api/system/setWorkspaceDir", {
                                         path: openPath
                                     }, () => {
+                                        console.warn(`(mobile) initAbout ${btnsElement[1]}.onClick -> exitSiYuan() invoked (openWorkspace)`);
                                         exitSiYuan();
                                     });
                                 });
@@ -342,6 +356,7 @@ export const initAbout = () => {
                             fetchPost("/api/system/setWorkspaceDir", {
                                 path: target.getAttribute("data-path")
                             }, () => {
+                                console.warn("(mobile) initAbout confirmDialog -> exitSiYuan() invoked (creatWorkspace)");
                                 exitSiYuan();
                             });
                         });
@@ -366,15 +381,17 @@ export const initAbout = () => {
             networkServeElement.addEventListener("change", () => {
                 fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
                     if(networkServeElement.checked){
-                        window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量");
+                        window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量","coldRestart");
+                    } else {
+                        window.Sillot?.androidRestartSiYuan();
                     }
-                    window.JSAndroid?.restartSillotAndroid();
                 });
             });
             const tokenElement = modelMainElement.querySelector("#token") as HTMLInputElement;
             tokenElement.addEventListener("change", () => {
                 fetchPost("/api/system/setAPIToken", {token: tokenElement.value}, () => {
                     window.siyuan.config.api.token = tokenElement.value;
+                    modelMainElement.querySelector("#tokenTip").innerHTML = window.siyuan.languages.about14.replace("${token}", window.siyuan.config.api.token);
                 });
             });
         }

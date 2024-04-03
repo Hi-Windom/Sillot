@@ -28,6 +28,7 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("GET", "/api/sillot/getAppConfigesStore", getAppConfigesStore)
 	ginServer.Handle("POST", "/api/sillot/getConfigesStore", getConfigesStore)
 	ginServer.Handle("POST", "/api/sillot/setConfigesStore", setConfigesStore)
+	ginServer.Handle("POST", "/api/sillot/androidReboot", androidReboot, model.Ready)
 
 	// 不需要鉴权
 
@@ -195,6 +196,7 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/block/updateBlock", model.CheckAuth, model.CheckReadonly, updateBlock, model.Ready)
 	ginServer.Handle("POST", "/api/block/deleteBlock", model.CheckAuth, model.CheckReadonly, deleteBlock, model.Ready)
 	ginServer.Handle("POST", "/api/block/moveBlock", model.CheckAuth, model.CheckReadonly, moveBlock, model.Ready)
+	ginServer.Handle("POST", "/api/block/moveOutlineHeading", model.CheckAuth, model.CheckReadonly, moveOutlineHeading)
 	ginServer.Handle("POST", "/api/block/foldBlock", model.CheckAuth, model.CheckReadonly, foldBlock)
 	ginServer.Handle("POST", "/api/block/unfoldBlock", model.CheckAuth, model.CheckReadonly, unfoldBlock)
 	ginServer.Handle("POST", "/api/block/setBlockReminder", model.CheckAuth, model.CheckReadonly, setBlockReminder)
@@ -257,9 +259,9 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/clipboard/readFilePaths", model.CheckAuth, readFilePaths)
 
 	ginServer.Handle("POST", "/api/asset/uploadCloud", model.CheckAuth, model.CheckReadonly, uploadCloud)
-	ginServer.Handle("POST", "/api/asset/insertLocalAssets", model.CheckAuth, model.CheckReadonly, insertLocalAssets)
+	ginServer.Handle("POST", "/api/asset/insertLocalAssets", model.CheckAuth, model.CheckReadonly, insertLocalAssets, model.Ready)
 	ginServer.Handle("POST", "/api/asset/resolveAssetPath", model.CheckAuth, resolveAssetPath)
-	ginServer.Handle("POST", "/api/asset/upload", model.CheckAuth, model.CheckReadonly, model.Upload)
+	ginServer.Handle("POST", "/api/asset/upload", model.CheckAuth, model.CheckReadonly, model.Upload, model.Ready)
 	ginServer.Handle("POST", "/api/asset/setFileAnnotation", model.CheckAuth, model.CheckReadonly, setFileAnnotation)
 	ginServer.Handle("POST", "/api/asset/getFileAnnotation", model.CheckAuth, getFileAnnotation)
 	ginServer.Handle("POST", "/api/asset/getUnusedAssets", model.CheckAuth, getUnusedAssets)

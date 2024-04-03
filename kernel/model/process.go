@@ -81,7 +81,7 @@ func HookDesktopUIProcJob() {
 	Close(false, true, 1)
 }
 
-var uiProcNames = []string{"siyuan", "electron"}
+var uiProcNames = []string{"sillot", "electron"}
 
 // getAttachedUIProcCount 获取已经附加的 UI 进程数。
 func getAttachedUIProcCount() (ret int) {

@@ -28,6 +28,7 @@ const T = `<!DOCTYPE html>
 <%- ndom.ReactApp.app1 %>
 <%- ndom.ReactApp.app3 %>
 <%- ndom.ReactApp.app5 %>
+<%- ndom.PAG %>
 <%- scripts.Clarity %>
 </body>
 </html>

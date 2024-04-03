@@ -53,7 +53,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PWD }}
 
-      - name: Build the Docker image
+      - name: Build the Docker image # amd64 就是 x86_64
         run: |
           docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:${{ github.event.inputs.image_tag }}-sillot .
 

@@ -4,15 +4,15 @@ from argparse import ArgumentParser
 from collections import defaultdict
 
 import github  # pip install PyGithub
-# ensure the milestone is open before run this
+# 注释掉了不需要关系的部分
 docmap = {
     "Feature": "引入特性 | Feature",
     "Enhancement": "改进功能 | Enhancement",
-    "Bug": "修复错误 | Bugfix",
-    "Document": "文档相关 | Document",
+    # "Bug": "修复错误 | Bugfix",
+    # "Document": "文档相关 | Document",
     "Refactor": "开发重构 | Refactor",
     "Abolishment": "移除废止 | Abolishment",
-    "Development": "Development",
+    # "Development": "Development",
 }
 
 
@@ -36,7 +36,7 @@ def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
     for v in [tag_name, lastestRelease]:
       print(f'''
 
-## ⚓ [{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v})
+## ⚓ [{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v}) 主要变化
 
 ''')
       desc_mapping = defaultdict(list)

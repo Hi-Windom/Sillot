@@ -15,8 +15,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-// 此文件中的控制台输出，可以使用 debugtron 查看
-// https://github.com/pd4d10/debugtron
 
 const {
     net, app,
@@ -39,17 +37,75 @@ process.noAsar = true;
 const appDir = path.dirname(app.getAppPath());
 const isDevEnv = process.env.NODE_ENV === "development";
 const DevMode = process.env.MODE === "dlv" ? "dlv" : "exec";
-let appVer = app.getVersion();
-try { require("electron-reloader")(module); } catch {}
-
-let pkg = {};
+const appVer = app.getVersion();
 if (isDevEnv) {
-  pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json")).toString());
-  if (pkg.version) { appVer = pkg.version;}
+  appIcon = path.join(appDir, "app", "stage", "icon-large.png");
 } else {
-  pkg = JSON.parse(fs.readFileSync(path.join(appDir, "app", "package.json")).toString());
+  appIcon = path.join(appDir, "stage", "icon-large.png");
 }
-const VerSY = pkg.syv;
+console.log("appVer: ", appVer)
+console.log("isDevEnv: ", isDevEnv)
+console.log("DevMode: ", DevMode)
+console.log("appDir: ", appDir)
+console.log("appIcon: ", appIcon)
+try { require("electron-reloader")(module); } catch {}
+const logFileName = 'electron-main.log';
+const logFile = path.join(appDir, logFileName);
+const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
+const formatTimestamp = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${year}/${month}/${day}${hours}:${minutes}:${seconds}`;
+};
+// 不重写 console.debug，配合使用 debugtron 查看. REF https://github.com/pd4d10/debugtron
+console.log = function(...args) {
+  originalLog.apply(console, args);
+  const timestamp = formatTimestamp();
+  const message = `I ${timestamp} main.js ${args.join(' ')}\n`;
+  fs.appendFile(logFile, message, (err) => {
+    if (err) {
+      originalError('Unable to write to log file:', err);
+    }
+  });
+};
+console.info = function(...args) {
+  originalLog.apply(console, args);
+  const timestamp = formatTimestamp();
+  const message = `I ${timestamp} main.js ${args.join(' ')}\n`;
+  fs.appendFile(logFile, message, (err) => {
+    if (err) {
+      originalError('Unable to write to log file:', err);
+    }
+  });
+};
+console.error = function(...args) {
+  originalError.apply(console, args);
+  const timestamp = formatTimestamp();
+  const message = `E ${timestamp} main.js ${args.join(' ')}\n`;
+  fs.appendFile(logFile, message, (err) => {
+    if (err) {
+      originalError('Unable to write to log file:', err);
+    }
+  });
+};
+console.warn = function(...args) {
+  originalWarn.apply(console, args);
+  const timestamp = formatTimestamp();
+  const message = `W ${timestamp} main.js ${args.join(' ')}\n`;
+  fs.appendFile(logFile, message, (err) => {
+    if (err) {
+      originalError('Unable to write to log file:', err);
+    }
+  });
+};
+
 const confDir = path.join(app.getPath("home"), ".config", "sillot");
 const windowStatePath = path.join(confDir, "windowState.json");
 let bootWindow;
@@ -61,6 +117,7 @@ let resetWindowStateOnRestart = false;
 remote.initialize();
 
 if (!app.requestSingleInstanceLock()) {
+    app.clearRecentDocuments();
     app.quit();
 }
 
@@ -98,13 +155,13 @@ const hotKey2Electron = (key) => {
     if (key.indexOf("⌥") > -1) {
         electronKey += "Alt+";
     }
-    return electronKey + key.substr(key.length - 1);
+    return electronKey + key.replace("⌘", "").replace("⇧", "").replace("⌥", "");
 };
 
 const exitApp = (port, errorWindowId) => {
     let tray;
     let mainWindow;
-
+    app.clearRecentDocuments()
     // 关闭端口相同的所有非主窗口
     BrowserWindow.getAllWindows().forEach((item) => {
         try {
@@ -190,7 +247,7 @@ const showErrorWindow = (title, content) => {
         width: Math.floor(screen.getPrimaryDisplay().size.width * 0.5),
         height: Math.floor(screen.getPrimaryDisplay().workAreaSize.height * 0.8),
         frame: false,
-        icon: path.join(appDir, "stage", "icon-large.png"),
+        icon: appIcon,
         webPreferences: {
             nodeIntegration: true, webviewTag: true, webSecurity: false, contextIsolation: false,
         },
@@ -201,7 +258,7 @@ const showErrorWindow = (title, content) => {
             v: appVer,
             title: title,
             content: content,
-            icon: path.join(appDir, "stage", "icon-large.png"),
+            icon: appIcon,
         },
     });
     errWindow.webContents.on('did-finish-load', () => {
@@ -318,7 +375,7 @@ const boot = () => {
         },
         frame: "darwin" === process.platform,
         titleBarStyle: "hidden",
-        icon: path.join(appDir, "stage", "icon-large.png"),
+        icon: appIcon,
     });
     remote.enable(currentWindow.webContents);
 
@@ -463,9 +520,8 @@ const initKernel = (workspace, port, lang) => {
             height: Math.floor(screen.getPrimaryDisplay().workAreaSize.height / 2),
             frame: false,
             backgroundColor: "#1e1e1e",
-            icon: path.join(appDir, "stage", "icon-large.png"),
+            icon: appIcon,
         });
-
         let bootIndex = path.join(appDir, "app", "electron", "boot.html");
         if (isDevEnv) {
             bootIndex = path.join(appDir, "electron", "boot.html");
@@ -481,7 +537,7 @@ const initKernel = (workspace, port, lang) => {
         } else if (!isDevEnv) {
           kernelPath = path.join(appDir, "kernel", kernelName);
         } else {
-          kernelPath = path.join(appDir,"app", "kernel", kernelName);
+          kernelPath = path.join(appDir, "app", "kernel", kernelName);
         }
         console.log("debug: $kernelPath = " + kernelPath);
         if (!fs.existsSync(kernelPath) && DevMode === "exec") {
@@ -621,6 +677,7 @@ const initKernel = (workspace, port, lang) => {
                     try {
                         const progressResult = await net.fetch(getServer() + "/api/system/bootProgress");
                         const progressData = await progressResult.json();
+                        bootWindow.setProgressBar(progressData.data.progress/100);
                         if (progressData.data.progress >= 100) {
                             resolve(true);
                             progressing = true;
@@ -639,6 +696,7 @@ const initKernel = (workspace, port, lang) => {
                         progressing = true;
                     }
                 }
+                bootWindow.setProgressBar(-1);
             }
         } else {
             writeLog(`get kernel version failed: ${apiData.code}, ${apiData.msg}`);
@@ -777,19 +835,18 @@ app.whenReady().then(() => {
 
         resetTrayMenu(tray, lang, mainWindow);
     };
+
     const getWindowByContentId = (id) => {
-        const wnd = BrowserWindow.getAllWindows().find((win) => win.webContents.id === id);
-        if (!wnd) {
-            return null;
-        }
-        return BrowserWindow.fromId(wnd.id);
+        return BrowserWindow.getAllWindows().find((win) => win.webContents.id === id);
     };
 
     ipcMain.on("siyuan-open-folder", (event, filePath) => {
         if (filePath === "openWorkspacesLogFolder") {
-          let ws = JSON.parse(fs.readFileSync(path.join(confDir, "workspace.json")).toString());
+          const ws = JSON.parse(fs.readFileSync(path.join(confDir, "workspace.json")).toString());
           ws.forEach((workspacePath) => {
-            shell.showItemInFolder(path.join(workspacePath, "temp", "siyuan.log"));
+            const file = path.join(workspacePath, "temp", "siyuan.log");
+            shell.showItemInFolder(file);
+            app.addRecentDocument(file);
           });
           return;
         }
@@ -797,14 +854,28 @@ app.whenReady().then(() => {
     });
     ipcMain.on("siyuan-open-file", (event, filePath) => {
       if (filePath === "openAppLog") {
-        filePath = path.join(confDir, "app.log");
+        shell.openPath(path.join(appDir, logFileName), (error) => {
+          if (error) {
+            console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
+          } else {
+            app.addRecentDocument(path.join(appDir, logFileName));
+          }
+        });
+        shell.openPath(path.join(confDir, "app.log"), (error) => {
+          if (error) {
+            console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
+          } else {
+            app.addRecentDocument(path.join(confDir, "app.log"));
+          }
+        });
+        return;
       }
+      // 默认处理
       shell.openPath(filePath, (error) => {
         if (error) {
-          // 如果有错误，返回错误信息
           console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
         } else {
-          // 如果成功，返回空字符串
+          console.log(filePath, " opened by siyuan-open-file")
         }
       });
     });
@@ -815,7 +886,7 @@ app.whenReady().then(() => {
         if (data.cmd === "showOpenDialog") {
             return dialog.showOpenDialog(data);
         }
-        if (data.cmd === "getCurrentWindowId") {
+        if (data.cmd === "getContentsId") {
             return event.sender.id;
         }
         if (data.cmd === "setProxy") {
@@ -911,8 +982,8 @@ app.whenReady().then(() => {
             case "openDevTools":
                 event.sender.openDevTools({mode: "bottom"});
                 break;
-            case "unregisterAll":
-                globalShortcut.unregisterAll();
+            case "unregisterGlobalShortcut":
+                globalShortcut.unregister(hotKey2Electron(data.accelerator));
                 break;
             case "show":
                 if (!currentWindow) {
@@ -1034,13 +1105,15 @@ app.whenReady().then(() => {
     });
     ipcMain.on("siyuan-export-newwindow", (event, data) => {
         // The PDF/Word export preview window automatically adjusts according to the size of the main window https://github.com/siyuan-note/siyuan/issues/10554
+        const wndBounds = getWindowByContentId(event.sender.id).getBounds();
+        const wndScreen = screen.getDisplayNearestPoint({x: wndBounds.x, y: wndBounds.y});
         const printWin = new BrowserWindow({
             show: true,
-            width: Math.floor(screen.getPrimaryDisplay().size.width * 0.8),
-            height: Math.floor(screen.getPrimaryDisplay().workAreaSize.height * 0.8),
+            width: Math.floor(wndScreen.size.width * 0.8),
+            height: Math.floor(wndScreen.size.height * 0.8),
             resizable: true,
             frame: "darwin" === process.platform,
-            icon: path.join(appDir, "stage", "icon-large.png"),
+            icon: appIcon,
             titleBarStyle: "hidden",
             webPreferences: {
                 contextIsolation: false,
@@ -1050,6 +1123,7 @@ app.whenReady().then(() => {
                 autoplayPolicy: "user-gesture-required" // 桌面端禁止自动播放多媒体 https://github.com/siyuan-note/siyuan/issues/7587
             },
         });
+        printWin.center();
         printWin.webContents.userAgent = "SiYuan/" + appVer + " https://b3log.org/siyuan Electron " + printWin.webContents.userAgent;
         printWin.loadURL(data);
         printWin.webContents.on("will-navigate", (nEvent) => {
@@ -1070,13 +1144,13 @@ app.whenReady().then(() => {
         const win = new BrowserWindow({
             show: true,
             trafficLightPosition: {x: 8, y: 13},
-            width: data.width || mainScreen.size.width * 0.7,
-            height: data.height || mainScreen.size.height * 0.9,
+            width: Math.floor(data.width || mainScreen.size.width * 0.7),
+            height: Math.floor(data.height || mainScreen.size.height * 0.9),
             minWidth: 493,
             minHeight: 376,
             fullscreenable: true,
             frame: "darwin" === process.platform,
-            icon: path.join(appDir, "stage", "icon-large.png"),
+            icon: appIcon,
             titleBarStyle: "hidden",
             webPreferences: {
                 contextIsolation: false,
@@ -1143,7 +1217,7 @@ app.whenReady().then(() => {
         let tray;
         if ("win32" === process.platform || "linux" === process.platform) {
             // 系统托盘
-            tray = new Tray(path.join(appDir, "stage", "icon-large.png"));
+            tray = new Tray(appIcon);
             tray.setToolTip(`{{ ${path.basename(data.workspaceDir)} }} <<< Sillot v${appVer}`);
             const mainWindow = getWindowByContentId(event.sender.id);
             if (!mainWindow) {
@@ -1164,7 +1238,6 @@ app.whenReady().then(() => {
         await net.fetch(getServer(data.port) + "/api/system/uiproc?pid=" + process.pid, {method: "POST"});
     });
     ipcMain.on("siyuan-hotkey", (event, data) => {
-        globalShortcut.unregisterAll();
         if (!data.hotkeys || data.hotkeys.length === 0) {
             return;
         }
@@ -1173,31 +1246,32 @@ app.whenReady().then(() => {
             if (!shortcut) {
                 return;
             }
+            if (globalShortcut.isRegistered(shortcut)) {
+                globalShortcut.unregister(shortcut);
+            }
             if (index === 0) {
                 globalShortcut.register(shortcut, () => {
-                    workspaces.forEach(workspaceItem => {
+                    workspaces.find(workspaceItem => {
                         const mainWindow = workspaceItem.browserWindow;
-                        if (mainWindow.isMinimized()) {
-                            mainWindow.restore();
-                            mainWindow.show(); // 按 `Alt+M` 后隐藏窗口，再次按 `Alt+M` 显示窗口后会卡住不能编辑 https://github.com/siyuan-note/siyuan/issues/8456
-                        } else {
-                            if (mainWindow.isVisible()) {
-                                if (1 === workspaces.length) { // 改进 `Alt+M` 激活窗口 https://github.com/siyuan-note/siyuan/issues/7258
+                        if (event.sender.id === mainWindow.webContents.id) {
+                            if (mainWindow.isMinimized()) {
+                                mainWindow.restore();
+                                mainWindow.show(); // 按 `Alt+M` 后隐藏窗口，再次按 `Alt+M` 显示窗口后会卡住不能编辑 https://github.com/siyuan-note/siyuan/issues/8456
+                            } else {
+                                if (mainWindow.isVisible()) {
                                     if (!mainWindow.isFocused()) {
                                         mainWindow.show();
                                     } else {
                                         hideWindow(mainWindow);
                                     }
                                 } else {
-                                    hideWindow(mainWindow);
+                                    mainWindow.show();
                                 }
-                            } else {
-                                mainWindow.show();
                             }
-                        }
-
-                        if ("win32" === process.platform || "linux" === process.platform) {
-                            resetTrayMenu(workspaceItem.tray, data.languages, mainWindow);
+                            if ("win32" === process.platform || "linux" === process.platform) {
+                                resetTrayMenu(workspaceItem.tray, data.languages, mainWindow);
+                            }
+                            return true;
                         }
                     });
                 });
@@ -1226,7 +1300,7 @@ app.whenReady().then(() => {
             width: Math.floor(screen.getPrimaryDisplay().size.width * 0.6),
             height: Math.floor(screen.getPrimaryDisplay().workAreaSize.height * 0.8),
             frame: false,
-            icon: path.join(appDir, "stage", "icon-large.png"),
+            icon: appIcon,
             webPreferences: {
                 nodeIntegration: true, webviewTag: true, webSecurity: false, contextIsolation: false,
             },
@@ -1244,7 +1318,7 @@ app.whenReady().then(() => {
                 lang: language,
                 home: app.getPath("home"),
                 v: appVer,
-                icon: path.join(appDir, "stage", "icon-large.png"),
+                icon: appIcon,
             },
         });
         firstOpenWindow.show();
@@ -1374,6 +1448,7 @@ app.whenReady().then(() => {
     const ignore = [
         "localhost",
         "www.clarity.ms",
+        "cdn.jsdelivr.net",
         "127.0.0.1",
         "0.0.0.0",
     ]

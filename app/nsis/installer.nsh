@@ -9,10 +9,10 @@ Caption "${PRODUCT_NAME} ${VERSION}"
 
 !macro customInstallMode
     ${IfNot} ${AtLeastWin10}
-    MessageBox mb_iconStop "抱歉，Windows 10 以下系统不受支持"
+    MessageBox mb_iconStop "❗ 抱歉，Windows 10 以下系统不受支持"
     Quit
     ${EndIf}
-    MessageBox MB_ICONEXCLAMATION|MB_OKCANCEL "数据无价，请勿在生产环节使用汐洛！安装前应当先备份重要文件！是否继续？$\n$\n" IDOK yes2 IDCANCEL no2
+    MessageBox MB_ICONEXCLAMATION|MB_OKCANCEL "🚧 汐洛仅用于开发者测试，不要用来存储重要数据！$\n☢️ 安装前应当先备份重要文件！$\n$\n❓ 是否继续？$\n$\n" IDOK yes2 IDCANCEL no2
     no2:
         Quit
     yes2:
@@ -21,7 +21,7 @@ Caption "${PRODUCT_NAME} ${VERSION}"
 !macro customUnInit
     ${un.FindIt} "$INSTDIR" "data" $R0
     ${If} -1 != $R0
-        MessageBox MB_ICONSTOP "检测到安装路径下包含了工作空间数据 $R0，请将工作空间文件夹移到其他位置后再试。$\n$\n\
+        MessageBox MB_ICONSTOP "❗ 检测到安装路径下包含了工作空间数据 $R0，请将工作空间文件夹移到其他位置后再试。$\n$\n\
             The workspace data $R0 was detected in the installation path, please move the workspace folder to another location and try again.$\n"
         Quit
     ${EndIf}
@@ -29,20 +29,20 @@ Caption "${PRODUCT_NAME} ${VERSION}"
 
 !macro customUnInstall
     ${IfNot} ${isUpdated}
-        MessageBox MB_YESNO "是否需要彻底删除全局配置（$PROFILE\.config\siyuan\）？$\n$\n\
-            Do you want to delete the global configuration ($PROFILE\.config\siyuan\)?$\n" \
+        MessageBox MB_YESNO "❓ 是否需要彻底删除全局配置（$PROFILE\.config\sillot\）$\n$\n\
+            Do you want to delete the global configuration ($PROFILE\.config\sillot\)?$\n" \
             /SD IDYES IDYES AcceptedRMConf IDNO SkippedRMConf
             AcceptedRMConf:
-                RMDir /r "$PROFILE\.config\siyuan\"
+                RMDir /r "$PROFILE\.config\sillot\"
             SkippedRMConf:
     ${EndIf}
 
     ${IfNot} ${isUpdated}
-        MessageBox MB_YESNO "是否需要彻底删除默认工作空间（$PROFILE\SiYuan\）？$\n$\n\
-            Do you want to completely delete the default workspace ($PROFILE\SiYuan\)?$\n" \
+        MessageBox MB_YESNO "❓ 是否需要彻底删除默认工作空间（$PROFILE\Sillot\）$\n$\n\
+            Do you want to completely delete the default workspace ($PROFILE\Sillot\)?$\n" \
             /SD IDNO IDYES AcceptedRMWorkspace IDNO SkippedRMWrokspace
             AcceptedRMWorkspace:
-                RMDir /r "$PROFILE\SiYuan\"
+                RMDir /r "$PROFILE\Sillot\"
             SkippedRMWrokspace:
     ${EndIf}
 !macroend

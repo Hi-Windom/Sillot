@@ -6,7 +6,7 @@ import {getSearch, isMobile, isValidAttrName} from "../util/functions";
 import {isLocalPath, movePathTo, moveToPath, pathPosix} from "../util/pathName";
 import {MenuItem} from "./Menu";
 import {saveExport} from "../protyle/export";
-import {openByMobile, writeText} from "../protyle/util/compatibility";
+import {isInAndroid, openByMobile, writeText} from "../protyle/util/compatibility";
 import {fetchPost, fetchSyncPost} from "../util/fetch";
 import {hideMessage, showMessage} from "../dialog/message";
 import {Dialog} from "../dialog";
@@ -683,7 +683,7 @@ export const openMenu = (app: App, src: string, onlyMenu: boolean, showAccelerat
     const submenu = [];
     /// #if MOBILE
     submenu.push({
-        label: window.siyuan.languages.useBrowserView,
+        label: isInAndroid() ? window.siyuan.languages.useDefault : window.siyuan.languages.useBrowserView,
         accelerator: showAccelerator ? "Click" : "",
         click: () => {
             openByMobile(src);
@@ -754,7 +754,7 @@ export const openMenu = (app: App, src: string, onlyMenu: boolean, showAccelerat
             });
             /// #else
             submenu.push({
-                label: window.siyuan.languages.useBrowserView,
+                label: isInAndroid() ? window.siyuan.languages.useDefault : window.siyuan.languages.useBrowserView,
                 accelerator: showAccelerator ? "Click" : "",
                 click: () => {
                     openByMobile(src);
@@ -780,7 +780,7 @@ export const openMenu = (app: App, src: string, onlyMenu: boolean, showAccelerat
         });
         /// #else
         submenu.push({
-            label: window.siyuan.languages.useBrowserView,
+            label: isInAndroid() ? window.siyuan.languages.useDefault : window.siyuan.languages.useBrowserView,
             accelerator: showAccelerator ? "Click" : "",
             click: () => {
                 const uri = src.startsWith("/") ? "" : "/" + src;

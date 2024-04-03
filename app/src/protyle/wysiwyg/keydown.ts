@@ -6,7 +6,7 @@ import {
     focusByWbr,
     getEditorRange,
     getSelectionOffset, getSelectionPosition,
-    selectAll, setFirstNodeRange,
+    selectAll, setFirstNodeRange, setLastNodeRange,
 } from "../util/selection";
 import {
     hasClosestBlock,
@@ -47,8 +47,6 @@ import {
     downSelect,
     duplicateBlock,
     getStartEndElement,
-    goEnd,
-    goHome,
     upSelect
 } from "./commonHotkey";
 import {enterBack, fileAnnotationRefMenu, linkMenu, refMenu, setFold, tagMenu, zoomOut} from "../../menus/protyle";
@@ -501,29 +499,13 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             event.preventDefault();
             return;
         }
-        // ctrl+home 光标移动到顶
-        if (!event.altKey && !event.shiftKey && isOnlyMeta(event) && event.key === "Home") {
-            goHome(protyle);
-            hideElements(["select"], protyle);
-            event.stopPropagation();
-            event.preventDefault();
-            return;
-        }
-        // ctrl+end 光标移动到尾
-        if (!event.altKey && !event.shiftKey && isOnlyMeta(event) && event.key === "End") {
-            goEnd(protyle);
-            hideElements(["select"], protyle);
-            event.stopPropagation();
-            event.preventDefault();
-            return;
-        }
         // 向上/下滚动一屏
         if (!event.altKey && !event.shiftKey && isNotCtrl(event) && (event.key === "PageUp" || event.key === "PageDown")) {
             if (event.key === "PageUp") {
-                protyle.contentElement.scrollTop = protyle.contentElement.scrollTop - protyle.contentElement.clientHeight;
+                protyle.contentElement.scrollTop = protyle.contentElement.scrollTop - protyle.contentElement.clientHeight + 60;
                 protyle.scroll.lastScrollTop = protyle.contentElement.scrollTop + 1;
             } else {
-                protyle.contentElement.scrollTop = protyle.contentElement.scrollTop + protyle.contentElement.clientHeight;
+                protyle.contentElement.scrollTop = protyle.contentElement.scrollTop + protyle.contentElement.clientHeight - 60;
                 protyle.scroll.lastScrollTop = protyle.contentElement.scrollTop - 1;
             }
             const contentRect = protyle.contentElement.getBoundingClientRect();
@@ -706,6 +688,9 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                         }
                         focusBlock(nextElement);
                         scrollCenter(protyle, nextElement);
+                    } else {
+                        setLastNodeRange(nodeEditableElement, range, false);
+                        range.collapse(false)
                     }
                     event.stopPropagation();
                     event.preventDefault();
@@ -715,9 +700,12 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     if (nextFoldElement && nextFoldElement.getAttribute("fold") === "1") {
                         focusBlock(nextFoldElement);
                         scrollCenter(protyle, nextFoldElement);
-                        event.stopPropagation();
-                        event.preventDefault();
+                    } else {
+                        setLastNodeRange(nodeEditableElement, range, false);
+                        range.collapse(false)
                     }
+                    event.stopPropagation();
+                    event.preventDefault();
                 }
             }
             return;
@@ -938,7 +926,12 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     writeText(`${content.trim()} ((${nodeElement.getAttribute("data-node-id")} "*"))`);
                 });
             } else {
-                nodeElement.setAttribute("data-reftext", "true");
+                const selectElements = protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select");
+                if (selectElements.length > 0) {
+                    selectElements[0].setAttribute("data-reftext", "true");
+                } else {
+                    nodeElement.setAttribute("data-reftext", "true");
+                }
                 focusByRange(getEditorRange(nodeElement));
                 document.execCommand("copy");
             }

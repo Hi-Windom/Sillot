@@ -30,6 +30,7 @@ const T = `<!DOCTYPE html>
 <%- ndom.ReactApp.app3 %>
 <%- ndom.ReactApp.app4 %>
 <%- ndom.ReactApp.app5 %>
+<%- ndom.PAG %>
 <%- scripts.loadingRefresh %>
 <%- scripts.Clarity %>
 </body>

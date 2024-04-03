@@ -48,6 +48,14 @@
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
 <div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
 <div id="app5" data-bind="react" data-lib="joyUI"></div>
+<canvas class="canvas" id="tencent-pag" style="position:absolute;display:none;"></canvas>
+      <script src="https://cdn.jsdelivr.net/npm/libpag@latest/lib/libpag.min.js"></script>
+      <script>
+        window.onload = async () => {
+            // 实例化 PAG
+            window.PAG = await window.libpag.PAGInit();
+        };
+       </script>
 <!-- Start of Microsoft Clarity -->
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){

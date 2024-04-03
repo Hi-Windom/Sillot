@@ -160,7 +160,7 @@ ${
     isAppMode() ? `<div class="fn__flex config__item  b3-label">
 <div class="fn__flex-1">
     ${window.siyuan.languages.about13}
-     <div class="b3-label__text">${window.siyuan.languages.about14}</div>
+     <div class="b3-label__text" id="tokenTip">${window.siyuan.languages.about14.replace("${token}", window.siyuan.config.api.token)}</div>
 </div>
 <span class="fn__space"></span>
 <input class="b3-text-field fn__flex-center fn__size200" id="token" value="${window.siyuan.config.api.token}">
@@ -211,6 +211,7 @@ ${
         tokenElement.addEventListener("change", () => {
             fetchPost("/api/system/setAPIToken", {token: tokenElement.value}, () => {
                 window.siyuan.config.api.token = tokenElement.value;
+                about.element.querySelector("#tokenTip").innerHTML = window.siyuan.languages.about14.replace("${token}", window.siyuan.config.api.token);
             });
         });
     }
@@ -314,10 +315,16 @@ ${
         const networkServeElement = about.element.querySelector("#networkServe") as HTMLInputElement;
         networkServeElement.addEventListener("change", () => {
             fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
-                exportLayout({
+                if (window.JSAndroid && networkServeElement.checked) { // 安卓平板
+                    window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量","coldRestart");
+                } else if (window.JSAndroid) {
+                    window.Sillot?.androidRestartSiYuan();
+                } else {
+                    exportLayout({
                     errorExit: true,
                     cb: exitSiYuan
-                });
+                    });
+                }
             });
         });
         const lockScreenModeElement = about.element.querySelector("#lockScreenMode") as HTMLInputElement;

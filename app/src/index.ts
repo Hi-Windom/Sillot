@@ -16,14 +16,15 @@ import {
     processSync,
     progressBackgroundTask,
     progressLoading,
-    progressStatus, reloadSync,
+    progressStatus,
+    reloadSync,
     setTitle,
     transactionError
 } from "./dialog/processSystem";
 import { initMessage } from "./dialog/message";
 import { getAllTabs } from "./layout/getAll";
 import { getLocalStorage } from "./protyle/util/compatibility";
-import { importIDB } from "./sillot/util/sillot-idb-backup-and-restore";
+import { exportIDB, importIDB } from "./sillot/util/sillot-idb-backup-and-restore";
 import { SillotEnv } from "./sillot";
 import {getSearch} from "./util/functions";
 import {hideAllElements} from "./protyle/ui/hideElements";
@@ -67,6 +68,9 @@ export class App {
                                 break;
                             case "syncMergeResult":
                                 reloadSync(this, data.data);
+                                break;
+                            case "reloaddoc":
+                                reloadSync(this, {upsertRootIDs: [data.data], removeRootIDs: []}, false);
                                 break;
                             case "readonly":
                                 window.siyuan.config.editor.readOnly = data.data;
@@ -151,6 +155,16 @@ export class App {
             }),
         };
         new SillotEnv();
+        window.Sillot.androidRestartSiYuan = ()=>{
+            const overlay = document.querySelector('#SillotOverlay') as HTMLElement;
+            overlay.style.display = "block";
+            exportIDB().then(() => {
+            hideAllElements(["util"]);
+            fetchPost("/api/sillot/androidReboot", {force: true}, (response) => {
+                window.location.href = "siyuan://androidRestartSiYuan";
+            });
+            })
+        };
 
         fetchPost("/api/system/getConf", {}, async (response) => {
             addScriptSync(`${Constants.PROTYLE_CDN}/js/lute/lute.min.js?v=${Constants.SIYUAN_VERSION}`, "protyleLuteScript");

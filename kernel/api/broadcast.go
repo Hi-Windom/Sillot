@@ -46,7 +46,7 @@ broadcast create a broadcast channel WebSocket connection
 
 @example
 
-	ws://localhost:6806/ws/broadcast?channel=test
+	ws://localhost:58131/ws/broadcast?channel=test
 */
 func broadcast(c *gin.Context) {
 	var (

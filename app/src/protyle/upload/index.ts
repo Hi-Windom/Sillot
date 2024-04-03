@@ -168,11 +168,21 @@ export const uploadLocalFiles = (files: string[], protyle: IProtyle, isUpload: b
         id: protyle.block.rootID
     }, (response) => {
         hideMessage(msgId);
+        let tip = "";
+        Object.keys(response.data.succMap).forEach(name => {
+            if (response.data.succMap[name].startsWith("file:")) {
+                tip += name + ", ";
+            }
+        });
+        if (tip) {
+            showMessage(window.siyuan.languages.dndFolderTip.replace("${x}", `<b>${tip.substring(0, tip.length - 2)}</b>`));
+        }
         genUploadedLabel(JSON.stringify(response), protyle);
     });
 };
 
 export const uploadFiles = (protyle: IProtyle, files: FileList | DataTransferItemList | File[], element?: HTMLInputElement, successCB?: (res: string) => void) => {
+    console.log("(web) uploadFiles invoked -> "+protyle?.block.rootID);
     // 文档书中点开属性->数据库后的变更操作
     if (!protyle) {
         const formData = new FormData();
@@ -207,7 +217,11 @@ export const uploadFiles = (protyle: IProtyle, files: FileList | DataTransferIte
         }
         if (0 === fileItem.size && "" === fileItem.type && -1 === fileItem.name.indexOf(".")) {
             // 文件夹
+            /// #if !BROWSER
             uploadLocalFiles([fileItem.path], protyle, false);
+            /// #else
+            showMessage("不支持文件夹上传");
+            /// #endif
         } else {
             fileList.push(fileItem);
         }

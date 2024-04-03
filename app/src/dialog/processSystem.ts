@@ -36,9 +36,11 @@ const updateTitle = (rootID: string, tab: Tab, protyle?: IProtyle) => {
     });
 };
 
-export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRootIDs: string[] }) => {
-    hideMessage();
-    /// #if MOBILE
+export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRootIDs: string[] }, hideMsg = true) => {
+   if (hideMsg) {
+       hideMessage();
+   }
+   /// #if MOBILE
     if (window.siyuan.mobile.popEditor) {
         if (data.removeRootIDs.includes(window.siyuan.mobile.popEditor.protyle.block.rootID)) {
             hideElements(["dialog"]);
@@ -150,6 +152,10 @@ export const lockScreen = (app: App) => {
 
 export const kernelError = () => {
     if (document.querySelector("#errorLog")) {
+        return;
+    }
+    if (window.JSAndroid) {
+        window.JSAndroid.androidReboot();
         return;
     }
     let iosReStart = "";
@@ -268,6 +274,7 @@ export const transactionError = () => {
     dialog.element.setAttribute("data-key", Constants.DIALOG_STATEEXCEPTED);
     const btnsElement = dialog.element.querySelectorAll(".b3-button");
     btnsElement[0].addEventListener("click", () => {
+        console.warn(`transactionError ${btnsElement[0]}.onClick -> exitSiYuan() invoked`);
         /// #if MOBILE
         exitSiYuan();
         /// #else

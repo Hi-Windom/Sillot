@@ -90,8 +90,8 @@ const renderPDF = async (id: string) => {
         themeStyle = `<link rel="stylesheet" type="text/css" id="themeStyle" href="${servePath}/appearance/themes/${window.siyuan.config.appearance.themeLight}/theme.d.pdf.css?${Constants.SIYUAN_VERSION}"/>`;
     }
     const currentWindowId = await ipcRenderer.invoke(Constants.SIYUAN_GET, {
-        cmd: "getCurrentWindowId",
-    })
+        cmd: "getContentsId",
+    });
     // data-theme-mode="light" https://github.com/siyuan-note/siyuan/issues/7379
     const html = /*html*/ `<!DOCTYPE html>
 <html lang="${window.siyuan.config.appearance.lang}" data-theme-mode="light" data-light-theme="${window.siyuan.config.appearance.themeLight}" data-dark-theme="${window.siyuan.config.appearance.themeDark}">
@@ -105,6 +105,7 @@ const renderPDF = async (id: string) => {
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="stylesheet" type="text/css" id="baseStyle" href="${servePath}/stage/build/export/base.css?${Constants.SIYUAN_VERSION}"/>
     <link rel="stylesheet" type="text/css" id="themeDefaultStyle" href="${servePath}/appearance/themes/daylight/theme.css?${Constants.SIYUAN_VERSION}"/>
+    <script src="${servePath}/stage/protyle/js/protyle-html.js?v=3.0.5"></script>
     ${themeStyle}
     <title>${window.siyuan.languages.export} PDF</title>
     <style>
@@ -384,7 +385,7 @@ const renderPDF = async (id: string) => {
         })
     }
     const renderPreview = (data) => {
-        previewElement.innerHTML = '<div style="padding:0" class="protyle-wysiwyg${window.siyuan.config.editor.displayBookmarkIcon ? " protyle-wysiwyg--attr" : ""}">' + data.content + '</div>';
+        previewElement.innerHTML = '<div style="padding:6px 0 0 0" class="protyle-wysiwyg${window.siyuan.config.editor.displayBookmarkIcon ? " protyle-wysiwyg--attr" : ""}">' + data.content + '</div>';
         const wysElement = previewElement.querySelector(".protyle-wysiwyg");
         wysElement.setAttribute("data-doc-type", data.type || "NodeDocument");
         if (data.attrs.memo) {
@@ -646,6 +647,8 @@ const onExport = (data: IWebSocketData, filePath: string, exportOption: IExportO
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <script src="stage/protyle/js/lute/lute.min.js"></script>
+    <script src="stage/protyle/js/protyle-html.js?v=3.0.5"></script>
     <link rel="stylesheet" type="text/css" id="baseStyle" href="stage/build/export/base.css?${Constants.SIYUAN_VERSION}"/>
     <link rel="stylesheet" type="text/css" id="themeDefaultStyle" href="appearance/themes/${themeName}/theme.css?${Constants.SIYUAN_VERSION}"/>
     ${themeStyle}

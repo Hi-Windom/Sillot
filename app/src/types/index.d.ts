@@ -46,6 +46,7 @@ type TOperation =
     | "sortAttrViewView"
     | "setAttrViewPageSize"
     | "updateAttrViewColRelation"
+    | "moveOutlineHeading"
     | "updateAttrViewColRollup"
     | "hideAttrViewName"
 type TBazaarType = "templates" | "icons" | "widgets" | "themes" | "plugins"
@@ -160,16 +161,18 @@ interface Window {
         scale?: number
     }) => Promise<any>;
     JSAndroid: {
-				// sillot extend
+        // sillot extend
+        openURLuseDefaultApp(): void
         showWifi(): void
-				setMMKV(key: string, value: string): void
-				showBiometricPrompt(): void
-				requestPermissionActivity(id: string, Msg: string): void
+        setMMKV(key: string, value: string): void
+        showBiometricPrompt(): void
+        requestPermissionActivity(id: string, Msg: string, cb: string): boolean
         requestPermission(id: string, Msg: string): boolean
         exitSillotAndroid(): void
         restartSillotAndroid(): void
+        androidReboot(): void
         savePictureByURL(uri: string): void
-				// sillot extend end
+        // sillot extend end
         returnDesktop(): void
         openExternal(url: string): void
         changeStatusBarColor(color: string, mode: number): void
@@ -283,7 +286,7 @@ interface ISearchOption {
 interface ISearchType {
     audioBlock: boolean
     videoBlock: boolean
-    iFrameBlock: boolean
+    iframeBlock: boolean
     widgetBlock: boolean
     mathBlock: boolean
     table: boolean
@@ -717,6 +720,7 @@ interface IModels {
 }
 
 interface IMenu {
+    checked?: boolean,
     iconClass?: string,
     label?: string,
     click?: (element: HTMLElement, event: MouseEvent) => boolean | void | Promise<boolean | void>

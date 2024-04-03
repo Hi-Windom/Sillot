@@ -27,6 +27,8 @@ import {saveScroll} from "../protyle/scroll/saveScroll";
 import {removeBlock} from "../protyle/wysiwyg/remove";
 import {isNotEditBlock} from "../protyle/wysiwyg/getBlock";
 import {updateCardHV} from "../card/util";
+import { exportIDB } from "../sillot/util/sillot-idb-backup-and-restore";
+import {hideAllElements, hideElements} from "../protyle/ui/hideElements";
 
 class App {
     public plugins: import("../plugin").Plugin[] = [];
@@ -62,6 +64,16 @@ class App {
             })
         };
         new SillotEnv();
+        window.Sillot.androidRestartSiYuan = ()=>{
+            const overlay = document.querySelector('#SillotOverlay') as HTMLElement;
+            overlay.style.display = "block";
+            exportIDB().then(() => {
+            hideAllElements(["util"]);
+            fetchPost("/api/sillot/androidReboot", {force: true}, (response) => {
+                window.location.href = "siyuan://androidRestartSiYuan";
+            });
+            })
+        };
         // 不能使用 touchstart，否则会被 event.stopImmediatePropagation() 阻塞
         window.addEventListener("click", (event: MouseEvent & { target: HTMLElement }) => {
             if (!window.siyuan.menus.menu.element.contains(event.target) && !hasClosestByAttribute(event.target, "data-menu", "true")) {
@@ -77,10 +89,10 @@ class App {
             }
         });
         window.addEventListener("beforeunload", () => {
-            saveScroll(window.siyuan.mobile.editor?.protyle);
+            window.siyuan.mobile.editor?.protyle ? saveScroll(window.siyuan.mobile.editor.protyle) : null;
         }, false);
         window.addEventListener("pagehide", () => {
-            saveScroll(window.siyuan.mobile.editor?.protyle);
+            window.siyuan.mobile.editor?.protyle ? saveScroll(window.siyuan.mobile.editor.protyle) : null;
         }, false);
         // 判断手机横竖屏状态
         window.matchMedia("(orientation:portrait)").addEventListener("change", () => {
