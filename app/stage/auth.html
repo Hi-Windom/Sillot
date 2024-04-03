@@ -540,7 +540,7 @@
         try {
             const {ipcRenderer} = require('electron')
             ipcRenderer.on('siyuan-save-close', (event, close) => {
-                console.warn(`ipcRenderer.on "siyuan-save-close" -> exitSiYuan() involved`);
+                console.warn(`ipcRenderer.on "siyuan-save-close" -> exitSiYuan() invoked`);
                 exitSiYuan()
             })
             await ipcRenderer.invoke("siyuan-init", {

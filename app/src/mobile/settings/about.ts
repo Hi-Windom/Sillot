@@ -301,7 +301,7 @@ ${
                                     fetchPost("/api/system/setWorkspaceDir", {
                                         path: openPath
                                     }, () => {
-                                        console.warn(`(mobile) initAbout ${btnsElement[1]}.onClick -> exitSiYuan() involved (openWorkspace)`);
+                                        console.warn(`(mobile) initAbout ${btnsElement[1]}.onClick -> exitSiYuan() invoked (openWorkspace)`);
                                         exitSiYuan();
                                     });
                                 });
@@ -356,7 +356,7 @@ ${
                             fetchPost("/api/system/setWorkspaceDir", {
                                 path: target.getAttribute("data-path")
                             }, () => {
-                                console.warn("(mobile) initAbout confirmDialog -> exitSiYuan() involved (creatWorkspace)");
+                                console.warn("(mobile) initAbout confirmDialog -> exitSiYuan() invoked (creatWorkspace)");
                                 exitSiYuan();
                             });
                         });

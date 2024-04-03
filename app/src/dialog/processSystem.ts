@@ -274,7 +274,7 @@ export const transactionError = () => {
     dialog.element.setAttribute("data-key", Constants.DIALOG_STATEEXCEPTED);
     const btnsElement = dialog.element.querySelectorAll(".b3-button");
     btnsElement[0].addEventListener("click", () => {
-        console.warn(`transactionError ${btnsElement[0]}.onClick -> exitSiYuan() involved`);
+        console.warn(`transactionError ${btnsElement[0]}.onClick -> exitSiYuan() invoked`);
         /// #if MOBILE
         exitSiYuan();
         /// #else

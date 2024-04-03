@@ -190,7 +190,7 @@ export const initWindow = async (app: App) => {
                         ipcRenderer.send(Constants.SIYUAN_CMD, "closeButtonBehavior");
                     }
                 } else {
-                    console.warn("initWindow -> exitSiYuan() involved (winOnClose)");
+                    console.warn("initWindow -> exitSiYuan() invoked (winOnClose)");
                     exitSiYuan();
                 }
             },

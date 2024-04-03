@@ -167,7 +167,7 @@ export const initRightMenu = (app: App) => {
                 event.stopPropagation();
                 break;
             } else if (target.id === "menuSafeQuit") {
-                console.warn("(mobile) menuSafeQuit -> exitSiYuan() involved");
+                console.warn("(mobile) menuSafeQuit -> exitSiYuan() invoked");
                 exitSiYuan();
                 event.preventDefault();
                 event.stopPropagation();
