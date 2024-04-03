@@ -295,7 +295,7 @@ export function exAce() {
           "data": data,
           "id": id
         }, res => {
-          console.log(res);
+          window.sout.tracker(res);
           if (res.code === 0) {
             window.__.toastify.success({message:"已保存",position:"bottom-center",duration:1});
           }

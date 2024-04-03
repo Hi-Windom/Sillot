@@ -127,6 +127,7 @@ const togglePinDock = (dock: Dock, icon: string) => {
 };
 
 export const workspaceMenu = (app: App, rect: DOMRect) => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
         window.siyuan.menus.menu.element.getAttribute("data-name") === "barWorkspace") {
         window.siyuan.menus.menu.remove();
@@ -481,6 +482,7 @@ export const workspaceMenu = (app: App, rect: DOMRect) => {
 };
 
 const openWorkspace = (workspace: string) => {
+    window.sout.tracker("invoked");
     /// #if !BROWSER
     if (workspace === window.siyuan.config.system.workspaceDir) {
         return;
@@ -497,6 +499,7 @@ const openWorkspace = (workspace: string) => {
 };
 
 const workspaceItem = (item: IWorkspace) => {
+    window.sout.tracker("invoked");
     /// #if !BROWSER
     return {
         label: `<div aria-label="${item.path}" class="fn__ellipsis ariaLabel" style="max-width: 256px">

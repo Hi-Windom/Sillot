@@ -7,6 +7,7 @@ import {getEditorRange} from "../../util/selection";
 import {Constants} from "../../../constants";
 
 export const openViewMenu = (options: { protyle: IProtyle, blockElement: HTMLElement, element: HTMLElement }) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("av-view");
     if (menu.isOpen) {
         return;
@@ -89,6 +90,7 @@ export const bindViewEvent = (options: {
     data: IAV,
     menuElement: HTMLElement
 }) => {
+    window.sout.tracker("invoked");
     const inputElement = options.menuElement.querySelector('.b3-text-field[data-type="name"]') as HTMLInputElement;
     inputElement.addEventListener("blur", () => {
         if (inputElement.value !== inputElement.dataset.value) {
@@ -120,6 +122,7 @@ export const bindViewEvent = (options: {
 };
 
 export const getViewHTML = (data: IAVTable) => {
+    window.sout.tracker("invoked");
     return `<div class="b3-menu__items">
 <button class="b3-menu__item" data-type="nobg">
     <span class="b3-menu__label ft__center">${window.siyuan.languages.config}</span>
@@ -176,6 +179,7 @@ export const getViewHTML = (data: IAVTable) => {
 };
 
 export const getSwitcherHTML = (views: IAVView[], viewId: string) => {
+    window.sout.tracker("invoked");
     let html = "";
     views.forEach((item) => {
         html += `<button draggable="true" class="b3-menu__item${item.id === viewId ? " b3-menu__item--current" : ""}" data-id="${item.id}">
@@ -198,6 +202,7 @@ ${html}
 };
 
 export const addView = (protyle: IProtyle, blockElement: Element) => {
+    window.sout.tracker("invoked");
     const id = Lute.NewNodeID();
     const avID = blockElement.getAttribute("data-av-id");
     transaction(protyle, [{

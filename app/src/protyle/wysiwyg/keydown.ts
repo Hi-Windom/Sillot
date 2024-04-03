@@ -69,6 +69,7 @@ import {checkFold} from "../../util/noRelyPCFunction";
 import {AIActions} from "../../ai/actions";
 
 export const getContentByInlineHTML = (range: Range, cb: (content: string) => void) => {
+    window.sout.tracker("invoked");
     let html = "";
     Array.from(range.cloneContents().childNodes).forEach((item: HTMLElement) => {
         if (item.nodeType === 3) {
@@ -83,6 +84,7 @@ export const getContentByInlineHTML = (range: Range, cb: (content: string) => vo
 };
 
 export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     editorElement.addEventListener("keydown", (event: KeyboardEvent & { target: HTMLElement }) => {
         if (event.target.localName === "protyle-html" || event.target.localName === "input") {
             event.stopPropagation();

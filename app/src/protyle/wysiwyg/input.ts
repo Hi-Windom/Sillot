@@ -231,6 +231,7 @@ export const input = async (protyle: IProtyle, blockElement: HTMLElement, range:
 };
 
 const updateInput = (html: string, protyle: IProtyle, id: string) => {
+    window.sout.tracker("invoked");
     const tempElement = document.createElement("template");
     tempElement.innerHTML = html;
     const doOperations: IOperation[] = [];

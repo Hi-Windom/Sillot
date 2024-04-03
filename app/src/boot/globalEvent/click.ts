@@ -6,6 +6,7 @@ import {writeText} from "../../protyle/util/compatibility";
 import {showMessage} from "../../dialog/message";
 
 export const globalClick = (event: MouseEvent & { target: HTMLElement }) => {
+    window.sout.tracker("invoked");
     const ghostElement = document.getElementById("dragGhost")
     if (ghostElement) {
         const startElement = ghostElement.parentElement.querySelector(`[data-node-id="${ghostElement.getAttribute("data-node-id")}"]`) as HTMLElement

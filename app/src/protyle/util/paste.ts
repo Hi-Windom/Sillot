@@ -19,6 +19,7 @@ import {cellScrollIntoView, getCellText} from "../render/av/cell";
 import {getContenteditableElement} from "../wysiwyg/getBlock";
 
 export const getTextStar = (blockElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     const dataType = blockElement.dataset.type;
     let refText = "";
     if (["NodeHeading", "NodeParagraph"].includes(dataType)) {
@@ -59,6 +60,7 @@ export const getTextStar = (blockElement: HTMLElement) => {
 };
 
 export const getPlainText = (blockElement: HTMLElement, isNested = false) => {
+    window.sout.tracker("invoked");
     let text = "";
     const dataType = blockElement.dataset.type;
     if ("NodeHTMLBlock" === dataType) {
@@ -94,6 +96,7 @@ export const getPlainText = (blockElement: HTMLElement, isNested = false) => {
 };
 
 export const pasteEscaped = async (protyle: IProtyle, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     try {
         // * _ [ ] ! \ ` < > & ~ { } ( ) = # $ ^ | .
         let clipText = await readText();
@@ -132,6 +135,7 @@ export const pasteEscaped = async (protyle: IProtyle, nodeElement: Element) => {
 };
 
 const filterClipboardHint = (protyle: IProtyle, textPlain: string) => {
+    window.sout.tracker("invoked");
     let needRender = true;
     protyle.options.hint.extend.find(item => {
         if (item.key === textPlain) {
@@ -145,6 +149,7 @@ const filterClipboardHint = (protyle: IProtyle, textPlain: string) => {
 };
 
 export const pasteAsPlainText = async (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     let localFiles: string[] = [];
     /// #if !BROWSER
     if ("darwin" === window.siyuan.config.system.os) {
@@ -178,6 +183,7 @@ export const pasteAsPlainText = async (protyle: IProtyle) => {
 };
 
 export const pasteText = (protyle: IProtyle, textPlain: string, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const range = getEditorRange(protyle.wysiwyg.element);
     if (nodeElement.getAttribute("data-type") === "NodeCodeBlock") {
         // 粘贴在代码位置
@@ -204,6 +210,7 @@ export const pasteText = (protyle: IProtyle, textPlain: string, nodeElement: Ele
 };
 
 export const paste = async (protyle: IProtyle, event: (ClipboardEvent | DragEvent) & { target: HTMLElement }) => {
+    window.sout.tracker("invoked");
     event.stopPropagation();
     event.preventDefault();
     let textHTML: string;

@@ -9,6 +9,7 @@ import {showMessage} from "../../../dialog/message";
 import {formatDate} from "sofill/mid";
 
 export const selectRow = (checkElement: Element, type: "toggle" | "select" | "unselect" | "unselectAll") => {
+    window.sout.tracker("invoked");
     const rowElement = hasClosestByClassName(checkElement, "av__row");
     if (!rowElement) {
         return;
@@ -46,6 +47,7 @@ export const selectRow = (checkElement: Element, type: "toggle" | "select" | "un
 };
 
 export const updateHeader = (rowElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     const blockElement = hasClosestBlock(rowElement);
     if (!blockElement) {
         return;
@@ -75,6 +77,7 @@ export const updateHeader = (rowElement: HTMLElement) => {
 };
 
 const setPage = (blockElement: Element) => {
+    window.sout.tracker("invoked");
     const pageSize = parseInt(blockElement.getAttribute("data-page-size"));
     if (pageSize) {
         const currentCount = blockElement.querySelectorAll(".av__row:not(.av__row--header)").length;
@@ -93,6 +96,7 @@ const setPage = (blockElement: Element) => {
  * @param avId 存在为新增否则为拖拽插入
  */
 export const insertAttrViewBlockAnimation = (protyle: IProtyle, blockElement: Element, srcIDs: string[], previousId: string, avId?: string,) => {
+    window.sout.tracker("invoked");
     if ((blockElement.querySelector('[data-type="av-search"]') as HTMLInputElement).value !== "") {
         showMessage(window.siyuan.languages.insertRowTip);
         return;
@@ -182,6 +186,7 @@ ${(item.getAttribute("data-block-id") || item.dataset.dtype === "block") ? ' dat
 };
 
 export const stickyRow = (blockElement: HTMLElement, elementRect: DOMRect, status: "top" | "bottom" | "all") => {
+    window.sout.tracker("invoked");
     if (blockElement.querySelector(".av__title").getAttribute("contenteditable") === "false") {
         return;
     }
@@ -218,6 +223,7 @@ const updatePageSize = (options: {
     avID: string,
     nodeElement: Element
 }) => {
+    window.sout.tracker("invoked");
     if (options.currentPageSize === options.newPageSize) {
         return;
     }
@@ -243,6 +249,7 @@ export const setPageSize = (options: {
     avID: string,
     nodeElement: Element
 }) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("av-page-size");
     if (menu.isOpen) {
         return;
@@ -312,6 +319,7 @@ export const setPageSize = (options: {
 };
 
 export const deleteRow = (blockElement: HTMLElement, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     const avID = blockElement.getAttribute("data-av-id");
     const undoOperations: IOperation[] = [];
     const rowElements = blockElement.querySelectorAll(".av__row--select:not(.av__row--header)");
@@ -353,6 +361,7 @@ export const deleteRow = (blockElement: HTMLElement, protyle: IProtyle) => {
 };
 
 export const insertRows = (blockElement: HTMLElement, protyle: IProtyle, count: number, previousID: string) => {
+    window.sout.tracker("invoked");
     const avID = blockElement.getAttribute("data-av-id");
     const srcIDs: string[] = [];
     new Array(count).fill(0).forEach(() => {

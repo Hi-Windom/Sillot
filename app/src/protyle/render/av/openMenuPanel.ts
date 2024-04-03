@@ -48,6 +48,7 @@ export const openMenuPanel = (options: {
     cellElements?: HTMLElement[],   // for select & date & relation & asset
     cb?: (avPanelElement: Element) => void
 }) => {
+    window.sout.tracker("invoked");
     let avPanelElement = document.querySelector(".av__panel");
     if (avPanelElement) {
         avPanelElement.remove();
@@ -1218,6 +1219,7 @@ export const openMenuPanel = (options: {
 };
 
 const getPropertiesHTML = (data: IAVTable) => {
+    window.sout.tracker("invoked");
     let showHTML = "";
     let hideHTML = "";
     data.columns.forEach((item: IAVColumn) => {

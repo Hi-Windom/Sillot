@@ -9,6 +9,7 @@ import {isOnlyMeta} from "../util/compatibility";
 export const commonClick = (event: MouseEvent & {
     target: HTMLElement
 }, protyle: IProtyle, data?: IObject) => {
+    window.sout.tracker("invoked");
     const isM = isMobile();
     const attrBookmarkElement = hasClosestByClassName(event.target, "protyle-attr--bookmark");
     if (attrBookmarkElement) {

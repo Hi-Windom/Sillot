@@ -8,6 +8,7 @@ import {App} from "../../index";
 import {setTitle} from "../../dialog/processSystem";
 
 export const setEmpty = (app: App) => {
+    window.sout.tracker("invoked");
     setTitle(window.siyuan.languages.siyuanNote);
     document.getElementById("toolbarName").classList.add("fn__hidden");
     document.getElementById("editor").classList.add("fn__none");
@@ -77,6 +78,7 @@ export const setEmpty = (app: App) => {
 };
 
 export const setEditor = () => {
+    window.sout.tracker("invoked");
     const toolbarNameElement =  document.getElementById("toolbarName") as HTMLInputElement;
     setTitle(toolbarNameElement.value);
     toolbarNameElement.classList.remove("fn__hidden");

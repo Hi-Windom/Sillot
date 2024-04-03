@@ -10,6 +10,7 @@ import {Constants} from "../../constants";
 import {htmlRender} from "../render/htmlRender";
 
 export const processPasteCode = (html: string, text: string) => {
+    window.sout.tracker("invoked");
     const tempElement = document.createElement("div");
     tempElement.innerHTML = html;
     let isCode = false;
@@ -44,6 +45,7 @@ export const processPasteCode = (html: string, text: string) => {
 };
 
 export const processRender = (previewPanel: Element) => {
+    window.sout.tracker("invoked");
     const language = previewPanel.getAttribute("data-subtype");
     if (!Constants.SIYUAN_RENDER_CODE_LANGUAGES.includes(language) || previewPanel.getAttribute("data-type") !== "NodeHTMLBlock") {
         abcRender(previewPanel);

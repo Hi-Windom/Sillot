@@ -19,6 +19,7 @@ declare interface INotebookConf {
 }
 
 export const onGetnotebookconf = (data: INotebookConf) => {
+    window.sout.tracker("invoked");
     const titleHTML = `<div class="fn__flex">${escapeHtml(data.name)}
 <div class="fn__space"></div>
 <button class="b3-button b3-button--small">${window.siyuan.languages.copy} ID</button></div>`;
@@ -69,6 +70,7 @@ export const onGetnotebookconf = (data: INotebookConf) => {
 };
 
 const bindSettingEvent = (contentElement: Element, data: INotebookConf) => {
+    window.sout.tracker("invoked");
     contentElement.querySelector(".b3-button--small").addEventListener("click", () => {
         writeText(data.box);
         showMessage(window.siyuan.languages.copied);

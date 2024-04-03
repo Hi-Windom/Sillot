@@ -3,6 +3,7 @@ const isNormalItem = (currentHintElement: HTMLElement, className: string) => {
 };
 
 export const upDownHint = (listElement: Element, event: KeyboardEvent, classActiveName = "b3-list-item--focus") => {
+    window.sout.tracker("invoked");
     let currentHintElement: HTMLElement = listElement.querySelector("." + classActiveName);
     if (!currentHintElement) {
         return;

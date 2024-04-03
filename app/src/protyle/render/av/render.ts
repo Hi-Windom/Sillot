@@ -13,6 +13,7 @@ import {addClearButton} from "../../../util/addClearButton";
 import {formatDate} from "sofill/mid";
 
 export const avRender = (element: Element, protyle: IProtyle, cb?: () => void, viewID?: string) => {
+    window.sout.tracker("invoked");
     let avElements: Element[] = [];
     if (element.getAttribute("data-type") === "NodeAttributeView") {
         // 编辑器内代码块编辑渲染
@@ -360,6 +361,7 @@ ${cell.color ? `color:${cell.color};` : ""}">${renderCell(cell.value)}</div>`;
 let searchTimeout: number;
 
 const updateSearch = (e: HTMLElement, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     clearTimeout(searchTimeout);
     searchTimeout = window.setTimeout(() => {
         e.removeAttribute("data-render");
@@ -371,6 +373,7 @@ const refreshTimeouts: {
     [key: string]: number;
 } = {};
 export const refreshAV = (protyle: IProtyle, operation: IOperation) => {
+    window.sout.tracker("invoked");
     if (operation.action === "setAttrViewName") {
         Array.from(protyle.wysiwyg.element.querySelectorAll(`[data-av-id="${operation.id}"]`)).forEach((item: HTMLElement) => {
             const titleElement = item.querySelector(".av__title") as HTMLElement;

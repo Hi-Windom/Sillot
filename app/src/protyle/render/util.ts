@@ -1,4 +1,5 @@
 export const genIconHTML = (element?: false|HTMLElement) => {
+    window.sout.tracker("invoked");
     let enable = true;
     if (element) {
         const readonly =  element.getAttribute("contenteditable");

@@ -39,6 +39,12 @@ importers:
       '@babel/plugin-proposal-optional-chaining':
         specifier: ^7.21.0
         version: 7.21.0(@babel/core@7.24.3)
+      '@babel/plugin-transform-nullish-coalescing-operator':
+        specifier: ^7.24.1
+        version: 7.24.1(@babel/core@7.24.3)
+      '@babel/plugin-transform-optional-chaining':
+        specifier: ^7.24.1
+        version: 7.24.1(@babel/core@7.24.3)
       '@babel/plugin-transform-runtime':
         specifier: ^7.24.3
         version: 7.24.3(@babel/core@7.24.3)
@@ -265,8 +271,8 @@ importers:
         specifier: ^4.7.5
         version: 4.7.5
       sofill:
-        specifier: ^1.1.4
-        version: 1.1.4(@sillot/bridge@0.0.3)(typescript@5.4.3)
+        specifier: ^1.1.7
+        version: 1.1.7(@sillot/bridge@0.0.3)(typescript@5.4.3)
       sout:
         specifier: ^1.1.0
         version: 1.1.0
@@ -5982,8 +5988,8 @@ packages:
     resolution: {integrity: sha512-B6w7tkwNid7ToxjZ08rQMT8M9BJAf8DKx8Ft4NivzH0zBUfd6jldGcisJn/RLgxcX3FPNDdNQCUEMMT79b+oCQ==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
-  sofill@1.1.4:
-    resolution: {integrity: sha512-eowy89UHjTz0h1ieFoUsI3YTheXLNmuNQKjp6UeX+aUxPNe5iucF9zM87JS1IHeAoQFOlB0Q+GH2zO5qdZ5/gw==}
+  sofill@1.1.7:
+    resolution: {integrity: sha512-wGDkhM7hzq5M0ezR1wz9aAvEzFP9NMiSo8dsLdnoQGuSFFv74ANtQs57esnQugEyZp1RziSa+M/uKg1xXrHdpA==}
     peerDependencies:
       '@sillot/bridge': ^0.0.3
       localforage: ^1.10.0
@@ -14827,7 +14833,7 @@ snapshots:
       smart-buffer: 4.2.0
     dev: true
 
-  sofill@1.1.4(@sillot/bridge@0.0.3)(typescript@5.4.3):
+  sofill@1.1.7(@sillot/bridge@0.0.3)(typescript@5.4.3):
     dependencies:
       '@sillot/bridge': 0.0.3
       typescript: 5.4.3

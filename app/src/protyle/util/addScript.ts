@@ -1,4 +1,5 @@
 export const addScriptSync = (path: string, id: string) => {
+    // window.sout.tracker("invoked"); // 这里不可使用
     if (document.getElementById(id)) {
         return false;
     }
@@ -15,6 +16,7 @@ export const addScriptSync = (path: string, id: string) => {
 };
 
 export const addScript = (path: string, id: string, type?: string) => {
+    // window.sout.tracker("invoked"); // 这里不可使用
     return new Promise((resolve) => {
         if (document.getElementById(id)) {
             // 脚本加载后再次调用直接返回

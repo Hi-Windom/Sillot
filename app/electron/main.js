@@ -778,7 +778,7 @@ app.whenReady().then(() => {
   };
   const ReactDeveloperToolsRoot = path.join(app.getPath("userData"), "extensions", "ReactDeveloperTools");
   loadExtension(ReactDeveloperToolsRoot);
-    const resetTrayMenu = (tray, lang, mainWindow) => {
+    const resetTrayMenu = (tray, lang, mainWindow) => { // 系统托盘右键菜单
         const trayMenuTemplate = [{
             label: mainWindow.isVisible() ? lang.hideWindow : lang.showWindow, click: () => {
                 showHideWindow(tray, lang, mainWindow);
@@ -799,6 +799,7 @@ app.whenReady().then(() => {
         }, {
             label: lang.quit, click: () => {
                 mainWindow.webContents.send("siyuan-save-close", true);
+                setTimeout(()=> { app.exit();}, 30000);   // 强制退出
             },
         },];
 

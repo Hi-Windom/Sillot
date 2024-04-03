@@ -29,6 +29,7 @@ import {Menu} from "../plugin/Menu";
 import {transaction} from "../protyle/wysiwyg/transaction";
 
 const genCardCount = (cardsData: ICardData, allIndex = 0) => {
+    window.sout.tracker("invoked");
     let newIndex = 0;
     let oldIndex = 0;
     cardsData.cards.forEach((item, index) => {
@@ -58,6 +59,7 @@ export const genCardHTML = (options: {
     cardsData: ICardData,
     isTab: boolean
 }) => {
+    window.sout.tracker("invoked");
     let iconsHTML: string;
     /// #if MOBILE
     iconsHTML = `<div class="toolbar toolbar--border">
@@ -162,6 +164,7 @@ export const bindCardEvent = async (options: {
     dialog?: Dialog,
     index?: number
 }) => {
+    window.sout.tracker("invoked");
     if (window.siyuan.storage[Constants.LOCAL_FLASHCARD].fullscreen) {
         fullscreen(options.element.querySelector(".card__main"),
             options.element.querySelector('[data-type="fullscreen"]'));
@@ -674,12 +677,14 @@ const emitEvent = (app: App, card: ICard, type: string) => {
 };
 
 export const openCard = (app: App) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/riff/getRiffDueCards", {deckID: ""}, (cardsResponse) => {
         openCardByData(app, cardsResponse.data, "all");
     });
 };
 
 export const openCardByData = async (app: App, cardsData: ICardData, cardType: TCardType, id?: string, title?: string) => {
+    window.sout.tracker("invoked");
     const exit = window.siyuan.dialogs.find(item => {
         if (item.element.getAttribute("data-key") === Constants.DIALOG_OPENCARD) {
             item.destroy();
@@ -751,6 +756,7 @@ const nextCard = (options: {
     index: number,
     cardsData: ICardData
 }) => {
+    window.sout.tracker("invoked");
     options.editor.protyle.element.classList.add("card__block--hide");
     if (window.siyuan.config.flashcard.superBlock) {
         options.editor.protyle.element.classList.add("card__block--hidesb");
@@ -795,6 +801,7 @@ const nextCard = (options: {
 };
 
 const allDone = (countElement: Element, editor: Protyle, actionElements: NodeListOf<Element>) => {
+    window.sout.tracker("invoked");
     countElement.classList.add("fn__none");
     editor.protyle.element.classList.add("fn__none");
     const emptyElement = editor.protyle.element.nextElementSibling;
@@ -805,6 +812,7 @@ const allDone = (countElement: Element, editor: Protyle, actionElements: NodeLis
 };
 
 const newRound = (countElement: Element, editor: Protyle, actionElements: NodeListOf<Element>, unreviewedCount: number) => {
+    window.sout.tracker("invoked");
     countElement.classList.add("fn__none");
     editor.protyle.element.classList.add("fn__none");
     const emptyElement = editor.protyle.element.nextElementSibling;

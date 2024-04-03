@@ -1,5 +1,6 @@
 export const updateCardHV = () => {
     /// #if MOBILE
+    window.sout.tracker("invoked");
     if (window.matchMedia("(orientation:portrait)").matches) {
         document.querySelectorAll(".card__action .card__icon").forEach(item => {
             item.classList.remove("fn__none");

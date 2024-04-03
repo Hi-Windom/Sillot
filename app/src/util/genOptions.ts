@@ -1,4 +1,5 @@
 export const genOptions = (data: string[] | { label: string, name: string }[], key: string) => {
+    window.sout.tracker("-> key: ", key);
     let html = "";
     data.forEach((item: string | { label: string, name: string }) => {
         if (typeof item === "string") {

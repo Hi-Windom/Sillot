@@ -16,6 +16,7 @@ const updateCol = (options: {
     colId: string,
     isRelation: boolean,
 }, itemElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     if (itemElement.classList.contains("b3-list--empty")) {
         return;
     }
@@ -59,6 +60,7 @@ const updateCol = (options: {
 };
 
 const genSearchList = (element: Element, keyword: string, avId: string, isRelation: boolean, cb?: () => void) => {
+    window.sout.tracker("invoked");
     if (!isRelation && !avId) {
         showMessage(window.siyuan.languages.selectRelation);
         return;
@@ -88,6 +90,7 @@ export const goSearchRollupCol = (options: {
     colId: string,
     isRelation: boolean,
 }) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     const menu = new Menu();
     menu.addItem({
@@ -145,6 +148,7 @@ export const goSearchRollupCol = (options: {
 };
 
 export const getRollupHTML = (options: { data?: IAV, cellElements?: HTMLElement[], colData?: IAVColumn }) => {
+    window.sout.tracker("invoked");
     let colData: IAVColumn;
     if (options.colData) {
         colData = options.colData;
@@ -178,6 +182,7 @@ export const bindRollupData = (options: {
     data: IAV,
     menuElement: HTMLElement
 }) => {
+    window.sout.tracker("invoked");
     const goSearchRollupColElement = options.menuElement.querySelector('[data-type="goSearchRollupCol"]') as HTMLElement;
     if (goSearchRollupColElement) {
         const oldValue = JSON.parse(goSearchRollupColElement.dataset.oldValue) as IAVCellRollupValue;

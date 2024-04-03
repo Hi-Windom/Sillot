@@ -2,6 +2,7 @@ import {MenuItem} from "./Menu";
 import {copySubMenu} from "./commonMenuItem";
 
 export const initSearchMenu = (id: string) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     window.siyuan.menus.menu.append(new MenuItem({
         label: window.siyuan.languages.copy,

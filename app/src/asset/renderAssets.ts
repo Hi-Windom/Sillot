@@ -7,6 +7,7 @@ import {pathPosix} from "../util/pathName";
 import {formatDate} from "sofill/mid";
 
 export const renderAssetsPreview = (pathString: string) => {
+    window.sout.tracker("invoked");
     if (!pathString) {
         return "";
     }
@@ -24,6 +25,7 @@ export const renderAssetsPreview = (pathString: string) => {
 
 export const pdfResize = () => {
     /// #if !MOBILE
+    window.sout.tracker("invoked");
     getAllModels().asset.forEach(item => {
         const pdfInstance = item.pdfObject;
         if (!pdfInstance) {
@@ -61,6 +63,7 @@ export const pdfResize = () => {
 };
 
 export const genAssetHTML = (type: string, pathString: string, imgName: string, linkName: string) => {
+    window.sout.tracker("invoked");
     let html = "";
     if (Constants.SIYUAN_ASSETS_AUDIO.includes(type)) {
         html = `<div data-node-id="${Lute.NewNodeID()}" data-type="NodeAudio" class="iframe" updated="${formatDate(new Date(), 'yyyyMMddHHmmss')}"><div class="iframe-content"><audio controls="controls" src="${pathString}" data-src="${pathString}"></audio>${Constants.ZWSP}</div><div class="protyle-attr" contenteditable="false">${Constants.ZWSP}</div></div>`;

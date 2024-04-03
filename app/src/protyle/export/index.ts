@@ -16,6 +16,7 @@ import {setStorageVal} from "../util/compatibility";
 import {isPaidUser} from "../../util/needSubscribe";
 
 export const saveExport = (option: IExportOptions) => {
+    window.sout.tracker("invoked");
     /// #if !BROWSER
     if (option.type === "pdf") {
         if (window.siyuan.config.appearance.mode === 1) {
@@ -71,6 +72,7 @@ export const saveExport = (option: IExportOptions) => {
 };
 
 const getSnippetCSS = () => {
+    window.sout.tracker("invoked");
     let snippetCSS = "";
     document.querySelectorAll("style").forEach((item) => {
         if (item.id.startsWith("snippet")) {
@@ -82,6 +84,7 @@ const getSnippetCSS = () => {
 
 /// #if !BROWSER
 const renderPDF = async (id: string) => {
+    window.sout.tracker("invoked");
     const localData = window.siyuan.storage[Constants.LOCAL_EXPORTPDF];
     const servePath = window.location.protocol + "//" + window.location.host;
     const isDefault = (window.siyuan.config.appearance.mode === 1 && window.siyuan.config.appearance.themeDark === "midnight") || (window.siyuan.config.appearance.mode === 0 && window.siyuan.config.appearance.themeLight === "daylight");
@@ -566,6 +569,7 @@ const renderPDF = async (id: string) => {
 };
 
 const getExportPath = (option: IExportOptions, removeAssets?: boolean, mergeSubdocs?: boolean) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/block/getBlockInfo", {
         id: option.id
     }, async (response) => {
@@ -627,6 +631,7 @@ const getExportPath = (option: IExportOptions, removeAssets?: boolean, mergeSubd
 };
 
 const onExport = (data: IWebSocketData, filePath: string, exportOption: IExportOptions, removeAssets?: boolean, msgId?: string) => {
+    window.sout.tracker("invoked");
     let themeName = window.siyuan.config.appearance.themeLight;
     let mode = 0;
     if (["html", "htmlmd"].includes(exportOption.type) && window.siyuan.config.appearance.mode === 1) {

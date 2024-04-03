@@ -11,6 +11,7 @@ import {hasClosestByClassName} from "../protyle/util/hasClosest";
 import {hideElements} from "../protyle/ui/hideElements";
 
 const getHTML = async (data: { rootID: string, icon: string, title: string }[], element: Element, key?: string) => {
+    window.sout.tracker("invoked");
     let tabHtml = "";
     let index = 0;
     data.forEach((item) => {
@@ -68,6 +69,7 @@ ${unicode2Emoji(item.icon || Constants.SIYUAN_IMAGE_FILE, "b3-list-item__graphic
 };
 
 export const openRecentDocs = () => {
+    window.sout.tracker("invoked");
     const openRecentDocsDialog = window.siyuan.dialogs.find(item => {
         if (item.element.getAttribute("data-key") === Constants.DIALOG_RECENTDOCS) {
             return true;

@@ -11,6 +11,7 @@ import {openMobileFileById} from "../mobile/editor";
 import {App} from "../index";
 
 export const fetchNewDailyNote = (app: App, notebook: string) => {
+    window.sout.tracker("-> notebook: ", notebook);
     fetchPost("/api/filetree/createDailyNote", {
         notebook,
         app: Constants.SIYUAN_APPID,
@@ -93,6 +94,7 @@ export const newDailyNote = (app: App) => {
 };
 
 export const mountHelp = () => {
+    window.sout.tracker("invoked");
     const overlay = document.querySelector('#SillotOverlay') as HTMLElement;
     overlay.style.display = "block";
     const notebookId = Constants.HELP_PATH[window.siyuan.config.appearance.lang as "zh_CN" | "en_US"];
@@ -104,6 +106,7 @@ export const mountHelp = () => {
 };
 
 export const newNotebook = () => {
+    window.sout.tracker("invoked");
     const dialog = new Dialog({
         title: window.siyuan.languages.newNotebook,
         content: `<div class="b3-dialog__content">

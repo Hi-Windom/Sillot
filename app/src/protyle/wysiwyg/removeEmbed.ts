@@ -1,6 +1,7 @@
 import {hasClosestByClassName} from "../util/hasClosest";
 
 export const removeEmbed = (element: Element, type: "outerHTML" | "innerHTML" = "outerHTML") => {
+    window.sout.tracker("invoked");
     // 防止内容块引用嵌入的标签打断 lute 渲染
     // :zap:
     if (!element.querySelector("[data-type='block-render']")) {
@@ -15,6 +16,7 @@ export const removeEmbed = (element: Element, type: "outerHTML" | "innerHTML" = 
 };
 
 export const getEnableHTML = (html: string) => {
+    window.sout.tracker("invoked");
     const tempElement = document.createElement("template");
     tempElement.innerHTML = html;
     tempElement.content.querySelectorAll('[contenteditable="false"][spellcheck]').forEach(item => {

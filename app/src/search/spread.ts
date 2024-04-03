@@ -13,6 +13,7 @@ export const openSearch = async (options: {
     notebookId?: string,
     searchPath?: string
 }) => {
+    window.sout.tracker("invoked");
     const exitDialog = window.siyuan.dialogs.find((item) => {
         if (item.element.querySelector("#searchList")) {
             const lastKey = item.element.getAttribute("data-key");

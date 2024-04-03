@@ -6,6 +6,7 @@ import {hasClosestByClassName} from "../../util/hasClosest";
 import {Constants} from "../../../constants";
 
 export const avKeydown = (event: KeyboardEvent, nodeElement: HTMLElement, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (!nodeElement.classList.contains("av") || !window.siyuan.menus.menu.element.classList.contains("fn__none")) {
         return false;
     }

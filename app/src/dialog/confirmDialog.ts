@@ -2,6 +2,7 @@ import {isMobile} from "../util/functions";
 import {Dialog} from "./index";
 
 export const confirmDialog = (title: string, text: string, confirm?: (dialog?: Dialog) => void, cancel?: (dialog: Dialog) => void) => {
+    window.sout.tracker("invoked");
     if (!text && !title) {
         confirm();
         return;

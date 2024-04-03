@@ -14,6 +14,7 @@ import {isPadAppMode} from "sofill/env";
 
 let popoverTargetElement: HTMLElement;
 export const initBlockPopover = (app: App) => {
+    window.sout.tracker("invoked");
     let timeout: number;
     let timeoutHide: number;
     // 编辑器内容块引用/backlinks/tag/bookmark/套娃中使用
@@ -128,6 +129,7 @@ export const initBlockPopover = (app: App) => {
 };
 
 const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
+    window.sout.tracker("invoked");
     // pad 端点击后 event.target 不会更新。
     const target = document.elementFromPoint(event.clientX, event.clientY);
     if (!target) {
@@ -233,6 +235,7 @@ const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
 };
 
 const getTarget = (event: MouseEvent & { target: HTMLElement }, aElement: false | HTMLElement) => {
+    window.sout.tracker("invoked");
     if (window.siyuan.config.editor.floatWindowMode === 2 || hasClosestByClassName(event.target, "history__repo", true)) {
         return false;
     }
@@ -270,6 +273,7 @@ const getTarget = (event: MouseEvent & { target: HTMLElement }, aElement: false 
 };
 
 export const showPopover = async (app: App, showRef = false) => {
+    window.sout.tracker("invoked");
     if (!popoverTargetElement) {
         return;
     }

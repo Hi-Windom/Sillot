@@ -14,6 +14,7 @@ import SillotDrawer from "./SillotDrawer";
 import {updateHotkeyTip} from "../protyle/util/compatibility";
 
 export const initStatus = (isWindow = false) => {
+    window.sout.tracker("invoked");
     /// #if !MOBILE
     let barDockHTML = "";
     if (!isWindow) {
@@ -143,6 +144,7 @@ export const initStatus = (isWindow = false) => {
 let countRootId: string;
 let countTimeout: number;
 export const countSelectWord = (range: Range, rootID?: string) => {
+    window.sout.tracker("invoked");
     /// #if !MOBILE
     if (document.getElementById("status").classList.contains("fn__none")) {
         return;
@@ -166,6 +168,7 @@ export const countSelectWord = (range: Range, rootID?: string) => {
 };
 
 export const countBlockWord = (ids: string[], rootID?: string, clearCache = false) => {
+    window.sout.tracker("invoked");
     /// #if !MOBILE
     if (document.getElementById("status").classList.contains("fn__none")) {
         return;
@@ -191,6 +194,7 @@ export const countBlockWord = (ids: string[], rootID?: string, clearCache = fals
 };
 
 export const clearCounter = () => {
+    window.sout.tracker("invoked");
     countRootId = "";
     document.querySelector("#status .status__counter").innerHTML = "";
     clearTimeout(countTimeout);
@@ -203,6 +207,7 @@ export const renderStatusbarCounter = (stat: {
     imageCount: number,
     refCount: number
 }) => {
+    window.sout.tracker("invoked");
     if(!stat) {
         return;
     }

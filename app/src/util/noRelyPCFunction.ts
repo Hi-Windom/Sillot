@@ -5,6 +5,7 @@ import {Constants} from "../constants";
 
 // 需独立出来，否则移动端引用的时候会引入 pc 端大量无用代码
 export const renameTag = (labelName: string) => {
+    window.sout.tracker("invoked");
     const dialog = new Dialog({
         title: window.siyuan.languages.rename,
         content: `<div class="b3-dialog__content"><input class="b3-text-field fn__block" value="${labelName}"></div>
@@ -31,10 +32,12 @@ export const renameTag = (labelName: string) => {
 };
 
 export const getWorkspaceName = () => {
+    window.sout.tracker("invoked");
     return window.siyuan.config.system.workspaceDir.replace(/^.*[\\\/]/, "");
 };
 
 export const checkFold = (id: string, cb: (zoomIn: boolean, action: string[]) => void) => {
+    window.sout.tracker("invoked");
     if (!id) {
         return;
     }

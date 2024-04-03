@@ -12,6 +12,7 @@ const getLang = (keys: string[]) => {
 };
 
 export const initConfigSearch = (element: HTMLElement, app: App) => {
+    window.sout.tracker("invoked");
     const configIndex = [
         // 编辑器
         getLang(["config", "fullWidth", "md7", "md8", "md37", "md38",

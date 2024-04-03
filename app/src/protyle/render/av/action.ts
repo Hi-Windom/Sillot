@@ -36,6 +36,7 @@ import {addView, openViewMenu} from "./view";
 import {isOnlyMeta, openByMobile, writeText} from "../../util/compatibility";
 
 export const avClick = (protyle: IProtyle, event: MouseEvent & { target: HTMLElement }) => {
+    window.sout.tracker("invoked");
     const blockElement = hasClosestBlock(event.target);
     if (!blockElement) {
         return false;
@@ -276,6 +277,7 @@ export const avClick = (protyle: IProtyle, event: MouseEvent & { target: HTMLEle
 };
 
 export const avContextmenu = (protyle: IProtyle, rowElement: HTMLElement, position: IPosition) => {
+    window.sout.tracker("invoked");
     if (rowElement.classList.contains("av__row--header")) {
         return false;
     }
@@ -419,6 +421,7 @@ ${window.siyuan.languages.insertRowAfter.replace("${x}", '<span class="fn__space
 };
 
 export const updateAVName = (protyle: IProtyle, blockElement: Element) => {
+    window.sout.tracker("invoked");
     const avId = blockElement.getAttribute("data-av-id");
     const id = blockElement.getAttribute("data-node-id");
     const nameElement = blockElement.querySelector(".av__title") as HTMLElement;
@@ -467,6 +470,7 @@ export const updateAttrViewCellAnimation = (cellElement: HTMLElement, value: IAV
     pin?: boolean,
     type?: TAVCol
 }) => {
+    window.sout.tracker("invoked");
     if (headerValue) {
         updateHeaderCell(cellElement, headerValue);
     } else {
@@ -480,6 +484,7 @@ export const updateAttrViewCellAnimation = (cellElement: HTMLElement, value: IAV
 };
 
 export const removeAttrViewColAnimation = (blockElement: Element, id: string) => {
+    window.sout.tracker("invoked");
     blockElement.querySelectorAll(`.av__cell[data-col-id="${id}"]`).forEach(item => {
         item.remove();
     });

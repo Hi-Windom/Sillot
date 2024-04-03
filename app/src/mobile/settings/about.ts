@@ -13,6 +13,7 @@ import {isBrowser} from "../../util/functions";
 import {isAppMode} from "sofill/env"
 
 export const initAbout = () => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.config.localIPs || window.siyuan.config.localIPs.length === 0 ||
         (window.siyuan.config.localIPs.length === 1 && window.siyuan.config.localIPs[0] === "")) {
         window.siyuan.config.localIPs = ["127.0.0.1"];
@@ -399,6 +400,7 @@ ${
 };
 
 const genWorkspace = (workspaceDirElement: Element) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/system/getWorkspaces", {}, (response) => {
         let html = "";
         response.data.forEach((item: IWorkspace) => {

@@ -7,6 +7,7 @@ import {Constants} from "../../constants";
 import {moveToPrevious} from "./remove";
 
 export const updateListOrder = (listElement: Element, sIndex?: number) => {
+    window.sout.tracker("invoked");
     if (listElement.getAttribute("data-subtype") !== "o") {
         return;
     }
@@ -30,6 +31,7 @@ export const updateListOrder = (listElement: Element, sIndex?: number) => {
 };
 
 export const genListItemElement = (listItemElement: Element, offset = 0, wbr = false) => {
+    window.sout.tracker("invoked");
     const element = document.createElement("template");
     const type = listItemElement.getAttribute("data-subtype");
     if (type === "o") {
@@ -44,6 +46,7 @@ export const genListItemElement = (listItemElement: Element, offset = 0, wbr = f
 };
 
 export const listIndent = (protyle: IProtyle, liItemElements: Element[], range: Range) => {
+    window.sout.tracker("invoked");
     const previousElement = liItemElements[0].previousElementSibling as HTMLElement;
     if (!previousElement) {
         return;
@@ -180,6 +183,7 @@ export const listIndent = (protyle: IProtyle, liItemElements: Element[], range: 
 };
 
 export const breakList = (protyle: IProtyle, blockElement: Element, range: Range) => {
+    window.sout.tracker("invoked");
     const listItemElement = blockElement.parentElement;
     const listItemId = listItemElement.getAttribute("data-node-id");
     const doOperations: IOperation[] = [];
@@ -288,6 +292,7 @@ export const breakList = (protyle: IProtyle, blockElement: Element, range: Range
  * @param deleteElement 末尾反向删除时才会传入
  */
 export const listOutdent = (protyle: IProtyle, liItemElements: Element[], range: Range, isDelete = false, deleteElement?: Element) => {
+    window.sout.tracker("invoked");
     const liElement = liItemElements[0].parentElement;
     const liId = liElement.getAttribute("data-node-id");
     if (!liId) {

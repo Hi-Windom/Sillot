@@ -33,6 +33,7 @@ export const emitOpenMenu = (options: {
     detail: any,
     separatorPosition?: "top" | "bottom",
 }) => {
+    window.sout.tracker("invoked");
     const pluginSubMenu = new subMenu();
     options.detail.menu = pluginSubMenu;
     options.plugins.forEach((plugin) => {

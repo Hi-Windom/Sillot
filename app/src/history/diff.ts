@@ -139,6 +139,7 @@ const renderCompare = (app: App, element: HTMLElement) => {
 };
 
 export const showDiff = (app: App, data: { id: string, time: string }[]) => {
+    window.sout.tracker("invoked");
     if (data.length !== 2) {
         return;
     }
@@ -207,6 +208,7 @@ export const showDiff = (app: App, data: { id: string, time: string }[]) => {
 };
 
 const genHTML = (left: string, right: string, dialog: Dialog, direct: string) => {
+    window.sout.tracker("invoked");
     leftEditor = undefined;
     rightEditor = undefined;
     const isPhone = isMobile();

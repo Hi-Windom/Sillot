@@ -4,6 +4,7 @@ import {hasClosestBlock, hasClosestByClassName, hasClosestByMatchTag} from "../.
 import {getColIndex} from "../../protyle/util/table";
 
 const getRightBlock = (element: HTMLElement, x: number, y: number) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     let index = 1;
     let nodeElement = element;
     while (nodeElement && (nodeElement.classList.contains("list") || nodeElement.classList.contains("li"))) {
@@ -15,6 +16,7 @@ const getRightBlock = (element: HTMLElement, x: number, y: number) => {
 };
 
 export const windowMouseMove = (event: MouseEvent & { target: HTMLElement }, mouseIsEnter: boolean) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (document.body.classList.contains("body--blur")) {
         // 非激活状态下不执行 https://ld246.com/article/1693474547631
         return;

@@ -15,6 +15,7 @@ import {Constants} from "../../../constants";
 import {hintRef} from "../../hint/extend";
 
 const renderCellURL = (urlContent: string) => {
+    window.sout.tracker("invoked");
     let host = urlContent;
     let suffix = "";
     try {
@@ -34,6 +35,7 @@ const renderCellURL = (urlContent: string) => {
 };
 
 export const getCellText = (cellElement: HTMLElement | false) => {
+    window.sout.tracker("invoked");
     if (!cellElement) {
         return "";
     }
@@ -57,6 +59,7 @@ export const getCellText = (cellElement: HTMLElement | false) => {
 };
 
 export const genCellValueByElement = (colType: TAVCol, cellElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     const cellValue: IAVCellValue = {
         type: colType,
         id: cellElement.dataset.id,
@@ -130,6 +133,7 @@ export const genCellValueByElement = (colType: TAVCol, cellElement: HTMLElement)
 };
 
 export const genCellValue = (colType: TAVCol, value: string | any) => {
+    window.sout.tracker("invoked");
     let cellValue: IAVCellValue = {
         type: colType,
         [colType === "select" ? "mSelect" : colType]: value as IAVCellDateValue
@@ -242,6 +246,7 @@ export const genCellValue = (colType: TAVCol, value: string | any) => {
 };
 
 export const cellScrollIntoView = (blockElement: HTMLElement, cellElement: Element, onlyHeight = true) => {
+    window.sout.tracker("invoked");
     const cellRect = cellElement.getBoundingClientRect();
     if (!onlyHeight) {
         const avScrollElement = blockElement.querySelector(".av__scroll");
@@ -298,6 +303,7 @@ export const cellScrollIntoView = (blockElement: HTMLElement, cellElement: Eleme
 };
 
 export const getTypeByCellElement = (cellElement: Element) => {
+    window.sout.tracker("invoked");
     const scrollElement = hasClosestByClassName(cellElement, "av__scroll");
     if (!scrollElement) {
         return;
@@ -306,6 +312,7 @@ export const getTypeByCellElement = (cellElement: Element) => {
 };
 
 export const popTextCell = (protyle: IProtyle, cellElements: HTMLElement[], type?: TAVCol) => {
+    window.sout.tracker("invoked");
     if (cellElements.length === 0 || (cellElements.length === 1 && !cellElements[0])) {
         return;
     }
@@ -449,6 +456,7 @@ export const popTextCell = (protyle: IProtyle, cellElements: HTMLElement[], type
 };
 
 const updateCellValueByInput = (protyle: IProtyle, type: TAVCol, blockElement: HTMLElement, cellElements: HTMLElement[]) => {
+    window.sout.tracker("invoked");
     const rowElement = hasClosestByClassName(cellElements[0], "av__row");
     if (!rowElement) {
         return;
@@ -497,6 +505,7 @@ const updateCellValueByInput = (protyle: IProtyle, type: TAVCol, blockElement: H
 };
 
 export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, value?: any, cElements?: HTMLElement[]) => {
+    window.sout.tracker("invoked");
     const doOperations: IOperation[] = [];
     const undoOperations: IOperation[] = [];
 
@@ -610,6 +619,7 @@ export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, va
 };
 
 export const renderCellAttr = (cellElement: Element, value: IAVCellValue) => {
+    window.sout.tracker("invoked");
     if (value.type === "checkbox") {
         if (value.checkbox.checked) {
             cellElement.classList.add("av__cell-check");
@@ -627,6 +637,7 @@ export const renderCellAttr = (cellElement: Element, value: IAVCellValue) => {
 };
 
 export const renderCell = (cellValue: IAVCellValue) => {
+    window.sout.tracker("invoked");
     let text = "";
     if (["text", "template"].includes(cellValue.type)) {
         text = `<span class="av__celltext">${cellValue ? (cellValue[cellValue.type as "text"].content || "") : ""}</span>`;
@@ -703,6 +714,7 @@ export const renderCell = (cellValue: IAVCellValue) => {
 };
 
 const renderRollup = (cellValue: IAVCellValue) => {
+    window.sout.tracker("invoked");
     let text = "";
     if (["text"].includes(cellValue.type)) {
         text = cellValue ? (cellValue[cellValue.type as "text"].content || "") : "";
@@ -744,6 +756,7 @@ export const updateHeaderCell = (cellElement: HTMLElement, headerValue: {
     name?: string,
     pin?: boolean,
 }) => {
+    window.sout.tracker("invoked");
     if (typeof headerValue.icon !== "undefined") {
         cellElement.dataset.icon = headerValue.icon;
         cellElement.querySelector(".av__cellheadericon").outerHTML = headerValue.icon ? unicode2Emoji(headerValue.icon, "av__cellheadericon", true) : `<svg class="av__cellheadericon"><use xlink:href="#${getColIconByType(cellElement.dataset.dtype as TAVCol)}"></use></svg>`;
@@ -764,6 +777,7 @@ export const updateHeaderCell = (cellElement: HTMLElement, headerValue: {
 };
 
 export const getPositionByCellElement = (cellElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     let rowElement = hasClosestByClassName(cellElement, "av__row");
     if (!rowElement) {
         return;
@@ -787,6 +801,7 @@ export const getPositionByCellElement = (cellElement: HTMLElement) => {
 export const dragFillCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, originData: {
     [key: string]: IAVCellValue[]
 }, originCellIds: string[]) => {
+    window.sout.tracker("invoked");
     nodeElement.querySelector(".av__drag-fill")?.remove();
     const newData: { [key: string]: Array<IAVCellValue & { colId?: string, element?: HTMLElement }> } = {};
     nodeElement.querySelectorAll(".av__cell--active").forEach((item: HTMLElement) => {
@@ -854,6 +869,7 @@ export const dragFillCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, 
 };
 
 export const addDragFill = (cellElement: Element) => {
+    window.sout.tracker("invoked");
     if (!cellElement) {
         return;
     }

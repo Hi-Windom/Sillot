@@ -22,6 +22,7 @@ import {commandPanel} from "../plugin/commandPanel";
 import {exportLayout} from "./util";
 
 export const initBar = (app: App) => {
+    window.sout.tracker("invoked");
     const toolbarElement = document.getElementById("toolbar");
     toolbarElement.innerHTML = `
 <div id="barWorkspace" aria-label="${window.siyuan.languages.mainMenu} ${updateHotkeyTip(window.siyuan.config.keymap.general.mainMenu.custom)}" class="ariaLabel toolbar__item toolbar__item--active">
@@ -254,6 +255,7 @@ export const initBar = (app: App) => {
 };
 
 export const setZoom = (type: "zoomIn" | "zoomOut" | "restore") => {
+    window.sout.tracker("invoked");
     /// #if !BROWSER
     const isTabWindow = isWindow();
     let zoom = 1;
@@ -293,6 +295,7 @@ export const setZoom = (type: "zoomIn" | "zoomOut" | "restore") => {
 };
 
 const openPlugin = (app: App, target: Element) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("topBarPlugin");
     if (!isHuawei()) {
         menu.addItem({

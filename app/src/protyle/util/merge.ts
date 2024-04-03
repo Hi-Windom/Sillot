@@ -1,4 +1,5 @@
 export const merge = (...options: any[]) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     const target: any = {};
     const merger = (obj: any) => {
         for (const prop in obj) {

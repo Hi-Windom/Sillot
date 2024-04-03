@@ -4,6 +4,7 @@ import {hasClosestByClassName} from "../../util/hasClosest";
 import {updateCellsValue} from "./cell";
 
 export const getDateHTML = (data: IAVTable, cellElements: HTMLElement[]) => {
+    window.sout.tracker("invoked");
     let hasEndDate = true;
     let cellValue: IAVCell;
     cellElements.forEach((cellElement) => {
@@ -70,6 +71,7 @@ export const bindDateEvent = (options: {
     blockElement: Element,
     cellElements: HTMLElement[]
 }) => {
+    window.sout.tracker("invoked");
     const inputElements: NodeListOf<HTMLInputElement> = options.menuElement.querySelectorAll("input");
     inputElements[0].addEventListener("change", () => {
         inputElements[0].dataset.value = inputElements[0].value.length > 10 ? inputElements[0].value : inputElements[0].value + " 00:00";

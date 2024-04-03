@@ -14,6 +14,7 @@ import {hideElements} from "../protyle/ui/hideElements";
 import {getCloudURL, getIndexURL} from "./util/about";
 
 const genSVGBG = () => {
+    window.sout.tracker("invoked");
     let html = "";
     const svgs: string[] = [];
     document.querySelectorAll("body > svg > defs > symbol").forEach((item) => {

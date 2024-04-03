@@ -5,6 +5,7 @@ import {confirmDialog} from "../../dialog/confirmDialog";
 import {Constants} from "../../constants";
 
 export const renderSnippet = () => {
+    window.sout.tracker("invoked");
     fetchPost("/api/snippet/getSnippet", {type: "all", enabled: 2}, (response) => {
         response.data.snippets.forEach((item: ISnippet) => {
             const id = `snippet${item.type === "css" ? "CSS" : "JS"}${item.id}`;
@@ -42,6 +43,7 @@ export const renderSnippet = () => {
 };
 
 export const openSnippets = () => {
+    window.sout.tracker("invoked");
     fetchPost("/api/snippet/getSnippet", {type: "all", enabled: 2}, (response) => {
         let cssHTML = "";
         let jsHTML = "";
@@ -185,6 +187,7 @@ export const openSnippets = () => {
 };
 
 const genSnippet = (options: ISnippet) => {
+    window.sout.tracker("invoked");
     return `<div data-id="${options.id || ""}" data-type="${options.type}">
     <div class="fn__hr--b"></div>
     <div class="fn__flex">
@@ -204,6 +207,7 @@ const genSnippet = (options: ISnippet) => {
 };
 
 const setSnippetPost = (dialog: Dialog, snippets: ISnippet[], removeIds: string[]) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/snippet/setSnippet", {snippets}, () => {
         removeIds.forEach(item => {
             const rmElement = document.querySelector(item);
@@ -220,6 +224,7 @@ const setSnippetPost = (dialog: Dialog, snippets: ISnippet[], removeIds: string[
 };
 
 const setSnippet = (dialog: Dialog, oldSnippets: ISnippet[], removeIds: string[], confirm = false) => {
+    window.sout.tracker("invoked");
     const snippets: ISnippet[] = [];
     dialog.element.querySelectorAll("[data-id]").forEach((item) => {
         snippets.push({

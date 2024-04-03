@@ -1,4 +1,5 @@
 export const setLute = (options: ILuteOptions) => {
+    window.sout.tracker("invoked");
     const lute: Lute = Lute.New();
     lute.SetSpellcheck(window.siyuan.config.editor.spellcheck);
     lute.SetProtyleMarkNetImg(window.siyuan.config.editor.displayNetImgMark);

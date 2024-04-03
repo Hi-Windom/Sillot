@@ -58,6 +58,7 @@ import {Menu} from "../plugin/Menu";
 import {getFirstBlock} from "../protyle/wysiwyg/getBlock";
 
 const renderAssetList = (element: Element, k: string, position: IPosition, exts: string[] = []) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/search/searchAsset", {
         k,
         exts
@@ -88,6 +89,7 @@ const renderAssetList = (element: Element, k: string, position: IPosition, exts:
 };
 
 export const assetMenu = (protyle: IProtyle, position: IPosition, callback?: (url: string, name: string) => void, exts?: string[]) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("background-asset");
     if (menu.isOpen) {
         return;
@@ -199,6 +201,7 @@ export const assetMenu = (protyle: IProtyle, position: IPosition, callback?: (ur
 };
 
 export const fileAnnotationRefMenu = (protyle: IProtyle, refElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     const nodeElement = hasClosestBlock(refElement);
     if (!nodeElement) {
         return;
@@ -314,6 +317,7 @@ export const fileAnnotationRefMenu = (protyle: IProtyle, refElement: HTMLElement
 };
 
 export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
+    window.sout.tracker("invoked");
     const nodeElement = hasClosestBlock(element);
     if (!nodeElement) {
         return;
@@ -623,6 +627,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
 };
 
 export const contentMenu = (protyle: IProtyle, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const range = getEditorRange(nodeElement);
     window.siyuan.menus.menu.remove();
     /// #if MOBILE
@@ -756,6 +761,7 @@ export const contentMenu = (protyle: IProtyle, nodeElement: Element) => {
 };
 
 export const enterBack = (protyle: IProtyle, id: string) => {
+    window.sout.tracker("invoked");
     if (!protyle.block.showAll) {
         const ids = protyle.path.split("/");
         if (ids.length > 2) {
@@ -782,6 +788,7 @@ export const zoomOut = (options: {
     callback?: () => void,
     reload?: boolean
 }) => {
+    window.sout.tracker("invoked");
     if (options.protyle.options.backlinkData) {
         return;
     }
@@ -886,6 +893,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
     clientX: number,
     clientY: number
 }) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     const nodeElement = hasClosestBlock(assetElement);
     if (!nodeElement) {
@@ -1115,6 +1123,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
 };
 
 export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText = false) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     const nodeElement = hasClosestBlock(linkElement);
     if (!nodeElement) {
@@ -1322,6 +1331,7 @@ export const linkMenu = (protyle: IProtyle, linkElement: HTMLElement, focusText 
 };
 
 export const tagMenu = (protyle: IProtyle, tagElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     const nodeElement = hasClosestBlock(tagElement);
     if (!nodeElement) {
@@ -1437,6 +1447,7 @@ export const tagMenu = (protyle: IProtyle, tagElement: HTMLElement) => {
 };
 
 const genImageWidthMenu = (label: string, assetElement: HTMLElement, imgElement: HTMLElement, protyle: IProtyle, id: string, nodeElement: HTMLElement, html: string) => {
+    window.sout.tracker("invoked");
     return {
         iconHTML: "",
         label,
@@ -1460,6 +1471,7 @@ const genImageWidthMenu = (label: string, assetElement: HTMLElement, imgElement:
 };
 
 export const iframeMenu = (protyle: IProtyle, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const id = nodeElement.getAttribute("data-node-id");
     const iframeElement = nodeElement.querySelector("iframe");
     let html = nodeElement.outerHTML;
@@ -1530,6 +1542,7 @@ export const iframeMenu = (protyle: IProtyle, nodeElement: Element) => {
 };
 
 export const videoMenu = (protyle: IProtyle, nodeElement: Element, type: string) => {
+    window.sout.tracker("invoked");
     const id = nodeElement.getAttribute("data-node-id");
     const videoElement = nodeElement.querySelector(type === "NodeVideo" ? "video" : "audio");
     let html = nodeElement.outerHTML;
@@ -1575,6 +1588,7 @@ export const videoMenu = (protyle: IProtyle, nodeElement: Element, type: string)
 };
 
 export const tableMenu = (protyle: IProtyle, nodeElement: Element, cellElement: HTMLTableCellElement, range: Range) => {
+    window.sout.tracker("invoked");
     const menus: IMenu[] = [];
     const colIndex = getColIndex(cellElement);
     if (cellElement.rowSpan > 1 || cellElement.colSpan > 1) {
@@ -1875,6 +1889,7 @@ export const tableMenu = (protyle: IProtyle, nodeElement: Element, cellElement: 
 };
 
 export const setFold = (protyle: IProtyle, nodeElement: Element, isOpen?: boolean, isRemove?: boolean) => {
+    window.sout.tracker("invoked");
     if (nodeElement.getAttribute("data-type") === "NodeListItem" && nodeElement.childElementCount < 4) {
         // 没有子列表或多个块的列表项不进行折叠
         return -1;

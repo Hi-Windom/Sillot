@@ -33,6 +33,7 @@ const bindAttrInput = (inputElement: HTMLInputElement, id: string) => {
 };
 
 export const openWechatNotify = (nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const id = nodeElement.getAttribute("data-node-id");
     const range = getEditorRange(nodeElement);
     const reminder = nodeElement.getAttribute(Constants.CUSTOM_REMINDER_WECHAT);
@@ -98,6 +99,7 @@ export const openWechatNotify = (nodeElement: Element) => {
 };
 
 export const openFileWechatNotify = (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/block/getDocInfo", {
         id: protyle.block.rootID
     }, (response) => {
@@ -154,6 +156,7 @@ export const openFileWechatNotify = (protyle: IProtyle) => {
 };
 
 export const openFileAttr = (attrs: IObject, focusName = "bookmark", protyle?: IProtyle) => {
+    window.sout.tracker("invoked");
     let customHTML = "";
     let notifyHTML = "";
     let hasAV = false;
@@ -362,6 +365,7 @@ export const openFileAttr = (attrs: IObject, focusName = "bookmark", protyle?: I
 };
 
 export const openAttr = (nodeElement: Element, focusName = "bookmark", protyle?: IProtyle) => {
+    window.sout.tracker("invoked");
     if (nodeElement.getAttribute("data-type") === "NodeThematicBreak") {
         return;
     }
@@ -372,6 +376,7 @@ export const openAttr = (nodeElement: Element, focusName = "bookmark", protyle?:
 };
 
 export const copySubMenu = (id: string, accelerator = true, focusElement?: Element) => {
+    window.sout.tracker("invoked");
     return [{
         icon: "iconRef",
         accelerator: accelerator ? window.siyuan.config.keymap.editor.general.copyBlockRef.custom : undefined,
@@ -438,6 +443,7 @@ export const copySubMenu = (id: string, accelerator = true, focusElement?: Eleme
 };
 
 export const exportMd = (id: string) => {
+    window.sout.tracker("invoked");
     return new MenuItem({
         label: window.siyuan.languages.export,
         type: "submenu",
@@ -680,6 +686,7 @@ export const exportMd = (id: string) => {
 };
 
 export const openMenu = (app: App, src: string, onlyMenu: boolean, showAccelerator: boolean) => {
+    window.sout.tracker("invoked");
     const submenu = [];
     /// #if MOBILE
     submenu.push({
@@ -784,7 +791,7 @@ export const openMenu = (app: App, src: string, onlyMenu: boolean, showAccelerat
             accelerator: showAccelerator ? "Click" : "",
             click: () => {
                 const uri = src.startsWith("/") ? "" : "/" + src;
-            console.log(uri);
+            window.sout.log(uri);
             openByMobile(uri);
             }
         });
@@ -807,6 +814,7 @@ export const renameMenu = (options: {
     name: string,
     type: "notebook" | "file"
 }) => {
+    window.sout.tracker("invoked");
     return new MenuItem({
         accelerator: window.siyuan.config.keymap.editor.general.rename.custom,
         icon: "iconEdit",
@@ -818,6 +826,7 @@ export const renameMenu = (options: {
 };
 
 export const movePathToMenu = (paths: string[]) => {
+    window.sout.tracker("invoked");
     return new MenuItem({
         label: window.siyuan.languages.move,
         icon: "iconMove",

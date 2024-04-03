@@ -28,6 +28,7 @@ import {checkFold} from "../../util/noRelyPCFunction";
 import {getDefaultType} from "../../search/getDefault";
 
 const replace = (element: Element, config: Config.IUILayoutTabSearchConfig, isAll: boolean) => {
+    window.sout.tracker("invoked");
     if (config.method === 1 || config.method === 2) {
         showMessage(window.siyuan.languages._kernel[132]);
         return;
@@ -107,6 +108,7 @@ const replace = (element: Element, config: Config.IUILayoutTabSearchConfig, isAl
 };
 
 const updateConfig = (element: Element, newConfig: Config.IUILayoutTabSearchConfig, config: Config.IUILayoutTabSearchConfig) => {
+    window.sout.tracker("invoked");
     if (config.hasReplace !== newConfig.hasReplace) {
         if (newConfig.hasReplace) {
             element.querySelector('[data-type="toggle-replace"]').classList.add("toolbar__icon--active");
@@ -163,6 +165,7 @@ const updateConfig = (element: Element, newConfig: Config.IUILayoutTabSearchConf
 };
 
 const onRecentBlocks = (data: IBlock[], config: Config.IUILayoutTabSearchConfig, response?: IWebSocketData) => {
+    window.sout.tracker("invoked");
     const listElement = document.querySelector("#searchList");
     let resultHTML = "";
     data.forEach((item: IBlock, index: number) => {
@@ -213,6 +216,7 @@ ${unicode2Emoji(childItem.ial.icon, "b3-list-item__graphic", true)}
 
 let toolbarSearchTimeout = 0;
 export const updateSearchResult = (config: Config.IUILayoutTabSearchConfig, element: Element, rmCurrentCriteria = false) => {
+    window.sout.tracker("invoked");
     clearTimeout(toolbarSearchTimeout);
     toolbarSearchTimeout = window.setTimeout(() => {
         if (rmCurrentCriteria) {
@@ -261,6 +265,7 @@ export const updateSearchResult = (config: Config.IUILayoutTabSearchConfig, elem
 };
 
 const initSearchEvent = (app: App, element: Element, config: Config.IUILayoutTabSearchConfig) => {
+    window.sout.tracker("invoked");
     const searchInputElement = document.getElementById("toolbarSearch") as HTMLInputElement;
     searchInputElement.value = config.k || "";
     searchInputElement.addEventListener("compositionend", (event: InputEvent) => {
@@ -617,6 +622,7 @@ const initSearchEvent = (app: App, element: Element, config: Config.IUILayoutTab
 };
 
 export const popSearch = (app: App, config = window.siyuan.storage[Constants.LOCAL_SEARCHDATA] as Config.IUILayoutTabSearchConfig) => {
+    window.sout.tracker("invoked");
     activeBlur();
     hideKeyboardToolbar();
     let includeChild = true;
@@ -726,6 +732,7 @@ export const popSearch = (app: App, config = window.siyuan.storage[Constants.LOC
 };
 
 const goAsset = () => {
+    window.sout.tracker("invoked");
     const assetsElement = document.querySelector("#searchAssetsPanel");
     assetsElement.classList.remove("fn__none");
     const listElement = assetsElement.querySelector("#searchAssetList");
@@ -758,6 +765,7 @@ const goAsset = () => {
 };
 
 export const goUnRef = () => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     const unRefElement = document.querySelector("#searchUnRefPanel");
     unRefElement.classList.remove("fn__none");
@@ -769,6 +777,7 @@ export const goUnRef = () => {
 };
 
 const getUnRefListMobile = (element: Element, page = 1) => {
+    window.sout.tracker("invoked");
     const previousElement = element.querySelector('[data-type="unRefPrevious"]');
     if (page > 1) {
         previousElement.removeAttribute("disabled");

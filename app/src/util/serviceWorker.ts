@@ -1,5 +1,6 @@
 // https://github.com/siyuan-note/siyuan/pull/8012
 export const registerServiceWorker = (scriptURL: string, scope = "/", workerType: WorkerType = "module") => {
+    window.sout.tracker("invoked");
     if (!("serviceWorker" in navigator) || typeof (navigator.serviceWorker) === "undefined" ||
         !("caches" in window) || !("fetch" in window)) {
         return;

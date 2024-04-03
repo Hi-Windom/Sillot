@@ -19,6 +19,7 @@ import {App} from "../index";
 let historyEditor: Protyle;
 
 const renderDoc = (element: HTMLElement, currentPage: number) => {
+    window.sout.tracker("invoked");
     const previousElement = element.querySelector('[data-type="docprevious"]');
     const nextElement = element.querySelector('[data-type="docnext"]');
     element.setAttribute("data-page", currentPage.toString());
@@ -78,6 +79,7 @@ const renderDoc = (element: HTMLElement, currentPage: number) => {
 };
 
 const renderRepoItem = (response: IWebSocketData, element: Element, type: string) => {
+    window.sout.tracker("invoked");
     if (response.data.snapshots.length === 0) {
         element.lastElementChild.innerHTML = `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
         return;
@@ -220,6 +222,7 @@ ${actionHTML}
 };
 
 const renderRepo = (element: Element, currentPage: number) => {
+    window.sout.tracker("invoked");
     const selectValue = (element.querySelector(".b3-select") as HTMLSelectElement).value;
     element.lastElementChild.innerHTML = '<li style="position: relative;height: 100%;"><div class="fn__loading"><img width="64px" src="/stage/loading-pure.svg"></div></li>';
     const previousElement = element.querySelector('[data-type="previous"]');
@@ -257,6 +260,7 @@ const renderRepo = (element: Element, currentPage: number) => {
 };
 
 const renderRmNotebook = (element: HTMLElement) => {
+    window.sout.tracker("invoked");
     element.setAttribute("data-init", "true");
     fetchPost("/api/history/getNotebookHistory", {}, (response) => {
         if (response.data.histories.length === 0) {
@@ -291,6 +295,7 @@ const renderRmNotebook = (element: HTMLElement) => {
 };
 
 export const openHistory = (app: App) => {
+    window.sout.tracker("invoked");
     if (window.siyuan.config.readonly) {
         return;
     }
@@ -433,6 +438,7 @@ export const openHistory = (app: App) => {
 };
 
 const bindEvent = (app: App, element: Element, dialog?: Dialog) => {
+    window.sout.tracker("invoked");
     const firstPanelElement = element.querySelector("#historyContainer [data-type=doc]") as HTMLElement;
     firstPanelElement.querySelectorAll(".b3-select").forEach((itemElement) => {
         itemElement.addEventListener("change", () => {

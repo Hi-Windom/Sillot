@@ -24,6 +24,7 @@ export const duplicateCol = (options: {
     viewID: string,
     blockElement: Element
 }) => {
+    window.sout.tracker("invoked");
     const id = Lute.NewNodeID();
     const nameMatch = options.newValue.match(/^(.*) \((\d+)\)$/);
     if (nameMatch) {
@@ -114,6 +115,7 @@ export const getEditHTML = (options: {
     data: IAV,
     isCustomAttr: boolean
 }) => {
+    window.sout.tracker("invoked");
     let colData: IAVColumn;
     options.data.view.columns.find((item) => {
         if (item.id === options.colId) {
@@ -241,6 +243,7 @@ export const bindEditEvent = (options: {
     menuElement: HTMLElement,
     isCustomAttr: boolean
 }) => {
+    window.sout.tracker("invoked");
     const avID = options.data.id;
     const colId = options.menuElement.querySelector(".b3-menu__item").getAttribute("data-col-id");
     const colData = options.data.view.columns.find((item: IAVColumn) => item.id === colId);
@@ -396,6 +399,7 @@ export const bindEditEvent = (options: {
 };
 
 export const getColNameByType = (type: TAVCol) => {
+    window.sout.tracker("invoked");
     switch (type) {
         case "text":
         case "number":
@@ -425,6 +429,7 @@ export const getColNameByType = (type: TAVCol) => {
 };
 
 export const getColIconByType = (type: TAVCol) => {
+    window.sout.tracker("invoked");
     switch (type) {
         case "text":
             return "iconAlignLeft";
@@ -469,6 +474,7 @@ const addAttrViewColAnimation = (options: {
     icon?: string,
     previousID: string
 }) => {
+    window.sout.tracker("invoked");
     if (!options.blockElement) {
         return;
     }
@@ -520,6 +526,7 @@ const addAttrViewColAnimation = (options: {
 };
 
 export const showColMenu = (protyle: IProtyle, blockElement: Element, cellElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     const type = cellElement.getAttribute("data-dtype") as TAVCol;
     const colId = cellElement.getAttribute("data-col-id");
     const avID = blockElement.getAttribute("data-av-id");
@@ -852,6 +859,7 @@ export const showColMenu = (protyle: IProtyle, blockElement: Element, cellElemen
 };
 
 const genUpdateColItem = (type: TAVCol, oldType: TAVCol, name: string) => {
+    window.sout.tracker("invoked");
     return `<button class="b3-menu__item" data-type="updateColType"  data-name="${name}" data-old-type="${oldType}" data-new-type="${type}">
     <svg class="b3-menu__icon"><use xlink:href="#${getColIconByType(type)}"></use></svg>
     <span class="b3-menu__label">${getColNameByType(type)}</span>
@@ -860,6 +868,7 @@ const genUpdateColItem = (type: TAVCol, oldType: TAVCol, name: string) => {
 };
 
 export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: string) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("av-header-add");
     const avID = blockElement.getAttribute("data-av-id");
     if (typeof previousID === "undefined") {
@@ -1425,6 +1434,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
 };
 
 const genColDataByType = (type: TAVCol, id: string) => {
+    window.sout.tracker("invoked");
     const colData: IAVColumn = {
         hidden: false,
         icon: "",

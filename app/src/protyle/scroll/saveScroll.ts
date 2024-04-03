@@ -6,6 +6,7 @@ import {Constants} from "../../constants";
 import {setStorageVal} from "../util/compatibility";
 
 export const saveScroll = (protyle: IProtyle, getObject = false) => {
+    window.sout.tracker("invoked");
     if (!protyle.wysiwyg?.element.firstElementChild || window.siyuan.config.readonly) {
         // 报错或者空白页面
         return undefined;
@@ -41,7 +42,6 @@ export const saveScroll = (protyle: IProtyle, getObject = false) => {
     }
     window.siyuan.storage[Constants.LOCAL_FILEPOSITION][protyle.block.rootID] = attr;
     setStorageVal(Constants.LOCAL_FILEPOSITION, window.siyuan.storage[Constants.LOCAL_FILEPOSITION]);
-    window.sout.tracker(range);
 };
 
 export const getDocByScroll = (options: {
@@ -51,6 +51,7 @@ export const getDocByScroll = (options: {
     cb?: () => void
     focus?: boolean
 }) => {
+    window.sout.tracker("invoked");
     let actions: string[] = [];
     if (options.mergedOptions) {
         actions = options.mergedOptions.action;

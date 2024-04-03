@@ -25,13 +25,13 @@ export const getIdZoomInByPath = () => {
     let isZoomIn = false;
     if (/^web\+siyuan:\/\/blocks\/\d{14}-\w{7}/.test(PWAURL)) {
         // PWA 捕获 web+siyuan://blocks/20221031001313-rk7sd0e?focus=1
-        console.log("getIdZoomInByPath()->PWAURL: ", PWAURL, "\tsubstring p: (20, 20 + 22)");
+        window.sout.tracker("-> PWAURL: ", PWAURL, "\tsubstring p: (20, 20 + 22)");
         id = PWAURL.substring(20, 20 + 22);
         isZoomIn = getSearch("focus", PWAURL) === "1";
     } else if (window.JSAndroid) {
         // PAD 通过思源协议打开
         const SYURL = window.JSAndroid.getBlockURL();
-        console.log("getIdZoomInByPath()->SYURL: ", SYURL);
+        window.sout.tracker("-> SYURL: ", SYURL);
         id = getIdFromSYProtocol(SYURL);
         isZoomIn = getSearch("focus", SYURL) === "1";
     } else {
@@ -39,7 +39,7 @@ export const getIdZoomInByPath = () => {
         id = searchParams.get("id");
         isZoomIn = searchParams.get("focus") === "1";
     }
-    console.log("getIdZoomInByPath()->id, isZoomIn: ", id, isZoomIn);
+    window.sout.tracker("-> id, isZoomIn: ", id, isZoomIn);
     return {
         id, isZoomIn
     };
@@ -50,12 +50,13 @@ export const isSYProtocol = (url: string) => {
 };
 
 export const getIdFromSYProtocol = (url: string) => {
-    console.log("getIdFromSYProtocol()->url: ", url, "\tsubstring p: (16, 16 + 22)");
+    window.sout.tracker("-> url: ", url, "\tsubstring p: (16, 16 + 22)");
     return url.substring(16, 16 + 22);
 };
 
 /* redirect to auth page */
 export const redirectToCheckAuth = (to: string = window.location.href) => {
+    window.sout.tracker("invoked");
     const url = new URL(window.location.origin);
     url.pathname = "/check-auth";
     url.searchParams.set("to", to);
@@ -63,6 +64,7 @@ export const redirectToCheckAuth = (to: string = window.location.href) => {
 };
 
 export const addBaseURL = () => {
+    window.sout?.tracker("invoked");
     let baseURLElement = document.getElementById("baseURL");
     if (!baseURLElement) {
         baseURLElement = document.createElement("base");
@@ -78,14 +80,14 @@ export const getDisplayName = (filePath: string, basename = true, removeSY = fal
         name = pathPosix().basename(filePath);
     }
     if (removeSY && name.endsWith(".sy")) {
-        console.log("getDisplayName()->name: ", name, "\tsubstring p: (0, name.length - 3)");
+        window.sout.tracker("-> name: ", name, "\tsubstring p: (0, name.length - 3)");
         name = name.substring(0, name.length - 3);
     }
     return name;
 };
 
 export const getAssetName = (assetPath: string) => {
-    console.log("getAssetName()->assetPath: ", name, "\tsubstring p: (7, assetPath.length - pathPosix().extname(assetPath).length - 23 + 7)");
+    window.sout.tracker("->assetPath: ", assetPath);
     return assetPath.substring(7, assetPath.length - pathPosix().extname(assetPath).length - 23 + 7);
 };
 
@@ -120,6 +122,7 @@ export const originalPath = () => {
 };
 
 export const getTopPaths = (liElements: Element[]) => {
+    window.sout.tracker("invoked");
     const fromPaths: string[] = [];
     liElements.forEach((item: HTMLElement) => {
         if (item.getAttribute("data-type") !== "navigation-root") {
@@ -138,6 +141,7 @@ export const getTopPaths = (liElements: Element[]) => {
 };
 
 export const moveToPath = (fromPaths: string[], toNotebook: string, toPath: string) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/filetree/moveDocs", {
         toNotebook,
         fromPaths,
@@ -147,6 +151,7 @@ export const moveToPath = (fromPaths: string[], toNotebook: string, toPath: stri
 
 export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void,
                            paths?: string[], range?: Range, title?: string, flashcard = false) => {
+    window.sout.tracker("invoked");
     const exitDialog = window.siyuan.dialogs.find((item) => {
         if (item.element.querySelector("#foldList")) {
             item.destroy();
@@ -484,6 +489,7 @@ export const movePathTo = (cb: (toPath: string[], toNotebook: string[]) => void,
 };
 
 const getLeaf = (liElement: HTMLElement, flashcard: boolean) => {
+    window.sout.tracker("invoked");
     const toggleElement = liElement.querySelector(".b3-list-item__arrow");
     if (toggleElement.classList.contains("b3-list-item__arrow--open")) {
         toggleElement.classList.remove("b3-list-item__arrow--open");
@@ -545,6 +551,7 @@ data-box="${notebookId}" class="b3-list-item" data-path="${item.path}">
 };
 
 export const getNotebookName = (id: string) => {
+    window.sout.tracker("invoked");
     let rootPath = "";
     window.siyuan.notebooks.find((item) => {
         if (item.id === id) {
@@ -556,6 +563,7 @@ export const getNotebookName = (id: string) => {
 };
 
 export const getNotebookIcon = (id: string) => {
+    window.sout.tracker("invoked");
     let rootPath = "";
     window.siyuan.notebooks.find((item) => {
         if (item.id === id) {
@@ -567,6 +575,7 @@ export const getNotebookIcon = (id: string) => {
 };
 
 export const setNotebookName = (id: string, name: string) => {
+    window.sout.tracker("invoked");
     window.siyuan.notebooks.find((item) => {
         if (item.id === id) {
             item.name = name;
@@ -576,6 +585,7 @@ export const setNotebookName = (id: string, name: string) => {
 };
 
 export const getOpenNotebookCount = () => {
+    window.sout.tracker("invoked");
     let count = 0;
     window.siyuan.notebooks.forEach(item => {
         if (!item.closed) {
@@ -586,6 +596,7 @@ export const getOpenNotebookCount = () => {
 };
 
 export const setNoteBook = (cb?: (notebook: INotebook[]) => void, flashcard = false) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/notebook/lsNotebooks", {
         flashcard
     }, (response) => {

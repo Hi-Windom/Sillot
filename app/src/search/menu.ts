@@ -10,6 +10,7 @@ import {confirmDialog} from "../dialog/confirmDialog";
 import {goUnRef, updateSearchResult} from "../mobile/menu/search";
 
 export const filterMenu = (config: Config.IUILayoutTabSearchConfig, cb: () => void) => {
+    window.sout.tracker("invoked");
     const filterDialog = new Dialog({
         title: window.siyuan.languages.searchType,
         content: `<div class="b3-dialog__content">
@@ -189,6 +190,7 @@ export const filterMenu = (config: Config.IUILayoutTabSearchConfig, cb: () => vo
 };
 
 export const replaceFilterMenu = (config: Config.IUILayoutTabSearchConfig) => {
+    window.sout.tracker("invoked");
     let html = "";
     Object.keys(Constants.SIYUAN_DEFAULT_REPLACETYPES).forEach((key: keyof Config.IUILayoutTabSearchConfigReplaceTypes) => {
         html += `<label class="fn__flex b3-label">
@@ -224,6 +226,7 @@ export const replaceFilterMenu = (config: Config.IUILayoutTabSearchConfig) => {
 };
 
 export const queryMenu = (config: Config.IUILayoutTabSearchConfig, cb: () => void) => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
         window.siyuan.menus.menu.element.getAttribute("data-name") === "searchMethod") {
         window.siyuan.menus.menu.remove();
@@ -274,6 +277,7 @@ const saveCriterionData = (config: Config.IUILayoutTabSearchConfig,
                            element: Element,
                            value: string,
                            saveDialog: Dialog) => {
+    window.sout.tracker("invoked");
     config.removed = false;
     const criterion = config;
     criterion.name = value;
@@ -292,6 +296,7 @@ const saveCriterionData = (config: Config.IUILayoutTabSearchConfig,
 export const saveCriterion = (config: Config.IUILayoutTabSearchConfig,
                               criteriaData: Config.IUILayoutTabSearchConfig[],
                               element: Element) => {
+    window.sout.tracker("invoked");
     const saveDialog = new Dialog({
         title: window.siyuan.languages.saveCriterion,
         content: `<div class="b3-dialog__content">
@@ -399,6 +404,7 @@ export const moreMenu = async (config: Config.IUILayoutTabSearchConfig,
                                cb: () => void,
                                removeCriterion: () => void,
                                layoutMenu?: () => void) => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
         window.siyuan.menus.menu.element.getAttribute("data-name") === "searchMore") {
         window.siyuan.menus.menu.remove();
@@ -606,6 +612,7 @@ export const moreMenu = async (config: Config.IUILayoutTabSearchConfig,
 };
 
 const configIsSame = (config: Config.IUILayoutTabSearchConfig, config2: Config.IUILayoutTabSearchConfig) => {
+    window.sout.tracker("invoked");
     if (config2.group === config.group && config2.hPath === config.hPath && config2.hasReplace === config.hasReplace &&
         config2.k === config.k && config2.method === config.method && config2.r === config.r &&
         config2.sort === config.sort && objEquals(config2.types, config.types) &&
@@ -616,6 +623,7 @@ const configIsSame = (config: Config.IUILayoutTabSearchConfig, config2: Config.I
 };
 
 export const initCriteriaMenu = (element: HTMLElement, data: Config.IUILayoutTabSearchConfig[], config: Config.IUILayoutTabSearchConfig) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/storage/getCriteria", {}, (response) => {
         let html = "";
         response.data.forEach((item: Config.IUILayoutTabSearchConfig, index: number) => {
@@ -649,6 +657,7 @@ export const initCriteriaMenu = (element: HTMLElement, data: Config.IUILayoutTab
 };
 
 export const getKeyByLiElement = (element: HTMLElement) => {
+    window.sout.tracker("invoked");
     const keys: string[] = [];
     element.querySelectorAll("mark").forEach(item => {
         keys.push(item.textContent);

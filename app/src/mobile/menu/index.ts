@@ -23,12 +23,14 @@ import {Menu} from "../../plugin/Menu";
 import {commandPanel} from "../../plugin/commandPanel";
 
 export const popMenu = () => {
+    window.sout.tracker("invoked");
     activeBlur();
     hideKeyboardToolbar();
     document.getElementById("menu").style.transform = "translateX(0px)";
 };
 
 export const initRightMenu = (app: App) => {
+    window.sout.tracker("invoked");
     const menuElement = document.getElementById("menu");
     let accountHTML = "";
     if (window.siyuan.user && !window.siyuan.config.readonly) {

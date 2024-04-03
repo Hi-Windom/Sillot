@@ -3,6 +3,7 @@ import {fetchPost} from "../../util/fetch";
 import {Constants} from "../../constants";
 
 export const openByMobile = (uri: string, from?: string) => {
+    window.sout.tracker("invoked");
     if (!uri) {
         return;
     }
@@ -63,6 +64,7 @@ export const openByMobile = (uri: string, from?: string) => {
 };
 
 export const readText = () => {
+    window.sout.tracker("invoked");
     if (isInAndroid()) {
         return window.JSAndroid.readClipboard();
     }
@@ -70,6 +72,7 @@ export const readText = () => {
 };
 
 export const writeText = (text: string) => {
+    window.sout.tracker("invoked");
     let range: Range;
     if (getSelection().rangeCount > 0) {
         range = getSelection().getRangeAt(0).cloneRange();
@@ -107,6 +110,7 @@ export const writeText = (text: string) => {
 };
 
 export const copyPlainText = async (text: string) => {
+    window.sout.tracker("invoked");
     text = text.replace(new RegExp(Constants.ZWSP, "g"), ""); // `复制纯文本` 时移除所有零宽空格 https://github.com/siyuan-note/siyuan/issues/6674
     await writeText(text);
 };
@@ -121,6 +125,7 @@ export const getEventName = () => {
 };
 
 export const isOnlyMeta = (event: KeyboardEvent | MouseEvent) => {
+    window.sout.tracker("invoked");
     if (isMac()) {
         // mac
         if (event.metaKey && !event.ctrlKey) {
@@ -136,6 +141,7 @@ export const isOnlyMeta = (event: KeyboardEvent | MouseEvent) => {
 };
 
 export const isNotCtrl = (event: KeyboardEvent | MouseEvent) => {
+    window.sout.tracker("invoked");
     if (!event.metaKey && !event.ctrlKey) {
         return true;
     }
@@ -168,6 +174,7 @@ export const isInIOS = () => {
 
 // Mac，Windows 快捷键展示
 export const updateHotkeyTip = (hotkey: string) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (isMac()) {
         return hotkey;
     }
@@ -199,6 +206,7 @@ export const updateHotkeyTip = (hotkey: string) => {
 };
 
 export const getLocalStorage = (cb: () => void) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/storage/getLocalStorage", undefined, (response) => {
         window.siyuan.storage = response.data;
         // 历史数据迁移
@@ -331,6 +339,7 @@ export const getLocalStorage = (cb: () => void) => {
 };
 
 export const setStorageVal = (key: string, val: any) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/storage/setLocalStorageVal", {
         app: Constants.SIYUAN_APPID,
         key,

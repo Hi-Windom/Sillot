@@ -10,6 +10,7 @@ import {MobileBookmarks} from "../mobile/dock/MobileBookmarks";
 import {Constants} from "../constants";
 
 export const openBookmarkMenu = (element: HTMLElement, event: MouseEvent, bookmarkObj: Bookmark | MobileBookmarks) => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
         window.siyuan.menus.menu.element.getAttribute("data-name") === "bookmarkMenu") {
         window.siyuan.menus.menu.remove();

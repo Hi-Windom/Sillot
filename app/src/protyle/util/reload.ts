@@ -6,6 +6,7 @@ import {hasClosestByClassName} from "./hasClosest";
 import {preventScroll} from "../scroll/preventScroll";
 
 export const reloadProtyle = (protyle: IProtyle, focus: boolean) => {
+    window.sout.tracker("invoked");
     if (!protyle.preview.element.classList.contains("fn__none")) {
         protyle.preview.render(protyle);
         return;

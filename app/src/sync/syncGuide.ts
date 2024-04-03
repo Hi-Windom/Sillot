@@ -12,6 +12,7 @@ import {App} from "../index";
 import {Constants} from "../constants";
 
 export const addCloudName = (cloudPanelElement: Element) => {
+    window.sout.tracker("invoked");
     const dialog = new Dialog({
         title: window.siyuan.languages.cloudSyncDir,
         content: `<div class="b3-dialog__content">
@@ -45,6 +46,7 @@ export const addCloudName = (cloudPanelElement: Element) => {
 };
 
 export const bindSyncCloudListEvent = (cloudPanelElement: Element, cb?: () => void) => {
+    window.sout.tracker("invoked");
     cloudPanelElement.addEventListener("click", (event) => {
         let target = event.target as HTMLElement;
         while (target && !target.isEqualNode(cloudPanelElement)) {
@@ -81,6 +83,7 @@ export const bindSyncCloudListEvent = (cloudPanelElement: Element, cb?: () => vo
 };
 
 export const getSyncCloudList = (cloudPanelElement: Element, reload = false, cb?: () => void) => {
+    window.sout.tracker("invoked");
     if (!reload && cloudPanelElement.firstElementChild.tagName !== "IMG") {
         return;
     }
@@ -144,6 +147,7 @@ export const getSyncCloudList = (cloudPanelElement: Element, reload = false, cb?
 };
 
 export const syncGuide = (app?: App) => {
+    window.sout.tracker("invoked");
     if (window.siyuan.config.readonly) {
         return;
     }
@@ -184,6 +188,7 @@ export const syncGuide = (app?: App) => {
 };
 
 const syncNow = () => {
+    window.sout.tracker("invoked");
     if (window.siyuan.config.sync.mode !== 3) {
         fetchPost("/api/sync/performSync", {});
         return;
@@ -231,6 +236,7 @@ const syncNow = () => {
 };
 
 const setSync = (key?: string, dialog?: Dialog) => {
+    window.sout.tracker("invoked");
     if (key) {
         window.siyuan.config.repo.key = key;
     }
@@ -293,6 +299,7 @@ const setSync = (key?: string, dialog?: Dialog) => {
 };
 
 export const setKey = (isSync: boolean, cb?: () => void) => {
+    window.sout.tracker("invoked");
     const dialog = new Dialog({
         title: window.siyuan.languages.syncConfGuide1,
         content: `<div class="b3-dialog__content ft__center">

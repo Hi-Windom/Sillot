@@ -40,6 +40,7 @@ export const openFileById = async (options: {
     removeCurrentTab?: boolean
     afterOpen?: () => void
 }) => {
+    window.sout.tracker("invoked");
     const response = await fetchSyncPost("/api/block/getBlockInfo", {id: options.id});
     if (response.code === -1) {
         return;
@@ -65,6 +66,7 @@ export const openFileById = async (options: {
 };
 
 export const openAsset = (app: App, assetPath: string, page: number | string, position?: string) => {
+    window.sout.tracker("invoked");
     const suffix = pathPosix().extname(assetPath.split("?page")[0]);
     if (!Constants.SIYUAN_ASSETS_EXTS.includes(suffix)) {
         return;
@@ -79,6 +81,7 @@ export const openAsset = (app: App, assetPath: string, page: number | string, po
 };
 
 export const openFile = async (options: IOpenFileOptions) => {
+    window.sout.tracker("invoked");
     if (typeof options.removeCurrentTab === "undefined") {
         options.removeCurrentTab = true;
     }
@@ -298,6 +301,7 @@ export const openFile = async (options: IOpenFileOptions) => {
 
 // 没有初始化的页签无法检测到
 const getUnInitTab = (options: IOpenFileOptions) => {
+    window.sout.tracker("invoked");
     return getAllTabs().find(item => {
         const initData = item.headElement?.getAttribute("data-initdata");
         if (initData) {
@@ -323,6 +327,7 @@ const getUnInitTab = (options: IOpenFileOptions) => {
 };
 
 const switchEditor = (editor: Editor, options: IOpenFileOptions, allModels: IModels) => {
+    window.sout.tracker("invoked");
     if (options.keepCursor) {
         editor.parent.headElement.setAttribute("keep-cursor", options.id);
         return true;
@@ -385,6 +390,7 @@ const switchEditor = (editor: Editor, options: IOpenFileOptions, allModels: IMod
 };
 
 const newTab = (options: IOpenFileOptions) => {
+    window.sout.tracker("invoked");
     let tab: Tab;
     if (options.assetPath) {
         const suffix = pathPosix().extname(options.assetPath.split("?page")[0]);
@@ -496,6 +502,7 @@ export const updatePanelByEditor = (options: {
     reload: boolean,
     resize: boolean
 }) => {
+    window.sout.tracker("invoked");
     if (options.protyle && options.protyle.path) {
         // https://ld246.com/article/1637636106054/comment/1641485541929#comments
         if (options.protyle.element.classList.contains("fn__none") ||
@@ -543,6 +550,7 @@ export const updatePanelByEditor = (options: {
 };
 
 export const isCurrentEditor = (blockId: string) => {
+    window.sout.tracker("invoked");
     const activeElement = document.querySelector(".layout__wnd--active > .fn__flex > .layout-tab-bar > .item--focus");
     if (activeElement) {
         const tab = getInstanceById(activeElement.getAttribute("data-id"));
@@ -558,6 +566,7 @@ export const isCurrentEditor = (blockId: string) => {
 };
 
 export const updateOutline = (models: IModels, protyle: IProtyle, reload = false) => {
+    window.sout.tracker("invoked");
     models.outline.find(item => {
         if (reload || (item.type === "pin" && (!protyle || item.blockId !== protyle.block?.rootID))) {
             let blockId = "";
@@ -599,6 +608,7 @@ export const updateOutline = (models: IModels, protyle: IProtyle, reload = false
 };
 
 export const updateBacklinkGraph = (models: IModels, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     // https://ld246.com/article/1637636106054/comment/1641485541929#comments
     if (protyle?.element.classList.contains("fn__none") ||
         (protyle && !hasClosestByClassName(protyle.element, "layout__wnd--active") &&
@@ -653,6 +663,7 @@ export const updateBacklinkGraph = (models: IModels, protyle: IProtyle) => {
 };
 
 export const openBy = (url: string, type: "folder" | "app") => {
+    window.sout.tracker("invoked");
     /// #if !BROWSER
     if (url.startsWith("assets/")) {
         fetchPost("/api/asset/resolveAssetPath", {path: url.replace(/\.pdf\?page=\d{1,}$/, ".pdf")}, (response) => {

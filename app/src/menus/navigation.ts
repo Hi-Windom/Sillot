@@ -31,6 +31,7 @@ import {emitOpenMenu} from "../plugin/EventBus";
 import {openByMobile} from "../protyle/util/compatibility";
 
 const initMultiMenu = (selectItemElements: NodeListOf<Element>, app: App) => {
+    window.sout.tracker("invoked");
     const fileItemElement = Array.from(selectItemElements).find(item => {
         if (item.getAttribute("data-type") === "navigation-file") {
             return true;
@@ -121,6 +122,7 @@ const initMultiMenu = (selectItemElements: NodeListOf<Element>, app: App) => {
 };
 
 export const initNavigationMenu = (app: App, liElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     const fileElement = hasClosestByTag(liElement, "DIV");
     if (!fileElement) {
@@ -355,6 +357,7 @@ export const initNavigationMenu = (app: App, liElement: HTMLElement) => {
 };
 
 export const initFileMenu = (app: App, notebookId: string, pathString: string, liElement: Element) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     const fileElement = hasClosestByTag(liElement, "DIV");
     if (!fileElement) {
@@ -638,6 +641,7 @@ export const initFileMenu = (app: App, notebookId: string, pathString: string, l
 };
 
 export const genImportMenu = (notebookId: string, pathString: string) => {
+    window.sout.tracker("invoked");
     if (window.siyuan.config.readonly) {
         return;
     }
@@ -716,6 +720,7 @@ export const genImportMenu = (notebookId: string, pathString: string) => {
 };
 
 export const sortMenu = (type: "notebooks" | "notebook", sortMode: number, clickEvent: (sort: number) => void) => {
+    window.sout.tracker("invoked");
     const sortMenu: IMenu[] = [{
         icon: sortMode === 0 ? "iconSelect" : undefined,
         label: window.siyuan.languages.fileNameASC,

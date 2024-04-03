@@ -8,6 +8,7 @@ import {openMobileFileById} from "../editor";
 import {App} from "../../index";
 
 export const getRecentDocs = (app: App) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/storage/getRecentDocs", {}, (response) => {
         let html = "";
         response.data.forEach((item: any, index: number) => {

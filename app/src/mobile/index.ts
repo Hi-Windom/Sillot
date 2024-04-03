@@ -117,9 +117,9 @@ class App {
                             window.siyuan.emojis = emojiResponse.data as IEmoji[];
                             setNoteBook(() => {
                                 initRightMenu(this); // 前置避免 initFramework crash 影响
-                                console.log("initRightMenu() resolved");
+                                window.sout.tracker("initRightMenu() resolved");
                                 initFramework(this, confResponse.data.start);
-                                console.log("initFramework() resolved");
+                                window.sout.tracker("initFramework() resolved");
                                 openChangelog();
                             });
                         });

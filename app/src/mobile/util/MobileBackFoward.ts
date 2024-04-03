@@ -17,6 +17,7 @@ import {setTitle} from "../../dialog/processSystem";
 const forwardStack: IBackStack[] = [];
 
 const focusStack = (backStack: IBackStack) => {
+    window.sout.tracker("invoked");
     const protyle = getCurrentEditor().protyle;
     window.siyuan.storage[Constants.LOCAL_DOCINFO] = {
         id: backStack.id,
@@ -99,6 +100,7 @@ const focusStack = (backStack: IBackStack) => {
 };
 
 export const pushBack = () => {
+    window.sout.tracker("invoked");
     const protyle = getCurrentEditor().protyle;
     if (protyle.wysiwyg.element.firstElementChild) {
         window.siyuan.backStack.push({
@@ -117,6 +119,7 @@ export const pushBack = () => {
 };
 
 export const goForward = () => {
+    window.sout.tracker("invoked");
     if (window.siyuan.menus.menu.element.classList.contains("b3-menu--fullscreen") &&
         !window.siyuan.menus.menu.element.classList.contains("fn__none")) {
         window.siyuan.menus.menu.element.dispatchEvent(new CustomEvent("click", {detail: "back"}));
@@ -139,6 +142,7 @@ export const goForward = () => {
 };
 
 export const goBack = () => {
+    window.sout.tracker("invoked");
     const editor = getCurrentEditor();
     if (window.siyuan.menus.menu.element.classList.contains("b3-menu--fullscreen") &&
         !window.siyuan.menus.menu.element.classList.contains("fn__none")) {

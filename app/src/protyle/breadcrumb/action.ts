@@ -13,6 +13,7 @@ import {isWindow} from "../../util/functions";
 import {Wnd} from "../../layout/Wnd";
 
 export const net2LocalAssets = (protyle: IProtyle, type: "Assets" | "Img") => {
+    window.sout.tracker("invoked");
     if (protyle.element.querySelector(".wysiwygLoading")) {
         return;
     }
@@ -34,6 +35,7 @@ export const net2LocalAssets = (protyle: IProtyle, type: "Assets" | "Img") => {
 };
 
 export const fullscreen = (element: Element, btnElement?: Element) => {
+    window.sout.tracker("invoked");
     setTimeout(() => {
         hideAllElements(["gutter"]);
     }, Constants.TIMEOUT_TRANSITION);   // 等待页面动画结束
@@ -100,6 +102,7 @@ export const fullscreen = (element: Element, btnElement?: Element) => {
 };
 
 export const updateReadonly = (target: Element, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.config.readonly) {
         const isReadonly = target.querySelector("use").getAttribute("xlink:href") !== "#iconUnlock";
         if (window.siyuan.config.editor.readOnly) {

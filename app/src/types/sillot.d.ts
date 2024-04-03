@@ -43,7 +43,7 @@ interface ISout {
   good(m: any, head?: string): void;
   wink(m: any, head?: string): void;
   bad(m: any, head?: string): void;
-  tracker(m: any): void;
+  tracker(m: any, ...additionalMessages: any[]): void;
   table(m: Array<object>): void;
 }
 

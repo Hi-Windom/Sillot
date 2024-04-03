@@ -3,6 +3,7 @@ import {Constants} from "../constants";
 import {genIconHTML} from "../protyle/render/util";
 
 export const customBlockRender = (app: App, element: Element) => {
+    window.sout.tracker("invoked");
     // TODO
     let abcElements: Element[] = [];
     if (element.getAttribute("data-subtype") === "abc") {

@@ -20,6 +20,7 @@ import {processRender} from "../util/processCode";
 import {hasClosestByClassName} from "../util/hasClosest";
 
 export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (hasClosestByClassName(blockElement, "protyle-wysiwyg__embed")) {
         return;
     }
@@ -297,6 +298,7 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
 };
 
 const listEnter = (protyle: IProtyle, blockElement: HTMLElement, range: Range) => {
+    window.sout.tracker("invoked");
     const listItemElement = blockElement.parentElement;
 
     const editableElement = getContenteditableElement(blockElement);
@@ -486,6 +488,7 @@ const listEnter = (protyle: IProtyle, blockElement: HTMLElement, range: Range) =
 };
 
 const removeEmptyNode = (newElement: Element) => {
+    window.sout.tracker("invoked");
     const children = getContenteditableElement(newElement).childNodes;
     for (let i = 0; i < children.length; i++) {
         if (children[i].nodeType === 3 && children[i].textContent.length === 0) {
@@ -496,6 +499,7 @@ const removeEmptyNode = (newElement: Element) => {
 };
 
 export const softEnter = (range: Range, nodeElement: HTMLElement, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     let startElement = range.startContainer as HTMLElement;
     const nextSibling = hasNextSibling(startElement) as Element;
     // 图片之前软换行
@@ -535,6 +539,7 @@ export const softEnter = (range: Range, nodeElement: HTMLElement, protyle: IProt
 };
 
 const addNewLineToEnd = (range: Range, nodeElement: HTMLElement, protyle: IProtyle, startElement: Element) => {
+    window.sout.tracker("invoked");
     const wbrElement = document.createElement("wbr");
     if (startElement.nodeType === 3) {
         range.insertNode(wbrElement);

@@ -10,6 +10,7 @@ import {transaction} from "../../wysiwyg/transaction";
 import {openMenuPanel} from "./openMenuPanel";
 
 const genAVRollupHTML = (value: IAVCellValue) => {
+    window.sout.tracker("invoked");
     let html = "";
     switch (value.type) {
         case "block":
@@ -50,6 +51,7 @@ const genAVRollupHTML = (value: IAVCellValue) => {
 };
 
 export const genAVValueHTML = (value: IAVCellValue) => {
+    window.sout.tracker("invoked");
     let html = "";
     switch (value.type) {
         case "block":
@@ -142,6 +144,7 @@ export const genAVValueHTML = (value: IAVCellValue) => {
 };
 
 export const renderAVAttribute = (element: HTMLElement, id: string, protyle: IProtyle, cb?: (element: HTMLElement) => void) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/av/getAttributeViewKeys", {id}, (response) => {
         let html = "";
         response.data.forEach((table: {

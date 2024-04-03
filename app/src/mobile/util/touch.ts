@@ -21,6 +21,7 @@ let lastClientX: number;    // 和起始方向不一致时，记录最后一次�
 let scrollBlock: boolean;
 
 const popSide = (render = true) => {
+    window.sout.tracker("invoked");
     if (render) {
         document.getElementById("toolbarFile").dispatchEvent(new CustomEvent("click"));
     } else {
@@ -31,6 +32,7 @@ const popSide = (render = true) => {
 };
 
 export const handleTouchEnd = (event: TouchEvent, app: App) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (isIPhone() && globalTouchEnd(event, yDiff, time, app)) {
         event.stopImmediatePropagation();
         event.preventDefault();
@@ -137,6 +139,7 @@ export const handleTouchEnd = (event: TouchEvent, app: App) => {
 };
 
 export const handleTouchStart = (event: TouchEvent) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (globalTouchStart(event)) {
         return;
     }
@@ -162,6 +165,7 @@ export const handleTouchStart = (event: TouchEvent) => {
 let previousClientX: number;
 const sideMaskElement = document.querySelector(".side-mask") as HTMLElement
 export const handleTouchMove = (event: TouchEvent) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     const target = event.target as HTMLElement;
     if (!clientX || !clientY ||
         target.tagName === "AUDIO" ||

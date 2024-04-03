@@ -14,6 +14,7 @@ const calcItem = (options: {
     avId: string,
     blockID: string
 }) => {
+    window.sout.tracker("invoked");
     options.menu.addItem({
         iconHTML: "",
         label: getNameByOperator(options.operator, !!options.data),
@@ -80,6 +81,7 @@ export const openCalcMenu = async (protyle: IProtyle, calcElement: HTMLElement, 
     colId: string,
     blockID: string
 }) => {
+    window.sout.tracker("invoked");
     let rowElement: HTMLElement | false;
     let type;
     let colId: string;
@@ -393,6 +395,7 @@ export const openCalcMenu = async (protyle: IProtyle, calcElement: HTMLElement, 
 };
 
 export const getCalcValue = (column: IAVColumn) => {
+    window.sout.tracker("invoked");
     if (!column.calc || !column.calc.result) {
         return "";
     }
@@ -465,6 +468,7 @@ export const getCalcValue = (column: IAVColumn) => {
 };
 
 export const getNameByOperator = (operator: string, isRollup: boolean) => {
+    window.sout.tracker("invoked");
     switch (operator) {
         case undefined:
         case "":

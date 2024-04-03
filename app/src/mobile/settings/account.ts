@@ -13,6 +13,7 @@ import {hideElements} from "../../protyle/ui/hideElements";
 import {Constants} from "../../constants";
 
 export const showAccountInfo = () => {
+    window.sout.tracker("invoked");
     const payHTML = `<a class="b3-button b3-button--big" href="${getIndexURL("pricing.html")}" target="_blank">
     <svg><use xlink:href="#iconVIP"></use></svg>${window.siyuan.languages[window.siyuan.user?.userSiYuanOneTimePayStatus === 1 ? "account4" : "account1"]}
 </a>
@@ -147,6 +148,7 @@ ${renewHTML}`;
 };
 
 const getLoginHTML = (deactivate = false) => {
+    window.sout.tracker("invoked");
     let confirmHTML: string;
     if (deactivate) {
         confirmHTML = `<div class="b3-form__img fn__none">
@@ -209,6 +211,7 @@ const getLoginHTML = (deactivate = false) => {
 };
 
 const afterLogin = (response: IWebSocketData, deactive = false) => {
+    window.sout.tracker("invoked");
     if (deactive) {
         hideElements(["dialog"]);
         confirmDialog("⚠️ " + window.siyuan.languages.deactivateUser, window.siyuan.languages.deactivateUserTip, () => {
@@ -233,6 +236,7 @@ const afterLogin = (response: IWebSocketData, deactive = false) => {
 };
 
 const bindLoginEvent = (modelMainElement: HTMLElement, deactive = false) => {
+    window.sout.tracker("invoked");
     const agreeLoginElement = modelMainElement.querySelector("#agreeLogin") as HTMLInputElement;
     const userNameElement = modelMainElement.querySelector("#userName") as HTMLInputElement;
     const userPasswordElement = modelMainElement.querySelector("#userPassword") as HTMLInputElement;
@@ -309,6 +313,7 @@ const bindLoginEvent = (modelMainElement: HTMLElement, deactive = false) => {
 };
 
 export const login = () => {
+    window.sout.tracker("invoked");
     openModel({
         title: window.siyuan.languages.login,
         icon: "iconAccount",

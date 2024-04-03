@@ -13,6 +13,7 @@ import {isInAndroid, updateHotkeyTip} from "../protyle/util/compatibility";
 import {checkFold} from "../util/noRelyPCFunction";
 
 export const exportAsset = (src: string) => {
+    window.sout.tracker("invoked");
     /// #if !BROWSER
     return {
         label: window.siyuan.languages.export,
@@ -33,6 +34,7 @@ export const exportAsset = (src: string) => {
 
 
 export const openEditorTab = (app: App, id: string, notebookId?: string, pathString?: string) => {
+    window.sout.tracker("invoked");
     /// #if !MOBILE
     const openSubmenus: IMenu[] = [{
         icon: "iconLayoutRight",
@@ -141,6 +143,7 @@ export const openEditorTab = (app: App, id: string, notebookId?: string, pathStr
 };
 
 export const copyPNG = (imgElement: HTMLImageElement) => {
+    window.sout.tracker("invoked");
     if (isInAndroid()) {
         window.JSAndroid.writeImageClipboard(imgElement.getAttribute("src"));
         return;

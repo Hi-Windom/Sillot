@@ -36,6 +36,7 @@ import { newCenterEmptyTab, resizeTabs } from "./tabUtil";
 import { setStorageVal } from "../protyle/util/compatibility";
 
 export const setPanelFocus = (element: Element) => {
+    window.sout.tracker("invoked");
     if (element.getAttribute("data-type") === "wnd") {
         setTitle(element.querySelector('.layout-tab-bar .item--focus[data-type="tab-header"] .item__text')?.textContent || window.siyuan.languages.siyuanNote);
     }
@@ -72,6 +73,7 @@ export const setPanelFocus = (element: Element) => {
 };
 
 export const switchWnd = (newWnd: Wnd, targetWnd: Wnd) => {
+    window.sout.tracker("invoked");
     // DOM 移动后 range 会变化
     const rangeDatas: {
         id: string,
@@ -123,6 +125,7 @@ export const switchWnd = (newWnd: Wnd, targetWnd: Wnd) => {
 };
 
 export const getWndByLayout: (layout: Layout) => Wnd = (layout: Layout) => {
+    window.sout.tracker("invoked");
     for (let i = 0; i < layout.children.length; i++) {
         const item = layout.children[i];
         if (item instanceof Wnd) {
@@ -134,6 +137,7 @@ export const getWndByLayout: (layout: Layout) => Wnd = (layout: Layout) => {
 };
 
 const dockToJSON = (dock: Dock) => {
+    window.sout.tracker("invoked");
     const json = [];
     const subDockToJSON = (index: number) => {
         const data: Config.IUILayoutDockTab[] = [];
@@ -169,6 +173,7 @@ const dockToJSON = (dock: Dock) => {
 };
 
 export const resetLayout = () => {
+    window.sout.tracker("invoked");
     fetchPost("/api/system/setUILayout", { layout: {} }, () => {
         window.siyuan.storage[Constants.LOCAL_FILEPOSITION] = {};
         setStorageVal(Constants.LOCAL_FILEPOSITION, window.siyuan.storage[Constants.LOCAL_FILEPOSITION]);
@@ -180,6 +185,7 @@ export const resetLayout = () => {
 
 let saveCount = 0;
 export const saveLayout = () => {
+    window.sout.tracker("invoked");
     const breakObj = {};
     let layoutJSON: any = {};
     if (isWindow()) {
@@ -223,6 +229,7 @@ export const exportLayout = (options: {
     cb: () => void,
     errorExit: boolean
 }) => {
+    window.sout.tracker("invoked");
     if (isWindow()) {
         const layoutJSON: any = {
             layout: {},
@@ -259,6 +266,7 @@ export const exportLayout = (options: {
 };
 
 export const getAllLayout = () => {
+    window.sout.tracker("invoked");
     const layoutJSON: any = {
         hideDock: document.querySelector("#barDock use").getAttribute("xlink:href") === "#iconDock",
         layout: {},
@@ -271,6 +279,7 @@ export const getAllLayout = () => {
 };
 
 const initInternalDock = (dockItem: Config.IUILayoutDockTab[]) => {
+    window.sout.tracker("invoked");
     dockItem.forEach((existSubItem) => {
         if (existSubItem.hotkeyLangId) {
             existSubItem.title = window.siyuan.languages[existSubItem.hotkeyLangId];
@@ -280,6 +289,7 @@ const initInternalDock = (dockItem: Config.IUILayoutDockTab[]) => {
 };
 
 const JSONToDock = (json: any, app: App) => {
+    window.sout.tracker("invoked");
     json.left.data.forEach((existItem: Config.IUILayoutDockTab[]) => {
         initInternalDock(existItem);
     });
@@ -300,6 +310,7 @@ export const JSONToCenter = (
     json: Config.TUILayoutItem,
     layout?: Layout | Wnd | Tab | Model,
 ) => {
+    window.sout.tracker("invoked");
     let child: Layout | Wnd | Tab | Model;
     if (json.instance === "Layout") {
         if (!layout) {
@@ -424,6 +435,7 @@ export const JSONToCenter = (
 };
 
 export const JSONToLayout = (app: App, isStart: boolean) => {
+    window.sout.tracker("invoked");
     JSONToCenter(app, window.siyuan.config.uiLayout.layout, undefined);
     JSONToDock(window.siyuan.config.uiLayout, app);
     // 启动时不打开页签，需要移除没有钉住的页签
@@ -494,6 +506,7 @@ export const JSONToLayout = (app: App, isStart: boolean) => {
 };
 
 export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any, breakObj?: IObject) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (layout instanceof Layout) {
         json.direction = layout.direction;
         if (layout.parent) {
@@ -629,6 +642,7 @@ export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any, brea
 };
 
 export const resizeTopBar = () => {
+    window.sout.tracker("invoked");
     const toolbarElement = document.querySelector("#toolbar");
     if (!toolbarElement) {
         return;
@@ -689,6 +703,7 @@ export const resizeTopBar = () => {
 };
 
 export const newModelByInitData = (app: App, tab: Tab, json: any) => {
+    window.sout.tracker("invoked");
     let model: Model;
     if (json.instance === "Custom") {
         if (json.customModelType === "siyuan-card") {
@@ -722,6 +737,7 @@ export const newModelByInitData = (app: App, tab: Tab, json: any) => {
 };
 
 export const pdfIsLoading = (element: HTMLElement) => {
+    window.sout.tracker("invoked");
     const isLoading = element.querySelector('.layout-tab-container > [data-loading="true"]') ? true : false;
     if (isLoading) {
         showMessage(window.siyuan.languages.pdfIsLoading);
@@ -730,6 +746,7 @@ export const pdfIsLoading = (element: HTMLElement) => {
 };
 
 export const getInstanceById = (id: string, layout = window.siyuan.layout.centerLayout) => {
+    window.sout.tracker("invoked");
     const _getInstanceById = (item: Layout | Wnd, id: string) => {
         if (item.id === id) {
             return item;
@@ -749,6 +766,7 @@ export const getInstanceById = (id: string, layout = window.siyuan.layout.center
 };
 
 export const addResize = (obj: Layout | Wnd) => {
+    window.sout.tracker("invoked");
     if (!obj.resize) {
         return;
     }
@@ -875,6 +893,7 @@ export const addResize = (obj: Layout | Wnd) => {
 };
 
 export const adjustLayout = (layout: Layout = window.siyuan.layout.centerLayout.parent) => {
+    window.sout.tracker("invoked");
     layout.children.forEach((item: Layout | Wnd) => {
         item.element.style.maxWidth = "";
         if (!item.element.style.width && !item.element.classList.contains("layout__center")) {

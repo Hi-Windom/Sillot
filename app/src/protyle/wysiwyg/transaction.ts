@@ -21,6 +21,7 @@ import {isPaidUser, needSubscribe} from "../../util/needSubscribe";
 import {resize} from "../util/resize";
 
 const removeTopElement = (updateElement: Element, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     // 移动到其他文档中，该块需移除
     // TODO 文档没有打开时，需要通过后台获取 getTopAloneElement
     const topAloneElement = getTopAloneElement(updateElement);
@@ -51,6 +52,7 @@ const removeTopElement = (updateElement: Element, protyle: IProtyle) => {
 
 // 用于执行操作，外加处理当前编辑器中引用块、嵌入块的更新
 const promiseTransaction = () => {
+    window.sout.tracker("invoked");
     if (window.siyuan.transactions.length === 0) {
         return;
     }
@@ -297,6 +299,7 @@ const promiseTransaction = () => {
 };
 
 const updateEmbed = (protyle: IProtyle, operation: IOperation) => {
+    window.sout.tracker("invoked");
     let updatedEmbed = false;
     protyle.wysiwyg.element.querySelectorAll(`[data-type="NodeBlockQueryEmbed"] [data-node-id="${operation.id}"]`).forEach((item) => {
         const tempElement = document.createElement("div");
@@ -319,6 +322,7 @@ const updateEmbed = (protyle: IProtyle, operation: IOperation) => {
 };
 
 const deleteBlock = (updateElements: Element[], id: string, protyle: IProtyle, isUndo: boolean) => {
+    window.sout.tracker("invoked");
     if (isUndo) {
         focusSideBlock(updateElements[0]);
     }
@@ -335,6 +339,7 @@ const deleteBlock = (updateElements: Element[], id: string, protyle: IProtyle, i
 };
 
 const updateBlock = (updateElements: Element[], protyle: IProtyle, operation: IOperation, isUndo: boolean) => {
+    window.sout.tracker("invoked");
     updateElements.forEach(item => {
         // 图标撤销后无法渲染
         if (item.getAttribute("data-subtype") === "echarts") {
@@ -373,6 +378,7 @@ const updateBlock = (updateElements: Element[], protyle: IProtyle, operation: IO
 
 // 用于推送和撤销
 export const onTransaction = (protyle: IProtyle, operation: IOperation, isUndo: boolean) => {
+    window.sout.tracker("invoked");
     const updateElements: Element[] = [];
     Array.from(protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${operation.id}"]`)).forEach(item => {
         if (!hasClosestByAttribute(item.parentElement, "data-type", "NodeBlockQueryEmbed")) {
@@ -758,6 +764,7 @@ export const turnsIntoOneTransaction = (options: {
     type: TTurnIntoOne,
     level?: TTurnIntoOneSub
 }) => {
+    window.sout.tracker("invoked");
     let parentElement: Element;
     const id = Lute.NewNodeID();
     if (options.type === "BlocksMergeSuperBlock") {
@@ -855,6 +862,7 @@ export const turnsIntoOneTransaction = (options: {
 };
 
 const removeUnfoldRepeatBlock = (html: string, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     const temp = document.createElement("template");
     temp.innerHTML = html;
     Array.from(temp.content.children).forEach(item => {
@@ -871,6 +879,7 @@ export const turnsIntoTransaction = (options: {
     isContinue?: boolean,
     range?: Range
 }) => {
+    window.sout.tracker("invoked");
     let selectsElement: Element[] = options.selectsElement;
     let range: Range;
     // 通过快捷键触发
@@ -1000,6 +1009,7 @@ export const turnsIntoTransaction = (options: {
 };
 
 const updateRef = (protyle: IProtyle, id: string, index = 0) => {
+    window.sout.tracker("invoked");
     if (index > 6) {
         return;
     }
@@ -1018,6 +1028,7 @@ const updateRef = (protyle: IProtyle, id: string, index = 0) => {
 
 let transactionsTimeout: number;
 export const transaction = (protyle: IProtyle, doOperations: IOperation[], undoOperations?: IOperation[]) => {
+    window.sout.tracker("invoked");
     if (doOperations.length === 0) {
         return;
     }
@@ -1074,6 +1085,7 @@ export const transaction = (protyle: IProtyle, doOperations: IOperation[], undoO
 };
 
 export const updateTransaction = (protyle: IProtyle, id: string, newHTML: string, html: string) => {
+    window.sout.tracker("invoked");
     if (newHTML === html) {
         return;
     }
@@ -1089,6 +1101,7 @@ export const updateTransaction = (protyle: IProtyle, id: string, newHTML: string
 };
 
 export const updateBatchTransaction = (nodeElements: Element[], protyle: IProtyle, cb: (e: HTMLElement) => void) => {
+    window.sout.tracker("invoked");
     const operations: IOperation[] = [];
     const undoOperations: IOperation[] = [];
     nodeElements.forEach((element) => {

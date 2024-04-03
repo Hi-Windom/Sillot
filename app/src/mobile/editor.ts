@@ -20,6 +20,7 @@ export const getCurrentEditor = () => {
 };
 
 export const openMobileFileById = (app: App, id: string, action = [Constants.CB_GET_HL]) => {
+    window.sout.tracker("invoked");
     window.siyuan.storage[Constants.LOCAL_DOCINFO] = {id};
     setStorageVal(Constants.LOCAL_DOCINFO, window.siyuan.storage[Constants.LOCAL_DOCINFO]);
     if (window.siyuan.mobile.editor) {

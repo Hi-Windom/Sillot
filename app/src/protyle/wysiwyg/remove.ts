@@ -24,6 +24,7 @@ import {scrollCenter} from "../../util/highlightById";
 import {isMobile} from "../../util/functions";
 
 export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Range, type: "Delete" | "Backspace" | "remove") => {
+    window.sout.tracker("invoked");
     // 删除后，防止滚动条滚动后调用 get 请求，因为返回的请求已查找不到内容块了
     preventScroll(protyle);
     const selectElements = Array.from(protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select"));
@@ -390,6 +391,7 @@ export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Ran
 };
 
 export const moveToPrevious = (blockElement: Element, range: Range, isDelete: boolean) => {
+    window.sout.tracker("invoked");
     if (isDelete) {
         const previousBlockElement = getPreviousBlock(blockElement);
         if (previousBlockElement) {
@@ -403,6 +405,7 @@ export const moveToPrevious = (blockElement: Element, range: Range, isDelete: bo
 
 // https://github.com/siyuan-note/siyuan/issues/10393
 export const removeImage = (imgSelectElement: Element, nodeElement: HTMLElement, range: Range, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     const oldHTML = nodeElement.outerHTML;
     const imgPreviousSibling = hasPreviousSibling(imgSelectElement);
     if (imgPreviousSibling && imgPreviousSibling.textContent.endsWith(Constants.ZWSP)) {
@@ -419,6 +422,7 @@ export const removeImage = (imgSelectElement: Element, nodeElement: HTMLElement,
 };
 
 const removeLi = (protyle: IProtyle, blockElement: Element, range: Range, isDelete = false) => {
+    window.sout.tracker("invoked");
     if (!blockElement.parentElement.previousElementSibling && blockElement.parentElement.nextElementSibling && blockElement.parentElement.nextElementSibling.classList.contains("protyle-attr")) {
         listOutdent(protyle, [blockElement.parentElement], range, isDelete, blockElement);
         return;

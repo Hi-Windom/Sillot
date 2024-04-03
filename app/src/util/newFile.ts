@@ -17,6 +17,7 @@ import {insertHTML} from "../protyle/util/insertHTML";
 import {escapeHtml} from "./escape";
 
 export const getNewFilePath = (useSavePath: boolean) => {
+    window.sout.tracker("invoked");
     let notebookId = "";
     let currentPath = "";
     /// #if !MOBILE
@@ -82,6 +83,7 @@ export const newFile = (optios: {
     useSavePath: boolean,
     name?: string
 }) => {
+    window.sout.tracker("invoked");
     if (getOpenNotebookCount() === 0) {
         showMessage(window.siyuan.languages.newFileTip);
         return;
@@ -161,6 +163,7 @@ export const newFile = (optios: {
 };
 
 export const getSavePath = (pathString: string, notebookId: string, cb: (p: string) => void) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/filetree/getRefCreateSavePath", {
         notebook: notebookId
     }, (data) => {
@@ -187,6 +190,7 @@ export const getSavePath = (pathString: string, notebookId: string, cb: (p: stri
 };
 
 export const newFileByName = (app: App, value: string) => {
+    window.sout.tracker("invoked");
     hideElements(["dialog"]);
     newFile({
         app,
@@ -196,6 +200,7 @@ export const newFileByName = (app: App, value: string) => {
 };
 
 export const newFileBySelect = (protyle: IProtyle, selectText: string, nodeElement: HTMLElement, pathDir: string) => {
+    window.sout.tracker("invoked");
     const newFileName = replaceFileName(selectText.trim() ? selectText.trim() : protyle.lute.BlockDOM2Content(nodeElement.outerHTML).replace(/\n/g, "")) || window.siyuan.languages.untitled;
     const hPath = pathPosix().join(pathDir, newFileName);
     fetchPost("/api/filetree/getIDsByHPath", {

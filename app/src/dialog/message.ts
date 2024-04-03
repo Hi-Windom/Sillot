@@ -2,6 +2,7 @@ import {genUUID} from "../util/genID";
 import {Constants} from "../constants";
 
 export const initMessage = () => {
+    window.sout.tracker("invoked");
     const messageElement = document.getElementById("message");
     messageElement.innerHTML = `<div class="fn__flex-1"></div>
 <button class="b3-button--cancel b3-button b3-tooltips b3-tooltips__w" aria-label="${window.siyuan.languages.clearMessage}"><svg style="margin-right: 0"><use xlink:href="#iconSelect"></use></svg></button>`;
@@ -34,6 +35,7 @@ export const initMessage = () => {
 
 // type: info/error; timeout: 0 手动关闭；-1 用不关闭
 export const showMessage = (message: string, timeout = 6000, type = "info", messageId?: string) => {
+    window.sout.tracker("invoked");
     const messagesElement = document.getElementById("message").firstElementChild;
     if (!messagesElement) {
         alert(message);
@@ -86,6 +88,7 @@ export const showMessage = (message: string, timeout = 6000, type = "info", mess
 };
 
 export const hideMessage = (id?: string) => {
+    window.sout.tracker("invoked");
     const messagesElement = document.getElementById("message").firstElementChild;
     if (!messagesElement) {
         return;

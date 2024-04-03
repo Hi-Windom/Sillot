@@ -6,6 +6,7 @@ import {setStorageVal} from "../protyle/util/compatibility";
 import {Constants} from "../constants";
 
 export const processMessage = (response: IWebSocketData) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if ("msg" === response.cmd) {
         showMessage(response.msg, response.data.closeTimeout, response.code === 0 ? "info" : "error", response.data.id);
         return false;

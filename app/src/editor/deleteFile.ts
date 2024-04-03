@@ -7,6 +7,7 @@ import {showMessage} from "../dialog/message";
 import {escapeHtml} from "../util/escape";
 
 export const deleteFile = (notebookId: string, pathString: string) => {
+    window.sout.tracker("invoked");
     if (window.siyuan.config.fileTree.removeDocWithoutConfirm) {
         fetchPost("/api/filetree/removeDoc", {
             notebook: notebookId,
@@ -32,6 +33,7 @@ export const deleteFile = (notebookId: string, pathString: string) => {
 };
 
 export const deleteFiles = (liElements: Element[]) => {
+    window.sout.tracker("invoked");
     if (liElements.length === 1) {
         const itemTopULElement = hasTopClosestByTag(liElements[0], "UL");
         if (itemTopULElement) {

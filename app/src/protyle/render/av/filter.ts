@@ -13,6 +13,7 @@ import {fetchSyncPost} from "../../../util/fetch";
 import {showMessage} from "../../../dialog/message";
 
 export const getDefaultOperatorByType = (type: TAVCol) => {
+    window.sout.tracker("invoked");
     if (["select", "number", "date", "created", "updated"].includes(type)) {
         return "=";
     }
@@ -25,6 +26,7 @@ export const getDefaultOperatorByType = (type: TAVCol) => {
 };
 
 const toggleEmpty = (element: HTMLElement, operator: string, type: TAVCol) => {
+    window.sout.tracker("invoked");
     const menuElement = hasClosestByClassName(element, "b3-menu");
     if (menuElement) {
         if (["date", "updated", "created"].includes(type)) {
@@ -62,6 +64,7 @@ export const setFilter = async (options: {
     target: HTMLElement,
     blockElement: Element
 }) => {
+    window.sout.tracker("invoked");
     let rectTarget = options.target.getBoundingClientRect();
     if (rectTarget.height === 0) {
         rectTarget = options.protyle.wysiwyg.element.querySelector(`[data-col-id="${options.target.dataset.colId}"]`).getBoundingClientRect();
@@ -512,6 +515,7 @@ export const addFilter = (options: {
     protyle: IProtyle
     blockElement: Element
 }) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("av-add-filter");
     options.data.view.columns.forEach((column) => {
         let filter: IAVFilter;
@@ -555,6 +559,7 @@ export const addFilter = (options: {
 };
 
 export const getFiltersHTML = (data: IAVTable) => {
+    window.sout.tracker("invoked");
     let html = "";
     const genFilterItem = (filter: IAVFilter) => {
         let filterHTML = "";

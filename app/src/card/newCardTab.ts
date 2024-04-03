@@ -17,6 +17,7 @@ export const newCardModel = (options: {
         index?: number,
     }
 }) => {
+    window.sout.tracker("invoked");
     let editor: Protyle;
     const customObj = new Custom({
         app: options.app,

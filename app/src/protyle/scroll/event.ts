@@ -8,6 +8,7 @@ import {stickyRow} from "../render/av/row";
 
 let getIndexTimeout: number;
 export const scrollEvent = (protyle: IProtyle, element: HTMLElement) => {
+    window.sout.tracker("invoked");
     element.addEventListener("scroll", () => {
         const elementRect = element.getBoundingClientRect();
         if (!protyle.toolbar.element.classList.contains("fn__none")) {
