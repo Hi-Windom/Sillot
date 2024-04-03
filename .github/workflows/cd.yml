@@ -344,5 +344,5 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             upload_url: ${{ needs.create_release.outputs.upload_url }}
-            asset_name: ${{ matrix.string.repo_name }}-${{ needs.create_release.outputs.release_version }}-debug.apk
+            asset_name: ${{ matrix.string.repo_name }}-${{ needs.create_release.outputs.release_version }}-beta_github.apk
             asset_path: ${{steps.sign_app.outputs.signedReleaseFile}}
