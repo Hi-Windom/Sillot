@@ -1,8 +1,4 @@
-import {
-    hasClosestByAttribute,
-    hasClosestByClassName,
-    hasTopClosestByClassName,
-} from "../../protyle/util/hasClosest";
+import {hasClosestByAttribute, hasClosestByClassName, hasTopClosestByClassName,} from "../../protyle/util/hasClosest";
 import {closeModel, closePanel} from "./closePanel";
 import {popMenu} from "../menu";
 import {activeBlur, hideKeyboardToolbar} from "./keyboardToolbar";
@@ -163,7 +159,7 @@ export const handleTouchStart = (event: TouchEvent) => {
 };
 
 let previousClientX: number;
-const sideMaskElement = document.querySelector(".side-mask") as HTMLElement
+const sideMaskElement = document.querySelector(".side-mask") as HTMLElement;
 export const handleTouchMove = (event: TouchEvent) => {
     // window.sout.tracker("invoked"); // 这里调用频繁
     const target = event.target as HTMLElement;
@@ -193,15 +189,15 @@ export const handleTouchMove = (event: TouchEvent) => {
     // 上下滚动防止左右滑动
     if (!firstXY) {
         if (Math.abs(xDiff) > Math.abs(yDiff)) {
-            firstXY = "x"
+            firstXY = "x";
         } else {
-            firstXY = "y"
+            firstXY = "y";
         }
         if (firstXY === "x") {
             if ((hasClosestByAttribute(target, "id", "menu") && firstDirection === "toLeft") ||
                 (hasClosestByAttribute(target, "id", "sidebar") && firstDirection === "toRight")) {
-                firstXY = "y"
-                yDiff = undefined
+                firstXY = "y";
+                yDiff = undefined;
             }
         }
     }

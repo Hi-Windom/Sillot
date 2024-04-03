@@ -289,6 +289,13 @@ func GetBlockAttributeViewKeys(blockID string) (ret []*BlockAttributeViewKeys) {
 			return
 		}
 
+		if !attrView.ExistBlock(blockID) {
+			// 比如剪切后粘贴，块 ID 会变，但是属性还在块上，这里做一次数据订正
+			// Auto verify the database name when clicking the block superscript icon https://github.com/siyuan-note/siyuan/issues/10861
+			unbindBlockAv(nil, avID, blockID)
+			return
+		}
+
 		var keyValues []*av.KeyValues
 		for _, kv := range attrView.KeyValues {
 			kValues := &av.KeyValues{Key: kv.Key}
@@ -687,7 +694,7 @@ func renderAttributeView(attrView *av.AttributeView, viewID, query string, page,
 			}
 
 			if 0 == v.UpdatedAt {
-				v.UpdatedAt = v.CreatedAt
+				v.UpdatedAt = v.CreatedAt + 1000
 			}
 		}
 	}
@@ -2179,6 +2186,11 @@ func removeAttributeViewBlock(srcIDs []string, avID string, tx *Transaction) (er
 		}
 	}
 
+	relatedAvIDs := av.GetSrcAvIDs(avID)
+	for _, relatedAvID := range relatedAvIDs {
+		util.BroadcastByType("protyle", "refreshAttributeView", 0, "", map[string]interface{}{"id": relatedAvID})
+	}
+
 	err = av.SaveAttributeView(attrView)
 	return
 }
@@ -2913,18 +2925,12 @@ func UpdateAttributeViewCell(tx *Transaction, avID, keyID, rowID, cellID string,
 
 	if nil != blockVal {
 		blockVal.Block.Updated = now
-		blockVal.UpdatedAt = now
-		if val.CreatedAt == val.UpdatedAt {
-			val.UpdatedAt += 1000 // 防止更新时间和创建时间一样
-		}
+		blockVal.SetUpdatedAt(now)
 		if isUpdatingBlockKey {
 			blockVal.IsDetached = val.IsDetached
 		}
 	}
-	val.UpdatedAt = now
-	if val.CreatedAt == val.UpdatedAt {
-		val.UpdatedAt += 1000 // 防止更新时间和创建时间一样
-	}
+	val.SetUpdatedAt(now)
 
 	key, _ := attrView.GetKey(val.KeyID)
 	if nil != key && av.KeyTypeRelation == key.Type && nil != key.Relation {
@@ -2956,6 +2962,7 @@ func UpdateAttributeViewCell(tx *Transaction, avID, keyID, rowID, cellID string,
 
 							destVal.Relation.BlockIDs = append(destVal.Relation.BlockIDs, rowID)
 							destVal.Relation.BlockIDs = gulu.Str.RemoveDuplicatedElem(destVal.Relation.BlockIDs)
+							destVal.SetUpdatedAt(now)
 							break
 						}
 					}
@@ -2974,6 +2981,7 @@ func UpdateAttributeViewCell(tx *Transaction, avID, keyID, rowID, cellID string,
 							for _, value := range keyValues.Values {
 								if value.BlockID == blockID {
 									value.Relation.BlockIDs = gulu.Str.RemoveElem(value.Relation.BlockIDs, rowID)
+									value.SetUpdatedAt(now)
 									break
 								}
 							}
