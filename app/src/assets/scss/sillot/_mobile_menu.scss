@@ -1,3 +1,35 @@
 .b3s-mobile-height-menu__item {
   padding: 5px 8px !important;
 }
+
+body.body--mobile {
+    #commonMenu:not(.b3-menu--fullscreen) { // 权宜之计，先凑合吧 https://github.com/Hi-Windom/Sillot/issues/611
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        top: auto !important;
+        padding-bottom: 58px !important;
+
+        .b3-menu__item {
+            line-height: 33px;
+
+            .b3-menu__icon {
+                width: 18px;
+                height: 18px;
+            }
+            .b3-menu__label {
+                letter-spacing: .58px;
+                font-size: 120%;
+            }
+            .b3-text-field {
+                width: 100% !important;
+            }
+
+            &.b3-menu__item--show {
+                .b3-menu__submenu {
+                    display: contents;
+                }
+            }
+        }
+    }
+}
