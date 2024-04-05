@@ -39,6 +39,11 @@ def generate_msg_from_repo(repo_name, tag_name, otherReleaseArray):
     gh = github.Github(token, base_url=f"https://{hostname}")
     repo = gh.get_repo(repo_name)
     print('# [@SiYuan](https://github.com/siyuan-note/siyuan)\n')
+    arr = quote_versions_v2(otherReleaseArray)
+    if len(arr) > 0:
+        print('''### 非目标思源版本更新：''')
+        for v in arr:
+            print(f'''[v{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v})  ''')
     print(f'''
 
 ## ⚓ [{tag_name}](https://github.com/siyuan-note/siyuan/releases/tag/{tag_name}) 主要变化
@@ -52,14 +57,6 @@ def generate_msg_from_repo(repo_name, tag_name, otherReleaseArray):
               {"title": issue.title, "url": issue.html_url}
           )
     generate_msg(desc_mapping)
-    print('''---
-''')
-    arr = quote_versions_v2(otherReleaseArray)
-    if len(arr) > 0:
-        for v in arr:
-            print(f'''## ✅ [{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v}) 也包含在此次更新💫
-
-''')
 
 
 def find_milestone(repo, title):
@@ -113,7 +110,7 @@ def generate_msg(desc_mapping):
     for header in docmap:
         if not desc_mapping[header]:
             continue
-        print(f"### {docmap[header]}\n")
+        print(f"#### {docmap[header]}\n")
         for item in desc_mapping[header]:
             print(f"* [{item['title']}]({item['url']})")
         print()

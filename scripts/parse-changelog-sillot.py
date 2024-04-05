@@ -86,7 +86,7 @@ def generate_msg(desc_mapping):
     for header in docmap:
         if not desc_mapping[header]:
             continue
-        print(f"### {docmap[header]}\n")
+        print(f"#### {docmap[header]}\n")
         for item in desc_mapping[header]:
             print(f"* [{item['title']}]({item['url']})")
         print()
