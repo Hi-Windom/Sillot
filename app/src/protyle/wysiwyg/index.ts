@@ -444,7 +444,7 @@ export class WYSIWYG {
                         action: "setAttrViewColWidth",
                         id: dragColId,
                         avID: avId,
-                        data: newWidth,
+                        data: newWidth + "px",
                         blockID
                     }], [{
                         action: "setAttrViewColWidth",
