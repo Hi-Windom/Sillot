@@ -141,7 +141,7 @@ export const isOnlyMeta = (event: KeyboardEvent | MouseEvent) => {
 };
 
 export const isNotCtrl = (event: KeyboardEvent | MouseEvent) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (!event.metaKey && !event.ctrlKey) {
         return true;
     }

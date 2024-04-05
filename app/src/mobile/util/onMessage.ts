@@ -5,8 +5,8 @@ import {App} from "../../index";
 import {reloadPlugin} from "../../plugin/loader";
 
 export const onMessage = (app: App, data: IWebSocketData) => {
-    window.sout.tracker("invoked");
     if (data) {
+        window.sout.tracker(`invoked -> ${data.cmd}`);
         switch (data.cmd) {
             case "reloadPlugin":
                 reloadPlugin(app);
