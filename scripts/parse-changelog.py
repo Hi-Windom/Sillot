@@ -52,12 +52,12 @@ def generate_msg_from_repo(repo_name, tag_name, otherReleaseArray):
               {"title": issue.title, "url": issue.html_url}
           )
     generate_msg(desc_mapping)
+    print('''---
+''')
     arr = quote_versions_v2(otherReleaseArray)
     if len(arr) > 0:
         for v in arr:
-            print(f'''
-
-## ✅ [{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v}) 也包含在此次更新💫
+            print(f'''## ✅ [{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v}) 也包含在此次更新💫
 
 ''')
 

@@ -83,7 +83,7 @@ jobs:
       - name: Gather SiYuan Release Information
         id: release_info_siyuan
         run: |
-          changelog=$(python scripts/parse-changelog.py -t v${{ steps.syv.outputs.value }} -a v${{ steps.sypv.outputs.value }} siyuan-note/siyuan)
+          changelog=$(python scripts/parse-changelog.py -t v${{ steps.syv.outputs.value }} -a "${{ steps.sypv.outputs.value }}" siyuan-note/siyuan)
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "release_body_siyuan<<$EOF" >> $GITHUB_ENV
           echo "$changelog" >> $GITHUB_ENV
