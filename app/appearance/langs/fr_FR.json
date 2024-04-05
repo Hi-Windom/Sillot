@@ -1,4 +1,5 @@
 {
+  "fillCreated": "Heure de création de remplissage par défaut",
   "removeCard": "Supprimer la flashcard",
   "updateLayout": "Mettre à jour la mise en page",
   "dndFolderTip": "Veuillez noter que ${x} insère uniquement le lien hypertexte file:// et ne copie pas le fichier",
@@ -742,7 +743,7 @@
   "moveToLeft": "vers la Gauche",
   "moveToRight": "vers la Droite",
   "copyProtocol": "Copier bloc d'hyperliens",
-  "copyProtocolInMd": "Copier bloc d'hyperliens (Markdown)",
+  "copyProtocolInMd": "Copier le lien Markdown du bloc",
   "uploadAssets2CDN": "Transférer les fichiers asset vers le Cloud",
   "uploadAssets2CDNConfirmTip": "Êtes-vous sûr de télécharger les ressources de ce document dans le cloud ?",
   "notSupport1": "Le glisser-déposer entre carnets n'est pas pris en charge",

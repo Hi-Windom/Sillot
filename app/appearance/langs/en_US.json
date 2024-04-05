@@ -1,4 +1,5 @@
 {
+  "fillCreated": "Default fill created time",
   "removeCard": "Remove flashcard",
   "updateLayout": "Update layout",
   "dndFolderTip": "Please note that ${x} only inserts the file:// hyperlink and does not copy the file",
@@ -742,7 +743,7 @@
   "moveToLeft": "Move Left",
   "moveToRight": "Move Right",
   "copyProtocol": "Copy block hyperlink",
-  "copyProtocolInMd": "Copy block hyperlink (Markdown)",
+  "copyProtocolInMd": "Copy block Markdown link",
   "uploadAssets2CDN": "Upload asset files to cloud",
   "uploadAssets2CDNConfirmTip": "Are you sure to upload the assets in this document to the cloud?",
   "notSupport1": "Does not support drag and drop across notebooks",
