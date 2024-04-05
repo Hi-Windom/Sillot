@@ -44,7 +44,7 @@ export const matchAuxiliaryHotKey = (hotKey: string, event: KeyboardEvent) => {
 };
 
 export const matchHotKey = (hotKey: string, event: KeyboardEvent) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (!hotKey) {
         return false;
     }

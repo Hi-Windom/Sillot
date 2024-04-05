@@ -125,7 +125,7 @@ export const initBlockPopover = (app: App) => {
 };
 
 const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 这里调用频繁
     // pad 端点击后 event.target 不会更新。
     const target = document.elementFromPoint(event.clientX, event.clientY);
     if (!target) {
@@ -231,7 +231,7 @@ const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
 };
 
 const getTarget = (event: MouseEvent & { target: HTMLElement }, aElement: false | HTMLElement) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (window.siyuan.config.editor.floatWindowMode === 2 || hasClosestByClassName(event.target, "history__repo", true)) {
         return false;
     }

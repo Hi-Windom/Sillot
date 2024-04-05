@@ -125,7 +125,7 @@ export const getEventName = () => {
 };
 
 export const isOnlyMeta = (event: KeyboardEvent | MouseEvent) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (isMac()) {
         // mac
         if (event.metaKey && !event.ctrlKey) {

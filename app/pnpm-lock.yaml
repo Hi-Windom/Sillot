@@ -271,8 +271,8 @@ importers:
         specifier: ^4.7.5
         version: 4.7.5
       sofill:
-        specifier: ^1.1.7
-        version: 1.1.7(@sillot/bridge@0.0.3)(typescript@5.4.3)
+        specifier: ^1.1.8
+        version: 1.1.8(@sillot/bridge@0.0.3)(typescript@5.4.3)
       sout:
         specifier: ^1.1.0
         version: 1.1.0
@@ -5988,14 +5988,16 @@ packages:
     resolution: {integrity: sha512-B6w7tkwNid7ToxjZ08rQMT8M9BJAf8DKx8Ft4NivzH0zBUfd6jldGcisJn/RLgxcX3FPNDdNQCUEMMT79b+oCQ==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
-  sofill@1.1.7:
-    resolution: {integrity: sha512-wGDkhM7hzq5M0ezR1wz9aAvEzFP9NMiSo8dsLdnoQGuSFFv74ANtQs57esnQugEyZp1RziSa+M/uKg1xXrHdpA==}
+  sofill@1.1.8:
+    resolution: {integrity: sha512-vqBrvHMSt59IhfgcVvXJr9HthyX2n42i5907DXeXH4OZqTelTHvcflBnApMXlGtwBmHn6AWXgQ95+hBIP+O0Rg==}
     peerDependencies:
       '@sillot/bridge': ^0.0.3
-      localforage: ^1.10.0
+      idb: ^8.0.0
       typescript: '>=3.7.0'
     peerDependenciesMeta:
-      localforage:
+      idb:
+        optional: true
+      typescript:
         optional: true
 
   sortablejs@1.15.2:
@@ -14833,7 +14835,7 @@ snapshots:
       smart-buffer: 4.2.0
     dev: true
 
-  sofill@1.1.7(@sillot/bridge@0.0.3)(typescript@5.4.3):
+  sofill@1.1.8(@sillot/bridge@0.0.3)(typescript@5.4.3):
     dependencies:
       '@sillot/bridge': 0.0.3
       typescript: 5.4.3
