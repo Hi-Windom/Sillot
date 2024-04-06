@@ -22,8 +22,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/siyuan-note/riff"
-	"github.com/siyuan-note/siyuan/kernel/av"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -38,6 +36,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/siyuan-note/riff"
+	"github.com/siyuan-note/siyuan/kernel/av"
 
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
@@ -409,7 +410,7 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 		}
 		return nil
 	})
-	for p, _ := range renamePaths {
+	for p := range renamePaths {
 		originalPath := p
 		p = strings.TrimPrefix(p, unzipRootPath)
 		p = filepath.ToSlash(p)
@@ -435,7 +436,7 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 	}
 
 	var oldPaths []string
-	for oldPath, _ := range renamePaths {
+	for oldPath := range renamePaths {
 		oldPaths = append(oldPaths, oldPath)
 	}
 	sort.Slice(oldPaths, func(i, j int) bool {

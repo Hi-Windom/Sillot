@@ -518,7 +518,7 @@ func buildLinkRefs(defRootID string, refs []*sql.Ref, keyword string) (ret []*Bl
 	}
 
 	var paragraphParentIDs []string
-	for parentID, _ := range parentRefParagraphs {
+	for parentID := range parentRefParagraphs {
 		paragraphParentIDs = append(paragraphParentIDs, parentID)
 	}
 	paragraphParents := sql.GetBlocks(paragraphParentIDs)

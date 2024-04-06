@@ -451,7 +451,7 @@ func exportData(exportFolder string) (zipPath string, err error) {
 	data := filepath.Join(util.WorkspaceDir, "data")
 	if err = filelock.Copy(data, exportFolder); nil != err {
 		logging.LogErrorf("copy data dir from [%s] to [%s] failed: %s", data, baseFolderName, err)
-		err = errors.New(fmt.Sprintf(Conf.Language(14), err.Error()))
+		err = fmt.Errorf(Conf.Language(14), err.Error())
 		return
 	}
 
@@ -597,13 +597,13 @@ func ExportDocx(id, savePath string, removeAssets, merge bool) (err error) {
 
 	if err = filelock.Copy(tmpDocxPath, targetPath); nil != err {
 		logging.LogErrorf("export docx failed: %s", err)
-		return errors.New(fmt.Sprintf(Conf.Language(14), err))
+		return fmt.Errorf(Conf.Language(14), err)
 	}
 
 	if tmpAssets := filepath.Join(tmpDir, "assets"); !removeAssets && gulu.File.IsDir(tmpAssets) {
 		if err = filelock.Copy(tmpAssets, filepath.Join(savePath, "assets")); nil != err {
 			logging.LogErrorf("export docx failed: %s", err)
-			return errors.New(fmt.Sprintf(Conf.Language(14), err))
+			return fmt.Errorf(Conf.Language(14), err)
 		}
 	}
 	return

@@ -47,14 +47,14 @@ func RenderGoTemplate(templateContent string) (ret string, err error) {
 	tmpl = tmpl.Funcs(tplFuncMap)
 	tpl, err := tmpl.Parse(templateContent)
 	if nil != err {
-		return "", errors.New(fmt.Sprintf(Conf.Language(44), err.Error()))
+		return "", fmt.Errorf(Conf.Language(44), err.Error())
 	}
 
 	buf := &bytes.Buffer{}
 	buf.Grow(4096)
 	err = tpl.Execute(buf, nil)
 	if nil != err {
-		return "", errors.New(fmt.Sprintf(Conf.Language(44), err.Error()))
+		return "", fmt.Errorf(Conf.Language(44), err.Error())
 	}
 	ret = buf.String()
 	return
@@ -229,14 +229,14 @@ func RenderTemplate(p, id string, preview bool) (tree *parse.Tree, dom string, e
 	goTpl = goTpl.Funcs(tplFuncMap)
 	tpl, err := goTpl.Funcs(tplFuncMap).Parse(gulu.Str.FromBytes(md))
 	if nil != err {
-		err = errors.New(fmt.Sprintf(Conf.Language(44), err.Error()))
+		err = fmt.Errorf(Conf.Language(44), err.Error())
 		return
 	}
 
 	buf := &bytes.Buffer{}
 	buf.Grow(4096)
 	if err = tpl.Execute(buf, dataModel); nil != err {
-		err = errors.New(fmt.Sprintf(Conf.Language(44), err.Error()))
+		err = fmt.Errorf(Conf.Language(44), err.Error())
 		return
 	}
 	md = buf.Bytes()

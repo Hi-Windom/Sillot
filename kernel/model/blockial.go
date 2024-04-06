@@ -60,7 +60,7 @@ func SetBlockReminder(id string, timed string) (err error) {
 
 	node := treenode.GetNodeInTree(tree, id)
 	if nil == node {
-		return errors.New(fmt.Sprintf(Conf.Language(15), id))
+		return fmt.Errorf(Conf.Language(15), id)
 	}
 
 	if ast.NodeDocument != node.Type && node.IsContainerBlock() {
@@ -106,7 +106,7 @@ func BatchSetBlockAttrs(blockAttrs []map[string]interface{}) (err error) {
 		id := blockAttr["id"].(string)
 		bt := treenode.GetBlockTree(id)
 		if nil == bt {
-			return errors.New(fmt.Sprintf(Conf.Language(15), id))
+			return fmt.Errorf(Conf.Language(15), id)
 		}
 
 		if nil == trees[bt.RootID] {
@@ -123,12 +123,12 @@ func BatchSetBlockAttrs(blockAttrs []map[string]interface{}) (err error) {
 		id := blockAttr["id"].(string)
 		bt := treenode.GetBlockTree(id)
 		if nil == bt {
-			return errors.New(fmt.Sprintf(Conf.Language(15), id))
+			return fmt.Errorf(Conf.Language(15), id)
 		}
 		tree := trees[bt.RootID]
 		node := treenode.GetNodeInTree(tree, id)
 		if nil == node {
-			return errors.New(fmt.Sprintf(Conf.Language(15), id))
+			return fmt.Errorf(Conf.Language(15), id)
 		}
 
 		attrs := blockAttr["attrs"].(map[string]string)
@@ -167,7 +167,7 @@ func SetBlockAttrs(id string, nameValues map[string]string) (err error) {
 
 	node := treenode.GetNodeInTree(tree, id)
 	if nil == node {
-		return errors.New(fmt.Sprintf(Conf.Language(15), id))
+		return fmt.Errorf(Conf.Language(15), id)
 	}
 
 	err = setNodeAttrs(node, tree, nameValues)
@@ -220,7 +220,7 @@ func setNodeAttrs0(node *ast.Node, nameValues map[string]string) (oldAttrs map[s
 	for name := range nameValues {
 		for i := 0; i < len(name); i++ {
 			if !lex.IsASCIILetterNumHyphen(name[i]) {
-				err = errors.New(fmt.Sprintf(Conf.Language(25), node.ID))
+				err = fmt.Errorf(Conf.Language(25), node.ID)
 				return
 			}
 		}
@@ -255,13 +255,13 @@ func ResetBlockAttrs(id string, nameValues map[string]string) (err error) {
 
 	node := treenode.GetNodeInTree(tree, id)
 	if nil == node {
-		return errors.New(fmt.Sprintf(Conf.Language(15), id))
+		return fmt.Errorf(Conf.Language(15), id)
 	}
 
 	for name := range nameValues {
 		for i := 0; i < len(name); i++ {
 			if !lex.IsASCIILetterNumHyphen(name[i]) {
-				return errors.New(fmt.Sprintf(Conf.Language(25), id))
+				return fmt.Errorf(Conf.Language(25), id)
 			}
 		}
 	}

@@ -327,12 +327,12 @@ func ver2num(a string) int {
 	if strings.Contains(a, "alpha") {
 		suffixpos = strings.Index(a, "-alpha")
 		version = a[0:suffixpos]
-		suffixStr = a[suffixpos+6 : len(a)]
+		suffixStr = a[suffixpos+6:]
 		suffix = "0" + fmt.Sprintf("%03s", suffixStr)
 	} else if strings.Contains(a, "beta") {
 		suffixpos = strings.Index(a, "-beta")
 		version = a[0:suffixpos]
-		suffixStr = a[suffixpos+5 : len(a)]
+		suffixStr = a[suffixpos+5:]
 		suffix = "1" + fmt.Sprintf("%03s", suffixStr)
 	} else {
 		version = a

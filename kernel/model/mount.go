@@ -101,7 +101,7 @@ func RemoveBox(boxID string) (err error) {
 	defer boxLock.Delete(boxID)
 
 	if util.IsReservedFilename(boxID) {
-		return errors.New(fmt.Sprintf("can not remove [%s] caused by it is a reserved file", boxID))
+		return fmt.Errorf("can not remove [%s] caused by it is a reserved file", boxID)
 	}
 
 	WaitForWritingFiles()
@@ -114,7 +114,7 @@ func RemoveBox(boxID string) (err error) {
 		return
 	}
 	if !gulu.File.IsDir(localPath) {
-		return errors.New(fmt.Sprintf("can not remove [%s] caused by it is not a dir", boxID))
+		return fmt.Errorf("can not remove [%s] caused by it is not a dir", boxID)
 	}
 
 	if !isUserGuide {
