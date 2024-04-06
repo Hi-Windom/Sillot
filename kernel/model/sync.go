@@ -815,7 +815,7 @@ func dialSyncWebSocket() (c *websocket.Conn, err error) {
 		"User-Agent":        []string{util.UserAgent},
 		"x-siyuan-uid":      []string{Conf.GetUser().UserId},
 		"x-siyuan-kernel":   []string{KernelID},
-		"x-siyuan-ver":      []string{util.Ver},
+		"x-siyuan-ver":      []string{util.VerSY},
 		"x-siyuan-os":       []string{runtime.GOOS},
 		"x-siyuan-hostname": []string{util.GetDeviceName()},
 		"x-siyuan-repo":     []string{Conf.Sync.CloudName},

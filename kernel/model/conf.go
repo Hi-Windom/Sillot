@@ -274,14 +274,14 @@ func InitConf() {
 		Conf.System = conf.NewSystem()
 		Conf.OpenHelp = true
 	} else {
-		if 0 < semver.Compare("v"+util.Ver, "v"+Conf.System.KernelVersion) {
-			logging.LogInfof("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.Ver)
+		if 0 < semver.Compare("v"+util.VerSY, "v"+Conf.System.KernelVersion) {
+			logging.LogInfof("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.VerSY)
 			Conf.ShowChangelog = true
-		} else if 0 > semver.Compare("v"+util.Ver, "v"+Conf.System.KernelVersion) {
-			logging.LogInfof("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.Ver)
+		} else if 0 > semver.Compare("v"+util.VerSY, "v"+Conf.System.KernelVersion) {
+			logging.LogInfof("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.VerSY)
 		}
 
-		Conf.System.KernelVersion = util.Ver
+		Conf.System.KernelVersion = util.VerSY
 		Conf.System.IsInsider = util.IsInsider
 	}
 	if nil == Conf.System.NetworkProxy {
