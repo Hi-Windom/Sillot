@@ -403,8 +403,7 @@ export const bazaar = {
                     if (bazaarType === "plugins") {
                         app.plugins.find((item: Plugin) => {
                             if (item.name === dataObj.name) {
-                                // @ts-ignore
-                                hasSetting = item.setting || item.__proto__.hasOwnProperty("openSetting");
+                                hasSetting = item.setting || Object.prototype.hasOwnProperty.call(item, "openSetting");
                                 return true;
                             }
                         });
@@ -919,8 +918,7 @@ export const bazaar = {
                             target.removeAttribute("disabled");
                             if (enabled) {
                                 loadPlugin(app, response.data).then((plugin: Plugin) => {
-                                    // @ts-ignore
-                                    if (plugin.setting || plugin.__proto__.hasOwnProperty("openSetting")) {
+                                    if (plugin.setting || Object.prototype.hasOwnProperty.call(plugin, "openSetting")) {
                                         target.parentElement.querySelector('[data-type="setting"]').classList.remove("fn__none");
                                     } else {
                                         target.parentElement.querySelector('[data-type="setting"]').classList.add("fn__none");

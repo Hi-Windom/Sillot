@@ -80,7 +80,7 @@ func performTransactions(c *gin.Context) {
 		}
 	}
 
-	elapsed := time.Now().Sub(start).Milliseconds()
+	elapsed := time.Since(start).Milliseconds()
 	c.Header("Server-Timing", fmt.Sprintf("total;dur=%d", elapsed))
 }
 
