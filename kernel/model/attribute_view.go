@@ -875,6 +875,7 @@ func renderAttributeViewTable(attrView *av.AttributeView, view *av.View, query s
 			Template:     key.Template,
 			Relation:     key.Relation,
 			Rollup:       key.Rollup,
+			Date:         key.Date,
 			Wrap:         col.Wrap,
 			Hidden:       col.Hidden,
 			Width:        col.Width,
@@ -2019,11 +2020,6 @@ func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID string,
 		node = treenode.GetNodeInTree(tree, addingBlockID)
 		if nil == node {
 			err = ErrBlockNotFound
-			return
-		}
-
-		if ast.NodeAttributeView == node.Type {
-			// 不能将一个属性视图拖拽到另一个属性视图中
 			return
 		}
 	} else {
