@@ -43,6 +43,7 @@ func SelectSpansRawStmt(stmt string, limit int) (ret []*Span) {
 		//logging.LogErrorf("select [%s] failed: %s", stmt, err)
 		return
 	}
+	//nolint:staticcheck
 	switch parsedStmt.(type) {
 	case *sqlparser.Select:
 		slct := parsedStmt.(*sqlparser.Select)

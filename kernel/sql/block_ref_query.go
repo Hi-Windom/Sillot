@@ -68,7 +68,7 @@ func queryRefTexts() (ret []string) {
 	sqlStmt := "SELECT DISTINCT content FROM refs LIMIT 10240"
 	rows, err := query(sqlStmt)
 	if nil != err {
-		logging.LogErrorf("sql query failed: %s", sqlStmt, err)
+		logging.LogErrorf("sql query failed: %s \n %s", sqlStmt, err)
 		return
 	}
 	defer rows.Close()

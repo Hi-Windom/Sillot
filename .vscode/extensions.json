@@ -26,7 +26,9 @@
     "unifiedjs.vscode-mdx",
     "astro-build.astro-vscode",
     "golang.go",
-    "github.vscode-github-actions"
+    "github.vscode-github-actions",
+    "maixiaojie.git-emoji-zh",
+    "doggy8088.pangu2"
   ],
   "unwantedRecommendations": []
 }
