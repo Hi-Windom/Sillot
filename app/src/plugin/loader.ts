@@ -91,7 +91,7 @@ export const loadPlugin = async (app: App, item: IPluginData) => {
 
 
 const updateDock = (dockItem: Config.IUILayoutDockTab[], index: number, plugin: Plugin, type: string) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 由插件触发可能调用频繁，请根据实际需求追踪
     const dockKeys = Object.keys(plugin.docks);
     dockItem.forEach((tabItem: Config.IUILayoutDockTab, tabIndex: number) => {
         if (dockKeys.includes(tabItem.type)) {

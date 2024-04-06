@@ -177,7 +177,6 @@ export class App {
                 importIDB(r.data).then(() => {
                     window.Sillot.status.IDBloaded = true;
                 });});
-            await loadPlugins(this);
             getLocalStorage(() => {
                 fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages: IObject) => {
                     window.siyuan.languages = lauguages;
@@ -195,6 +194,7 @@ export class App {
         });
         setNoteBook();
         initBlockPopover(this);
+        loadPlugins(this);
     }
 }
 
