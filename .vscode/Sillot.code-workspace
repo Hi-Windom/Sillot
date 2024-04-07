@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"path": "..",
+            "name": "汐洛🤍/ 🗂️"
+		},
+		{
+			"path": "../kernel",
+            "name": "思源内核🤍/kernel 🗂️"
+		},
+		{
+			"path": "../app/appearance",
+            "name": "思源美化🤍/app/appearance 🗂️"
+		},
+		{
+			"path": "../_sili",
+            "name": "司丽🤍/_sili 🗂️"
+		},
+		{
+			"path": "../docs",
+            "name": "汐洛宝典🤍/docs 🗂️"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.sy": "json"
+		},
+		"workbench.editor.wrapTabs": true,
+        "search.exclude": {
+          "**/.history": true
+        }
+	}
+}

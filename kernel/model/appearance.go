@@ -50,12 +50,12 @@ func InitAppearance() {
 	loadThemes()
 
 	if !gulu.Str.Contains(Conf.Appearance.ThemeDark, Conf.Appearance.DarkThemes) {
-		Conf.Appearance.ThemeDark = "sillou"
-		Conf.Appearance.ThemeJS = false
+		Conf.Appearance.ThemeDark = "lnco"
+		Conf.Appearance.ThemeJS = true
 	}
 	if !gulu.Str.Contains(Conf.Appearance.ThemeLight, Conf.Appearance.LightThemes) {
-		Conf.Appearance.ThemeLight = "sillon"
-		Conf.Appearance.ThemeJS = false
+		Conf.Appearance.ThemeLight = "lnco"
+		Conf.Appearance.ThemeJS = true
 	}
 
 	loadIcons()

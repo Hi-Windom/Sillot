@@ -2,9 +2,8 @@ export abstract class SConst {
   public static readonly Themes = {
     BuiltinThemeLight: "daylight", // 思源默认主题
     BuiltinThemeDark: "midnight", // 思源默认主题
-    DefaultThemeLight: "sillon", // 汐洛默认主题
-    DefaultThemeDark: "sillou", //汐洛默认主题
-    lnco: "Sofill+",
+    DefaultThemeLight: "lnco",
+    DefaultThemeDark: "lnco",
   };
 
   // 渲染进程调主进程
