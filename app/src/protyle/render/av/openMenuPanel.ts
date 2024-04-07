@@ -117,7 +117,7 @@ export const openMenuPanel = (options: {
         avPanelElement = document.querySelector(".av__panel");
         let closeCB: () => void;
         const menuElement = avPanelElement.lastElementChild as HTMLElement;
-        const tabRect = options.blockElement.querySelector(`.av__views, .av__row[data-col-id="${options.colId}"] > .block__logo`)?.getBoundingClientRect();
+        let tabRect = options.blockElement.querySelector(`.av__views, .av__row[data-col-id="${options.colId}"] > .block__logo`)?.getBoundingClientRect();
         if (["select", "date", "asset", "relation", "rollup"].includes(options.type)) {
             const cellRect = options.cellElements[options.cellElements.length - 1].getBoundingClientRect();
             if (options.type === "select") {
@@ -164,7 +164,7 @@ export const openMenuPanel = (options: {
             if (options.type === "sorts") {
                 bindSortsEvent(options.protyle, menuElement, data, blockID);
             } else if (options.type === "edit") {
-                bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr});
+                bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr, blockID});
             } else if (options.type === "config") {
                 bindViewEvent({protyle: options.protyle, data, menuElement, blockElement: options.blockElement});
             }
@@ -360,7 +360,7 @@ export const openMenuPanel = (options: {
                         colId,
                         isCustomAttr
                     });
-                    bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr});
+                    bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr, blockID});
                 }
                 return;
             }
@@ -486,6 +486,8 @@ export const openMenuPanel = (options: {
                     event.stopPropagation();
                     break;
                 } else if (type === "go-properties") {
+                    // 复制列后点击返回到属性面板，宽度不一致，需重新计算
+                    tabRect = options.blockElement.querySelector(".av__views").getBoundingClientRect();
                     menuElement.innerHTML = getPropertiesHTML(data.view);
                     setPosition(menuElement, tabRect.right - menuElement.clientWidth, tabRect.bottom, tabRect.height);
                     event.preventDefault();
@@ -822,10 +824,10 @@ export const openMenuPanel = (options: {
                     menuElement.innerHTML = getEditHTML({
                         protyle: options.protyle,
                         data,
-                        colId: target.parentElement.dataset.id,
+                        colId: target.dataset.id,
                         isCustomAttr
                     });
-                    bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr});
+                    bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr, blockID});
                     setPosition(menuElement, tabRect.right - menuElement.clientWidth, tabRect.bottom, tabRect.height);
                     event.preventDefault();
                     event.stopPropagation();
@@ -889,7 +891,11 @@ export const openMenuPanel = (options: {
                     event.stopPropagation();
                     break;
                 } else if (type === "goSearchRollupCalc") {
-                    openCalcMenu(options.protyle, target, {data, colId: options.colId, blockID});
+                    openCalcMenu(options.protyle, target, {
+                        data,
+                        colId: options.colId || menuElement.querySelector(".b3-menu__item").getAttribute("data-col-id"),
+                        blockID
+                    });
                     event.preventDefault();
                     event.stopPropagation();
                     break;
@@ -938,7 +944,7 @@ export const openMenuPanel = (options: {
                             colId,
                             isCustomAttr
                         });
-                        bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr});
+                        bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr, blockID});
                     } else {
                         menuElement.innerHTML = getPropertiesHTML(data.view);
                     }
@@ -970,7 +976,7 @@ export const openMenuPanel = (options: {
                             colId,
                             isCustomAttr
                         });
-                        bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr});
+                        bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr, blockID});
                     } else {
                         menuElement.innerHTML = getPropertiesHTML(data.view);
                     }
@@ -979,19 +985,13 @@ export const openMenuPanel = (options: {
                     event.stopPropagation();
                     break;
                 } else if (type === "duplicateCol") {
-                    const colId = menuElement.querySelector(".b3-menu__item").getAttribute("data-col-id");
-                    const colData = data.view.columns.find((item: IAVColumn) => item.id === colId);
                     duplicateCol({
                         blockElement: options.blockElement,
                         protyle: options.protyle,
-                        type: colData.type,
-                        avID,
-                        colId,
-                        icon: colData.icon,
-                        newValue: colData.name,
+                        colId: menuElement.querySelector(".b3-menu__item").getAttribute("data-col-id"),
+                        data,
                         viewID: data.viewID,
                     });
-                    avPanelElement.remove();
                     event.preventDefault();
                     event.stopPropagation();
                     break;
@@ -1002,6 +1002,7 @@ export const openMenuPanel = (options: {
                         const colData = data.view.columns.find((item: IAVColumn, index) => {
                             if (item.id === colId) {
                                 previousID = data.view.columns[index - 1]?.id;
+                                data.view.columns.splice(index, 1);
                                 return true;
                             }
                         });
@@ -1028,7 +1029,14 @@ export const openMenuPanel = (options: {
                         }]);
                         removeAttrViewColAnimation(options.blockElement, colId);
                         options.blockElement.setAttribute("updated", newUpdated);
-                        avPanelElement.remove();
+
+                        if (isCustomAttr) {
+                            avPanelElement.remove();
+                        } else {
+                            tabRect = options.blockElement.querySelector(".av__views").getBoundingClientRect();
+                            menuElement.innerHTML = getPropertiesHTML(data.view);
+                            setPosition(menuElement, tabRect.right - menuElement.clientWidth, tabRect.bottom, tabRect.height);
+                        }
                     });
                     event.preventDefault();
                     event.stopPropagation();
@@ -1185,30 +1193,30 @@ export const openMenuPanel = (options: {
     });
 };
 
-const getPropertiesHTML = (data: IAVTable) => {
+export const getPropertiesHTML = (data: IAVTable) => {
     window.sout.tracker("invoked");
     let showHTML = "";
     let hideHTML = "";
     data.columns.forEach((item: IAVColumn) => {
         if (item.hidden) {
-            hideHTML += `<button class="b3-menu__item" draggable="true" data-id="${item.id}">
+            hideHTML += `<button class="b3-menu__item" data-type="editCol" draggable="true" data-id="${item.id}">
     <svg class="b3-menu__icon fn__grab"><use xlink:href="#iconDrag"></use></svg>
     <div class="b3-menu__label fn__flex">
         ${item.icon ? unicode2Emoji(item.icon, "b3-menu__icon", true) : `<svg class="b3-menu__icon"><use xlink:href="#${getColIconByType(item.type)}"></use></svg>`}
         ${item.name}
     </div>
     <svg class="b3-menu__action" data-type="showCol"><use xlink:href="#iconEye"></use></svg>
-    <svg class="b3-menu__action" data-type="editCol"><use xlink:href="#iconEdit"></use></svg>
+    <svg class="b3-menu__icon b3-menu__icon--small"><use xlink:href="#iconRight"></use></svg>
 </button>`;
         } else {
-            showHTML += `<button class="b3-menu__item" draggable="true" data-id="${item.id}">
+            showHTML += `<button class="b3-menu__item" data-type="editCol" draggable="true" data-id="${item.id}">
     <svg class="b3-menu__icon fn__grab"><use xlink:href="#iconDrag"></use></svg>
     <div class="b3-menu__label fn__flex">
         ${item.icon ? unicode2Emoji(item.icon, "b3-menu__icon", true) : `<svg class="b3-menu__icon"><use xlink:href="#${getColIconByType(item.type)}"></use></svg>`}
         ${item.name}
     </div>
     <svg class="b3-menu__action${item.type === "block" ? " fn__none" : ""}" data-type="hideCol"><use xlink:href="#iconEyeoff"></use></svg>
-    <svg class="b3-menu__action${item.type === "block" ? " fn__none" : ""}" data-type="editCol"><use xlink:href="#iconEdit"></use></svg>
+    <svg class="b3-menu__icon b3-menu__icon--small"><use xlink:href="#iconRight"></use></svg>
 </button>`;
         }
     });
