@@ -12,6 +12,7 @@ import {Constants} from "../constants";
 import {toggleDockBar} from "./dock/util";
 import SillotDrawer from "./SillotDrawer";
 import {updateHotkeyTip} from "../protyle/util/compatibility";
+import {isPadAppMode} from "sofill/env"
 
 export const initStatus = (isWindow = false) => {
     window.sout.tracker("invoked");
@@ -84,10 +85,12 @@ export const initStatus = (isWindow = false) => {
                     label: window.siyuan.languages.feedback,
                     icon: "iconFeedback",
                     click: () => {
-                        if ("zh_CN" === window.siyuan.config.lang || "zh_CHT" === window.siyuan.config.lang) {
-                            window.open("https://ld246.com/article/1649901726096");
+                        if (isPadAppMode()) {
+                            window.open('siyuan://androidFeedback', '_blank');
+                        } else if ("zh_CN" === window.siyuan.config.lang || "zh_CHT" === window.siyuan.config.lang) {
+                            window.open("https://ld246.com/member/soltus");
                         } else {
-                            window.open("https://liuyun.io/article/1686530886208");
+                            window.open("https://liuyun.io/member/soltus");
                         }
                     }
                 }).element);

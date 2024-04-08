@@ -25,6 +25,7 @@ import {confirmDialog} from "../dialog/confirmDialog";
 import {App} from "../index";
 import {isBrowser} from "../util/functions";
 import {openRecentDocs} from "../business/openRecentDocs";
+import {isPadAppMode} from "sofill/env"
 
 const editLayout = (layoutName?: string) => {
     const dialog = new Dialog({
@@ -441,10 +442,12 @@ export const workspaceMenu = (app: App, rect: DOMRect) => {
             label: window.siyuan.languages.feedback,
             icon: "iconFeedback",
             click: () => {
-                if ("zh_CN" === window.siyuan.config.lang || "zh_CHT" === window.siyuan.config.lang) {
-                    window.open("https://ld246.com/article/1649901726096");
+                if (isPadAppMode()) {
+                    window.open('siyuan://androidFeedback', '_blank');
+                } else if ("zh_CN" === window.siyuan.config.lang || "zh_CHT" === window.siyuan.config.lang) {
+                    window.open("https://ld246.com/member/soltus");
                 } else {
-                    window.open("https://liuyun.io/article/1686530886208");
+                    window.open("https://liuyun.io/member/soltus");
                 }
             }
         }).element);
