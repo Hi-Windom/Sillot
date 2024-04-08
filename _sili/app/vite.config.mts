@@ -1,11 +1,6 @@
-import { defineConfig } from 'npm:vite@^5.0.10'
-import react from 'npm:@vitejs/plugin-react@^4.2.1'
-
-// import 'npm:react@^18.2.0'
-// import 'npm:react-dom@^18.2.0'
-// import "npm:react-router-dom@^6.4" // 添加此行
-
-// import 'npm:react-vant@^3.3.4'
+// 在 deno.jsonc 中添加了导入映射的无需在此 import "npm:xxx"
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({

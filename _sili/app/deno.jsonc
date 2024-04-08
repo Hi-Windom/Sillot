@@ -22,8 +22,12 @@
   },
   "imports": { // 导入映射
     "std/": "https://deno.land/std@0.208.0/",
+    "vite": "npm:vite@^5.0.10",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^4.2.1",
     "react": "npm:react",
-    "react-dom": "npm:react-dom"
+    "react-dom": "npm:react-dom",
+    "react-router-dom": "npm:react-router-dom@^6.4",
+    "react-vant@": "npm:react-vant@^3.3.4"
   },
   "compilerOptions": { // REF https://docs.denohub.com/deno/runtime/manual/advanced/typescript/configuration
     "jsx": "react",
