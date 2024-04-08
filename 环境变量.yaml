@@ -1,0 +1,25 @@
+# 环境变量配置文件说明：
+# 0.这里列出作为参考，可以手动添加环境变量，也可以编程处理（不推荐）
+# 1.文件夹路径相关的需要根据实际情况修改，其中 -> 是指示符不包含在值里
+# 2.Administrator是用户名
+
+USER_ENV: # 用户级环境变量
+  TEMP: -> %SystemRoot%\TEMP # 是中文名系统账号时此项有用，因为中文名路径并不总是受支持，%SystemRoot% 系统会自动识别，也可以替换为具体路径
+  TMP: -> %SystemRoot%\TEMP # 同上，是临时缓存路径，可以换成非系统级缓存路径
+  __SILLOT_PYTHON_PATH__: -> D:\X-S01\conda3\envs\vsc\Scripts # vscode 配置文件中引用了该变量
+  GITHUB_TOKEN: ! # 谨慎使用，存储到变量意味着任何代码都可以读取！GITHUB_TOKEN 一般在 action 中使用，无需在开发环境配置。
+  GOROOT: -> C:\Users\Administrator\.g\go
+  G_MIRROR: https://golang.google.cn/dl/
+  Path: # 在 Path 变量中添加，每行一个值
+    - C:\Users\Administrator\go\bin
+    - C:\Users\Administrator\.deno\bin # deno 可执行文件目录 -> https://github.com/denoland/deno
+
+SYS_ENV: # 系统级环境变量
+  ANDROID_HOME: -> C:\Users\Administrator\AppData\Local\Android\Sdk # Sillot-android 开发需要
+  ANDROID_NDK_HOME: -> C:\Users\Administrator\AppData\Local\Android\Sdk\ndk\25.2.9519653 # Sillot-android 开发需要
+  JAVA_HOME: -> C:\Program Files\Microsoft\jdk-17.0.6.10-hotspot\ # Sillot-android 开发需要
+  Path: # 在 Path 变量中添加，每行一个值
+    - C:\Program Files\GitHub CLI\
+    - C:\Users\Administrator\.g\bin # go 版本管理工具 g -> https://github.com/voidint/g
+    - D:\X-S01\nodejs\
+    - D:\X-S01\TortoiseGit\bin # Git 工具，极少用到 -> https://tortoisegit.org/
