@@ -114,7 +114,7 @@ export const initRightMenu = (app: App) => {
     <div class="b3-menu__item b3s-mobile-height-menu__item" id="menuHelp">
         <svg class="b3-menu__icon"><use xlink:href="#iconHelp"></use></svg><span class="b3-menu__label">${window.siyuan.languages.userGuide}</span>
     </div>
-    <a class="b3-menu__item b3s-mobile-height-menu__item" href="${"zh_CN" === window.siyuan.config.lang || "zh_CHT" === window.siyuan.config.lang ? "https://ld246.com/article/1649901726096" : "https://liuyun.io/article/1686530886208"}" target="_blank">
+    <a class="b3-menu__item b3s-mobile-height-menu__item" id="androidFeedback">
         <svg class="b3-menu__icon"><use xlink:href="#iconFeedback"></use></svg>
         <span class="b3-menu__label">${window.siyuan.languages.feedback}</span>
     </a>
@@ -227,6 +227,11 @@ export const initRightMenu = (app: App) => {
                 break;
             } else if (target.id === "menuHelp") {
                 mountHelp();
+                event.preventDefault();
+                event.stopPropagation();
+                break;
+            } else if (target.id === "androidFeedback") {
+                window.open('siyuan://androidFeedback', '_blank');
                 event.preventDefault();
                 event.stopPropagation();
                 break;
