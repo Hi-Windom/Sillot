@@ -34,7 +34,6 @@ import (
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/av"
 	"github.com/siyuan-note/siyuan/kernel/cache"
-	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
@@ -190,36 +189,69 @@ type SearchAttributeViewResult struct {
 	HPath   string `json:"hPath"`
 }
 
-func SearchAttributeView(keyword string, page int, pageSize int) (ret []*SearchAttributeViewResult, pageCount int) {
+func SearchAttributeView(keyword string) (ret []*SearchAttributeViewResult) {
 	waitForSyncingStorages()
 	ret = []*SearchAttributeViewResult{}
-
-	var blocks []*Block
 	keyword = strings.TrimSpace(keyword)
-	if "" == keyword {
-		sqlBlocks := sql.SelectBlocksRawStmt("SELECT * FROM blocks WHERE type = 'av' ORDER BY updated DESC LIMIT 10", page, pageSize)
-		blocks = fromSQLBlocks(&sqlBlocks, "", 36)
-		pageCount = 1
-	} else {
-		var matchedBlockCount int
-		blocks, matchedBlockCount, _ = fullTextSearchByKeyword(keyword, "", "", "('av')", "", 36, page, pageSize)
-		pageCount = (matchedBlockCount + pageSize - 1) / pageSize
+
+	avs := map[string]string{}
+	avDir := filepath.Join(util.DataDir, "storage", "av")
+	const limit = 16
+	entries, err := os.ReadDir(avDir)
+	if nil != err {
+		logging.LogErrorf("read directory [%s] failed: %s", avDir, err)
+		return
 	}
 
+	count := 0
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		id := strings.TrimSuffix(entry.Name(), ".json")
+		if !ast.IsNodeIDPattern(id) {
+			continue
+		}
+
+		name, _ := av.GetAttributeViewNameByPath(filepath.Join(avDir, entry.Name()))
+		if "" == name {
+			continue
+		}
+
+		if strings.Contains(strings.ToLower(name), strings.ToLower(keyword)) {
+			avs[id] = name
+			count++
+			if limit <= count {
+				break
+			}
+		}
+	}
+
+	var avIDs []string
+	for avID := range avs {
+		avIDs = append(avIDs, avID)
+	}
+	blockIDs := treenode.BatchGetMirrorAttrViewBlockIDs(avIDs)
 	trees := map[string]*parse.Tree{}
-	for _, block := range blocks {
-		tree := trees[block.RootID]
+	for _, blockID := range blockIDs {
+		bt := treenode.GetBlockTree(blockID)
+		if nil == bt {
+			continue
+		}
+
+		tree := trees[bt.RootID]
 		if nil == tree {
-			tree, _ = LoadTreeByBlockID(block.ID)
+			tree, _ = LoadTreeByBlockID(blockID)
 			if nil != tree {
-				trees[block.RootID] = tree
+				trees[bt.RootID] = tree
 			}
 		}
 		if nil == tree {
 			continue
 		}
 
-		node := treenode.GetNodeInTree(tree, block.ID)
+		node := treenode.GetNodeInTree(tree, blockID)
 		if nil == node {
 			continue
 		}
@@ -229,8 +261,8 @@ func SearchAttributeView(keyword string, page int, pageSize int) (ret []*SearchA
 		}
 
 		avID := node.AttributeViewID
-		attrView, _ := av.ParseAttributeView(avID)
-		if nil == attrView {
+		name := avs[avID]
+		if "" == name {
 			continue
 		}
 
@@ -255,8 +287,8 @@ func SearchAttributeView(keyword string, page int, pageSize int) (ret []*SearchA
 		if !exist {
 			ret = append(ret, &SearchAttributeViewResult{
 				AvID:    avID,
-				AvName:  attrView.Name,
-				BlockID: block.ID,
+				AvName:  name,
+				BlockID: blockID,
 				HPath:   hPath,
 			})
 		}
@@ -286,11 +318,13 @@ func GetBlockAttributeViewKeys(blockID string) (ret []*BlockAttributeViewKeys) {
 		attrView, err := av.ParseAttributeView(avID)
 		if nil != err {
 			logging.LogErrorf("parse attribute view [%s] failed: %s", avID, err)
+			unbindBlockAv(nil, avID, blockID)
 			return
 		}
 
 		if 1 > len(attrView.Views) {
 			err = av.ErrViewNotFound
+			unbindBlockAv(nil, avID, blockID)
 			return
 		}
 
@@ -2039,23 +2073,29 @@ func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID string,
 		return
 	}
 
-	// 不允许重复添加相同的块到属性视图中
+	var content string
+	if !isDetached {
+		content = getNodeRefText(node)
+	}
+
+	now := time.Now().UnixMilli()
+
+	// 检查是否重复添加相同的块
 	blockValues := attrView.GetBlockKeyValues()
 	for _, blockValue := range blockValues.Values {
 		if blockValue.Block.ID == addingBlockID {
 			if !isDetached {
-				// 重复绑定一下，比如剪切数据库块的场景需要
-				bindBlockAv0(tx, avID, blockID, node, tree)
+				// 重复绑定一下，比如剪切数据库块、取消绑定块后再次添加的场景需要
+				bindBlockAv0(tx, avID, node, tree)
+				blockValue.IsDetached = isDetached
+				blockValue.Block.Content = content
+				blockValue.UpdatedAt = now
+				err = av.SaveAttributeView(attrView)
 			}
 			return
 		}
 	}
 
-	var content string
-	if !isDetached {
-		content = getNodeRefText(node)
-	}
-	now := time.Now().UnixMilli()
 	blockValue := &av.Value{
 		ID:         ast.NewNodeID(),
 		KeyID:      blockValues.Key.ID,
@@ -2148,7 +2188,7 @@ func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID string,
 	}
 
 	if !isDetached {
-		bindBlockAv0(tx, avID, blockID, node, tree)
+		bindBlockAv0(tx, avID, node, tree)
 	}
 
 	for _, v := range attrView.Views {
@@ -3069,6 +3109,11 @@ func unbindBlockAv(tx *Transaction, avID, blockID string) {
 		node.SetIALAttr(av.NodeAttrNameAvs, strings.Join(avIDs, ","))
 	}
 
+	avNames := getAvNames(attrs[av.NodeAttrNameAvs])
+	if "" != avNames {
+		attrs[av.NodeAttrViewNames] = avNames
+	}
+
 	if nil != tx {
 		err = setNodeAttrsWithTx(tx, node, tree, attrs)
 	} else {
@@ -3087,11 +3132,11 @@ func bindBlockAv(tx *Transaction, avID, blockID string) {
 		return
 	}
 
-	bindBlockAv0(tx, avID, blockID, node, tree)
+	bindBlockAv0(tx, avID, node, tree)
 	return
 }
 
-func bindBlockAv0(tx *Transaction, avID, blockID string, node *ast.Node, tree *parse.Tree) {
+func bindBlockAv0(tx *Transaction, avID string, node *ast.Node, tree *parse.Tree) {
 	attrs := parse.IAL2Map(node.KramdownIAL)
 	if "" == attrs[av.NodeAttrNameAvs] {
 		attrs[av.NodeAttrNameAvs] = avID
@@ -3114,7 +3159,7 @@ func bindBlockAv0(tx *Transaction, avID, blockID string, node *ast.Node, tree *p
 		err = setNodeAttrs(node, tree, attrs)
 	}
 	if nil != err {
-		logging.LogWarnf("set node [%s] attrs failed: %s", blockID, err)
+		logging.LogWarnf("set node [%s] attrs failed: %s", node.ID, err)
 		return
 	}
 	return

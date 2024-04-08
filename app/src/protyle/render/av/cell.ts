@@ -448,7 +448,8 @@ export const popTextCell = (protyle: IProtyle, cellElements: HTMLElement[], type
         });
     }
     avMaskElement.addEventListener("click", (event) => {
-        if ((event.target as HTMLElement).classList.contains("av__mask")) {
+        if ((event.target as HTMLElement).classList.contains("av__mask")
+            && document.activeElement.tagName !== "TEXTAREA" && document.activeElement.tagName !== "INPUT") {
             updateCellValueByInput(protyle, type, blockElement, cellElements);
             avMaskElement?.remove();
         }
@@ -739,7 +740,7 @@ const renderRollup = (cellValue: IAVCellValue) => {
     } else if (cellValue.type === "date") {
         const dataValue = cellValue ? cellValue.date : null;
         if (dataValue.formattedContent) {
-            text = dataValue.formattedContent
+            text = dataValue.formattedContent;
         } else {
             if (dataValue && dataValue.isNotEmpty) {
                 text = formatDate(dataValue.content, dataValue.isNotTime ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm");
@@ -878,5 +879,7 @@ export const addDragFill = (cellElement: Element) => {
         return;
     }
     cellElement.classList.add("av__cell--active");
-    cellElement.insertAdjacentHTML("beforeend", `<div aria-label="${window.siyuan.languages.dragFill}" class="av__drag-fill ariaLabel"></div>`);
+    if (!cellElement.querySelector(".av__drag-fill")) {
+        cellElement.insertAdjacentHTML("beforeend", `<div aria-label="${window.siyuan.languages.dragFill}" class="av__drag-fill ariaLabel"></div>`);
+    }
 };

@@ -1,6 +1,7 @@
 {
+  "unbindBlock": "取消綁定區塊",
   "showTitle": "顯示資料庫標題",
-  "fillCreated": "Default fill creation time",
+  "fillCreated": "預設填滿創建時間",
   "removeCard": "移除閃卡",
   "updateLayout": "更新版面配置",
   "dndFolderTip": "請注意 ${x} 僅插入 file:// 超鏈接，不複製檔案",
@@ -1057,6 +1058,7 @@
   "parentRelation": "父子關係",
   "openInNewTab": "在新分頁中打開",
   "help": "幫助",
+  "userGuide": "用戶指南",
   "paragraphBeginningSpace": "段落開頭空兩格",
   "outline": "大綱",
   "newFile": "新建文檔",

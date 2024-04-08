@@ -1,4 +1,5 @@
 {
+  "unbindBlock": "Desvincular bloque",
   "showTitle": "Mostrar título de la base de datos",
   "fillCreated": "Hora de creación del relleno predeterminado",
   "removeCard": "Eliminar tarjeta flash",
@@ -1057,6 +1058,7 @@
   "parentRelation": "Padre - Hijo",
   "openInNewTab": "Abrir en una nueva pestaña",
   "help": "Ayuda",
+  "userGuide": "User Guide",
   "paragraphBeginningSpace": "Dos espacios vacíos al principio del párrafo",
   "outline": "Esquema",
   "newFile": "Nuevo documento",
