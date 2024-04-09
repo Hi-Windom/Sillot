@@ -1,8 +1,8 @@
 {
   "name": "sillot",
-  "version": "0.28.24",
-  "syv": "3.0.8",
-  "sypv": "[3.0.7, 3.0.6]",
+  "version": "0.29.1",
+  "syv": "3.0.9",
+  "sypv": "[]",
   "description": "Build Your Eternal Digital Garden",
   "author": "Soltus",
   "homepage": "https://github.com/Hi-Windom/Sillot",
