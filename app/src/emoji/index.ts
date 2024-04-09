@@ -12,6 +12,7 @@ import {Dialog} from "../dialog";
 import {setPosition} from "../util/setPosition";
 
 export const getRandomEmoji = () => {
+    window.sout.tracker("invoked");
     const emojis = window.siyuan.emojis[getRandom(0, window.siyuan.emojis.length - 1)];
     if (typeof emojis.items[getRandom(0, emojis.items.length - 1)] === "undefined") {
         return "1f600";
@@ -20,6 +21,7 @@ export const getRandomEmoji = () => {
 };
 
 export const unicode2Emoji = (unicode: string, className = "", needSpan = false, lazy = false) => {
+    window.sout.tracker("invoked");
     if (!unicode) {
         return "";
     }
@@ -47,6 +49,7 @@ export const unicode2Emoji = (unicode: string, className = "", needSpan = false,
 };
 
 export const lazyLoadEmoji = (element: HTMLElement) => {
+    window.sout.tracker("invoked");
     const emojiIntersectionObserver = new IntersectionObserver((entries) => {
         entries.forEach((entrie: IntersectionObserverEntry & { target: HTMLImageElement }) => {
             const index = entrie.target.getAttribute("data-index");
@@ -67,6 +70,7 @@ ${unicode2Emoji(emoji.unicode)}</button>`;
 };
 
 export const lazyLoadEmojiImg = (element: Element) => {
+    window.sout.tracker("invoked");
     const emojiIntersectionObserver = new IntersectionObserver((entries) => {
         entries.forEach((entrie: IntersectionObserverEntry & { target: HTMLImageElement }) => {
             const src = entrie.target.getAttribute("data-src");
@@ -82,6 +86,7 @@ export const lazyLoadEmojiImg = (element: Element) => {
 };
 
 export const filterEmoji = (key = "", max?: number) => {
+    window.sout.tracker("invoked");
     let html = "";
     const recentEmojis: {
         unicode: string,
@@ -182,6 +187,7 @@ ${unicode2Emoji(emoji[0].unicode, undefined, false, true)}
 };
 
 export const addEmoji = (unicode: string) => {
+    window.sout.tracker("invoked");
     window.siyuan.config.editor.emoji.unshift(unicode);
     if (window.siyuan.config.editor.emoji.length > Constants.SIZE_UNDO) {
         window.siyuan.config.editor.emoji.pop();
@@ -192,6 +198,7 @@ export const addEmoji = (unicode: string) => {
 };
 
 export const openEmojiPanel = (id: string, type: "doc" | "notebook" | "av", position: IPosition, avCB?: (emoji: string) => void) => {
+    window.sout.tracker("invoked");
     if (type !== "av") {
         window.siyuan.menus.menu.remove();
     } else {
@@ -474,6 +481,7 @@ ${unicode2Emoji(emoji.unicode)}</button>`;
 };
 
 export const updateOutlineEmoji = (unicode: string, id: string) => {
+    window.sout.tracker("invoked");
     /// #if !MOBILE
     getAllModels().outline.forEach(model => {
         if (model.blockId === id) {
@@ -484,6 +492,7 @@ export const updateOutlineEmoji = (unicode: string, id: string) => {
 };
 
 export const updateFileTreeEmoji = (unicode: string, id: string, icon = "iconFile") => {
+    window.sout.tracker("invoked");
     let emojiElement;
     /// #if MOBILE
     emojiElement = document.querySelector(`#sidebar [data-type="sidebar-file"] [data-node-id="${id}"] .b3-list-item__icon`);

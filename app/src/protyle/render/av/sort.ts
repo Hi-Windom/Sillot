@@ -13,6 +13,7 @@ export const addSort = (options: {
     protyle: IProtyle,
     blockID: string,
 }) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("av-add-sort");
     options.data.view.columns.forEach((column) => {
         let hasSort = false;
@@ -58,6 +59,7 @@ export const addSort = (options: {
 };
 
 export const bindSortsEvent = (protyle: IProtyle, menuElement: HTMLElement, data: IAV, blockID: string) => {
+    window.sout.tracker("invoked");
     menuElement.querySelectorAll("select").forEach((item: HTMLSelectElement) => {
         item.addEventListener("change", () => {
             const colId = item.parentElement.getAttribute("data-id");
@@ -89,6 +91,7 @@ export const bindSortsEvent = (protyle: IProtyle, menuElement: HTMLElement, data
 };
 
 export const getSortsHTML = (columns: IAVColumn[], sorts: IAVSort[]) => {
+    window.sout.tracker("invoked");
     let html = "";
     const genSortItem = (id: string) => {
         let sortHTML = "";

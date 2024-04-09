@@ -20,6 +20,7 @@ import {processRender} from "../util/processCode";
 import {hasClosestByClassName} from "../util/hasClosest";
 
 export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (hasClosestByClassName(blockElement, "protyle-wysiwyg__embed")) {
         return;
     }
@@ -235,16 +236,15 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
     enterElement.innerHTML = protyle.lute.SpinBlockDOM(editableElement.parentElement.outerHTML);
     const doOperation: IOperation[] = [];
     const undoOperation: IOperation[] = [];
+    let currentElement = blockElement;
     // 回车之前的块为 1\n\n2 时会产生多个块
     Array.from(enterElement.children).forEach((item: HTMLElement) => {
         if (item.dataset.nodeId === id) {
-            const blockPreviousElement = blockElement.previousElementSibling;
-            const blockParentElement = blockElement.parentElement;
-            blockElement.outerHTML = item.outerHTML;
-            blockElement = (blockPreviousElement ? blockPreviousElement.nextElementSibling : blockParentElement.firstElementChild) as HTMLElement;
+            blockElement.before(item);
+            blockElement.remove();
             doOperation.push({
                 action: "update",
-                data: blockElement.outerHTML,
+                data: item.outerHTML,
                 id,
             });
             undoOperation.push({
@@ -252,7 +252,6 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
                 data: html,
                 id,
             });
-            mathRender(blockElement);
         } else {
             doOperation.push({
                 action: "insert",
@@ -260,43 +259,44 @@ export const enter = (blockElement: HTMLElement, range: Range, protyle: IProtyle
                 id: item.dataset.nodeId,
                 nextID: id,
             });
-            blockElement.insertAdjacentElement("beforebegin", item);
+            currentElement.insertAdjacentElement("afterend", item);
             undoOperation.push({
                 action: "delete",
                 id: item.dataset.nodeId,
             });
-            mathRender(item);
         }
+        mathRender(item);
+        currentElement = item;
     });
 
-    let previousElement = blockElement;
     Array.from(newElement.children).forEach((item: HTMLElement) => {
         const newId = item.getAttribute("data-node-id");
         doOperation.push({
             action: "insert",
             data: item.outerHTML,
             id: newId,
-            previousID: previousElement.getAttribute("data-node-id"),
+            previousID: currentElement.getAttribute("data-node-id"),
         });
         undoOperation.push({
             action: "delete",
             id: newId,
         });
-        previousElement.insertAdjacentElement("afterend", item);
+        currentElement.insertAdjacentElement("afterend", item);
         if (item.classList.contains("code-block")) {
             highlightRender(item);
         } else {
-            mathRender(previousElement.nextElementSibling);
+            mathRender(currentElement.nextElementSibling);
         }
-        previousElement = item;
+        currentElement = item;
     });
     transaction(protyle, doOperation, undoOperation);
-    focusBlock(blockElement.nextElementSibling);
+    focusBlock(currentElement);
     scrollCenter(protyle);
     return true;
 };
 
 const listEnter = (protyle: IProtyle, blockElement: HTMLElement, range: Range) => {
+    window.sout.tracker("invoked");
     const listItemElement = blockElement.parentElement;
 
     const editableElement = getContenteditableElement(blockElement);
@@ -486,6 +486,7 @@ const listEnter = (protyle: IProtyle, blockElement: HTMLElement, range: Range) =
 };
 
 const removeEmptyNode = (newElement: Element) => {
+    window.sout.tracker("invoked");
     const children = getContenteditableElement(newElement).childNodes;
     for (let i = 0; i < children.length; i++) {
         if (children[i].nodeType === 3 && children[i].textContent.length === 0) {
@@ -496,6 +497,7 @@ const removeEmptyNode = (newElement: Element) => {
 };
 
 export const softEnter = (range: Range, nodeElement: HTMLElement, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     let startElement = range.startContainer as HTMLElement;
     const nextSibling = hasNextSibling(startElement) as Element;
     // 图片之前软换行
@@ -535,6 +537,7 @@ export const softEnter = (range: Range, nodeElement: HTMLElement, protyle: IProt
 };
 
 const addNewLineToEnd = (range: Range, nodeElement: HTMLElement, protyle: IProtyle, startElement: Element) => {
+    window.sout.tracker("invoked");
     const wbrElement = document.createElement("wbr");
     if (startElement.nodeType === 3) {
         range.insertNode(wbrElement);

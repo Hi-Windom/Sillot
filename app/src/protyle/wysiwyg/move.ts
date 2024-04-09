@@ -7,6 +7,7 @@ import {scrollCenter} from "../../util/highlightById";
 import {focusByWbr} from "../util/selection";
 
 export const moveToUp = (protyle: IProtyle, nodeElement: HTMLElement, range: Range) => {
+    window.sout.tracker("invoked");
     let previousElement: Element;
     let oldListHTML = "";
     let sourceElements = Array.from(protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select"));
@@ -110,6 +111,7 @@ export const moveToUp = (protyle: IProtyle, nodeElement: HTMLElement, range: Ran
 };
 
 export const moveToDown = (protyle: IProtyle, nodeElement: HTMLElement, range: Range) => {
+    window.sout.tracker("invoked");
     let nextElement: Element;
     let oldListHTML = "";
     let sourceElements = Array.from(protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select"));

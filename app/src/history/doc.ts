@@ -12,6 +12,7 @@ let historyEditor: Protyle;
 let isLoading = false;
 
 const renderDoc = (element: HTMLElement, currentPage: number, id: string) => {
+    window.sout.tracker("invoked");
     const previousElement = element.querySelector('[data-type="docprevious"]');
     const nextElement = element.querySelector('[data-type="docnext"]');
     element.setAttribute("data-page", currentPage.toString());
@@ -60,6 +61,7 @@ export const openDocHistory = (options: {
     notebookId: string,
     pathString: string
 }) => {
+    window.sout.tracker("invoked");
     const contentHTML = `<div class="fn__flex-column" style="height: 100%;">
         <div class="block__icons">
             ${isMobile() ? "" : options.pathString}
@@ -182,6 +184,7 @@ export const openDocHistory = (options: {
 };
 
 const getHistoryPath = (target: Element, op: string, id: string, cb: (path: string) => void) => {
+    window.sout.tracker("invoked");
     isLoading = true;
     const path = target.getAttribute("data-path");
     if (path) {

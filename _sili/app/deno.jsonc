@@ -1,0 +1,36 @@
+{
+  "version": "1.0.1",
+  "tasks": {
+    "dev": "deno run -A --node-modules-dir npm:vite",
+    "build": "deno run -A --node-modules-dir npm:vite build",
+    "preview": "deno run -A --node-modules-dir npm:vite preview",
+    "serve": "deno run --allow-net --allow-read https://deno.land/std@0.157.0/http/file_server.ts dist/",
+    "api": "deno run --allow-env --allow-net api/main-hono.ts"
+  },
+  "lint": {
+    "include": ["src/"],
+    "exclude": [],
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["ban-untagged-todo"],
+      "exclude": ["no-unused-vars","import-prefix-missing"]
+    }
+  },
+  "test": {
+    "include": ["src/"],
+    "exclude": []
+  },
+  "imports": { // 导入映射
+    "std/": "https://deno.land/std@0.208.0/",
+    "vite": "npm:vite@^5.0.10",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^4.2.1",
+    "react": "npm:react",
+    "react-dom": "npm:react-dom",
+    "react-router-dom": "npm:react-router-dom@^6.4",
+    "react-vant@": "npm:react-vant@^3.3.4"
+  },
+  "compilerOptions": { // REF https://docs.denohub.com/deno/runtime/manual/advanced/typescript/configuration
+    "jsx": "react",
+    "lib": ["deno.window"]
+  }
+}

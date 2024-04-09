@@ -10,6 +10,7 @@ const addFormatItem = (options: {
     oldFormat: string
     avPanelElement: Element
 }) => {
+    window.sout.tracker("invoked");
     options.menu.addItem({
         iconHTML: "",
         label: getLabelByNumberFormat(options.format),
@@ -40,6 +41,7 @@ export const formatNumber = (options: {
     avID: string,
     oldFormat: string
 }) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("av-col-format-number");
     addFormatItem({
         menu,
@@ -169,6 +171,7 @@ export const formatNumber = (options: {
 };
 
 export const getLabelByNumberFormat = (format: string) => {
+    window.sout.tracker("invoked");
     switch (format) {
         case "":
             return window.siyuan.languages.numberFormatNone;

@@ -17,16 +17,16 @@
 package model
 
 import (
-	"errors"
 	"fmt"
-	"github.com/88250/gulu"
-	"github.com/siyuan-note/logging"
-	"github.com/siyuan-note/siyuan/kernel/util"
 	"path"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/88250/gulu"
+	"github.com/siyuan-note/logging"
+	"github.com/siyuan-note/siyuan/kernel/util"
 
 	"github.com/siyuan-note/siyuan/kernel/bazaar"
 )
@@ -239,7 +239,7 @@ func InstallBazaarPlugin(repoURL, repoHash, pluginName string) error {
 	installPath := filepath.Join(util.DataDir, "plugins", pluginName)
 	err := bazaar.InstallPlugin(repoURL, repoHash, installPath, Conf.System.ID)
 	if nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(46), pluginName, err))
+		return fmt.Errorf(Conf.Language(46), pluginName, err)
 	}
 	return nil
 }
@@ -248,7 +248,7 @@ func UninstallBazaarPlugin(pluginName, frontend string) error {
 	installPath := filepath.Join(util.DataDir, "plugins", pluginName)
 	err := bazaar.UninstallPlugin(installPath)
 	if nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(47), err.Error()))
+		return fmt.Errorf(Conf.Language(47), err)
 	}
 
 	petals := getPetals()
@@ -303,7 +303,7 @@ func InstallBazaarWidget(repoURL, repoHash, widgetName string) error {
 	installPath := filepath.Join(util.DataDir, "widgets", widgetName)
 	err := bazaar.InstallWidget(repoURL, repoHash, installPath, Conf.System.ID)
 	if nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(46), widgetName, err))
+		return fmt.Errorf(Conf.Language(46), widgetName, err)
 	}
 	return nil
 }
@@ -312,7 +312,7 @@ func UninstallBazaarWidget(widgetName string) error {
 	installPath := filepath.Join(util.DataDir, "widgets", widgetName)
 	err := bazaar.UninstallWidget(installPath)
 	if nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(47), err.Error()))
+		return fmt.Errorf(Conf.Language(47), err.Error())
 	}
 	return nil
 }
@@ -360,7 +360,7 @@ func InstallBazaarIcon(repoURL, repoHash, iconName string) error {
 	installPath := filepath.Join(util.IconsPath, iconName)
 	err := bazaar.InstallIcon(repoURL, repoHash, installPath, Conf.System.ID)
 	if nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(46), iconName, err))
+		return fmt.Errorf(Conf.Language(46), iconName, err)
 	}
 	Conf.Appearance.Icon = iconName
 	Conf.Save()
@@ -372,7 +372,7 @@ func UninstallBazaarIcon(iconName string) error {
 	installPath := filepath.Join(util.IconsPath, iconName)
 	err := bazaar.UninstallIcon(installPath)
 	if nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(47), err.Error()))
+		return fmt.Errorf(Conf.Language(47), err.Error())
 	}
 
 	InitAppearance()
@@ -424,7 +424,7 @@ func InstallBazaarTheme(repoURL, repoHash, themeName string, mode int, update bo
 	installPath := filepath.Join(util.ThemesPath, themeName)
 	err := bazaar.InstallTheme(repoURL, repoHash, installPath, Conf.System.ID)
 	if nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(46), themeName, err))
+		return fmt.Errorf(Conf.Language(46), themeName, err)
 	}
 
 	if !update {
@@ -449,7 +449,7 @@ func UninstallBazaarTheme(themeName string) error {
 	installPath := filepath.Join(util.ThemesPath, themeName)
 	err := bazaar.UninstallTheme(installPath)
 	if nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(47), err.Error()))
+		return fmt.Errorf(Conf.Language(47), err.Error())
 	}
 
 	InitAppearance()
@@ -493,7 +493,7 @@ func InstallBazaarTemplate(repoURL, repoHash, templateName string) error {
 	installPath := filepath.Join(util.DataDir, "templates", templateName)
 	err := bazaar.InstallTemplate(repoURL, repoHash, installPath, Conf.System.ID)
 	if nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(46), templateName, err))
+		return fmt.Errorf(Conf.Language(46), templateName, err)
 	}
 	return nil
 }
@@ -502,7 +502,7 @@ func UninstallBazaarTemplate(templateName string) error {
 	installPath := filepath.Join(util.DataDir, "templates", templateName)
 	err := bazaar.UninstallTemplate(installPath)
 	if nil != err {
-		return errors.New(fmt.Sprintf(Conf.Language(47), err.Error()))
+		return fmt.Errorf(Conf.Language(47), err.Error())
 	}
 	return nil
 }

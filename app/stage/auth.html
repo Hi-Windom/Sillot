@@ -87,14 +87,37 @@
             border-radius: 4px;
             box-shadow: inset 0 0 77px -58px var(--b3-theme-primary), 0 0 0 3px var(--b3-theme-primary-lightest);
             padding: 0 13px;
-            line-height: 2;
-            letter-spacing: 0.05em;
-            font-size: 2em;
+            line-height: 3.6;
+            letter-spacing: 0.01em;
+            font-size: 1.2em;
+            text-align: center;
             box-sizing: border-box;
             color: var(--b3-theme-on-background);
             transition: box-shadow 120ms 0ms cubic-bezier(0, 0, 0.2, 1);
             background-color: var(--b3-theme-background);
             -webkit-appearance: none;
+        }
+
+        @media  (min-width: 768px) {
+            .b3-text-field {
+                line-height: 3;
+                letter-spacing: 0.05em;
+                font-size: 1.7em;
+            }
+        }
+        /* 手机横屏模式下的样式 */
+        @media screen and (orientation: landscape) {
+            body.body--mobile { /* body--mobile 由 java 注入 */
+                .ft__on-surface {
+                    margin: 13px 0 0;
+                }
+                .b3-button {
+                    margin: 13px 0 0;
+                }
+                #Biometric, #BiometricTip, h1 {
+                    display: none;
+                }
+            }
         }
 
         .b3-text-field:hover {

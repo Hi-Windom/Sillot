@@ -10,6 +10,7 @@ import {escapeAttr} from "../../../util/escape";
 import {genCellValueByElement, getTypeByCellElement} from "./cell";
 
 const filterSelectHTML = (key: string, options: { name: string, color: string }[], selected: string[] = []) => {
+    window.sout.tracker("invoked");
     let html = "";
     let hasMatch = false;
     if (selected.length === 0) {
@@ -62,6 +63,7 @@ const filterSelectHTML = (key: string, options: { name: string, color: string }[
 };
 
 export const removeCellOption = (protyle: IProtyle, data: IAV, cellElements: HTMLElement[], target: HTMLElement, blockElement: Element) => {
+    window.sout.tracker("invoked");
     if (!target) {
         return;
     }
@@ -131,10 +133,12 @@ export const removeCellOption = (protyle: IProtyle, data: IAV, cellElements: HTM
 };
 
 export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, blockElement: Element, isCustomAttr: boolean, cellElements?: HTMLElement[]) => {
+    window.sout.tracker("invoked");
     const menuElement = hasClosestByClassName(target, "b3-menu");
     if (!menuElement) {
         return;
     }
+    const blockID = blockElement.getAttribute("data-node-id");
     const colId = cellElements ? cellElements[0].dataset.colId : menuElement.querySelector(".b3-menu__item").getAttribute("data-col-id");
     let name = target.parentElement.dataset.name;
     let color = target.parentElement.dataset.color;
@@ -189,7 +193,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
         });
         if (!cellElements) {
             menuElement.innerHTML = getEditHTML({protyle, data, colId, isCustomAttr});
-            bindEditEvent({protyle, data, menuElement, isCustomAttr});
+            bindEditEvent({protyle, data, menuElement, isCustomAttr, blockID});
         } else {
             cellElements.forEach((cellElement: HTMLMediaElement) => {
                 data.view.rows.find(row => {
@@ -267,7 +271,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
                 });
                 if (!cellElements) {
                     menuElement.innerHTML = getEditHTML({protyle, data, colId, isCustomAttr});
-                    bindEditEvent({protyle, data, menuElement, isCustomAttr});
+                    bindEditEvent({protyle, data, menuElement, isCustomAttr, blockID});
                 } else {
                     cellElements.forEach((cellElement: HTMLElement) => {
                         data.view.rows.find(row => {
@@ -346,7 +350,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
                 });
                 if (!cellElements) {
                     menuElement.innerHTML = getEditHTML({protyle, data, colId, isCustomAttr});
-                    bindEditEvent({protyle, data, menuElement, isCustomAttr});
+                    bindEditEvent({protyle, data, menuElement, isCustomAttr, blockID});
                 } else {
                     cellElements.forEach((cellElement: HTMLElement) => {
                         data.view.rows.find(row => {
@@ -393,6 +397,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
 };
 
 export const bindSelectEvent = (protyle: IProtyle, data: IAV, menuElement: HTMLElement, cellElements: HTMLElement[], blockElement: Element) => {
+    window.sout.tracker("invoked");
     const inputElement = menuElement.querySelector("input");
     const colId = cellElements[0].dataset.colId;
     let colData: IAVColumn;
@@ -439,6 +444,7 @@ export const bindSelectEvent = (protyle: IProtyle, data: IAV, menuElement: HTMLE
 };
 
 export const addColOptionOrCell = (protyle: IProtyle, data: IAV, cellElements: HTMLElement[], currentElement: HTMLElement, menuElement: HTMLElement, blockElement: Element) => {
+    window.sout.tracker("invoked");
     let hasSelected = false;
     Array.from(menuElement.querySelectorAll(".b3-chips .b3-chip")).find((item: HTMLElement) => {
         if (item.dataset.content === currentElement.dataset.name) {
@@ -572,6 +578,7 @@ export const addColOptionOrCell = (protyle: IProtyle, data: IAV, cellElements: H
 };
 
 export const getSelectHTML = (data: IAVTable, cellElements: HTMLElement[]) => {
+    window.sout.tracker("invoked");
     const colId = cellElements[0].dataset["colId"];
     const colData = data.columns.find(item => {
         if (item.id === colId) {

@@ -5,3 +5,4 @@ app/src/asset/pdf/** linguist-vendored
 *.bat linguist-language=shell
 *.json linguist-language=shell
 *.mdx linguist-language=astro
+*.md linguist-language=html

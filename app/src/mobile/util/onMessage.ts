@@ -14,6 +14,7 @@ export const onMessage = (app: App, data: IWebSocketData) => {
                 reloadSync(app, data.data);
                 break;
             case "setConf":
+                window.sout.tracker(`invoked -> ${data.cmd} -> ${data.data}`);
                 window.siyuan.config = data.data;
                 break;
             case "readonly":
@@ -29,9 +30,11 @@ export const onMessage = (app: App, data: IWebSocketData) => {
                 }
                 break;
             case "openFileById":
+                window.sout.tracker(`invoked -> ${data.cmd} -> ${data.data?.id}`);
                 openMobileFileById(app, data.data.id, [Constants.CB_GET_HL]);
                 break;
             case"txerr":
+                window.sout.tracker(`invoked -> ${data.cmd}`);
                 transactionError();
                 break;
             case"statusbar":

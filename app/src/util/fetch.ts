@@ -6,6 +6,7 @@ import {processMessage} from "./processMessage";
 import {kernelError} from "../dialog/processSystem";
 
 export const fetchPost = (url: string, data?: any, cb?: (response: IWebSocketData) => void, headers?: IObject) => {
+    window.sout.tracker("-> url: ", url, data);
     const init: RequestInit = {
         method: "POST",
     };
@@ -81,6 +82,7 @@ export const fetchPost = (url: string, data?: any, cb?: (response: IWebSocketDat
 };
 
 export const fetchSyncPost = async (url: string, data?: any) => {
+    window.sout.tracker("-> url: ", url, data);
     const init: RequestInit = {
         method: "POST",
     };
@@ -98,6 +100,7 @@ export const fetchSyncPost = async (url: string, data?: any) => {
 };
 
 export const fetchGet = (url: string, cb: (response: IWebSocketData | IObject | string) => void) => {
+    window.sout.tracker("-> url: ", url);
     fetch(url).then((response) => {
         if (response.headers.get("content-type")?.indexOf("application/json") > -1) {
             return response.json();

@@ -5,6 +5,7 @@ import {escapeHtml} from "../util/escape";
 import {renameTag} from "../util/noRelyPCFunction";
 
 export const openTagMenu = (element: HTMLElement, event: MouseEvent, labelName: string) => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
         window.siyuan.menus.menu.element.getAttribute("data-name") === "tagMenu") {
         window.siyuan.menus.menu.remove();

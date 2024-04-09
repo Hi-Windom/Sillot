@@ -138,17 +138,20 @@ func getUpdatePkg() (downloadPkgURLs []string, checksum string, err error) {
 	}
 	pkg := "/Sillot-" + result["name"].(string) + "-" + suffix
 
-	b3logURL := "https://release.liuyun.io/siyuan/" + pkg
+	b3logURL := "https://release.b3log.org/siyuan/" + pkg
+	liuyunURL := "https://release.liuyun.io/siyuan/" + pkg
 	// downloadPkgURLs = append(downloadPkgURLs, b3logURL)
 	githubURL := "https://github.com/Hi-Windom/Sillot/releases/download/" + ver.(string) + pkg
 	ghproxyURL := "https://mirror.ghproxy.com/" + githubURL
 	if util.IsChinaCloud() {
 		downloadPkgURLs = append(downloadPkgURLs, b3logURL)
+		downloadPkgURLs = append(downloadPkgURLs, liuyunURL)
 		downloadPkgURLs = append(downloadPkgURLs, ghproxyURL)
 		downloadPkgURLs = append(downloadPkgURLs, githubURL)
 	} else {
 		downloadPkgURLs = append(downloadPkgURLs, githubURL)
 		downloadPkgURLs = append(downloadPkgURLs, b3logURL)
+		downloadPkgURLs = append(downloadPkgURLs, liuyunURL)
 	}
 
 	checksums := result["checksums"].(map[string]interface{})
@@ -324,12 +327,12 @@ func ver2num(a string) int {
 	if strings.Contains(a, "alpha") {
 		suffixpos = strings.Index(a, "-alpha")
 		version = a[0:suffixpos]
-		suffixStr = a[suffixpos+6 : len(a)]
+		suffixStr = a[suffixpos+6:]
 		suffix = "0" + fmt.Sprintf("%03s", suffixStr)
 	} else if strings.Contains(a, "beta") {
 		suffixpos = strings.Index(a, "-beta")
 		version = a[0:suffixpos]
-		suffixStr = a[suffixpos+5 : len(a)]
+		suffixStr = a[suffixpos+5:]
 		suffix = "1" + fmt.Sprintf("%03s", suffixStr)
 	} else {
 		version = a

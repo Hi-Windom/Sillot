@@ -106,7 +106,7 @@ func RemoveTag(label string) (err error) {
 
 func RenameTag(oldLabel, newLabel string) (err error) {
 	if invalidChar := treenode.ContainsMarker(newLabel); "" != invalidChar {
-		return errors.New(fmt.Sprintf(Conf.Language(112), invalidChar))
+		return fmt.Errorf(Conf.Language(112), invalidChar)
 	}
 
 	newLabel = strings.TrimSpace(newLabel)
@@ -215,7 +215,7 @@ func BuildTags() (ret *Tags) {
 	ret = &Tags{}
 	labels := labelTags()
 	tags := Tags{}
-	for label, _ := range labels {
+	for label := range labels {
 		tags = buildTags(tags, strings.Split(label, "/"), 0)
 	}
 	appendTagChildren(&tags, labels)
@@ -258,7 +258,7 @@ func SearchTags(keyword string) (ret []string) {
 	defer logging.Recover() // 定位 无法添加题头图标签 https://github.com/siyuan-note/siyuan/issues/6756
 
 	labels := labelBlocksByKeyword(keyword)
-	for label, _ := range labels {
+	for label := range labels {
 		_, t := search.MarkText(label, keyword, 1024, Conf.Search.CaseSensitive)
 		ret = append(ret, t)
 	}

@@ -1,4 +1,5 @@
 export const removeFoldHeading = (nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const nodeH = parseInt(nodeElement.getAttribute("data-subtype").substring(1));
     let nextElement = nodeElement.nextElementSibling;
     while (nextElement) {

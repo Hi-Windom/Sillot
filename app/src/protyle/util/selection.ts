@@ -10,6 +10,7 @@ import {countBlockWord, countSelectWord} from "../../layout/status";
 import {hideElements} from "../ui/hideElements";
 
 const selectIsEditor = (editor: Element, range?: Range) => {
+    window.sout.tracker("invoked");
     if (!range) {
         if (getSelection().rangeCount === 0) {
             return false;
@@ -24,6 +25,7 @@ const selectIsEditor = (editor: Element, range?: Range) => {
 
 // table 选中处理
 export const fixTableRange = (range: Range) => {
+    window.sout.tracker("invoked");
     const tableElement = hasClosestByAttribute(range.startContainer, "data-type", "NodeTable");
     if (range.toString() !== "" && tableElement && range.commonAncestorContainer.nodeType !== 3) {
         const parentTag = (range.commonAncestorContainer as Element).tagName;
@@ -44,6 +46,7 @@ export const fixTableRange = (range: Range) => {
 };
 
 export const selectAll = (protyle: IProtyle, nodeElement: Element, range: Range) => {
+    window.sout.tracker("invoked");
     const editElement = getContenteditableElement(nodeElement);
     if (editElement) {
         let position;
@@ -122,6 +125,7 @@ export const selectAll = (protyle: IProtyle, nodeElement: Element, range: Range)
 
 // https://github.com/siyuan-note/siyuan/issues/8196
 export const getRangeByPoint = (x: number, y: number) => {
+    window.sout.tracker("invoked");
     const range = document.caretRangeFromPoint(x, y);
     const imgElement = hasClosestByAttribute(range.startContainer, "data-type", "img");
     if (imgElement) {
@@ -132,6 +136,7 @@ export const getRangeByPoint = (x: number, y: number) => {
 };
 
 export const getEditorRange = (element: Element) => {
+    window.sout.tracker("invoked");
     let range: Range;
     if (getSelection().rangeCount > 0) {
         range = getSelection().getRangeAt(0);
@@ -161,6 +166,7 @@ export const getEditorRange = (element: Element) => {
 };
 
 export const getSelectionPosition = (nodeElement: Element, range?: Range) => {
+    window.sout.tracker("invoked");
     if (!range) {
         range = getEditorRange(nodeElement);
     }
@@ -239,6 +245,7 @@ export const getSelectionPosition = (nodeElement: Element, range?: Range) => {
 };
 
 export const getSelectionOffset = (selectElement: Node, editorElement?: Element, range?: Range) => {
+    window.sout.tracker("invoked");
     const position = {
         end: 0,
         start: 0,
@@ -272,6 +279,7 @@ function searchNode(
     predicate: (node: Node) => boolean,
     excludeSibling?: boolean,
 ): boolean {
+    window.sout.tracker("invoked");
     if (!startNode) {
         return false;
     }
@@ -304,6 +312,7 @@ function searchNode(
 }
 
 export const setLastNodeRange = (editElement: Element, range: Range, setStart = true) => {
+    window.sout.tracker("invoked");
     if (!editElement) {
         return range;
     }
@@ -325,6 +334,7 @@ export const setLastNodeRange = (editElement: Element, range: Range, setStart = 
 };
 
 export const setFirstNodeRange = (editElement: Element, range: Range) => {
+    window.sout.tracker("invoked");
     if (!editElement) {
         return range;
     }
@@ -349,12 +359,12 @@ export const setFirstNodeRange = (editElement: Element, range: Range) => {
 };
 
 export const focusByOffset = (container: Element, start: number, end: number) => {
+    window.sout.tracker("invoked");
     if (!container) {
         return false;
     }
     // 空块无法 focus
     const editElement = getContenteditableElement(container);
-    window.sout.tracker(editElement);
     if (editElement) {
         container = editElement;
     } else if (isNotEditBlock(container) || container.classList.contains("av")) {
@@ -422,6 +432,7 @@ export const focusByOffset = (container: Element, start: number, end: number) =>
 };
 
 export const focusByWbr = (element: Element, range: Range) => {
+    window.sout.tracker("invoked");
     const wbrElements = element.querySelectorAll("wbr");
     if (wbrElements.length === 0) {
         return;
@@ -473,6 +484,7 @@ export const focusByWbr = (element: Element, range: Range) => {
 };
 
 export const focusByRange = (range: Range) => {
+    window.sout.tracker("invoked");
     if (!range) {
         return;
     }
@@ -482,17 +494,16 @@ export const focusByRange = (range: Range) => {
         startNode.focus();
         return;
     }
-    window.sout.tracker(range);
     const selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(range);
 };
 
 export const focusBlock = (element: Element, parentElement?: HTMLElement, toStart = true) => {
+    window.sout.tracker("invoked");
     if (!element) {
         return false;
     }
-    window.sout.tracker(element);
     // hr、嵌入块、数学公式、iframe、音频、视频、图表渲染块等，删除段落块后，光标位置矫正 https://github.com/siyuan-note/siyuan/issues/4143
     if (element.classList.contains("render-node") || element.classList.contains("iframe") || element.classList.contains("hr")) {
         const range = document.createRange();
@@ -613,7 +624,7 @@ export const focusBlock = (element: Element, parentElement?: HTMLElement, toStar
 };
 
 export const focusSideBlock = (updateElement: Element) => {
-    window.sout.tracker(updateElement);
+    window.sout.tracker("invoked");
     if (updateElement.getAttribute("data-node-id")) {
         let sideBlockElement;
         let collapse;

@@ -9,6 +9,7 @@ export const bgFade = (element: Element) => {
 };
 
 export const highlightById = (protyle: IProtyle, id: string, top = false) => {
+    window.sout.tracker("-> id: ", id);
     let nodeElement: HTMLElement;
     const protyleElement = protyle.wysiwyg.element;
     if (!protyle.preview.element.classList.contains("fn__none")) {
@@ -39,6 +40,7 @@ export const highlightById = (protyle: IProtyle, id: string, top = false) => {
 };
 
 export const scrollCenter = (protyle: IProtyle, nodeElement?: Element, top = false, behavior: ScrollBehavior = "auto") => {
+    window.sout.tracker("invoked");
     if (!protyle.disabled && !top && getSelection().rangeCount > 0) {
         const blockElement = hasClosestBlock(getSelection().getRangeAt(0).startContainer);
         if (blockElement) {

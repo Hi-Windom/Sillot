@@ -4,6 +4,7 @@ import {hideAllElements} from "../protyle/ui/hideElements";
 import {setStorageVal} from "../protyle/util/compatibility";
 
 export const moveResize = (element: HTMLElement, afterCB?: (type: string) => void) => {
+    window.sout.tracker("invoked");
     element.addEventListener("mousedown", (event: MouseEvent & { target: HTMLElement }) => {
         // https://github.com/siyuan-note/siyuan/issues/8746
         if (hasClosestByClassName(event.target, "protyle-util") && !element.classList.contains("protyle-util")) {

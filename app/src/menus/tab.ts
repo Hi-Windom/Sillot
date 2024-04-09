@@ -12,6 +12,7 @@ import {Wnd} from "../layout/Wnd";
 import {getAllWnds} from "../layout/getAll";
 
 const closeMenu = (tab: Tab) => {
+    window.sout.tracker("invoked");
     const unmodifiedTabs: Tab[] = [];
     const leftTabs: Tab[] = [];
     const rightTabs: Tab[] = [];
@@ -86,6 +87,7 @@ const closeMenu = (tab: Tab) => {
 };
 
 const splitSubMenu = (app: App, tab: Tab) => {
+    window.sout.tracker("invoked");
     const subMenus: IMenu[] = [{
         icon: "iconSplitLR",
         accelerator: window.siyuan.config.keymap.general.splitLR.custom,
@@ -163,6 +165,7 @@ const splitSubMenu = (app: App, tab: Tab) => {
 };
 
 export const initTabMenu = (app: App, tab: Tab) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     closeMenu(tab);
     window.siyuan.menus.menu.append(new MenuItem({
@@ -221,6 +224,7 @@ export const initTabMenu = (app: App, tab: Tab) => {
 };
 
 const unsplitWnd = (target: Wnd | Layout, layout: Layout, onlyWnd: boolean) => {
+    window.sout.tracker("invoked");
     let wnd: Wnd = target as Wnd;
     while (wnd instanceof Layout) {
         wnd = wnd.children[0] as Wnd;

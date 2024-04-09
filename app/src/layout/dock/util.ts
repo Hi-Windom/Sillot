@@ -16,6 +16,7 @@ export const openBacklink = async (options: {
     title?: string,
     useBlockId?: boolean,
 }) => {
+    window.sout.tracker("invoked");
     const backlink = getAllModels().backlink.find(item => {
         if (item.blockId === options.blockId && item.type === "local") {
             item.parent.parent.removeTab(item.parent.id);
@@ -72,6 +73,7 @@ export const openGraph = async (options: {
     title?: string,
     useBlockId?: boolean,
 }) => {
+    window.sout.tracker("invoked");
     const graph = getAllModels().graph.find(item => {
         if (item.blockId === options.blockId && item.type === "local") {
             item.parent.parent.removeTab(item.parent.id);
@@ -121,6 +123,7 @@ export const openGraph = async (options: {
 };
 
 export const openOutline = async (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     const outlinePanel = getAllModels().outline.find(item => {
         if (item.blockId === protyle.block.rootID && item.type === "local") {
             item.parent.parent.removeTab(item.parent.id);
@@ -167,6 +170,7 @@ export const openOutline = async (protyle: IProtyle) => {
 };
 
 export const resetFloatDockSize = () => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.layout.leftDock.pin && window.siyuan.layout.leftDock.layout.element.style.opacity === "1") {
         window.siyuan.layout.leftDock.showDock(true);
     }
@@ -179,6 +183,7 @@ export const resetFloatDockSize = () => {
 };
 
 export const toggleDockBar = (useElement: Element) => {
+    window.sout.tracker("invoked");
     const dockIsShow = useElement.getAttribute("xlink:href") === "#iconHideDock";
     if (dockIsShow) {
         useElement.setAttribute("xlink:href", "#iconDock");
@@ -195,4 +200,42 @@ export const toggleDockBar = (useElement: Element) => {
     });
     resizeTabs();
     resetFloatDockSize();
+};
+
+export const clearOBG = () => {
+    const models = getAllModels();
+    models.outline.find(item => {
+        if (item.type === "pin") {
+            if ("" === item.blockId) {
+                return;
+            }
+            item.isPreview = false;
+            item.update({data: [], msg: "", code: 0}, "");
+            item.updateDocTitle();
+        }
+    });
+    models.graph.forEach(item => {
+        if (item.type !== "global") {
+            if (item.type === "local") {
+                return;
+            }
+            if ("" === item.blockId) {
+                return;
+            }
+            item.blockId = "";
+            item.graphData = undefined;
+            item.onGraph(false);
+        }
+    });
+    models.backlink.forEach(item => {
+        if (item.type === "local") {
+            return;
+        }
+        if ("" === item.blockId) {
+            return;
+        }
+        item.saveStatus();
+        item.blockId = "";
+        item.render(undefined);
+    });
 };

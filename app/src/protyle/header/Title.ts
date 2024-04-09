@@ -15,8 +15,7 @@ import {matchHotKey} from "../util/hotKey";
 import {isMac, readText, writeText} from "../util/compatibility";
 // import * as dayjs from "dayjs";
 import {formatDate,parseDate} from "sofill/mid";
-import {setPanelFocus} from "../../layout/util";
-import {openFileById, updatePanelByEditor} from "../../editor/util";
+import {openFileById} from "../../editor/util";
 import {setTitle} from "../../dialog/processSystem";
 import {getNoContainerElement} from "../wysiwyg/getBlock";
 import {commonHotkey} from "../wysiwyg/commonHotkey";
@@ -50,16 +49,6 @@ export class Title {
             this.rename(protyle);
         });
         this.editElement.addEventListener("click", () => {
-            if (protyle.model) {
-                setPanelFocus(protyle.model.element.parentElement.parentElement);
-                updatePanelByEditor({
-                    protyle: protyle,
-                    focus: false,
-                    pushBackStack: false,
-                    reload: false,
-                    resize: false,
-                });
-            }
             protyle.toolbar?.element.classList.add("fn__none");
         });
         this.editElement.addEventListener("input", (event: InputEvent) => {
@@ -86,11 +75,16 @@ export class Title {
             }
             if (matchHotKey("⇧⌘V", event)) {
                 navigator.clipboard.readText().then(textPlain => {
+                    // 对 HTML 标签进行内部转义，避免被 Lute 解析以后变为小写 https://github.com/siyuan-note/siyuan/issues/10620
                     textPlain = textPlain.replace(/</g, ";;;lt;;;").replace(/>/g, ";;;gt;;;");
-                    const content = protyle.lute.BlockDOM2EscapeMarkerContent(protyle.lute.Md2BlockDOM(textPlain));
+                    let content = protyle.lute.BlockDOM2EscapeMarkerContent(protyle.lute.Md2BlockDOM(textPlain));
+                    // 移除 ;;;lt;;; 和 ;;;gt;;; 转义及其包裹的内容
+                    content = content.replace(/;;;lt;;;[^;]+;;;gt;;;/g, "");
                     document.execCommand("insertText", false, replaceFileName(content));
                     this.rename(protyle);
                 });
+                event.preventDefault();
+                event.stopPropagation();
             }
             if (matchHotKey(window.siyuan.config.keymap.general.enterBack.custom, event)) {
                 const ids = protyle.path.split("/");
@@ -236,7 +230,9 @@ export class Title {
                 click: async () => {
                     navigator.clipboard.readText().then(textPlain => {
                         textPlain = textPlain.replace(/</g, ";;;lt;;;").replace(/>/g, ";;;gt;;;");
-                        const content = protyle.lute.BlockDOM2EscapeMarkerContent(protyle.lute.Md2BlockDOM(textPlain));
+                        let content = protyle.lute.BlockDOM2EscapeMarkerContent(protyle.lute.Md2BlockDOM(textPlain));
+                        // 移除 ;;;lt;;; 和 ;;;gt;;; 转义及其包裹的内容
+                        content = content.replace(/;;;lt;;;[^;]+;;;gt;;;/g, "");
                         document.execCommand("insertText", false, replaceFileName(content));
                         this.rename(protyle);
                     });

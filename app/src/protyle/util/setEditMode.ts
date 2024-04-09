@@ -4,6 +4,7 @@ import {updateOutline} from "../../editor/util";
 import {resize} from "./resize";
 
 export const setEditMode = (protyle: IProtyle, type: TEditorMode) => {
+    window.sout.tracker("invoked");
     if (type === "preview") {
         if (!protyle.preview.element.classList.contains("fn__none")) {
             return;

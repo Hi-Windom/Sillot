@@ -531,7 +531,7 @@ func GetAssetAbsPath(relativePath string) (ret string, err error) {
 		}
 		return
 	}
-	return "", errors.New(fmt.Sprintf(Conf.Language(12), relativePath))
+	return "", fmt.Errorf(Conf.Language(12), relativePath)
 }
 
 func UploadAssets2Cloud(rootID string) (count int, err error) {
@@ -632,7 +632,7 @@ func uploadAssets2Cloud(assetPaths []string, bizType string) (err error) {
 			SetCookies(&http.Cookie{Name: "symphony", Value: uploadToken}).
 			SetHeader("meta-type", metaType).
 			SetHeader("biz-type", bizType).
-			Post(util.GetCloudServer() + "/apis/siyuan/upload?ver=" + util.Ver)
+			Post(util.GetCloudServer() + "/apis/siyuan/upload?ver=" + util.VerSY)
 		if nil != reqErr {
 			logging.LogErrorf("upload assets failed: %s", reqErr)
 			return ErrFailedToConnectCloudServer
@@ -645,7 +645,7 @@ func uploadAssets2Cloud(assetPaths []string, bizType string) (err error) {
 
 		if 0 != requestResult.Code {
 			logging.LogErrorf("upload assets failed: %s", requestResult.Msg)
-			err = errors.New(fmt.Sprintf(Conf.Language(94), requestResult.Msg))
+			err = fmt.Errorf(Conf.Language(94), requestResult.Msg)
 			return
 		}
 

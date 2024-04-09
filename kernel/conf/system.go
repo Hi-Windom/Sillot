@@ -50,7 +50,7 @@ func NewSystem() *System {
 	return &System{
 		ID:                 util.GetDeviceID(),
 		Name:               util.GetDeviceName(),
-		KernelVersion:      util.Ver,
+		KernelVersion:      util.VerSY,
 		NetworkProxy:       &NetworkProxy{},
 		DownloadInstallPkg: true,
 	}

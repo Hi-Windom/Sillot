@@ -19,6 +19,7 @@ import {checkFold} from "../../util/noRelyPCFunction";
 import {getUnRefList} from "../../search/unRef";
 
 export const searchKeydown = (app: App, event: KeyboardEvent) => {
+    window.sout.tracker("invoked");
     if (getSelection().rangeCount === 0) {
         return false;
     }

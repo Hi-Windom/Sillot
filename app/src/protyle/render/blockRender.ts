@@ -7,6 +7,7 @@ import {genBreadcrumb} from "../wysiwyg/renderBacklink";
 import {avRender} from "./av/render";
 
 export const blockRender = (protyle: IProtyle, element: Element, top?: number) => {
+    window.sout.tracker("invoked");
     let blockElements: Element[] = [];
     if (element.getAttribute("data-type") === "NodeBlockQueryEmbed") {
         // 编辑器内代码块编辑渲染

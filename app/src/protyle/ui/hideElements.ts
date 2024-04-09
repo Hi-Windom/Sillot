@@ -6,6 +6,7 @@ import {getAllEditor} from "../../layout/getAll";
 
 // "gutter", "toolbar", "select", "hint", "util", "dialog"
 export const hideElements = (panels: string[], protyle?: IProtyle, focusHide = false) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (!protyle) {
         if (panels.includes("dialog")) {
             for (let i = 0; i < window.siyuan.dialogs.length; i++) {
@@ -57,6 +58,7 @@ export const hideElements = (panels: string[], protyle?: IProtyle, focusHide = f
 
 // "toolbar", "pdfutil", "gutter", "util"
 export const hideAllElements = (types: string[]) => {
+    window.sout.tracker("invoked");
     if (types.includes("toolbar")) {
         document.querySelectorAll(".protyle-toolbar").forEach((item: HTMLElement) => {
             item.classList.add("fn__none");

@@ -5,6 +5,7 @@ import {fetchPost} from "../util/fetch";
 import {Constants} from "../constants";
 
 export const transferBlockRef = (id: string) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.append(new MenuItem({
         label: window.siyuan.languages.transferBlockRef,
         icon: "iconScrollHoriz",

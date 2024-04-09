@@ -15,6 +15,7 @@ import {Menu} from "../plugin/Menu";
 import {upDownHint} from "../util/upDownHint";
 
 export const fillContent = (protyle: IProtyle, data: string, elements: Element[]) => {
+    window.sout.tracker("invoked");
     if (!data) {
         return;
     }
@@ -27,6 +28,7 @@ export const fillContent = (protyle: IProtyle, data: string, elements: Element[]
 };
 
 const editDialog = (customName: string, customMemo: string) => {
+    window.sout.tracker("invoked");
     const dialog = new Dialog({
         title: window.siyuan.languages.update,
         content: `<div class="b3-dialog__content">
@@ -84,6 +86,7 @@ const editDialog = (customName: string, customMemo: string) => {
 };
 
 const customDialog = (protyle: IProtyle, ids: string[], elements: Element[]) => {
+    window.sout.tracker("invoked");
     const dialog = new Dialog({
         title: window.siyuan.languages.aiCustomAction,
         content: `<div class="b3-dialog__content">
@@ -137,6 +140,7 @@ const customDialog = (protyle: IProtyle, ids: string[], elements: Element[]) => 
 };
 
 const filterAI = (element: HTMLElement, inputElement: HTMLInputElement) => {
+    window.sout.tracker("invoked");
     element.querySelectorAll(".b3-list-item").forEach(item => {
         if (item.textContent.indexOf(inputElement.value) > -1) {
             item.classList.remove("fn__none");
@@ -156,6 +160,7 @@ const filterAI = (element: HTMLElement, inputElement: HTMLInputElement) => {
 };
 
 export const AIActions = (elements: Element[], protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     const ids: string[] = [];
     elements.forEach(item => {

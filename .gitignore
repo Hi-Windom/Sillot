@@ -39,12 +39,7 @@ package-lock.json
 yarn.lock
 
 # Sillot extend
-/.history
+**/.history
 /app/jestCD
 /app/out
 /app/dist-electron
-# copy to out for sillot-bridge gitmodule
-/app/package/app
-
-# subtree
-/astro

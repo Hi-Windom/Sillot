@@ -78,7 +78,7 @@ func Themes() (ret []*Theme) {
 		theme.IconURL = util.BazaarOSSServer + "/package/" + repoURL + "/icon.png"
 		theme.Funding = repo.Package.Funding
 		theme.PreferredFunding = getPreferredFunding(theme.Funding)
-		theme.PreferredName = getPreferredName(theme.Package)
+		theme.PreferredName = GetPreferredName(theme.Package)
 		theme.PreferredDesc = getPreferredDesc(theme.Description)
 		theme.Updated = repo.Updated
 		theme.Stars = repo.Stars
@@ -142,7 +142,7 @@ func InstalledThemes() (ret []*Theme) {
 		theme.PreviewURLThumb = "/appearance/themes/" + dirName + "/preview.png"
 		theme.IconURL = "/appearance/themes/" + dirName + "/icon.png"
 		theme.PreferredFunding = getPreferredFunding(theme.Funding)
-		theme.PreferredName = getPreferredName(theme.Package)
+		theme.PreferredName = GetPreferredName(theme.Package)
 		theme.PreferredDesc = getPreferredDesc(theme.Description)
 		info, statErr := os.Stat(filepath.Join(installPath, "README.md"))
 		if nil != statErr {
@@ -168,7 +168,7 @@ func InstalledThemes() (ret []*Theme) {
 }
 
 func isBuiltInTheme(dirName string) bool {
-	return "daylight" == dirName || "midnight" == dirName || "sillon" == dirName || "sillou" == dirName || "Sofill+" == dirName
+	return "daylight" == dirName || "midnight" == dirName || "lnco" == dirName
 }
 
 func InstallTheme(repoURL, repoHash, installPath string, systemID string) error {

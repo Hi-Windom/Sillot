@@ -25,6 +25,7 @@ import {openSearchAV} from "../render/av/relation";
 import {transaction} from "../wysiwyg/transaction";
 
 export const openTitleMenu = (protyle: IProtyle, position: IPosition) => {
+    window.sout.tracker("invoked");
     hideTooltip();
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
         window.siyuan.menus.menu.element.getAttribute("data-name") === "titleMenu") {
@@ -34,7 +35,7 @@ export const openTitleMenu = (protyle: IProtyle, position: IPosition) => {
     fetchPost("/api/block/getDocInfo", {
         id: protyle.block.rootID
     }, (response) => {
-        console.log(response.data);
+        window.sout.tracker("/api/block/getDocInfo -> ", response.data);
         window.siyuan.menus.menu.remove();
         window.siyuan.menus.menu.element.setAttribute("data-name", "titleMenu");
         window.siyuan.menus.menu.append(new MenuItem({

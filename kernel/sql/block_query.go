@@ -398,16 +398,16 @@ func Query(stmt string, limit int) (ret []map[string]interface{}, err error) {
 				return queryRawStmt(stmt, limit)
 			}
 
-			switch parsedStmt.(type) {
+			switch parsedStmt := parsedStmt.(type) {
 			case *sqlparser.Select:
 				limitClause := getLimitClause(parsedStmt, limit)
-				slct := parsedStmt.(*sqlparser.Select)
+				slct := parsedStmt // 这里不需要再次进行类型断言
 				slct.Limit = limitClause
 				stmt = sqlparser.String(slct)
 			case *sqlparser.Union:
 				// Kernel API `/api/query/sql` support `UNION` statement https://github.com/siyuan-note/siyuan/issues/8226
 				limitClause := getLimitClause(parsedStmt, limit)
-				union := parsedStmt.(*sqlparser.Union)
+				union := parsedStmt // 这里不需要再次进行类型断言
 				union.Limit = limitClause
 				stmt = sqlparser.String(union)
 			default:
@@ -417,13 +417,13 @@ func Query(stmt string, limit int) (ret []map[string]interface{}, err error) {
 			return queryRawStmt(stmt, limit)
 		}
 	} else {
-		switch parsedStmt2.(type) {
+		switch parsedStmt := parsedStmt2.(type) {
 		case *sqlparser2.SelectStatement:
-			slct := parsedStmt2.(*sqlparser2.SelectStatement)
-			if nil == slct.LimitExpr {
-				slct.LimitExpr = &sqlparser2.NumberLit{Value: strconv.Itoa(limit)}
+			// 这里不需要再次进行类型断言
+			if nil == parsedStmt.LimitExpr {
+				parsedStmt.LimitExpr = &sqlparser2.NumberLit{Value: strconv.Itoa(limit)}
 			}
-			stmt = slct.String()
+			stmt = parsedStmt.String()
 		default:
 			return queryRawStmt(stmt, limit)
 		}

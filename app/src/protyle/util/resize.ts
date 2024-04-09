@@ -6,6 +6,7 @@ import {lineNumberRender} from "../render/highlightRender";
 import {stickyRow} from "../render/av/row";
 
 export const resize = (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     hideElements(["gutterOnly"], protyle);
     const abs = setPadding(protyle);
     const MIN_ABS = 4;

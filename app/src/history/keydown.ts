@@ -1,6 +1,7 @@
 import {Dialog} from "../dialog";
 
 export const historyKeydown = (event: KeyboardEvent, dialog: Dialog) => {
+    window.sout.tracker("invoked");
     let currentItem = dialog.element.querySelector(".history__diff .b3-list-item--focus");
     const items = Array.from(dialog.element.querySelectorAll(".history__diff .b3-list-item[data-id]"));
     if (items.length < 2) {

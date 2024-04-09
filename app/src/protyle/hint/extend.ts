@@ -22,6 +22,7 @@ import {unicode2Emoji} from "../../emoji";
 import {avRender} from "../render/av/render";
 
 export const hintSlash = (key: string, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     const allList: IHintData[] = [{
         filter: ["模版", "moban", "mb", "template"],
         value: Constants.ZWSP,
@@ -46,7 +47,7 @@ export const hintSlash = (key: string, protyle: IProtyle) => {
         filter: ["ai chat"],
         value: Constants.ZWSP + 5,
         html: '<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconSparkles"></use></svg><span class="b3-list-item__text">AI Chat</span></div>',
-    },{
+    }, {
         filter: ["数据库", "视图", "shujuku", "shitu", "sjk", "st", "database", "view", "db"],
         value: '<div data-type="NodeAttributeView" data-av-type="table"></div>',
         html: `<div class="b3-list-item__first"><svg class="b3-list-item__graphic"><use xlink:href="#iconDatabase"></use></svg><span class="b3-list-item__text">${window.siyuan.languages.database}</span></div>`,
@@ -241,7 +242,7 @@ export const hintSlash = (key: string, protyle: IProtyle) => {
         filter: ["移除样式", "yichuyangshi", "ycys", "remove style"],
         value: `style${Constants.ZWSP}`,
         html: `<div class="b3-list-item__first"><div class="color__square">A</div><span class="b3-list-item__text">${window.siyuan.languages.clearFontStyle}</span></div>`,
-    },{
+    }, {
         value: "",
         html: "separator",
     }];
@@ -280,6 +281,7 @@ export const hintSlash = (key: string, protyle: IProtyle) => {
 };
 
 export const hintTag = (key: string, protyle: IProtyle): IHintData[] => {
+    window.sout.tracker("invoked");
     protyle.hint.genLoading(protyle);
     fetchPost("/api/search/searchTag", {
         k: key,
@@ -312,6 +314,7 @@ export const hintTag = (key: string, protyle: IProtyle): IHintData[] => {
 };
 
 export const genHintItemHTML = (item: IBlock) => {
+    window.sout.tracker("invoked");
     let iconHTML;
     if (item.type === "NodeDocument" && item.ial.icon) {
         iconHTML = unicode2Emoji(item.ial.icon, "b3-list-item__graphic popover__block", true);
@@ -341,13 +344,14 @@ export const genHintItemHTML = (item: IBlock) => {
 };
 
 export const hintRef = (key: string, protyle: IProtyle, source: THintSource): IHintData[] => {
+    window.sout.tracker("invoked");
     const nodeElement = hasClosestBlock(getEditorRange(protyle.wysiwyg.element).startContainer);
     protyle.hint.genLoading(protyle);
     fetchPost("/api/search/searchRefBlock", {
         k: key,
         id: nodeElement ? nodeElement.getAttribute("data-node-id") : protyle.block.parentID,
         beforeLen: Math.floor((Math.max(protyle.element.clientWidth / 2, 320) - 58) / 28.8),
-        rootID: protyle.block.rootID,
+        rootID: source === "av" ? "" : protyle.block.rootID,
         isSquareBrackets: ["[[", "【【"].includes(protyle.hint.splitChar)
     }, (response) => {
         const dataList: IHintData[] = [];
@@ -387,6 +391,7 @@ export const hintRef = (key: string, protyle: IProtyle, source: THintSource): IH
 };
 
 export const hintEmbed = (key: string, protyle: IProtyle): IHintData[] => {
+    window.sout.tracker("invoked");
     if (key.endsWith("}}") || key.endsWith("」」")) {
         return [];
     }
@@ -417,6 +422,7 @@ export const hintEmbed = (key: string, protyle: IProtyle): IHintData[] => {
 };
 
 export const hintRenderTemplate = (value: string, protyle: IProtyle, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/template/render", {
         id: protyle.block.parentID,
         path: value
@@ -441,6 +447,7 @@ export const hintRenderTemplate = (value: string, protyle: IProtyle, nodeElement
 };
 
 export const hintRenderWidget = (value: string, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     focusByRange(protyle.toolbar.range);
     // src 地址以 / 结尾
     // Use the path ending with `/` when loading the widget https://github.com/siyuan-note/siyuan/issues/10520
@@ -449,6 +456,7 @@ export const hintRenderWidget = (value: string, protyle: IProtyle) => {
 };
 
 export const hintRenderAssets = (value: string, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     focusByRange(protyle.toolbar.range);
     const type = pathPosix().extname(value).toLowerCase();
     const filename = value.startsWith("assets/") ? getAssetName(value) : value;
@@ -457,6 +465,7 @@ export const hintRenderAssets = (value: string, protyle: IProtyle) => {
 };
 
 export const hintMoveBlock = (pathString: string, sourceElements: Element[], protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (pathString === "/") {
         return;
     }

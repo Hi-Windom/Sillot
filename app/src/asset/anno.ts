@@ -9,6 +9,7 @@ import {Dialog} from "../dialog";
 import {showMessage} from "../dialog/message";
 
 export const initAnno = (element: HTMLElement, pdf: any, pdfConfig: any) => {
+    window.sout.tracker("invoked");
     getConfig(pdf);
     const rectAnnoElement = pdfConfig.toolbar.rectAnno;
     rectAnnoElement.addEventListener("click", () => {
@@ -274,6 +275,7 @@ export const initAnno = (element: HTMLElement, pdf: any, pdfConfig: any) => {
 };
 
 const getRelationHTML = (ids: string[]) => {
+    window.sout.tracker("invoked");
     if (!ids) {
         return `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
     }
@@ -361,11 +363,13 @@ const setRelation = (pdf: any) => {
 };
 
 const hideToolbar = (element: HTMLElement) => {
+    window.sout.tracker("invoked");
     element.querySelector(".pdf__util").classList.add("fn__none");
 };
 
 let rectElement: HTMLElement;
 const showToolbar = (element: HTMLElement, range: Range, target?: HTMLElement) => {
+    window.sout.tracker("invoked");
     if (target) {
         // 阻止 popover
         target.setAttribute("prevent-popover", "true");
@@ -392,6 +396,7 @@ const showToolbar = (element: HTMLElement, range: Range, target?: HTMLElement) =
 };
 
 const getHightlightCoordsByRange = (pdf: any, color: string) => {
+    window.sout.tracker("invoked");
     const range = window.getSelection().getRangeAt(0);
     const startPageElement = hasClosestByClassName(range.startContainer, "page");
     if (!startPageElement) {
@@ -502,6 +507,7 @@ const getHightlightCoordsByRange = (pdf: any, color: string) => {
 };
 
 const getHightlightCoordsByRect = (pdf: any, color: string, rectResizeElement: HTMLElement, type: string) => {
+    window.sout.tracker("invoked");
     const rect = rectResizeElement.getBoundingClientRect();
 
     const startPageElement = hasClosestByClassName(document.elementFromPoint(rect.left, rect.top - 1), "page");
@@ -582,6 +588,7 @@ const getHightlightCoordsByRect = (pdf: any, color: string, rectResizeElement: H
 };
 
 const mergeRects = (range: Range) => {
+    window.sout.tracker("invoked");
     const rects = range.getClientRects();
     const mergedRects: { left: number, top: number, right: number, bottom: number }[] = [];
     let lastTop: number = undefined;
@@ -600,6 +607,7 @@ const mergeRects = (range: Range) => {
 };
 
 export const getPdfInstance = (element: HTMLElement) => {
+    window.sout.tracker("invoked");
     let pdfInstance;
     getAllModels().asset.find(item => {
         if (item.pdfObject && element && item.element && typeof item.element.contains !== "undefined" && item.element.contains(element)) {
@@ -611,6 +619,7 @@ export const getPdfInstance = (element: HTMLElement) => {
 };
 
 export const getHighlight = (element: HTMLElement) => {
+    window.sout.tracker("invoked");
     const pdfInstance: any = getPdfInstance(element);
     if (!pdfInstance) {
         return;
@@ -642,6 +651,7 @@ export const getHighlight = (element: HTMLElement) => {
 };
 
 const showHighlight = (selected: IPdfAnno, pdf: any, hl?: boolean) => {
+    window.sout.tracker("invoked");
     const pageIndex = selected.index;
     const page = pdf.pdfViewer.getPageView(pageIndex);
     let textLayerElement = page.textLayer.div;
@@ -680,6 +690,7 @@ const showHighlight = (selected: IPdfAnno, pdf: any, hl?: boolean) => {
 };
 
 export const hlPDFRect = (element: HTMLElement, id: string) => {
+    window.sout.tracker("invoked");
     const currentElement = element.querySelector(`.pdf__rect[data-node-id="${id}"]`);
     if (currentElement?.firstElementChild) {
         const scrollElement = hasClosestByAttribute(currentElement, "id",
@@ -706,6 +717,7 @@ export const hlPDFRect = (element: HTMLElement, id: string) => {
 };
 
 const copyAnno = (idPath: string, fileName: string, pdf: any) => {
+    window.sout.tracker("invoked");
     const mode = rectElement.getAttribute("data-mode");
     const content = rectElement.getAttribute("data-content");
     setTimeout(() => {
@@ -733,6 +745,7 @@ const copyAnno = (idPath: string, fileName: string, pdf: any) => {
 };
 
 const getCaptureCanvas = async (pdfObj: any, pageNumber: number) => {
+    window.sout.tracker("invoked");
     const pdfPage = await pdfObj.pdfDocument.getPage(pageNumber);
     const viewport = pdfPage.getViewport({scale: 1.5 * pdfObj.pdfViewer.currentScale * window.pdfjsLib.PixelsPerInch.PDF_TO_CSS_UNITS});
     const canvas = document.createElement("canvas");
@@ -748,6 +761,7 @@ const getCaptureCanvas = async (pdfObj: any, pageNumber: number) => {
 };
 
 async function getRectImgData(pdfObj: any) {
+    window.sout.tracker("invoked");
     const pageElement = hasClosestByClassName(rectElement, "page");
     if (!pageElement) {
         return;
@@ -772,6 +786,7 @@ async function getRectImgData(pdfObj: any) {
 }
 
 const setConfig = (pdf: any, id: string, data: IPdfAnno) => {
+    window.sout.tracker("invoked");
     const config = getConfig(pdf);
     config[id] = data;
     fetchPost("/api/asset/setFileAnnotation", {
@@ -781,6 +796,7 @@ const setConfig = (pdf: any, id: string, data: IPdfAnno) => {
 };
 
 const getConfig = (pdf: any) => {
+    window.sout.tracker("invoked");
     if (pdf.appConfig.config) {
         return pdf.appConfig.config;
     }

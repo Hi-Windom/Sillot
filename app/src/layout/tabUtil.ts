@@ -25,6 +25,7 @@ import {mountHelp, newNotebook} from "../util/mount";
 import {Constants} from "../constants";
 
 export const getActiveTab = (wndActive = true) => {
+    window.sout.tracker("invoked");
     const activeTabElement = document.querySelector(".layout__wnd--active .item--focus");
     let tab;
     if (activeTabElement) {
@@ -41,6 +42,7 @@ export const getActiveTab = (wndActive = true) => {
 };
 
 export const switchTabByIndex = (index: number) => {
+    window.sout.tracker("invoked");
     const activeDockIcoElement = document.querySelector(".dock .dock__item--activefocus");
     if (activeDockIcoElement) {
         let indexElement = activeDockIcoElement.parentElement.children[index];
@@ -100,6 +102,7 @@ export const switchTabByIndex = (index: number) => {
 
 let resizeTimeout: number;
 export const resizeTabs = (isSaveLayout = true) => {
+    window.sout.tracker("invoked");
     clearTimeout(resizeTimeout);
     //  .layout .fn__flex-shrink {width .15s cubic-bezier(0, 0, .2, 1) 0ms} 时需要再次计算 padding
     // PDF 避免分屏多次调用后，页码跳转到1 https://github.com/siyuan-note/siyuan/issues/5646
@@ -143,6 +146,7 @@ export const resizeTabs = (isSaveLayout = true) => {
 };
 
 export const getDockByType = (type: string) => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.layout.leftDock) {
         return undefined;
     }
@@ -158,6 +162,7 @@ export const getDockByType = (type: string) => {
 };
 
 export const newCenterEmptyTab = (app: App) => {
+    window.sout.tracker("invoked");
     return new Tab({
         panel: `<div class="layout__empty b3-list">
     <div class="${!window.siyuan.config.readonly ? " fn__none" : ""}">
@@ -194,7 +199,7 @@ export const newCenterEmptyTab = (app: App) => {
     </div>
     <div class="b3-list-item" id="editorEmptyHelp">
         <svg class="b3-list-item__graphic"><use xlink:href="#iconHelp"></use></svg>
-        <span>${window.siyuan.languages.help}</span>
+        <span>${window.siyuan.languages.userGuide}</span>
     </div>
 </div>`,
         callback(tab: Tab) {
@@ -246,6 +251,7 @@ export const newCenterEmptyTab = (app: App) => {
 };
 
 export const copyTab = (app: App, tab: Tab) => {
+    window.sout.tracker("invoked");
     return new Tab({
         icon: tab.icon,
         docIcon: tab.docIcon,
@@ -335,6 +341,7 @@ export const copyTab = (app: App, tab: Tab) => {
 };
 
 export const closeTabByType = async (tab: Tab, type: "closeOthers" | "closeAll" | "other", tabs?: Tab[]) => {
+    window.sout.tracker("invoked");
     if (type === "closeOthers") {
         for (let index = 0; index < tab.parent.children.length; index++) {
             if (tab.parent.children[index].id !== tab.id && !tab.parent.children[index].headElement.classList.contains("item--pin")) {

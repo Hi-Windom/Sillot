@@ -27,16 +27,19 @@ export const onGet = (options: {
     updateReadonly?: boolean
     afterCB?: () => void
 }) => {
+    window.sout.tracker("invoked");
     if (!options.action) {
         options.action = [];
     }
     options.protyle.wysiwyg.element.removeAttribute("data-top");
     if (options.data.code === 1) {
         // 其他报错
-        if (options.protyle.model) {
-            options.protyle.model.parent.parent.removeTab(options.protyle.model.parent.id, false);
-        } else {
-            options.protyle.element.innerHTML = `<div class="ft__smaller ft__secondary b3-form__space--small" contenteditable="false">${window.siyuan.languages.refExpired}</div>`;
+        if (!options.action.includes(Constants.CB_GET_APPEND)) {    // 向下加载时块可能还没有创建 https://github.com/siyuan-note/siyuan/issues/10851
+            if (options.protyle.model) {
+                options.protyle.model.parent.parent.removeTab(options.protyle.model.parent.id, false);
+            } else {
+                options.protyle.element.innerHTML = `<div class="ft__smaller ft__secondary b3-form__space--small" contenteditable="false">${window.siyuan.languages.refExpired}</div>`;
+            }
         }
         return;
     }
@@ -123,6 +126,7 @@ const setHTML = (options: {
     scrollAttr?: IScrollAttr
     afterCB?: () => void
 }, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (protyle.contentElement.classList.contains("fn__none") && protyle.wysiwyg.element.innerHTML !== "") {
         return;
     }
@@ -270,6 +274,7 @@ const setHTML = (options: {
 };
 
 export const disabledForeverProtyle = (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     disabledProtyle(protyle);
     if (protyle.breadcrumb && !isMobile()) {
         protyle.breadcrumb.element.nextElementSibling.textContent = window.siyuan.languages["_kernel"][81];
@@ -281,6 +286,7 @@ export const disabledForeverProtyle = (protyle: IProtyle) => {
 
 /** 禁用编辑器 */
 export const disabledProtyle = (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     hideElements(["gutter", "toolbar", "select", "hint", "util"], protyle);
     protyle.disabled = true;
@@ -338,6 +344,7 @@ export const disabledProtyle = (protyle: IProtyle) => {
 
 /** 解除编辑器禁用 */
 export const enableProtyle = (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (protyle.element.getAttribute("disabled-forever") === "true") {
         return;
     }
@@ -396,6 +403,7 @@ export const enableProtyle = (protyle: IProtyle) => {
 };
 
 const focusElementById = (protyle: IProtyle, action: string[], scrollAttr?: IScrollAttr) => {
+    window.sout.tracker("invoked");
     let focusElement: Element;
     if (scrollAttr && scrollAttr.focusId) {
         focusElement = protyle.wysiwyg.element.querySelector(`[data-node-id="${scrollAttr.focusId}"]`);
@@ -471,6 +479,7 @@ const focusElementById = (protyle: IProtyle, action: string[], scrollAttr?: IScr
 };
 
 export const setReadonlyByConfig = (protyle: IProtyle, updateReadonly: boolean) => {
+    window.sout.tracker("invoked");
     let readOnly = window.siyuan.config.readonly ? "true" : "false";
     if (!updateReadonly) {
         readOnly = protyle.disabled ? "true" : "false";

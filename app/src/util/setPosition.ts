@@ -1,6 +1,7 @@
 import {Constants} from "../constants";
 
 export const setPosition = (element: HTMLElement, x: number, y: number, targetHeight = 0, targetLeft = 0) => {
+    window.sout.tracker("invoked");
     element.style.top = y + "px";
     element.style.left = x + "px";
     const rect = element.getBoundingClientRect();

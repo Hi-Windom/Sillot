@@ -8,6 +8,7 @@ import {fetchPost} from "../../util/fetch";
 import {lineNumberRender} from "../render/highlightRender";
 
 export const initUI = (protyle: IProtyle) => {
+    window.sout?.tracker("invoked");
     protyle.contentElement = document.createElement("div");
     protyle.contentElement.className = "protyle-content";
     if (protyle.options.render.background) {
@@ -81,6 +82,7 @@ export const initUI = (protyle: IProtyle) => {
 };
 
 export const addLoading = (protyle: IProtyle, msg?: string) => {
+    window.sout?.tracker("invoked");
     protyle.element.removeAttribute("data-loading");
     setTimeout(() => {
         if (protyle.element.getAttribute("data-loading") !== "finished") {
@@ -93,6 +95,7 @@ export const addLoading = (protyle: IProtyle, msg?: string) => {
 };
 
 export const removeLoading = (protyle: IProtyle) => {
+    window.sout?.tracker("invoked");
     protyle.element.setAttribute("data-loading", "finished");
     protyle.element.querySelectorAll(".wysiwygLoading").forEach(item => {
         item.remove();

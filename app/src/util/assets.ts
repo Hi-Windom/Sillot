@@ -22,6 +22,7 @@ const loadThirdIcon = (iconURL: string, data: Config.IAppearance) => {
 };
 
 export const loadAssets = (data: Config.IAppearance) => {
+    window.sout.tracker("-> data: ", data);
     const htmlElement = document.getElementsByTagName("html")[0];
     htmlElement.setAttribute("lang", window.siyuan.config.appearance.lang);
     htmlElement.setAttribute("data-theme-mode", getThemeMode());
@@ -108,6 +109,7 @@ export const loadAssets = (data: Config.IAppearance) => {
 };
 
 export const initAssets = () => {
+    window.sout.tracker("invoked");
     const loadingElement = document.getElementById("loading");
     if (loadingElement) {
         setTimeout(() => {
@@ -202,6 +204,7 @@ window.dataLayer.push(arguments);
 };
 
 export const setInlineStyle = (set = true) => {
+    window.sout.tracker("invoked");
     const height = Math.floor(window.siyuan.config.editor.fontSize * 1.625);
     let style = `.b3-typography, .protyle-wysiwyg, .protyle-title {font-size:${window.siyuan.config.editor.fontSize}px !important}
 .b3-typography code:not(.hljs), .protyle-wysiwyg span[data-type~=code] { font-variant-ligatures: ${window.siyuan.config.editor.codeLigatures ? "normal" : "none"} }
@@ -233,6 +236,7 @@ export const setInlineStyle = (set = true) => {
 };
 
 export const setCodeTheme = (cdn = Constants.PROTYLE_CDN) => {
+    window.sout.tracker("invoked");
     const protyleHljsStyle = document.getElementById("protyleHljsStyle") as HTMLLinkElement;
     let css;
     if (window.siyuan.config.appearance.mode === 0) {
@@ -257,6 +261,7 @@ export const setCodeTheme = (cdn = Constants.PROTYLE_CDN) => {
 
 export const setMode = (modeElementValue: number) => {
     /// #if !MOBILE
+    window.sout.tracker("invoked");
     fetchPost("/api/setting/setAppearance", Object.assign({}, window.siyuan.config.appearance, {
         mode: modeElementValue === 2 ? window.siyuan.config.appearance.mode : modeElementValue,
         modeOS: modeElementValue === 2,
@@ -303,6 +308,7 @@ export const setMode = (modeElementValue: number) => {
 };
 
 const rgba2hex = (rgba: string) => {
+    window.sout.tracker("invoked");
     if (rgba.startsWith("#")) {
         return rgba;
     }
@@ -326,6 +332,7 @@ const rgba2hex = (rgba: string) => {
 
 const updateMobileTheme = (OSTheme: string) => {
     if (isInIOS() || isInAndroid()) {
+        window.sout.tracker("invoked");
         setTimeout(() => {
             const backgroundColor = rgba2hex(getComputedStyle(document.body).getPropertyValue("--b3-theme-background").trim());
             let mode = window.siyuan.config.appearance.mode;
@@ -346,6 +353,7 @@ const updateMobileTheme = (OSTheme: string) => {
 };
 
 export const getThemeMode = () => {
+    window.sout.tracker("invoked");
     const OSTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     if (window.siyuan.config.appearance.modeOS) {
         return OSTheme;

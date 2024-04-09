@@ -161,7 +161,7 @@ func getPreferredReadme(readme *Readme) string {
 	return ret
 }
 
-func getPreferredName(pkg *Package) string {
+func GetPreferredName(pkg *Package) string {
 	if nil == pkg.DisplayName {
 		return pkg.Name
 	}
@@ -675,7 +675,7 @@ func disallowDisplayBazaarPackage(pkg *Package) bool {
 	if "" == pkg.MinAppVersion { // TODO: 目前暂时放过所有不带 minAppVersion 的集市包，后续版本会使用 defaultMinAppVersion
 		return false
 	}
-	if 0 < semver.Compare("v"+pkg.MinAppVersion, "v"+util.Ver) {
+	if 0 < semver.Compare("v"+pkg.MinAppVersion, "v"+util.VerSY) {
 		return true
 	}
 	return false

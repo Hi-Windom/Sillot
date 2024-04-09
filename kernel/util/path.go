@@ -225,7 +225,7 @@ func FilterSelfChildDocs(paths []string) (ret []string) {
 	for _, fromPath := range paths {
 		dir := strings.TrimSuffix(fromPath, ".sy")
 		existParent := false
-		for d, _ := range dirs {
+		for d := range dirs {
 			if strings.HasPrefix(fromPath, d) {
 				existParent = true
 				break

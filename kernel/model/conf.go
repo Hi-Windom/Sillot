@@ -242,11 +242,11 @@ func InitConf() {
 	if 1 > Conf.Editor.HistoryRetentionDays {
 		Conf.Editor.HistoryRetentionDays = 30
 	}
-	if 48 > Conf.Editor.DynamicLoadBlocks {
-		Conf.Editor.DynamicLoadBlocks = 48
+	if conf.MinDynamicLoadBlocks > Conf.Editor.DynamicLoadBlocks {
+		Conf.Editor.DynamicLoadBlocks = conf.MinDynamicLoadBlocks
 	}
-	if 1024 < Conf.Editor.DynamicLoadBlocks {
-		Conf.Editor.DynamicLoadBlocks = 1024
+	if conf.MaxDynamicLoadBlocks < Conf.Editor.DynamicLoadBlocks {
+		Conf.Editor.DynamicLoadBlocks = conf.MaxDynamicLoadBlocks
 	}
 	if 0 > Conf.Editor.BacklinkExpandCount {
 		Conf.Editor.BacklinkExpandCount = 0
@@ -274,14 +274,14 @@ func InitConf() {
 		Conf.System = conf.NewSystem()
 		Conf.OpenHelp = true
 	} else {
-		if 0 < semver.Compare("v"+util.Ver, "v"+Conf.System.KernelVersion) {
-			logging.LogInfof("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.Ver)
+		if 0 < semver.Compare("v"+util.VerSY, "v"+Conf.System.KernelVersion) {
+			logging.LogInfof("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.VerSY)
 			Conf.ShowChangelog = true
-		} else if 0 > semver.Compare("v"+util.Ver, "v"+Conf.System.KernelVersion) {
-			logging.LogInfof("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.Ver)
+		} else if 0 > semver.Compare("v"+util.VerSY, "v"+Conf.System.KernelVersion) {
+			logging.LogInfof("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, util.VerSY)
 		}
 
-		Conf.System.KernelVersion = util.Ver
+		Conf.System.KernelVersion = util.VerSY
 		Conf.System.IsInsider = util.IsInsider
 	}
 	if nil == Conf.System.NetworkProxy {
@@ -1040,6 +1040,7 @@ func clearWorkspaceTemp() {
 	os.RemoveAll(filepath.Join(util.DataDir, ".siyuan", "history"))               // 这个不要改为 .sillot
 	os.RemoveAll(filepath.Join(util.WorkspaceDir, "backup"))
 	os.RemoveAll(filepath.Join(util.WorkspaceDir, "sync"))
+	os.RemoveAll(filepath.Join(util.DataDir, "%")) // v3.0.6 生成的错误历史文件夹
 
 	logging.LogInfof("cleared workspace temp")
 }

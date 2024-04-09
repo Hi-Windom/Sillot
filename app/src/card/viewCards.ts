@@ -14,6 +14,7 @@ import {App} from "../index";
 import {confirmDialog} from "../dialog/confirmDialog";
 
 export const viewCards = (app: App, deckID: string, title: string, deckType: "Tree" | "" | "Notebook", cb?: (response: IWebSocketData) => void) => {
+    window.sout.tracker("invoked");
     let pageIndex = 1;
     let edit: Protyle;
     fetchPost(`/api/riff/get${deckType}RiffCards`, {
@@ -239,6 +240,7 @@ export const viewCards = (app: App, deckID: string, title: string, deckType: "Tr
 
 
 const renderViewItem = (blocks: IBlock[], title: string, deckType: string) => {
+    window.sout.tracker("invoked");
     let listHTML = "";
     let isFirst = true;
     const pathArray = title.split("/");
@@ -287,6 +289,7 @@ ${unicode2Emoji(item.ial.icon, "b3-list-item__graphic", true)}
 
 
 const getArticle = (edit: Protyle, id: string) => {
+    window.sout.tracker("invoked");
     if (!id) {
         edit.protyle.element.classList.add("fn__none");
         edit.protyle.element.nextElementSibling.classList.remove("fn__none");

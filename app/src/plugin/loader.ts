@@ -22,10 +22,12 @@ if (window.require instanceof Function) {
 }
 
 const runCode = (code: string, sourceURL: string) => {
+    window.sout.tracker("-> code:", code);
     return window.eval("(function anonymous(require, module, exports){".concat(code, "\n})\n//# sourceURL=").concat(sourceURL, "\n"));
 };
 
 export const loadPlugins = async (app: App) => {
+    window.sout.tracker("invoked");
     const response = await fetchSyncPost("/api/petal/loadPetals", {frontend: getFrontend()});
     let css = "";
     // 为加快启动速度，不进行 await
@@ -42,6 +44,7 @@ export const loadPlugins = async (app: App) => {
 };
 
 const loadPluginJS = async (app: App, item: IPluginData) => {
+    window.sout.tracker("invoked");
     const exportsObj: { [key: string]: any } = {};
     const moduleObj = {exports: exportsObj};
     try {
@@ -76,6 +79,7 @@ const loadPluginJS = async (app: App, item: IPluginData) => {
 
 // 启用插件
 export const loadPlugin = async (app: App, item: IPluginData) => {
+    window.sout.tracker("invoked");
     const plugin = await loadPluginJS(app, item);
     const styleElement = document.createElement("style");
     styleElement.textContent = item.css;
@@ -87,6 +91,7 @@ export const loadPlugin = async (app: App, item: IPluginData) => {
 
 
 const updateDock = (dockItem: Config.IUILayoutDockTab[], index: number, plugin: Plugin, type: string) => {
+    // window.sout.tracker("invoked"); // 由插件触发可能调用频繁，请根据实际需求追踪
     const dockKeys = Object.keys(plugin.docks);
     dockItem.forEach((tabItem: Config.IUILayoutDockTab, tabIndex: number) => {
         if (dockKeys.includes(tabItem.type)) {
@@ -105,6 +110,7 @@ const updateDock = (dockItem: Config.IUILayoutDockTab[], index: number, plugin: 
 };
 
 export const afterLoadPlugin = (plugin: Plugin) => {
+    window.sout.tracker("invoked");
     try {
         plugin.onLayoutReady();
     } catch (e) {
@@ -198,6 +204,7 @@ export const afterLoadPlugin = (plugin: Plugin) => {
 };
 
 export const reloadPlugin = (app: App) => {
+    window.sout.tracker("invoked");
     app.plugins.forEach((item) => {
         uninstall(this, item.name);
     });

@@ -18,6 +18,7 @@ let renderKeyboardToolbarTimeout: number;
 let showUtil = false;
 
 const getSlashItem = (value: string, icon: string, text: string, focus = "false") => {
+    window.sout.tracker("invoked");
     let iconHTML;
     if (icon?.startsWith("icon")) {
         iconHTML = `<svg class="keyboard__slash-icon"><use xlink:href="#${icon}"></use></svg>`;
@@ -31,6 +32,7 @@ const getSlashItem = (value: string, icon: string, text: string, focus = "false"
 };
 
 export const renderTextMenu = (protyle: IProtyle, toolbarElement: Element) => {
+    window.sout.tracker("invoked");
     let colorHTML = "";
     ["var(--b3-font-color1)", "var(--b3-font-color2)", "var(--b3-font-color3)", "var(--b3-font-color4)",
         "var(--b3-font-color5)", "var(--b3-font-color6)", "var(--b3-font-color7)", "var(--b3-font-color8)",
@@ -193,7 +195,8 @@ export const renderTextMenu = (protyle: IProtyle, toolbarElement: Element) => {
 };
 
 const renderSlashMenu = (protyle: IProtyle, toolbarElement: Element) => {
-    console.log("renderSlashMenu protyle", protyle);
+    window.sout.tracker("invoked");
+    window.sout.tracker("protyle: ", protyle);
     protyle.hint.splitChar = "/";
     protyle.hint.lastIndex = -1;
     let pluginHTML = "";
@@ -268,6 +271,7 @@ const renderSlashMenu = (protyle: IProtyle, toolbarElement: Element) => {
 };
 
 export const showKeyboardToolbarUtil = (oldScrollTop: number) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     showUtil = true;
 
@@ -288,6 +292,7 @@ export const showKeyboardToolbarUtil = (oldScrollTop: number) => {
 };
 
 const hideKeyboardToolbarUtil = () => {
+    window.sout.tracker("invoked");
     const toolbarElement = document.getElementById("keyboardToolbar");
     toolbarElement.style.height = "";
     const editor = getCurrentEditor();
@@ -300,6 +305,7 @@ const hideKeyboardToolbarUtil = () => {
 };
 
 const renderKeyboardToolbar = () => {
+    window.sout.tracker("invoked");
     clearTimeout(renderKeyboardToolbarTimeout);
     renderKeyboardToolbarTimeout = window.setTimeout(() => {
         if (getSelection().rangeCount === 0 ||
@@ -393,6 +399,7 @@ const renderKeyboardToolbar = () => {
 };
 
 export const showKeyboardToolbar = () => {
+    window.sout.tracker("invoked");
     if (!showUtil) {
         hideKeyboardToolbarUtil();
     }
@@ -433,6 +440,7 @@ export const showKeyboardToolbar = () => {
 };
 
 export const hideKeyboardToolbar = () => {
+    window.sout.tracker("invoked");
     if (showUtil) {
         return;
     }
@@ -460,6 +468,7 @@ export const activeBlur = () => {
 };
 
 export const initKeyboardToolbar = () => {
+    window.sout.tracker("invoked");
     let preventRender = false;
     document.addEventListener("selectionchange", () => {
         if (!preventRender) {

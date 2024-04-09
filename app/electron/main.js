@@ -778,7 +778,7 @@ app.whenReady().then(() => {
   };
   const ReactDeveloperToolsRoot = path.join(app.getPath("userData"), "extensions", "ReactDeveloperTools");
   loadExtension(ReactDeveloperToolsRoot);
-    const resetTrayMenu = (tray, lang, mainWindow) => {
+    const resetTrayMenu = (tray, lang, mainWindow) => { // 系统托盘右键菜单
         const trayMenuTemplate = [{
             label: mainWindow.isVisible() ? lang.hideWindow : lang.showWindow, click: () => {
                 showHideWindow(tray, lang, mainWindow);
@@ -799,6 +799,7 @@ app.whenReady().then(() => {
         }, {
             label: lang.quit, click: () => {
                 mainWindow.webContents.send("siyuan-save-close", true);
+                setTimeout(()=> { app.exit();}, 30000);   // 强制退出
             },
         },];
 
@@ -983,7 +984,9 @@ app.whenReady().then(() => {
                 event.sender.openDevTools({mode: "bottom"});
                 break;
             case "unregisterGlobalShortcut":
-                globalShortcut.unregister(hotKey2Electron(data.accelerator));
+                if (data.accelerator) {
+                    globalShortcut.unregister(hotKey2Electron(data.accelerator));
+                }
                 break;
             case "show":
                 if (!currentWindow) {
@@ -1513,8 +1516,18 @@ app.whenReady().then(() => {
     );
 });
 
-app.on("open-url", (event, url) => { // for macOS
+app.on("open-url", async (event, url) => { // for macOS
     if (url.startsWith("siyuan://")) {
+        if (workspaces.length === 0) {
+            let index = 0;
+            while (index < 10) {
+                index++;
+                await sleep(500);
+                if (workspaces.length > 0) {
+                    break;
+                }
+            }
+        }
         workspaces.forEach(item => {
             if (item.browserWindow && !item.browserWindow.isDestroyed()) {
                 item.browserWindow.webContents.send("siyuan-open-url", url);

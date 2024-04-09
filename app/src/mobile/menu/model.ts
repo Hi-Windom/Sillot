@@ -4,6 +4,7 @@ export const openModel = (obj: {
     title: string,
     bindEvent: (element: HTMLElement) => void
 }) => {
+    window.sout.tracker("invoked");
     const modelElement = document.getElementById("model");
     modelElement.style.transform = "translateY(0px)";
     modelElement.querySelector(".toolbar__icon use").setAttribute("xlink:href", "#" + obj.icon);

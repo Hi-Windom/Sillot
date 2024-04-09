@@ -3,6 +3,7 @@ import {Constants} from "../../constants";
 
 // 是否匹配辅助键 ⌃⌥⇧⌘
 export const matchAuxiliaryHotKey = (hotKey: string, event: KeyboardEvent) => {
+    window.sout.tracker("invoked");
     if (hotKey.includes("⌃")) {
         if (!event.ctrlKey) {
             return false;
@@ -43,6 +44,7 @@ export const matchAuxiliaryHotKey = (hotKey: string, event: KeyboardEvent) => {
 };
 
 export const matchHotKey = (hotKey: string, event: KeyboardEvent) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (!hotKey) {
         return false;
     }

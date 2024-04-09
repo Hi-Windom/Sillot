@@ -5,6 +5,7 @@ import {setCodeTheme} from "../../util/assets";
 import {hasClosestByClassName} from "../util/hasClosest";
 
 export const highlightRender = (element: Element, cdn = Constants.PROTYLE_CDN) => {
+    window.sout.tracker("invoked");
     let codeElements: NodeListOf<Element>;
     let _action_nodes: NodeListOf<Element>;
     let isPreview = false;
@@ -144,6 +145,7 @@ export const highlightRender = (element: Element, cdn = Constants.PROTYLE_CDN) =
 };
 
 export const lineNumberRender = (block: HTMLElement) => {
+    window.sout.tracker("invoked");
     if (block.parentElement.getAttribute("lineNumber") === "false") {
         return;
     }

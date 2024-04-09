@@ -6,6 +6,7 @@ declare global {
     }
 }
 export const speechRender = (element: HTMLElement, lang: string) => {
+    window.sout.tracker("invoked");
     if (typeof speechSynthesis === "undefined" || typeof SpeechSynthesisUtterance === "undefined") {
         return;
     }

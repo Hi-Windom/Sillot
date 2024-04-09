@@ -11,6 +11,7 @@ import {resize} from "../protyle/util/resize";
 import {Menu} from "../plugin/Menu";
 
 export const openSearchUnRef = (element: Element, editor: Protyle) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     element.previousElementSibling.previousElementSibling.classList.add("fn__none");
     element.classList.remove("fn__none");
@@ -75,6 +76,7 @@ export const openSearchUnRef = (element: Element, editor: Protyle) => {
 };
 
 export const getUnRefList = (element: Element, edit: Protyle, page = 1) => {
+    window.sout.tracker("invoked");
     const previousElement = element.querySelector('[data-type="unRefPrevious"]');
     if (page > 1) {
         previousElement.removeAttribute("disabled");
@@ -122,6 +124,7 @@ ${getAttr(item)}
 };
 
 export const unRefMoreMenu = (target: Element, element: Element, edit: Protyle) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("searchUnRefMore");
     if (menu.isOpen) {
         return;

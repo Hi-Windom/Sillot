@@ -1,7 +1,11 @@
 {
   "vue.features.codeActions.enable": false,
-  "files.associations": {
-    "*.sy": "json"
+  "deno.enable": false,
+  "files.exclude": {
+    "_sili": true,
+    "docs": true,
+    "kernel": true,
+    "app/appearance": true
   },
-  "workbench.editor.wrapTabs": true
+  "editor.formatOnSave": false,
 }

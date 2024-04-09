@@ -1,4 +1,5 @@
 export const getIconByType = (type: string, sub?: string) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     let iconName = "";
     switch (type) {
         case "NodeDocument":

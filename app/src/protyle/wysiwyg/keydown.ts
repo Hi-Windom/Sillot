@@ -5,8 +5,11 @@ import {
     focusByRange,
     focusByWbr,
     getEditorRange,
-    getSelectionOffset, getSelectionPosition,
-    selectAll, setFirstNodeRange, setLastNodeRange,
+    getSelectionOffset,
+    getSelectionPosition,
+    selectAll,
+    setFirstNodeRange,
+    setLastNodeRange,
 } from "../util/selection";
 import {
     hasClosestBlock,
@@ -28,11 +31,7 @@ import {
 import {matchHotKey} from "../util/hotKey";
 import {enter, softEnter} from "./enter";
 import {fixTable} from "../util/table";
-import {
-    turnsIntoOneTransaction, turnsIntoTransaction,
-    updateBatchTransaction,
-    updateTransaction
-} from "./transaction";
+import {turnsIntoOneTransaction, turnsIntoTransaction, updateBatchTransaction, updateTransaction} from "./transaction";
 import {fontEvent} from "../toolbar/Font";
 import {listIndent, listOutdent} from "./list";
 import {newFileContentBySelect, rename, replaceFileName} from "../../editor/rename";
@@ -42,7 +41,8 @@ import {isLocalPath} from "../../util/pathName";
 import {openBy, openFileById} from "../../editor/util";
 /// #endif
 import {
-    alignImgCenter, alignImgLeft,
+    alignImgCenter,
+    alignImgLeft,
     commonHotkey,
     downSelect,
     duplicateBlock,
@@ -69,6 +69,7 @@ import {checkFold} from "../../util/noRelyPCFunction";
 import {AIActions} from "../../ai/actions";
 
 export const getContentByInlineHTML = (range: Range, cb: (content: string) => void) => {
+    window.sout.tracker("invoked");
     let html = "";
     Array.from(range.cloneContents().childNodes).forEach((item: HTMLElement) => {
         if (item.nodeType === 3) {
@@ -83,6 +84,7 @@ export const getContentByInlineHTML = (range: Range, cb: (content: string) => vo
 };
 
 export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     editorElement.addEventListener("keydown", (event: KeyboardEvent & { target: HTMLElement }) => {
         if (event.target.localName === "protyle-html" || event.target.localName === "input") {
             event.stopPropagation();
@@ -675,6 +677,13 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                 }
             }
             if (event.key === "ArrowDown") {
+                if (nodeElement.isSameNode(protyle.wysiwyg.element.lastElementChild)) {
+                    setLastNodeRange(getContenteditableElement(nodeEditableElement), range, false);
+                    range.collapse(false);
+                    event.stopPropagation();
+                    event.preventDefault();
+                    return;
+                }
                 const foldElement = hasClosestByAttribute(range.startContainer, "fold", "1");
                 if (foldElement) {
                     // 本身为折叠块
@@ -688,9 +697,6 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                         }
                         focusBlock(nextElement);
                         scrollCenter(protyle, nextElement);
-                    } else {
-                        setLastNodeRange(nodeEditableElement, range, false);
-                        range.collapse(false)
                     }
                     event.stopPropagation();
                     event.preventDefault();
@@ -700,12 +706,9 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     if (nextFoldElement && nextFoldElement.getAttribute("fold") === "1") {
                         focusBlock(nextFoldElement);
                         scrollCenter(protyle, nextFoldElement);
-                    } else {
-                        setLastNodeRange(nodeEditableElement, range, false);
-                        range.collapse(false)
+                        event.stopPropagation();
+                        event.preventDefault();
                     }
-                    event.stopPropagation();
-                    event.preventDefault();
                 }
             }
             return;

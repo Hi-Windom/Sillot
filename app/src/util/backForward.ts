@@ -20,6 +20,7 @@ let forwardStack: IBackStack[] = [];
 let previousIsBack = false;
 
 const focusStack = async (app: App, stack: IBackStack) => {
+    window.sout.tracker("invoked");
     hideElements(["gutter", "toolbar", "hint", "util", "dialog"], stack.protyle);
     let blockElement: HTMLElement;
     if (!document.contains(stack.protyle.element)) {
@@ -215,6 +216,7 @@ const focusStack = async (app: App, stack: IBackStack) => {
 };
 
 export const goBack = async (app: App) => {
+    window.sout.tracker("invoked");
     if (window.siyuan.backStack.length === 0) {
         if (forwardStack.length > 0) {
             await focusStack(app, forwardStack[forwardStack.length - 1]);
@@ -244,6 +246,7 @@ export const goBack = async (app: App) => {
 };
 
 export const goForward = async (app: App) => {
+    window.sout.tracker("invoked");
     if (forwardStack.length === 0) {
         if (window.siyuan.backStack.length > 0) {
             await focusStack(app, window.siyuan.backStack[window.siyuan.backStack.length - 1]);
@@ -272,6 +275,7 @@ export const goForward = async (app: App) => {
 };
 
 export const pushBack = (protyle: IProtyle, range?: Range, blockElement?: Element) => {
+    window.sout.tracker("invoked");
     if (!protyle.model) {
         return;
     }

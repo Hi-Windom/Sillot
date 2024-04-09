@@ -4,6 +4,7 @@ import {fetchPost} from "../../util/fetch";
 import {Constants} from "../../constants";
 
 export const setAccessAuthCode = () => {
+    window.sout.tracker("invoked");
     const dialog = new Dialog({
         title: window.siyuan.languages.about5,
         content: `<div class="b3-dialog__content">
@@ -33,11 +34,13 @@ export const setAccessAuthCode = () => {
 };
 
 export const getCloudURL = (key: string) => {
+    window.sout.tracker("invoked");
     const origin = window.siyuan.config.cloudRegion === 0 ? "https://ld246.com" : "https://liuyun.io";
     return `${origin}/${key}`;
 };
 
 export const getIndexURL = (key: string) => {
+    window.sout.tracker("invoked");
     const lang = "zh_CN" === window.siyuan.config.lang ? "" : "/en";
     return "https://b3log.org/siyuan" + `${lang}/${key}`;
 };

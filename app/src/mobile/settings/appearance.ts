@@ -3,6 +3,7 @@ import {genOptions} from "../../util/genOptions";
 import {openModel} from "../menu/model";
 
 export const initAppearance = () => {
+    window.sout.tracker("invoked");
     openModel({
         title: window.siyuan.languages.appearance,
         icon:"iconTheme",

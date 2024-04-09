@@ -1,9 +1,10 @@
 {
-  "name": "sillou",
+  "name": "lnco",
   "author": "Soltus",
   "url": "https://github.com/Soltus",
-  "version": "1.0.2",
+  "version": "1.0.1",
   "modes": [
+    "light",
     "dark"
   ]
 }

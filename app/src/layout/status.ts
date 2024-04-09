@@ -12,8 +12,10 @@ import {Constants} from "../constants";
 import {toggleDockBar} from "./dock/util";
 import SillotDrawer from "./SillotDrawer";
 import {updateHotkeyTip} from "../protyle/util/compatibility";
+import {isPadAppMode} from "sofill/env"
 
 export const initStatus = (isWindow = false) => {
+    window.sout.tracker("invoked");
     /// #if !MOBILE
     let barDockHTML = "";
     if (!isWindow) {
@@ -73,7 +75,7 @@ export const initStatus = (isWindow = false) => {
                 window.siyuan.menus.menu.remove();
                 window.siyuan.menus.menu.element.setAttribute("data-name", "statusHelp");
                 window.siyuan.menus.menu.append(new MenuItem({
-                    label: window.siyuan.languages.help,
+                    label: window.siyuan.languages.userGuide,
                     icon: "iconHelp",
                     click: () => {
                         mountHelp();
@@ -83,10 +85,12 @@ export const initStatus = (isWindow = false) => {
                     label: window.siyuan.languages.feedback,
                     icon: "iconFeedback",
                     click: () => {
-                        if ("zh_CN" === window.siyuan.config.lang || "zh_CHT" === window.siyuan.config.lang) {
-                            window.open("https://ld246.com/article/1649901726096");
+                        if (isPadAppMode()) {
+                            window.open('siyuan://androidFeedback', '_blank');
+                        } else if ("zh_CN" === window.siyuan.config.lang || "zh_CHT" === window.siyuan.config.lang) {
+                            window.open("https://ld246.com/member/soltus");
                         } else {
-                            window.open("https://liuyun.io/article/1686530886208");
+                            window.open("https://liuyun.io/member/soltus");
                         }
                     }
                 }).element);
@@ -143,6 +147,7 @@ export const initStatus = (isWindow = false) => {
 let countRootId: string;
 let countTimeout: number;
 export const countSelectWord = (range: Range, rootID?: string) => {
+    window.sout.tracker("invoked");
     /// #if !MOBILE
     if (document.getElementById("status").classList.contains("fn__none")) {
         return;
@@ -166,6 +171,7 @@ export const countSelectWord = (range: Range, rootID?: string) => {
 };
 
 export const countBlockWord = (ids: string[], rootID?: string, clearCache = false) => {
+    window.sout.tracker("invoked");
     /// #if !MOBILE
     if (document.getElementById("status").classList.contains("fn__none")) {
         return;
@@ -191,6 +197,7 @@ export const countBlockWord = (ids: string[], rootID?: string, clearCache = fals
 };
 
 export const clearCounter = () => {
+    window.sout.tracker("invoked");
     countRootId = "";
     document.querySelector("#status .status__counter").innerHTML = "";
     clearTimeout(countTimeout);
@@ -203,6 +210,7 @@ export const renderStatusbarCounter = (stat: {
     imageCount: number,
     refCount: number
 }) => {
+    window.sout.tracker("invoked");
     if(!stat) {
         return;
     }

@@ -4,6 +4,7 @@ import {focusByWbr} from "../util/selection";
 import {formatDate} from "sofill/mid";
 
 export const turnIntoTaskList = (protyle: IProtyle, type: string, blockElement: HTMLElement, editElement: HTMLElement, range: Range) => {
+    window.sout.tracker("invoked");
     if (type !== "NodeCodeBlock" &&
         blockElement.parentElement.getAttribute("data-subtype") !== "t" &&
         (
@@ -78,6 +79,7 @@ export const turnIntoTaskList = (protyle: IProtyle, type: string, blockElement: 
 };
 
 export const headingTurnIntoList = (protyle: IProtyle, type: string, blockElement: HTMLElement, editElement: HTMLElement, range: Range) => {
+    window.sout.tracker("invoked");
     if (type === "NodeHeading" && ["* ", "- "].includes(editElement.innerHTML.substring(0, 2)) &&
         blockElement.parentElement.getAttribute("data-type") !== "NodeListItem") {
         const id = blockElement.getAttribute("data-node-id");

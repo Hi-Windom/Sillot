@@ -25,6 +25,7 @@ import {confirmDialog} from "../dialog/confirmDialog";
 import {App} from "../index";
 import {isBrowser} from "../util/functions";
 import {openRecentDocs} from "../business/openRecentDocs";
+import {isPadAppMode} from "sofill/env"
 
 const editLayout = (layoutName?: string) => {
     const dialog = new Dialog({
@@ -127,6 +128,7 @@ const togglePinDock = (dock: Dock, icon: string) => {
 };
 
 export const workspaceMenu = (app: App, rect: DOMRect) => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
         window.siyuan.menus.menu.element.getAttribute("data-name") === "barWorkspace") {
         window.siyuan.menus.menu.remove();
@@ -430,7 +432,7 @@ export const workspaceMenu = (app: App, rect: DOMRect) => {
             window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
         }
         window.siyuan.menus.menu.append(new MenuItem({
-            label: window.siyuan.languages.help,
+            label: window.siyuan.languages.userGuide,
             icon: "iconHelp",
             click: () => {
                 mountHelp();
@@ -440,10 +442,12 @@ export const workspaceMenu = (app: App, rect: DOMRect) => {
             label: window.siyuan.languages.feedback,
             icon: "iconFeedback",
             click: () => {
-                if ("zh_CN" === window.siyuan.config.lang || "zh_CHT" === window.siyuan.config.lang) {
-                    window.open("https://ld246.com/article/1649901726096");
+                if (isPadAppMode()) {
+                    window.open('siyuan://androidFeedback', '_blank');
+                } else if ("zh_CN" === window.siyuan.config.lang || "zh_CHT" === window.siyuan.config.lang) {
+                    window.open("https://ld246.com/member/soltus");
                 } else {
-                    window.open("https://liuyun.io/article/1686530886208");
+                    window.open("https://liuyun.io/member/soltus");
                 }
             }
         }).element);
@@ -481,6 +485,7 @@ export const workspaceMenu = (app: App, rect: DOMRect) => {
 };
 
 const openWorkspace = (workspace: string) => {
+    window.sout.tracker("invoked");
     /// #if !BROWSER
     if (workspace === window.siyuan.config.system.workspaceDir) {
         return;
@@ -497,6 +502,7 @@ const openWorkspace = (workspace: string) => {
 };
 
 const workspaceItem = (item: IWorkspace) => {
+    window.sout.tracker("invoked");
     /// #if !BROWSER
     return {
         label: `<div aria-label="${item.path}" class="fn__ellipsis ariaLabel" style="max-width: 256px">

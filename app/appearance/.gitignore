@@ -2,8 +2,7 @@ themes/*/custom.css
 themes/*
 !themes/daylight/
 !themes/midnight/
-!themes/sillon/
-!themes/sillou/
+!themes/_lnco/
 
 icons/
 !icons/ant/

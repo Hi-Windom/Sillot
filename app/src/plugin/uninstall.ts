@@ -6,6 +6,7 @@ import {resizeTopBar} from "../layout/util";
 /// #endif
 
 export const uninstall = (app: App, name: string, isUninstall = false) => {
+    window.sout.tracker("invoked");
     app.plugins.find((plugin: Plugin, index) => {
         if (plugin.name === name) {
             // rm command

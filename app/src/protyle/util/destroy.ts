@@ -1,6 +1,7 @@
 import {hideElements} from "../ui/hideElements";
 
 export const destroy = (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (!protyle) {
         return;
     }

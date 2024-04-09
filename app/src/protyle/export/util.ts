@@ -15,6 +15,7 @@ import {showFileInFolder} from "../../util/pathName";
 import {isPaidUser} from "../../util/needSubscribe";
 
 export const afterExport = (exportPath: string, msgId: string) => {
+    window.sout.tracker("invoked");
     /// #if !BROWSER
     showMessage(`${window.siyuan.languages.exported} ${escapeHtml(exportPath)}
 <div class="fn__space"></div>
@@ -27,6 +28,7 @@ export const afterExport = (exportPath: string, msgId: string) => {
 };
 
 export const exportImage = (id: string) => {
+    window.sout.tracker("invoked");
     const exportDialog = new Dialog({
         title: window.siyuan.languages.exportAsImage,
         content: `<div class="b3-dialog__content" style="${isMobile() ? "padding:8px;" : ""};background-color: var(--b3-theme-background)">

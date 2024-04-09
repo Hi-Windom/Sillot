@@ -421,7 +421,7 @@ export class WYSIWYG {
                 documentSelf.onmousemove = (moveEvent: MouseEvent) => {
                     newWidth = Math.max(oldWidth + (moveEvent.clientX - event.clientX), 25);
                     scrollElement.querySelectorAll(".av__row, .av__row--footer").forEach(item => {
-                        const cellElement = item.querySelector(`[data-col-id="${dragColId}"]`) as HTMLElement
+                        const cellElement = item.querySelector(`[data-col-id="${dragColId}"]`) as HTMLElement;
                         if (cellElement.previousElementSibling) {
                             cellElement.style.width = newWidth + "px";
                         } else {
@@ -444,7 +444,7 @@ export class WYSIWYG {
                         action: "setAttrViewColWidth",
                         id: dragColId,
                         avID: avId,
-                        data: newWidth,
+                        data: newWidth + "px",
                         blockID
                     }], [{
                         action: "setAttrViewColWidth",
@@ -740,6 +740,10 @@ export class WYSIWYG {
             let endLastElement: Element;
             documentSelf.onmousemove = (moveEvent: MouseEvent) => {
                 const moveTarget = moveEvent.target as HTMLElement;
+                if (moveTarget.tagName === "IFRAME") {
+                    moveTarget.style.pointerEvents = "none";
+                    return;
+                }
                 // table cell select
                 if (!protyle.disabled && tableBlockElement && tableBlockElement.contains(moveTarget) && !hasClosestByClassName(tableBlockElement, "protyle-wysiwyg__embed")) {
                     if ((moveTarget.tagName === "TH" || moveTarget.tagName === "TD") && !moveTarget.isSameNode(target) && (!moveCellElement || !moveCellElement.isSameNode(moveTarget))) {
@@ -1195,6 +1199,9 @@ export class WYSIWYG {
                 const selectElement = protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select");
                 selectElement.forEach(item => {
                     ids.push(item.getAttribute("data-node-id"));
+                    if (item.classList.contains("iframe")) {
+                        item.querySelector("iframe").style.pointerEvents = "";
+                    }
                 });
                 countBlockWord(ids);
                 // 划选后不能存在跨块的 range https://github.com/siyuan-note/siyuan/issues/4473
@@ -1975,7 +1982,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
             });
             // 面包屑定位，需至于前，否则 return 的元素就无法进行面包屑定位
             if (protyle.options.render.breadcrumb) {
-                protyle.breadcrumb.render(protyle);
+                protyle.breadcrumb.render(protyle, false, hasClosestBlock(event.target));
             }
             const range = getEditorRange(this.element);
             // 需放在嵌入块之前，否则嵌入块内的引用、链接、pdf 双链无法点击打开 https://ld246.com/article/1630479789513

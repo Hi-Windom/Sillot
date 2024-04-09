@@ -26,6 +26,7 @@ import {isInAndroid, isInIOS, setStorageVal} from "../protyle/util/compatibility
 import {Plugin} from "../plugin";
 
 const updateTitle = (rootID: string, tab: Tab, protyle?: IProtyle) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/block/getDocInfo", {
         id: rootID
     }, (response) => {
@@ -37,6 +38,7 @@ const updateTitle = (rootID: string, tab: Tab, protyle?: IProtyle) => {
 };
 
 export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRootIDs: string[] }, hideMsg = true) => {
+    window.sout.tracker("invoked");
    if (hideMsg) {
        hideMessage();
    }
@@ -134,6 +136,7 @@ export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRoot
 };
 
 export const lockScreen = (app: App) => {
+    window.sout.tracker("invoked");
     if (window.siyuan.config.readonly) {
         return;
     }
@@ -151,6 +154,7 @@ export const lockScreen = (app: App) => {
 };
 
 export const kernelError = () => {
+    window.sout.tracker("invoked");
     if (document.querySelector("#errorLog")) {
         return;
     }
@@ -188,6 +192,7 @@ export const kernelError = () => {
 
 
 export const exitSiYuan = () => {
+    window.sout.tracker("invoked");
     const overlay = document.querySelector('#SillotOverlay') as HTMLElement;
     overlay.style.display = "block";
     exportIDB().then(() => {
@@ -257,6 +262,7 @@ export const exitSiYuan = () => {
 };
 
 export const transactionError = () => {
+    window.sout.tracker("invoked");
     if (document.getElementById("transactionError")) {
         return;
     }
@@ -291,6 +297,7 @@ export const transactionError = () => {
 };
 
 export const progressStatus = (data: IWebSocketData) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     const statusElement = document.querySelector("#status") as HTMLElement;
     if (!statusElement) {
         return;
@@ -311,6 +318,7 @@ export const progressStatus = (data: IWebSocketData) => {
 };
 
 export const progressLoading = (data: IWebSocketData) => {
+    window.sout.tracker("invoked");
     let progressElement = document.getElementById("progress");
     if (!progressElement) {
         document.body.insertAdjacentHTML("beforeend", `<div id="progress" style="z-index: ${++window.siyuan.zIndex}"></div>`);
@@ -342,6 +350,7 @@ export const progressLoading = (data: IWebSocketData) => {
 };
 
 export const progressBackgroundTask = (tasks: { action: string }[]) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     const backgroundTaskElement = document.querySelector(".status__backgroundtask");
     if (!backgroundTaskElement) {
         return;
@@ -360,6 +369,7 @@ export const progressBackgroundTask = (tasks: { action: string }[]) => {
 };
 
 export const bootSync = () => {
+    window.sout.tracker("invoked");
     fetchPost("/api/sync/getBootSync", {}, response => {
         if (response.code === 1) {
             const dialog = new Dialog({
@@ -393,6 +403,7 @@ export const bootSync = () => {
 };
 
 export const setTitle = (title: string) => {
+    window.sout.tracker("invoked");
     const dragElement = document.getElementById("drag");
     const workspaceName = getWorkspaceName();
     if (title === window.siyuan.languages.siyuanNote) {
@@ -414,6 +425,7 @@ export const setTitle = (title: string) => {
 };
 
 export const downloadProgress = (data: { id: string, percent: number }) => {
+    window.sout.tracker("invoked");
     const bazzarSideElement = document.querySelector("#configBazaarReadme .item__side");
     if (!bazzarSideElement) {
         return;
@@ -436,6 +448,7 @@ export const downloadProgress = (data: { id: string, percent: number }) => {
 };
 
 export const processSync = (data?: IWebSocketData, plugins?: Plugin[]) => {
+    window.sout.tracker("invoked");
     /// #if MOBILE
     const menuSyncUseElement = document.querySelector("#menuSyncNow use");
     const barSyncUseElement = document.querySelector("#toolbarSync use");

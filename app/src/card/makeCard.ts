@@ -11,6 +11,7 @@ import {transaction} from "../protyle/wysiwyg/transaction";
 import {App} from "../index";
 
 export const genCardItem = (item: ICardPackage) => {
+    window.sout.tracker("invoked");
     return `<li data-id="${item.id}" data-name="${escapeAttr(item.name)}" class="b3-list-item b3-list-item--narrow${isMobile() ? "" : " b3-list-item--hide-action"}">
 <span class="b3-list-item__text">
     <span>${escapeHtml(item.name)}</span>
@@ -36,6 +37,7 @@ export const genCardItem = (item: ICardPackage) => {
 };
 
 export const makeCard = (app: App, ids: string[]) => {
+    window.sout.tracker("invoked");
     window.siyuan.dialogs.find(item => {
         if (item.element.getAttribute("data-key") === Constants.DIALOG_MAKECARD) {
             hideElements(["dialog"]);
@@ -176,6 +178,7 @@ export const makeCard = (app: App, ids: string[]) => {
 };
 
 export const quickMakeCard = (protyle: IProtyle, nodeElement: Element[]) => {
+    window.sout.tracker("invoked");
     let isRemove = true;
     const ids: string[] = [];
     nodeElement.forEach(item => {

@@ -14,6 +14,7 @@ import {isPaidUser} from "../util/needSubscribe";
 import {showMessage} from "../dialog/message";
 
 export const openSearchAsset = (element: Element, isStick: boolean) => {
+    window.sout.tracker("invoked");
     /// #if !MOBILE
     window.siyuan.menus.menu.remove();
     element.previousElementSibling.classList.add("fn__none");
@@ -170,6 +171,7 @@ export const openSearchAsset = (element: Element, isStick: boolean) => {
 
 let inputTimeout: number;
 export const assetInputEvent = (element: Element, localSearch?: ISearchAssetOption, page = 1) => {
+    window.sout.tracker("invoked");
     const loadingElement = element.parentElement.querySelector(".fn__loading--top");
     if (!isPaidUser()) {
         loadingElement.classList.add("fn__none");
@@ -243,6 +245,7 @@ export const assetInputEvent = (element: Element, localSearch?: ISearchAssetOpti
 };
 
 export const toggleAssetHistory = (assetElement: Element) => {
+    window.sout.tracker("invoked");
     const keys = window.siyuan.storage[Constants.LOCAL_SEARCHASSET].keys;
     if (!keys || keys.length === 0) {
         return;
@@ -312,6 +315,7 @@ export const toggleAssetHistory = (assetElement: Element) => {
 };
 
 export const renderPreview = (element: Element, id: string, query: string, queryMethod: number) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/search/getAssetContent", {id, query, queryMethod}, (response) => {
         element.innerHTML = `<p style="white-space: pre-wrap;">${response.data.assetContent.content}</p>`;
         const matchElement = element.querySelector("mark");
@@ -324,6 +328,7 @@ export const renderPreview = (element: Element, id: string, query: string, query
 };
 
 export const renderNextAssetMark = (element: Element) => {
+    window.sout.tracker("invoked");
     let matchElement;
     const allMatchElements = Array.from(element.querySelectorAll("mark"));
     allMatchElements.find((item, itemIndex) => {
@@ -344,6 +349,7 @@ export const renderNextAssetMark = (element: Element) => {
 };
 
 export const assetMethodMenu = (target: HTMLElement, cb: () => void) => {
+    window.sout.tracker("invoked");
     const method = window.siyuan.storage[Constants.LOCAL_SEARCHASSET].method;
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
         window.siyuan.menus.menu.element.getAttribute("data-name") === "searchAssetMethod") {
@@ -388,6 +394,7 @@ export const assetMethodMenu = (target: HTMLElement, cb: () => void) => {
 };
 
 const filterTypesHTML = (types: IObject) => {
+    window.sout.tracker("invoked");
     let html = "";
     Constants.SIYUAN_ASSETS_SEARCH.sort((a: string, b: string) => {
         return a.localeCompare(b);
@@ -404,6 +411,7 @@ const filterTypesHTML = (types: IObject) => {
 };
 
 export const assetFilterMenu = (assetsElement: Element) => {
+    window.sout.tracker("invoked");
     const localData = window.siyuan.storage[Constants.LOCAL_SEARCHASSET].types;
     const filterDialog = new Dialog({
         title: window.siyuan.languages.type,
@@ -431,6 +439,7 @@ export const assetFilterMenu = (assetsElement: Element) => {
 };
 
 export const assetMoreMenu = (target: Element, element: Element, cb: () => void) => {
+    window.sout.tracker("invoked");
     if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
         window.siyuan.menus.menu.element.getAttribute("data-name") === "searchAssetMore") {
         window.siyuan.menus.menu.remove();

@@ -7,6 +7,7 @@ import {getEditorRange} from "../../util/selection";
 import {Constants} from "../../../constants";
 
 export const openViewMenu = (options: { protyle: IProtyle, blockElement: HTMLElement, element: HTMLElement }) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("av-view");
     if (menu.isOpen) {
         return;
@@ -88,7 +89,9 @@ export const bindViewEvent = (options: {
     protyle: IProtyle,
     data: IAV,
     menuElement: HTMLElement
+    blockElement: Element
 }) => {
+    window.sout.tracker("invoked");
     const inputElement = options.menuElement.querySelector('.b3-text-field[data-type="name"]') as HTMLInputElement;
     inputElement.addEventListener("blur", () => {
         if (inputElement.value !== inputElement.dataset.value) {
@@ -117,9 +120,43 @@ export const bindViewEvent = (options: {
         }
     });
     inputElement.select();
+    const toggleTitleElement = options.menuElement.querySelector('.b3-switch[data-type="toggle-view-title"]') as HTMLInputElement;
+    toggleTitleElement.addEventListener("change", () => {
+        const avID = options.blockElement.getAttribute("data-av-id");
+        const blockID = options.blockElement.getAttribute("data-node-id");
+        if (!toggleTitleElement.checked) {
+            // hide
+            transaction(options.protyle, [{
+                action: "hideAttrViewName",
+                avID,
+                blockID,
+                data: true
+            }], [{
+                action: "hideAttrViewName",
+                avID,
+                blockID,
+                data: false
+            }]);
+            options.blockElement.querySelector(".av__title").classList.add("av__title--hide");
+        } else {
+            transaction(options.protyle, [{
+                action: "hideAttrViewName",
+                avID,
+                blockID,
+                data: false
+            }], [{
+                action: "hideAttrViewName",
+                avID,
+                blockID,
+                data: true
+            }]);
+            options.blockElement.querySelector(".av__title").classList.remove("av__title--hide");
+        }
+    });
 };
 
 export const getViewHTML = (data: IAVTable) => {
+    window.sout.tracker("invoked");
     return `<div class="b3-menu__items">
 <button class="b3-menu__item" data-type="nobg">
     <span class="b3-menu__label ft__center">${window.siyuan.languages.config}</span>
@@ -154,13 +191,12 @@ export const getViewHTML = (data: IAVTable) => {
     <span class="b3-menu__accelerator">${data.pageSize}</span>
     <svg class="b3-menu__icon b3-menu__icon--small"><use xlink:href="#iconRight"></use></svg>
 </button>
-<button class="b3-menu__item">
-    <div class="b3-menu__label fn__flex">
-        <svg class="b3-menu__icon"></svg>
-        <span class="b3-menu__label">${window.siyuan.languages.title}</span>
-    </div>
-    <svg class="b3-menu__action" data-type="toggle-view-title"><use xlink:href="#iconEye${data.hideAttrViewName ? "" : "off"}"></use></svg>
-</button>
+<label class="b3-menu__item">
+    <svg class="b3-menu__icon"></svg>
+    <span class="fn__flex-center">${window.siyuan.languages.showTitle}</span>
+    <span class="fn__space fn__flex-1"></span>
+    <input data-type="toggle-view-title" type="checkbox" class="b3-switch b3-switch--menu" ${data.hideAttrViewName ? "" : "checked"}>
+</label>
 <button class="b3-menu__separator"></button>
 <button class="b3-menu__item" data-type="duplicate-view">
     <svg class="b3-menu__icon">
@@ -176,6 +212,7 @@ export const getViewHTML = (data: IAVTable) => {
 };
 
 export const getSwitcherHTML = (views: IAVView[], viewId: string) => {
+    window.sout.tracker("invoked");
     let html = "";
     views.forEach((item) => {
         html += `<button draggable="true" class="b3-menu__item${item.id === viewId ? " b3-menu__item--current" : ""}" data-id="${item.id}">
@@ -198,6 +235,7 @@ ${html}
 };
 
 export const addView = (protyle: IProtyle, blockElement: Element) => {
+    window.sout.tracker("invoked");
     const id = Lute.NewNodeID();
     const avID = blockElement.getAttribute("data-av-id");
     transaction(protyle, [{

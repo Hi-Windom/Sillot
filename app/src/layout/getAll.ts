@@ -14,6 +14,7 @@ import {Protyle} from "../protyle";
 import {Wnd} from "./Wnd";
 
 export const getAllEditor = () => {
+    window.sout.tracker("invoked");
     const models = getAllModels();
     const editors: Protyle[] = [];
     models.editor.forEach(item => {
@@ -49,6 +50,7 @@ export const getAllEditor = () => {
 };
 
 export const getAllModels = () => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     const models: IModels = {
         editor: [],
         graph: [],
@@ -101,6 +103,7 @@ export const getAllModels = () => {
 };
 
 export const getAllWnds = (layout: Layout, wnds: Wnd[]) => {
+    window.sout.tracker("invoked");
     for (let i = 0; i < layout.children.length; i++) {
         const item = layout.children[i];
         if (item instanceof Wnd) {
@@ -112,6 +115,7 @@ export const getAllWnds = (layout: Layout, wnds: Wnd[]) => {
 };
 
 export const getAllTabs = () => {
+    window.sout.tracker("invoked");
     const tabs: Tab[] = [];
     const getTabs = (layout: Layout) => {
         for (let i = 0; i < layout.children.length; i++) {
@@ -131,6 +135,7 @@ export const getAllTabs = () => {
 };
 
 export const getAllDocks = () => {
+    window.sout.tracker("invoked");
     const docks: Config.IUILayoutDockTab[] = [];
     window.siyuan.config.uiLayout.left.data.forEach((item) => {
         item.forEach((dock) => {

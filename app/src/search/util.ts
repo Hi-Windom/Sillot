@@ -53,6 +53,7 @@ import {getUnRefList, openSearchUnRef, unRefMoreMenu} from "./unRef";
 import {getDefaultType} from "./getDefault";
 
 export const toggleReplaceHistory = (searchElement: Element) => {
+    window.sout.tracker("invoked");
     const list = window.siyuan.storage[Constants.LOCAL_SEARCHKEYS];
     if (!list.replaceKeys || list.replaceKeys.length === 0) {
         return;
@@ -121,6 +122,7 @@ export const toggleReplaceHistory = (searchElement: Element) => {
 };
 
 export const toggleSearchHistory = (searchElement: Element, config: Config.IUILayoutTabSearchConfig, edit: Protyle) => {
+    window.sout.tracker("invoked");
     const list = window.siyuan.storage[Constants.LOCAL_SEARCHKEYS];
     if (!list.keys || list.keys.length === 0) {
         return;
@@ -191,6 +193,7 @@ export const toggleSearchHistory = (searchElement: Element, config: Config.IUILa
 };
 
 const saveKeyList = (type: "keys" | "replaceKeys", value: string) => {
+    window.sout.tracker("invoked");
     let list: string[] = window.siyuan.storage[Constants.LOCAL_SEARCHKEYS][type];
     list.splice(0, 0, value);
     list = Array.from(new Set(list));
@@ -203,6 +206,7 @@ const saveKeyList = (type: "keys" | "replaceKeys", value: string) => {
 };
 
 export const openGlobalSearch = (app: App, text: string, replace: boolean) => {
+    window.sout.tracker("invoked");
     text = text.trim();
     const searchModel = getAllModels().search.find((item) => {
         item.parent.parent.switchTab(item.parent.headElement);
@@ -235,6 +239,7 @@ export const openGlobalSearch = (app: App, text: string, replace: boolean) => {
 
 // closeCB 不存在为页签搜索
 export const genSearch = (app: App, config: Config.IUILayoutTabSearchConfig, element: Element, closeCB?: () => void) => {
+    window.sout.tracker("invoked");
     let methodText = window.siyuan.languages.keyword;
     if (config.method === 1) {
         methodText = window.siyuan.languages.querySyntax;
@@ -1054,6 +1059,7 @@ export const genSearch = (app: App, config: Config.IUILayoutTabSearchConfig, ele
 };
 
 export const getQueryTip = (method: number) => {
+    window.sout.tracker("invoked");
     let methodTip = window.siyuan.languages.searchMethod + " ";
     switch (method) {
         case 0:
@@ -1073,6 +1079,7 @@ export const getQueryTip = (method: number) => {
 };
 
 const updateConfig = (element: Element, item: Config.IUILayoutTabSearchConfig, config: Config.IUILayoutTabSearchConfig, edit: Protyle) => {
+    window.sout.tracker("invoked");
     const dialogElement = hasClosestByClassName(element, "b3-dialog--open");
     if (dialogElement && dialogElement.getAttribute("data-key") === Constants.DIALOG_SEARCH) {
         // https://github.com/siyuan-note/siyuan/issues/6828
@@ -1138,6 +1145,7 @@ const renderNextSearchMark = (options: {
     edit: Protyle,
     target: Element,
 }) => {
+    window.sout.tracker("invoked");
     let matchElement;
     const allMatchElements = Array.from(options.edit.protyle.wysiwyg.element.querySelectorAll(`div[data-node-id="${options.id}"] span[data-type~="search-mark"]`));
     allMatchElements.find((item, itemIndex) => {
@@ -1163,6 +1171,7 @@ export const getArticle = (options: {
     edit: Protyle
     value?: string,
 }) => {
+    window.sout.tracker("invoked");
     checkFold(options.id, (zoomIn) => {
         options.edit.protyle.scroll.lastScrollTop = 0;
         addLoading(options.edit.protyle);
@@ -1197,6 +1206,7 @@ export const getArticle = (options: {
 };
 
 export const replace = (element: Element, config: Config.IUILayoutTabSearchConfig, edit: Protyle, isAll: boolean) => {
+    window.sout.tracker("invoked");
     if (config.method === 1 || config.method === 2) {
         showMessage(window.siyuan.languages._kernel[132]);
         return;
@@ -1283,6 +1293,7 @@ export const replace = (element: Element, config: Config.IUILayoutTabSearchConfi
 };
 
 export const inputEvent = (element: Element, config: Config.IUILayoutTabSearchConfig, edit: Protyle, rmCurrentCriteria = false) => {
+    window.sout.tracker("invoked");
     let inputTimeout = parseInt(element.getAttribute("data-timeout") || "0");
     clearTimeout(inputTimeout);
     inputTimeout = window.setTimeout(() => {
@@ -1347,6 +1358,7 @@ export const inputEvent = (element: Element, config: Config.IUILayoutTabSearchCo
 };
 
 export const getAttr = (block: IBlock) => {
+    window.sout.tracker("invoked");
     let attrHTML = "";
     if (block.name) {
         attrHTML += `<span class="b3-list-item__meta fn__flex" style="max-width: 30%"><svg class="b3-list-item__hinticon"><use xlink:href="#iconN"></use></svg><span class="b3-list-item__hinttext">${block.name}</span></span>`;
@@ -1361,6 +1373,7 @@ export const getAttr = (block: IBlock) => {
 };
 
 const onSearch = (data: IBlock[], edit: Protyle, element: Element, config: Config.IUILayoutTabSearchConfig) => {
+    window.sout.tracker("invoked");
     let resultHTML = "";
     data.forEach((item, index) => {
         const title = getNotebookName(item.box) + getDisplayName(item.hPath, false);

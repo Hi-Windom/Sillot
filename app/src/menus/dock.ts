@@ -2,6 +2,7 @@ import {MenuItem} from "./Menu";
 import {saveLayout} from "../layout/util";
 
 const moveMenuItem = (label: string, target: Element) => {
+    window.sout.tracker("invoked");
     return new MenuItem({
         label: window.siyuan.languages[label],
         icon: label.replace("moveTo", "icon"),
@@ -19,6 +20,7 @@ const moveMenuItem = (label: string, target: Element) => {
 };
 
 export const initDockMenu = (target: Element) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     window.siyuan.menus.menu.append(moveMenuItem("moveToLeftTop", target).element);
     window.siyuan.menus.menu.append(moveMenuItem("moveToLeftBottom", target).element);

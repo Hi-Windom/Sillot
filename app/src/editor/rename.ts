@@ -10,6 +10,7 @@ import {Constants} from "../constants";
 import {showTooltip} from "../dialog/tooltip";
 
 export const validateName = (name: string, targetElement?: HTMLElement) => {
+    window.sout.tracker("invoked");
     if (/\r\n|\r|\n|\u2028|\u2029|\t|\//.test(name)) {
         if (targetElement) {
             showTooltip(window.siyuan.languages.fileNameRule, targetElement, true);
@@ -30,10 +31,12 @@ export const validateName = (name: string, targetElement?: HTMLElement) => {
 };
 
 export const replaceFileName = (name: string) => {
+    window.sout.tracker("invoked");
     return name.replace(/\r\n|\r|\n|\u2028|\u2029|\t|\//g, "").substring(0, Constants.SIZE_TITLE);
 };
 
 export const replaceLocalPath = (name: string) => {
+    window.sout.tracker("invoked");
     return name.replace(/\\\\|\/|"|:|\*|\?|\\|'|<|>|\|/g, "");
 };
 
@@ -44,6 +47,7 @@ export const rename = (options: {
     type: "notebook" | "file"
     range?: Range,
 }) => {
+    window.sout.tracker("invoked");
     if (window.siyuan.config.readonly) {
         return;
     }
@@ -105,6 +109,7 @@ export const rename = (options: {
 };
 
 export const renameAsset = (assetPath: string) => {
+    window.sout.tracker("invoked");
     const dialog = new Dialog({
         title: window.siyuan.languages.rename,
         content: `<div class="b3-dialog__content"><input class="b3-text-field fn__block" value=""></div>
@@ -137,6 +142,7 @@ export const renameAsset = (assetPath: string) => {
 };
 
 export const newFileContentBySelect = (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (getSelection().rangeCount === 0) {
         return;
     }

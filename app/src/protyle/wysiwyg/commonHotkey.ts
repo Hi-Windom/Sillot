@@ -19,6 +19,7 @@ import {net2LocalAssets} from "../breadcrumb/action";
 import {formatDate} from "sofill/mid";
 
 export const commonHotkey = (protyle: IProtyle, event: KeyboardEvent, nodeElement?: HTMLElement) => {
+    window.sout.tracker("invoked");
     if (matchHotKey(window.siyuan.config.keymap.editor.general.copyHPath.custom, event)) {
         fetchPost("/api/filetree/getHPathByID", {
             id: protyle.block.rootID
@@ -90,6 +91,7 @@ export const upSelect = (options: {
     range: Range,
     cb: (selectElements: NodeListOf<Element>) => void
 }) => {
+    window.sout.tracker("invoked");
     const selectElements = options.protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select");
     if (selectElements.length > 0) {
         options.event.stopPropagation();
@@ -135,6 +137,7 @@ export const downSelect = (options: {
     range: Range,
     cb: (selectElement: NodeListOf<Element>) => void
 }) => {
+    window.sout.tracker("invoked");
     const selectElements = options.protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select");
     if (selectElements.length > 0) {
         options.event.stopPropagation();
@@ -162,6 +165,7 @@ export const downSelect = (options: {
 };
 
 export const getStartEndElement = (selectElements: NodeListOf<Element> | Element[]) => {
+    window.sout.tracker("invoked");
     let startElement;
     let endElement;
     selectElements.forEach(item => {
@@ -187,6 +191,7 @@ export const getStartEndElement = (selectElements: NodeListOf<Element> | Element
 };
 
 export const duplicateBlock = (nodeElements: Element[], protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     let focusElement;
     const doOperations: IOperation[] = [];
     const undoOperations: IOperation[] = [];
@@ -219,6 +224,7 @@ export const duplicateBlock = (nodeElements: Element[], protyle: IProtyle) => {
 };
 
 export const goHome = (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-index") === "0" ||
         protyle.wysiwyg.element.firstElementChild.getAttribute("data-eof") === "1" ||
         protyle.options.backlinkData) {
@@ -237,6 +243,7 @@ export const goHome = (protyle: IProtyle) => {
 };
 
 export const goEnd = (protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (!protyle.scroll.element.classList.contains("fn__none") &&
         protyle.wysiwyg.element.lastElementChild.getAttribute("data-eof") !== "2") {
         fetchPost("/api/filetree/getDoc", {
@@ -261,6 +268,7 @@ export const goEnd = (protyle: IProtyle) => {
 };
 
 export const alignImgCenter = (protyle: IProtyle, nodeElement: Element, assetElements: Element[], id: string, html: string) => {
+    window.sout.tracker("invoked");
     nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
     assetElements.forEach((item: HTMLElement) => {
         item.style.display = "block";
@@ -291,6 +299,7 @@ export const alignImgCenter = (protyle: IProtyle, nodeElement: Element, assetEle
 };
 
 export const alignImgLeft = (protyle: IProtyle, nodeElement: Element, assetElements: Element[], id: string, html: string) => {
+    window.sout.tracker("invoked");
     nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
     assetElements.forEach((item: HTMLElement) => {
         item.style.display = "";

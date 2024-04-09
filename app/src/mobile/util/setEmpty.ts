@@ -8,6 +8,7 @@ import {App} from "../../index";
 import {setTitle} from "../../dialog/processSystem";
 
 export const setEmpty = (app: App) => {
+    window.sout.tracker("invoked");
     setTitle(window.siyuan.languages.siyuanNote);
     document.getElementById("toolbarName").classList.add("fn__hidden");
     document.getElementById("editor").classList.add("fn__none");
@@ -32,7 +33,7 @@ export const setEmpty = (app: App) => {
     <svg class="b3-list-item__graphic"><use xlink:href="#iconFilesRoot"></use></svg><span class="fn__space"></span><span class="b3-list-item__text">${window.siyuan.languages.newNotebook}</span>
 </div>
 <div class="b3-list-item" id="emptyHelp">
-    <svg class="b3-list-item__graphic"><use xlink:href="#iconHelp"></use></svg><span class="fn__space"></span><span class="b3-list-item__text">${window.siyuan.languages.help}</span>
+    <svg class="b3-list-item__graphic"><use xlink:href="#iconHelp"></use></svg><span class="fn__space"></span><span class="b3-list-item__text">${window.siyuan.languages.userGuide}</span>
 </div>`;
     emptyElement.addEventListener("click", (event) => {
         let target = event.target as HTMLElement;
@@ -77,6 +78,7 @@ export const setEmpty = (app: App) => {
 };
 
 export const setEditor = () => {
+    window.sout.tracker("invoked");
     const toolbarNameElement =  document.getElementById("toolbarName") as HTMLInputElement;
     setTitle(toolbarNameElement.value);
     toolbarNameElement.classList.remove("fn__hidden");

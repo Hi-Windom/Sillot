@@ -2,6 +2,7 @@ import {hasClosestBlock, hasClosestByAttribute} from "../util/hasClosest";
 import {Constants} from "../../constants";
 
 export const getPreviousBlock = (element: Element) => {
+    window.sout.tracker("invoked");
     let parentElement = element;
     while (parentElement) {
         if (parentElement.previousElementSibling?.getAttribute("data-node-id")) {
@@ -17,6 +18,7 @@ export const getPreviousBlock = (element: Element) => {
 };
 
 export const getLastBlock = (element: Element) => {
+    window.sout.tracker("invoked");
     let lastElement;
     Array.from(element.querySelectorAll("[data-node-id]")).reverse().find(item => {
         if (!hasClosestByAttribute(item.parentElement, "data-type", "NodeBlockQueryEmbed")) {
@@ -28,6 +30,7 @@ export const getLastBlock = (element: Element) => {
 };
 
 export const getFirstBlock = (element: Element) => {
+    window.sout.tracker("invoked");
     let firstElement;
     Array.from(element.querySelectorAll("[data-node-id]")).find(item => {
         if (!hasClosestByAttribute(item.parentElement, "data-type", "NodeBlockQueryEmbed") &&
@@ -40,6 +43,7 @@ export const getFirstBlock = (element: Element) => {
 };
 
 export const getNextBlock = (element: Element) => {
+    window.sout.tracker("invoked");
     let parentElement = element;
     while (parentElement) {
         if (parentElement.nextElementSibling && !parentElement.nextElementSibling.classList.contains("protyle-attr")) {
@@ -56,6 +60,7 @@ export const getNextBlock = (element: Element) => {
 };
 
 export const getNoContainerElement = (element: Element) => {
+    window.sout.tracker("invoked");
     let childElement = element;
     while (childElement) {
         if (childElement.classList.contains("list") || childElement.classList.contains("li") || childElement.classList.contains("bq") || childElement.classList.contains("sb")) {
@@ -68,6 +73,7 @@ export const getNoContainerElement = (element: Element) => {
 };
 
 export const getContenteditableElement = (element: Element) => {
+    window.sout.tracker("invoked");
     if (!element || (element.getAttribute("contenteditable") === "true") && !element.classList.contains("protyle-wysiwyg")) {
         return element;
     }
@@ -75,11 +81,13 @@ export const getContenteditableElement = (element: Element) => {
 };
 
 export const isNotEditBlock = (element: Element) => {
+    window.sout.tracker("invoked");
     return ["NodeBlockQueryEmbed", "NodeThematicBreak", "NodeMathBlock", "NodeHTMLBlock", "NodeIFrame", "NodeWidget", "NodeVideo", "NodeAudio"].includes(element.getAttribute("data-type")) ||
         (element.getAttribute("data-type") === "NodeCodeBlock" && element.classList.contains("render-node"));
 };
 
 export const getTopEmptyElement = (element: Element) => {
+    window.sout.tracker("invoked");
     let topElement = element;
     while (topElement.parentElement && !topElement.parentElement.classList.contains("protyle-wysiwyg")) {
         if (!topElement.parentElement.getAttribute("data-node-id")) {
@@ -104,6 +112,7 @@ export const getTopEmptyElement = (element: Element) => {
 };
 
 export const getTopAloneElement = (topSourceElement: Element) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if ("NodeBlockquote" === topSourceElement.parentElement.getAttribute("data-type") && topSourceElement.parentElement.childElementCount === 2) {
         while (!topSourceElement.parentElement.classList.contains("protyle-wysiwyg")) {
             if (topSourceElement.parentElement.getAttribute("data-type") === "NodeBlockquote" && topSourceElement.parentElement.childElementCount === 2) {
@@ -149,6 +158,7 @@ export const getTopAloneElement = (topSourceElement: Element) => {
 };
 
 export const hasNextSibling = (element: Node) => {
+    window.sout.tracker("invoked");
     let nextSibling = element.nextSibling;
     while (nextSibling) {
         if (nextSibling.textContent === "" && nextSibling.nodeType === 3) {
@@ -161,6 +171,7 @@ export const hasNextSibling = (element: Node) => {
 };
 
 export const hasPreviousSibling = (element: Node) => {
+    window.sout.tracker("invoked");
     let previousSibling = element.previousSibling;
     while (previousSibling) {
         if (previousSibling.textContent === "" && previousSibling.nodeType === 3) {
@@ -173,6 +184,7 @@ export const hasPreviousSibling = (element: Node) => {
 };
 
 export const getNextFileLi = (current: Element) => {
+    window.sout.tracker("invoked");
     let nextElement = current.nextElementSibling;
     if (nextElement) {
         if (nextElement.tagName === "LI") {
@@ -196,6 +208,7 @@ export const getNextFileLi = (current: Element) => {
 };
 
 export const getPreviousFileLi = (current: Element) => {
+    window.sout.tracker("invoked");
     let previousElement = current.previousElementSibling;
     if (previousElement) {
         if (previousElement.tagName === "LI") {

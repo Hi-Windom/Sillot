@@ -10,6 +10,7 @@ import {focusBlock} from "../../util/selection";
 import {setPosition} from "../../../util/setPosition";
 
 const genSearchList = (element: Element, keyword: string, avId: string, cb?: () => void) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/av/searchAttributeView", {keyword}, (response) => {
         let html = "";
         response.data.results.forEach((item: {
@@ -36,6 +37,7 @@ const genSearchList = (element: Element, keyword: string, avId: string, cb?: () 
 };
 
 const setDatabase = (avId: string, element: HTMLElement, item: HTMLElement) => {
+    window.sout.tracker("invoked");
     element.dataset.avId = item.dataset.avId;
     element.dataset.blockId = item.dataset.blockId;
     element.querySelector(".b3-menu__accelerator").textContent = item.querySelector(".b3-list-item__hinticon").classList.contains("fn__none") ? item.querySelector(".b3-list-item__text").textContent : window.siyuan.languages.thisDatabase;
@@ -46,6 +48,7 @@ const setDatabase = (avId: string, element: HTMLElement, item: HTMLElement) => {
 };
 
 export const openSearchAV = (avId: string, target: HTMLElement, cb?: (element: HTMLElement) => void) => {
+    window.sout.tracker("invoked");
     window.siyuan.menus.menu.remove();
     const menu = new Menu();
     menu.addItem({
@@ -126,6 +129,7 @@ export const updateRelation = (options: {
     colsData: IAVColumn[],
     blockElement: Element,
 }) => {
+    window.sout.tracker("invoked");
     const inputElement = options.avElement.querySelector('input[data-type="colName"]') as HTMLInputElement;
     const goSearchAVElement = options.avElement.querySelector('.b3-menu__item[data-type="goSearchAV"]') as HTMLElement;
     const newAVId = goSearchAVElement.getAttribute("data-av-id");
@@ -166,6 +170,7 @@ export const updateRelation = (options: {
 };
 
 export const toggleUpdateRelationBtn = (menuItemsElement: HTMLElement, avId: string, resetData = false) => {
+    window.sout.tracker("invoked");
     const searchElement = menuItemsElement.querySelector('.b3-menu__item[data-type="goSearchAV"]') as HTMLElement;
     const switchItemElement = searchElement.nextElementSibling;
     const switchElement = switchItemElement.querySelector(".b3-switch") as HTMLInputElement;
@@ -211,6 +216,7 @@ export const toggleUpdateRelationBtn = (menuItemsElement: HTMLElement, avId: str
 };
 
 const genSelectItemHTML = (type: "selected" | "empty" | "unselect", id?: string, isDetached?: boolean, text?: string) => {
+    window.sout.tracker("invoked");
     if (type === "selected") {
         return `<svg class="b3-menu__icon fn__grab"><use xlink:href="#iconDrag"></use></svg>
 <span class="b3-menu__label${isDetached ? "" : " popover__block"}" ${isDetached ? "" : 'style="color:var(--b3-protyle-inline-blockref-color)"'} data-id="${id}">${text}</span>
@@ -230,6 +236,7 @@ const genSelectItemHTML = (type: "selected" | "empty" | "unselect", id?: string,
 };
 
 const filterItem = (menuElement: Element, cellElement: HTMLElement, keyword: string) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/av/getAttributeViewPrimaryKeyValues", {
         id: menuElement.firstElementChild.getAttribute("data-av-id"),
         keyword,
@@ -260,6 +267,7 @@ export const bindRelationEvent = (options: {
     blockElement: Element,
     cellElements: HTMLElement[]
 }) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/av/getAttributeViewPrimaryKeyValues", {
         id: options.menuElement.firstElementChild.getAttribute("data-av-id"),
         keyword: "",
@@ -277,7 +285,6 @@ export const bindRelationEvent = (options: {
                 html += genSelectItemHTML("unselect", item.block.id, item.isDetached, item.block.content || window.siyuan.languages.untitled);
             }
         });
-        options.menuElement.querySelector(".b3-menu__label").innerHTML = response.data.name;
         options.menuElement.querySelector(".b3-menu__items").innerHTML = `${selectHTML || genSelectItemHTML("empty")}
 <button class="b3-menu__separator"></button>
 ${html || genSelectItemHTML("empty")}`;
@@ -286,9 +293,11 @@ ${html || genSelectItemHTML("empty")}`;
         options.menuElement.querySelector(".b3-menu__items .b3-menu__item:not(.fn__none)").classList.add("b3-menu__item--current");
         const inputElement = options.menuElement.querySelector("input");
         inputElement.focus();
+        const databaseName = inputElement.parentElement.querySelector(".popover__block");
+        databaseName.innerHTML = response.data.name;
+        databaseName.setAttribute("data-id", response.data.blockIDs[0]);
         const listElement = options.menuElement.querySelector(".b3-menu__items");
         inputElement.addEventListener("keydown", (event) => {
-            event.stopPropagation();
             if (event.isComposing) {
                 return;
             }
@@ -319,6 +328,7 @@ ${html || genSelectItemHTML("empty")}`;
 };
 
 export const getRelationHTML = (data: IAV, cellElements?: HTMLElement[]) => {
+    window.sout.tracker("invoked");
     let colRelationData: IAVCellRelationValue;
     data.view.columns.find(item => {
         if (item.id === cellElements[0].dataset.colId) {
@@ -328,9 +338,10 @@ export const getRelationHTML = (data: IAV, cellElements?: HTMLElement[]) => {
     });
     if (colRelationData && colRelationData.avID) {
         return `<div data-av-id="${colRelationData.avID}" class="fn__flex-column">
-<div class="b3-menu__item fn__flex-column" data-type="nobg">
-    <div class="b3-menu__label">&nbsp;</div>
-    <input class="b3-text-field fn__flex-shrink"/>
+<div class="b3-menu__item" data-type="nobg">
+    <input class="b3-text-field fn__flex-1"/>
+    <span class="fn__space"></span>
+    <span style="color: var(--b3-protyle-inline-blockref-color);" data-id="" class="popover__block fn__pointer"></span>
 </div>
 <div class="fn__hr"></div>
 <div class="b3-menu__items">
@@ -342,6 +353,7 @@ export const getRelationHTML = (data: IAV, cellElements?: HTMLElement[]) => {
 };
 
 export const setRelationCell = (protyle: IProtyle, nodeElement: HTMLElement, target: HTMLElement, cellElements: HTMLElement[]) => {
+    window.sout.tracker("invoked");
     const menuElement = hasClosestByClassName(target, "b3-menu__items");
     if (!menuElement) {
         return;

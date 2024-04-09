@@ -11,6 +11,7 @@ import {fetchPost} from "../util/fetch";
 import {zoomOut} from "../menus/protyle";
 
 export const cancelSB = (protyle: IProtyle, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const doOperations: IOperation[] = [];
     const undoOperations: IOperation[] = [];
     let previousId = nodeElement.previousElementSibling ? nodeElement.previousElementSibling.getAttribute("data-node-id") : undefined;
@@ -65,6 +66,7 @@ export const cancelSB = (protyle: IProtyle, nodeElement: Element) => {
 };
 
 export const genSBElement = (layout: string, id?: string, attrHTML?: string) => {
+    window.sout.tracker("invoked");
     const sbElement = document.createElement("div");
     sbElement.setAttribute("data-node-id", id || Lute.NewNodeID());
     sbElement.setAttribute("data-type", "NodeSuperBlock");
@@ -75,6 +77,7 @@ export const genSBElement = (layout: string, id?: string, attrHTML?: string) => 
 };
 
 export const jumpToParentNext = (protyle: IProtyle, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const topElement = getTopAloneElement(nodeElement);
     if (topElement) {
         const topParentElement = hasClosestByClassName(topElement, "list") || hasClosestByClassName(topElement, "bq") || hasClosestByClassName(topElement, "sb") || topElement;
@@ -96,6 +99,7 @@ export const jumpToParentNext = (protyle: IProtyle, nodeElement: Element) => {
 };
 
 export const insertEmptyBlock = (protyle: IProtyle, position: InsertPosition, id?: string) => {
+    window.sout.tracker("invoked");
     const range = getEditorRange(protyle.wysiwyg.element);
     let blockElement: Element;
     if (id) {
@@ -157,6 +161,7 @@ export const insertEmptyBlock = (protyle: IProtyle, position: InsertPosition, id
 };
 
 export const genEmptyBlock = (zwsp = true, wbr = true, string?: string) => {
+    window.sout.tracker("invoked");
     let html = "";
     if (zwsp) {
         html = Constants.ZWSP;
@@ -171,6 +176,7 @@ export const genEmptyBlock = (zwsp = true, wbr = true, string?: string) => {
 };
 
 export const genEmptyElement = (zwsp = true, wbr = true, id?: string) => {
+    window.sout.tracker("invoked");
     const element = document.createElement("div");
     element.setAttribute("data-node-id", id || Lute.NewNodeID());
     element.setAttribute("data-type", "NodeParagraph");

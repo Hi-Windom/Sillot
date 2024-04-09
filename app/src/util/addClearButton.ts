@@ -1,4 +1,5 @@
 const update = (inputElement: HTMLInputElement, clearElement: Element, right: number) => {
+    window.sout.tracker("-> inputElement: ", inputElement);
     if (inputElement.value === "") {
         clearElement.classList.add("fn__none");
         if (typeof right === "number") {
@@ -18,6 +19,7 @@ export const addClearButton = (options: {
     height?: number
     className?: string
 }) => {
+    window.sout.tracker("-> options: ", options);
     options.inputElement.dataset.oldPaddingRight = options.inputElement.style.paddingRight;
     options.inputElement.insertAdjacentHTML("afterend",
         `<svg class="${options.className || "b3-form__icon-clear"} ariaLabel" aria-label="${window.siyuan.languages.clear}" style="${options.right ? "right: " + options.right + "px;" : ""}${options.height ? "height:" + options.height + "px" : ""}">

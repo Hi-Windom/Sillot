@@ -5,6 +5,7 @@ import {setInlineStyle} from "../../util/assets";
 import {confirmDialog} from "../../dialog/confirmDialog";
 
 const setEditor = (modelMainElement: Element) => {
+    window.sout.tracker("invoked");
     let dynamicLoadBlocks = parseInt((modelMainElement.querySelector("#dynamicLoadBlocks") as HTMLInputElement).value);
     if (48 > dynamicLoadBlocks) {
         dynamicLoadBlocks = 48;
@@ -48,6 +49,7 @@ const setEditor = (modelMainElement: Element) => {
 };
 
 export const initEditor = () => {
+    window.sout.tracker("invoked");
     openModel({
         title: window.siyuan.languages.editor,
         icon: "iconEdit",

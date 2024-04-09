@@ -1,6 +1,7 @@
 import {activeBlur, hideKeyboardToolbar} from "./keyboardToolbar";
 
 export const closePanel = () => {
+    window.sout.tracker("invoked");
     document.getElementById("menu").style.transform = "";
     document.getElementById("sidebar").style.transform = "";
     document.getElementById("model").style.transform = "";
@@ -11,6 +12,7 @@ export const closePanel = () => {
 };
 
 export const closeModel = () => {
+    window.sout.tracker("invoked");
     document.getElementById("model").style.transform = "";
     activeBlur();
     hideKeyboardToolbar();

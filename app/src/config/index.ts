@@ -18,6 +18,7 @@ import {isHuawei} from "../protyle/util/compatibility";
 import {Constants} from "../constants";
 
 export const genItemPanel = (type: string, containerElement: Element, app: App) => {
+    window.sout.tracker("invoked");
     switch (type) {
         case "filetree":
             containerElement.innerHTML = fileTree.genHTML();
@@ -85,6 +86,7 @@ export const genItemPanel = (type: string, containerElement: Element, app: App) 
 };
 
 export const openSetting = (app: App) => {
+    window.sout.tracker("invoked");
     const exitDialog = window.siyuan.dialogs.find((item) => {
         if (item.element.querySelector(".config__tab-container")) {
             item.destroy();

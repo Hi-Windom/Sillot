@@ -7,6 +7,7 @@ import {scrollCenter} from "../../util/highlightById";
 import {insertEmptyBlock} from "../../block/util";
 
 const scrollToView = (nodeElement: Element, rowElement: HTMLElement, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     if (nodeElement.getAttribute("custom-pinthead") === "true") {
         const tableElement = nodeElement.querySelector("table");
         if (tableElement.clientHeight + tableElement.scrollTop < rowElement.offsetTop + rowElement.clientHeight) {
@@ -20,6 +21,7 @@ const scrollToView = (nodeElement: Element, rowElement: HTMLElement, protyle: IP
 };
 
 export const getColIndex = (cellElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     let previousElement = cellElement.previousElementSibling;
     let index = 0;
     while (previousElement) {
@@ -31,6 +33,7 @@ export const getColIndex = (cellElement: HTMLElement) => {
 
 // 光标设置到前一个表格中
 const goPreviousCell = (cellElement: HTMLElement, range: Range, isSelected = true) => {
+    window.sout.tracker("invoked");
     let previousElement = cellElement.previousElementSibling;
     if (!previousElement) {
         if (cellElement.parentElement.previousElementSibling) {
@@ -54,6 +57,7 @@ const goPreviousCell = (cellElement: HTMLElement, range: Range, isSelected = tru
 };
 
 export const setTableAlign = (protyle: IProtyle, cellElements: HTMLElement[], nodeElement: Element, type: string, range: Range) => {
+    window.sout.tracker("invoked");
     range.insertNode(document.createElement("wbr"));
     const html = nodeElement.outerHTML;
 
@@ -82,6 +86,7 @@ export const setTableAlign = (protyle: IProtyle, cellElements: HTMLElement[], no
 };
 
 export const insertRow = (protyle: IProtyle, range: Range, cellElement: HTMLElement, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const wbrElement = document.createElement("wbr");
     range.insertNode(wbrElement);
     const html = nodeElement.outerHTML;
@@ -113,6 +118,7 @@ export const insertRow = (protyle: IProtyle, range: Range, cellElement: HTMLElem
 };
 
 export const insertRowAbove = (protyle: IProtyle, range: Range, cellElement: HTMLElement, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const wbrElement = document.createElement("wbr");
     range.insertNode(wbrElement);
     const html = nodeElement.outerHTML;
@@ -165,6 +171,7 @@ export const insertRowAbove = (protyle: IProtyle, range: Range, cellElement: HTM
 };
 
 export const insertColumn = (protyle: IProtyle, nodeElement: Element, cellElement: HTMLElement, type: InsertPosition, range: Range) => {
+    window.sout.tracker("invoked");
     const wbrElement = document.createElement("wbr");
     range.insertNode(wbrElement);
     const html = nodeElement.outerHTML;
@@ -191,6 +198,7 @@ export const insertColumn = (protyle: IProtyle, nodeElement: Element, cellElemen
 };
 
 export const deleteRow = (protyle: IProtyle, range: Range, cellElement: HTMLElement, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     if (cellElement.parentElement.parentElement.tagName !== "THEAD") {
         const wbrElement = document.createElement("wbr");
         range.insertNode(wbrElement);
@@ -217,6 +225,7 @@ export const deleteRow = (protyle: IProtyle, range: Range, cellElement: HTMLElem
 };
 
 export const deleteColumn = (protyle: IProtyle, range: Range, nodeElement: Element, cellElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     const wbrElement = document.createElement("wbr");
     range.insertNode(wbrElement);
     const html = nodeElement.outerHTML;
@@ -246,6 +255,7 @@ export const deleteColumn = (protyle: IProtyle, range: Range, nodeElement: Eleme
 };
 
 export const moveRowToUp = (protyle: IProtyle, range: Range, cellElement: HTMLElement, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const rowElement = cellElement.parentElement;
     if (rowElement.parentElement.tagName === "THEAD") {
         return;
@@ -275,6 +285,7 @@ export const moveRowToUp = (protyle: IProtyle, range: Range, cellElement: HTMLEl
 };
 
 export const moveRowToDown = (protyle: IProtyle, range: Range, cellElement: HTMLElement, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     const rowElement = cellElement.parentElement;
     if ((rowElement.parentElement.tagName === "TBODY" && !rowElement.nextElementSibling) ||
         (rowElement.parentElement.tagName === "THEAD" && !rowElement.parentElement.nextElementSibling)) {
@@ -305,6 +316,7 @@ export const moveRowToDown = (protyle: IProtyle, range: Range, cellElement: HTML
 };
 
 export const moveColumnToLeft = (protyle: IProtyle, range: Range, cellElement: HTMLElement, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     if (!cellElement.previousElementSibling) {
         return;
     }
@@ -332,6 +344,7 @@ export const moveColumnToLeft = (protyle: IProtyle, range: Range, cellElement: H
 };
 
 export const moveColumnToRight = (protyle: IProtyle, range: Range, cellElement: HTMLElement, nodeElement: Element) => {
+    window.sout.tracker("invoked");
     if (!cellElement.nextElementSibling) {
         return;
     }
@@ -358,6 +371,7 @@ export const moveColumnToRight = (protyle: IProtyle, range: Range, cellElement: 
 };
 
 export const fixTable = (protyle: IProtyle, event: KeyboardEvent, range: Range) => {
+    window.sout.tracker("invoked");
     const cellElement = hasClosestByMatchTag(range.startContainer, "TD") || hasClosestByMatchTag(range.startContainer, "TH");
     const nodeElement = hasClosestBlock(range.startContainer) as HTMLTableElement;
     if (!cellElement || !nodeElement) {

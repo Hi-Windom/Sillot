@@ -266,7 +266,7 @@ func IndexRefs() {
 			i++
 		}
 	}
-	logging.LogInfof("resolved refs [%d] in [%dms]", size, time.Now().Sub(start).Milliseconds())
+	logging.LogInfof("resolved refs [%d] in [%dms]", size, time.Since(start).Milliseconds())
 	util.PushStatusBar(fmt.Sprintf(Conf.Language(55), i))
 
 	ResetVirtualBlockRefCache()

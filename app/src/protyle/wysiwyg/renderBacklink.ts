@@ -13,6 +13,7 @@ export const renderBacklink = (protyle: IProtyle, backlinkData: {
     dom: string,
     expand: boolean
 }[]) => {
+    window.sout.tracker("invoked");
     protyle.block.showAll = true;
     let html = "";
     backlinkData.forEach(item => {
@@ -31,6 +32,7 @@ export const renderBacklink = (protyle: IProtyle, backlinkData: {
 
 // 传递型折叠处理
 export const foldPassiveType = (expand: boolean, element: HTMLElement | DocumentFragment) => {
+    window.sout.tracker("invoked");
     if (element.firstElementChild.classList.contains("li")) {
         if (expand) {
             element.querySelectorAll(".li .li").forEach(item => {
@@ -54,6 +56,7 @@ export const foldPassiveType = (expand: boolean, element: HTMLElement | Document
 };
 
 const setBacklinkFold = (html: string, expand: boolean) => {
+    window.sout.tracker("invoked");
     const tempDom = document.createElement("template");
     tempDom.innerHTML = html;
     foldPassiveType(expand, tempDom.content);
@@ -61,6 +64,7 @@ const setBacklinkFold = (html: string, expand: boolean) => {
 };
 
 export const loadBreadcrumb = (protyle: IProtyle, element: HTMLElement) => {
+    window.sout.tracker("invoked");
     fetchPost("/api/filetree/getDoc", {
         id: element.getAttribute("data-id"),
         size: Constants.SIZE_GET_MAX,
@@ -91,6 +95,7 @@ export const loadBreadcrumb = (protyle: IProtyle, element: HTMLElement) => {
 };
 
 export const getBacklinkHeadingMore = (moreElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     let nextElement = moreElement.nextElementSibling;
     while (nextElement && !nextElement.classList.contains("protyle-breadcrumb__bar")) {
         nextElement.classList.remove("fn__none");
@@ -100,6 +105,7 @@ export const getBacklinkHeadingMore = (moreElement: HTMLElement) => {
 };
 
 export const genBreadcrumb = (blockPaths: IBreadcrumb[], renderFirst = false) => {
+    window.sout.tracker("invoked");
     let html = "";
     blockPaths.forEach((item, index) => {
         if (index === 0 && !renderFirst) {

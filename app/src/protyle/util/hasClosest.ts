@@ -1,4 +1,5 @@
 export const hasClosestByTag = (element: Node, nodeName: string) => {
+    window.sout.tracker("invoked");
     if (!element) {
         return false;
     }
@@ -18,6 +19,7 @@ export const hasClosestByTag = (element: Node, nodeName: string) => {
 };
 
 export const hasTopClosestByClassName = (element: Node, className: string, top = false) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     let closest = hasClosestByClassName(element, className, top);
     let parentClosest: boolean | HTMLElement = false;
     let findTop = false;
@@ -33,6 +35,7 @@ export const hasTopClosestByClassName = (element: Node, className: string, top =
 };
 
 export const hasTopClosestByTag = (element: Node, nodeName: string) => {
+    window.sout.tracker("invoked");
     let closest = hasClosestByTag(element, nodeName);
     let parentClosest: boolean | HTMLElement = false;
     let findTop = false;
@@ -48,6 +51,7 @@ export const hasTopClosestByTag = (element: Node, nodeName: string) => {
 };
 
 export const hasTopClosestByAttribute = (element: Node, attr: string, value: string | null, top = false) => {
+    window.sout.tracker("invoked");
     let closest = hasClosestByAttribute(element, attr, value, top);
     let parentClosest: boolean | HTMLElement = false;
     let findTop = false;
@@ -63,6 +67,7 @@ export const hasTopClosestByAttribute = (element: Node, attr: string, value: str
 };
 
 export const hasClosestByAttribute = (element: Node, attr: string, value: string | null, top = false) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (!element) {
         return false;
     }
@@ -84,6 +89,7 @@ export const hasClosestByAttribute = (element: Node, attr: string, value: string
 };
 
 export const hasClosestBlock = (element: Node) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     const nodeElement = hasClosestByAttribute(element, "data-node-id", null);
     if (nodeElement && nodeElement.tagName !== "BUTTON" && nodeElement.getAttribute("data-type")?.startsWith("Node")) {
         return nodeElement;
@@ -92,6 +98,7 @@ export const hasClosestBlock = (element: Node) => {
 };
 
 export const hasClosestByMatchTag = (element: Node, nodeName: string) => {
+    window.sout.tracker("invoked");
     if (!element) {
         return false;
     }
@@ -111,6 +118,7 @@ export const hasClosestByMatchTag = (element: Node, nodeName: string) => {
 };
 
 export const hasClosestByClassName = (element: Node, className: string, top = false) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (!element) {
         return false;
     }

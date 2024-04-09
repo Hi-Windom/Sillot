@@ -17,6 +17,7 @@ import {openFileById} from "../../editor/util";
 import {checkFold} from "../../util/noRelyPCFunction";
 
 export const initWindowEvent = (app: App) => {
+    window.sout.tracker("invoked");
     document.body.addEventListener("mouseleave", () => {
         if (window.siyuan.layout.leftDock) {
             window.siyuan.layout.leftDock.hideDock();

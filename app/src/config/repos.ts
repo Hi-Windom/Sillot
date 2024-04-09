@@ -8,6 +8,7 @@ import {openByMobile} from "../protyle/util/compatibility";
 import {confirmDialog} from "../dialog/confirmDialog";
 
 const renderProvider = (provider: number) => {
+    window.sout.tracker("invoked");
     if (provider === 0) {
         if (needSubscribe("")) {
             return `<div class="b3-label b3-label--inner">${window.siyuan.config.system.container === "ios" ? window.siyuan.languages._kernel[122] : window.siyuan.languages._kernel[29].replace("${url}", getCloudURL("subscribe/siyuan"))}</div>
@@ -63,6 +64,7 @@ const renderProvider = (provider: number) => {
 };
 
 const bindProviderEvent = () => {
+    window.sout.tracker("invoked");
     const importElement = repos.element.querySelector("#importData") as HTMLInputElement;
     if (importElement) {
         importElement.addEventListener("change", () => {
@@ -267,8 +269,11 @@ export const repos = {
 </div>
 <div class="b3-label">
     <div class="fn__flex config__item">
-        <div class="fn__flex-center">${window.siyuan.languages.cloudSyncDir}</div>
-        <div class="fn__flex-1"></div>
+        <div class="fn__flex-1">
+            ${window.siyuan.languages.cloudSyncDir}
+            <div class="b3-label__text">${window.siyuan.languages.cloudSyncDirTip}</div>
+        </div>
+        <div class="fn__space"></div>
         <button class="b3-button b3-button--outline fn__flex-center fn__size200" data-action="config">
             <svg><use xlink:href="#iconSettings"></use></svg>${window.siyuan.languages.config}
         </button>

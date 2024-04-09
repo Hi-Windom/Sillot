@@ -28,6 +28,7 @@ import {Search} from "../search";
 import {App} from "../index";
 import {newCardModel} from "../card/newCardTab";
 import {preventScroll} from "../protyle/scroll/preventScroll";
+import {clearOBG} from "../layout/dock/util";
 
 export const openFileById = async (options: {
     app: App,
@@ -40,6 +41,7 @@ export const openFileById = async (options: {
     removeCurrentTab?: boolean
     afterOpen?: () => void
 }) => {
+    window.sout.tracker("invoked");
     const response = await fetchSyncPost("/api/block/getBlockInfo", {id: options.id});
     if (response.code === -1) {
         return;
@@ -65,6 +67,7 @@ export const openFileById = async (options: {
 };
 
 export const openAsset = (app: App, assetPath: string, page: number | string, position?: string) => {
+    window.sout.tracker("invoked");
     const suffix = pathPosix().extname(assetPath.split("?page")[0]);
     if (!Constants.SIYUAN_ASSETS_EXTS.includes(suffix)) {
         return;
@@ -79,6 +82,7 @@ export const openAsset = (app: App, assetPath: string, page: number | string, po
 };
 
 export const openFile = async (options: IOpenFileOptions) => {
+    window.sout.tracker("invoked");
     if (typeof options.removeCurrentTab === "undefined") {
         options.removeCurrentTab = true;
     }
@@ -86,9 +90,14 @@ export const openFile = async (options: IOpenFileOptions) => {
     document.querySelectorAll(".av__panel, .av__mask").forEach(item => {
         item.remove();
     });
+    // 打开 PDF 时移除文档光标
+    if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+    }
     const allModels = getAllModels();
     // 文档已打开
     if (options.assetPath) {
+        clearOBG();
         const asset = allModels.asset.find((item) => {
             if (item.path === options.assetPath) {
                 if (!pdfIsLoading(item.parent.parent.element)) {
@@ -106,6 +115,7 @@ export const openFile = async (options: IOpenFileOptions) => {
             return asset.parent;
         }
     } else if (options.custom) {
+        clearOBG();
         const custom = allModels.custom.find((item) => {
             if (objEquals(item.data, options.custom.data) && (!options.custom.id || options.custom.id === item.type)) {
                 if (!pdfIsLoading(item.parent.parent.element)) {
@@ -129,6 +139,7 @@ export const openFile = async (options: IOpenFileOptions) => {
             return hasModel;
         }
     } else if (options.searchData) {
+        clearOBG();
         const search = allModels.search.find((item) => {
             if (objEquals(item.config, options.searchData)) {
                 if (!pdfIsLoading(item.parent.parent.element)) {
@@ -298,6 +309,7 @@ export const openFile = async (options: IOpenFileOptions) => {
 
 // 没有初始化的页签无法检测到
 const getUnInitTab = (options: IOpenFileOptions) => {
+    window.sout.tracker("invoked");
     return getAllTabs().find(item => {
         const initData = item.headElement?.getAttribute("data-initdata");
         if (initData) {
@@ -323,6 +335,7 @@ const getUnInitTab = (options: IOpenFileOptions) => {
 };
 
 const switchEditor = (editor: Editor, options: IOpenFileOptions, allModels: IModels) => {
+    window.sout.tracker("invoked");
     if (options.keepCursor) {
         editor.parent.headElement.setAttribute("keep-cursor", options.id);
         return true;
@@ -385,6 +398,7 @@ const switchEditor = (editor: Editor, options: IOpenFileOptions, allModels: IMod
 };
 
 const newTab = (options: IOpenFileOptions) => {
+    window.sout.tracker("invoked");
     let tab: Tab;
     if (options.assetPath) {
         const suffix = pathPosix().extname(options.assetPath.split("?page")[0]);
@@ -496,6 +510,7 @@ export const updatePanelByEditor = (options: {
     reload: boolean,
     resize: boolean
 }) => {
+    window.sout.tracker("invoked");
     if (options.protyle && options.protyle.path) {
         // https://ld246.com/article/1637636106054/comment/1641485541929#comments
         if (options.protyle.element.classList.contains("fn__none") ||
@@ -543,21 +558,23 @@ export const updatePanelByEditor = (options: {
 };
 
 export const isCurrentEditor = (blockId: string) => {
+    window.sout.tracker("invoked");
     const activeElement = document.querySelector(".layout__wnd--active > .fn__flex > .layout-tab-bar > .item--focus");
     if (activeElement) {
         const tab = getInstanceById(activeElement.getAttribute("data-id"));
         if (tab instanceof Tab && tab.model instanceof Editor) {
-            if (tab.model.editor.protyle.block.rootID !== blockId &&
-                tab.model.editor.protyle.block.parentID !== blockId &&  // updateBacklinkGraph 时会传入 parentID
-                tab.model.editor.protyle.block.id !== blockId) {
-                return false;
+            if (tab.model.editor.protyle.block.rootID === blockId ||
+                tab.model.editor.protyle.block.parentID === blockId ||  // updateBacklinkGraph 时会传入 parentID
+                tab.model.editor.protyle.block.id === blockId) {
+                return true;
             }
         }
     }
-    return true;
+    return false;
 };
 
 export const updateOutline = (models: IModels, protyle: IProtyle, reload = false) => {
+    window.sout.tracker("invoked");
     models.outline.find(item => {
         if (reload || (item.type === "pin" && (!protyle || item.blockId !== protyle.block?.rootID))) {
             let blockId = "";
@@ -599,6 +616,7 @@ export const updateOutline = (models: IModels, protyle: IProtyle, reload = false
 };
 
 export const updateBacklinkGraph = (models: IModels, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     // https://ld246.com/article/1637636106054/comment/1641485541929#comments
     if (protyle?.element.classList.contains("fn__none") ||
         (protyle && !hasClosestByClassName(protyle.element, "layout__wnd--active") &&
@@ -653,6 +671,7 @@ export const updateBacklinkGraph = (models: IModels, protyle: IProtyle) => {
 };
 
 export const openBy = (url: string, type: "folder" | "app") => {
+    window.sout.tracker("invoked");
     /// #if !BROWSER
     if (url.startsWith("assets/")) {
         fetchPost("/api/asset/resolveAssetPath", {path: url.replace(/\.pdf\?page=\d{1,}$/, ".pdf")}, (response) => {

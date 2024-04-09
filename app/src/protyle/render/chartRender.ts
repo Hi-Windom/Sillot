@@ -5,6 +5,7 @@ import {looseJsonParse} from "../../util/functions";
 import {genIconHTML} from "./util";
 
 export const chartRender = (element: Element, cdn = Constants.PROTYLE_CDN) => {
+    window.sout.tracker("invoked");
     let echartsElements: Element[] = [];
     if (element.getAttribute("data-subtype") === "echarts") {
         // 编辑器内代码块编辑渲染

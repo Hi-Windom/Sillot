@@ -80,6 +80,7 @@ import {formatDate} from "sofill/mid";
 import {getPlainText} from "../../protyle/util/paste";
 
 const switchDialogEvent = (app: App, event: MouseEvent) => {
+    window.sout.tracker("invoked");
     event.preventDefault();
     let target = event.target as HTMLElement;
     while (!target.isSameNode(switchDialog.element)) {
@@ -110,6 +111,7 @@ const switchDialogEvent = (app: App, event: MouseEvent) => {
 };
 
 const dialogArrow = (app: App, element: HTMLElement, event: KeyboardEvent) => {
+    window.sout.tracker("invoked");
     let currentLiElement = element.querySelector(".b3-list-item--focus");
     if (currentLiElement) {
         currentLiElement.classList.remove("b3-list-item--focus");
@@ -178,6 +180,7 @@ const dialogArrow = (app: App, element: HTMLElement, event: KeyboardEvent) => {
 };
 
 const editKeydown = (app: App, event: KeyboardEvent) => {
+    window.sout.tracker("invoked");
     let protyle: IProtyle;
     let range: Range;
     if (getSelection().rangeCount > 0) {
@@ -581,6 +584,7 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
 };
 
 const fileTreeKeydown = (app: App, event: KeyboardEvent) => {
+    window.sout.tracker("invoked");
     const dockFile = getDockByType("file");
     if (!dockFile) {
         return false;
@@ -931,6 +935,7 @@ const fileTreeKeydown = (app: App, event: KeyboardEvent) => {
 };
 
 const panelTreeKeydown = (app: App, event: KeyboardEvent) => {
+    window.sout.tracker("invoked");
     // 面板折叠展开操作
     const target = event.target as HTMLElement;
     if (["INPUT", "TEXTAREA"].includes(target.tagName) ||
@@ -1134,6 +1139,7 @@ const panelTreeKeydown = (app: App, event: KeyboardEvent) => {
 
 let switchDialog: Dialog;
 export const windowKeyDown = (app: App, event: KeyboardEvent) => {
+    window.sout.tracker("invoked");
     // https://github.com/siyuan-note/siyuan/issues/9848 忘记为什么要阻止了 .av__mask 的情况，测了下没问题就先移除
     if (document.getElementById("progress") || document.getElementById("errorLog") || event.isComposing) {
         return;
@@ -1793,6 +1799,7 @@ export const windowKeyDown = (app: App, event: KeyboardEvent) => {
 
 export const sendGlobalShortcut = (app: App) => {
     /// #if !BROWSER
+    window.sout.tracker("invoked");
     const hotkeys = [window.siyuan.config.keymap.general.toggleWin.custom];
     app.plugins.forEach(plugin => {
         plugin.commands.forEach(command => {

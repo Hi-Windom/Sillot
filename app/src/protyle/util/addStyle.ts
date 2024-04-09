@@ -1,4 +1,5 @@
 export const addStyle = (url: string, id: string) => {
+    window.sout.tracker("invoked");
     if (!document.getElementById(id)) {
         const styleElement = document.createElement("link");
         styleElement.id = id;

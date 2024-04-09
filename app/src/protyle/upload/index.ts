@@ -22,6 +22,7 @@ export class Upload {
 }
 
 const validateFile = (protyle: IProtyle, files: File[]) => {
+    window.sout.tracker("invoked");
     const uploadFileList = [];
     let errorTip = "";
     let uploadingStr = "";
@@ -79,6 +80,7 @@ const validateFile = (protyle: IProtyle, files: File[]) => {
 };
 
 const genUploadedLabel = (responseText: string, protyle: IProtyle) => {
+    window.sout.tracker("invoked");
     const response = JSON.parse(responseText);
     let errorTip = "";
 
@@ -161,6 +163,7 @@ const genUploadedLabel = (responseText: string, protyle: IProtyle) => {
 };
 
 export const uploadLocalFiles = (files: string[], protyle: IProtyle, isUpload: boolean) => {
+    window.sout.tracker("invoked");
     const msgId = showMessage(window.siyuan.languages.uploading, 0);
     fetchPost("/api/asset/insertLocalAssets", {
         assetPaths: files,
@@ -182,7 +185,7 @@ export const uploadLocalFiles = (files: string[], protyle: IProtyle, isUpload: b
 };
 
 export const uploadFiles = (protyle: IProtyle, files: FileList | DataTransferItemList | File[], element?: HTMLInputElement, successCB?: (res: string) => void) => {
-    console.log("(web) uploadFiles invoked -> "+protyle?.block.rootID);
+    window.sout.tracker("(web) uploadFiles invoked -> "+protyle?.block.rootID);
     // 文档书中点开属性->数据库后的变更操作
     if (!protyle) {
         const formData = new FormData();

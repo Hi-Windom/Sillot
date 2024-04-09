@@ -152,7 +152,7 @@ func FlushQueue() {
 
 	operationQueue = nil
 
-	elapsed := time.Now().Sub(start).Milliseconds()
+	elapsed := time.Since(start).Milliseconds()
 	if 7000 < elapsed {
 		logging.LogInfof("database op tx [%dms]", elapsed)
 	}

@@ -1,9 +1,5 @@
 import {BlockPanel} from "./Panel";
-import {
-    hasClosestBlock,
-    hasClosestByAttribute,
-    hasClosestByClassName,
-} from "../protyle/util/hasClosest";
+import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName,} from "../protyle/util/hasClosest";
 import {fetchPost, fetchSyncPost} from "../util/fetch";
 import {hideTooltip, showTooltip} from "../dialog/tooltip";
 import {getIdFromSYProtocol, isLocalPath} from "../util/pathName";
@@ -14,6 +10,7 @@ import {isPadAppMode} from "sofill/env";
 
 let popoverTargetElement: HTMLElement;
 export const initBlockPopover = (app: App) => {
+    window.sout.tracker("invoked");
     let timeout: number;
     let timeoutHide: number;
     // 编辑器内容块引用/backlinks/tag/bookmark/套娃中使用
@@ -128,6 +125,7 @@ export const initBlockPopover = (app: App) => {
 };
 
 const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     // pad 端点击后 event.target 不会更新。
     const target = document.elementFromPoint(event.clientX, event.clientY);
     if (!target) {
@@ -178,7 +176,7 @@ const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
     if (!popoverTargetElement && linkElement && linkElement.getAttribute("data-href")?.startsWith("siyuan://blocks")) {
         popoverTargetElement = linkElement;
     }
-    if (!popoverTargetElement) {
+    if (!popoverTargetElement || (popoverTargetElement && window.siyuan.menus.menu.data?.isSameNode(popoverTargetElement))) {
         // 移动到弹窗的 loading 元素上，但经过 settimeout 后 loading 已经被移除了
         // https://ld246.com/article/1673596577519/comment/1673767749885#comments
         let targetElement = target;
@@ -233,6 +231,7 @@ const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
 };
 
 const getTarget = (event: MouseEvent & { target: HTMLElement }, aElement: false | HTMLElement) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (window.siyuan.config.editor.floatWindowMode === 2 || hasClosestByClassName(event.target, "history__repo", true)) {
         return false;
     }
@@ -270,7 +269,8 @@ const getTarget = (event: MouseEvent & { target: HTMLElement }, aElement: false 
 };
 
 export const showPopover = async (app: App, showRef = false) => {
-    if (!popoverTargetElement) {
+    window.sout.tracker("invoked");
+    if (!popoverTargetElement || window.siyuan.menus.menu.data?.isSameNode(popoverTargetElement)) {
         return;
     }
     let ids: string[];

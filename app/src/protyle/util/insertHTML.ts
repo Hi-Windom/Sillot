@@ -13,6 +13,7 @@ import {input} from "../wysiwyg/input";
 import {objEquals} from "../../util/functions";
 
 const processAV = (range: Range, html: string, protyle: IProtyle, blockElement: HTMLElement) => {
+    window.sout.tracker("invoked");
     const tempElement = document.createElement("template");
     tempElement.innerHTML = html;
     let values: IAVCellValue[][] = [];
@@ -177,6 +178,7 @@ const processAV = (range: Range, html: string, protyle: IProtyle, blockElement: 
 export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
                            // 移动端插入嵌入块时，获取到的 range 为旧值
                            useProtyleRange = false) => {
+    window.sout.tracker("invoked");
     if (html === "") {
         return;
     }

@@ -13,6 +13,7 @@ import {Editor} from "../../editor";
 import {hideTooltip} from "../../dialog/tooltip";
 
 export const globalTouchStart = (event: TouchEvent) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     // 文档背景位置调整
     const target = event.target as HTMLElement;
     const backgroundElement = hasClosestByClassName(target, "protyle-background");
@@ -48,6 +49,7 @@ export const globalTouchStart = (event: TouchEvent) => {
 };
 
 export const globalTouchEnd = (event: TouchEvent, yDiff: number, time: number, app: App) => {
+    // window.sout.tracker("invoked"); // 这里调用频繁
     const target = event.target as HTMLElement;
     const isIPadBoolean = isIPad();
     if (typeof yDiff === "undefined" && new Date().getTime() - time > 900) {

@@ -23,6 +23,7 @@ export const bindAssetEvent = (options: {
     cellElements: HTMLElement[],
     blockElement: Element
 }) => {
+    window.sout.tracker("invoked");
     options.menuElement.querySelector("input").addEventListener("change", (event: InputEvent & {
         target: HTMLInputElement
     }) => {
@@ -52,6 +53,7 @@ export const bindAssetEvent = (options: {
 };
 
 export const getAssetHTML = (cellElements: HTMLElement[]) => {
+    window.sout.tracker("invoked");
     let html = "";
     genCellValueByElement("mAsset", cellElements[0]).mAsset.forEach(item => {
         if (!item.content) {
@@ -100,6 +102,7 @@ export const updateAssetCell = (options: {
     removeContent?: string,
     blockElement: Element
 }) => {
+    window.sout.tracker("invoked");
     const colId = options.cellElements[0].dataset.colId;
     const cellDoOperations: IOperation[] = [];
     const cellUndoOperations: IOperation[] = [];
@@ -200,6 +203,7 @@ export const updateAssetCell = (options: {
 };
 
 export const editAssetItem = (protyle: IProtyle, data: IAV, cellElements: HTMLElement[], target: HTMLElement, blockElement: Element) => {
+    window.sout.tracker("invoked");
     const linkAddress = target.dataset.content;
     const type = target.dataset.type as "image" | "file";
     const menu = new Menu("av-asset-edit", () => {
@@ -271,6 +275,7 @@ export const editAssetItem = (protyle: IProtyle, data: IAV, cellElements: HTMLEl
 };
 
 export const addAssetLink = (protyle: IProtyle, data: IAV, cellElements: HTMLElement[], target: HTMLElement, blockElement: Element) => {
+    window.sout.tracker("invoked");
     const menu = new Menu("av-asset-link", () => {
         const textElements = menu.element.querySelectorAll("textarea");
         if (!textElements[0].value) {
@@ -311,6 +316,7 @@ ${window.siyuan.languages.title}
 };
 
 export const dragUpload = (files: string[], protyle: IProtyle, cellElement: HTMLElement, avID: string) => {
+    window.sout.tracker("invoked");
     const msgId = showMessage(window.siyuan.languages.uploading, 0);
     fetchPost("/api/asset/insertLocalAssets", {
         assetPaths: files,
