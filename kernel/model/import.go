@@ -282,6 +282,10 @@ func ImportSY(zipPath, boxID, toPath string) (err error) {
 				}
 				return ast.WalkContinue
 			})
+
+			// 关联数据库和块
+			avNodes := tree.Root.ChildrenByType(ast.NodeAttributeView)
+			av.BatchUpsertBlockRel(avNodes)
 		}
 	}
 
