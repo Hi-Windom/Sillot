@@ -98,7 +98,7 @@ export const hasClosestBlock = (element: Node) => {
 };
 
 export const hasClosestByMatchTag = (element: Node, nodeName: string) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 这里调用频繁
     if (!element) {
         return false;
     }
