@@ -34,7 +34,7 @@ import {removeEmbed} from "../wysiwyg/removeEmbed";
 import {getContenteditableElement, getTopAloneElement, isNotEditBlock} from "../wysiwyg/getBlock";
 // import * as dayjs from "dayjs";
 import {formatDate} from "sofill/mid";
-import { parseNumber2FormatString } from "../../sillot/util/date";
+import {isInvalidStringStrict} from "sofill/api"
 import {fetchPost, fetchSyncPost} from "../../util/fetch";
 import {cancelSB, genEmptyElement, insertEmptyBlock, jumpToParentNext} from "../../block/util";
 import {countBlockWord} from "../../layout/status";
@@ -1823,13 +1823,15 @@ export class Gutter {
         }
 
         let updateHTML = nodeElement.getAttribute("updated") || "";
-        if (updateHTML) {
-            updateHTML = `${window.siyuan.languages.modifiedAt} ${parseNumber2FormatString(updateHTML,'yyyy-MM-dd HH:mm:ss')}<br>`;
+        if (!isInvalidStringStrict(updateHTML)) {
+            updateHTML = `${window.siyuan.languages.modifiedAt} ${formatDate(updateHTML,'yyyy-MM-dd HH:mm:ss')}<br>`;
+        } else {
+            updateHTML = `${window.siyuan.languages.modifiedAt} ${formatDate(new Date(),'yyyy-MM-dd HH:mm:ss')}<br>`; // 使用新时间覆盖丢失的
         }
         window.siyuan.menus.menu.append(new MenuItem({
             iconHTML: "",
             type: "readonly",
-            label: `${updateHTML}${window.siyuan.languages.createdAt} ${parseNumber2FormatString(id.substring(0, 14),'yyyy-MM-dd HH:mm:ss')}`,
+            label: `${updateHTML}${window.siyuan.languages.createdAt} ${formatDate(id.substring(0, 14),'yyyy-MM-dd HH:mm:ss')}`,
         }).element);
         return window.siyuan.menus.menu;
     }

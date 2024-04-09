@@ -156,7 +156,7 @@
     "sass-loader": "^14.1.1",
     "shelljs": "^0.8.5",
     "socket.io": "^4.7.5",
-    "sofill": "^1.1.8",
+    "sofill": "^1.1.9",
     "sout": "^1.1.0",
     "style-loader": "^3.3.4",
     "sweetalert2": "^11.10.7",
