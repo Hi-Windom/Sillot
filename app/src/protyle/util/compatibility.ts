@@ -25,7 +25,7 @@ export const openByMobile = (uri: string, from?: string) => {
 					if (!existingUri) {
 							toolbarConsole.classList.add("fn__none");
 							toolbarOpenBy.classList.remove("fn__none");
-
+                            toolbarOpenBy.removeAttribute("data-refBlockId"); // 避免冲突
 							toolbarOpenBy.addEventListener("click", () => {
 									toolbarOpenBy.classList.add("fn__none");
 									toolbarConsole.classList.remove("fn__none");
