@@ -2005,9 +2005,63 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 }
                 checkFold(refBlockId, (zoomIn, action) => {
                     /// #if MOBILE
-                    openMobileFileById(protyle.app, refBlockId, zoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
-                    activeBlur();
-                    hideKeyboardToolbar();
+                    console.warn(`refBlockId : ${refBlockId}`); // 文档中直接点击双链
+                    const toolbarOpenBy = document.querySelector("#toolbarOpenBy");
+                    const toolbarConsole = document.querySelector("#toolbarConsole");
+                    if (toolbarOpenBy && toolbarConsole) {
+                        const existingUri = toolbarOpenBy.getAttribute("data-refBlockId");
+
+                        // 只有在首次调用时才更新uri和绑定事件
+                        if (!existingUri) {
+                            toolbarConsole.classList.add("fn__none");
+                            toolbarOpenBy.classList.remove("fn__none");
+                            toolbarOpenBy.removeAttribute("data-uri"); // 避免冲突
+                            toolbarOpenBy.addEventListener("click", () => {
+                                toolbarOpenBy.classList.add("fn__none");
+                                toolbarConsole.classList.remove("fn__none");
+                                const updatedUri = toolbarOpenBy.getAttribute("data-refBlockId");
+                                if (updatedUri) {
+                                    console.warn(`refBlockId : ${updatedUri} -> openMobileFileById() ? (toolbarOpenBy && toolbarConsole)`);
+                                    toolbarOpenBy.removeAttribute("data-refBlockId");
+                                    openMobileFileById(protyle.app, updatedUri, zoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
+                                    activeBlur();
+                                    hideKeyboardToolbar();
+                                }
+                            });
+
+                            // 更新"data-refBlockId"值
+                            toolbarOpenBy.setAttribute("data-refBlockId", refBlockId);
+                            if (
+                                !toolbarOpenBy.classList.contains("flash-blue")
+                            ) {
+                                toolbarOpenBy.classList.add("flash-blue");
+                                setTimeout(() => {
+                                    toolbarOpenBy.classList.remove("flash-blue");
+                                }, 200);
+                            }
+                        } else {
+                            // 更新"data-refBlockId"值
+                            toolbarOpenBy.setAttribute("data-refBlockId", refBlockId);
+                            if (
+                                !toolbarOpenBy.classList.contains("flash-blue")
+                            ) {
+                                toolbarOpenBy.classList.add("flash-blue");
+                                setTimeout(() => {
+                                    toolbarOpenBy.classList.remove("flash-blue");
+                                }, 200);
+                            }
+                        }
+                    } else {
+                        // 如果找不到元素，则直接调用
+                        toolbarOpenBy.removeAttribute("data-refBlockId");
+                        console.warn(`refBlockId : ${refBlockId} -> openMobileFileById() ? not(toolbarOpenBy && toolbarConsole)`);
+                        openMobileFileById(protyle.app, refBlockId, zoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
+                        activeBlur();
+                        hideKeyboardToolbar();
+                    }
+                    // openMobileFileById(protyle.app, refBlockId, zoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
+                    // activeBlur();
+                    // hideKeyboardToolbar();
                     /// #else
                     if (event.shiftKey) {
                         openFileById({
@@ -2070,6 +2124,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                         excludeIDs: [blockElement.getAttribute("data-node-id")]
                     }, (response) => {
                         checkFold(response.data[0], (zoomIn) => {
+                            console.warn(`response.data[0] : ${response.data[0]}`);
                             openMobileFileById(protyle.app, response.data[0], zoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
                             activeBlur();
                             hideKeyboardToolbar();
@@ -2189,6 +2244,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 const embedId = embedItemElement.getAttribute("data-id");
                 checkFold(embedId, (zoomIn, action) => {
                     /// #if MOBILE
+                    console.warn(`embedId : ${embedId}`);
                     openMobileFileById(protyle.app, embedId, zoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
                     activeBlur();
                     hideKeyboardToolbar();
