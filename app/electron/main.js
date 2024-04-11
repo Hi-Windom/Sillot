@@ -792,6 +792,25 @@ app.whenReady().then(() => {
                 shell.openExternal("https://github.com/Hi-Windom/Sillot");
             },
         }, {
+            label: lang.openWSlog, click: () => {
+                const ws = JSON.parse(fs.readFileSync(path.join(confDir, "workspace.json")).toString());
+                ws.forEach((workspacePath) => {
+                    const file = path.join(workspacePath, "temp", "siyuan.log");
+                    shell.showItemInFolder(file);
+                    app.addRecentDocument(file);
+                });
+            },
+        }, {
+            label: lang.openAPPlog, click: () => {
+                shell.openPath(path.join(confDir, "app.log"), (error) => {
+                    if (error) {
+                      console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
+                    } else {
+                      app.addRecentDocument(path.join(confDir, "app.log"));
+                    }
+                  });
+            },
+        }, {
             label: lang.resetWindow, type: "checkbox", click: v => {
                 resetWindowStateOnRestart = v.checked;
                 mainWindow.webContents.send("siyuan-save-close", true);
@@ -799,7 +818,7 @@ app.whenReady().then(() => {
         }, {
             label: lang.quit, click: () => {
                 mainWindow.webContents.send("siyuan-save-close", true);
-                setTimeout(()=> { app.exit();}, 30000);   // 强制退出
+                setTimeout(()=> { app.exit();}, 60000);   // 强制退出
             },
         },];
 

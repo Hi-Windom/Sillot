@@ -1222,7 +1222,9 @@
     "officialWebsite": "Visit official website",
     "openSource": "Visit project on GitHub",
     "resetWindow": "Reset window and exit",
-    "quit": "Quit application"
+    "quit": "Quit application",
+    "openWSlog": "Locate WS Log Dir",
+    "openAPPlog": "Open App log"
   },
   "_attrView": {
     "table": "Table",

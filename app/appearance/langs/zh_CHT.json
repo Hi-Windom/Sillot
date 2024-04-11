@@ -1222,7 +1222,9 @@
     "officialWebsite": "訪問官方網站",
     "openSource": "訪問 GitHub 項目",
     "resetWindow": "重置窗口並退出程序",
-    "quit": "退出程序"
+    "quit": "退出程序",
+    "openWSlog": "定位工作空间日志目录",
+    "openAPPlog": "打开应用日志"
   },
   "_attrView": {
     "table": "表格",
