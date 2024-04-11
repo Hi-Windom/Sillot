@@ -8,7 +8,7 @@ import {Constants} from "../../constants";
 import {matchHotKey} from "../../protyle/util/hotKey";
 
 export const windowKeyUp = (app: App, event: KeyboardEvent) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 这里调用频繁，请细化调试逻辑
     window.siyuan.ctrlIsPressed = false;
     window.siyuan.shiftIsPressed = false;
     window.siyuan.altIsPressed = false;

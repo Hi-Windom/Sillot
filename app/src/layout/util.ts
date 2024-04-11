@@ -137,7 +137,7 @@ export const getWndByLayout: (layout: Layout) => Wnd = (layout: Layout) => {
 };
 
 const dockToJSON = (dock: Dock) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 这里调用频繁，请细化调试逻辑
     const json = [];
     const subDockToJSON = (index: number) => {
         const data: Config.IUILayoutDockTab[] = [];
@@ -310,7 +310,7 @@ export const JSONToCenter = (
     json: Config.TUILayoutItem,
     layout?: Layout | Wnd | Tab | Model,
 ) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 这里调用频繁，请细化调试逻辑
     let child: Layout | Wnd | Tab | Model;
     if (json.instance === "Layout") {
         if (!layout) {
