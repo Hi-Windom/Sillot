@@ -38,10 +38,6 @@ type Widget struct {
 
 func Widgets() (widgets []*Widget) {
 	widgets = []*Widget{}
-	widgetsBlacklist := []string{
-		"zuoez02/siyuan-plugin-system-widget",
-	}
-
 	stageIndex, err := getStageIndex("widgets")
 	if nil != err {
 		return
