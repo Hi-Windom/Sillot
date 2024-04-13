@@ -137,7 +137,7 @@ export const bindViewEvent = (options: {
                 blockID,
                 data: false
             }]);
-            options.blockElement.querySelector(".av__title").classList.add("av__title--hide");
+            options.blockElement.querySelector(".av__title").classList.add("fn__none");
         } else {
             transaction(options.protyle, [{
                 action: "hideAttrViewName",
@@ -150,7 +150,7 @@ export const bindViewEvent = (options: {
                 blockID,
                 data: true
             }]);
-            options.blockElement.querySelector(".av__title").classList.remove("av__title--hide");
+            options.blockElement.querySelector(".av__title").classList.remove("fn__none");
         }
     });
 };

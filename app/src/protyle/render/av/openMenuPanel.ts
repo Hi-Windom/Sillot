@@ -312,7 +312,6 @@ export const openMenuPanel = (options: {
                     protyle: options.protyle,
                     data,
                     cellElements: options.cellElements,
-                    type: "replace",
                     replaceValue,
                     blockElement: options.blockElement
                 });
@@ -1105,8 +1104,7 @@ export const openMenuPanel = (options: {
                             protyle: options.protyle,
                             data,
                             cellElements: options.cellElements,
-                            type: "addUpdate",
-                            addUpdateValue: [value],
+                            addValue: [value],
                             blockElement: options.blockElement
                         });
                         window.siyuan.menus.menu.remove();

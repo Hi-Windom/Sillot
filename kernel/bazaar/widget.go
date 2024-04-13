@@ -24,7 +24,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/88250/gulu"
 	"github.com/dustin/go-humanize"
 	ants "github.com/panjf2000/ants/v2"
 	"github.com/siyuan-note/filelock"
@@ -56,6 +55,13 @@ func Widgets() (widgets []*Widget) {
 
 		repo := arg.(*StageRepo)
 		repoURL := repo.URL
+
+		if pkg, found := packageCache.Get(repoURL); found {
+			lock.Lock()
+			widgets = append(widgets, pkg.(*Widget))
+			lock.Unlock()
+			return
+		}
 
 		widget := &Widget{}
 		innerU := util.BazaarOSSServer + "/package/" + repoURL + "/widget.json"
@@ -94,11 +100,11 @@ func Widgets() (widgets []*Widget) {
 		if nil != pkg {
 			widget.Downloads = pkg.Downloads
 		}
-		if !gulu.Str.Contains(repoURLHash[0], widgetsBlacklist) {
-			lock.Lock()
-			widgets = append(widgets, widget)
-			lock.Unlock()
-		}
+		lock.Lock()
+		widgets = append(widgets, widget)
+		lock.Unlock()
+
+		packageCache.SetDefault(repoURL, widget)
 	})
 	for _, repo := range stageIndex.Repos {
 		waitGroup.Add(1)

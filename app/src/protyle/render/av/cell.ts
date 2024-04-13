@@ -13,6 +13,7 @@ import {getColIconByType} from "./col";
 import {genAVValueHTML} from "./blockAttr";
 import {Constants} from "../../../constants";
 import {hintRef} from "../../hint/extend";
+import {pathPosix} from "../../../util/pathName";
 
 const renderCellURL = (urlContent: string) => {
     window.sout.tracker("invoked");
@@ -138,7 +139,7 @@ export const genCellValue = (colType: TAVCol, value: string | any) => {
         type: colType,
         [colType === "select" ? "mSelect" : colType]: value as IAVCellDateValue
     };
-    if (typeof value === "string" && value && colType !== "mAsset") {
+    if (typeof value === "string" && value) {
         if (colType === "number") {
             cellValue = {
                 type: colType,
@@ -185,6 +186,16 @@ export const genCellValue = (colType: TAVCol, value: string | any) => {
             cellValue = {
                 type: colType,
                 relation: {blockIDs: [value], contents: []}
+            };
+        } else if (colType === "mAsset") {
+            const type = pathPosix().extname(value).toLowerCase();
+            cellValue = {
+                type: colType,
+                mAsset: [{
+                    type: Constants.SIYUAN_ASSETS_IMAGE.includes(type) ? "image" : "file",
+                    content: value,
+                    name: "",
+                }]
             };
         }
     } else if (typeof value === "undefined" || !value) {
@@ -454,12 +465,12 @@ export const popTextCell = (protyle: IProtyle, cellElements: HTMLElement[], type
             updateCellValueByInput(protyle, type, blockElement, cellElements);
             avMaskElement?.remove();
         }
-    }
+    };
     avMaskElement.addEventListener("click", (event) => {
-        removeAvMask(event)
+        removeAvMask(event);
     });
     avMaskElement.addEventListener("contextmenu", (event) => {
-        removeAvMask(event)
+        removeAvMask(event);
     });
 };
 
@@ -687,9 +698,9 @@ export const renderCell = (cellValue: IAVCellValue) => {
     } else if (cellValue.type === "mAsset") {
         cellValue?.mAsset?.forEach((item) => {
             if (item.type === "image") {
-                text += `<img class="av__cellassetimg" src="${item.content}">`;
+                text += `<img class="av__cellassetimg ariaLabel" aria-label="${item.content}" src="${item.content}">`;
             } else {
-                text += `<span class="b3-chip av__celltext--url" data-url="${item.content}">${item.name}</span>`;
+                text += `<span class="b3-chip av__celltext--url ariaLabel" aria-label="${item.content}" data-url="${item.content}">${item.name}</span>`;
             }
         });
     } else if (cellValue.type === "checkbox") {
