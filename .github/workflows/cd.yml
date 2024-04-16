@@ -56,7 +56,9 @@ jobs:
       - id: output_packageManager
         run: |
           packageManager=${{ steps.packageManager.outputs.value }}
-          echo "$packageManager" >> $GITHUB_ENV
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "packageManager<<$EOF" >> $GITHUB_ENV
+          echo "$EOF" >> $GITHUB_ENV
 
       - id: thislatestR
         uses: pozetroninc/github-action-get-latest-release@master
