@@ -54,7 +54,9 @@ jobs:
         with:
             cmd: "jq .packageManager app/package.json -r"
       - id: output_packageManager
-        run: echo "::set-output name=packageManager::$(${{ steps.packageManager.outputs.value }})"
+        run: |
+          packageManager=${{ steps.packageManager.outputs.value }}
+          echo "$packageManager" >> $GITHUB_ENV
 
       - id: thislatestR
         uses: pozetroninc/github-action-get-latest-release@master
@@ -199,7 +201,7 @@ jobs:
           node-version: 20
 
       - name: Install Node pnpm
-        run: npm install -g ${{ needs.create_release.outputs.packageManager }}
+        run: npm install -g ${{ env.packageManager }}
         working-directory: ${{ github.workspace }}/go/src/github.com/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
 
       - name: Change NPMRC File
