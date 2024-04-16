@@ -56,6 +56,7 @@ import {insertAttrViewBlockAnimation} from "../render/av/row";
 import {avContextmenu} from "../render/av/action";
 import {openSearchAV} from "../render/av/relation";
 import {getPlainText} from "../util/paste";
+import {Menu} from "../../plugin/Menu";
 
 export class Gutter {
     public element: HTMLElement;
@@ -71,6 +72,7 @@ export class Gutter {
         this.element.className = "protyle-gutters";
         this.element.addEventListener("dragstart", (event: DragEvent & { target: HTMLElement }) => {
             hideTooltip();
+            window.siyuan.menus.menu.remove();
             const buttonElement = event.target.parentElement;
             let selectIds: string[] = [];
             let selectElements: Element[] = [];
@@ -825,6 +827,7 @@ export class Gutter {
                 });
             }
         }).element);
+        const range = getSelection().rangeCount > 0 ? getSelection().getRangeAt(0) : undefined;
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.addToDatabase,
             accelerator: window.siyuan.config.keymap.general.addToDatabase.custom,
@@ -852,7 +855,7 @@ export class Gutter {
                         srcIDs: sourceIds,
                         avID,
                     }]);
-                    focusBlock(selectsElement[0]);
+                    focusByRange(range);
                 });
             }
         }).element);
@@ -942,7 +945,10 @@ export class Gutter {
         }
         // 单个块的菜单
         hideElements(["util", "toolbar", "hint"], protyle);
-        window.siyuan.menus.menu.remove();
+        const menu = new Menu("gutter");
+        if (menu.isOpen) {
+            return;
+        }
         if (isMobile()) {
             activeBlur();
         }
@@ -1316,6 +1322,7 @@ export class Gutter {
                     });
                 }
             }).element);
+            const range = getSelection().rangeCount > 0 ? getSelection().getRangeAt(0) : undefined;
             window.siyuan.menus.menu.append(new MenuItem({
                 label: window.siyuan.languages.addToDatabase,
                 accelerator: window.siyuan.config.keymap.general.addToDatabase.custom,
@@ -1340,7 +1347,7 @@ export class Gutter {
                             srcIDs: sourceIds,
                             avID,
                         }]);
-                        focusBlock(nodeElement);
+                        focusByRange(range);
                     });
                 }
             }).element);

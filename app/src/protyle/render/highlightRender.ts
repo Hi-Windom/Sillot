@@ -146,7 +146,7 @@ export const highlightRender = (element: Element, cdn = Constants.PROTYLE_CDN) =
 
 export const lineNumberRender = (block: HTMLElement) => {
     window.sout.tracker("invoked");
-    const lineNumber = block.parentElement.getAttribute("lineNumber")
+    const lineNumber = block.parentElement.getAttribute("lineNumber");
     if (lineNumber === "false") {
         return;
     }

@@ -193,6 +193,7 @@ const promiseTransaction = () => {
                         blockRender(protyle, item);
                     }
                 });
+                hideElements(["gutter"], protyle);
                 return;
             }
             if (operation.action === "move") {

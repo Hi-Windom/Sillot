@@ -880,8 +880,8 @@ app.whenReady().then(() => {
         }), new MenuItem({
             role: "selectAll", label: langs.selectAll
         })];
-        const menu = Menu.buildFromTemplate(template)
-        menu.popup({window: BrowserWindow.fromWebContents(event.sender)})
+        const menu = Menu.buildFromTemplate(template);
+        menu.popup({window: BrowserWindow.fromWebContents(event.sender)});
     });
     ipcMain.on("siyuan-open-folder", (event, filePath) => {
         if (filePath === "openWorkspacesLogFolder") {
