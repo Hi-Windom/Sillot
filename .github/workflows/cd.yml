@@ -48,6 +48,14 @@ jobs:
         with:
             cmd: "jq .sypv app/package.json -r"
 
+      - name: Extract packageManager from package.json
+        uses: sergeysova/jq-action@v2
+        id: packageManager
+        with:
+            cmd: "jq .packageManager app/package.json -r"
+      - id: output_packageManager
+        run: echo "::set-output name=packageManager::$(${{ steps.packageManager.outputs.value }})"
+
       - id: thislatestR
         uses: pozetroninc/github-action-get-latest-release@master
         with:
@@ -185,19 +193,13 @@ jobs:
           GOPATH: ${{ github.workspace }}/go
           GOARCH: ${{ matrix.config.goarch }}
 
-      - name: Extract packageManager from package.json
-        uses: sergeysova/jq-action@v2
-        id: packageManager
-        with:
-          cmd: "jq .packageManager ${{ github.workspace }}/go/src/github.com/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/package.json -r"
-
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install Node pnpm
-        run: npm install -g ${{ steps.packageManager.outputs.value }}
+        run: npm install -g ${{ needs.create_release.outputs.packageManager }}
         working-directory: ${{ github.workspace }}/go/src/github.com/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
 
       - name: Change NPMRC File
