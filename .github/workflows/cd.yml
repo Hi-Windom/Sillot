@@ -48,6 +48,12 @@ jobs:
         with:
             cmd: "jq .sypv app/package.json -r"
 
+      - name: Extract packageManager from package.json
+        uses: sergeysova/jq-action@v2
+        id: packageManager
+        with:
+            cmd: "jq .packageManager app/package.json -r"
+
       - id: thislatestR
         uses: pozetroninc/github-action-get-latest-release@master
         with:
@@ -191,7 +197,7 @@ jobs:
           node-version: 20
 
       - name: Install Node pnpm
-        run: npm install -g pnpm
+        run: npm install -g ${{ steps.packageManager.outputs.value }}
         working-directory: ${{ github.workspace }}/go/src/github.com/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
 
       - name: Change NPMRC File
