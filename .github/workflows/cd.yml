@@ -20,6 +20,7 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       release_version: ${{ steps.release_info.outputs.release_version }}
       version: ${{ steps.version.outputs.value }}
+      packageManager: ${{ steps.packageManager.outputs.value }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -53,13 +54,6 @@ jobs:
         id: packageManager
         with:
             cmd: "jq .packageManager app/package.json -r"
-      - id: output_packageManager
-        run: |
-          packageManager=${{ steps.packageManager.outputs.value }}
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "packageManager<<$EOF" >> $GITHUB_ENV
-          echo "$packageManager" >> $GITHUB_ENV
-          echo "$EOF" >> $GITHUB_ENV
 
       - id: thislatestR
         uses: pozetroninc/github-action-get-latest-release@master
@@ -204,7 +198,7 @@ jobs:
           node-version: 20
 
       - name: Install Node pnpm
-        run: npm install -g ${{ env.packageManager }}
+        run: npm install -g ${{ needs.create_release.outputs.packageManager }}
         working-directory: ${{ github.workspace }}/go/src/github.com/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
 
       - name: Change NPMRC File
