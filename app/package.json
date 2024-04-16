@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.29.18",
+  "version": "0.29.19",
   "syv": "3.0.10",
   "sypv": "[3.0.9]",
   "description": "Build Your Eternal Digital Garden",
@@ -12,7 +12,7 @@
     "node": ">=20.11.1",
     "pnpm": ">=9.0.0"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@9.0.1",
   "scripts": {
     "cli": "node ./package.cli.mjs",
     "dlv": "echo '注意：dlv debug 是否在独立终端运行中（需要在dlv里执行continue）？没有请先启动（终端工作路径是 kernel/main.go 所在目录），不需要内核调试则应该运行 pnpm run start 命令\n' && pause && NODE_ENV=development MODE=dlv electron-forge start",
@@ -116,7 +116,7 @@
     "date-fns": "^3.6.0",
     "ejs": "^3.1.10",
     "electron": "30.0.0",
-    "electron-builder": "^24.13.3",
+    "electron-builder": "25.0.0-alpha.6",
     "electron-reloader": "^1.2.3",
     "encoding": "^0.1.13",
     "esbuild": "^0.20.2",
