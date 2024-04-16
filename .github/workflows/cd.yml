@@ -58,6 +58,7 @@ jobs:
           packageManager=${{ steps.packageManager.outputs.value }}
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "packageManager<<$EOF" >> $GITHUB_ENV
+          echo "$packageManager" >> $GITHUB_ENV
           echo "$EOF" >> $GITHUB_ENV
 
       - id: thislatestR
