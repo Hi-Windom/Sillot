@@ -341,7 +341,7 @@ jobs:
       - name: Build with Gradle
         if: contains( matrix.config.goos, 'windows')
         working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}
-        run: ./gradlew assembleAction --quiet --stacktrace
+        run: ./gradlew assembleAction --debug --stacktrace
         continue-on-error: false
 
       - uses: noriban/sign-android-release@v5
