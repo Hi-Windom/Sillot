@@ -9,6 +9,7 @@ on:
 jobs:
   create_release:
     name: Create Release
+    if: github.ref == 'refs/tags/v${{ github.event.release.tag_name }}'
     runs-on: ubuntu-latest
     strategy:
         matrix:
@@ -24,18 +25,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Check if tag is the latest
-        id: check_tag
-        run: |
-          latest_tag=$(git describe --tags$(git rev-list --tags --max-count=1))
-          echo "Latest tag is $latest_tag"
-          if [ "refs/tags/$latest_tag" = "$GITHUB_REF" ]; then
-            echo "Tag is the latest"
-          else
-            echo "Tag is not the latest"
-            exit 1
-          fi
 
       - name: Setup Python
         uses: actions/setup-python@v5
