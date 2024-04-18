@@ -213,27 +213,27 @@ jobs:
         working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
 
       - name: Remove Build Directory
-        uses: JesseTG/rm@v1.0.2
+        uses: K-Sillot/rm@master
         with:
           path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/build
 
       - name: Remove Kernel Directory for Linux
-        uses: JesseTG/rm@v1.0.2
+        uses: K-Sillot/rm@master
         with:
           path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/kernel-linux
 
       - name: Remove Kernel Directory for Windows
-        uses: JesseTG/rm@v1.0.2
+        uses: K-Sillot/rm@master
         with:
           path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/kernel
 
       # - name: Remove Kernel Directory for macOS
-      #   uses: JesseTG/rm@v1.0.2
+      #   uses: K-Sillot/rm@master
       #   with:
       #     path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/kernel-darwin
 
       # - name: Remove Kernel Directory for macOS ARM64
-      #   uses: JesseTG/rm@v1.0.2
+      #   uses: K-Sillot/rm@master
       #   with:
       #     path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/kernel-darwin-arm64
 
@@ -305,7 +305,7 @@ jobs:
           ndk-version: r25b
           add-to-path: true
       - name: Remove android Directory
-        uses: JesseTG/rm@v1.0.2
+        uses: K-Sillot/rm@master
         if: contains( matrix.config.goos, 'windows')
         with:
           path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}
