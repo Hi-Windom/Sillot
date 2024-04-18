@@ -120,6 +120,7 @@ jobs:
 
   build:
     runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.name }}
     needs: create_release
     strategy:
       matrix:
