@@ -4,7 +4,7 @@ name: Sillot CI/CD
 on:
   push:
     tags:
-      - "v*"
+      - "v*-sillot"
 
 jobs:
   create_release:
@@ -24,19 +24,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Check if latest tag
-        id: check_tag
-        run: |
-          echo "${{ github.ref }}"
-          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
-          echo "refs/tags/${latest_tag}"
-          if [[ "${{ github.ref }}" == "refs/tags/${latest_tag}" ]]; then
-            echo "This tag is the latest."
-          else
-            echo "This tag is not the latest."
-            exit 1
-          fi
 
       - name: Setup Python
         uses: actions/setup-python@v5
