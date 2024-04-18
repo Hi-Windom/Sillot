@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.29.19",
+  "version": "0.29.20",
   "syv": "3.0.10",
   "sypv": "[3.0.9]",
   "description": "Build Your Eternal Digital Garden",
@@ -12,7 +12,7 @@
     "node": ">=20.11.1",
     "pnpm": ">=9.0.0"
   },
-  "packageManager": "pnpm@9.0.1",
+  "packageManager": "pnpm@9.0.2",
   "scripts": {
     "cli": "node ./package.cli.mjs",
     "dlv": "echo '注意：dlv debug 是否在独立终端运行中（需要在dlv里执行continue）？没有请先启动（终端工作路径是 kernel/main.go 所在目录），不需要内核调试则应该运行 pnpm run start 命令\n' && pause && NODE_ENV=development MODE=dlv electron-forge start",
@@ -79,8 +79,6 @@
     "@babel/core": "^7.24.4",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
-    "@babel/plugin-transform-nullish-coalescing-operator": "^7.24.1",
-    "@babel/plugin-transform-optional-chaining": "^7.24.1",
     "@babel/plugin-transform-runtime": "^7.24.3",
     "@babel/preset-env": "^7.24.4",
     "@babel/preset-react": "^7.23.3",
@@ -115,7 +113,7 @@
     "csstype": "^3.1.3",
     "date-fns": "^3.6.0",
     "ejs": "^3.1.10",
-    "electron": "30.0.0",
+    "electron": "31.0.0-alpha.1",
     "electron-builder": "25.0.0-alpha.6",
     "electron-reloader": "^1.2.3",
     "encoding": "^0.1.13",

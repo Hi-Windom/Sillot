@@ -13,7 +13,7 @@ importers:
     dependencies:
       '@electron/remote':
         specifier: ^2.1.0
-        version: 2.1.2(electron@30.0.0)
+        version: 2.1.2(electron@31.0.0-alpha.1)
       '@monaco-editor/loader':
         specifier: ^1.4.0
         version: 1.4.0(monaco-editor@0.47.0)
@@ -39,12 +39,6 @@ importers:
       '@babel/plugin-proposal-optional-chaining':
         specifier: ^7.21.0
         version: 7.21.0(@babel/core@7.24.4)
-      '@babel/plugin-transform-nullish-coalescing-operator':
-        specifier: ^7.24.1
-        version: 7.24.1(@babel/core@7.24.4)
-      '@babel/plugin-transform-optional-chaining':
-        specifier: ^7.24.1
-        version: 7.24.1(@babel/core@7.24.4)
       '@babel/plugin-transform-runtime':
         specifier: ^7.24.3
         version: 7.24.3(@babel/core@7.24.4)
@@ -148,8 +142,8 @@ importers:
         specifier: ^3.1.10
         version: 3.1.10
       electron:
-        specifier: 30.0.0
-        version: 30.0.0
+        specifier: 31.0.0-alpha.1
+        version: 31.0.0-alpha.1
       electron-builder:
         specifier: 25.0.0-alpha.6
         version: 25.0.0-alpha.6(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.0-alpha.6))
@@ -3170,8 +3164,8 @@ packages:
   electron-to-chromium@1.4.737:
     resolution: {integrity: sha512-QvLTxaLHKdy5YxvixAw/FfHq2eWLUL9KvsPjp0aHK1gI5d3EDuDgITkvj0nFO2c6zUY3ZqVAJQiBYyQP9tQpfw==}
 
-  electron@30.0.0:
-    resolution: {integrity: sha512-GRwKphq/TUhSlb44OwSckXKl50f5OR/pm9MvF3rBLyqcxwfu7L11xejrZ0hDea1eKyCkzGd4B+cIqaQiDguPEA==}
+  electron@31.0.0-alpha.1:
+    resolution: {integrity: sha512-+IRJ/xvexoItAUYG5Z5yYCbM88yG5K5Hc/5dYPn14RhWfVLlIRvtRk+lFkh1XRgqWnvpB72tgURI09ALh2aXrA==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -7836,9 +7830,9 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@electron/remote@2.1.2(electron@30.0.0)':
+  '@electron/remote@2.1.2(electron@31.0.0-alpha.1)':
     dependencies:
-      electron: 30.0.0
+      electron: 31.0.0-alpha.1
 
   '@electron/universal@1.5.1':
     dependencies:
@@ -10325,7 +10319,7 @@ snapshots:
 
   electron-to-chromium@1.4.737: {}
 
-  electron@30.0.0:
+  electron@31.0.0-alpha.1:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.12.7
