@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.29.601",
+  "version": "0.29.611",
   "syv": "3.0.10",
   "sypv": "[3.0.9]",
   "description": "Build Your Eternal Digital Garden",
@@ -13,6 +13,7 @@
     "pnpm": ">=9.0.0"
   },
   "packageManager": "pnpm@9.0.2",
+  "actionInstallCommand": "pnpm install --no-frozen-lockfile",
   "scripts": {
     "cli": "node ./package.cli.mjs",
     "dlv": "echo '注意：dlv debug 是否在独立终端运行中（需要在dlv里执行continue）？没有请先启动（终端工作路径是 kernel/main.go 所在目录），不需要内核调试则应该运行 pnpm run start 命令\n' && pause && NODE_ENV=development MODE=dlv electron-forge start",
