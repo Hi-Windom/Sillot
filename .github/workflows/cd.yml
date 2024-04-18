@@ -159,6 +159,12 @@ jobs:
             suffix: "win.exe"
 
     steps:
+      - name: Enable long paths for windows # 如果路径超过了 260 个字符（对于 .pnpm 几乎不可避免），可能会遇到问题。
+        if: contains( matrix.config.goos, 'windows')
+        run: |
+          # Enable long paths
+          Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1
+
       - name: Checkout repository and submodules
         uses: actions/checkout@v4
         with:
