@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.29.20",
+  "version": "0.29.21",
   "syv": "3.0.10",
   "sypv": "[3.0.9]",
   "description": "Build Your Eternal Digital Garden",
@@ -157,7 +157,7 @@
     "sofill": "^1.1.9",
     "sout": "^1.1.0",
     "style-loader": "^4.0.0",
-    "sweetalert2": "^11.10.7",
+    "sweetalert2": "^11.10.8",
     "terser-webpack-plugin": "^5.3.10",
     "ts-jest": "^29.1.2",
     "ts-loader": "^9.5.1",
