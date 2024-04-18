@@ -16,6 +16,7 @@ jobs:
             - repo_name_android: "Sillot-android"
               repo_name: "Sillot"
               repo_owner: "Hi-Windom"
+              package_json: "app/package.json"
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       release_version: ${{ steps.release_info.outputs.release_version }}
@@ -35,25 +36,25 @@ jobs:
         uses: sergeysova/jq-action@v2
         id: version
         with:
-          cmd: "jq .version app/package.json -r"
+          cmd: "jq .version ${{ matrix.string.package_json }} -r"
 
       - name: Extract SiYuan version from package.json
         uses: sergeysova/jq-action@v2
         id: syv
         with:
-          cmd: "jq .syv app/package.json -r"
+          cmd: "jq .syv ${{ matrix.string.package_json }} -r"
 
       - name: Extract SiYuan version from package.json
         uses: sergeysova/jq-action@v2
         id: sypv
         with:
-            cmd: "jq .sypv app/package.json -r"
+            cmd: "jq .sypv ${{ matrix.string.package_json }} -r"
 
       - name: Extract packageManager from package.json
         uses: sergeysova/jq-action@v2
         id: packageManager
         with:
-            cmd: "jq .packageManager app/package.json -r"
+            cmd: "jq .packageManager ${{ matrix.string.package_json }} -r"
 
       - id: thisLatestRelease
         uses: K-Sillot/github-action-get-latest-release@master
