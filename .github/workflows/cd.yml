@@ -120,6 +120,7 @@ jobs:
 
   build:
     runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.name }}
     needs: create_release
     strategy:
       matrix:
@@ -129,6 +130,7 @@ jobs:
             repo_owner: "Hi-Windom"
         config:
           - os: ubuntu-20.04
+            name: ubuntu build linux.AppImage
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
             build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist-linux"
@@ -136,27 +138,15 @@ jobs:
             goarch: "amd64"
             suffix: "linux.AppImage"
           - os: ubuntu-20.04
+            name: ubuntu build linux.tar.gz
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
             build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist-linux"
             goos: "linux"
             goarch: "amd64"
             suffix: "linux.tar.gz"
-          # - os: macos-latest
-          #   kernel_path: "../app/kernel-darwin/SiYuan-Sillot-Kernel"
-          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
-          #   electron_args: "dist-darwin"
-          #   goos: "darwin"
-          #   goarch: "amd64"
-          #   suffix: "mac.dmg"
-          # - os: macos-latest
-          #   kernel_path: "../app/kernel-darwin-arm64/SiYuan-Sillot-Kernel"
-          #   build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
-          #   electron_args: "dist-darwin-arm64"
-          #   goos: "darwin"
-          #   goarch: "arm64"
-          #   suffix: "mac-arm64.dmg"
           - os: windows-latest
+            name: windows build win.exe
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
             build_args: "-s -w -H=windowsgui -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
             electron_args: "dist"
@@ -165,6 +155,16 @@ jobs:
             mingwsys: "MINGW64"
             goarch: "amd64"
             suffix: "win.exe"
+          - os: windows-latest
+            name: windows build android.apk
+            kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
+            build_args: "-s -w -H=windowsgui -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+            electron_args: "dist"
+            goos: "windows"
+            gobin: "bin"
+            mingwsys: "MINGW64"
+            goarch: "amd64"
+            suffix: "apk"
 
     steps:
       - name: Enable long paths for windows # 如果路径超过了 260 个字符（对于 .pnpm 几乎不可避免），可能会遇到问题。GitHub Actions 的 windows-latest 已经支持长路径。
@@ -228,35 +228,29 @@ jobs:
 
       - name: Remove Build Directory
         uses: K-Sillot/rm@master
+        if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
           path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/build
 
       - name: Remove Kernel Directory for Linux
         uses: K-Sillot/rm@master
+        if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
           path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/kernel-linux
 
       - name: Remove Kernel Directory for Windows
         uses: K-Sillot/rm@master
+        if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
           path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/kernel
 
-      # - name: Remove Kernel Directory for macOS
-      #   uses: K-Sillot/rm@master
-      #   with:
-      #     path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/kernel-darwin
-
-      # - name: Remove Kernel Directory for macOS ARM64
-      #   uses: K-Sillot/rm@master
-      #   with:
-      #     path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/kernel-darwin-arm64
-
       - name: Generate Icon Resource and Properties/Version Info For Windows
         run: ${{ github.workspace }}\go\${{ matrix.config.gobin }}\goversioninfo -platform-specific=true -icon="resource\icon.ico" -manifest="resource\goversioninfo.exe.manifest"
-        if: contains( matrix.config.goos, 'windows')
+        if: ${{ contains( matrix.config.goos, 'windows') && !contains( matrix.config.suffix, 'apk') }}
         working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/kernel
 
       - name: Building Kernel
+        if: ${{ !contains( matrix.config.suffix, 'apk') }}
         run: go build --tags fts5 -o "${{ matrix.config.kernel_path }}" -v -ldflags "${{ matrix.config.build_args }}"
         working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/kernel
         env:
@@ -267,10 +261,12 @@ jobs:
           GOARCH: ${{ matrix.config.goarch }}
 
       - name: Building Electron
+        if: ${{ !contains( matrix.config.suffix, 'apk') }}
         run: pnpm run ${{ matrix.config.electron_args }}
         working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
 
       - name: Upload Release Asset for Windows & Linux
+        if: ${{ !contains( matrix.config.suffix, 'apk') }}
         uses: shogo82148/actions-upload-release-asset@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -281,7 +277,7 @@ jobs:
 
       - name: zip WinPortable
         uses: thedoctor0/zip-release@0.7.1
-        if: contains( matrix.config.goos, 'windows')
+        if: ${{ contains( matrix.config.goos, 'windows') && !contains( matrix.config.suffix, 'apk') }}
         with:
           type: 'zip'
           filename: ${{ matrix.string.repo_name }}-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
@@ -290,7 +286,7 @@ jobs:
           recursive_exclusions: 'LICENSES.chromium.html'
 
       - name: Upload WinPortable to release asset
-        if: contains(matrix.config.goos, 'windows')
+        if: ${{ contains(matrix.config.goos, 'windows') && !contains( matrix.config.suffix, 'apk') }}
         uses: shogo82148/actions-upload-release-asset@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -303,7 +299,7 @@ jobs:
       # Manual setup is required when the built-in version does not work correctly in windows2022
       - name: Setup JDK
         uses: actions/setup-java@v3
-        if: contains( matrix.config.goos, 'windows')
+        if: contains( matrix.config.suffix, 'apk')
         continue-on-error: true
         with:
           java-version: '17'
@@ -311,41 +307,41 @@ jobs:
           overwrite-settings: true
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3.2.0
-        if: contains( matrix.config.goos, 'windows')
+        if: contains( matrix.config.suffix, 'apk')
       - name: Install Android NDK
         uses: nttld/setup-ndk@v1
-        if: contains( matrix.config.goos, 'windows')
+        if: contains( matrix.config.suffix, 'apk')
         with:
           ndk-version: r25b
           add-to-path: true
       - name: Remove android Directory
         uses: K-Sillot/rm@master
-        if: contains( matrix.config.goos, 'windows')
+        if: contains( matrix.config.suffix, 'apk')
         with:
           path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}
 
       - name: Checkout android repo
         uses: actions/checkout@v4
-        if: contains( matrix.config.goos, 'windows')
+        if: contains( matrix.config.suffix, 'apk')
         with:
           repository: ${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}
           path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}
 
       - name: Before android build
-        if: contains( matrix.config.goos, 'windows')
+        if: contains( matrix.config.suffix, 'apk')
         run: |
             cd ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}
             .\scripts\sillot-android-build-action.bat
         continue-on-error: false
 
       - name: Build with Gradle
-        if: contains( matrix.config.goos, 'windows')
+        if: contains( matrix.config.suffix, 'apk')
         working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}
         run: ./gradlew assembleAction --quiet --stacktrace
         continue-on-error: false
 
       - uses: noriban/sign-android-release@v5
-        if: contains( matrix.config.goos, 'windows')
+        if: contains( matrix.config.suffix, 'apk')
         name: Sign APK
         id: sign_app
         with:
@@ -359,7 +355,7 @@ jobs:
           BUILD_TOOLS_VERSION: "34.0.0"
 
       - name: Upload APK to release asset
-        if: contains(matrix.config.goos, 'windows')
+        if: contains( matrix.config.suffix, 'apk')
         uses: shogo82148/actions-upload-release-asset@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
