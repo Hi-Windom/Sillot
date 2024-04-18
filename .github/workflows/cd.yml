@@ -22,6 +22,9 @@ jobs:
       version: ${{ steps.version.outputs.value }}
       packageManager: ${{ steps.packageManager.outputs.value }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Check if tag is the latest
         id: check_tag
         run: |
@@ -33,9 +36,6 @@ jobs:
             echo "Tag is not the latest"
             exit 1
           fi
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
