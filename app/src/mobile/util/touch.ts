@@ -54,6 +54,7 @@ export const handleTouchEnd = (event: TouchEvent, app: App) => {
     // 有些事件不经过 touchmove
 
     if (scrollBlock) {
+        closePanel();
         return;
     }
 
@@ -236,7 +237,7 @@ export const handleTouchMove = (event: TouchEvent) => {
             } else if (scrollElement.dataset.type === "NodeMathBlock") {
                 scrollElement = target;
                 while (scrollElement && scrollElement.dataset.type !== "NodeMathBlock") {
-                    if (scrollElement.nodeType === 1 && scrollElement.scrollWidth > scrollElement.clientWidth) {
+                    if (scrollElement.nodeType === 1 && scrollElement.scrollLeft > 0) {
                         break;
                     }
                     scrollElement = scrollElement.parentElement;

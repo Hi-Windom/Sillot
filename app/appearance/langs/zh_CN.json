@@ -119,6 +119,7 @@
   "goToEditTabPrev": "跳转到上一个编辑页签",
   "createdTime": "创建时间",
   "updatedTime": "更新时间",
+  "lineNumber": "行号",
   "removeBookmark": "移除 ${x} 中的书签？",
   "lockEdit": "锁定编辑",
   "unlockEdit": "解除锁定",
@@ -1224,7 +1225,9 @@
     "officialWebsite": "访问官网",
     "openSource": "访问 GitHub 项目",
     "resetWindow": "重置窗口并退出程序",
-    "quit": "退出程序"
+    "quit": "退出程序",
+    "openWSlog": "定位工作空间日志目录",
+    "openAPPlog": "打开应用日志"
   },
   "_attrView": {
     "table": "表格",
@@ -1473,6 +1476,7 @@
     "238": "集市包 [%s] 更新失败，请稍后再试",
     "239": "相关操作正在处理中，请稍后再试",
     "240": "不支持拖拽文档中容器块下的标题",
-    "241": "不支持拖拽为自己的子标题"
+    "241": "不支持拖拽为自己的子标题",
+    "242": "当前数据库中已经存在该绑定块"
   }
 }

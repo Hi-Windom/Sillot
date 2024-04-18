@@ -342,7 +342,7 @@ func FirstLeafBlock(node *ast.Node) (ret *ast.Node) {
 
 func CountBlockNodes(node *ast.Node) (ret int) {
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering || !n.IsBlock() || ast.NodeList == n.Type || ast.NodeListItem == n.Type || ast.NodeBlockquote == n.Type || ast.NodeSuperBlock == n.Type {
+		if !entering || !n.IsBlock() || ast.NodeList == n.Type || ast.NodeBlockquote == n.Type || ast.NodeSuperBlock == n.Type {
 			return ast.WalkContinue
 		}
 
@@ -598,7 +598,7 @@ func getAttributeViewContent(avID string) (content string) {
 			if nil == cell.Value {
 				continue
 			}
-			buf.WriteString(cell.Value.String())
+			buf.WriteString(cell.Value.String(true))
 			buf.WriteByte(' ')
 		}
 	}
@@ -954,7 +954,7 @@ func GetAttributeViewDefaultValue(valueID, keyID, blockID string, typ av.KeyType
 		ret.CreatedAt = time.Now().UnixMilli()
 	}
 	if 0 == ret.UpdatedAt {
-		ret.UpdatedAt = ret.CreatedAt + 1000
+		ret.UpdatedAt = ret.CreatedAt
 	}
 
 	switch typ {
@@ -1050,12 +1050,33 @@ func renderTemplateCol(ial map[string]string, rowValues []*av.KeyValues, tplCont
 					dataModel[rowValue.Key.Name] = time.UnixMilli(v.Date.Content)
 				}
 			} else if av.KeyTypeRollup == v.Type {
-				if 0 < len(v.Rollup.Contents) && av.KeyTypeNumber == v.Rollup.Contents[0].Type {
-					// 汇总数字时仅取第一个数字填充模板
-					dataModel[rowValue.Key.Name] = v.Rollup.Contents[0].Number.Content
+				if 0 < len(v.Rollup.Contents) {
+					var numbers []float64
+					var contents []string
+					for _, content := range v.Rollup.Contents {
+						if av.KeyTypeNumber == content.Type {
+							numbers = append(numbers, content.Number.Content)
+						} else {
+							contents = append(contents, content.String(true))
+						}
+					}
+
+					if 0 < len(numbers) {
+						dataModel[rowValue.Key.Name] = numbers
+					} else {
+						dataModel[rowValue.Key.Name] = contents
+					}
+				}
+			} else if av.KeyTypeRelation == v.Type {
+				if 0 < len(v.Relation.Contents) {
+					var contents []string
+					for _, content := range v.Relation.Contents {
+						contents = append(contents, content.String(true))
+					}
+					dataModel[rowValue.Key.Name] = contents
 				}
 			} else {
-				dataModel[rowValue.Key.Name] = v.String()
+				dataModel[rowValue.Key.Name] = v.String(true)
 			}
 		}
 	}

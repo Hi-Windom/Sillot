@@ -17,15 +17,20 @@
 
 
 const {
-    net, app,
+    net,
+    app,
     session,
     BrowserWindow,
     shell,
     Menu,
+    MenuItem,
     screen,
     ipcMain,
     globalShortcut,
-    Tray, dialog, systemPreferences, powerMonitor,
+    Tray,
+    dialog,
+    systemPreferences,
+    powerMonitor,
     Notification,
 } = require("electron");
 const path = require("path");
@@ -470,10 +475,8 @@ const boot = () => {
             label: `Quit ${productName}`, role: "quit",
         },],
     }, {
-        role: "editMenu",
-        submenu: [{role: "cut"}, {role: "copy"}, {role: "paste"}, {
-            role: "pasteAndMatchStyle",
-            accelerator: "CmdOrCtrl+Shift+C"
+        role: "editMenu", submenu: [{role: "cut"}, {role: "copy"}, {role: "paste"}, {
+            role: "pasteAndMatchStyle", accelerator: "CmdOrCtrl+Shift+C"
         }, {role: "selectAll"},],
     }, {
         role: "windowMenu",
@@ -792,6 +795,25 @@ app.whenReady().then(() => {
                 shell.openExternal("https://github.com/Hi-Windom/Sillot");
             },
         }, {
+            label: lang.openWSlog, click: () => {
+                const ws = JSON.parse(fs.readFileSync(path.join(confDir, "workspace.json")).toString());
+                ws.forEach((workspacePath) => {
+                    const file = path.join(workspacePath, "temp", "siyuan.log");
+                    shell.showItemInFolder(file);
+                    app.addRecentDocument(file);
+                });
+            },
+        }, {
+            label: lang.openAPPlog, click: () => {
+                shell.openPath(path.join(confDir, "app.log"), (error) => {
+                    if (error) {
+                      console.error(`无法打开: ${filePath}. 错误信息: ${error.message}`);
+                    } else {
+                      app.addRecentDocument(path.join(confDir, "app.log"));
+                    }
+                  });
+            },
+        }, {
             label: lang.resetWindow, type: "checkbox", click: v => {
                 resetWindowStateOnRestart = v.checked;
                 mainWindow.webContents.send("siyuan-save-close", true);
@@ -799,7 +821,7 @@ app.whenReady().then(() => {
         }, {
             label: lang.quit, click: () => {
                 mainWindow.webContents.send("siyuan-save-close", true);
-                setTimeout(()=> { app.exit();}, 30000);   // 强制退出
+                setTimeout(()=> { app.exit();}, 60000);   // 强制退出
             },
         },];
 
@@ -840,7 +862,27 @@ app.whenReady().then(() => {
     const getWindowByContentId = (id) => {
         return BrowserWindow.getAllWindows().find((win) => win.webContents.id === id);
     };
-
+    ipcMain.on("siyuan-context-menu", (event, langs) => {
+        const template = [new MenuItem({
+            role: "undo", label: langs.undo
+        }), new MenuItem({
+            role: "redo", label: langs.redo
+        }), {type: "separator"}, new MenuItem({
+            role: "copy", label: langs.copy
+        }), new MenuItem({
+            role: "cut", label: langs.cut
+        }), new MenuItem({
+            role: "delete", label: langs.delete
+        }), new MenuItem({
+            role: "paste", label: langs.paste
+        }), new MenuItem({
+            role: "pasteAndMatchStyle", label: langs.pasteAsPlainText
+        }), new MenuItem({
+            role: "selectAll", label: langs.selectAll
+        })];
+        const menu = Menu.buildFromTemplate(template);
+        menu.popup({window: BrowserWindow.fromWebContents(event.sender)});
+    });
     ipcMain.on("siyuan-open-folder", (event, filePath) => {
         if (filePath === "openWorkspacesLogFolder") {
           const ws = JSON.parse(fs.readFileSync(path.join(confDir, "workspace.json")).toString());
@@ -1094,8 +1136,7 @@ app.whenReady().then(() => {
     });
     ipcMain.on("siyuan-export-pdf", (event, data) => {
         dialog.showOpenDialog({
-            title: data.title,
-            properties: ["createDirectory", "openDirectory"],
+            title: data.title, properties: ["createDirectory", "openDirectory"],
         }).then((result) => {
             if (result.canceled) {
                 event.sender.destroy();
@@ -1518,7 +1559,9 @@ app.whenReady().then(() => {
 
 app.on("open-url", async (event, url) => { // for macOS
     if (url.startsWith("siyuan://")) {
+        let isBackground = true;
         if (workspaces.length === 0) {
+            isBackground = false;
             let index = 0;
             while (index < 10) {
                 index++;
@@ -1527,6 +1570,9 @@ app.on("open-url", async (event, url) => { // for macOS
                     break;
                 }
             }
+        }
+        if (!isBackground) {
+            await sleep(1500);
         }
         workspaces.forEach(item => {
             if (item.browserWindow && !item.browserWindow.isDestroyed()) {

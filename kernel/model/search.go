@@ -384,17 +384,22 @@ func SearchRefBlock(id, rootID, keyword string, beforeLen int, isSquareBrackets 
 			}
 		}
 
-		if b.ID != id && !hitFirstChildID && b.ID != rootID {
+		if "NodeAttributeView" == b.Type {
+			// 数据库块可以添加到自身数据库块中，当前文档也可以添加到自身数据库块中
 			tmp = append(tmp, b)
+		} else {
+			// 排除自身块、父块和根块
+			if b.ID != id && !hitFirstChildID && b.ID != rootID {
+				tmp = append(tmp, b)
+			}
 		}
+
 	}
 	ret = tmp
 
-	if "" != keyword {
-		if block := treenode.GetBlockTree(id); nil != block {
-			p := path.Join(block.HPath, keyword)
-			newDoc = nil == treenode.GetBlockTreeRootByHPath(block.BoxID, p)
-		}
+	if block := treenode.GetBlockTree(id); nil != block {
+		p := path.Join(block.HPath, keyword)
+		newDoc = nil == treenode.GetBlockTreeRootByHPath(block.BoxID, p)
 	}
 
 	// 在 hPath 中加入笔记本名 Show notebooks in hpath of block ref search list results https://github.com/siyuan-note/siyuan/issues/9378
@@ -721,7 +726,7 @@ func FindReplace(keyword, replacement string, replaceTypes map[string]bool, ids 
 				return ast.WalkContinue
 			})
 
-			if err = writeJSONQueue(tree); nil != err {
+			if err = writeTreeUpsertQueue(tree); nil != err {
 				return
 			}
 		}
@@ -1350,7 +1355,7 @@ func fromSQLBlock(sqlBlock *sql.Block, terms string, beforeLen int) (block *Bloc
 	content, _ = markSearch(content, terms, beforeLen)
 	content = maxContent(content, 5120)
 	markdown := maxContent(sqlBlock.Markdown, 5120)
-
+	fContent := util.EscapeHTML(sqlBlock.FContent) // fContent 会用于和 content 对比，在反链计算时用于判断是否是列表项下第一个子块，所以也需要转义 https://github.com/siyuan-note/siyuan/issues/11001
 	block = &Block{
 		Box:      sqlBlock.Box,
 		Path:     sqlBlock.Path,
@@ -1362,7 +1367,7 @@ func fromSQLBlock(sqlBlock *sql.Block, terms string, beforeLen int) (block *Bloc
 		Memo:     sqlBlock.Memo,
 		Tag:      sqlBlock.Tag,
 		Content:  content,
-		FContent: sqlBlock.FContent,
+		FContent: fContent,
 		Markdown: markdown,
 		Type:     treenode.FromAbbrType(sqlBlock.Type),
 		SubType:  sqlBlock.SubType,

@@ -119,6 +119,7 @@
   "goToEditTabPrev": "跳到上一個編輯頁籤",
   "createdTime": "建立時間",
   "updatedTime": "更新時間",
+  "lineNumber": "行號",
   "removeBookmark": "移除 ${x} 中的書籤？",
   "lockEdit": "鎖定編輯",
   "unlockEdit": "解除鎖定",
@@ -1222,7 +1223,9 @@
     "officialWebsite": "訪問官方網站",
     "openSource": "訪問 GitHub 項目",
     "resetWindow": "重置窗口並退出程序",
-    "quit": "退出程序"
+    "quit": "退出程序",
+    "openWSlog": "定位工作空间日志目录",
+    "openAPPlog": "打开应用日志"
   },
   "_attrView": {
     "table": "表格",
@@ -1471,6 +1474,7 @@
     "238": "市集包 [%s] 更新失敗，請稍後再試",
     "239": "相關操作正在處理中，請稍後再試",
     "240": "不支援拖曳文件中容器區塊下的標題",
-    "241": "不支持拖曳為自己的子標題"
+    "241": "不支持拖曳為自己的子標題",
+    "242": "目前資料庫中已經存在該綁定區塊"
   }
 }

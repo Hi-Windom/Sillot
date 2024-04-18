@@ -332,6 +332,7 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
                     srcIDs: sourceIds,
                     avID,
                 }]);
+                focusByRange(range);
             });
         } else {
             const selectElement: Element[] = [];
@@ -366,6 +367,7 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
                     srcIDs: sourceIds,
                     avID,
                 }]);
+                focusByRange(range);
             });
         }
         event.preventDefault();
@@ -1139,7 +1141,7 @@ const panelTreeKeydown = (app: App, event: KeyboardEvent) => {
 
 let switchDialog: Dialog;
 export const windowKeyDown = (app: App, event: KeyboardEvent) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 这里调用频繁，请细化调试逻辑
     // https://github.com/siyuan-note/siyuan/issues/9848 忘记为什么要阻止了 .av__mask 的情况，测了下没问题就先移除
     if (document.getElementById("progress") || document.getElementById("errorLog") || event.isComposing) {
         return;
@@ -1722,9 +1724,9 @@ export const windowKeyDown = (app: App, event: KeyboardEvent) => {
     if (matchHotKey(window.siyuan.config.keymap.general.stickSearch.custom, event)) {
         if (getSelection().rangeCount > 0) {
             const range = getSelection().getRangeAt(0);
-            openGlobalSearch(app, range.toString(), false);
+            openGlobalSearch(app, range.toString(), true);
         } else {
-            openGlobalSearch(app, "", false);
+            openGlobalSearch(app, "", true);
         }
         event.preventDefault();
         return;

@@ -73,7 +73,8 @@ const processAV = (range: Range, html: string, protyle: IProtyle, blockElement: 
                     return true;
                 }
                 const type = getTypeByCellElement(cellElement) || cellElement.dataset.type as TAVCol;
-                if (["created", "updated", "template", "rollup"].includes(type)) {
+                if (["created", "updated", "template", "rollup"].includes(type) ||
+                    (type === "block" && !cellElement.dataset.detached)) {
                     return;
                 }
                 const rowID = currentRowElement.getAttribute("data-id");
@@ -91,7 +92,8 @@ const processAV = (range: Range, html: string, protyle: IProtyle, blockElement: 
                         return;
                     }
                     cellValue = genCellValue(type, cellValue[cellValue.type as "text"].content.toString());
-                } else if (cellValue.type === "block") {
+                }
+                if (cellValue.type === "block") {
                     cellValue.isDetached = true;
                     delete cellValue.block.id;
                 }

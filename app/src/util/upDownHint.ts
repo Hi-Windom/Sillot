@@ -2,9 +2,14 @@ const isNormalItem = (currentHintElement: HTMLElement, className: string) => {
     return currentHintElement.classList.contains("fn__none") || !currentHintElement.classList.contains(className);
 };
 
-export const upDownHint = (listElement: Element, event: KeyboardEvent, classActiveName = "b3-list-item--focus") => {
+export const upDownHint = (listElement: Element, event: KeyboardEvent, classActiveName = "b3-list-item--focus", defaultElement?: Element) => {
     window.sout.tracker("invoked");
     let currentHintElement: HTMLElement = listElement.querySelector("." + classActiveName);
+    if (!currentHintElement && defaultElement) {
+        defaultElement.classList.add(classActiveName);
+        defaultElement.scrollIntoView(true);
+        return;
+    }
     if (!currentHintElement) {
         return;
     }
