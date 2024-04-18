@@ -10,24 +10,34 @@ on:
 jobs:
   check-branch:
     runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          string:
+            - repo_name: "Sillot"
+              repo_owner: "Hi-Windom"
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          path: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot
-      - name: Set up Node 18
+          path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}
+      - name: Extract packageManager from package.json
+        uses: sergeysova/jq-action@v2
+        id: packageManager
+        with:
+              cmd: "jq .packageManager app/package.json -r"
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - name: Install Node pnpm
-        run: npm install -g pnpm
-        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
+        run: npm install -g ${{ steps.packageManager.outputs.value }}
+        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
       - name: Install dependencies
         run: pnpm install
-        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
+        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
       - name: Run tests and collect coverage
         run: pnpm run test
-        working-directory: ${{ github.workspace }}/go/src/github.com/Hi-Windom/Sillot/app
+        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
