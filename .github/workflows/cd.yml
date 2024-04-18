@@ -353,3 +353,10 @@ jobs:
             upload_url: ${{ needs.create_release.outputs.upload_url }}
             asset_name: ${{ matrix.string.repo_name }}-${{ needs.create_release.outputs.release_version }}-beta_github.apk
             asset_path: ${{steps.sign_app.outputs.signedReleaseFile}}
+
+      - name: Upload logs if failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+            name: logs
+            path: ./**/*.log
