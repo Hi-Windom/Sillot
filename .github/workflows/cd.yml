@@ -22,6 +22,18 @@ jobs:
       version: ${{ steps.version.outputs.value }}
       packageManager: ${{ steps.packageManager.outputs.value }}
     steps:
+      - name: Check if tag is the latest
+        id: check_tag
+        run: |
+          latest_tag=$(git describe --tags$(git rev-list --tags --max-count=1))
+          echo "Latest tag is $latest_tag"
+          if [ "refs/tags/$latest_tag" = "$GITHUB_REF" ]; then
+            echo "Tag is the latest"
+          else
+            echo "Tag is not the latest"
+            exit 1
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
