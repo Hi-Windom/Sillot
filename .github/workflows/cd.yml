@@ -22,6 +22,7 @@ jobs:
       release_version: ${{ steps.release_info.outputs.release_version }}
       version: ${{ steps.version.outputs.value }}
       packageManager: ${{ steps.packageManager.outputs.value }}
+      actionInstallCommand: ${{ steps.actionInstallCommand.outputs.value }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,6 +56,12 @@ jobs:
         id: packageManager
         with:
             cmd: "jq .packageManager ${{ matrix.string.package_json }} -r"
+
+      - name: Extract actionInstallCommand from package.json
+        uses: sergeysova/jq-action@v2
+        id: actionInstallCommand
+        with:
+            cmd: "jq .actionInstallCommand ${{ matrix.string.package_json }} -r"
 
       - id: thisLatestRelease
         uses: K-Sillot/github-action-get-latest-release@master
@@ -212,7 +219,7 @@ jobs:
         run: pnpm config set registry https://registry.npmjs.org/ --location project
         working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
       - name: Install Node Dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: ${{ needs.create_release.outputs.actionInstallCommand }}
         working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
 
       - name: Building UI
