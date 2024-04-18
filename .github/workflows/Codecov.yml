@@ -25,7 +25,7 @@ jobs:
         uses: sergeysova/jq-action@v2
         id: packageManager
         with:
-              cmd: "jq .packageManager app/package.json -r"
+              cmd: "jq .packageManager ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/package.json -r"
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
