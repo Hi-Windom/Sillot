@@ -25,7 +25,7 @@
       },
       "performance": { "noDelete": "off" },
       "style": { "useTemplate": "off","useConst":"warn","noVar":"warn","useDefaultParameterLast":"off" },
-      "complexity": { "useSimplifiedLogicExpression": "off" },
+      "complexity": { "useSimplifiedLogicExpression": "off","useLiteralKeys": "warn" },
       "correctness": { "noUnreachable": "warn" }
     }
   }

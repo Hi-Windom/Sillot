@@ -23,6 +23,10 @@ export const openMobileFileById = (app: App, id: string, action = [Constants.CB_
     window.sout.tracker("invoked");
     window.siyuan.storage[Constants.LOCAL_DOCINFO] = {id};
     setStorageVal(Constants.LOCAL_DOCINFO, window.siyuan.storage[Constants.LOCAL_DOCINFO]);
+    const avPanelElement = document.querySelector(".av__panel");
+    if (avPanelElement && !avPanelElement.classList.contains("fn__none")) {
+        avPanelElement.dispatchEvent(new CustomEvent("click", {detail: "close"}));
+    }
     if (window.siyuan.mobile.editor) {
         saveScroll(window.siyuan.mobile.editor.protyle);
         hideElements(["toolbar", "hint", "util"], window.siyuan.mobile.editor.protyle);

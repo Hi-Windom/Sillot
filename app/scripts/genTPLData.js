@@ -80,7 +80,7 @@ exports.default = {
     </div>
     <div id="modelMain" class="fn__flex-1"></div>
 </div>`,
-          status: /*html*/ `<div id="status" class="status status--hide"></div>`,
+          status: /*html*/ `<div id="status" class="status"></div>`,
           keyboardToolbar: /*html*/ `<div id="keyboardToolbar" class="keyboard fn__none"></div>`,
           sideMask: /*html*/ `<div class="side-mask fn__none"></div>`,
         },

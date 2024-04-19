@@ -28,7 +28,6 @@ import { exportIDB, importIDB } from "./sillot/util/sillot-idb-backup-and-restor
 import { SillotEnv } from "./sillot";
 import {getSearch} from "./util/functions";
 import {hideAllElements} from "./protyle/ui/hideElements";
-import VConsole from 'vconsole';
 import {loadPlugins, reloadPlugin} from "./plugin/loader";
 import "./assets/scss/base.scss";
 

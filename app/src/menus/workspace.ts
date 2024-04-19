@@ -25,6 +25,8 @@ import {confirmDialog} from "../dialog/confirmDialog";
 import {App} from "../index";
 import {isBrowser} from "../util/functions";
 import {openRecentDocs} from "../business/openRecentDocs";
+// import * as dayjs from "dayjs";
+import {formatDate} from "sofill/mid";
 import {isPadAppMode} from "sofill/env"
 
 const editLayout = (layoutName?: string) => {
@@ -73,6 +75,7 @@ const editLayout = (layoutName?: string) => {
         window.siyuan.storage[Constants.LOCAL_LAYOUTS].find((layoutItem: ISaveLayout) => {
             if (layoutItem.name === layoutName) {
                 layoutItem.name = value;
+                layoutItem.time = new Date().getTime();
                 setStorageVal(Constants.LOCAL_LAYOUTS, window.siyuan.storage[Constants.LOCAL_LAYOUTS]);
                 return true;
             }
@@ -89,6 +92,7 @@ const editLayout = (layoutName?: string) => {
             window.siyuan.storage[Constants.LOCAL_LAYOUTS].find((layoutItem: ISaveLayout) => {
                 if (layoutItem.name === layoutName) {
                     layoutItem.name = value;
+                    layoutItem.time = new Date().getTime();
                     layoutItem.layout = getAllLayout();
                     setStorageVal(Constants.LOCAL_LAYOUTS, window.siyuan.storage[Constants.LOCAL_LAYOUTS]);
                     return true;
@@ -100,6 +104,7 @@ const editLayout = (layoutName?: string) => {
             if (item.name === value) {
                 confirmDialog(window.siyuan.languages.save, window.siyuan.languages.exportTplTip, () => {
                     item.layout = getAllLayout();
+                    item.time = new Date().getTime();
                     setStorageVal(Constants.LOCAL_LAYOUTS, window.siyuan.storage[Constants.LOCAL_LAYOUTS]);
                 });
                 return true;
@@ -110,6 +115,7 @@ const editLayout = (layoutName?: string) => {
         }
         window.siyuan.storage[Constants.LOCAL_LAYOUTS].push({
             name: value,
+            time: new Date().getTime(),
             layout: getAllLayout()
         });
         setStorageVal(Constants.LOCAL_LAYOUTS, window.siyuan.storage[Constants.LOCAL_LAYOUTS]);
@@ -329,7 +335,7 @@ export const workspaceMenu = (app: App, rect: DOMRect) => {
             layoutSubMenu.push({
                 iconHTML: "",
                 action: "iconEdit",
-                label: item.name,
+                label: `${item.name} <span class="ft__smaller ft__on-surface">${item.time ? formatDate(new Date(item.time), 'yyyy-MM-dd HH:mm') : ""}</span>`,
                 bind(menuElement) {
                     menuElement.addEventListener("click", (event) => {
                         if (hasClosestByClassName(event.target as Element, "b3-menu__action")) {
