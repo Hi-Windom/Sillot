@@ -46,7 +46,7 @@ export const newCardModel = (options: {
                     cardsData: options.data.cardsData,
                     index: options.data.index,
                 });
-                this.data.editor = editor;
+                customObj.editors.push(editor);
                 // https://github.com/siyuan-note/siyuan/issues/9561#issuecomment-1794473512
                 delete options.data.cardsData;
                 delete options.data.index;
@@ -76,7 +76,8 @@ export const newCardModel = (options: {
                         cardType: this.data.cardType,
                         cardsData,
                     });
-                    customObj.data.editor = editor;
+
+                    customObj.editors.push(editor);
                 });
             }
         },
