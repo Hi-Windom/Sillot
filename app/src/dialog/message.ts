@@ -88,7 +88,7 @@ export const showMessage = (message: string, timeout = 6000, type = "info", mess
 };
 
 export const hideMessage = (id?: string) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 无价值的追踪
     const messagesElement = document.getElementById("message").firstElementChild;
     if (!messagesElement) {
         return;

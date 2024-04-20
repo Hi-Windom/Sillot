@@ -38,6 +38,10 @@ const genSearchList = (element: Element, keyword: string, avId: string, cb?: () 
 
 const setDatabase = (avId: string, element: HTMLElement, item: HTMLElement) => {
     window.sout.tracker("invoked");
+    if (typeof item?.dataset === "undefined") {
+        window.sout.error("item?.dataset is null");
+        return;
+    }
     element.dataset.avId = item.dataset.avId;
     element.dataset.blockId = item.dataset.blockId;
     element.querySelector(".b3-menu__accelerator").textContent = item.querySelector(".b3-list-item__hinticon").classList.contains("fn__none") ? item.querySelector(".b3-list-item__text").textContent : window.siyuan.languages.thisDatabase;
