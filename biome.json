@@ -1,0 +1,48 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.0.0/schema.json",
+    "files": {
+        "ignore": [
+            "./out/*",
+            "./PSP/*",
+            "./stage/*",
+            "./build/*",
+            "./src/asset/pdf/*",
+            "./appearance/*"
+        ]
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120,
+        "formatWithErrors": true
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single"
+        }
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "suspicious": {
+                "noExplicitAny": "off",
+                "noAsyncPromiseExecutor": "off"
+            },
+            "performance": { "noDelete": "off" },
+            "style": {
+                "useTemplate": "off",
+                "useConst": "warn",
+                "noVar": "warn",
+                "useDefaultParameterLast": "off"
+            },
+            "complexity": {
+                "useSimplifiedLogicExpression": "off",
+                "useLiteralKeys": "warn",
+                "useOptionalChain": "warn"
+            },
+            "correctness": { "noUnreachable": "warn" }
+        }
+    }
+}

@@ -18,7 +18,6 @@
         "christian-kohler.npm-intellisense",
         "leizongmin.node-module-intellisense",
         "christian-kohler.path-intellisense",
-        "rome.rome",
         "tyriar.vscode-terminal-here",
         "symbolk.somanyconflicts",
         "shardulm94.trailing-spaces",
@@ -31,6 +30,7 @@
         "doggy8088.pangu2",
         "ms-ceintl.vscode-language-pack-zh-hans",
         "cweijan.vscode-office",
+        "biomejs.biome",
     ],
     "unwantedRecommendations": [
         "hayden.extension-pack-manager",
