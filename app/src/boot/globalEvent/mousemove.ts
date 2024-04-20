@@ -22,6 +22,7 @@ export const windowMouseMove = (event: MouseEvent & { target: HTMLElement }, mou
         return;
     }
     // https://github.com/siyuan-note/siyuan/pull/8793
+    // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
     const coordinates = window.siyuan.coordinates ?? (window.siyuan.coordinates = {
         pageX: 0,
         pageY: 0,
@@ -84,7 +85,7 @@ export const windowMouseMove = (event: MouseEvent & { target: HTMLElement }, mou
     const eventPath0 = event.composedPath()[0] as HTMLElement;
     if (eventPath0 && eventPath0.nodeType !== 3 && eventPath0.classList.contains("protyle-wysiwyg") && eventPath0.style.paddingLeft) {
         // 光标在编辑器右边也需要进行显示
-        const mouseElement = document.elementFromPoint(eventPath0.getBoundingClientRect().left + parseInt(eventPath0.style.paddingLeft) + 13, event.clientY);
+        const mouseElement = document.elementFromPoint(eventPath0.getBoundingClientRect().left + Number.parseInt(eventPath0.style.paddingLeft) + 13, event.clientY);
         const blockElement = hasClosestBlock(mouseElement);
         if (blockElement) {
             const targetBlockElement = getRightBlock(blockElement, blockElement.getBoundingClientRect().left + 1, event.clientY);

@@ -4,7 +4,7 @@ import {hideMessage, showMessage} from "../dialog/message";
 import {fetchPost} from "../util/fetch";
 import {exportLayout} from "../layout/util";
 import {confirmDialog} from "../dialog/confirmDialog";
-import {App} from "../index";
+import type {App} from "../index";
 /// #if !BROWSER
 import {ipcRenderer} from "electron";
 /// #endif

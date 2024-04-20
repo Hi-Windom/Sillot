@@ -6,7 +6,7 @@ import inquirer from "inquirer";
 import ora from "ora";
 import fs from "fs";
 import path from "path";
-import { spawn } from 'child_process';
+import { spawn } from 'node:child_process';
 const shell = (await import("shelljs")).default;
 const iconv = (await import("iconv-lite")).default;
 import pkg from "./package.json" assert { type: "json" };
@@ -91,7 +91,7 @@ function exeHandler(cmds, silent) {
   shell.exec(
     cmds,
     { encoding: silent ? "base64" : "utf8", silent: silent },
-    function (code, stdout, stderr) {
+    (code, stdout, stderr) => {
       clearInterval(intervalId); // 停止更新spinner文本
       console.log("Exit code:", code);
       console.log(

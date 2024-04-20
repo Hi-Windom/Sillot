@@ -3,7 +3,7 @@ import {fetchPost} from "../../util/fetch";
 import {openMobileFileById} from "../editor";
 import {Constants} from "../../constants";
 import {getEventName} from "../../protyle/util/compatibility";
-import {App} from "../../index";
+import type {App} from "../../index";
 import {closePanel} from "../util/closePanel";
 import {checkFold} from "../../util/noRelyPCFunction";
 

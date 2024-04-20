@@ -13,7 +13,7 @@ import {query} from "./query";
 import {Dialog} from "../dialog";
 import {ai} from "./ai";
 import {flashcard} from "./flashcard";
-import {App} from "../index";
+import type {App} from "../index";
 import {isHuawei} from "../protyle/util/compatibility";
 import {Constants} from "../constants";
 

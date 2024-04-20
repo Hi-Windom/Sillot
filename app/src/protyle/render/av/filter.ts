@@ -120,14 +120,14 @@ export const setFilter = async (options: {
             const directElements = menu.element.querySelectorAll('.b3-select[data-type="dataDirection"]') as NodeListOf<HTMLSelectElement>;
             if (typeElement.value === "custom") {
                 newFilter.relativeDate = {
-                    count: parseInt((directElements[0].parentElement.querySelector(".b3-text-field") as HTMLInputElement).value || "1"),
-                    unit: parseInt((directElements[0].parentElement.lastElementChild as HTMLSelectElement).value),
-                    direction: parseInt(directElements[0].value)
+                    count: Number.parseInt((directElements[0].parentElement.querySelector(".b3-text-field") as HTMLInputElement).value || "1"),
+                    unit: Number.parseInt((directElements[0].parentElement.lastElementChild as HTMLSelectElement).value),
+                    direction: Number.parseInt(directElements[0].value)
                 };
                 newFilter.relativeDate2 = {
-                    count: parseInt((directElements[1].parentElement.querySelector(".b3-text-field") as HTMLInputElement).value || "1"),
-                    unit: parseInt((directElements[1].parentElement.lastElementChild as HTMLSelectElement).value),
-                    direction: parseInt(directElements[1].value)
+                    count: Number.parseInt((directElements[1].parentElement.querySelector(".b3-text-field") as HTMLInputElement).value || "1"),
+                    unit: Number.parseInt((directElements[1].parentElement.lastElementChild as HTMLSelectElement).value),
+                    direction: Number.parseInt(directElements[1].value)
                 };
                 newValue = {type: filterValue.type};
             } else {

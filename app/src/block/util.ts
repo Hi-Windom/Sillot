@@ -125,7 +125,7 @@ export const insertEmptyBlock = (protyle: IProtyle, position: InsertPosition, id
     let orderIndex = 1;
     if (blockElement.getAttribute("data-type") === "NodeListItem") {
         newElement = genListItemElement(blockElement, 0, true) as HTMLDivElement;
-        orderIndex = parseInt(blockElement.parentElement.firstElementChild.getAttribute("data-marker"));
+        orderIndex = Number.parseInt(blockElement.parentElement.firstElementChild.getAttribute("data-marker"));
     }
     const parentOldHTML = blockElement.parentElement.outerHTML;
     const newId = newElement.getAttribute("data-node-id");

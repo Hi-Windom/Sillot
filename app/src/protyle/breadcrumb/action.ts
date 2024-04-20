@@ -10,7 +10,7 @@ import {reloadProtyle} from "../util/reload";
 import {resize} from "../util/resize";
 import {disabledProtyle, enableProtyle} from "../util/onGet";
 import {isWindow} from "../../util/functions";
-import {Wnd} from "../../layout/Wnd";
+import type {Wnd} from "../../layout/Wnd";
 
 export const net2LocalAssets = (protyle: IProtyle, type: "Assets" | "Img") => {
     window.sout.tracker("invoked");

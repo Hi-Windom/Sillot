@@ -1,6 +1,6 @@
 import {copySubMenu, exportMd, movePathToMenu, openFileAttr, renameMenu,} from "./commonMenuItem";
 /// #if !BROWSER
-import {FileFilter, ipcRenderer, shell} from "electron";
+import {type FileFilter, ipcRenderer, shell} from "electron";
 import * as path from "path";
 /// #endif
 import {MenuItem} from "./Menu";
@@ -19,10 +19,10 @@ import {newFile} from "../util/newFile";
 import {hasClosestByTag, hasTopClosestByTag} from "../protyle/util/hasClosest";
 import {deleteFiles} from "../editor/deleteFile";
 import {getDockByType} from "../layout/tabUtil";
-import {Files} from "../layout/dock/Files";
+import type {Files} from "../layout/dock/Files";
 import {openCardByData} from "../card/openCard";
 import {viewCards} from "../card/viewCards";
-import {App} from "../index";
+import type {App} from "../index";
 import {openDocHistory} from "../history/doc";
 import {openEditorTab} from "./util";
 import {makeCard} from "../card/makeCard";
@@ -160,7 +160,7 @@ export const initNavigationMenu = (app: App, liElement: HTMLElement) => {
                 });
             }
         }).element);
-        const subMenu = sortMenu("notebook", parseInt(liElement.parentElement.getAttribute("data-sortmode")), (sort) => {
+        const subMenu = sortMenu("notebook", Number.parseInt(liElement.parentElement.getAttribute("data-sortmode")), (sort) => {
             fetchPost("/api/notebook/setNotebookConf", {
                 notebook: notebookId,
                 conf: {

@@ -3,7 +3,7 @@ import {closeModel, closePanel} from "./closePanel";
 import {popMenu} from "../menu";
 import {activeBlur, hideKeyboardToolbar} from "./keyboardToolbar";
 import {isIPhone} from "../../protyle/util/compatibility";
-import {App} from "../../index";
+import type {App} from "../../index";
 import {globalTouchEnd, globalTouchStart} from "../../boot/globalEvent/touch";
 
 let clientX: number;

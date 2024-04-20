@@ -19,7 +19,7 @@ import {ipcRenderer} from "electron";
 // import * as dayjs from "dayjs";
 import {formatDate} from "sofill/mid";
 import {getDisplayName, movePathTo} from "../util/pathName";
-import {App} from "../index";
+import type {App} from "../index";
 import {resize} from "../protyle/util/resize";
 import {setStorageVal} from "../protyle/util/compatibility";
 import {focusByRange} from "../protyle/util/selection";
@@ -317,7 +317,7 @@ export const bindCardEvent = async (options: {
                             fetchPost("/api/riff/batchSetRiffCardsDueTime", {
                                 cardDues: [{
                                     id: currentCard.cardID,
-                                    due: formatDate(parseInt(inputElement.value) * 1000, 'yyyyMMddHHmmss')
+                                    due: formatDate(Number.parseInt(inputElement.value) * 1000, 'yyyyMMddHHmmss')
                                 }]
                             }, () => {
                                 actionElements[0].classList.add("fn__none");
@@ -608,7 +608,7 @@ export const bindCardEvent = async (options: {
             fetchPost(type === "-3" ? "/api/riff/skipReviewRiffCard" : "/api/riff/reviewRiffCard", {
                 deckID: currentCard.deckID,
                 cardID: currentCard.cardID,
-                rating: parseInt(type),
+                rating: Number.parseInt(type),
                 reviewedCards: options.cardsData.cards
             }, () => {
                 /// #if MOBILE

@@ -4,7 +4,7 @@ import {focusByOffset, focusByRange, getSelectionOffset} from "../protyle/util/s
 import {hideElements} from "../protyle/ui/hideElements";
 import {fetchPost, fetchSyncPost} from "./fetch";
 import {Constants} from "../constants";
-import {Wnd} from "../layout/Wnd";
+import type {Wnd} from "../layout/Wnd";
 import {getInstanceById, getWndByLayout} from "../layout/util";
 import {Tab} from "../layout/Tab";
 import {Editor} from "../editor";
@@ -13,7 +13,7 @@ import {zoomOut} from "../menus/protyle";
 import {showMessage} from "../dialog/message";
 import {saveScroll} from "../protyle/scroll/saveScroll";
 import {getAllModels} from "../layout/getAll";
-import {App} from "../index";
+import type {App} from "../index";
 import {onGet} from "../protyle/util/onGet";
 
 let forwardStack: IBackStack[] = [];
@@ -285,7 +285,7 @@ export const pushBack = (protyle: IProtyle, range?: Range, blockElement?: Elemen
     if (!blockElement) {
         return;
     }
-    let editElement;
+    let editElement: Node;
     if (blockElement.classList.contains("protyle-title__input")) {
         editElement = blockElement;
     } else {

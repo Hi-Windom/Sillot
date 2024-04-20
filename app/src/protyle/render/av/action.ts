@@ -23,6 +23,7 @@ import {showMessage} from "../../../dialog/message";
 import {previewImage} from "../../preview/image";
 import {unicode2Emoji} from "../../../emoji";
 import {selectRow} from "./row";
+// import * as dayjs from "dayjs";
 import {formatDate} from "sofill/mid";
 import {openCalcMenu} from "./calc";
 import {avRender} from "./render";
@@ -43,7 +44,7 @@ export const avClick = (protyle: IProtyle, event: MouseEvent & { target: HTMLEle
     if (loadMoreElement) {
         (blockElement.querySelector(".av__row--footer") as HTMLElement).style.transform = "";
         blockElement.removeAttribute("data-render");
-        blockElement.dataset.pageSize = (parseInt(blockElement.dataset.pageSize) + parseInt(blockElement.querySelector('[data-type="set-page-size"]').getAttribute("data-size"))).toString();
+        blockElement.dataset.pageSize = (Number.parseInt(blockElement.dataset.pageSize) + Number.parseInt(blockElement.querySelector('[data-type="set-page-size"]').getAttribute("data-size"))).toString();
         avRender(blockElement, protyle);
         event.preventDefault();
         event.stopPropagation();
@@ -301,7 +302,7 @@ export const avContextmenu = (protyle: IProtyle, rowElement: HTMLElement, positi
                 }, {
                     action: "doUpdateUpdated",
                     id: listItemElement.dataset.blockId,
-                    data: dayjs().format("YYYYMMDDHHmmss"),
+                    data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                 }], [{
                     action: "removeAttrViewBlock",
                     srcIDs: sourceIds,
@@ -326,12 +327,12 @@ ${window.siyuan.languages.insertRowBefore.replace("${x}", '<span class="fn__spac
                         if (document.activeElement.isSameNode(inputElement)) {
                             return;
                         }
-                        insertRows(blockElement, protyle, parseInt(inputElement.value), rowElements[0].previousElementSibling.getAttribute("data-id"));
+                        insertRows(blockElement, protyle, Number.parseInt(inputElement.value), rowElements[0].previousElementSibling.getAttribute("data-id"));
                         menu.close();
                     });
                     inputElement.addEventListener("keydown", (event: KeyboardEvent) => {
                         if (!event.isComposing && event.key === "Enter") {
-                            insertRows(blockElement, protyle, parseInt(inputElement.value), rowElements[0].previousElementSibling.getAttribute("data-id"));
+                            insertRows(blockElement, protyle, Number.parseInt(inputElement.value), rowElements[0].previousElementSibling.getAttribute("data-id"));
                             menu.close();
                         }
                     });
@@ -348,12 +349,12 @@ ${window.siyuan.languages.insertRowAfter.replace("${x}", '<span class="fn__space
                         if (document.activeElement.isSameNode(inputElement)) {
                             return;
                         }
-                        insertRows(blockElement, protyle, parseInt(inputElement.value), rowElements[0].getAttribute("data-id"));
+                        insertRows(blockElement, protyle, Number.parseInt(inputElement.value), rowElements[0].getAttribute("data-id"));
                         menu.close();
                     });
                     inputElement.addEventListener("keydown", (event: KeyboardEvent) => {
                         if (!event.isComposing && event.key === "Enter") {
-                            insertRows(blockElement, protyle, parseInt(inputElement.value), rowElements[0].getAttribute("data-id"));
+                            insertRows(blockElement, protyle, Number.parseInt(inputElement.value), rowElements[0].getAttribute("data-id"));
                             menu.close();
                         }
                     });

@@ -1,4 +1,4 @@
-import {App} from "../../index";
+import type {App} from "../../index";
 import {windowMouseMove} from "./mousemove";
 import {windowKeyUp} from "./keyup";
 import {windowKeyDown} from "./keydown";
@@ -11,7 +11,7 @@ import {initDockMenu} from "../../menus/dock";
 import {hasClosestByAttribute, hasClosestByClassName, hasTopClosestByAttribute} from "../../protyle/util/hasClosest";
 import {initTabMenu} from "../../menus/tab";
 import {getInstanceById} from "../../layout/util";
-import {Tab} from "../../layout/Tab";
+import type {Tab} from "../../layout/Tab";
 import {hideTooltip} from "../../dialog/tooltip";
 import {openFileById} from "../../editor/util";
 import {checkFold} from "../../util/noRelyPCFunction";

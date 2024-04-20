@@ -287,7 +287,7 @@ export const editor = {
         }) : null;
 
         const setEditor = () => {
-            let dynamicLoadBlocks = parseInt((editor.element.querySelector("#dynamicLoadBlocks") as HTMLInputElement).value);
+            let dynamicLoadBlocks = Number.parseInt((editor.element.querySelector("#dynamicLoadBlocks") as HTMLInputElement).value);
             if (48 > dynamicLoadBlocks) {
                 dynamicLoadBlocks = 48;
                 (editor.element.querySelector("#dynamicLoadBlocks") as HTMLInputElement).value = "48";
@@ -310,23 +310,23 @@ export const editor = {
                 listItemDotNumberClickFocus: (editor.element.querySelector("#listItemDotNumberClickFocus") as HTMLInputElement).checked,
                 spellcheck: (editor.element.querySelector("#spellcheck") as HTMLInputElement).checked,
                 onlySearchForDoc: (editor.element.querySelector("#onlySearchForDoc") as HTMLInputElement).checked,
-                floatWindowMode: parseInt((editor.element.querySelector("#floatWindowMode") as HTMLSelectElement).value),
+                floatWindowMode: Number.parseInt((editor.element.querySelector("#floatWindowMode") as HTMLSelectElement).value),
                 plantUMLServePath: (editor.element.querySelector("#plantUMLServePath") as HTMLInputElement).value,
                 katexMacros: (editor.element.querySelector("#katexMacros") as HTMLTextAreaElement).value,
                 codeLineWrap: (editor.element.querySelector("#codeLineWrap") as HTMLInputElement).checked,
                 virtualBlockRef: (editor.element.querySelector("#virtualBlockRef") as HTMLInputElement).checked,
                 virtualBlockRefInclude: (editor.element.querySelector("#virtualBlockRefInclude") as HTMLInputElement).value,
                 virtualBlockRefExclude: (editor.element.querySelector("#virtualBlockRefExclude") as HTMLInputElement).value,
-                blockRefDynamicAnchorTextMaxLen: parseInt((editor.element.querySelector("#blockRefDynamicAnchorTextMaxLen") as HTMLInputElement).value),
-                backlinkExpandCount: parseInt((editor.element.querySelector("#backlinkExpandCount") as HTMLInputElement).value),
-                backmentionExpandCount: parseInt((editor.element.querySelector("#backmentionExpandCount") as HTMLInputElement).value),
+                blockRefDynamicAnchorTextMaxLen: Number.parseInt((editor.element.querySelector("#blockRefDynamicAnchorTextMaxLen") as HTMLInputElement).value),
+                backlinkExpandCount: Number.parseInt((editor.element.querySelector("#backlinkExpandCount") as HTMLInputElement).value),
+                backmentionExpandCount: Number.parseInt((editor.element.querySelector("#backmentionExpandCount") as HTMLInputElement).value),
                 dynamicLoadBlocks: dynamicLoadBlocks,
                 codeLigatures: (editor.element.querySelector("#codeLigatures") as HTMLInputElement).checked,
-                codeTabSpaces: parseInt((editor.element.querySelector("#codeTabSpaces") as HTMLInputElement).value),
-                fontSize: parseInt((editor.element.querySelector("#fontSize") as HTMLInputElement).value),
+                codeTabSpaces: Number.parseInt((editor.element.querySelector("#codeTabSpaces") as HTMLInputElement).value),
+                fontSize: Number.parseInt((editor.element.querySelector("#fontSize") as HTMLInputElement).value),
                 fontSizeScrollZoom: (editor.element.querySelector("#fontSizeScrollZoom") as HTMLInputElement).checked,
-                generateHistoryInterval: parseInt((editor.element.querySelector("#generateHistoryInterval") as HTMLInputElement).value),
-                historyRetentionDays: parseInt((editor.element.querySelector("#historyRetentionDays") as HTMLInputElement).value),
+                generateHistoryInterval: Number.parseInt((editor.element.querySelector("#generateHistoryInterval") as HTMLInputElement).value),
+                historyRetentionDays: Number.parseInt((editor.element.querySelector("#historyRetentionDays") as HTMLInputElement).value),
                 fontFamily: fontFamilyElement.value,
                 emoji: window.siyuan.config.editor.emoji
             }, response => {

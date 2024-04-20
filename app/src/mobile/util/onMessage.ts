@@ -1,7 +1,7 @@
 import {openMobileFileById} from "../editor";
 import {processSync, progressLoading, progressStatus, reloadSync, transactionError} from "../../dialog/processSystem";
 import {Constants} from "../../constants";
-import {App} from "../../index";
+import type {App} from "../../index";
 import {reloadPlugin} from "../../plugin/loader";
 
 export const onMessage = (app: App, data: IWebSocketData) => {

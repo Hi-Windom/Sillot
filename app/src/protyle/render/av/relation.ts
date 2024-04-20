@@ -227,7 +227,7 @@ const genSelectItemHTML = (type: "selected" | "empty" | "unselect", id?: string,
     <span class="b3-menu__label">${window.siyuan.languages.emptyContent}</span>
 </button>`;
     }
-    if (type == "unselect") {
+    if (type === "unselect") {
         return `<button data-id="${id}" class="b3-menu__item" data-type="setRelationCell">
     <span class="b3-menu__label${isDetached ? "" : " popover__block"}" ${isDetached ? "" : 'style="color:var(--b3-protyle-inline-blockref-color)"'} data-id="${id}">${text}</span>
     <svg class="b3-menu__action"><use xlink:href="#iconAdd"></use></svg>

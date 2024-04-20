@@ -123,7 +123,7 @@ ${item.label ? "data-label='" + item.label + "'" : ""}>
             if (item.count) {
                 countHTML = `<span class="counter">${item.count}</span>`;
             }
-            let iconHTML;
+            let iconHTML: string;
             if (type === "outline") {
                 iconHTML = `<svg data-defids='["${item.defID}"]' class="b3-list-item__graphic popover__block" data-id="${item.id}" style="height: 22px;width: 10px;"><use xlink:href="#${getIconByType(item.type, item.subType)}"></use></svg>`;
             } else {

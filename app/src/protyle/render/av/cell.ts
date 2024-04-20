@@ -68,7 +68,7 @@ export const genCellValueByElement = (colType: TAVCol, cellElement: HTMLElement)
     if (colType === "number") {
         const value = cellElement.querySelector(".av__celltext").getAttribute("data-content");
         cellValue.number = {
-            content: parseFloat(value) || 0,
+            content: Number.parseFloat(value) || 0,
             isNotEmpty: !!value
         };
     } else if (["text", "block", "url", "phone", "email", "template"].includes(colType)) {
@@ -92,7 +92,7 @@ export const genCellValueByElement = (colType: TAVCol, cellElement: HTMLElement)
         cellValue[colType as "date"] = JSON.parse(cellElement.querySelector(".av__celltext").getAttribute("data-value"));
     } else if (colType === "checkbox") {
         cellValue.checkbox = {
-            checked: cellElement.querySelector("use").getAttribute("xlink:href") === "#iconCheck" ? true : false
+            checked: cellElement.querySelector("use").getAttribute("xlink:href")  === "#iconCheck"
         };
     } else if (colType === "relation") {
         const blockIDs: string[] = [];
@@ -144,7 +144,7 @@ export const genCellValue = (colType: TAVCol, value: string | any) => {
             cellValue = {
                 type: colType,
                 number: {
-                    content: parseFloat(value) || 0,
+                    content: Number.parseFloat(value) || 0,
                     isNotEmpty: true
                 }
             };

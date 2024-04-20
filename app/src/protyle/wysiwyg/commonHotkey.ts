@@ -166,7 +166,9 @@ export const downSelect = (options: {
 
 export const getStartEndElement = (selectElements: NodeListOf<Element> | Element[]) => {
     window.sout.tracker("invoked");
+    // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
     let startElement;
+    // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
     let endElement;
     selectElements.forEach(item => {
         if (item.getAttribute("select-start")) {
@@ -192,7 +194,7 @@ export const getStartEndElement = (selectElements: NodeListOf<Element> | Element
 
 export const duplicateBlock = (nodeElements: Element[], protyle: IProtyle) => {
     window.sout.tracker("invoked");
-    let focusElement;
+    let focusElement: Element;
     const doOperations: IOperation[] = [];
     const undoOperations: IOperation[] = [];
     nodeElements.reverse().forEach((item, index) => {

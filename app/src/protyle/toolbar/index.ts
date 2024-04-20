@@ -740,7 +740,7 @@ export class Toolbar {
             const aElement = newNodes[0] as HTMLElement;
             if (aElement.textContent.replace(Constants.ZWSP, "") === "" || !aElement.getAttribute("data-href")) {
                 needFocus = false;
-                linkMenu(protyle, aElement, aElement.getAttribute("data-href") ? true : false);
+                linkMenu(protyle, aElement, !!aElement.getAttribute("data-href"));
             } else {
                 this.range.collapse(false);
             }
@@ -911,9 +911,7 @@ export class Toolbar {
         const exportImg = () => {
             const msgId = showMessage(window.siyuan.languages.exporting, 0);
             if (renderElement.getAttribute("data-subtype") === "plantuml") {
-                fetch(renderElement.querySelector("img").getAttribute("src")).then(function (response) {
-                    return response.blob();
-                }).then(function (blob) {
+                fetch(renderElement.querySelector("img").getAttribute("src")).then((response) => response.blob()).then((blob) => {
                     const formData = new FormData();
                     formData.append("file", blob);
                     formData.append("type", "image/png");

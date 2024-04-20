@@ -15,7 +15,7 @@ import {openModel} from "./model";
 import {initAbout} from "../settings/about";
 import {getRecentDocs} from "./getRecentDocs";
 import {initEditor} from "../settings/editor";
-import {App} from "../../index";
+import type {App} from "../../index";
 import {isHuawei, isInAndroid, isInIOS} from "../../protyle/util/compatibility";
 import {newFile} from "../../util/newFile";
 import {afterLoadPlugin} from "../../plugin/loader";

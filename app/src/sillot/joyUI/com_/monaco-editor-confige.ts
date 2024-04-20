@@ -1,4 +1,4 @@
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
+import type * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 
 export const initEditorOptions: monaco.editor.IStandaloneEditorConstructionOptions =
   {

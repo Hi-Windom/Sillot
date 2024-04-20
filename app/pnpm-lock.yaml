@@ -265,8 +265,8 @@ importers:
         specifier: ^4.7.5
         version: 4.7.5
       sofill:
-        specifier: ^1.1.9
-        version: 1.1.9(@sillot/bridge@0.0.3)(typescript@5.4.5)
+        specifier: ^1.1.10
+        version: 1.1.10(@sillot/bridge@0.0.3)(typescript@5.4.5)
       sout:
         specifier: ^1.1.0
         version: 1.1.0
@@ -5927,8 +5927,8 @@ packages:
     resolution: {integrity: sha512-l5x7VUUWbjVFbafGLxPWkYsHIhEvmF85tbIeFZWc8ZPtoMyybuEhL7Jye/ooC4/d48FgOjSJXgsF/AJPYCW8Zw==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
-  sofill@1.1.9:
-    resolution: {integrity: sha512-KCuAV42lUx9qS4+Kyldtq8whIdV3TwfC/OD4nDChPoPIcbgqldL9MeiE7FIcyBvX8cwDy3Bi3/Fec3KKH1uRGQ==}
+  sofill@1.1.10:
+    resolution: {integrity: sha512-3X8BCoo+K6wbAFhYaGqo6QkTW4xDrbOXDNOg+aslhXUKSwrzdVNO6WFsR+SpgViOb9FD15trO154rmuyVEjR1Q==}
     peerDependencies:
       '@sillot/bridge': ^0.0.3
       idb: ^8.0.0
@@ -13399,7 +13399,7 @@ snapshots:
       ip-address: 9.0.5
       smart-buffer: 4.2.0
 
-  sofill@1.1.9(@sillot/bridge@0.0.3)(typescript@5.4.5):
+  sofill@1.1.10(@sillot/bridge@0.0.3)(typescript@5.4.5):
     dependencies:
       '@sillot/bridge': 0.0.3
     optionalDependencies:

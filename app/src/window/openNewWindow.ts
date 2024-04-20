@@ -3,7 +3,7 @@ import {layoutToJSON} from "../layout/util";
 import {ipcRenderer} from "electron";
 /// #endif
 import {Constants} from "../constants";
-import {Tab} from "../layout/Tab";
+import type {Tab} from "../layout/Tab";
 import {fetchPost} from "../util/fetch";
 import {showMessage} from "../dialog/message";
 import {getDisplayName, pathPosix} from "../util/pathName";
@@ -87,7 +87,7 @@ export const openAssetNewWindow = (assetPath: string, options: windowOptions = {
             action: "Tab",
             children: {
                 path: assetPath,
-                page: parseInt(getSearch("page", assetPath)),
+                page: Number.parseInt(getSearch("page", assetPath)),
                 instance: "Asset",
             }
         };

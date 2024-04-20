@@ -2,7 +2,7 @@ import {getRandom, isMobile} from "../util/functions";
 import {fetchPost} from "../util/fetch";
 import {hasClosestByClassName} from "../protyle/util/hasClosest";
 import {Constants} from "../constants";
-import {Files} from "../layout/dock/Files";
+import type {Files} from "../layout/dock/Files";
 /// #if !MOBILE
 import {getDockByType} from "../layout/tabUtil";
 import {getAllModels} from "../layout/getAll";
@@ -32,9 +32,9 @@ export const unicode2Emoji = (unicode: string, className = "", needSpan = false,
         try {
             unicode.split("-").forEach(item => {
                 if (item.length < 5) {
-                    emoji += String.fromCodePoint(parseInt("0" + item, 16));
+                    emoji += String.fromCodePoint(Number.parseInt("0" + item, 16));
                 } else {
-                    emoji += String.fromCodePoint(parseInt(item, 16));
+                    emoji += String.fromCodePoint(Number.parseInt(item, 16));
                 }
             });
             if (needSpan) {
@@ -55,7 +55,7 @@ export const lazyLoadEmoji = (element: HTMLElement) => {
             const index = entrie.target.getAttribute("data-index");
             if ((typeof entrie.isIntersecting === "undefined" ? entrie.intersectionRatio !== 0 : entrie.isIntersecting) && index) {
                 let html = "";
-                window.siyuan.emojis[parseInt(index)].items.forEach(emoji => {
+                window.siyuan.emojis[Number.parseInt(index)].items.forEach(emoji => {
                     html += `<button data-unicode="${emoji.unicode}" class="emojis__item ariaLabel" aria-label="${window.siyuan.config.lang === "zh_CN" ? emoji.description_zh_cn : emoji.description}">
 ${unicode2Emoji(emoji.unicode)}</button>`;
                 });
@@ -404,7 +404,7 @@ export const openEmojiPanel = (id: string, type: "doc" | "notebook" | "av", posi
                 const index = titleElement.nextElementSibling.getAttribute("data-index");
                 if (index) {
                     let html = "";
-                    window.siyuan.emojis[parseInt(index)].items.forEach(emoji => {
+                    window.siyuan.emojis[Number.parseInt(index)].items.forEach(emoji => {
                         html += `<button data-unicode="${emoji.unicode}" class="emojis__item ariaLabel" aria-label="${window.siyuan.config.lang === "zh_CN" ? emoji.description_zh_cn : emoji.description}">
 ${unicode2Emoji(emoji.unicode)}</button>`;
                     });

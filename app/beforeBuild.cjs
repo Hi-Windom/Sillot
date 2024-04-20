@@ -13,7 +13,7 @@ function deleteDir(url) {
     //判断给定的路径是否存在
 
     files = fs.readdirSync(url); //返回文件和子目录的数组
-    files.forEach(function (file, index) {
+    files.forEach((file, index) => {
       const curPath = path.join(url, file);
       if (!curPath.endsWith(".git")) {
         if (fs.statSync(curPath).isDirectory()) {

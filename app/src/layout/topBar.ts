@@ -8,7 +8,7 @@ import {MenuItem} from "../menus/Menu";
 import {setMode} from "../util/assets";
 import {openSetting} from "../config";
 import {openSearch} from "../search/spread";
-import {App} from "../index";
+import type {App} from "../index";
 /// #if !BROWSER
 import {webFrame} from "electron";
 /// #endif
@@ -318,6 +318,7 @@ const openPlugin = (app: App, target: Element) => {
     let hasPlugin = false;
     app.plugins.forEach((plugin) => {
         // @ts-ignore
+        // biome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
         const hasSetting = plugin.setting || plugin.__proto__.hasOwnProperty("openSetting");
         let hasTopBar = false;
         plugin.topBarIcons.forEach(item => {

@@ -1,5 +1,5 @@
 import {Dialog} from "../dialog";
-import {App} from "../index";
+import type {App} from "../index";
 import {upDownHint} from "../util/upDownHint";
 /// #if !MOBILE
 import {openSetting} from "../config";

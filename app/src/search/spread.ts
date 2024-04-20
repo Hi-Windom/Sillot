@@ -4,7 +4,7 @@ import {Dialog} from "../dialog";
 import {fetchSyncPost} from "../util/fetch";
 import {focusByRange} from "../protyle/util/selection";
 import {genSearch} from "./util";
-import {App} from "../index";
+import type {App} from "../index";
 
 export const openSearch = async (options: {
     app: App,

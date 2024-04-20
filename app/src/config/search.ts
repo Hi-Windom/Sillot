@@ -1,7 +1,7 @@
 import {Constants} from "../constants";
 import {genItemPanel} from "./index";
 import {keymap} from "./keymap";
-import {App} from "../index";
+import type {App} from "../index";
 
 const getLang = (keys: string[]) => {
     const langArray: string[] = [];

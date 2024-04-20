@@ -16,7 +16,7 @@ import {fetchPost, fetchSyncPost} from "../../util/fetch";
 import {onGet} from "./onGet";
 /// #if !MOBILE
 import {getInstanceById} from "../../layout/util";
-import {Tab} from "../../layout/Tab";
+import type {Tab} from "../../layout/Tab";
 import {updatePanelByEditor} from "../../editor/util";
 /// #endif
 import {Editor} from "../../editor";
@@ -1127,8 +1127,8 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
                 point.className = "dragover__top";
             } else if (contentRect) {
                 const editorPosition = {
-                    left: contentRect.left + parseInt(editorElement.style.paddingLeft),
-                    right: contentRect.left + protyle.contentElement.clientWidth - parseInt(editorElement.style.paddingRight)
+                    left: contentRect.left + Number.parseInt(editorElement.style.paddingLeft),
+                    right: contentRect.left + protyle.contentElement.clientWidth - Number.parseInt(editorElement.style.paddingRight)
                 };
                 if (event.clientX < editorPosition.left) {
                     // 左侧

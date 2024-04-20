@@ -8,7 +8,7 @@ import {viewCards} from "./viewCards";
 import {Constants} from "../constants";
 import {escapeAttr, escapeHtml} from "../util/escape";
 import {transaction} from "../protyle/wysiwyg/transaction";
-import {App} from "../index";
+import type {App} from "../index";
 
 export const genCardItem = (item: ICardPackage) => {
     window.sout.tracker("invoked");

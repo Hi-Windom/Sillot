@@ -1,6 +1,6 @@
 import {Tab} from "../layout/Tab";
 import {Editor} from "./index";
-import {Wnd} from "../layout/Wnd";
+import type {Wnd} from "../layout/Wnd";
 import {getInstanceById, getWndByLayout, pdfIsLoading, setPanelFocus} from "../layout/util";
 import {getDockByType} from "../layout/tabUtil";
 import {getAllModels, getAllTabs} from "../layout/getAll";
@@ -25,7 +25,7 @@ import {showMessage} from "../dialog/message";
 import {objEquals} from "../util/functions";
 import {resize} from "../protyle/util/resize";
 import {Search} from "../search";
-import {App} from "../index";
+import type {App} from "../index";
 import {newCardModel} from "../card/newCardTab";
 import {preventScroll} from "../protyle/scroll/preventScroll";
 import {clearOBG} from "../layout/dock/util";

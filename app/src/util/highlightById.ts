@@ -3,7 +3,7 @@ import {getEditorRange, getSelectionPosition} from "../protyle/util/selection";
 
 export const bgFade = (element: Element) => {
     element.classList.add("protyle-wysiwyg--hl");
-    setTimeout(function () {
+    setTimeout(() => {
         element.classList.remove("protyle-wysiwyg--hl");
     }, 1024);
 };

@@ -1,10 +1,10 @@
 import {Constants} from "../constants";
 /// #if !MOBILE
-import {Tab} from "./Tab";
+import type {Tab} from "./Tab";
 /// #endif
 import {processMessage} from "../util/processMessage";
 import {kernelError, reloadSync} from "../dialog/processSystem";
-import {App} from "../index";
+import type {App} from "../index";
 
 export class Model {
     public ws: WebSocket;
@@ -13,6 +13,7 @@ export class Model {
     public parent: Tab;
     /// #else
     // @ts-ignore
+    // biome-ignore lint/suspicious/noDuplicateClassMembers: <explanation>
     public parent: any;
     /// #endif
     public app: App;

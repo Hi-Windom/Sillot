@@ -8,7 +8,7 @@ import {validateName} from "../editor/rename";
 import {setStorageVal} from "../protyle/util/compatibility";
 import {openFileById} from "../editor/util";
 import {openMobileFileById} from "../mobile/editor";
-import {App} from "../index";
+import type {App} from "../index";
 
 export const fetchNewDailyNote = (app: App, notebook: string) => {
     window.sout.tracker("-> notebook: ", notebook);

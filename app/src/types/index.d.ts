@@ -735,6 +735,7 @@ interface IMenu {
     checked?: boolean,
     iconClass?: string,
     label?: string,
+    // biome-ignore lint/suspicious/noConfusingVoidType: <explanation>
     click?: (element: HTMLElement, event: MouseEvent) => boolean | void | Promise<boolean | void>
     type?: "separator" | "submenu" | "readonly" | "empty",
     accelerator?: string,

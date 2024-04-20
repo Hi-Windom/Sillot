@@ -33,7 +33,7 @@ export const duplicateCol = (options: {
     });
     const nameMatch = newColData.name.match(/^(.*) \((\d+)\)$/);
     if (nameMatch) {
-        newColData.name = `${nameMatch[1]} (${parseInt(nameMatch[2]) + 1})`;
+        newColData.name = `${nameMatch[1]} (${Number.parseInt(nameMatch[2]) + 1})`;
     } else {
         newColData.name = `${newColData.name} (1)`;
     }
@@ -1459,7 +1459,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.lineNumber,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = dayjs().format("YYYYMMDDHHmmss");
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.lineNumber,

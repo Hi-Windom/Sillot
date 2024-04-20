@@ -76,7 +76,7 @@ export const avRender = (element: Element, protyle: IProtyle, cb?: () => void, v
                 id: e.getAttribute("data-av-id"),
                 created,
                 snapshot,
-                pageSize: parseInt(e.dataset.pageSize) || undefined,
+                pageSize: Number.parseInt(e.dataset.pageSize) || undefined,
                 viewID: newViewID,
                 query
             }, (response) => {
@@ -106,7 +106,7 @@ export const avRender = (element: Element, protyle: IProtyle, cb?: () => void, v
                             pinIndex = index;
                         }
                         if (indexWidth < eWidth - 200) {
-                            indexWidth += parseInt(item.width) || 200;
+                            indexWidth += Number.parseInt(item.width) || 200;
                             pinMaxIndex = index;
                         }
                     }

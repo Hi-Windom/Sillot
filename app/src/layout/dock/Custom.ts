@@ -1,6 +1,6 @@
-import {Tab} from "../Tab";
+import type {Tab} from "../Tab";
 import {Model} from "../Model";
-import {App} from "../../index";
+import type {App} from "../../index";
 
 export class Custom extends Model {
     public element: Element;

@@ -14,7 +14,7 @@ import {showDiff} from "./diff";
 import {setStorageVal} from "../protyle/util/compatibility";
 import {openModel} from "../mobile/menu/model";
 import {closeModel} from "../mobile/util/closePanel";
-import {App} from "../index";
+import type {App} from "../index";
 
 let historyEditor: Protyle;
 
@@ -53,7 +53,7 @@ const renderDoc = (element: HTMLElement, currentPage: number) => {
         query: inputElement.value,
         page: currentPage,
         op: opElement.value,
-        type: parseInt(typeElement.value)
+        type: Number.parseInt(typeElement.value)
     }, (response) => {
         if (currentPage < response.data.pageCount) {
             nextElement.removeAttribute("disabled");
@@ -71,7 +71,7 @@ const renderDoc = (element: HTMLElement, currentPage: number) => {
         response.data.histories.forEach((item: string) => {
             logsHTML += `<li class="b3-list-item" data-type="toggle" data-created="${item}">
     <span class="b3-list-item__toggle b3-list-item__toggle--hl"><svg class="b3-list-item__arrow"><use xlink:href="#iconRight"></use></svg></span>
-    <span style="padding-left: 4px" class="b3-list-item__text">${formatDate(parseInt(item) * 1000, 'yyyy-MM-dd HH:mm:ss')}</span>
+    <span style="padding-left: 4px" class="b3-list-item__text">${formatDate(Number.parseInt(item) * 1000, 'yyyy-MM-dd HH:mm:ss')}</span>
 </li>`;
         });
         element.lastElementChild.firstElementChild.innerHTML = logsHTML;
@@ -559,7 +559,7 @@ const bindEvent = (app: App, element: Element, dialog?: Dialog) => {
                             notebook: notebookElement.value,
                             query: inputElement.value,
                             op: opElement.value,
-                            type: parseInt(typeElement.value),
+                            type: Number.parseInt(typeElement.value),
                             created
                         }, (response) => {
                             iconElement.classList.add("b3-list-item__arrow--open");
@@ -777,13 +777,13 @@ const bindEvent = (app: App, element: Element, dialog?: Dialog) => {
                 event.preventDefault();
                 break;
             } else if ((type === "previous" || type === "next") && target.getAttribute("disabled") !== "disabled") {
-                const currentPage = parseInt(repoElement.getAttribute("data-page"));
+                const currentPage = Number.parseInt(repoElement.getAttribute("data-page"));
                 renderRepo(repoElement, type === "previous" ? currentPage - 1 : currentPage + 1);
                 event.stopPropagation();
                 event.preventDefault();
                 break;
             } else if ((type === "docprevious" || type === "docnext") && target.getAttribute("disabled") !== "disabled") {
-                const currentPage = parseInt(firstPanelElement.getAttribute("data-page"));
+                const currentPage = Number.parseInt(firstPanelElement.getAttribute("data-page"));
                 renderDoc(firstPanelElement, type === "docprevious" ? currentPage - 1 : currentPage + 1);
                 event.stopPropagation();
                 event.preventDefault();

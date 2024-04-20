@@ -4,9 +4,9 @@ import {fetchPost} from "../util/fetch";
 import {confirmDialog} from "../dialog/confirmDialog";
 import {escapeHtml} from "../util/escape";
 import {copySubMenu} from "./commonMenuItem";
-import {Bookmark} from "../layout/dock/Bookmark";
+import type {Bookmark} from "../layout/dock/Bookmark";
 import {isMobile} from "../util/functions";
-import {MobileBookmarks} from "../mobile/dock/MobileBookmarks";
+import type {MobileBookmarks} from "../mobile/dock/MobileBookmarks";
 import {Constants} from "../constants";
 
 export const openBookmarkMenu = (element: HTMLElement, event: MouseEvent, bookmarkObj: Bookmark | MobileBookmarks) => {

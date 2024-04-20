@@ -159,9 +159,9 @@ export class Background {
             const y = event.clientY;
             const documentSelf = document;
             const height = this.imgElement.naturalHeight * this.imgElement.clientWidth / this.imgElement.naturalWidth - this.imgElement.clientHeight;
-            let originalPositionY = parseFloat(this.imgElement.style.objectPosition.substring(7)) || 50;
+            let originalPositionY = Number.parseFloat(this.imgElement.style.objectPosition.substring(7)) || 50;
             if (this.imgElement.style.objectPosition.endsWith("px")) {
-                originalPositionY = -parseInt(this.imgElement.style.objectPosition.substring(7)) / height * 100;
+                originalPositionY = -Number.parseInt(this.imgElement.style.objectPosition.substring(7)) / height * 100;
             }
             documentSelf.onmousemove = (moveEvent: MouseEvent) => {
                 this.imgElement.style.objectPosition = `center ${((y - moveEvent.clientY) / height * 100 + originalPositionY).toFixed(2)}%`;
@@ -266,7 +266,7 @@ export class Background {
                     dialog.element.addEventListener("click", (event) => {
                         const target = event.target as HTMLElement;
                         if (target.classList.contains("b3-card")) {
-                            this.ial["title-img"] = bgs[parseInt(target.getAttribute("data-index"))];
+                            this.ial["title-img"] = bgs[Number.parseInt(target.getAttribute("data-index"))];
                             this.render(this.ial, protyle.block.rootID);
                             fetchPost("/api/attr/setBlockAttrs", {
                                 id: protyle.block.rootID,

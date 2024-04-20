@@ -13,7 +13,7 @@ import {mountHelp, newNotebook} from "../../util/mount";
 import {confirmDialog} from "../../dialog/confirmDialog";
 import {newFile} from "../../util/newFile";
 import {MenuItem} from "../../menus/Menu";
-import {App} from "../../index";
+import type {App} from "../../index";
 
 export class MobileFiles extends Model {
     public element: HTMLElement;

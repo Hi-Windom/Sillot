@@ -14,6 +14,7 @@ export const globalClick = (event: MouseEvent & { target: HTMLElement }) => {
     const ghostElement = document.getElementById("dragGhost");
     if (ghostElement) {
         const startElement = ghostElement.parentElement.querySelector(`[data-node-id="${ghostElement.getAttribute("data-node-id")}"]`) as HTMLElement;
+        // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
         startElement ? startElement.style.opacity = "" : "";
         ghostElement.parentElement.querySelectorAll(".dragover__top, .dragover__bottom, .dragover").forEach((item: HTMLElement) => {
             item.classList.remove("dragover__top", "dragover__bottom", "dragover");

@@ -91,7 +91,7 @@ export const genAVValueHTML = (value: IAVCellValue) => {
         case "created":
         case "updated":
             if (value[value.type].isNotEmpty) {
-                html = `<span data-content="${value[value.type].content}">${format(new Date(value[value.type].content), 'yyyy-MM-dd HH:mm')}</span>`;
+                html = `<span data-content="${value[value.type].content}">${formatDate(new Date(value[value.type].content), 'yyyy-MM-dd HH:mm')}</span>`;
             }
             break;
         case "url":
@@ -369,7 +369,7 @@ class="fn__flex-1 fn__flex${["url", "text", "number", "email", "phone", "block"]
                     } else {
                         value = {
                             number: {
-                                content: parseFloat(item.value) || 0,
+                                content: Number.parseFloat(item.value) || 0,
                                 isNotEmpty: true
                             }
                         };

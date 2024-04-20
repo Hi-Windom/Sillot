@@ -13,7 +13,7 @@ export const scrollEvent = (protyle: IProtyle, element: HTMLElement) => {
         const elementRect = element.getBoundingClientRect();
         if (!protyle.toolbar.element.classList.contains("fn__none")) {
             const initY = protyle.toolbar.element.getAttribute("data-inity").split(Constants.ZWSP);
-            const top = parseInt(initY[0]) + (parseInt(initY[1]) - element.scrollTop);
+            const top = Number.parseInt(initY[0]) + (Number.parseInt(initY[1]) - element.scrollTop);
             if (top < elementRect.top - protyle.toolbar.toolbarHeight || top > elementRect.bottom - protyle.toolbar.toolbarHeight) {
                 protyle.toolbar.element.style.display = "none";
             } else {

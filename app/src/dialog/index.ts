@@ -4,7 +4,7 @@ import {moveResize} from "./moveResize";
 /// #endif
 import {isMobile} from "../util/functions";
 import {isNotCtrl} from "../protyle/util/compatibility";
-import {Protyle} from "../protyle";
+import type {Protyle} from "../protyle";
 import {Constants} from "../constants";
 
 export class Dialog {

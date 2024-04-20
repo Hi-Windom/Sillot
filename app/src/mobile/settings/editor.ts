@@ -6,7 +6,7 @@ import {confirmDialog} from "../../dialog/confirmDialog";
 
 const setEditor = (modelMainElement: Element) => {
     window.sout.tracker("invoked");
-    let dynamicLoadBlocks = parseInt((modelMainElement.querySelector("#dynamicLoadBlocks") as HTMLInputElement).value);
+    let dynamicLoadBlocks = Number.parseInt((modelMainElement.querySelector("#dynamicLoadBlocks") as HTMLInputElement).value);
     if (48 > dynamicLoadBlocks) {
         dynamicLoadBlocks = 48;
         (modelMainElement.querySelector("#dynamicLoadBlocks") as HTMLInputElement).value = "48";
@@ -33,14 +33,14 @@ const setEditor = (modelMainElement: Element) => {
     window.siyuan.config.editor.virtualBlockRef = (modelMainElement.querySelector("#virtualBlockRef") as HTMLInputElement).checked;
     window.siyuan.config.editor.virtualBlockRefInclude = (modelMainElement.querySelector("#virtualBlockRefInclude") as HTMLInputElement).value;
     window.siyuan.config.editor.virtualBlockRefExclude = (modelMainElement.querySelector("#virtualBlockRefExclude") as HTMLInputElement).value;
-    window.siyuan.config.editor.blockRefDynamicAnchorTextMaxLen = parseInt((modelMainElement.querySelector("#blockRefDynamicAnchorTextMaxLen") as HTMLInputElement).value);
-    window.siyuan.config.editor.backlinkExpandCount = parseInt((modelMainElement.querySelector("#backlinkExpandCount") as HTMLInputElement).value);
-    window.siyuan.config.editor.backmentionExpandCount = parseInt((modelMainElement.querySelector("#backmentionExpandCount") as HTMLInputElement).value);
+    window.siyuan.config.editor.blockRefDynamicAnchorTextMaxLen = Number.parseInt((modelMainElement.querySelector("#blockRefDynamicAnchorTextMaxLen") as HTMLInputElement).value);
+    window.siyuan.config.editor.backlinkExpandCount = Number.parseInt((modelMainElement.querySelector("#backlinkExpandCount") as HTMLInputElement).value);
+    window.siyuan.config.editor.backmentionExpandCount = Number.parseInt((modelMainElement.querySelector("#backmentionExpandCount") as HTMLInputElement).value);
     window.siyuan.config.editor.codeLigatures = (modelMainElement.querySelector("#codeLigatures") as HTMLInputElement).checked;
-    window.siyuan.config.editor.codeTabSpaces = parseInt((modelMainElement.querySelector("#codeTabSpaces") as HTMLInputElement).value);
-    window.siyuan.config.editor.fontSize = parseInt((modelMainElement.querySelector("#fontSize") as HTMLInputElement).value);
-    window.siyuan.config.editor.generateHistoryInterval = parseInt((modelMainElement.querySelector("#generateHistoryInterval") as HTMLInputElement).value);
-    window.siyuan.config.editor.historyRetentionDays = parseInt((modelMainElement.querySelector("#historyRetentionDays") as HTMLInputElement).value);
+    window.siyuan.config.editor.codeTabSpaces = Number.parseInt((modelMainElement.querySelector("#codeTabSpaces") as HTMLInputElement).value);
+    window.siyuan.config.editor.fontSize = Number.parseInt((modelMainElement.querySelector("#fontSize") as HTMLInputElement).value);
+    window.siyuan.config.editor.generateHistoryInterval = Number.parseInt((modelMainElement.querySelector("#generateHistoryInterval") as HTMLInputElement).value);
+    window.siyuan.config.editor.historyRetentionDays = Number.parseInt((modelMainElement.querySelector("#historyRetentionDays") as HTMLInputElement).value);
     fetchPost("/api/setting/setEditor", window.siyuan.config.editor, response => {
         window.siyuan.config.editor = response.data;
         reloadProtyle(window.siyuan.mobile.editor.protyle, false);

@@ -5,8 +5,8 @@ import {Outline} from "./Outline";
 import {fixWndFlex1, getInstanceById, getWndByLayout, saveLayout, switchWnd} from "../util";
 import {resizeTabs} from "../tabUtil";
 import {Backlink} from "./Backlink";
-import {App} from "../../index";
-import {Wnd} from "../Wnd";
+import type {App} from "../../index";
+import type {Wnd} from "../Wnd";
 import {fetchSyncPost} from "../../util/fetch";
 
 export const openBacklink = async (options: {

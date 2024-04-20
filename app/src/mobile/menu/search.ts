@@ -14,7 +14,7 @@ import {newFileByName} from "../../util/newFile";
 import {showMessage} from "../../dialog/message";
 import {reloadProtyle} from "../../protyle/util/reload";
 import {activeBlur, hideKeyboardToolbar} from "../util/keyboardToolbar";
-import {App} from "../../index";
+import type {App} from "../../index";
 import {
     assetFilterMenu,
     assetInputEvent,
@@ -510,7 +510,7 @@ const initSearchEvent = (app: App, element: Element, config: Config.IUILayoutTab
                 break;
             } else if (type === "unRefPrevious") {
                 if (!target.getAttribute("disabled")) {
-                    let currentPage = parseInt(unRefElement.querySelector("#searchUnRefResult").lastElementChild.textContent);
+                    let currentPage = Number.parseInt(unRefElement.querySelector("#searchUnRefResult").lastElementChild.textContent);
                     if (currentPage > 1) {
                         currentPage--;
                         getUnRefListMobile(unRefElement, currentPage);
@@ -521,8 +521,8 @@ const initSearchEvent = (app: App, element: Element, config: Config.IUILayoutTab
                 break;
             } else if (type === "unRefNext") {
                 const unRefRageElement = unRefElement.querySelector("#searchUnRefResult").lastElementChild;
-                let currentPage = parseInt(unRefRageElement.textContent);
-                if (currentPage < parseInt(unRefRageElement.textContent.split("/")[1])) {
+                let currentPage = Number.parseInt(unRefRageElement.textContent);
+                if (currentPage < Number.parseInt(unRefRageElement.textContent.split("/")[1])) {
                     currentPage++;
                     getUnRefListMobile(unRefElement, currentPage);
                 }
@@ -563,14 +563,14 @@ const initSearchEvent = (app: App, element: Element, config: Config.IUILayoutTab
                 break;
             } else if (type === "assetPrevious") {
                 if (!target.getAttribute("disabled")) {
-                    assetInputEvent(assetsElement, localSearch, parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[1]) - 1);
+                    assetInputEvent(assetsElement, localSearch, Number.parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[1]) - 1);
                 }
                 event.stopPropagation();
                 event.preventDefault();
                 break;
             } else if (type === "assetNext") {
                 if (!target.getAttribute("disabled")) {
-                    assetInputEvent(assetsElement, localSearch, parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[1]) + 1);
+                    assetInputEvent(assetsElement, localSearch, Number.parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[1]) + 1);
                 }
                 event.stopPropagation();
                 event.preventDefault();

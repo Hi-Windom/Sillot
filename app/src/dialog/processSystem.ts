@@ -17,13 +17,13 @@ import {redirectToCheckAuth, setNoteBook} from "../util/pathName";
 import { exportIDB } from "../sillot/util/sillot-idb-backup-and-restore";
 import {getAllModels} from "../layout/getAll";
 import {reloadProtyle} from "../protyle/util/reload";
-import {Tab} from "../layout/Tab";
+import type {Tab} from "../layout/Tab";
 import {setEmpty} from "../mobile/util/setEmpty";
 import {hideAllElements, hideElements} from "../protyle/ui/hideElements";
-import {App} from "../index";
+import type {App} from "../index";
 import {saveScroll} from "../protyle/scroll/saveScroll";
 import {isInAndroid, isInIOS, setStorageVal} from "../protyle/util/compatibility";
-import {Plugin} from "../plugin";
+import type {Plugin} from "../plugin";
 
 const updateTitle = (rootID: string, tab: Tab, protyle?: IProtyle) => {
     window.sout.tracker("invoked");

@@ -1,4 +1,4 @@
-import {Tab} from "../Tab";
+import type {Tab} from "../Tab";
 import {Model} from "../Model";
 import {Tree} from "../../util/Tree";
 import {getInstanceById, setPanelFocus} from "../util";
@@ -13,7 +13,7 @@ import {escapeHtml} from "../../util/escape";
 import {unicode2Emoji} from "../../emoji";
 import {onGet} from "../../protyle/util/onGet";
 import {getPreviousBlock} from "../../protyle/wysiwyg/getBlock";
-import {App} from "../../index";
+import type {App} from "../../index";
 import {checkFold} from "../../util/noRelyPCFunction";
 import {transaction} from "../../protyle/wysiwyg/transaction";
 

@@ -1,4 +1,4 @@
-const { execSync } = require('child_process');
+const { execSync } = require('node:child_process');
 
 
 // Get the list of tags sorted by commit date
@@ -15,6 +15,7 @@ const remoteTags = execSync('git ls-remote --tags origin').toString().trim().spl
 const newTags = localTags.filter(tag => !remoteTags.includes(tag));
 
 // Iterate through each new tag and push it to the remote
+// biome-ignore lint/complexity/noForEach: <explanation>
 newTags.forEach(tag => {
   try {
     execSync(`git push origin ${tag}`);

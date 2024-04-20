@@ -1460,7 +1460,7 @@ export class Gutter {
                 icon: "iconCode",
                 submenu: [{
                     label: `${window.siyuan.languages.height}<span class="fn__space"></span>
-<input style="margin: 4px 0;width: 84px" type="number" step="1" min="148" class="b3-text-field" value="${height ? parseInt(height) : "420"}">`,
+<input style="margin: 4px 0;width: 84px" type="number" step="1" min="148" class="b3-text-field" value="${height ? Number.parseInt(height) : "420"}">`,
                     bind: (element) => {
                         element.querySelector("input").addEventListener("change", (event) => {
                             const newHeight = ((event.target as HTMLInputElement).value || "420") + "px";
@@ -1989,7 +1989,7 @@ export class Gutter {
         if (nodeElements.length === 1) {
             const widthStyle = (nodeElements[0] as HTMLElement).style.width;
             if (widthStyle.endsWith("%")) {
-                width = parseInt(widthStyle);
+                width = Number.parseInt(widthStyle);
             }
         }
         window.siyuan.menus.menu.append(new MenuItem({
@@ -2212,7 +2212,7 @@ data-type="fold"><svg style="width:10px${fold && fold === "1" ? "" : ";transform
             left = nodeElement.getBoundingClientRect().left - this.element.clientWidth - space;
         } else if (element.classList.contains("av__row")) {
             // 为数据库行
-            left = nodeElement.getBoundingClientRect().left - this.element.clientWidth - space + parseInt(getComputedStyle(nodeElement).paddingLeft);
+            left = nodeElement.getBoundingClientRect().left - this.element.clientWidth - space + Number.parseInt(getComputedStyle(nodeElement).paddingLeft);
         }
         this.element.style.left = `${left}px`;
         if (left < this.element.parentElement.getBoundingClientRect().left) {

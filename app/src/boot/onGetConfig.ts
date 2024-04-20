@@ -23,7 +23,7 @@ import {setTabPosition} from "../window/setHeader";
 import {initBar} from "../layout/topBar";
 import {openChangelog} from "./openChangelog";
 import {getIdFromSYProtocol, isSYProtocol} from "../util/pathName";
-import {App} from "../index";
+import type {App} from "../index";
 import {initWindowEvent} from "./globalEvent/event";
 import {sendGlobalShortcut} from "./globalEvent/keydown";
 import {closeWindow} from "../window/closeWin";
@@ -400,14 +400,14 @@ ${response.data.replace("%pages", "<span class=totalPages></span>").replace("%pa
                     afterExport(pdfFilePath, msgId);
                     if (ipcData.removeAssets) {
                         const removePromise = (dir: string) => {
-                            return new Promise(function (resolve) {
+                            return new Promise((resolve) => {
                                 //先读文件夹
-                                fs.stat(dir, function (err, stat) {
+                                fs.stat(dir, (err, stat) => {
                                     if (stat) {
                                         if (stat.isDirectory()) {
-                                            fs.readdir(dir, function (err, files) {
+                                            fs.readdir(dir, (err, files) => {
                                                 files = files.map(file => path.join(dir, file)); // a/b  a/m
-                                                Promise.all(files.map(file => removePromise(file))).then(function () {
+                                                Promise.all(files.map(file => removePromise(file))).then(() => {
                                                     fs.rmdir(dir, resolve);
                                                 });
                                             });

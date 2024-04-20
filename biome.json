@@ -33,19 +33,24 @@
             "recommended": true,
             "suspicious": {
                 "noExplicitAny": "off",
-                "noAsyncPromiseExecutor": "off"
+                "noAsyncPromiseExecutor": "off",
+                "noImplicitAnyLet": "warn"
             },
             "performance": { "noDelete": "off" },
             "style": {
                 "useTemplate": "off",
                 "useConst": "warn",
                 "noVar": "warn",
-                "useDefaultParameterLast": "off"
+                "useDefaultParameterLast": "off",
+                "noUselessElse": "warn",
+                "noParameterAssign": "warn",
+                "useNodejsImportProtocol": "off"
             },
             "complexity": {
                 "useSimplifiedLogicExpression": "off",
                 "useLiteralKeys": "warn",
-                "useOptionalChain": "warn"
+                "useOptionalChain": "warn",
+                "noForEach": "warn"
             },
             "correctness": { "noUnreachable": "warn" }
         }

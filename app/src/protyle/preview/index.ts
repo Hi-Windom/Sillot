@@ -100,7 +100,7 @@ export class Preview {
                         } else if (event.shiftKey) {
                             openBy(linkAddress, "app");
                         } else if (Constants.SIYUAN_ASSETS_EXTS.includes(pathPosix().extname((linkAddress.split("?page")[0])))) {
-                            openAsset(protyle.app, linkAddress.split("?page")[0], parseInt(getSearch("page", linkAddress)));
+                            openAsset(protyle.app, linkAddress.split("?page")[0], Number.parseInt(getSearch("page", linkAddress)));
                         }
                         /// #endif
                     } else {
@@ -217,7 +217,7 @@ export class Preview {
                 item.style.display = "initial";
             });
             copyElement.querySelectorAll("mjx-container > svg").forEach((item) => {
-                item.setAttribute("width", (parseInt(item.getAttribute("width")) * 8) + "px");
+                item.setAttribute("width", (Number.parseInt(item.getAttribute("width")) * 8) + "px");
             });
         } else if (type === "zhihu") {
             this.link2online(copyElement);

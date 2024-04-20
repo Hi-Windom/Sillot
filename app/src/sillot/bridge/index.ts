@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 
 export class bS {
   public io: Server = null;
+  // biome-ignore lint/complexity/noUselessConstructor: <explanation>
   constructor() {
   }
   newBridge() {

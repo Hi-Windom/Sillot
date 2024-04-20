@@ -1,5 +1,5 @@
 import {escapeHtml} from "../../util/escape";
-import {Tab} from "../Tab";
+import type {Tab} from "../Tab";
 import {Model} from "../Model";
 import {getInstanceById, setPanelFocus} from "../util";
 import {getDockByType} from "../tabUtil";
@@ -18,7 +18,7 @@ import {isNotCtrl, isOnlyMeta, updateHotkeyTip} from "../../protyle/util/compati
 import {openFileById} from "../../editor/util";
 import {hasClosestByAttribute, hasClosestByTag, hasTopClosestByTag} from "../../protyle/util/hasClosest";
 import {isTouchDevice} from "../../util/functions";
-import {App} from "../../index";
+import type {App} from "../../index";
 
 export class Files extends Model {
     public element: HTMLElement;

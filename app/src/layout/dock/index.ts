@@ -1,6 +1,6 @@
 import {updateHotkeyTip} from "../../protyle/util/compatibility";
-import {Layout} from "../index";
-import {Wnd} from "../Wnd";
+import type {Layout} from "../index";
+import type {Wnd} from "../Wnd";
 import {Tab} from "../Tab";
 import {Files} from "./Files";
 import {Outline} from "./Outline";
@@ -8,16 +8,16 @@ import {getAllModels, getAllTabs} from "../getAll";
 import {Bookmark} from "./Bookmark";
 import {Tag} from "./Tag";
 import {Graph} from "./Graph";
-import {Model} from "../Model";
+import type {Model} from "../Model";
 import {setPanelFocus} from "../util";
 import {getDockByType, resizeTabs} from "../tabUtil";
 import {Inbox} from "./Inbox";
-import {Protyle} from "../../protyle";
+import type {Protyle} from "../../protyle";
 import {Backlink} from "./Backlink";
 import {resetFloatDockSize} from "./util";
 import {hasClosestByClassName} from "../../protyle/util/hasClosest";
-import {App} from "../../index";
-import {Plugin} from "../../plugin";
+import type {App} from "../../index";
+import type {Plugin} from "../../plugin";
 import {Custom} from "./Custom";
 
 const TYPES = ["file", "outline", "inbox", "bookmark", "tag", "graph", "globalGraph", "backlink"];
@@ -217,7 +217,7 @@ export class Dock {
         this.pin = !this.pin;
         const hasActive = this.element.querySelector(".dock__item--active");
         if (!this.pin) {
-            this.resetDockPosition(hasActive ? true : false);
+            this.resetDockPosition(!!hasActive);
             this.resizeElement.classList.add("fn__none");
             if (hasActive) {
                 this.showDock(true);
@@ -329,7 +329,7 @@ export class Dock {
         if (show && target.classList.contains("dock__item--active")) {
             target.classList.remove("dock__item--active", "dock__item--activefocus");
         }
-        const index = parseInt(target.getAttribute("data-index"));
+        const index = Number.parseInt(target.getAttribute("data-index"));
         const wnd = this.layout.children[index] as Wnd;
         if (target.classList.contains("dock__item--active") || hide) {
             if (!close) {
@@ -542,14 +542,14 @@ export class Dock {
             }
             const lastActiveElement = this.element.querySelector('.dock__item--active[data-index="1"]');
             if (this.position === "Left" || this.position === "Right") {
-                const dataHeight = parseInt(lastActiveElement.getAttribute("data-height"));
-                if (dataHeight !== 0 && !isNaN(dataHeight)) {
+                const dataHeight = Number.parseInt(lastActiveElement.getAttribute("data-height"));
+                if (dataHeight !== 0 && !Number.isNaN(dataHeight)) {
                     lastWnd.element.style.height = dataHeight + "px";
                     lastWnd.element.classList.remove("fn__flex-1");
                 }
             } else {
-                const dataWidth = parseInt(lastActiveElement.getAttribute("data-width"));
-                if (dataWidth !== 0 && !isNaN(dataWidth)) {
+                const dataWidth = Number.parseInt(lastActiveElement.getAttribute("data-width"));
+                if (dataWidth !== 0 && !Number.isNaN(dataWidth)) {
                     lastWnd.element.style.width = dataWidth + "px";
                     lastWnd.element.classList.remove("fn__flex-1");
                 }
@@ -592,7 +592,7 @@ export class Dock {
         if (sourceDock.element.querySelectorAll(".dock__item").length === 2) {
             sourceDock.element.classList.add("fn__none");
         }
-        const sourceWnd = sourceDock.layout.children[parseInt(sourceElement.getAttribute("data-index"))] as Wnd;
+        const sourceWnd = sourceDock.layout.children[Number.parseInt(sourceElement.getAttribute("data-index"))] as Wnd;
         const sourceId = sourceElement.getAttribute("data-id");
         if (sourceId) {
             sourceWnd.removeTab(sourceElement.getAttribute("data-id"));
@@ -670,9 +670,9 @@ export class Dock {
         this.element.querySelectorAll(".dock__item--active").forEach((item) => {
             let size;
             if (this.position === "Left" || this.position === "Right") {
-                size = parseInt(item.getAttribute("data-width")) || (["graph", "globalGraph", "backlink"].includes(item.getAttribute("data-type")) ? 320 : 227);
+                size = Number.parseInt(item.getAttribute("data-width")) || (["graph", "globalGraph", "backlink"].includes(item.getAttribute("data-type")) ? 320 : 227);
             } else {
-                size = parseInt(item.getAttribute("data-height")) || 227;
+                size = Number.parseInt(item.getAttribute("data-height")) || 227;
             }
             if (size > max) {
                 max = size;

@@ -398,9 +398,9 @@ export class WYSIWYG {
             }
             const documentSelf = document;
             const rect = protyle.element.getBoundingClientRect();
-            const mostLeft = rect.left + (parseInt(protyle.wysiwyg.element.style.paddingLeft) || 24) + 1;
+            const mostLeft = rect.left + (Number.parseInt(protyle.wysiwyg.element.style.paddingLeft) || 24) + 1;
             // 不能用 firstElement，否则 https://ld246.com/article/1668758661338
-            const mostRight = mostLeft + (protyle.wysiwyg.element.clientWidth - (parseInt(protyle.wysiwyg.element.style.paddingLeft) || 24) - (parseInt(protyle.wysiwyg.element.style.paddingRight) || 16)) - 2;
+            const mostRight = mostLeft + (protyle.wysiwyg.element.clientWidth - (Number.parseInt(protyle.wysiwyg.element.style.paddingLeft) || 24) - (Number.parseInt(protyle.wysiwyg.element.style.paddingRight) || 16)) - 2;
             const mostBottom = rect.bottom;
             const y = event.clientY;
 
@@ -641,7 +641,7 @@ export class WYSIWYG {
                             dragElement.style.height = (dragHeight + (moveEvent.clientY - y)) + "px";
                         }
                     } else {
-                        dragElement.parentElement.parentElement.style.width = (parseInt(dragElement.style.width) + 10) + "px";
+                        dragElement.parentElement.parentElement.style.width = (Number.parseInt(dragElement.style.width) + 10) + "px";
                     }
                 };
 
@@ -687,7 +687,7 @@ export class WYSIWYG {
                 target.removeAttribute("style");
                 const id = nodeElement.getAttribute("data-node-id");
                 const x = event.clientX;
-                const colIndex = parseInt(target.getAttribute("data-col-index"));
+                const colIndex = Number.parseInt(target.getAttribute("data-col-index"));
                 const colElement = nodeElement.querySelectorAll("table col")[colIndex] as HTMLElement;
                 // 清空初始化 table 时的最小宽度
                 if (colElement.style.minWidth) {
@@ -2192,7 +2192,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                             (linkPathname.endsWith(".pdf") && !linkAddress.startsWith("file://")))
                     ) {
                         if (event.altKey) {
-                            openAsset(protyle.app, linkAddress, parseInt(getSearch("page", linkAddress)));
+                            openAsset(protyle.app, linkAddress, Number.parseInt(getSearch("page", linkAddress)));
                         } else if (ctrlIsPressed) {
                             /// #if !BROWSER
                             openBy(linkAddress, "folder");
@@ -2206,7 +2206,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                             openByMobile(linkAddress);
                             /// #endif
                         } else {
-                            openAsset(protyle.app, linkPathname, parseInt(getSearch("page", linkAddress)), "right");
+                            openAsset(protyle.app, linkPathname, Number.parseInt(getSearch("page", linkAddress)), "right");
                         }
                     } else {
                         /// #if !BROWSER

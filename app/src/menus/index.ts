@@ -1,6 +1,6 @@
 /// #if !MOBILE
 import {getInstanceById} from "../layout/util";
-import {Tab} from "../layout/Tab";
+import type {Tab} from "../layout/Tab";
 import {initSearchMenu} from "./search";
 import {initDockMenu} from "./dock";
 import {initFileMenu, initNavigationMenu} from "./navigation";
@@ -11,7 +11,7 @@ import {ipcRenderer} from "electron";
 /// #endif
 import {Menu} from "./Menu";
 import {hasClosestByClassName, hasTopClosestByTag} from "../protyle/util/hasClosest";
-import {App} from "../index";
+import type {App} from "../index";
 import {Constants} from "../constants";
 
 

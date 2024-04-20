@@ -2,8 +2,8 @@ import {isIPad} from "../../protyle/util/compatibility";
 import {hasClosestByAttribute, hasClosestByClassName, hasTopClosestByTag} from "../../protyle/util/hasClosest";
 import {initFileMenu, initNavigationMenu} from "../../menus/navigation";
 import {fileAnnotationRefMenu, linkMenu, refMenu, tagMenu} from "../../menus/protyle";
-import {App} from "../../index";
-import {Protyle} from "../../protyle";
+import type {App} from "../../index";
+import type {Protyle} from "../../protyle";
 import {getCurrentEditor} from "../../mobile/editor";
 /// #if !MOBILE
 import {getInstanceById} from "../../layout/util";
@@ -25,9 +25,9 @@ export const globalTouchStart = (event: TouchEvent) => {
         contentElement.style.overflow = "hidden";
         const y = event.touches[0].clientY;
         const height = (target as HTMLImageElement).naturalHeight * target.clientWidth / (target as HTMLImageElement).naturalWidth - target.clientHeight;
-        let originalPositionY = parseFloat(target.style.objectPosition.substring(7)) || 50;
+        let originalPositionY = Number.parseFloat(target.style.objectPosition.substring(7)) || 50;
         if (target.style.objectPosition.endsWith("px")) {
-            originalPositionY = -parseInt(target.style.objectPosition.substring(7)) / height * 100;
+            originalPositionY = -Number.parseInt(target.style.objectPosition.substring(7)) / height * 100;
         }
 
         const documentSelf = document;

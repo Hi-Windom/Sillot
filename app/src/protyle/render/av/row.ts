@@ -78,7 +78,7 @@ export const updateHeader = (rowElement: HTMLElement) => {
 
 const setPage = (blockElement: Element) => {
     window.sout.tracker("invoked");
-    const pageSize = parseInt(blockElement.getAttribute("data-page-size"));
+    const pageSize = Number.parseInt(blockElement.getAttribute("data-page-size"));
     if (pageSize) {
         const currentCount = blockElement.querySelectorAll(".av__row:not(.av__row--header)").length;
         if (pageSize < currentCount) {
@@ -232,11 +232,11 @@ const updatePageSize = (options: {
     transaction(options.protyle, [{
         action: "setAttrViewPageSize",
         avID: options.avID,
-        data: parseInt(options.newPageSize),
+        data: Number.parseInt(options.newPageSize),
         blockID
     }], [{
         action: "setAttrViewPageSize",
-        data: parseInt(options.currentPageSize),
+        data: Number.parseInt(options.currentPageSize),
         avID: options.avID,
         blockID
     }]);

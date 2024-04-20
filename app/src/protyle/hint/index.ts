@@ -71,7 +71,7 @@ export class Hint {
                     const index = titleElement.nextElementSibling.getAttribute("data-index");
                     if (index) {
                         let html = "";
-                        window.siyuan.emojis[parseInt(index)].items.forEach(emoji => {
+                        window.siyuan.emojis[Number.parseInt(index)].items.forEach(emoji => {
                             html += `<button data-unicode="${emoji.unicode}" class="emojis__item ariaLabel" aria-label="${window.siyuan.config.lang === "zh_CN" ? emoji.description_zh_cn : emoji.description}">
 ${unicode2Emoji(emoji.unicode)}</button>`;
                         });
@@ -338,7 +338,7 @@ ${genHintItemHTML(item)}
                 searchHTML = `<button style="width: calc(100% - 16px)" class="b3-list-item b3-list-item--two" data-value="">${window.siyuan.languages.emptyContent}</button>`;
             }
             this.element.lastElementChild.innerHTML = searchHTML;
-            setPosition(this.element, parseInt(this.element.style.left), parseInt(this.element.style.right));
+            setPosition(this.element, Number.parseInt(this.element.style.left), Number.parseInt(this.element.style.right));
         });
     }
 

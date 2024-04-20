@@ -6,8 +6,8 @@ import {fetchPost} from "../../util/fetch";
 import {openFileById} from "../../editor/util";
 import {Constants} from "../../constants";
 import {newFileByName} from "../../util/newFile";
-import {App} from "../../index";
-import {Dialog} from "../../dialog";
+import type {App} from "../../index";
+import type {Dialog} from "../../dialog";
 import {getAllModels} from "../../layout/getAll";
 import {hasClosestByClassName} from "../../protyle/util/hasClosest";
 import {getArticle, inputEvent, replace, toggleReplaceHistory, toggleSearchHistory} from "../../search/util";
@@ -159,7 +159,7 @@ export const searchKeydown = (app: App, event: KeyboardEvent) => {
     if (Constants.KEYCODELIST[event.keyCode] === "PageUp") {
         if (searchType === "asset") {
             if (!assetsElement.querySelector('[data-type="assetPrevious"]').getAttribute("disabled")) {
-                let currentPage = parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[0]);
+                let currentPage = Number.parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[0]);
                 if (currentPage > 1) {
                     currentPage--;
                     assetInputEvent(assetsElement, assetLocal, currentPage);
@@ -174,7 +174,7 @@ export const searchKeydown = (app: App, event: KeyboardEvent) => {
             }
         } else if (searchType === "unRef") {
             if (!element.querySelector('[data-type="unRefPrevious"]').getAttribute("disabled")) {
-                let currentPage = parseInt(unRefElement.querySelector("#searchUnRefResult").textContent);
+                let currentPage = Number.parseInt(unRefElement.querySelector("#searchUnRefResult").textContent);
                 if (currentPage > 1) {
                     currentPage--;
                     getUnRefList(unRefElement, unRefEdit, currentPage);
@@ -187,8 +187,8 @@ export const searchKeydown = (app: App, event: KeyboardEvent) => {
         if (searchType === "asset") {
             if (!assetsElement.querySelector('[data-type="assetNext"]').getAttribute("disabled")) {
                 const assetPages = assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/");
-                let currentPage = parseInt(assetPages[0]);
-                if (currentPage < parseInt(assetPages[1])) {
+                let currentPage = Number.parseInt(assetPages[0]);
+                if (currentPage < Number.parseInt(assetPages[1])) {
                     currentPage++;
                     assetInputEvent(assetsElement, assetLocal, currentPage);
                 }
@@ -196,15 +196,15 @@ export const searchKeydown = (app: App, event: KeyboardEvent) => {
         } else if (searchType === "doc") {
             const nextElement = element.querySelector('[data-type="next"]');
             if (!nextElement.getAttribute("disabled")) {
-                if (config.page < parseInt(nextElement.parentElement.querySelector("#searchResult").getAttribute("data-pagecount"))) {
+                if (config.page < Number.parseInt(nextElement.parentElement.querySelector("#searchResult").getAttribute("data-pagecount"))) {
                     config.page++;
                     inputEvent(element, config, edit);
                 }
             }
         } else if (searchType === "unRef") {
             if (!element.querySelector('[data-type="unRefNext"]').getAttribute("disabled")) {
-                let currentPage = parseInt(unRefElement.querySelector("#searchUnRefResult").textContent);
-                if (currentPage < parseInt(unRefElement.querySelector("#searchUnRefResult").textContent.split("/")[1])) {
+                let currentPage = Number.parseInt(unRefElement.querySelector("#searchUnRefResult").textContent);
+                if (currentPage < Number.parseInt(unRefElement.querySelector("#searchUnRefResult").textContent.split("/")[1])) {
                     currentPage++;
                     getUnRefList(unRefElement, unRefEdit, currentPage);
                 }

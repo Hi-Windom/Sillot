@@ -1,5 +1,5 @@
 import {fetchSyncPost} from "../util/fetch";
-import {App} from "../index";
+import type {App} from "../index";
 import {Plugin} from "./index";
 /// #if !MOBILE
 import {resizeTopBar, saveLayout} from "../layout/util";
@@ -23,6 +23,7 @@ if (window.require instanceof Function) {
 
 const runCode = (code: string, sourceURL: string) => {
     window.sout.tracker("-> code:", code);
+    // biome-ignore lint/security/noGlobalEval: <explanation>
     return window.eval("(function anonymous(require, module, exports){".concat(code, "\n})\n//# sourceURL=").concat(sourceURL, "\n"));
 };
 

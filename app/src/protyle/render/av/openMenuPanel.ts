@@ -59,7 +59,7 @@ export const openMenuPanel = (options: {
     const blockID = options.blockElement.getAttribute("data-node-id");
     fetchPost("/api/av/renderAttributeView", {
         id: avID,
-        pageSize: parseInt(options.blockElement.getAttribute("data-page-size")) || undefined,
+        pageSize: Number.parseInt(options.blockElement.getAttribute("data-page-size")) || undefined,
         viewID: options.blockElement.getAttribute(Constants.CUSTOM_SY_AV_VIEW)
     }, (response) => {
         const isCustomAttr = !options.blockElement.classList.contains("av");
@@ -1176,7 +1176,7 @@ export const openMenuPanel = (options: {
                             suffix !== ".pdf" || (suffix === ".pdf" && !assetLink.startsWith("file://"))
                         )
                     )) {
-                        openAsset(options.protyle.app, assetLink.trim(), parseInt(getSearch("page", assetLink)), "right");
+                        openAsset(options.protyle.app, assetLink.trim(), Number.parseInt(getSearch("page", assetLink)), "right");
                     } else if (Constants.SIYUAN_ASSETS_IMAGE.includes(suffix)) {
                         previewImage(assetLink);
                     } else {

@@ -1,4 +1,4 @@
-import {Tab} from "../Tab";
+import type {Tab} from "../Tab";
 import {Model} from "../Model";
 import {Tree} from "../../util/Tree";
 import {setPanelFocus} from "../util";
@@ -8,7 +8,7 @@ import {updateHotkeyTip} from "../../protyle/util/compatibility";
 import {openFileById} from "../../editor/util";
 import {hasClosestByClassName} from "../../protyle/util/hasClosest";
 import {openBookmarkMenu} from "../../menus/bookmark";
-import {App} from "../../index";
+import type {App} from "../../index";
 import {Constants} from "../../constants";
 import {checkFold} from "../../util/noRelyPCFunction";
 

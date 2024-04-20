@@ -1,5 +1,5 @@
-import {App} from "../index";
-import {Plugin} from "../plugin";
+import type {App} from "../index";
+import type {Plugin} from "../plugin";
 /// #if !MOBILE
 import {getAllModels} from "../layout/getAll";
 import {resizeTopBar} from "../layout/util";

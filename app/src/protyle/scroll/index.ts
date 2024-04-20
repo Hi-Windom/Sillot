@@ -65,7 +65,7 @@ export class Scroll {
         }
         protyle.wysiwyg.element.setAttribute("data-top", protyle.wysiwyg.element.scrollTop.toString());
         fetchPost("/api/filetree/getDoc", {
-            index: parseInt(this.inputElement.value),
+            index: Number.parseInt(this.inputElement.value),
             id: protyle.block.parentID,
             mode: 0,
             size: window.siyuan.config.editor.dynamicLoadBlocks,
