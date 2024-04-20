@@ -800,6 +800,7 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
                 }
 
                 const sourceIds: string [] = [];
+                const srcs: IOperationSrcs[] = [];
                 sourceElements.forEach(item => {
                     item.classList.remove("protyle-wysiwyg--select", "protyle-wysiwyg--hl");
                     item.removeAttribute("select-start");
@@ -808,7 +809,12 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
                     item.querySelectorAll('[data-type="search-mark"]').forEach(markItem => {
                         markItem.outerHTML = markItem.innerHTML;
                     });
-                    sourceIds.push(item.getAttribute("data-node-id"));
+                    const id = item.getAttribute("data-node-id")
+                    sourceIds.push(id);
+                    srcs.push({
+                        id,
+                        isDetached: false,
+                    })
                 });
 
                 hideElements(["gutter"], protyle);
@@ -901,8 +907,7 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
                                 action: "insertAttrViewBlock",
                                 avID,
                                 previousID,
-                                srcIDs: sourceIds,
-                                isDetached: false,
+                                srcs,
                                 blockID: blockElement.dataset.nodeId
                             }, {
                                 action: "doUpdateUpdated",
@@ -968,12 +973,18 @@ export const dropEvent = (protyle: IProtyle, editorElement: HTMLElement) => {
                     }
                     const avID = blockElement.getAttribute("data-av-id");
                     const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
+                    const srcs: IOperationSrcs[] = [];
+                    ids.forEach(id => {
+                        srcs.push({
+                            id,
+                            isDetached: false,
+                        });
+                    });
                     transaction(protyle, [{
                         action: "insertAttrViewBlock",
                         avID,
                         previousID,
-                        srcIDs: ids,
-                        isDetached: false,
+                        srcs,
                         blockID: blockElement.dataset.nodeId,
                     }, {
                         action: "doUpdateUpdated",

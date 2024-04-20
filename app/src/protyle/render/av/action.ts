@@ -4,7 +4,7 @@ import {transaction} from "../../wysiwyg/transaction";
 import {openEditorTab} from "../../../menus/util";
 import {copySubMenu} from "../../../menus/commonMenuItem";
 import {
-    addDragFill,
+    addDragFill, genCellValueByElement,
     getCellText,
     getTypeByCellElement,
     popTextCell,
@@ -21,12 +21,6 @@ import {hintRef} from "../../hint/extend";
 import {focusByRange} from "../../util/selection";
 import {showMessage} from "../../../dialog/message";
 import {previewImage} from "../../preview/image";
-import {pathPosix} from "../../../util/pathName";
-import {Constants} from "../../../constants";
-/// #if !MOBILE
-import {openAsset, openBy} from "../../../editor/util";
-/// #endif
-import {getSearch} from "../../../util/functions";
 import {unicode2Emoji} from "../../../emoji";
 import {selectRow} from "./row";
 import {formatDate} from "sofill/mid";
@@ -273,32 +267,6 @@ export const avContextmenu = (protyle: IProtyle, rowElement: HTMLElement, positi
             submenu: copySubMenu(blockId)
         });
         menu.addItem({
-            label: window.siyuan.languages.addToDatabase,
-            icon: "iconDatabase",
-            click() {
-                openSearchAV(blockElement.getAttribute("data-av-id"), rowElements[0] as HTMLElement, (listItemElement) => {
-                    const sourceIds: string[] = [blockId];
-                    const avID = listItemElement.dataset.avId;
-                    transaction(protyle, [{
-                        action: "insertAttrViewBlock",
-                        avID,
-                        ignoreFillFilter: true,
-                        srcIDs: sourceIds,
-                        isDetached: false,
-                        blockID: listItemElement.dataset.nodeId
-                    }, {
-                        action: "doUpdateUpdated",
-                        id: listItemElement.dataset.nodeId,
-                        data: dayjs().format("YYYYMMDDHHmmss"),
-                    }], [{
-                        action: "removeAttrViewBlock",
-                        srcIDs: sourceIds,
-                        avID,
-                    }]);
-                });
-            }
-        });
-        menu.addItem({
             label: window.siyuan.languages.unbindBlock,
             icon: "iconLinkOff",
             click() {
@@ -306,6 +274,42 @@ export const avContextmenu = (protyle: IProtyle, rowElement: HTMLElement, positi
             }
         });
     }
+    menu.addItem({
+        label: window.siyuan.languages.addToDatabase,
+        icon: "iconDatabase",
+        click() {
+            openSearchAV(blockElement.getAttribute("data-av-id"), rowElements[0] as HTMLElement, (listItemElement) => {
+                const srcs: IOperationSrcs[] = [];
+                const sourceIds: string[] = [];
+                rowElements.forEach(item => {
+                    const rowId = item.getAttribute("data-id")
+                    const blockValue = genCellValueByElement("block", item.querySelector(".av__cell[data-block-id]"));
+                    srcs.push({
+                        content: blockValue.block.content,
+                        id: rowId,
+                        isDetached: blockValue.isDetached,
+                    });
+                    sourceIds.push(rowId);
+                })
+                const avID = listItemElement.dataset.avId;
+                transaction(protyle, [{
+                    action: "insertAttrViewBlock",
+                    avID,
+                    ignoreFillFilter: true,
+                    srcs,
+                    blockID: listItemElement.dataset.blockId
+                }, {
+                    action: "doUpdateUpdated",
+                    id: listItemElement.dataset.blockId,
+                    data: dayjs().format("YYYYMMDDHHmmss"),
+                }], [{
+                    action: "removeAttrViewBlock",
+                    srcIDs: sourceIds,
+                    avID,
+                }]);
+            });
+        }
+    });
     if (!protyle.disabled) {
         if (rowElements.length === 1) {
             if (keyCellElement.getAttribute("data-detached") !== "true") {

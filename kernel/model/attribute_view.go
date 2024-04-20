@@ -186,8 +186,9 @@ type SearchAttributeViewResult struct {
 	HPath   string `json:"hPath"`
 }
 
-func SearchAttributeView(keyword string) (ret []*SearchAttributeViewResult) {
+func SearchAttributeView(keyword string, excludes []string) (ret []*SearchAttributeViewResult) {
 	waitForSyncingStorages()
+
 	ret = []*SearchAttributeViewResult{}
 	keyword = strings.TrimSpace(keyword)
 
@@ -321,7 +322,7 @@ func SearchAttributeView(keyword string) (ret []*SearchAttributeViewResult) {
 			hPath = box.Name + hPath
 		}
 
-		if !exist {
+		if !exist && !gulu.Str.Contains(avID, excludes) {
 			ret = append(ret, &SearchAttributeViewResult{
 				AvID:    avID,
 				AvName:  existAv.AvName,
@@ -2165,37 +2166,43 @@ func setAttributeViewColumnCalc(operation *Operation) (err error) {
 }
 
 func (tx *Transaction) doInsertAttrViewBlock(operation *Operation) (ret *TxErr) {
-	err := AddAttributeViewBlock(tx, operation.SrcIDs, operation.AvID, operation.BlockID, operation.PreviousID, operation.IsDetached, operation.IgnoreFillFilterVal)
+	err := AddAttributeViewBlock(tx, operation.Srcs, operation.AvID, operation.BlockID, operation.PreviousID, operation.IgnoreFillFilterVal)
 	if nil != err {
 		return &TxErr{code: TxErrWriteAttributeView, id: operation.AvID, msg: err.Error()}
 	}
 	return
 }
 
-func AddAttributeViewBlock(tx *Transaction, srcIDs []string, avID, blockID, previousBlockID string, isDetached, ignoreFillFilter bool) (err error) {
-	for _, id := range srcIDs {
+func AddAttributeViewBlock(tx *Transaction, srcs []map[string]interface{}, avID, blockID, previousBlockID string, ignoreFillFilter bool) (err error) {
+	for _, src := range srcs {
+		srcID := src["id"].(string)
+		isDetached := src["isDetached"].(bool)
 		var tree *parse.Tree
 		if !isDetached {
 			var loadErr error
 			if nil != tx {
-				tree, loadErr = tx.loadTree(id)
+				tree, loadErr = tx.loadTree(srcID)
 			} else {
-				tree, loadErr = LoadTreeByBlockID(id)
+				tree, loadErr = LoadTreeByBlockID(srcID)
 			}
 			if nil != loadErr {
-				logging.LogErrorf("load tree [%s] failed: %s", id, err)
+				logging.LogErrorf("load tree [%s] failed: %s", srcID, loadErr)
 				return loadErr
 			}
 		}
 
-		if avErr := addAttributeViewBlock(avID, blockID, previousBlockID, id, isDetached, ignoreFillFilter, tree, tx); nil != avErr {
+		var srcContent string
+		if nil != src["content"] {
+			srcContent = src["content"].(string)
+		}
+		if avErr := addAttributeViewBlock(avID, blockID, previousBlockID, srcID, srcContent, isDetached, ignoreFillFilter, tree, tx); nil != avErr {
 			return avErr
 		}
 	}
 	return
 }
 
-func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID string, isDetached, ignoreFillFilter bool, tree *parse.Tree, tx *Transaction) (err error) {
+func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID, addingBlockContent string, isDetached, ignoreFillFilter bool, tree *parse.Tree, tx *Transaction) (err error) {
 	var node *ast.Node
 	if !isDetached {
 		node = treenode.GetNodeInTree(tree, addingBlockID)
@@ -2215,9 +2222,8 @@ func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID string,
 		return
 	}
 
-	var content string
 	if !isDetached {
-		content = getNodeRefText(node)
+		addingBlockContent = getNodeRefText(node)
 	}
 
 	now := time.Now().UnixMilli()
@@ -2230,7 +2236,7 @@ func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID string,
 				// 重复绑定一下，比如剪切数据库块、取消绑定块后再次添加的场景需要
 				bindBlockAv0(tx, avID, node, tree)
 				blockValue.IsDetached = isDetached
-				blockValue.Block.Content = content
+				blockValue.Block.Content = addingBlockContent
 				blockValue.UpdatedAt = now
 				err = av.SaveAttributeView(attrView)
 			}
@@ -2246,7 +2252,7 @@ func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID string,
 		IsDetached: isDetached,
 		CreatedAt:  now,
 		UpdatedAt:  now,
-		Block:      &av.ValueBlock{ID: addingBlockID, Content: content, Created: now, Updated: now}}
+		Block:      &av.ValueBlock{ID: addingBlockID, Content: addingBlockContent, Created: now, Updated: now}}
 	blockValues.Values = append(blockValues.Values, blockValue)
 
 	// 如果存在过滤条件，则将过滤条件应用到新添加的块上

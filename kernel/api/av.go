@@ -114,21 +114,21 @@ func addAttributeViewValues(c *gin.Context) {
 	if blockIDArg := arg["blockID"]; nil != blockIDArg {
 		blockID = blockIDArg.(string)
 	}
-	var srcIDs []string
-	for _, v := range arg["srcIDs"].([]interface{}) {
-		srcIDs = append(srcIDs, v.(string))
-	}
 	var previousID string
 	if nil != arg["previousID"] {
 		previousID = arg["previousID"].(string)
 	}
-	isDetached := arg["isDetached"].(bool)
 	ignoreFillFilter := true
 	if nil != arg["ignoreFillFilter"] {
 		ignoreFillFilter = arg["ignoreFillFilter"].(bool)
 	}
 
-	err := model.AddAttributeViewBlock(nil, srcIDs, avID, blockID, previousID, isDetached, ignoreFillFilter)
+	var srcs []map[string]interface{}
+	for _, v := range arg["srcs"].([]interface{}) {
+		src := v.(map[string]interface{})
+		srcs = append(srcs, src)
+	}
+	err := model.AddAttributeViewBlock(nil, srcs, avID, blockID, previousID, ignoreFillFilter)
 	if nil != err {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -318,7 +318,13 @@ func searchAttributeView(c *gin.Context) {
 	}
 
 	keyword := arg["keyword"].(string)
-	results := model.SearchAttributeView(keyword)
+	var excludes []string
+	if nil != arg["excludes"] {
+		for _, e := range arg["excludes"].([]interface{}) {
+			excludes = append(excludes, e.(string))
+		}
+	}
+	results := model.SearchAttributeView(keyword, excludes)
 	ret.Data = map[string]interface{}{
 		"results": results,
 	}

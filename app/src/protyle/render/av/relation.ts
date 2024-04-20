@@ -11,7 +11,7 @@ import {setPosition} from "../../../util/setPosition";
 
 const genSearchList = (element: Element, keyword: string, avId: string, cb?: () => void) => {
     window.sout.tracker("invoked");
-    fetchPost("/api/av/searchAttributeView", {keyword}, (response) => {
+    fetchPost("/api/av/searchAttributeView", {keyword, excludes: [avId]}, (response) => {
         let html = "";
         response.data.results.forEach((item: {
             avID: string

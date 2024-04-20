@@ -314,22 +314,23 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
     if (!isFileFocus && matchHotKey(window.siyuan.config.keymap.general.addToDatabase.custom, event)) {
         if (protyle.title?.editElement.contains(range.startContainer)) {
             openSearchAV("", protyle.breadcrumb.element, (listItemElement) => {
-                const sourceIds: string[] = [protyle.block.rootID];
                 const avID = listItemElement.dataset.avId;
                 transaction(protyle, [{
                     action: "insertAttrViewBlock",
                     avID,
                     ignoreFillFilter: true,
-                    srcIDs: sourceIds,
-                    isDetached: false,
-                    blockID: listItemElement.dataset.nodeId
+                    srcs: [{
+                        id: protyle.block.rootID,
+                        isDetached: false
+                    }],
+                    blockID: listItemElement.dataset.blockId
                 }, {
                     action: "doUpdateUpdated",
-                    id: listItemElement.dataset.nodeId,
+                    id: listItemElement.dataset.blockId,
                     data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                 }], [{
                     action: "removeAttrViewBlock",
-                    srcIDs: sourceIds,
+                    srcIDs: [protyle.block.rootID],
                     avID,
                 }]);
                 focusByRange(range);
@@ -346,17 +347,21 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
                 }
             }
             openSearchAV("", selectElement[0] as HTMLElement, (listItemElement) => {
-                const sourceIds: string[] = [];
+                const srcIDs: string[] = [];
+                const srcs: IOperationSrcs[] = [];
                 selectElement.forEach(item => {
-                    sourceIds.push(item.getAttribute("data-node-id"));
+                    srcIDs.push(item.getAttribute("data-node-id"));
+                    srcs.push({
+                        id: item.getAttribute("data-node-id"),
+                        isDetached: false
+                    });
                 });
                 const avID = listItemElement.dataset.avId;
                 transaction(protyle, [{
                     action: "insertAttrViewBlock",
                     avID,
                     ignoreFillFilter: true,
-                    srcIDs: sourceIds,
-                    isDetached: false,
+                    srcs,
                     blockID: listItemElement.dataset.blockId
                 }, {
                     action: "doUpdateUpdated",
@@ -364,7 +369,7 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
                     data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                 }], [{
                     action: "removeAttrViewBlock",
-                    srcIDs: sourceIds,
+                    srcIDs,
                     avID,
                 }]);
                 focusByRange(range);
