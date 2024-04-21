@@ -1,18 +1,18 @@
 {
   "name": "sillot",
-  "version": "0.30.1300",
+  "version": "0.30.1400",
   "syv": "3.0.11",
   "sypv": "[]",
   "description": "Build Your Eternal Digital Garden",
-  "author": "Soltus",
-  "homepage": "https://github.com/Hi-Windom/Sillot",
+  "author": "Hi-Windom",
+  "homepage": "https://sillot.db.sc.cn",
   "repository": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
   "engines": {
     "node": ">=20.11.1",
     "pnpm": ">=9.0.0"
   },
-  "packageManager": "pnpm@9.0.2",
+  "packageManager": "pnpm@9.0.4",
   "actionInstallCommand": "pnpm install --no-frozen-lockfile",
   "scripts": {
     "cli": "node ./package.cli.mjs",
