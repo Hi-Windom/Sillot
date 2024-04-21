@@ -10,7 +10,7 @@ import {Files} from "./dock/Files";
 import {Bookmark} from "./dock/Bookmark";
 import {Tag} from "./dock/Tag";
 import {Custom} from "./dock/Custom";
-import {Protyle} from "../protyle";
+import type {Protyle} from "../protyle";
 import {Wnd} from "./Wnd";
 
 export const getAllEditor = () => {

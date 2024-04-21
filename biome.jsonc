@@ -6,6 +6,7 @@
         "useIgnoreFile": true
     },
     "files": {
+        "maxSize": 5888888,
         "ignore": [
             "./out/*",
             "./PSP/*",
@@ -14,6 +15,9 @@
             "./src/asset/pdf/*",
             "./appearance/*"
         ]
+    },
+    "organizeImports": {
+        "enabled": false // 禁用 import 排序
     },
     "formatter": {
         "enabled": true,
@@ -24,7 +28,8 @@
     },
     "javascript": {
         "formatter": {
-            "quoteStyle": "single"
+            "jsxQuoteStyle": "double",
+            "quoteStyle": "double"
         }
     },
     "linter": {
@@ -36,7 +41,9 @@
                 "noAsyncPromiseExecutor": "off",
                 "noImplicitAnyLet": "warn"
             },
-            "performance": { "noDelete": "off" },
+            "performance": {
+                "noDelete": "off"
+            },
             "style": {
                 "useTemplate": "off",
                 "useConst": "warn",
@@ -52,7 +59,9 @@
                 "useOptionalChain": "warn",
                 "noForEach": "warn"
             },
-            "correctness": { "noUnreachable": "warn" }
+            "correctness": {
+                "noUnreachable": "warn"
+            }
         }
     }
 }
