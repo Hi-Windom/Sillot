@@ -5,7 +5,7 @@ root = true
 
 [*]
 charset = utf-8
-end_of_line = lf
+# end_of_line = crlf # 不需要指定换行符，因为 Git 会自动处理这些转换
 indent_size = 4
 indent_style = space
 insert_final_newline = true

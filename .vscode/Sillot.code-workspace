@@ -104,8 +104,6 @@
             "ms-python.python", // Python 官方插件包
             // Jupyter
             "ms-toolsai.jupyter", // Jupyter 官方插件包
-            // Pylance
-            "ms-python.vscode-pylance", // Python 最好用的 Linter，ms-python.python 插件包已集成此插件，但是我必须要在此单独列出来嘿嘿
             // 会了吧
             "mqycn.huile8", // 编程时学习英文单词
             // any-rule
@@ -116,22 +114,31 @@
             "ctcuff.font-preview", // 30MB以内字体预览
             // Font Switcher
             "evan-buss.font-switcher", // 快速字体切换
+            // Microsoft Edge Tools for VS Code
+            "ms-edgedevtools.vscode-edge-devtools", // Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, 与本工作区的契合仍有待研究
 		],
         "unwantedRecommendations": [
-            "hayden.extension-pack-manager",
-            "vscjava.vscode-java-pack",
-            "vscjava.vscode-gradle",
-            "googlecloudtools.cloudcode",
-            "github.copilot",
-            "ms-kubernetes-tools.vscode-kubernetes-tools",
-            "firefox-devtools.vscode-firefox-debug",
-            "felipecaputo.git-project-manager",
-            "dbaeumer.vscode-eslint",
-            "oderwat.indent-rainbow",
-            "esbenp.prettier-vscode",
-            "rvest.vs-code-prettier-eslint",
-            "github.vscode-pull-request-github",
-            "wn244.directory-tree"
+            "oderwat.indent-rainbow", // 花里胡哨影响观感
+            "wn244.directory-tree", // 通用性差，不可配置
+            "esbenp.prettier-vscode", // 本工作区使用 biome 方案，不需要 prettier
+            "rvest.vs-code-prettier-eslint", // 本工作区使用 biome 方案，不需要 eslint
+            "dbaeumer.vscode-eslint", // 本工作区使用 biome 方案，不需要 eslint
+            "hayden.extension-pack-manager", // 不适用本工作区
+            "felipecaputo.git-project-manager", // 不适用本工作区
+            "donjayamanne.githistory", // 不适用本工作区
+            "DavidAnson.vscode-markdownlint", // 不适用本工作区
+            "vscjava.vscode-java-pack", // 避免自动推荐，有需要的自己会安装
+            "vscjava.vscode-gradle", // 避免自动推荐，有需要的自己会安装
+            "googlecloudtools.cloudcode", // 避免自动推荐，有需要的自己会安装
+            "github.copilot", // 避免自动推荐，有需要的自己会安装
+            "ms-kubernetes-tools.vscode-kubernetes-tools", // 避免自动推荐，有需要的自己会安装
+            "firefox-devtools.vscode-firefox-debug", // 避免自动推荐，有需要的自己会安装
+            "github.vscode-pull-request-github", // 避免自动推荐，有需要的自己会安装
+            "ms-vscode-remote.remote-wsl", // 避免自动推荐，有需要的自己会安装
+            "ms-vscode.PowerShell", // 避免自动推荐，有需要的自己会安装
+            "DotJoshJohnson.xml", // 避免自动推荐，有需要的自己会安装
+            "ms-azuretools.vscode-docker", // 避免自动推荐，有需要的自己会安装
+            "ms-python.vscode-pylance", // 推荐的插件包已集成此插件，无需单独推荐
         ]
 	}
 }
