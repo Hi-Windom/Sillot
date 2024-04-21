@@ -1,67 +1,92 @@
 {
-    "$schema": "https://biomejs.dev/schemas/1.0.0/schema.json",
-    "vcs": {
-        "enabled": true,
-        "clientKind": "git",
-        "useIgnoreFile": true
-    },
-    "files": {
-        "maxSize": 5888888,
-        "ignore": [
-            "./out/*",
-            "./PSP/*",
-            "./stage/*",
-            "./build/*",
-            "./src/asset/pdf/*",
-            "./appearance/*"
-        ]
-    },
-    "organizeImports": {
-        "enabled": false // 禁用 import 排序
+  "$schema": "https://biomejs.dev/schemas/1.0.0/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "maxSize": 5888888,
+    "ignore": ["./out/*", "./PSP/*", "./stage/*", "./build/*", "./src/asset/pdf/*", "./appearance/*"]
+  },
+  "organizeImports": {
+    "enabled": false // 禁用 import 排序
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space", // 缩进的样式 = tab | space
+    "indentWidth": 4, // 缩进
+    "lineWidth": 140, // 一行可以写多少个字符
+    "formatWithErrors": true, // 允许设置具有语法错误的文档的格式 = false | true
+    "attributePosition": "auto" // HTMLish 语言中的属性位置样式 = auto | multiline
+  },
+  "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": false // 允许支持不安全/实验参数装饰器 = false | true
     },
     "formatter": {
-        "enabled": true,
-        "indentStyle": "space",
-        "indentWidth": 4,
-        "lineWidth": 120,
-        "formatWithErrors": true
-    },
-    "javascript": {
-        "formatter": {
-            "jsxQuoteStyle": "double",
-            "quoteStyle": "double"
-        }
-    },
-    "linter": {
-        "enabled": true,
-        "rules": {
-            "recommended": true,
-            "suspicious": {
-                "noExplicitAny": "off",
-                "noAsyncPromiseExecutor": "off",
-                "noImplicitAnyLet": "warn"
-            },
-            "performance": {
-                "noDelete": "off"
-            },
-            "style": {
-                "useTemplate": "off",
-                "useConst": "warn",
-                "noVar": "warn",
-                "useDefaultParameterLast": "off",
-                "noUselessElse": "warn",
-                "noParameterAssign": "warn",
-                "useNodejsImportProtocol": "off"
-            },
-            "complexity": {
-                "useSimplifiedLogicExpression": "off",
-                "useLiteralKeys": "warn",
-                "useOptionalChain": "warn",
-                "noForEach": "warn"
-            },
-            "correctness": {
-                "noUnreachable": "warn"
-            }
-        }
+      "enabled": true,
+      "arrowParentheses": "asNeeded", // 是否在箭头函数中添加不必要的括号 = always | asNeeded
+      "bracketSameLine": false, // 选择多行 JSX 元素的结尾是否应位于最后一个属性行上> = false | true
+      "bracketSpacing": true, // 选择是否应在括号和内部值之间添加空格 = true | false
+      "quoteProperties": "asNeeded", // 当对象内部的属性应加引号时 = asNeeded | preserve
+      "semicolons": "always", // 分号 = always | asNeeded
+      "trailingComma": "es5", // 尾随逗号 = all | es5 | none
+      "attributePosition": "auto", // jsx 元素中的属性位置样式 = auto | multiline
+      "jsxQuoteStyle": "double", // 表示 jsx 字符串文本时使用的引号类型 = double | single
+      "quoteStyle": "double" // 表示字符串文本时使用的引号类型 = double | single
     }
+  },
+  "json": {
+    "parser": {
+      "allowComments": true, // 启用 JSON 文件中的注释分析
+      "allowTrailingCommas": true // 启用 JSON 文件中尾随逗号的分析
+    },
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space", // 缩进样式 = tab | space
+      "indentWidth": 2, // 缩进
+      "lineWidth": 140, // 一行可以写多少个字符
+      "trailingCommas": "none" // 尾随逗号 = none | all
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      // 检测可能不正确或无用的代码的规则
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noAsyncPromiseExecutor": "off",
+        "noImplicitAnyLet": "warn"
+      },
+      // 规则捕获编写代码的方式，以加快运行速度或通常提高效率
+      "performance": {
+        "noDelete": "off"
+      },
+      // 强制执行一致且惯用的代码编写方式的规则
+      "style": {
+        "useTemplate": "off",
+        "useConst": "warn",
+        "noVar": "warn",
+        "useDefaultParameterLast": "off",
+        "noUselessElse": "warn",
+        "noParameterAssign": "warn",
+        "useNodejsImportProtocol": "off"
+      },
+      // 专注于检查可以简化的复杂代码的规则
+      "complexity": {
+        "useSimplifiedLogicExpression": "off",
+        "useLiteralKeys": "warn",
+        "useOptionalChain": "warn",
+        "noForEach": "warn"
+      },
+      // 检测保证不正确或无用的代码的规则
+      "correctness": {
+        "noUnreachable": "warn"
+      },
+      // 检测潜在安全漏洞的规则
+      "security": {}
+    }
+  }
 }

@@ -89,6 +89,7 @@ function Loader(props: { nodeID: any; initConfig: any }) {
   const [monacoIns, setmonacoIns] = React.useState(null);
   const nodeID = props.nodeID;
   const initConfig = props.initConfig;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   React.useEffect(
     () => {
       /// #if !BROWSER
@@ -146,6 +147,7 @@ function Loader(props: { nodeID: any; initConfig: any }) {
     [] // 空数组保证只执行一次
   );
   const [loading, setLoading] = React.useState(true); // 顺序重要
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   React.useEffect(() => {
     if (!editor) return; // 第一次初始化时不执行
     fetchPost(
@@ -248,6 +250,7 @@ function Configer() {
   const [readonly, setReadonly] = React.useState(false);
   const { mode, setMode } = useColorScheme();
   console.log(_props.initConfig.lang, _props.initConfig.theme);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   React.useEffect(
     () => {
       setMode(_props.initConfig.theme === "vs" ? "light" : "dark");
