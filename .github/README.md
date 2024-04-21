@@ -52,7 +52,7 @@
 
 <p align="center">
 <br><br>
-<a href="https://github.com/siyuan-note/siyuan">思源（SiYuan）</a> | <a href="README_Sillot.md">汐洛（Sillot）</a>
+<a href="https://github.com/siyuan-note/siyuan" target="_blank">思源（SiYuan）</a> | <a href="README_Sillot.md" target="_blank">汐洛（Sillot）</a>
 </p>
 
 ## 📚 文档
