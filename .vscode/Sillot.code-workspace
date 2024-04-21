@@ -37,5 +37,101 @@
         "search.exclude": {
           "**/.history": true
         }
+	},
+	"extensions": {
+		"recommendations": [
+            ////
+            ////
+            //// 已包含在 Sillot.code-profile 中
+            ////
+            // Chinese (Simplified) (简体中文) Language Pack for Visual Studio Code
+            "ms-ceintl.vscode-language-pack-zh-hans", // VSCode官方汉化
+            // Material Icon Theme
+            "PKief.material-icon-theme", // Material Design Icons 文件图标主题
+            // vscode-icons
+            "vscode-icons-team.vscode-icons", // 很全的官方文件图标主题
+            // VSCode Great Icons
+            "emmanuelbeziat.vscode-great-icons", // 很不错的一款文件图标主题
+            // Fluent Icons
+            "miguelsolorio.fluent-icons", // 现代扁平风的一款文件图标主题，捆绑了产品图标主题（还可以）
+            // Gruvbox Material Icon Theme
+            "JonathanHarty.gruvbox-material-icon-theme", // 蛮有意思的一款文件图标主题
+            // Atom Material Icons
+            "atommaterial.a-file-icon-vscode", // 很全的一款文件图标主题，捆绑了产品图标主题（还可以）。区分了 index.ts 非常好用。
+            // GitHub Theme
+            "GitHub.github-vscode-theme", // 不错的一款颜色主题，[GitHub Dark Dimmed] [GitHub Dark Colorblind] 提供了不错的视觉观感
+            // Winter is Coming Theme
+            "johnpapa.winteriscoming", // 不错的一款颜色主题，[Winter is Coming (Dark Blue)] 提供了不错的视觉观感
+            // Office Viewer(Markdown Editor)
+            "cweijan.vscode-office", // View word,excel files and using WYSIWYG editor for markdown. 捆绑了颜色主题（不推荐）和文件图标主题（ Material Icon 青春版）
+            // Terminal Here
+            "tyriar.vscode-terminal-here", // 在当前文件路径打开一个终端
+            // EditorConfig for VS Code
+            "editorconfig.editorconfig", // 项目通用配置
+            // gitignore
+            "michelemelluso.gitignore", // Add file to .gitignore
+            // GitLens — Git supercharged
+            "eamodio.gitlens", // 免登陆白嫖就很好用的 Git 插件
+            // Git Graph
+            "mhutchie.git-graph", // View git log, file history, compare branches or commits
+            // So Many Conflicts
+            "symbolk.somanyconflicts", // 合并冲突时使用
+            // Error Gutters
+            "igorsbitnev.error-gutters", // 错误高亮
+            // Error Lens
+            "usernamehw.errorlens", // 错误高亮
+            // Trailing Spaces
+            "shardulm94.trailing-spaces", // 空白高亮
+            // GitHub Actions
+            "github.vscode-github-actions", // Github Action 官方插件
+            // filesize
+            "mkxml.vscode-filesize",  // Show the current file size in the status bar
+            // File Tree to Text Generator
+            "d-koppenhagen.file-tree-to-text-generator", // Print the selected directory within it's files and subdirectories as text (multiple formats available)
+            // Biome
+            "biomejs.biome", // Biome LSP VS Code Extension
+            // 盤古之白
+            "doggy8088.pangu2", // 這個擴充套件會自動替你在文件中所有的中文字和半形的英文、數字、符號之間插入空白。
+            // Git Emoji Commit 中文版
+            "maixiaojie.git-emoji-zh", // 起到一个建议提示的作用，很遗憾不能自动填充
+            ////
+            ////
+            //// 不包含在 Sillot.code-profile 中
+            ////
+            // Ignore files
+            "ldez.ignore-files", // 各种 ignore 文件高亮
+            // Python
+            "ms-python.python", // Python 官方插件包
+            // Jupyter
+            "ms-toolsai.jupyter", // Jupyter 官方插件包
+            // Pylance
+            "ms-python.vscode-pylance", // Python 最好用的 Linter，ms-python.python 插件包已集成此插件，但是我必须要在此单独列出来嘿嘿
+            // 会了吧
+            "mqycn.huile8", // 编程时学习英文单词
+            // any-rule
+            "russell.any-rule", // 常用正则表达式
+            // MinifyAll
+            "josee9988.minifyall", // 统一的前端代码最小化
+            // Font Preview
+            "ctcuff.font-preview", // 30MB以内字体预览
+            // Font Switcher
+            "evan-buss.font-switcher", // 快速字体切换
+		],
+        "unwantedRecommendations": [
+            "hayden.extension-pack-manager",
+            "vscjava.vscode-java-pack",
+            "vscjava.vscode-gradle",
+            "googlecloudtools.cloudcode",
+            "github.copilot",
+            "ms-kubernetes-tools.vscode-kubernetes-tools",
+            "firefox-devtools.vscode-firefox-debug",
+            "felipecaputo.git-project-manager",
+            "dbaeumer.vscode-eslint",
+            "oderwat.indent-rainbow",
+            "esbenp.prettier-vscode",
+            "rvest.vs-code-prettier-eslint",
+            "github.vscode-pull-request-github",
+            "wn244.directory-tree"
+        ]
 	}
 }
