@@ -24,7 +24,6 @@ electron/dist
 
 # IDE
 .idea/
-.vscode/
 
 # Log
 logs
