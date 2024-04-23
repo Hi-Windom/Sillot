@@ -8,4 +8,7 @@
     "app/appearance": true
   },
   "editor.formatOnSave": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
 }

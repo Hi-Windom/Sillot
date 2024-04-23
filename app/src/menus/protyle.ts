@@ -2,7 +2,8 @@ import {
     hasClosestBlock,
     hasClosestByAttribute,
     hasClosestByClassName,
-    hasClosestByMatchTag, hasTopClosestByClassName
+    hasClosestByMatchTag,
+    hasTopClosestByClassName
 } from "../protyle/util/hasClosest";
 import {MenuItem} from "./Menu";
 import {focusBlock, focusByRange, focusByWbr, getEditorRange, selectAll,} from "../protyle/util/selection";
@@ -957,7 +958,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
         }
     }).element);
     window.siyuan.menus.menu.append(new MenuItem({
-        label: window.siyuan.languages.copy + " PNG",
+        label: window.siyuan.languages.copyAsPNG,
         accelerator: window.siyuan.config.keymap.editor.general.copyBlockRef.custom,
         icon: "iconImage",
         click() {
@@ -981,7 +982,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
             icon: "iconTrashcan",
             accelerator: "⌫",
             label: window.siyuan.languages.delete,
-            click: function () {
+            click: () => {
                 (assetElement as HTMLElement).outerHTML = "<wbr>";
                 nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
                 updateTransaction(protyle, id, nodeElement.outerHTML, html);
@@ -1045,7 +1046,7 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
                 alignImgLeft(protyle, nodeElement, [assetElement], id, html);
             }
         }).element);
-        const width = assetElement.style.width.endsWith("%") ? parseInt(assetElement.style.width) : 0;
+        const width = assetElement.style.width.endsWith("%") ? Number.parseInt(assetElement.style.width) : 0;
         window.siyuan.menus.menu.append(new MenuItem({
             label: window.siyuan.languages.width,
             submenu: [genImageWidthMenu("25%", assetElement, imgElement, protyle, id, nodeElement, html),

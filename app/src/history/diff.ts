@@ -8,7 +8,7 @@ import {escapeAttr, escapeHtml} from "../util/escape";
 // import * as dayjs from "dayjs";
 import {formatDate} from "sofill/mid";
 import {isMobile} from "../util/functions";
-import {App} from "../index";
+import type {App} from "../index";
 import {pathPosix} from "../util/pathName";
 import {renderAssetsPreview} from "../asset/renderAssets";
 

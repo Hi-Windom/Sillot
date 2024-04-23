@@ -91,7 +91,7 @@ export const genAVValueHTML = (value: IAVCellValue) => {
         case "created":
         case "updated":
             if (value[value.type].isNotEmpty) {
-                html = `<span data-content="${value[value.type].content}">${format(new Date(value[value.type].content), 'yyyy-MM-dd HH:mm')}</span>`;
+                html = `<span data-content="${value[value.type].content}">${formatDate(new Date(value[value.type].content), 'yyyy-MM-dd HH:mm')}</span>`;
             }
             break;
         case "url":
@@ -219,23 +219,27 @@ class="fn__flex-1 fn__flex${["url", "text", "number", "email", "phone", "block"]
                 const targetElement = element.querySelector(".dragover__bottom, .dragover__top") as HTMLElement;
                 if (targetElement && dragBlockElement) {
                     const isBottom = targetElement.classList.contains("dragover__bottom");
-                    transaction(protyle, [{
-                        action: "sortAttrViewCol",
-                        avID: dragBlockElement.dataset.avId,
-                        previousID: isBottom ? targetElement.dataset.colId : targetElement.previousElementSibling?.getAttribute("data-col-id"),
-                        id: window.siyuan.dragElement.dataset.colId,
-                        blockID: id
-                    }, {
-                        action: "sortAttrViewCol",
-                        avID: dragBlockElement.dataset.avId,
-                        previousID: window.siyuan.dragElement.previousElementSibling?.getAttribute("data-col-id"),
-                        id,
-                        blockID: id
-                    }]);
-                    if (isBottom) {
-                        targetElement.after(window.siyuan.dragElement);
-                    } else {
-                        targetElement.before(window.siyuan.dragElement);
+                    const previousID = isBottom ? targetElement.dataset.colId : targetElement.previousElementSibling?.getAttribute("data-col-id");
+                    const undoPreviousID = window.siyuan.dragElement.previousElementSibling?.getAttribute("data-col-id");
+                    if (previousID !== undoPreviousID && previousID !== window.siyuan.dragElement.dataset.colId) {
+                        transaction(protyle, [{
+                            action: "sortAttrViewCol",
+                            avID: dragBlockElement.dataset.avId,
+                            previousID,
+                            id: window.siyuan.dragElement.dataset.colId,
+                            blockID: id
+                        }, {
+                            action: "sortAttrViewCol",
+                            avID: dragBlockElement.dataset.avId,
+                            previousID: undoPreviousID,
+                            id,
+                            blockID: id
+                        }]);
+                        if (isBottom) {
+                            targetElement.after(window.siyuan.dragElement);
+                        } else {
+                            targetElement.before(window.siyuan.dragElement);
+                        }
                     }
                     targetElement.classList.remove("dragover__bottom", "dragover__top");
                 }
@@ -365,7 +369,7 @@ class="fn__flex-1 fn__flex${["url", "text", "number", "email", "phone", "block"]
                     } else {
                         value = {
                             number: {
-                                content: parseFloat(item.value) || 0,
+                                content: Number.parseFloat(item.value) || 0,
                                 isNotEmpty: true
                             }
                         };

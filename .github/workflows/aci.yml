@@ -14,15 +14,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    name: afterCI action
     steps:
-    # - uses: actions/checkout@v4
-    # - uses: actions/setup-node@v4
-    #   with:
-    #       node-version: 20
     - name: Get Latest Release Assets
       id: latest_release
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
           result-encoding: string
           retries: 3
@@ -47,21 +43,19 @@ jobs:
       continue-on-error: false
 
     - name: Upload Assets_MD5_Sum.txt File to Release Asset
-      uses: actions/upload-release-asset@v1
+      uses: shogo82148/actions-upload-release-asset@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.latest_release.outputs.result }}
           asset_path: ./Assets_MD5_Sum.txt
           asset_name: Assets_MD5_Sum.txt
-          asset_content_type: text/plain
 
     - name: Upload Assets_SHA256_Sum.txt File to Release Asset
-      uses: actions/upload-release-asset@v1
+      uses: shogo82148/actions-upload-release-asset@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.latest_release.outputs.result }}
           asset_path: ./Assets_SHA256_Sum.txt
           asset_name: Assets_SHA256_Sum.txt
-          asset_content_type: text/plain

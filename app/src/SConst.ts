@@ -1,3 +1,4 @@
+// biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 export abstract class SConst {
   public static readonly Themes = {
     BuiltinThemeLight: "daylight", // 思源默认主题

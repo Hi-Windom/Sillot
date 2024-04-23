@@ -142,8 +142,8 @@ export const moveResize = (element: HTMLElement, afterCB?: (type: string) => voi
                     window.siyuan.storage[Constants.LOCAL_DIALOGPOSITION][dialogId] = {
                         width: element.offsetWidth,
                         height: element.offsetHeight,
-                        left: parseInt(element.style.left),
-                        top: parseInt(element.style.top),
+                        left: Number.parseInt(element.style.left),
+                        top: Number.parseInt(element.style.top),
                     };
                     setStorageVal(Constants.LOCAL_DIALOGPOSITION, window.siyuan.storage[Constants.LOCAL_DIALOGPOSITION]);
                 }

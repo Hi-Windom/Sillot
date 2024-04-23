@@ -402,14 +402,14 @@ const getHightlightCoordsByRange = (pdf: any, color: string) => {
     if (!startPageElement) {
         return;
     }
-    const startIndex = parseInt(
+    const startIndex = Number.parseInt(
         startPageElement.getAttribute("data-page-number")) - 1;
 
     const endPageElement = hasClosestByClassName(range.endContainer, "page");
     if (!endPageElement) {
         return;
     }
-    const endIndex = parseInt(endPageElement.getAttribute("data-page-number")) - 1;
+    const endIndex = Number.parseInt(endPageElement.getAttribute("data-page-number")) - 1;
     // https://github.com/siyuan-note/siyuan/issues/5213
     const rangeContents = range.cloneContents();
     Array.from(rangeContents.children).forEach(item => {
@@ -428,6 +428,7 @@ const getHightlightCoordsByRange = (pdf: any, color: string) => {
         }
     });
     // eslint-disable-next-line no-control-regex
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: <explanation>
     const content = Lute.EscapeHTMLStr(rangeContents.textContent.replace(/[\x00]|\n/g, ""));
     const startPage = pdf.pdfViewer.getPageView(startIndex);
     const startPageRect = startPage.canvas.getClientRects()[0];
@@ -440,7 +441,7 @@ const getHightlightCoordsByRange = (pdf: any, color: string) => {
     }
 
     const startSelected: number[] = [];
-    mergeRects(range).forEach(function (r) {
+    mergeRects(range).forEach((r) => {
         startSelected.push(
             startViewport.convertToPdfPoint(r.left - startPageRect.x,
                 r.top - startPageRect.y).concat(startViewport.convertToPdfPoint(r.right - startPageRect.x,
@@ -456,7 +457,7 @@ const getHightlightCoordsByRange = (pdf: any, color: string) => {
         const endViewport = endPage.viewport;
         const endDivs = endPage.textLayer.textDivs;
         cloneRange.setStart(endDivs[0], 0);
-        mergeRects(cloneRange).forEach(function (r) {
+        mergeRects(cloneRange).forEach((r) => {
             endSelected.push(
                 endViewport.convertToPdfPoint(r.left - endPageRect.x,
                     r.top - endPageRect.y).concat(endViewport.convertToPdfPoint(r.right - endPageRect.x,
@@ -514,7 +515,7 @@ const getHightlightCoordsByRect = (pdf: any, color: string, rectResizeElement: H
     if (!startPageElement) {
         return;
     }
-    const startIndex = parseInt(
+    const startIndex = Number.parseInt(
         startPageElement.getAttribute("data-page-number")) - 1;
 
     const startPage = pdf.pdfViewer.getPageView(startIndex);
@@ -550,7 +551,7 @@ const getHightlightCoordsByRect = (pdf: any, color: string, rectResizeElement: H
     let endPageElement = document.elementFromPoint(rect.right, rect.bottom + 1);
     endPageElement = hasClosestByClassName(endPageElement, "page") as HTMLElement;
     if (endPageElement) {
-        const endIndex = parseInt(
+        const endIndex = Number.parseInt(
             endPageElement.getAttribute("data-page-number")) - 1;
         if (endIndex !== startIndex) {
             const endPage = pdf.pdfViewer.getPageView(endIndex);
@@ -624,7 +625,7 @@ export const getHighlight = (element: HTMLElement) => {
     if (!pdfInstance) {
         return;
     }
-    const pageIndex = parseInt(
+    const pageIndex = Number.parseInt(
         element.parentElement.getAttribute("data-page-number")) - 1;
     const config = getConfig(pdfInstance);
     Object.keys(config).find(key => {
@@ -767,15 +768,15 @@ async function getRectImgData(pdfObj: any) {
         return;
     }
 
-    const captureCanvas = await getCaptureCanvas(pdfObj, parseInt(pageElement.getAttribute("data-page-number")));
+    const captureCanvas = await getCaptureCanvas(pdfObj, Number.parseInt(pageElement.getAttribute("data-page-number")));
 
     const rectStyle = (rectElement.firstElementChild as HTMLElement).style;
     const scale = 1.5;
     const captureImageData = captureCanvas.getContext("2d").getImageData(
-        scale * parseFloat(rectStyle.left),
-        scale * parseFloat(rectStyle.top),
-        scale * parseFloat(rectStyle.width),
-        scale * parseFloat(rectStyle.height));
+        scale * Number.parseFloat(rectStyle.left),
+        scale * Number.parseFloat(rectStyle.top),
+        scale * Number.parseFloat(rectStyle.width),
+        scale * Number.parseFloat(rectStyle.height));
 
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = captureImageData.width;

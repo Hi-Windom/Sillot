@@ -1,14 +1,21 @@
 @echo off
+@REM if errorlevel 1 实际上是在检查errorlevel是否大于或等于1，这是检查命令是否失败的标准做法。
 echo 'use ".\scripts\sillot-win-build.bat" instead of "sillot-win-build.bat"'
 
 echo ===== Building UI =====
 cd app
 call pnpm install
 call pnpm run build
+if errorlevel 1 (
+    exit /b %errorlevel%
+)
 cd ..
 
 echo ===== Cleaning Builds =====
 call python ./scripts/sillot-win-dev.py
+if errorlevel 1 (
+    exit /b %errorlevel%
+)
 del /S /Q /F app\build 1>nul
 del /S /Q /F app\kernel 1>nul
 

@@ -148,10 +148,13 @@ export class Toastify {
 
   public setTransition(t?: string) {
     switch (t) {
+      // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
       case "slide":
         this.transition = Slide;
+      // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
       case "zoom":
         this.transition = Zoom;
+      // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
       case "flip":
         this.transition = Flip;
       default:

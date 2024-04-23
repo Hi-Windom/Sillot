@@ -5,7 +5,7 @@
 import { defineConfig } from "rollup";
 // 这里是babel的插件，用来处理es的转换，当然会用一个.babelrc配置文件
 import babel from "@rollup/plugin-babel";
-import sucrase from '@rollup/plugin-sucrase'; // 转换 TS / JSX
+import sucrase from "@rollup/plugin-sucrase"; // 转换 TS / JSX
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import terser from "@rollup/plugin-terser";
@@ -23,39 +23,36 @@ const banner = `/*!
 */`;
 
 export default defineConfig({
-  input: "src/bridge.ts",
-  output: [
-    {
-      file: "out/index.mjs",
-      format: "es",
-      banner,
-    },
-    {
-      file: "out/index.cjs",
-      format: "cjs",
-      banner,
-    },
-  ],
-  // 解释同globals配置，这个配置的意思是我简单处理把外部依赖不打包进bundle中，而是前置引入或者作为依赖安装使用
-  external: [
-    ...Object.keys(pkg2.devDependencies),
-    ...Object.keys(pkg2.dependencies),
-  ],
-  plugins: [
-    commonjs({ transformMixedEsModules: true }),
-    json({
-      compact: true,
-    }),
-    // css(),
-    postcss(),
-    // babel({ babelHelpers: "bundled" }),
-    resolve({
-      moduleDirectories: ["node_modules"],
-      extensions: ['.js', '.ts']
-    }),
-    sucrase({
-      exclude: ['node_modules/**'],
-      transforms: ['typescript','jsx'],
-    })
-  ],
+    input: "src/bridge.ts",
+    output: [
+        {
+            file: "out/index.mjs",
+            format: "es",
+            banner,
+        },
+        {
+            file: "out/index.cjs",
+            format: "cjs",
+            banner,
+        },
+    ],
+    // 解释同globals配置，这个配置的意思是我简单处理把外部依赖不打包进bundle中，而是前置引入或者作为依赖安装使用
+    external: [...Object.keys(pkg2.devDependencies), ...Object.keys(pkg2.dependencies)],
+    plugins: [
+        commonjs({ transformMixedEsModules: true }),
+        json({
+            compact: true,
+        }),
+        // css(),
+        postcss(),
+        // babel({ babelHelpers: "bundled" }),
+        resolve({
+            moduleDirectories: ["node_modules"],
+            extensions: [".js", ".ts"],
+        }),
+        sucrase({
+            exclude: ["node_modules/**"],
+            transforms: ["typescript", "jsx"],
+        }),
+    ],
 });

@@ -1,4 +1,4 @@
-const data = require('./genTPLData.js').default;
+const data = require("./genTPLData.js").default;
 const ejs = require("ejs");
 const fs = require("fs");
 const platform = "docker";
@@ -36,10 +36,10 @@ const T = `<!DOCTYPE html>
 
 const template = ejs.compile(T);
 const htmlStr = template(data.data); // => 输出渲染后的 HTML 字符串
-fs.writeFile(`${data.baseRoot}${platform}/index.tpl`, htmlStr, (err) => {
-  if (err) {
-    console.error(err);
-    return;
-  }
-  //文件写入成功。
+fs.writeFile(`${data.baseRoot}${platform}/index.tpl`, htmlStr, err => {
+    if (err) {
+        console.error(err);
+        return;
+    }
+    //文件写入成功。
 });

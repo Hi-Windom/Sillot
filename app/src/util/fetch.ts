@@ -23,7 +23,7 @@ export const fetchPost = (url: string, data?: any, cb?: (response: IWebSocketDat
         if (url === "/api/transactions") {
             data.reqId = new Date().getTime();
         }
-        if (data instanceof FormData) {
+        if (typeof FormData !== 'undefined' && data instanceof FormData) {
             init.body = data;
         } else {
             init.body = JSON.stringify(data);
@@ -87,7 +87,7 @@ export const fetchSyncPost = async (url: string, data?: any) => {
         method: "POST",
     };
     if (data) {
-        if (data instanceof FormData) {
+        if (typeof FormData !== 'undefined' && data instanceof FormData) {
             init.body = data;
         } else {
             init.body = JSON.stringify(data);

@@ -33,7 +33,7 @@ export const duplicateCol = (options: {
     });
     const nameMatch = newColData.name.match(/^(.*) \((\d+)\)$/);
     if (nameMatch) {
-        newColData.name = `${nameMatch[1]} (${parseInt(nameMatch[2]) + 1})`;
+        newColData.name = `${nameMatch[1]} (${Number.parseInt(nameMatch[2]) + 1})`;
     } else {
         newColData.name = `${newColData.name} (1)`;
     }
@@ -795,12 +795,14 @@ export const showColMenu = (protyle: IProtyle, blockElement: Element, cellElemen
         }
         menu.addSeparator();
     }
-
     menu.addItem({
         icon: "iconInsertLeft",
         label: window.siyuan.languages.insertColumnLeft,
         click() {
             const addMenu = addCol(protyle, blockElement, cellElement.previousElementSibling?.getAttribute("data-col-id") || "");
+            if (!blockElement.contains(cellElement)) {
+                cellElement = blockElement.querySelector(`.av__row--header .av__cell--header[data-col-id="${colId}"]`);
+            }
             const addRect = cellElement.getBoundingClientRect();
             addMenu.open({
                 x: addRect.left,
@@ -813,7 +815,10 @@ export const showColMenu = (protyle: IProtyle, blockElement: Element, cellElemen
         icon: "iconInsertRight",
         label: window.siyuan.languages.insertColumnRight,
         click() {
-            const addMenu = addCol(protyle, blockElement, cellElement.getAttribute("data-col-id") || "");
+            const addMenu = addCol(protyle, blockElement, colId);
+            if (!blockElement.contains(cellElement)) {
+                cellElement = blockElement.querySelector(`.av__row--header .av__cell--header[data-col-id="${colId}"]`);
+            }
             const addRect = cellElement.getBoundingClientRect();
             addMenu.open({
                 x: addRect.left,
@@ -1454,7 +1459,7 @@ export const addCol = (protyle: IProtyle, blockElement: Element, previousID?: st
         label: window.siyuan.languages.lineNumber,
         click() {
             const id = Lute.NewNodeID();
-            const newUpdated = dayjs().format("YYYYMMDDHHmmss");
+            const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
             transaction(protyle, [{
                 action: "addAttrViewCol",
                 name: window.siyuan.languages.lineNumber,

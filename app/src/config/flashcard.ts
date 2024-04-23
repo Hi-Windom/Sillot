@@ -134,16 +134,16 @@ export const flashcard = {
         flashcard.element.querySelectorAll("input, select.b3-select").forEach((item) => {
             item.addEventListener("change", () => {
                 fetchPost("/api/setting/setFlashcard", {
-                    reviewMode: parseInt((flashcard.element.querySelector("#reviewMode") as HTMLSelectElement).value),
-                    newCardLimit: parseInt((flashcard.element.querySelector("#newCardLimit") as HTMLInputElement).value),
-                    reviewCardLimit: parseInt((flashcard.element.querySelector("#reviewCardLimit") as HTMLInputElement).value),
+                    reviewMode: Number.parseInt((flashcard.element.querySelector("#reviewMode") as HTMLSelectElement).value),
+                    newCardLimit: Number.parseInt((flashcard.element.querySelector("#newCardLimit") as HTMLInputElement).value),
+                    reviewCardLimit: Number.parseInt((flashcard.element.querySelector("#reviewCardLimit") as HTMLInputElement).value),
                     mark: (flashcard.element.querySelector("#mark") as HTMLInputElement).checked,
                     list: (flashcard.element.querySelector("#list") as HTMLInputElement).checked,
                     superBlock: (flashcard.element.querySelector("#superBlock") as HTMLInputElement).checked,
                     heading: (flashcard.element.querySelector("#heading") as HTMLInputElement).checked,
                     deck: (flashcard.element.querySelector("#deck") as HTMLInputElement).checked,
-                    requestRetention: parseFloat((flashcard.element.querySelector("#requestRetention") as HTMLInputElement).value),
-                    maximumInterval: parseInt((flashcard.element.querySelector("#maximumInterval") as HTMLInputElement).value),
+                    requestRetention: Number.parseFloat((flashcard.element.querySelector("#requestRetention") as HTMLInputElement).value),
+                    maximumInterval: Number.parseInt((flashcard.element.querySelector("#maximumInterval") as HTMLInputElement).value),
                     weights: (flashcard.element.querySelector("#weights") as HTMLInputElement).value,
                 }, response => {
                     window.siyuan.config.flashcard = response.data;

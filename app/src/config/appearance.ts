@@ -149,7 +149,7 @@ ${
     _send: () => {
         const themeLight = (appearance.element.querySelector("#themeLight") as HTMLSelectElement).value;
         const themeDark = (appearance.element.querySelector("#themeDark") as HTMLSelectElement).value;
-        const modeElementValue = parseInt((appearance.element.querySelector("#mode") as HTMLSelectElement).value);
+        const modeElementValue = Number.parseInt((appearance.element.querySelector("#mode") as HTMLSelectElement).value);
         fetchPost("/api/setting/setAppearance", {
             icon: (appearance.element.querySelector("#icon") as HTMLSelectElement).value,
             mode: modeElementValue === 2 ? window.siyuan.config.appearance.mode : modeElementValue,

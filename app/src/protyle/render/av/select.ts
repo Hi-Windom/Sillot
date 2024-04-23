@@ -297,7 +297,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
     menu.addSeparator();
     Array.from(Array(13).keys()).forEach(index => {
         menu.addItem({
-            checked: parseInt(color) === index + 1,
+            checked: Number.parseInt(color) === index + 1,
             iconHTML: "",
             label: `<span class="color__square"  style="padding: 5px;margin: 2px;color: var(--b3-font-color${index + 1});background-color: var(--b3-font-background${index + 1});">A</span>`,
             click(element) {

@@ -203,11 +203,11 @@ export const ai = {
                         apiVersion: (ai.element.querySelector("#apiVersion") as HTMLInputElement).value,
                         apiKey: (ai.element.querySelector("#apiKey") as HTMLInputElement).value,
                         apiModel: (ai.element.querySelector("#apiModel") as HTMLSelectElement).value,
-                        apiMaxTokens: parseInt((ai.element.querySelector("#apiMaxTokens") as HTMLInputElement).value),
-                        apiTemperature: parseFloat((ai.element.querySelector("#apiTemperature") as HTMLInputElement).value),
-                        apiMaxContexts: parseInt((ai.element.querySelector("#apiMaxContexts") as HTMLInputElement).value),
+                        apiMaxTokens: Number.parseInt((ai.element.querySelector("#apiMaxTokens") as HTMLInputElement).value),
+                        apiTemperature: Number.parseFloat((ai.element.querySelector("#apiTemperature") as HTMLInputElement).value),
+                        apiMaxContexts: Number.parseInt((ai.element.querySelector("#apiMaxContexts") as HTMLInputElement).value),
                         apiProxy: (ai.element.querySelector("#apiProxy") as HTMLInputElement).value,
-                        apiTimeout: parseInt((ai.element.querySelector("#apiTimeout") as HTMLInputElement).value),
+                        apiTimeout: Number.parseInt((ai.element.querySelector("#apiTimeout") as HTMLInputElement).value),
                         apiProvider: (ai.element.querySelector("#apiProvider") as HTMLSelectElement).value,
                     }
                 }, response => {

@@ -1,7 +1,7 @@
 import {Layout} from "./index";
 import {Wnd} from "./Wnd";
 import {Tab} from "./Tab";
-import {Model} from "./Model";
+import type {Model} from "./Model";
 import {Graph} from "./dock/Graph";
 import {Editor} from "../editor";
 import {Files} from "./dock/Files";
@@ -29,7 +29,7 @@ import {showMessage} from "../dialog/message";
 import {getIdZoomInByPath} from "../util/pathName";
 import {Custom} from "./dock/Custom";
 import {newCardModel} from "../card/newCardTab";
-import {App} from "../index";
+import type {App} from "../index";
 import {afterLoadPlugin} from "../plugin/loader";
 import {setTitle} from "../dialog/processSystem";
 import {newCenterEmptyTab, resizeTabs} from "./tabUtil";
@@ -145,8 +145,8 @@ const dockToJSON = (dock: Dock) => {
             data.push({
                 type: item.getAttribute("data-type"),
                 size: {
-                    height: parseInt(item.getAttribute("data-height")),
-                    width: parseInt(item.getAttribute("data-width")),
+                    height: Number.parseInt(item.getAttribute("data-height")),
+                    width: Number.parseInt(item.getAttribute("data-width")),
                 },
                 title: item.getAttribute("data-title"),
                 show: item.classList.contains("dock__item--active"),
@@ -592,8 +592,6 @@ export const layoutToJSON = (layout: Layout | Wnd | Tab | Model, json: any, brea
         json.instance = "Custom";
         json.customModelType = layout.type;
         json.customModelData = Object.assign({}, layout.data);
-        // https://github.com/siyuan-note/siyuan/issues/9250
-        delete json.customModelData.editor;
     }
 
     if (layout instanceof Layout || layout instanceof Wnd) {
@@ -738,7 +736,7 @@ export const newModelByInitData = (app: App, tab: Tab, json: any) => {
 
 export const pdfIsLoading = (element: HTMLElement) => {
     window.sout.tracker("invoked");
-    const isLoading = element.querySelector('.layout-tab-container > [data-loading="true"]') ? true : false;
+    const isLoading = !!element.querySelector('.layout-tab-container > [data-loading="true"]');
     if (isLoading) {
         showMessage(window.siyuan.languages.pdfIsLoading);
     }

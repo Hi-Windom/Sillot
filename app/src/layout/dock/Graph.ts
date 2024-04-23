@@ -1,4 +1,4 @@
-import {Tab} from "../Tab";
+import type {Tab} from "../Tab";
 import {setPanelFocus} from "../util";
 import {getDockByType} from "../tabUtil";
 import {Model} from "../Model";
@@ -10,7 +10,7 @@ import {fetchPost} from "../../util/fetch";
 import {isCurrentEditor, openFileById} from "../../editor/util";
 import {updateHotkeyTip} from "../../protyle/util/compatibility";
 import {openGlobalSearch} from "../../search/util";
-import {App} from "../../index";
+import type {App} from "../../index";
 import {checkFold} from "../../util/noRelyPCFunction";
 
 declare const vis: any;
@@ -319,7 +319,7 @@ export class Graph extends Model {
                         target.previousElementSibling.classList.remove("fn__none");
                         (target.previousElementSibling as HTMLInputElement).select();
                     } else if (dataType === "refresh") {
-                        this.searchGraph(false);
+                        this.searchGraph(false, undefined, true);
                     } else if (dataType === "fullscreen") {
                         fullscreen(this.element, target);
                     }
@@ -406,7 +406,7 @@ export class Graph extends Model {
         this.searchGraph(false);
     }
 
-    public searchGraph(focus: boolean, id?: string) {
+    public searchGraph(focus: boolean, id?: string, refresh = false) {
         const element = this.element.querySelector('.block__icon[data-type="refresh"] svg');
         if (element.classList.contains("fn__rotate") && !id) {
             return;
@@ -426,13 +426,13 @@ export class Graph extends Model {
         };
         const d3 = {
             arrow: (this.panelElement.querySelector("[data-type='arrow']") as HTMLInputElement).checked,
-            nodeSize: parseFloat((this.panelElement.querySelector("[data-type='nodeSize']") as HTMLInputElement).value),
-            centerStrength: parseFloat((this.panelElement.querySelector("[data-type='centerStrength']") as HTMLInputElement).value),
-            collideRadius: parseFloat((this.panelElement.querySelector("[data-type='collideRadius']") as HTMLInputElement).value),
-            collideStrength: parseFloat((this.panelElement.querySelector("[data-type='collideStrength']") as HTMLInputElement).value),
-            lineOpacity: parseFloat((this.panelElement.querySelector("[data-type='lineOpacity']") as HTMLInputElement).value),
-            linkDistance: parseFloat((this.panelElement.querySelector("[data-type='linkDistance']") as HTMLInputElement).value),
-            linkWidth: parseFloat((this.panelElement.querySelector("[data-type='linkWidth']") as HTMLInputElement).value),
+            nodeSize: Number.parseFloat((this.panelElement.querySelector("[data-type='nodeSize']") as HTMLInputElement).value),
+            centerStrength: Number.parseFloat((this.panelElement.querySelector("[data-type='centerStrength']") as HTMLInputElement).value),
+            collideRadius: Number.parseFloat((this.panelElement.querySelector("[data-type='collideRadius']") as HTMLInputElement).value),
+            collideStrength: Number.parseFloat((this.panelElement.querySelector("[data-type='collideStrength']") as HTMLInputElement).value),
+            lineOpacity: Number.parseFloat((this.panelElement.querySelector("[data-type='lineOpacity']") as HTMLInputElement).value),
+            linkDistance: Number.parseFloat((this.panelElement.querySelector("[data-type='linkDistance']") as HTMLInputElement).value),
+            linkWidth: Number.parseFloat((this.panelElement.querySelector("[data-type='linkWidth']") as HTMLInputElement).value),
         };
         if (this.type === "global") {
             // 全局
@@ -442,7 +442,7 @@ export class Graph extends Model {
                     type,
                     d3,
                     dailyNote: (this.panelElement.querySelector("[data-type='dailyNote']") as HTMLInputElement).checked,
-                    minRefs: parseFloat((this.panelElement.querySelector("[data-type='minRefs']") as HTMLInputElement).value)
+                    minRefs: Number.parseFloat((this.panelElement.querySelector("[data-type='minRefs']") as HTMLInputElement).value)
                 }
             }, response => {
                 this.graphData = response.data;
@@ -465,9 +465,7 @@ export class Graph extends Model {
                 if (id) {
                     this.blockId = id;
                 }
-                if (!isCurrentEditor(this.blockId) &&
-                    this.graphElement.firstElementChild.classList.contains("fn__none") // 引用右键打开关系图
-                ) {
+                if (!refresh && this.type === "pin" && this.blockId && !isCurrentEditor(this.blockId)) {
                     return;
                 }
                 this.graphData = response.data;

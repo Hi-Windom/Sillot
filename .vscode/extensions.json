@@ -1,49 +1,26 @@
 {
-    "recommendations": [
-        "editorconfig.editorconfig",
-        "mqycn.huile8",
-        "codeinchinese.chineseinputassistant",
-        "russell.any-rule",
-        "mrcrowl.easy-less",
-        "igorsbitnev.error-gutters",
-        "usernamehw.errorlens",
-        "mkxml.vscode-filesize",
-        "mhutchie.git-graph",
-        "donjayamanne.githistory",
-        "michelemelluso.gitignore",
-        "eamodio.gitlens",
-        "ldez.ignore-files",
-        "wix.vscode-import-cost",
-        "josee9988.minifyall",
-        "christian-kohler.npm-intellisense",
-        "leizongmin.node-module-intellisense",
-        "christian-kohler.path-intellisense",
-        "rome.rome",
-        "tyriar.vscode-terminal-here",
-        "symbolk.somanyconflicts",
-        "shardulm94.trailing-spaces",
-        "xboxyan.tree-generator",
-        "unifiedjs.vscode-mdx",
-        "astro-build.astro-vscode",
-        "golang.go",
-        "github.vscode-github-actions",
-        "maixiaojie.git-emoji-zh",
-        "doggy8088.pangu2",
-        "ms-ceintl.vscode-language-pack-zh-hans",
-        "cweijan.vscode-office",
-    ],
-    "unwantedRecommendations": [
-        "hayden.extension-pack-manager",
-        "vscjava.vscode-java-pack",
-        "vscjava.vscode-gradle",
-        "googlecloudtools.cloudcode",
-        "github.copilot",
-        "ms-kubernetes-tools.vscode-kubernetes-tools",
-        "firefox-devtools.vscode-firefox-debug",
-        "felipecaputo.git-project-manager",
-        "dbaeumer.vscode-eslint",
-        "oderwat.indent-rainbow",
-        "esbenp.prettier-vscode",
-        "rvest.vs-code-prettier-eslint"
-    ],
+  "recommendations": [
+    // 这里不重复工作区已有推荐
+    ////
+    ////
+    //// 通用部分
+    "codeinchinese.chineseinputassistant",
+    ////
+    ////
+    ////
+    //// 前端部分
+    ////
+    "mrcrowl.easy-less",
+    "wix.vscode-import-cost",
+    "christian-kohler.npm-intellisense",
+    "leizongmin.node-module-intellisense",
+    "christian-kohler.path-intellisense",
+    "linqin.linqin-js-snippets",
+    ////
+    ////
+    //// 后端部分
+    ////
+    "golang.go"
+  ],
+  "unwantedRecommendations": []
 }

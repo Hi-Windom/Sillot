@@ -1,11 +1,11 @@
-import {App} from "../index";
+import type {App} from "../index";
 import {EventBus} from "./EventBus";
 import {fetchPost} from "../util/fetch";
 import {isMobile, isWindow} from "../util/functions";
 /// #if !MOBILE
 import {Custom} from "../layout/dock/Custom";
 import {getAllModels} from "../layout/getAll";
-import {Tab} from "../layout/Tab";
+import type {Tab} from "../layout/Tab";
 import {setPanelFocus} from "../layout/util";
 import {getDockByType} from "../layout/tabUtil";
 ///#else
@@ -13,7 +13,7 @@ import {MobileCustom} from "../mobile/dock/MobileCustom";
 /// #endif
 import {hasClosestByAttribute} from "../protyle/util/hasClosest";
 import {BlockPanel} from "../block/Panel";
-import {Setting} from "./Setting";
+import type {Setting} from "./Setting";
 import {clearOBG} from "../layout/dock/util";
 
 export class Plugin {

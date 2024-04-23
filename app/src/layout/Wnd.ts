@@ -8,8 +8,8 @@ import {
     setPanelFocus,
     switchWnd
 } from "./util";
-import {Tab} from "./Tab";
-import {Model} from "./Model";
+import type {Tab} from "./Tab";
+import type {Model} from "./Model";
 import {Editor} from "../editor";
 import {Graph} from "./dock/Graph";
 import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName} from "../protyle/util/hasClosest";
@@ -33,7 +33,7 @@ import {isWindow} from "../util/functions";
 import {hideAllElements} from "../protyle/ui/hideElements";
 import {focusByOffset, getSelectionOffset} from "../protyle/util/selection";
 import {Custom} from "./dock/Custom";
-import {App} from "../index";
+import type {App} from "../index";
 import {unicode2Emoji} from "../emoji";
 import {closeWindow} from "../window/closeWin";
 import {setTitle} from "../dialog/processSystem";

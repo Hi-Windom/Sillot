@@ -19,7 +19,7 @@ export const updateListOrder = (listElement: Element, sIndex?: number) => {
                 item.setAttribute("data-marker", (starIndex) + ".");
                 item.querySelector(".protyle-action--order").textContent = (starIndex) + ".";
             } else {
-                starIndex = parseInt(item.getAttribute("data-marker"));
+                starIndex = Number.parseInt(item.getAttribute("data-marker"));
             }
         } else if (item.classList.contains("li")) {
             // 保证列表项的缩放和常规列表属性的存在
@@ -35,7 +35,7 @@ export const genListItemElement = (listItemElement: Element, offset = 0, wbr = f
     const element = document.createElement("template");
     const type = listItemElement.getAttribute("data-subtype");
     if (type === "o") {
-        const index = parseInt(listItemElement.getAttribute("data-marker")) + offset;
+        const index = Number.parseInt(listItemElement.getAttribute("data-marker")) + offset;
         element.innerHTML = `<div data-marker="${index + 1}." data-subtype="${type}" data-node-id="${Lute.NewNodeID()}" data-type="NodeListItem" class="li"><div contenteditable="false" class="protyle-action protyle-action--order" draggable="true">${index + 1}.</div>${genEmptyBlock(false, wbr)}<div class="protyle-attr" contenteditable="false"></div></div>`;
     } else if (type === "t") {
         element.innerHTML = `<div data-marker="*" data-subtype="${type}" data-node-id="${Lute.NewNodeID()}" data-type="NodeListItem" class="li"><div class="protyle-action protyle-action--task" draggable="true"><svg><use xlink:href="#iconUncheck"></use></svg></div>${genEmptyBlock(false, wbr)}<div class="protyle-attr" contenteditable="false"></div></div>`;
@@ -314,7 +314,7 @@ export const listOutdent = (protyle: IProtyle, liItemElements: Element[], range:
         range.insertNode(document.createElement("wbr"));
         let startIndex;
         if (!liItemElements[0].previousElementSibling && liElement.getAttribute("data-subtype") === "o") {
-            startIndex = parseInt(liItemElements[0].getAttribute("data-marker"));
+            startIndex = Number.parseInt(liItemElements[0].getAttribute("data-marker"));
         }
         let topPreviousID = liId;
         let previousElement: Element = liElement;
@@ -486,7 +486,7 @@ export const listOutdent = (protyle: IProtyle, liItemElements: Element[], range:
     });
     let startIndex;
     if (!liItemElements[0].previousElementSibling && liElement.getAttribute("data-subtype") === "o") {
-        startIndex = parseInt(liItemElements[0].getAttribute("data-marker"));
+        startIndex = Number.parseInt(liItemElements[0].getAttribute("data-marker"));
     }
     const html = parentLiItemElement.parentElement.outerHTML;
     let nextElement = liItemElements[liItemElements.length - 1].nextElementSibling;

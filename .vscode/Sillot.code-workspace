@@ -1,37 +1,144 @@
 {
-	"folders": [
-		{
-			"path": "..",
-            "name": "汐洛🤍/ 🗂️"
-		},
-		{
-			"path": "../kernel", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-            "name": "思源内核🤍/kernel 🗂️"
-		},
-		{
-			"path": "../app/appearance", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-            "name": "思源美化🤍/app/appearance 🗂️"
-		},
-		{
-			"path": "../_sili", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-            "name": "司丽🤍/_sili 🗂️"
-		},
-		{
-			"path": "../docs", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-            "name": "汐洛宝典🤍/docs 🗂️"
-		},
-        {
-			"path": "../../Sillot-android", // 开发在 Android Studio 完成，这里列出只是方便 Git 管理
-            "name": "汐洛安卓🤍../Sillot-android 🗂️"
-		},
-	],
-	"settings": {
-		"files.associations": {
-			"*.sy": "json"
-		},
-		"workbench.editor.wrapTabs": true,
-        "search.exclude": {
-          "**/.history": true
-        }
-	}
+  "folders": [
+    {
+      "path": "..",
+      "name": "汐洛🤍/ 🗂️"
+    },
+    {
+      "path": "../kernel", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
+      "name": "思源内核🤍/kernel 🗂️"
+    },
+    {
+      "path": "../app/appearance", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
+      "name": "思源美化🤍/app/appearance 🗂️"
+    },
+    {
+      "path": "../_sili", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
+      "name": "司丽🤍/_sili 🗂️"
+    },
+    {
+      "path": "../docs", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
+      "name": "汐洛宝典🤍/docs 🗂️"
+    },
+    {
+      "path": "../../Sillot-android", // 开发在 Android Studio 完成，这里列出只是方便 Git 管理
+      "name": "汐洛安卓🤍../Sillot-android 🗂️"
+    },
+    {
+      "path": "../../sofillBuilder", // 沁棘开发仓库（暂未开源）
+      "name": "沁棘🤍../sofillBuilder 🗂️"
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "*.sy": "json"
+    },
+    "workbench.editor.wrapTabs": true,
+    "search.exclude": {
+      "**/.history": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      ////
+      ////
+      //// 已包含在 Sillot.code-profile 中
+      ////
+      // Chinese (Simplified) (简体中文) Language Pack for Visual Studio Code
+      "ms-ceintl.vscode-language-pack-zh-hans", // VSCode官方汉化
+      // Material Icon Theme
+      "PKief.material-icon-theme", // Material Design Icons 文件图标主题
+      // vscode-icons
+      "vscode-icons-team.vscode-icons", // 很全的官方文件图标主题
+      // VSCode Great Icons
+      "emmanuelbeziat.vscode-great-icons", // 很不错的一款文件图标主题
+      // Fluent Icons
+      "miguelsolorio.fluent-icons", // 现代扁平风的一款文件图标主题，捆绑了产品图标主题（还可以）
+      // Gruvbox Material Icon Theme
+      "JonathanHarty.gruvbox-material-icon-theme", // 蛮有意思的一款文件图标主题
+      // Atom Material Icons
+      "atommaterial.a-file-icon-vscode", // 很全的一款文件图标主题，捆绑了产品图标主题（还可以）。区分了 index.ts 非常好用。
+      // GitHub Theme
+      "GitHub.github-vscode-theme", // 不错的一款颜色主题，[GitHub Dark Dimmed] [GitHub Dark Colorblind] 提供了不错的视觉观感
+      // Winter is Coming Theme
+      "johnpapa.winteriscoming", // 不错的一款颜色主题，[Winter is Coming (Dark Blue)] 提供了不错的视觉观感
+      // Office Viewer(Markdown Editor)
+      "cweijan.vscode-office", // View word,excel files and using WYSIWYG editor for markdown. 捆绑了颜色主题（不推荐）和文件图标主题（ Material Icon 青春版）
+      // Terminal Here
+      "tyriar.vscode-terminal-here", // 在当前文件路径打开一个终端
+      // EditorConfig for VS Code
+      "editorconfig.editorconfig", // 项目通用配置
+      // gitignore
+      "michelemelluso.gitignore", // Add file to .gitignore
+      // GitLens — Git supercharged
+      "eamodio.gitlens", // 免登陆白嫖就很好用的 Git 插件
+      // Git Graph
+      "mhutchie.git-graph", // View git log, file history, compare branches or commits
+      // So Many Conflicts
+      "symbolk.somanyconflicts", // 合并冲突时使用
+      // Error Gutters
+      "igorsbitnev.error-gutters", // 错误高亮
+      // Error Lens
+      "usernamehw.errorlens", // 错误高亮
+      // Trailing Spaces
+      "shardulm94.trailing-spaces", // 空白高亮
+      // GitHub Actions
+      "github.vscode-github-actions", // Github Action 官方插件
+      // filesize
+      "mkxml.vscode-filesize", // Show the current file size in the status bar
+      // File Tree to Text Generator
+      "d-koppenhagen.file-tree-to-text-generator", // Print the selected directory within it's files and subdirectories as text (multiple formats available)
+      // Biome
+      "biomejs.biome", // Biome LSP VS Code Extension
+      // 盤古之白
+      "doggy8088.pangu2", // 這個擴充套件會自動替你在文件中所有的中文字和半形的英文、數字、符號之間插入空白。
+      // Git Emoji Commit 中文版
+      "maixiaojie.git-emoji-zh", // 起到一个建议提示的作用，很遗憾不能自动填充
+      ////
+      ////
+      //// 不包含在 Sillot.code-profile 中
+      ////
+      // Ignore files
+      "ldez.ignore-files", // 各种 ignore 文件高亮
+      // Python
+      "ms-python.python", // Python 官方插件包
+      // Jupyter
+      "ms-toolsai.jupyter", // Jupyter 官方插件包
+      // 会了吧
+      "mqycn.huile8", // 编程时学习英文单词
+      // any-rule
+      "russell.any-rule", // 常用正则表达式
+      // MinifyAll
+      "josee9988.minifyall", // 统一的前端代码最小化
+      // Font Preview
+      "ctcuff.font-preview", // 30MB以内字体预览
+      // Font Switcher
+      "evan-buss.font-switcher", // 快速字体切换
+      // Microsoft Edge Tools for VS Code
+      "ms-edgedevtools.vscode-edge-devtools" // Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, 与本工作区的契合仍有待研究
+    ],
+    "unwantedRecommendations": [
+      "oderwat.indent-rainbow", // 花里胡哨影响观感
+      "wn244.directory-tree", // 通用性差，不可配置
+      "esbenp.prettier-vscode", // 本工作区使用 biome 方案，不需要 prettier
+      "rvest.vs-code-prettier-eslint", // 本工作区使用 biome 方案，不需要 eslint
+      "dbaeumer.vscode-eslint", // 本工作区使用 biome 方案，不需要 eslint
+      "hayden.extension-pack-manager", // 不适用本工作区
+      "felipecaputo.git-project-manager", // 不适用本工作区
+      "donjayamanne.githistory", // 不适用本工作区
+      "DavidAnson.vscode-markdownlint", // 不适用本工作区
+      "vscjava.vscode-java-pack", // 避免自动推荐，有需要的自己会安装
+      "vscjava.vscode-gradle", // 避免自动推荐，有需要的自己会安装
+      "googlecloudtools.cloudcode", // 避免自动推荐，有需要的自己会安装
+      "github.copilot", // 避免自动推荐，有需要的自己会安装
+      "ms-kubernetes-tools.vscode-kubernetes-tools", // 避免自动推荐，有需要的自己会安装
+      "firefox-devtools.vscode-firefox-debug", // 避免自动推荐，有需要的自己会安装
+      "github.vscode-pull-request-github", // 避免自动推荐，有需要的自己会安装
+      "ms-vscode-remote.remote-wsl", // 避免自动推荐，有需要的自己会安装
+      "ms-vscode.PowerShell", // 避免自动推荐，有需要的自己会安装
+      "DotJoshJohnson.xml", // 避免自动推荐，有需要的自己会安装
+      "ms-azuretools.vscode-docker", // 避免自动推荐，有需要的自己会安装
+      "ms-python.vscode-pylance" // 推荐的插件包已集成此插件，无需单独推荐
+    ]
+  }
 }

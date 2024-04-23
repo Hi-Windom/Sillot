@@ -45,7 +45,7 @@ export const showMessage = (message: string, timeout = 6000, type = "info", mess
     const existElement = messagesElement.querySelector(`.b3-snackbar[data-id="${id}"]`);
     const messageVersion = message + (type === "error" ? " v" + Constants.SIYUAN_VERSION : "");
     if (existElement) {
-        window.clearTimeout(parseInt(existElement.getAttribute("data-timeoutid")));
+        window.clearTimeout(Number.parseInt(existElement.getAttribute("data-timeoutid")));
         existElement.innerHTML = `<div class="b3-snackbar__content${timeout === 0 ? " b3-snackbar__content--close" : ""}">${messageVersion}</div>${timeout === 0 ? '<svg class="b3-snackbar__close"><use xlink:href="#iconCloseRound"></use></svg>' : ""}`;
         if (type === "error") {
             existElement.classList.add("b3-snackbar--error");
@@ -88,7 +88,7 @@ export const showMessage = (message: string, timeout = 6000, type = "info", mess
 };
 
 export const hideMessage = (id?: string) => {
-    window.sout.tracker("invoked");
+    // window.sout.tracker("invoked"); // 无价值的追踪
     const messagesElement = document.getElementById("message").firstElementChild;
     if (!messagesElement) {
         return;

@@ -1,5 +1,5 @@
 import {Model} from "../layout/Model";
-import {Tab} from "../layout/Tab";
+import type {Tab} from "../layout/Tab";
 import {Constants} from "../constants";
 import {setPanelFocus} from "../layout/util";
 /// #if !BROWSER
@@ -13,7 +13,7 @@ import {webViewerPageNumberChanged} from "./pdf/app";
 /// #endif
 import {fetchPost} from "../util/fetch";
 import {setStorageVal, updateHotkeyTip} from "../protyle/util/compatibility";
-import {App} from "../index";
+import type {App} from "../index";
 import {clearOBG} from "../layout/dock/util";
 
 export class Asset extends Model {
@@ -77,7 +77,7 @@ export class Asset extends Model {
             });
             return;
         }
-        if (typeof pdfId === "number" && !isNaN(pdfId)) {
+        if (typeof pdfId === "number" && !Number.isNaN(pdfId)) {
             webViewerPageNumberChanged({value: this.pdfId, pdfInstance: this.pdfObject});
         }
         /// #endif

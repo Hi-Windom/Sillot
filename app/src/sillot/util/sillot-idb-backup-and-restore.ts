@@ -59,7 +59,7 @@ function importFromJson(idbDatabase: IDBRequest, importObject: any) {
           "readwrite"
         );
         // transaction.addEventListener('error', reject)
-        transaction.onerror = function (event: any) {
+        transaction.onerror = (event: any) => {
           window.sout.error("transaction error: " + transaction.error);
           reject();
         };
@@ -72,7 +72,7 @@ function importFromJson(idbDatabase: IDBRequest, importObject: any) {
           }
           const request = transaction.objectStore(storeName);
           const req = request.openCursor(key);
-          req.onsuccess = function (e: any) {
+          req.onsuccess = (e: any) => {
             const cursor = e.target.result;
             if (cursor) { // key already exist
               // cursor.update(value);
@@ -134,7 +134,7 @@ export async function importIDB(result: any) {
         resolved += 1;
       } else {
         const DBOpenRequest: IDBOpenDBRequest = window.indexedDB.open(dbName);
-        DBOpenRequest.onupgradeneeded = function (event) {
+        DBOpenRequest.onupgradeneeded = (event) => {
           // 数据库创建或升级时触发
           const db = DBOpenRequest.result;
           const kList: Array<string> = Object.keys(importObject[dbName]);
@@ -145,7 +145,7 @@ export async function importIDB(result: any) {
             }
           });
         };
-        DBOpenRequest.onsuccess = function (event) {
+        DBOpenRequest.onsuccess = (event) => {
           // 第一次打开数据库时，会先触发upgradeneeded事件，然后触发success事件
           importFromJson(DBOpenRequest, importObject[dbName]).then(() => { resolved += 1; }).catch((e) => {
             window.sout.error(e);
@@ -200,7 +200,7 @@ export async function exportIDB() {
     fetch("/api/sillot/setConfigesStore", {
       body: formdata,
       method: "POST",
-    }).then(function (response) {
+    }).then((response) => {
     });
   });
 }

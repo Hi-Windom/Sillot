@@ -1,4 +1,4 @@
-import {Tab} from "../Tab";
+import type {Tab} from "../Tab";
 import {Model} from "../Model";
 import {Tree} from "../../util/Tree";
 import {setPanelFocus} from "../util";
@@ -9,7 +9,7 @@ import {updateHotkeyTip} from "../../protyle/util/compatibility";
 import {openFileById} from "../../editor/util";
 import {Protyle} from "../../protyle";
 import {MenuItem} from "../../menus/Menu";
-import {App} from "../../index";
+import type {App} from "../../index";
 
 export class Backlink extends Model {
     public element: HTMLElement;
@@ -466,6 +466,9 @@ export class Backlink extends Model {
         if (!this.blockId) {
             return;
         }
+        this.editors.forEach(item => {
+            item.destroy();
+        });
         const element = this.element.querySelector('.block__icon[data-type="refresh"] svg');
         element.classList.add("fn__rotate");
         fetchPost("/api/ref/refreshBacklink", {
@@ -592,8 +595,7 @@ export class Backlink extends Model {
                         this.status[this.blockId].backlinkMOpenIds.push(data.backmentions[index].id);
                     }
                 });
-                if (window.siyuan.config.editor.backmentionExpandCount === 0) {
-                    // 设置为 0 时需折叠
+                if (data.mentionsCount === 0) {
                     this.status[this.blockId].backlinkMStatus = 3;
                 } else {
                     if (data.linkRefsCount === 0) {

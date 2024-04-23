@@ -44,7 +44,7 @@ export const pdfResize = () => {
             // https://github.com/siyuan-note/siyuan/issues/6890
             const scrollTop = pdfViewerElement.getAttribute("data-scrolltop");
             if (scrollTop) {
-                pdfViewerElement.scrollTo(0, parseInt(scrollTop));
+                pdfViewerElement.scrollTo(0, Number.parseInt(scrollTop));
                 pdfViewerElement.removeAttribute("data-scrolltop");
             }
         }

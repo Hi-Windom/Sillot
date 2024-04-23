@@ -19,11 +19,11 @@ import {Constants} from "../../constants";
 import {openSetting} from "../../config";
 import {getInstanceById} from "../../layout/util";
 import {closeTabByType, copyTab, getActiveTab, getDockByType, resizeTabs, switchTabByIndex} from "../../layout/tabUtil";
-import {Tab} from "../../layout/Tab";
+import type {Tab} from "../../layout/Tab";
 import {Editor} from "../../editor";
 import {setEditMode} from "../../protyle/util/setEditMode";
 import {rename} from "../../editor/rename";
-import {Files} from "../../layout/dock/Files";
+import type {Files} from "../../layout/dock/Files";
 import {newDailyNote} from "../../util/mount";
 import {hideElements} from "../../protyle/ui/hideElements";
 import {fetchPost} from "../../util/fetch";
@@ -46,7 +46,7 @@ import {getStartEndElement, goEnd, goHome} from "../../protyle/wysiwyg/commonHot
 import {getNextFileLi, getPreviousFileLi} from "../../protyle/wysiwyg/getBlock";
 import {editor} from "../../config/editor";
 import {hintMoveBlock} from "../../protyle/hint/extend";
-import {Backlink} from "../../layout/dock/Backlink";
+import type {Backlink} from "../../layout/dock/Backlink";
 /// #if !BROWSER
 import {setZoom} from "../../layout/topBar";
 import {ipcRenderer} from "electron";
@@ -58,14 +58,13 @@ import {isWindow} from "../../util/functions";
 import {reloadProtyle} from "../../protyle/util/reload";
 import {fullscreen, updateReadonly} from "../../protyle/breadcrumb/action";
 import {openRecentDocs} from "../../business/openRecentDocs";
-import {App} from "../../index";
+import type {App} from "../../index";
 import {commandPanel} from "../../plugin/commandPanel";
 import {openBacklink, openGraph, openOutline, toggleDockBar} from "../../layout/dock/util";
 import {workspaceMenu} from "../../menus/workspace";
 import {resize} from "../../protyle/util/resize";
 import {Search} from "../../search";
 import {Custom} from "../../layout/dock/Custom";
-import {Protyle} from "../../protyle";
 import {transaction} from "../../protyle/wysiwyg/transaction";
 import {quickMakeCard} from "../../card/makeCard";
 import {copyPNG} from "../../menus/util";
@@ -218,10 +217,18 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
             } else {
                 protyle = activeTab.model.editors.unRefEdit.protyle;
             }
-        } else if (activeTab.model instanceof Custom && activeTab.model.data?.editor instanceof Protyle) {
-            protyle = activeTab.model.data.editor.protyle;
-        } else {
-            return false;
+        } else if (activeTab.model instanceof Custom && activeTab.model.editors?.length > 0) {
+            if (range) {
+                activeTab.model.editors.find(item => {
+                    if (item.protyle.element.contains(range.startContainer)) {
+                        protyle = item.protyle;
+                        return true;
+                    }
+                });
+            }
+        }
+        if (!protyle) {
+            return;
         }
     } else if (!protyle) {
         if (!protyle && range) {
@@ -314,22 +321,23 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
     if (!isFileFocus && matchHotKey(window.siyuan.config.keymap.general.addToDatabase.custom, event)) {
         if (protyle.title?.editElement.contains(range.startContainer)) {
             openSearchAV("", protyle.breadcrumb.element, (listItemElement) => {
-                const sourceIds: string[] = [protyle.block.rootID];
                 const avID = listItemElement.dataset.avId;
                 transaction(protyle, [{
                     action: "insertAttrViewBlock",
                     avID,
                     ignoreFillFilter: true,
-                    srcIDs: sourceIds,
-                    isDetached: false,
-                    blockID: listItemElement.dataset.nodeId
+                    srcs: [{
+                        id: protyle.block.rootID,
+                        isDetached: false
+                    }],
+                    blockID: listItemElement.dataset.blockId
                 }, {
                     action: "doUpdateUpdated",
-                    id: listItemElement.dataset.nodeId,
+                    id: listItemElement.dataset.blockId,
                     data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                 }], [{
                     action: "removeAttrViewBlock",
-                    srcIDs: sourceIds,
+                    srcIDs: [protyle.block.rootID],
                     avID,
                 }]);
                 focusByRange(range);
@@ -346,17 +354,21 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
                 }
             }
             openSearchAV("", selectElement[0] as HTMLElement, (listItemElement) => {
-                const sourceIds: string[] = [];
+                const srcIDs: string[] = [];
+                const srcs: IOperationSrcs[] = [];
                 selectElement.forEach(item => {
-                    sourceIds.push(item.getAttribute("data-node-id"));
+                    srcIDs.push(item.getAttribute("data-node-id"));
+                    srcs.push({
+                        id: item.getAttribute("data-node-id"),
+                        isDetached: false
+                    });
                 });
                 const avID = listItemElement.dataset.avId;
                 transaction(protyle, [{
                     action: "insertAttrViewBlock",
                     avID,
                     ignoreFillFilter: true,
-                    srcIDs: sourceIds,
-                    isDetached: false,
+                    srcs,
                     blockID: listItemElement.dataset.blockId
                 }, {
                     action: "doUpdateUpdated",
@@ -364,7 +376,7 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
                     data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                 }], [{
                     action: "removeAttrViewBlock",
-                    srcIDs: sourceIds,
+                    srcIDs,
                     avID,
                 }]);
                 focusByRange(range);
@@ -1483,7 +1495,7 @@ export const windowKeyDown = (app: App, event: KeyboardEvent) => {
         const maxEditLevels: { [key: string]: number } = {oid: 0};
         window.siyuan.blockPanels.forEach((item) => {
             if ((item.targetElement || typeof item.x === "number") && item.element.getAttribute("data-pin") === "true") {
-                const level = parseInt(item.element.getAttribute("data-level"));
+                const level = Number.parseInt(item.element.getAttribute("data-level"));
                 const oid = item.element.getAttribute("data-oid");
                 if (maxEditLevels[oid]) {
                     if (level > maxEditLevels[oid]) {

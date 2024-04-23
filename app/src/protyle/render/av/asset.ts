@@ -203,7 +203,7 @@ export const editAssetItem = (protyle: IProtyle, data: IAV, cellElements: HTMLEl
             cellElements,
             blockElement,
             updateValue: {
-                index: parseInt(target.dataset.index),
+                index: Number.parseInt(target.dataset.index),
                 value: {
                     content: textElements[0].value,
                     name: textElements[1].value,
@@ -243,7 +243,7 @@ ${window.siyuan.languages.title}
                 data,
                 cellElements,
                 blockElement,
-                removeIndex: parseInt(target.dataset.index)
+                removeIndex: Number.parseInt(target.dataset.index)
             });
         }
     });
@@ -265,6 +265,7 @@ ${window.siyuan.languages.title}
         textElements[1].value = target.dataset.name;
         textElements[0].value = linkAddress;
         textElements[0].focus();
+        textElements[0].select();
     }
 };
 
@@ -340,7 +341,7 @@ export const dragUpload = (files: string[], protyle: IProtyle, cellElement: HTML
             });
             fetchPost("/api/av/renderAttributeView", {
                 id: avID,
-                pageSize: parseInt(blockElement.getAttribute("data-page-size")) || undefined,
+                pageSize: Number.parseInt(blockElement.getAttribute("data-page-size")) || undefined,
                 viewID: blockElement.getAttribute(Constants.CUSTOM_SY_AV_VIEW)
             }, (response) => {
                 updateAssetCell({

@@ -11,7 +11,7 @@ import {setPosition} from "../../../util/setPosition";
 
 const genSearchList = (element: Element, keyword: string, avId: string, cb?: () => void) => {
     window.sout.tracker("invoked");
-    fetchPost("/api/av/searchAttributeView", {keyword}, (response) => {
+    fetchPost("/api/av/searchAttributeView", {keyword, excludes: [avId]}, (response) => {
         let html = "";
         response.data.results.forEach((item: {
             avID: string
@@ -38,6 +38,10 @@ const genSearchList = (element: Element, keyword: string, avId: string, cb?: () 
 
 const setDatabase = (avId: string, element: HTMLElement, item: HTMLElement) => {
     window.sout.tracker("invoked");
+    if (typeof item?.dataset === "undefined") {
+        window.sout.error("item?.dataset is null");
+        return;
+    }
     element.dataset.avId = item.dataset.avId;
     element.dataset.blockId = item.dataset.blockId;
     element.querySelector(".b3-menu__accelerator").textContent = item.querySelector(".b3-list-item__hinticon").classList.contains("fn__none") ? item.querySelector(".b3-list-item__text").textContent : window.siyuan.languages.thisDatabase;
@@ -227,7 +231,7 @@ const genSelectItemHTML = (type: "selected" | "empty" | "unselect", id?: string,
     <span class="b3-menu__label">${window.siyuan.languages.emptyContent}</span>
 </button>`;
     }
-    if (type == "unselect") {
+    if (type === "unselect") {
         return `<button data-id="${id}" class="b3-menu__item" data-type="setRelationCell">
     <span class="b3-menu__label${isDetached ? "" : " popover__block"}" ${isDetached ? "" : 'style="color:var(--b3-protyle-inline-blockref-color)"'} data-id="${id}">${text}</span>
     <svg class="b3-menu__action"><use xlink:href="#iconAdd"></use></svg>

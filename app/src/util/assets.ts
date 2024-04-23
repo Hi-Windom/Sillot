@@ -238,7 +238,7 @@ export const setInlineStyle = (set = true) => {
 export const setCodeTheme = (cdn = Constants.PROTYLE_CDN) => {
     window.sout.tracker("invoked");
     const protyleHljsStyle = document.getElementById("protyleHljsStyle") as HTMLLinkElement;
-    let css;
+    let css: string;
     if (window.siyuan.config.appearance.mode === 0) {
         css = window.siyuan.config.appearance.codeBlockThemeLight;
         if (!Constants.SIYUAN_CONFIG_APPEARANCE_LIGHT_CODE.includes(css)) {

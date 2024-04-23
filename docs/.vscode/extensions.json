@@ -1,0 +1,27 @@
+{
+  "recommendations": [
+    // 这里不重复工作区已有推荐
+    ////
+    ////
+    //// 通用部分
+    "codeinchinese.chineseinputassistant",
+    ////
+    ////
+    ////
+    //// 前端部分
+    ////
+    "mrcrowl.easy-less",
+    "wix.vscode-import-cost",
+    "christian-kohler.npm-intellisense",
+    "leizongmin.node-module-intellisense",
+    "christian-kohler.path-intellisense",
+    "linqin.linqin-js-snippets",
+    "unifiedjs.vscode-mdx",
+    "astro-build.astro-vscode"
+    ////
+    ////
+    //// 后端部分
+    ////
+  ],
+  "unwantedRecommendations": []
+}

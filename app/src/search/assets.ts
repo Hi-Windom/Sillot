@@ -329,7 +329,7 @@ export const renderPreview = (element: Element, id: string, query: string, query
 
 export const renderNextAssetMark = (element: Element) => {
     window.sout.tracker("invoked");
-    let matchElement;
+    let matchElement: HTMLElement;
     const allMatchElements = Array.from(element.querySelectorAll("mark"));
     allMatchElements.find((item, itemIndex) => {
         if (item.classList.contains("mark--hl")) {

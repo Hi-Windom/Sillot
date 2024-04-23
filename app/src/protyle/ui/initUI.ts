@@ -109,7 +109,7 @@ export const setPadding = (protyle: IProtyle) => {
             padding: 0
         };
     }
-    const oldLeft = parseInt(protyle.wysiwyg.element.style.paddingLeft);
+    const oldLeft = Number.parseInt(protyle.wysiwyg.element.style.paddingLeft);
     let left = 16;
     let right = 24;
     if (!isMobile()) {
@@ -158,10 +158,10 @@ export const setPadding = (protyle: IProtyle) => {
         }
     }
     const oldWidth = protyle.wysiwyg.element.getAttribute("data-realwidth");
-    const newWidth = protyle.wysiwyg.element.clientWidth - parseInt(protyle.wysiwyg.element.style.paddingLeft) - parseInt(protyle.wysiwyg.element.style.paddingRight);
+    const newWidth = protyle.wysiwyg.element.clientWidth - Number.parseInt(protyle.wysiwyg.element.style.paddingLeft) - Number.parseInt(protyle.wysiwyg.element.style.paddingRight);
     protyle.wysiwyg.element.setAttribute("data-realwidth", newWidth.toString());
     return {
-        width: Math.abs(parseInt(oldWidth) - newWidth),
-        padding: Math.abs(oldLeft - parseInt(protyle.wysiwyg.element.style.paddingLeft))
+        width: Math.abs(Number.parseInt(oldWidth) - newWidth),
+        padding: Math.abs(oldLeft - Number.parseInt(protyle.wysiwyg.element.style.paddingLeft))
     };
 };

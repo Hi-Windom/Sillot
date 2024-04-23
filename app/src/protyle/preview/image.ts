@@ -18,7 +18,7 @@ export const previewImage = (src: string) => {
                 }],
                 button: false,
                 transition: false,
-                hidden: function () {
+                hidden: () => {
                     window.siyuan.viewer.destroy();
                 },
                 toolbar: {
@@ -33,7 +33,7 @@ export const previewImage = (src: string) => {
                     rotateRight: true,
                     flipHorizontal: true,
                     flipVertical: true,
-                    close: function () {
+                    close: () => {
                         window.siyuan.viewer.destroy();
                     },
                 },
@@ -70,7 +70,7 @@ export const previewDocImage = (src: string, id: string) => {
                 button: false,
                 initialViewIndex,
                 transition: false,
-                hidden: function () {
+                hidden: () => {
                     window.siyuan.viewer.destroy();
                 },
                 toolbar: {
@@ -85,7 +85,7 @@ export const previewDocImage = (src: string, id: string) => {
                     rotateRight: true,
                     flipHorizontal: true,
                     flipVertical: true,
-                    close: function () {
+                    close: () => {
                         window.siyuan.viewer.destroy();
                     },
                 },

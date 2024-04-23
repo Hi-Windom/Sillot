@@ -12,7 +12,7 @@ import {hideElements} from "../protyle/ui/hideElements";
 import {pushBack} from "./util/MobileBackFoward";
 import {setStorageVal} from "../protyle/util/compatibility";
 import {showMessage} from "../dialog/message";
-import {App} from "../index";
+import type {App} from "../index";
 import {getDocByScroll, saveScroll} from "../protyle/scroll/saveScroll";
 
 export const getCurrentEditor = () => {
@@ -23,6 +23,10 @@ export const openMobileFileById = (app: App, id: string, action = [Constants.CB_
     window.sout.tracker("invoked");
     window.siyuan.storage[Constants.LOCAL_DOCINFO] = {id};
     setStorageVal(Constants.LOCAL_DOCINFO, window.siyuan.storage[Constants.LOCAL_DOCINFO]);
+    const avPanelElement = document.querySelector(".av__panel");
+    if (avPanelElement && !avPanelElement.classList.contains("fn__none")) {
+        avPanelElement.dispatchEvent(new CustomEvent("click", {detail: "close"}));
+    }
     if (window.siyuan.mobile.editor) {
         saveScroll(window.siyuan.mobile.editor.protyle);
         hideElements(["toolbar", "hint", "util"], window.siyuan.mobile.editor.protyle);

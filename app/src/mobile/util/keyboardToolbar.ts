@@ -76,13 +76,13 @@ export const renderTextMenu = (protyle: IProtyle, toolbarElement: Element) => {
                 case "color":
                     lastColorHTML += `<button class="keyboard__slash-item" data-type="${lastFontStatus[0]}">
     <span class="keyboard__slash-icon" style="color:${lastFontStatus[1]}">A</span>
-    <span class="keyboard__slash-text">${window.siyuan.languages.colorFont} ${parseInt(lastFontStatus[1].replace("var(--b3-font-color", "")) + 1}</span>
+    <span class="keyboard__slash-text">${window.siyuan.languages.colorFont} ${Number.parseInt(lastFontStatus[1].replace("var(--b3-font-color", "")) + 1}</span>
 </button>`;
                     break;
                 case "backgroundColor":
                     lastColorHTML += `<button class="keyboard__slash-item" data-type="${lastFontStatus[0]}">
     <span class="keyboard__slash-icon" style="background-color:${lastFontStatus[1]}">A</span>
-    <span class="keyboard__slash-text">${window.siyuan.languages.colorPrimary} ${parseInt(lastFontStatus[1].replace("var(--b3-font-background", "")) + 1}</span>
+    <span class="keyboard__slash-text">${window.siyuan.languages.colorPrimary} ${Number.parseInt(lastFontStatus[1].replace("var(--b3-font-background", "")) + 1}</span>
 </button>`;
                     break;
                 case "style2":
@@ -189,7 +189,7 @@ export const renderTextMenu = (protyle: IProtyle, toolbarElement: Element) => {
         <option ${fontSize === "48px" ? "selected" : ""} value="48px">48px</option>
     </select>
 </div>`;
-    utilElement.querySelector("select").addEventListener("change", function (event: Event) {
+    utilElement.querySelector("select").addEventListener("change", (event: Event) => {
         fontEvent(protyle, nodeElements, "fontSize", (event.target as HTMLSelectElement).value);
     });
 };
@@ -277,7 +277,7 @@ export const showKeyboardToolbarUtil = (oldScrollTop: number) => {
 
     const toolbarElement = document.getElementById("keyboardToolbar");
     let keyboardHeight = toolbarElement.getAttribute("data-keyboardheight");
-    keyboardHeight = (keyboardHeight ? (parseInt(keyboardHeight) + 42) : window.outerHeight / 2) + "px";
+    keyboardHeight = (keyboardHeight ? (Number.parseInt(keyboardHeight) + 42) : window.outerHeight / 2) + "px";
     const editor = getCurrentEditor();
     if (editor) {
         editor.protyle.element.parentElement.style.paddingBottom = keyboardHeight;

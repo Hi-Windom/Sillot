@@ -1,4 +1,4 @@
-import {Dialog} from "../dialog";
+import type {Dialog} from "../dialog";
 
 export const historyKeydown = (event: KeyboardEvent, dialog: Dialog) => {
     window.sout.tracker("invoked");

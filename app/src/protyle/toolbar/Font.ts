@@ -160,7 +160,7 @@ export const appearanceMenu = (protyle: IProtyle, nodeElements?: Element[]) => {
 <button class="b3-button b3-button--cancel" data-type="clear">
     <svg><use xlink:href="#iconTrashcan"></use></svg>${window.siyuan.languages.clearFontStyle}
 </button>`;
-    element.addEventListener("click", function (event: Event) {
+    element.addEventListener("click", (event: Event) => {
         let target = event.target as HTMLElement;
         while (target && !target.isEqualNode(element)) {
             const dataType = target.getAttribute("data-type");
@@ -181,7 +181,7 @@ export const appearanceMenu = (protyle: IProtyle, nodeElements?: Element[]) => {
             target = target.parentElement;
         }
     });
-    element.querySelector("select").addEventListener("change", function (event: Event) {
+    element.querySelector("select").addEventListener("change", (event: Event) => {
         fontEvent(protyle, nodeElements, "fontSize", (event.target as HTMLSelectElement).value);
     });
     return element;

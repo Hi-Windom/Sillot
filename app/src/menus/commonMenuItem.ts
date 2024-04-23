@@ -19,7 +19,7 @@ import {rename, replaceFileName} from "../editor/rename";
 import {formatDate} from "sofill/mid";
 import {Constants} from "../constants";
 import {exportImage} from "../protyle/export/util";
-import {App} from "../index";
+import type {App} from "../index";
 import {renderAVAttribute} from "../protyle/render/av/blockAttr";
 import {openAssetNewWindow} from "../window/openNewWindow";
 
@@ -707,7 +707,7 @@ export const openMenu = (app: App, src: string, onlyMenu: boolean, showAccelerat
                 label: window.siyuan.languages.insertRight,
                 accelerator: showAccelerator ? "Click" : "",
                 click() {
-                    openAsset(app, src.trim(), parseInt(getSearch("page", src)), "right");
+                    openAsset(app, src.trim(), Number.parseInt(getSearch("page", src)), "right");
                 }
             });
             submenu.push({
@@ -715,7 +715,7 @@ export const openMenu = (app: App, src: string, onlyMenu: boolean, showAccelerat
                 icon: "iconOpen",
                 accelerator: showAccelerator ? "⌥Click" : "",
                 click() {
-                    openAsset(app, src.trim(), parseInt(getSearch("page", src)));
+                    openAsset(app, src.trim(), Number.parseInt(getSearch("page", src)));
                 }
             });
             /// #if !BROWSER

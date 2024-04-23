@@ -1,4 +1,4 @@
-import {Tab} from "../layout/Tab";
+import type {Tab} from "../layout/Tab";
 import {MenuItem} from "./Menu";
 import {Editor} from "../editor";
 import {closeTabByType, copyTab, resizeTabs} from "../layout/tabUtil";
@@ -6,7 +6,7 @@ import {closeTabByType, copyTab, resizeTabs} from "../layout/tabUtil";
 import {openNewWindow} from "../window/openNewWindow";
 /// #endif
 import {copySubMenu} from "./commonMenuItem";
-import {App} from "../index";
+import type {App} from "../index";
 import {Layout} from "../layout";
 import {Wnd} from "../layout/Wnd";
 import {getAllWnds} from "../layout/getAll";

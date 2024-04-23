@@ -493,7 +493,7 @@ const removeLi = (protyle: IProtyle, blockElement: Element, range: Range, isDele
         listElement.insertAdjacentHTML("beforebegin", blockElement.parentElement.innerHTML);
         blockElement.parentElement.remove();
         if (listElement.getAttribute("data-subtype") === "o") {
-            updateListOrder(listElement, parseInt(listElement.firstElementChild.getAttribute("data-marker")) - 1);
+            updateListOrder(listElement, Number.parseInt(listElement.firstElementChild.getAttribute("data-marker")) - 1);
         }
         doOperations.splice(0, 0, {
             action: "update",

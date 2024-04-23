@@ -744,7 +744,10 @@ export const onTransaction = (protyle: IProtyle, operation: IOperation, isUndo: 
         return;
     }
     if (operation.action === "append") {
-        reloadProtyle(protyle, false);
+        // 目前只有移动块的时候会调用，反连面板就自己点击刷新处理。
+        if (!protyle.options.backlinkData) {
+            reloadProtyle(protyle, false);
+        }
         return;
     }
     if (["addAttrViewCol", "insertAttrViewBlock", "updateAttrViewCol", "updateAttrViewColOptions",
@@ -921,7 +924,7 @@ export const turnsIntoTransaction = (options: {
         }
         if (selectsElement.length === 1 && options.type === "Blocks2Hs" &&
             selectsElement[0].getAttribute("data-type") === "NodeHeading" &&
-            options.level === parseInt(selectsElement[0].getAttribute("data-subtype").substring(1))) {
+            options.level === Number.parseInt(selectsElement[0].getAttribute("data-subtype").substring(1))) {
             // 快捷键同级转换，消除标题
             options.type = "Blocks2Ps";
         }

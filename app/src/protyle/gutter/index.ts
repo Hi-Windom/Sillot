@@ -30,7 +30,7 @@ import {getContenteditableElement, getTopAloneElement, isNotEditBlock} from "../
 import {formatDate} from "sofill/mid";
 import {isInvalidStringStrict} from "sofill/api"
 import {fetchPost, fetchSyncPost} from "../../util/fetch";
-import {cancelSB, genEmptyElement, insertEmptyBlock, jumpToParentNext} from "../../block/util";
+import {cancelSB, genEmptyElement, getLangByType, insertEmptyBlock, jumpToParentNext} from "../../block/util";
 import {countBlockWord} from "../../layout/status";
 /// #if !MOBILE
 import {openFileById} from "../../editor/util";
@@ -105,11 +105,10 @@ export class Gutter {
             ghostElement.className = protyle.wysiwyg.element.className;
             selectElements.forEach(item => {
                 const type = item.getAttribute("data-type");
-                if (["NodeIFrame", "NodeWidget"].includes(type)) {
+                if (item.querySelector("iframe")) {
                     const embedElement = genEmptyElement();
                     embedElement.classList.add("protyle-wysiwyg--select");
-                    const isIFrame = type === "NodeIFrame";
-                    getContenteditableElement(embedElement).innerHTML = `<svg class="svg"><use xlink:href="#icon${isIFrame ? "Language" : "Both"}"></use></svg> ${isIFrame ? "IFrame" : window.siyuan.languages.widget}`;
+                    getContenteditableElement(embedElement).innerHTML = `<svg class="svg"><use xlink:href="${buttonElement.querySelector("use").getAttribute("xlink:href")}"></use></svg> ${getLangByType(type)}`;
                     ghostElement.append(embedElement);
                 } else {
                     ghostElement.append(item.cloneNode(true));
@@ -243,8 +242,11 @@ export class Gutter {
                         action: "insertAttrViewBlock",
                         avID,
                         previousID,
-                        srcIDs,
-                        isDetached: true,
+                        srcs: [{
+                            id: srcIDs[0],
+                            isDetached: true,
+                            content: ""
+                        }],
                         blockID: id,
                     }, {
                         action: "doUpdateUpdated",
@@ -834,17 +836,21 @@ export class Gutter {
             icon: "iconDatabase",
             click: () => {
                 openSearchAV("", selectsElement[0] as HTMLElement, (listItemElement) => {
-                    const sourceIds: string[] = [];
+                    const srcIDs: string[] = [];
+                    const srcs: IOperationSrcs[] = [];
                     selectsElement.forEach(item => {
-                        sourceIds.push(item.getAttribute("data-node-id"));
+                        srcIDs.push(item.getAttribute("data-node-id"));
+                        srcs.push({
+                            id:item.getAttribute("data-node-id"),
+                            isDetached: false,
+                        });
                     });
                     const avID = listItemElement.dataset.avId;
                     transaction(protyle, [{
                         action: "insertAttrViewBlock",
                         avID,
-                        srcIDs: sourceIds,
+                        srcs,
                         ignoreFillFilter: true,
-                        isDetached: false,
                         blockID: listItemElement.dataset.blockId
                     }, {
                         action: "doUpdateUpdated",
@@ -852,7 +858,7 @@ export class Gutter {
                         data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                     }], [{
                         action: "removeAttrViewBlock",
-                        srcIDs: sourceIds,
+                        srcIDs,
                         avID,
                     }]);
                     focusByRange(range);
@@ -1329,14 +1335,15 @@ export class Gutter {
                 icon: "iconDatabase",
                 click: () => {
                     openSearchAV("", nodeElement as HTMLElement, (listItemElement) => {
-                        const sourceIds: string[] = [id];
                         const avID = listItemElement.dataset.avId;
                         transaction(protyle, [{
                             action: "insertAttrViewBlock",
                             avID,
-                            srcIDs: sourceIds,
+                            srcs:[{
+                                id,
+                                isDetached: false
+                            }],
                             ignoreFillFilter: true,
-                            isDetached: false,
                             blockID: listItemElement.dataset.blockId
                         }, {
                             action: "doUpdateUpdated",
@@ -1344,7 +1351,7 @@ export class Gutter {
                             data: formatDate(new Date(), 'yyyyMMddHHmmss'),
                         }], [{
                             action: "removeAttrViewBlock",
-                            srcIDs: sourceIds,
+                            srcIDs: [id],
                             avID,
                         }]);
                         focusByRange(range);
@@ -1453,7 +1460,7 @@ export class Gutter {
                 icon: "iconCode",
                 submenu: [{
                     label: `${window.siyuan.languages.height}<span class="fn__space"></span>
-<input style="margin: 4px 0;width: 84px" type="number" step="1" min="148" class="b3-text-field" value="${height ? parseInt(height) : "420"}">`,
+<input style="margin: 4px 0;width: 84px" type="number" step="1" min="148" class="b3-text-field" value="${height ? Number.parseInt(height) : "420"}">`,
                     bind: (element) => {
                         element.querySelector("input").addEventListener("change", (event) => {
                             const newHeight = ((event.target as HTMLInputElement).value || "420") + "px";
@@ -1982,7 +1989,7 @@ export class Gutter {
         if (nodeElements.length === 1) {
             const widthStyle = (nodeElements[0] as HTMLElement).style.width;
             if (widthStyle.endsWith("%")) {
-                width = parseInt(widthStyle);
+                width = Number.parseInt(widthStyle);
             }
         }
         window.siyuan.menus.menu.append(new MenuItem({
@@ -2205,7 +2212,7 @@ data-type="fold"><svg style="width:10px${fold && fold === "1" ? "" : ";transform
             left = nodeElement.getBoundingClientRect().left - this.element.clientWidth - space;
         } else if (element.classList.contains("av__row")) {
             // 为数据库行
-            left = nodeElement.getBoundingClientRect().left - this.element.clientWidth - space + parseInt(getComputedStyle(nodeElement).paddingLeft);
+            left = nodeElement.getBoundingClientRect().left - this.element.clientWidth - space + Number.parseInt(getComputedStyle(nodeElement).paddingLeft);
         }
         this.element.style.left = `${left}px`;
         if (left < this.element.parentElement.getBoundingClientRect().left) {

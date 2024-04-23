@@ -148,7 +148,7 @@ const bindProviderEvent = () => {
     providerPanelElement.querySelectorAll(".b3-text-field, .b3-select").forEach(item => {
         item.addEventListener("blur", () => {
             if (window.siyuan.config.sync.provider === 2) {
-                let timeout = parseInt((providerPanelElement.querySelector("#timeout") as HTMLInputElement).value, 10);
+                let timeout = Number.parseInt((providerPanelElement.querySelector("#timeout") as HTMLInputElement).value, 10);
                 if (7 > timeout) {
                     if (1 > timeout) {
                         timeout = 30;
@@ -174,7 +174,7 @@ const bindProviderEvent = () => {
                     window.siyuan.config.sync.s3 = s3;
                 });
             } else if (window.siyuan.config.sync.provider === 3) {
-                let timeout = parseInt((providerPanelElement.querySelector("#timeout") as HTMLInputElement).value, 10);
+                let timeout = Number.parseInt((providerPanelElement.querySelector("#timeout") as HTMLInputElement).value, 10);
                 if (7 > timeout) {
                     timeout = 7;
                 }
@@ -315,25 +315,25 @@ export const repos = {
         });
         const syncModeElement = repos.element.querySelector("#syncMode") as HTMLSelectElement;
         syncModeElement.addEventListener("change", () => {
-            fetchPost("/api/sync/setSyncMode", {mode: parseInt(syncModeElement.value, 10)}, () => {
+            fetchPost("/api/sync/setSyncMode", {mode: Number.parseInt(syncModeElement.value, 10)}, () => {
                 if (syncModeElement.value === "1" && window.siyuan.config.sync.provider === 0 && window.siyuan.config.system.container !== "docker") {
                     syncPerceptionElement.parentElement.classList.remove("fn__none");
                 } else {
                     syncPerceptionElement.parentElement.classList.add("fn__none");
                 }
-                window.siyuan.config.sync.mode = parseInt(syncModeElement.value, 10);
+                window.siyuan.config.sync.mode = Number.parseInt(syncModeElement.value, 10);
             });
         });
         const syncConfigElement = repos.element.querySelector("#reposCloudSyncList");
         const syncProviderElement = repos.element.querySelector("#syncProvider") as HTMLSelectElement;
         syncProviderElement.addEventListener("change", () => {
-            fetchPost("/api/sync/setSyncProvider", {provider: parseInt(syncProviderElement.value, 10)}, (response) => {
+            fetchPost("/api/sync/setSyncProvider", {provider: Number.parseInt(syncProviderElement.value, 10)}, (response) => {
                 if (response.code === 1) {
                     showMessage(response.msg);
                     syncProviderElement.value = "0";
                     window.siyuan.config.sync.provider = 0;
                 } else {
-                    window.siyuan.config.sync.provider = parseInt(syncProviderElement.value, 10);
+                    window.siyuan.config.sync.provider = Number.parseInt(syncProviderElement.value, 10);
                 }
                 repos.element.querySelector("#syncProviderPanel").innerHTML = renderProvider(window.siyuan.config.sync.provider);
                 bindProviderEvent();

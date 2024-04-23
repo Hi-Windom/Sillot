@@ -13,7 +13,7 @@ export class HotToast {
     id: string;
   }) {
     this.root = ReactDOM.createRoot(document.getElementById(props.id));
-    this.root.render(<><Toaster /></>);
+    this.root.render(<Toaster />);
   }
 
   public alert(message: string, options?: any) {

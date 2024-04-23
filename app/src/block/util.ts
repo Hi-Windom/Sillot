@@ -125,7 +125,7 @@ export const insertEmptyBlock = (protyle: IProtyle, position: InsertPosition, id
     let orderIndex = 1;
     if (blockElement.getAttribute("data-type") === "NodeListItem") {
         newElement = genListItemElement(blockElement, 0, true) as HTMLDivElement;
-        orderIndex = parseInt(blockElement.parentElement.firstElementChild.getAttribute("data-marker"));
+        orderIndex = Number.parseInt(blockElement.parentElement.firstElementChild.getAttribute("data-marker"));
     }
     const parentOldHTML = blockElement.parentElement.outerHTML;
     const newId = newElement.getAttribute("data-node-id");
@@ -183,4 +183,32 @@ export const genEmptyElement = (zwsp = true, wbr = true, id?: string) => {
     element.classList.add("p");
     element.innerHTML = `<div contenteditable="true" spellcheck="${window.siyuan.config.editor.spellcheck}">${zwsp ? Constants.ZWSP : ""}${wbr ? "<wbr>" : ""}</div><div class="protyle-attr" contenteditable="false">${Constants.ZWSP}</div>`;
     return element;
+};
+
+export const getLangByType = (type: string) => {
+    let lang = type;
+    switch (type) {
+        case "NodeIFrame":
+            lang = "IFrame";
+            break;
+        case "NodeAttributeView":
+            lang = window.siyuan.languages.database;
+            break;
+        case "NodeThematicBreak":
+            lang = window.siyuan.languages.line;
+            break;
+        case "NodeWidget":
+            lang = window.siyuan.languages.widget;
+            break;
+        case "NodeVideo":
+            lang = window.siyuan.languages.video;
+            break;
+        case "NodeAudio":
+            lang = window.siyuan.languages.audio;
+            break;
+        case "NodeBlockQueryEmbed":
+            lang = window.siyuan.languages.blockEmbed;
+            break;
+    }
+    return lang;
 };

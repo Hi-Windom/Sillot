@@ -47,7 +47,7 @@ export const initAppearance = () => {
         bindEvent(modelMainElement: HTMLElement) {
             modelMainElement.querySelectorAll("select").forEach(item => {
                 item.addEventListener("change", () => {
-                    const modeElementValue = parseInt((modelMainElement.querySelector("#mode") as HTMLSelectElement).value);
+                    const modeElementValue = Number.parseInt((modelMainElement.querySelector("#mode") as HTMLSelectElement).value);
                     fetchPost("/api/setting/setAppearance", Object.assign({}, window.siyuan.config.appearance, {
                         icon: (modelMainElement.querySelector("#icon") as HTMLSelectElement).value,
                         mode: modeElementValue === 2 ? window.siyuan.config.appearance.mode : modeElementValue,

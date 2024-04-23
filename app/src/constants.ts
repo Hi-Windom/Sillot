@@ -4,7 +4,7 @@ import {isMobile} from "./util/functions";
 // declare const NODE_ENV: string;
 // declare const SIYUAN_ORIGIN_VERSION: string;
 import { SConst } from "./SConst";
-import * as pkg from "../package.json";
+import * as pkg from "../package.json" assert { type: "json" };
 const NODE_ENV = "development";
 const SIYUAN_VERSION = pkg.version;
 const SIYUAN_ORIGIN_VERSION = pkg.syv;
@@ -24,6 +24,7 @@ const getFunctionKey = () => {
 
 
 
+// biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 export abstract class Constants extends SConst { // Sillot extend
     public static readonly SIYUAN_ORIGIN_VERSION: string = _SIYUAN_ORIGIN_VERSION;
     public static readonly SIYUAN_VERSION: string = _SIYUAN_VERSION;

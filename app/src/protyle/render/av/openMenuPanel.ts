@@ -59,7 +59,7 @@ export const openMenuPanel = (options: {
     const blockID = options.blockElement.getAttribute("data-node-id");
     fetchPost("/api/av/renderAttributeView", {
         id: avID,
-        pageSize: parseInt(options.blockElement.getAttribute("data-page-size")) || undefined,
+        pageSize: Number.parseInt(options.blockElement.getAttribute("data-page-size")) || undefined,
         viewID: options.blockElement.getAttribute(Constants.CUSTOM_SY_AV_VIEW)
     }, (response) => {
         const isCustomAttr = !options.blockElement.classList.contains("av");
@@ -391,37 +391,44 @@ export const openMenuPanel = (options: {
                 return;
             }
 
-            transaction(options.protyle, [{
-                action: "sortAttrViewCol",
-                avID,
-                previousID: (targetElement.classList.contains("dragover__top") ? targetElement.previousElementSibling?.getAttribute("data-id") : targetElement.getAttribute("data-id")) || "",
-                id: sourceId,
-                blockID,
-            }], [{
-                action: "sortAttrViewCol",
-                avID,
-                previousID: sourceElement.previousElementSibling?.getAttribute("data-id") || "",
-                id: sourceId,
-                blockID
-            }]);
-            let column: IAVColumn;
-            data.view.columns.find((item, index: number) => {
-                if (item.id === sourceId) {
-                    column = data.view.columns.splice(index, 1)[0];
-                    return true;
+            if (targetElement.getAttribute("data-type") === "editCol") {
+                const previousID = (targetElement.classList.contains("dragover__top") ? targetElement.previousElementSibling?.getAttribute("data-id") : targetElement.getAttribute("data-id")) || "";
+                const undoPreviousID = sourceElement.previousElementSibling?.getAttribute("data-id") || "";
+                if (previousID !== undoPreviousID && previousID !== sourceId) {
+                    transaction(options.protyle, [{
+                        action: "sortAttrViewCol",
+                        avID,
+                        previousID,
+                        id: sourceId,
+                        blockID,
+                    }], [{
+                        action: "sortAttrViewCol",
+                        avID,
+                        previousID: undoPreviousID,
+                        id: sourceId,
+                        blockID
+                    }]);
+                    let column: IAVColumn;
+                    data.view.columns.find((item, index: number) => {
+                        if (item.id === sourceId) {
+                            column = data.view.columns.splice(index, 1)[0];
+                            return true;
+                        }
+                    });
+                    data.view.columns.find((item, index: number) => {
+                        if (item.id === targetId) {
+                            if (isTop) {
+                                data.view.columns.splice(index, 0, column);
+                            } else {
+                                data.view.columns.splice(index + 1, 0, column);
+                            }
+                            return true;
+                        }
+                    });
                 }
-            });
-            data.view.columns.find((item, index: number) => {
-                if (item.id === targetId) {
-                    if (isTop) {
-                        data.view.columns.splice(index, 0, column);
-                    } else {
-                        data.view.columns.splice(index + 1, 0, column);
-                    }
-                    return true;
-                }
-            });
-            menuElement.innerHTML = getPropertiesHTML(data.view);
+                menuElement.innerHTML = getPropertiesHTML(data.view);
+                return;
+            }
         });
         let dragoverElement: HTMLElement;
         avPanelElement.addEventListener("dragover", (event: DragEvent) => {
@@ -843,6 +850,7 @@ export const openMenuPanel = (options: {
                 } else if (type === "updateColType") {
                     if (target.dataset.newType !== target.dataset.oldType) {
                         const name = (avPanelElement.querySelector('.b3-text-field[data-type="name"]') as HTMLInputElement).value;
+                        data.view.columns.find((item: IAVColumn) => item.id === options.colId).type = target.dataset.newType as TAVCol;
                         transaction(options.protyle, [{
                             action: "updateAttrViewCol",
                             id: options.colId,
@@ -894,10 +902,16 @@ export const openMenuPanel = (options: {
                                     blockID
                                 }]);
                             }
-
                         }
                     }
-                    avPanelElement.remove();
+                    menuElement.innerHTML = getEditHTML({
+                        protyle: options.protyle,
+                        data,
+                        colId: options.colId,
+                        isCustomAttr
+                    });
+                    bindEditEvent({protyle: options.protyle, data, menuElement, isCustomAttr, blockID});
+                    setPosition(menuElement, tabRect.right - menuElement.clientWidth, tabRect.bottom, tabRect.height);
                     event.preventDefault();
                     event.stopPropagation();
                     break;
@@ -1162,7 +1176,7 @@ export const openMenuPanel = (options: {
                             suffix !== ".pdf" || (suffix === ".pdf" && !assetLink.startsWith("file://"))
                         )
                     )) {
-                        openAsset(options.protyle.app, assetLink.trim(), parseInt(getSearch("page", assetLink)), "right");
+                        openAsset(options.protyle.app, assetLink.trim(), Number.parseInt(getSearch("page", assetLink)), "right");
                     } else if (Constants.SIYUAN_ASSETS_IMAGE.includes(suffix)) {
                         previewImage(assetLink);
                     } else {

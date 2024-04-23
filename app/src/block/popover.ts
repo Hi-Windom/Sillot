@@ -3,7 +3,7 @@ import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName,} from "..
 import {fetchPost, fetchSyncPost} from "../util/fetch";
 import {hideTooltip, showTooltip} from "../dialog/tooltip";
 import {getIdFromSYProtocol, isLocalPath} from "../util/pathName";
-import {App} from "../index";
+import type {App} from "../index";
 import {Constants} from "../constants";
 import {getCellText} from "../protyle/render/av/cell";
 import {isPadAppMode} from "sofill/env";
@@ -187,7 +187,7 @@ const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
         const maxEditLevels: { [key: string]: number } = {oid: 0};
         window.siyuan.blockPanels.forEach((item) => {
             if ((item.targetElement || typeof item.x === "number") && item.element.getAttribute("data-pin") === "true") {
-                const level = parseInt(item.element.getAttribute("data-level"));
+                const level = Number.parseInt(item.element.getAttribute("data-level"));
                 const oid = item.element.getAttribute("data-oid");
                 if (maxEditLevels[oid]) {
                     if (level > maxEditLevels[oid]) {
@@ -198,15 +198,15 @@ const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
                 }
             }
         });
-        const menuLevel = parseInt(window.siyuan.menus.menu.element.dataset.from);
+        const menuLevel = Number.parseInt(window.siyuan.menus.menu.element.dataset.from);
         if (blockElement) {
             for (let i = window.siyuan.blockPanels.length - 1; i >= 0; i--) {
                 const item = window.siyuan.blockPanels[i];
-                const itemLevel = parseInt(item.element.getAttribute("data-level"));
+                const itemLevel = Number.parseInt(item.element.getAttribute("data-level"));
                 if ((item.targetElement || typeof item.x === "number") &&
                     itemLevel > (maxEditLevels[item.element.getAttribute("data-oid")] || 0) &&
                     item.element.getAttribute("data-pin") === "false" &&
-                    itemLevel > parseInt(blockElement.getAttribute("data-level"))) {
+                    itemLevel > Number.parseInt(blockElement.getAttribute("data-level"))) {
                     if (menuLevel && menuLevel >= itemLevel) {
                         // 有 gutter 菜单时不隐藏
                     } else {
@@ -217,7 +217,7 @@ const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
         } else {
             for (let i = window.siyuan.blockPanels.length - 1; i >= 0; i--) {
                 const item = window.siyuan.blockPanels[i];
-                const itemLevel = parseInt(item.element.getAttribute("data-level"));
+                const itemLevel = Number.parseInt(item.element.getAttribute("data-level"));
                 if ((item.targetElement || typeof item.x === "number") && item.element.getAttribute("data-pin") === "false") {
                     if (menuLevel && menuLevel >= itemLevel) {
                         // 有 gutter 菜单时不隐藏

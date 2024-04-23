@@ -78,7 +78,7 @@ export const updateHeader = (rowElement: HTMLElement) => {
 
 const setPage = (blockElement: Element) => {
     window.sout.tracker("invoked");
-    const pageSize = parseInt(blockElement.getAttribute("data-page-size"));
+    const pageSize = Number.parseInt(blockElement.getAttribute("data-page-size"));
     if (pageSize) {
         const currentCount = blockElement.querySelectorAll(".av__row:not(.av__row--header)").length;
         if (pageSize < currentCount) {
@@ -115,7 +115,7 @@ export const insertAttrViewBlockAnimation = (protyle: IProtyle, blockElement: El
     previousElement.querySelectorAll(".av__cell").forEach((item: HTMLElement, index) => {
         colHTML += `<div class="av__cell" data-col-id="${item.dataset.colId}" 
 style="width: ${item.style.width};${item.dataset.dtype === "number" ? "text-align: right;" : ""}" 
-${(item.getAttribute("data-block-id") || item.dataset.dtype === "block") ? ' data-detached="true"' : ""}><span class="${avId ? "av__celltext" : "av__pulse"}"></span></div>`;
+${getTypeByCellElement(item) === "block" ? ' data-detached="true"' : ""}><span class="${avId ? "av__celltext" : "av__pulse"}"></span></div>`;
         if (pinIndex === index) {
             colHTML += "</div>";
         }
@@ -232,11 +232,11 @@ const updatePageSize = (options: {
     transaction(options.protyle, [{
         action: "setAttrViewPageSize",
         avID: options.avID,
-        data: parseInt(options.newPageSize),
+        data: Number.parseInt(options.newPageSize),
         blockID
     }], [{
         action: "setAttrViewPageSize",
-        data: parseInt(options.currentPageSize),
+        data: Number.parseInt(options.currentPageSize),
         avID: options.avID,
         blockID
     }]);
@@ -328,12 +328,16 @@ export const deleteRow = (blockElement: HTMLElement, protyle: IProtyle) => {
         blockIds.push(item.querySelector(".av__cell[data-block-id]").getAttribute("data-block-id"));
     });
     rowElements.forEach(item => {
+        const blockValue = genCellValueByElement("block", item.querySelector(".av__cell[data-block-id]"));
         undoOperations.push({
             action: "insertAttrViewBlock",
             avID,
             previousID: item.previousElementSibling?.getAttribute("data-id") || "",
-            srcIDs: [item.getAttribute("data-id")],
-            isDetached: item.querySelector('.av__cell[data-detached="true"]') ? true : false,
+            srcs: [{
+                id: item.getAttribute("data-id"),
+                isDetached: blockValue.isDetached,
+                content: blockValue.block.content
+            }],
             blockID: blockElement.dataset.nodeId
         });
     });
@@ -364,16 +368,22 @@ export const insertRows = (blockElement: HTMLElement, protyle: IProtyle, count: 
     window.sout.tracker("invoked");
     const avID = blockElement.getAttribute("data-av-id");
     const srcIDs: string[] = [];
+    const srcs: IOperationSrcs[] = [];
     new Array(count).fill(0).forEach(() => {
-        srcIDs.push(Lute.NewNodeID());
+        const newNodeID = Lute.NewNodeID();
+        srcIDs.push(newNodeID);
+        srcs.push({
+            id: newNodeID,
+            isDetached: true,
+            content: "",
+        });
     });
     const newUpdated = formatDate(new Date(), 'yyyyMMddHHmmss');
     transaction(protyle, [{
         action: "insertAttrViewBlock",
         avID,
         previousID,
-        srcIDs,
-        isDetached: true,
+        srcs,
         blockID: blockElement.dataset.nodeId,
     }, {
         action: "doUpdateUpdated",

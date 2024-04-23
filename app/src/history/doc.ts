@@ -6,7 +6,7 @@ import {disabledProtyle, onGet} from "../protyle/util/onGet";
 import {formatDate} from "sofill/mid";
 import {fetchPost} from "../util/fetch";
 import {isMobile} from "../util/functions";
-import {App} from "../index";
+import type {App} from "../index";
 
 let historyEditor: Protyle;
 let isLoading = false;
@@ -44,7 +44,7 @@ const renderDoc = (element: HTMLElement, currentPage: number, id: string) => {
         let logsHTML = "";
         response.data.histories.forEach((item: string) => {
             logsHTML += `<li class="b3-list-item b3-list-item--hide-action" data-created="${item}">
-    <span class="b3-list-item__text">${formatDate(parseInt(item) * 1000, 'yyyy-MM-dd HH:mm')}</span>
+    <span class="b3-list-item__text">${formatDate(Number.parseInt(item) * 1000, 'yyyy-MM-dd HH:mm')}</span>
     <span class="fn__space"></span>
     <span class="b3-list-item__action b3-tooltips b3-tooltips__w" data-type="rollback" aria-label="${window.siyuan.languages.rollback}">
         <svg><use xlink:href="#iconUndo"></use></svg>
@@ -172,7 +172,7 @@ export const openDocHistory = (options: {
                 event.preventDefault();
                 break;
             } else if ((type === "docprevious" || type === "docnext") && target.getAttribute("disabled") !== "disabled") {
-                const currentPage = parseInt(dialog.element.getAttribute("data-page"));
+                const currentPage = Number.parseInt(dialog.element.getAttribute("data-page"));
                 renderDoc(dialog.element, type === "docprevious" ? currentPage - 1 : currentPage + 1, options.id);
                 event.stopPropagation();
                 event.preventDefault();

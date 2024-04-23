@@ -12,7 +12,7 @@ import {moveResize} from "../dialog/moveResize";
 /// #endif
 import {fetchPost} from "../util/fetch";
 import {showMessage} from "../dialog/message";
-import {App} from "../index";
+import type {App} from "../index";
 import {isMobile} from "../util/functions";
 import {resize} from "../protyle/util/resize";
 
@@ -54,7 +54,7 @@ export class BlockPanel {
         let level = 1;
         if (parentElement) {
             this.element.setAttribute("data-oid", parentElement.getAttribute("data-oid"));
-            level = parseInt(parentElement.getAttribute("data-level")) + 1;
+            level = Number.parseInt(parentElement.getAttribute("data-level")) + 1;
         } else {
             this.element.setAttribute("data-oid", this.nodeIds[0]);
         }
@@ -63,7 +63,7 @@ export class BlockPanel {
         for (let i = 0; i < window.siyuan.blockPanels.length; i++) {
             const item = window.siyuan.blockPanels[i];
             if (item.element.getAttribute("data-pin") === "false" &&
-                item.targetElement && parseInt(item.element.getAttribute("data-level")) >= level) {
+                item.targetElement && Number.parseInt(item.element.getAttribute("data-level")) >= level) {
                 item.destroy();
                 i--;
             }
@@ -143,7 +143,7 @@ export class BlockPanel {
     }
 
     private initProtyle(editorElement: HTMLElement, afterCB?: () => void) {
-        const index = parseInt(editorElement.getAttribute("data-index"));
+        const index = Number.parseInt(editorElement.getAttribute("data-index"));
         fetchPost("/api/block/getBlockInfo", {id: this.nodeIds[index]}, (response) => {
             if (response.code === 3) {
                 showMessage(response.msg);
@@ -211,12 +211,12 @@ export class BlockPanel {
             });
             this.editors = [];
         }
-        const level = parseInt(this.element.dataset.level);
+        const level = Number.parseInt(this.element.dataset.level);
         this.element.remove();
         this.element = undefined;
         this.targetElement = undefined;
         // 移除弹出上使用右键菜单
-        const menuLevel = parseInt(window.siyuan.menus.menu.element.dataset.from);
+        const menuLevel = Number.parseInt(window.siyuan.menus.menu.element.dataset.from);
         if (window.siyuan.menus.menu.element.dataset.from !== "app" && menuLevel && menuLevel >= level) {
             // https://github.com/siyuan-note/siyuan/issues/9854 右键菜单不是从浮窗中弹出的则不进行移除
             window.siyuan.menus.menu.remove();

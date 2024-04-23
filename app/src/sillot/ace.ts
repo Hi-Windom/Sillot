@@ -243,11 +243,11 @@ export function exAce() {
             useSoftTabs: true, // 使用软标签（使用空格替换tab）
             enableEmmet: true // 未知用途
           });
-          editor.$blockScrolling = Infinity; // Automatically scrolling cursor into view after selection change this will be disabled in the next version set editor.$blockScrolling = Infinity to disable this message
+          editor.$blockScrolling = Number.POSITIVE_INFINITY; // Automatically scrolling cursor into view after selection change this will be disabled in the next version set editor.$blockScrolling = Infinity to disable this message
           editor.commands.addCommands([{
             name: "saveCode",
             bindKey: { win: "Ctrl-s", mac: "Ctrl-s" },
-            exec: function (e: any) {
+            exec: (e: any) => {
               const v = window.__.ace.editor.getValue();
               const data = "````" + initMode + "\n" + v;
               fetchPost("/api/block/updateBlock", {

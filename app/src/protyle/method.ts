@@ -11,6 +11,7 @@ import { plantumlRender } from "./render/plantumlRender";
 import { avRender } from "./render/av/render";
 import "../assets/scss/export.scss";
 
+// biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 class Protyle {
 
     /** 对 graphviz 进行渲染 */

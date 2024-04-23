@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    // 这里不重复工作区已有推荐
+    ////
+    ////
+    //// 通用部分
+    "codeinchinese.chineseinputassistant",
+    ////
+    ////
+    ////
+    //// 前端部分
+    ////
+    ////
+    ////
+    //// 后端部分
+    ////
+    "golang.go"
+  ],
+  "unwantedRecommendations": []
+}

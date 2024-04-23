@@ -15,7 +15,7 @@ export const saveScroll = (protyle: IProtyle, getObject = false) => {
         rootId: protyle.block.rootID,
         startId: protyle.wysiwyg.element.firstElementChild.getAttribute("data-node-id"),
         endId: protyle.wysiwyg.element.lastElementChild.getAttribute("data-node-id"),
-        scrollTop: protyle.contentElement.scrollTop || parseInt(protyle.contentElement.getAttribute("data-scrolltop")) || 0,
+        scrollTop: protyle.contentElement.scrollTop || Number.parseInt(protyle.contentElement.getAttribute("data-scrolltop")) || 0,
     };
     let range: Range;
     if (getSelection().rangeCount > 0) {

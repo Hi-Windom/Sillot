@@ -211,6 +211,7 @@ interface IPosition {
 interface ISaveLayout {
     name: string,
     layout: IObject
+    time: number
 }
 
 interface IWorkspace {
@@ -490,12 +491,20 @@ interface IOperation {
     nextID?: string // insert 专享
     isDetached?: boolean // insertAttrViewBlock 专享
     ignoreFillFilter?: boolean // insertAttrViewBlock 专享
-    srcIDs?: string[] // insertAttrViewBlock 专享
+    srcIDs?: string[] // removeAttrViewBlock 专享
+    srcs?: IOperationSrcs[] // insertAttrViewBlock 专享
     name?: string // addAttrViewCol 专享
     type?: TAVCol // addAttrViewCol 专享
     deckID?: string // add/removeFlashcards 专享
     blockIDs?: string[] // add/removeFlashcards 专享
 }
+
+interface IOperationSrcs {
+    id: string,
+    content?: string,
+    isDetached: boolean
+}
+
 
 interface IObject {
     [key: string]: string;
@@ -726,6 +735,7 @@ interface IMenu {
     checked?: boolean,
     iconClass?: string,
     label?: string,
+    // biome-ignore lint/suspicious/noConfusingVoidType: <explanation>
     click?: (element: HTMLElement, event: MouseEvent) => boolean | void | Promise<boolean | void>
     type?: "separator" | "submenu" | "readonly" | "empty",
     accelerator?: string,

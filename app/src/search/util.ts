@@ -34,7 +34,7 @@ import {
     replaceFilterMenu,
     saveCriterion
 } from "./menu";
-import {App} from "../index";
+import type {App} from "../index";
 import {
     assetFilterMenu,
     assetInputEvent,
@@ -526,7 +526,7 @@ export const genSearch = (app: App, config: Config.IUILayoutTabSearchConfig, ele
                 break;
             } else if (type === "next") {
                 if (!target.getAttribute("disabled")) {
-                    if (config.page < parseInt(target.parentElement.querySelector("#searchResult").getAttribute("data-pagecount"))) {
+                    if (config.page < Number.parseInt(target.parentElement.querySelector("#searchResult").getAttribute("data-pagecount"))) {
                         config.page++;
                         inputEvent(element, config, edit);
                     }
@@ -686,7 +686,7 @@ export const genSearch = (app: App, config: Config.IUILayoutTabSearchConfig, ele
                 break;
             } else if (type === "unRefPrevious") {
                 if (!target.getAttribute("disabled")) {
-                    let currentPage = parseInt(unRefPanelElement.querySelector("#searchUnRefResult").textContent);
+                    let currentPage = Number.parseInt(unRefPanelElement.querySelector("#searchUnRefResult").textContent);
                     if (currentPage > 1) {
                         currentPage--;
                         getUnRefList(unRefPanelElement, unRefEdit, currentPage);
@@ -697,8 +697,8 @@ export const genSearch = (app: App, config: Config.IUILayoutTabSearchConfig, ele
                 break;
             } else if (type === "unRefNext") {
                 if (!target.getAttribute("disabled")) {
-                    let currentPage = parseInt(unRefPanelElement.querySelector("#searchUnRefResult").textContent);
-                    if (currentPage < parseInt(unRefPanelElement.querySelector("#searchUnRefResult").textContent.split("/")[1])) {
+                    let currentPage = Number.parseInt(unRefPanelElement.querySelector("#searchUnRefResult").textContent);
+                    if (currentPage < Number.parseInt(unRefPanelElement.querySelector("#searchUnRefResult").textContent.split("/")[1])) {
                         currentPage++;
                         getUnRefList(unRefPanelElement, unRefEdit, currentPage);
                     }
@@ -832,7 +832,7 @@ export const genSearch = (app: App, config: Config.IUILayoutTabSearchConfig, ele
                 break;
             } else if (type === "assetPrevious") {
                 if (!target.getAttribute("disabled")) {
-                    let currentPage = parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[0]);
+                    let currentPage = Number.parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[0]);
                     if (currentPage > 1) {
                         currentPage--;
                         assetInputEvent(assetsElement, localSearch, currentPage);
@@ -843,8 +843,8 @@ export const genSearch = (app: App, config: Config.IUILayoutTabSearchConfig, ele
                 break;
             } else if (type === "assetNext") {
                 if (!target.getAttribute("disabled")) {
-                    let currentPage = parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[0]);
-                    if (currentPage < parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[1])) {
+                    let currentPage = Number.parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[0]);
+                    if (currentPage < Number.parseInt(assetsElement.querySelector("#searchAssetResult .fn__flex-center").textContent.split("/")[1])) {
                         currentPage++;
                         assetInputEvent(assetsElement, localSearch, currentPage);
                     }
@@ -924,7 +924,7 @@ export const genSearch = (app: App, config: Config.IUILayoutTabSearchConfig, ele
             } else if (target.classList.contains("b3-list-item")) {
                 const searchAssetInputElement = element.querySelector("#searchAssetInput") as HTMLInputElement;
                 if (type === "search-new") {
-                    if (config.method == 0) {
+                    if (config.method === 0) {
                         newFileByName(app, searchInputElement.value);
                     }
                 } else if (type === "search-item") {
@@ -1146,7 +1146,7 @@ const renderNextSearchMark = (options: {
     target: Element,
 }) => {
     window.sout.tracker("invoked");
-    let matchElement;
+    let matchElement: Element;
     const allMatchElements = Array.from(options.edit.protyle.wysiwyg.element.querySelectorAll(`div[data-node-id="${options.id}"] span[data-type~="search-mark"]`));
     allMatchElements.find((item, itemIndex) => {
         if (item.classList.contains("search-mark--hl")) {
@@ -1294,7 +1294,7 @@ export const replace = (element: Element, config: Config.IUILayoutTabSearchConfi
 
 export const inputEvent = (element: Element, config: Config.IUILayoutTabSearchConfig, edit: Protyle, rmCurrentCriteria = false) => {
     window.sout.tracker("invoked");
-    let inputTimeout = parseInt(element.getAttribute("data-timeout") || "0");
+    let inputTimeout = Number.parseInt(element.getAttribute("data-timeout") || "0");
     clearTimeout(inputTimeout);
     inputTimeout = window.setTimeout(() => {
         if (rmCurrentCriteria) {

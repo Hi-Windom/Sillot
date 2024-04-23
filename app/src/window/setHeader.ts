@@ -1,5 +1,5 @@
 import {isWindow} from "../util/functions";
-import {Wnd} from "../layout/Wnd";
+import type {Wnd} from "../layout/Wnd";
 import {getAllTabs, getAllWnds} from "../layout/getAll";
 import {Editor} from "../editor";
 import {Asset} from "../asset";

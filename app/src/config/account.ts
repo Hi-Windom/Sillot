@@ -366,7 +366,7 @@ ${renewHTML}
 
         const cloudRegionElement = element.querySelector("#cloudRegion") as HTMLSelectElement;
         cloudRegionElement.addEventListener("change", () => {
-            window.siyuan.config.cloudRegion = parseInt(cloudRegionElement.value);
+            window.siyuan.config.cloudRegion = Number.parseInt(cloudRegionElement.value);
             element.querySelector(".config-account__center--text").innerHTML = account.genHTML(true);
             element.querySelector("#form1").lastElementChild.innerHTML = `<a href="${getCloudURL("forget-pwd")}" class="b3-button b3-button--cancel" target="_blank">${window.siyuan.languages.forgetPassword}</a>
 <span class="fn__space${window.siyuan.config.system.container === "ios" ? " fn__none" : ""}"></span>
