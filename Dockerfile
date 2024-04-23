@@ -1,21 +1,30 @@
-FROM node:18 as NODE_BUILD
-WORKDIR /go/src/github.com/Hi-Windom/Sillot/
-ADD . /go/src/github.com/Hi-Windom/Sillot/
-RUN cd app && npm install -g pnpm && pnpm install --registry=http://registry.npmjs.org/ --silent && pnpm run docker:build
+FROM node:20 as NODE_BUILD
+WORKDIR /Hi-Windom/Sillot/
+ADD . /Hi-Windom/Sillot/
+RUN cd app && \
+packageManager=$(jq -r '.packageManager' package.json) && \
+if [ -n "$packageManager" ] then \
+    npm install -g $packageManager \
+else \
+    echo "No packageManager field found in package.json" && \
+    npm install -g pnpm \
+fi && \
+pnpm install --registry=http://registry.npmjs.org/ --silent && \
+pnpm run docker:build
 
 FROM golang:alpine as GO_BUILD
-WORKDIR /go/src/github.com/Hi-Windom/Sillot/
-COPY --from=NODE_BUILD /go/src/github.com/Hi-Windom/Sillot/ /go/src/github.com/Hi-Windom/Sillot/
+WORKDIR /Hi-Windom/Sillot/
+COPY --from=NODE_BUILD /Hi-Windom/Sillot/ /Hi-Windom/Sillot/
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1
 RUN apk add --no-cache gcc musl-dev && \
     cd kernel && go build --tags fts5 -v -ldflags "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod" && \
     mkdir /opt/Sillot/ && \
-    mv /go/src/github.com/Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
-    mv /go/src/github.com/Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
-    mv /go/src/github.com/Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
-    mv /go/src/github.com/Hi-Windom/Sillot/app/changelogs/ /opt/siyuan/ && \
-    mv /go/src/github.com/Hi-Windom/Sillot/kernel/kernel /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/app/changelogs/ /opt/siyuan/ && \
+    mv /Hi-Windom/Sillot/kernel/kernel /opt/Sillot/ && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 
 FROM alpine:latest
