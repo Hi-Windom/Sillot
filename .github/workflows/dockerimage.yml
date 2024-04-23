@@ -2,18 +2,27 @@ name: Release Docker Image
 
 on:
   workflow_dispatch:
-  # 运行预发行镜像而无需合并到主分支，例如 v0.13.3rc1
+  # 务必注意：手动触发时请确认选择了正确的分支
     inputs:
       image_tag:
-        description: '镜像标签（  -sillot 会自动补全因此禁止输入 ) 完整输入示例：v0.27.25 '
+        description: '镜像标签，留空则使用 package.json 中的版本号。完整输入示例：v0.27.25-rc0 '
         required: true
-        default: 'v0.'
+        default: ''
+  push:
+    branches:
+        - master
 
 jobs:
   build:
     name: build
     runs-on: ubuntu-latest
-
+    strategy:
+        matrix:
+          string:
+            - repo_name_android: "Sillot-android"
+              repo_name: "Sillot"
+              repo_owner: "Hi-Windom"
+              package_json: "app/package.json"
     permissions:
       packages: write
       contents: read
@@ -41,21 +50,32 @@ jobs:
           ref: ${{ github.event.ref }}
           submodules: recursive
 
+      - name: Extract Sillot version from package.json
+        uses: sergeysova/jq-action@v2
+        id: version
+        with:
+          cmd: "jq .version ${{ matrix.string.package_json }} -r"
+
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PWD }}
 
-      - name: Build the Docker image # amd64 就是 x86_64
+      - name: Build the Docker image use Workflow Dispatch inputs' version
+        if: ${{ github.event_name == 'workflow_dispatch' && !github.event.inputs.image_tag == '' }}
         run: |
           docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:${{ github.event.inputs.image_tag }}-sillot .
+      - name: Build the Docker image use package_json version
+        if: ${{ github.event_name == 'push' || github.event.inputs.image_tag == '' }}
+        run: |
+          docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:${{ steps.version.outputs.value }}-sillot .
 
       - name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v4

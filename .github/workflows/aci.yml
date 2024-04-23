@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     name: afterCI action
     steps:
+    - name: Install dependencies
+      run: npm install axios
     - name: Get Latest Release Assets
       id: latest_release
       uses: actions/github-script@v7
@@ -25,12 +27,27 @@ jobs:
           debug: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { execSync } = require('child_process');
-            const { data } = await github.rest.repos.getLatestRelease({owner: 'Hi-Windom',repo: 'Sillot'});
-            // const d = JSON.stringify(data);
-            // console.log(d)
-            data.assets.forEach(async (e) => { console.log(e.browser_download_url); execSync(`curl -LO ${e.browser_download_url}`); })
-            return data.upload_url
+            const axios = require('axios');
+            const fs = require('fs');
+            const { data } = await github.rest.repos.getLatestRelease({ owner: 'Hi-Windom', repo: 'Sillot' });
+            async function downloadAsset(asset) {
+                const url = asset.browser_download_url;
+                const path = `${process.env.RUNNER_TEMP}/${asset.name}`;
+                console.log(`Downloading ${url} to${path}`);
+                const response = await axios({
+                url,
+                method: 'GET',
+                responseType: 'stream',
+                });
+                await new Promise((resolve, reject) => {
+                const writer = response.data.pipe(fs.createWriteStream(path));
+                writer.on('finish', resolve);
+                writer.on('error', reject);
+                });
+                console.log(`Downloaded ${path}`);
+            }
+            await Promise.all(data.assets.map(downloadAsset));
+            return data.upload_url;
       continue-on-error: false
 
     - name: Generate Hash for Assets
