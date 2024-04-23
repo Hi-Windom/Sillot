@@ -9,6 +9,7 @@ on:
   release:
     types: [released]
     # https://docs.github.com/zh/actions/using-workflows/events-that-trigger-workflows#release
+    # 注意：触发使用的配置是 released 时的 aci.yml 内容，与主分支或者后续更新无关。
 
 
 jobs:
@@ -32,7 +33,7 @@ jobs:
             const { data } = await github.rest.repos.getLatestRelease({ owner: 'Hi-Windom', repo: 'Sillot' });
             async function downloadAsset(asset) {
                 const url = asset.browser_download_url;
-                const path = `${process.env.RUNNER_TEMP}/${asset.name}`;
+                const path = `${asset.name}`;
                 console.log(`Downloading ${url} to${path}`);
                 const response = await axios({
                 url,
