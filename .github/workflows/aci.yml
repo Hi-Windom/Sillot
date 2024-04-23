@@ -9,6 +9,7 @@ on:
   release:
     types: [released]
     # https://docs.github.com/zh/actions/using-workflows/events-that-trigger-workflows#release
+    # 注意：触发使用的配置是 released 时的 aci.yml 内容，与主分支或者后续更新无关。
 
 
 jobs:
