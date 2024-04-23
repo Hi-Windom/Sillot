@@ -2,8 +2,7 @@ FROM node:20 as NODE_BUILD
 WORKDIR /Hi-Windom/Sillot/
 ADD . /Hi-Windom/Sillot/
 RUN apt-get update && \
-    apt-get install -y jq && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y jq
 RUN cd app && \
 packageManager=$(jq -r '.packageManager' package.json) && \
 if [ -n "$packageManager" ]; then \
@@ -15,6 +14,8 @@ fi && \
 pnpm install --registry=http://registry.npmjs.org/ --silent && \
 pnpm run docker:build
 RUN apt-get purge -y jq
+RUN apt-get autoremove -y
+RUN rm -rf /var/lib/apt/lists/*
 
 FROM golang:alpine as GO_BUILD
 WORKDIR /Hi-Windom/Sillot/
