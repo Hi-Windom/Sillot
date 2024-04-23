@@ -8,12 +8,21 @@ on:
         description: '镜像标签（  -sillot 会自动补全因此禁止输入 ) 完整输入示例：v0.27.25 '
         required: true
         default: 'v0.'
+  push:
+    branches:
+        - master
 
 jobs:
   build:
     name: build
     runs-on: ubuntu-latest
-
+    strategy:
+        matrix:
+          string:
+            - repo_name_android: "Sillot-android"
+              repo_name: "Sillot"
+              repo_owner: "Hi-Windom"
+              package_json: "app/package.json"
     permissions:
       packages: write
       contents: read
@@ -53,9 +62,21 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PWD }}
 
-      - name: Build the Docker image # amd64 就是 x86_64
+      - name: Extract Sillot version from package.json
+        uses: sergeysova/jq-action@v2
+        id: version
+        if: github.event_name == 'push'
+        with:
+          cmd: "jq .version ${{ matrix.string.package_json }} -r"
+      # amd64 就是 x86_64
+      - name: Build the Docker image by Workflow Dispatch
+        if: github.event_name == 'workflow_dispatch'
         run: |
           docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:${{ github.event.inputs.image_tag }}-sillot .
+      - name: Build the Docker image by Push
+        if: github.event_name == 'push'
+        run: |
+          docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:${{ steps.version.outputs.value }}-sillot .
 
       - name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v4
