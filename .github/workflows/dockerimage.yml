@@ -50,6 +50,12 @@ jobs:
           ref: ${{ github.event.ref }}
           submodules: recursive
 
+      - name: Extract Sillot version from package.json
+        uses: sergeysova/jq-action@v2
+        id: version
+        with:
+          cmd: "jq .version ${{ matrix.string.package_json }} -r"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -61,12 +67,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PWD }}
-
-      - name: Extract Sillot version from package.json
-        uses: sergeysova/jq-action@v2
-        id: version
-        with:
-          cmd: "jq .version ${{ matrix.string.package_json }} -r"
 
       - name: Build the Docker image use Workflow Dispatch inputs' version
         if: ${{ github.event_name == 'workflow_dispatch' && !github.event.inputs.image_tag == '' }}
