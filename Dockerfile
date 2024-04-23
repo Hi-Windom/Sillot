@@ -14,6 +14,7 @@ else \
 fi && \
 pnpm install --registry=http://registry.npmjs.org/ --silent && \
 pnpm run docker:build
+RUN apt-get purge -y jq
 
 FROM golang:alpine as GO_BUILD
 WORKDIR /Hi-Windom/Sillot/
