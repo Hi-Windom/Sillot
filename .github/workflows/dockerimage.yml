@@ -5,7 +5,7 @@ on:
   # 务必注意：手动触发时请确认选择了正确的分支
     inputs:
       image_tag:
-        description: '镜像标签，留空则使用 package.json 中的版本号。完整输入示例：v0.27.25-rc0 '
+        description: '镜像标签，留空则使用 package.json 中的版本号。务必注意：请确认选择了正确的分支。完整输入示例：v0.27.25-rc0 '
         required: true
         default: ''
   push:
