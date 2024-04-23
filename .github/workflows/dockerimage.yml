@@ -28,6 +28,18 @@ jobs:
       contents: read
 
     steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.ref }}
+          submodules: recursive
+
+      - name: Extract Sillot version from package.json
+        uses: sergeysova/jq-action@v2
+        id: version
+        with:
+          cmd: "jq .version ${{ matrix.string.package_json }} -r"
+
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
@@ -43,18 +55,6 @@ jobs:
           large-packages: true
           docker-images: true
           swap-storage: true
-
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.ref }}
-          submodules: recursive
-
-      - name: Extract Sillot version from package.json
-        uses: sergeysova/jq-action@v2
-        id: version
-        with:
-          cmd: "jq .version ${{ matrix.string.package_json }} -r"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
