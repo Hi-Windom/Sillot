@@ -28,11 +28,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/88250/go-humanize"
 	"github.com/88250/gulu"
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/Xuanwo/go-locale"
-	"github.com/dustin/go-humanize"
 	"github.com/getsentry/sentry-go"
 	"github.com/sashabaranov/go-openai"
 	"github.com/siyuan-note/eventbus"
@@ -905,7 +905,7 @@ func InitBoxes() {
 
 	var dbSize string
 	if dbFile, err := os.Stat(util.DBPath); nil == err {
-		dbSize = humanize.Bytes(uint64(dbFile.Size()))
+		dbSize = humanize.BytesCustomCeil(uint64(dbFile.Size()), 2)
 	}
 	logging.LogInfof("database size [%s], tree/block count [%d/%d]", dbSize, treenode.CountTrees(), treenode.CountBlocks())
 }
