@@ -1,7 +1,25 @@
 import type * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
+import type { ColorPaletteProp } from "@mui/joy/styles"
 
-export const initEditorOptions: monaco.editor.IStandaloneEditorConstructionOptions =
-  {
+// OverridableStringUnion 无法从 mui 引入，自己造一个
+type OverridableStringUnion<T extends ColorPaletteProp = ColorPaletteProp, U extends string =  string> = {
+    [key in U]: T;
+};
+export type OverridableColorTheme = OverridableStringUnion<ColorPaletteProp, ColorsThemeKeys>;
+export type OverridableColorLang = OverridableStringUnion<ColorPaletteProp, ColorsLangKeys>;
+
+export type TypeGroupList<T extends string = string> = {
+    [key: string]: T[];
+};
+
+export type TypeStringKV<T extends string = string> = {
+    [key in T]: string;
+};
+
+type ColorsThemeKeys = 'build-in' | 'Light' | 'Dark';
+type ColorsLangKeys = 'IntelliSenseable' | 'Popular' | 'Other';
+
+export const initEditorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
     // value: "",
     autoDetectHighContrast: true, // 根据OS配置自动切换为高对比度主题（仅内置主题）
     acceptSuggestionOnCommitCharacter: true, // 接受关于提交字符的建议
@@ -20,8 +38,8 @@ export const initEditorOptions: monaco.editor.IStandaloneEditorConstructionOptio
     codeLensFontSize: 14, // codeLens的字体大小
     colorDecorators: true, // 呈现内联色彩装饰器和颜色选择器
     comments: {
-      ignoreEmptyLines: true, // 插入行注释时忽略空行。默认为真。
-      insertSpace: true, // 在行注释标记之后和块注释标记内插入一个空格。默认为真。
+        ignoreEmptyLines: true, // 插入行注释时忽略空行。默认为真。
+        insertSpace: true, // 在行注释标记之后和块注释标记内插入一个空格。默认为真。
     }, // 注释配置
     contextmenu: true, // 启用上下文菜单
     columnSelection: false, // 启用列编辑 启用后 shift + ↑↓ 列选择 ，但是副作用明显：鼠标选区也是列对齐的而不是开始结束区间，不符合使用习惯。这个选项不影响 alt + ↑↓ 移动行。禁用后，可以使用 alt + click 实现同等效果
@@ -34,7 +52,7 @@ export const initEditorOptions: monaco.editor.IStandaloneEditorConstructionOptio
     cursorSurroundingLinesStyle: "all", // 光标环绕样式
     cursorWidth: 2, // <=25 光标宽度
     minimap: {
-      enabled: true, // 是否启用预览图
+        enabled: true, // 是否启用预览图
     },
     folding: true, // 是否启用代码折叠
     links: true, // 是否允许打开链接
@@ -55,146 +73,124 @@ export const initEditorOptions: monaco.editor.IStandaloneEditorConstructionOptio
     showUnused: true, // 未使用的变量显示
     // suggestFontSize: 16, // 自动建议的字体大小，默认使用编辑器字体大小可以跟随滚轮缩放
     tabSize: 2, // TAB 缩进量
-  };
+};
 
-export const groupTheme = {
-  "build-in": ["vs", "vs-dark", "hc-light", "hc-black"],
-  light: ["IPlastic", "Katzenmilch", "Solarized-light"],
-  dark: [
-    "Birds-of-Paradise",
-    "Blackboard",
-    "Cobalt",
-    "Cobalt2",
-    "Dracula",
-    "IdleFingers",
-    "Monokai",
-    "Night-Owl",
-    "Sunburst",
-    "Tomorrow-Night-Eighties",
-    "Zenburnesque",
-  ],
+export const fontSliderMasks = [
+    {
+        value: 8,
+        label: "8",
+    },
+    {
+        value: 16,
+        label: "16",
+    },
+    {
+        value: 24,
+        label: "24",
+    },
+    {
+        value: 32,
+        label: "32",
+    },
+]
+
+export const groupTheme: TypeGroupList = {
+    "build-in": ["vs", "vs-dark", "hc-light", "hc-black"],
+    Light: ["IPlastic", "Katzenmilch", "Solarized-light"],
+    Dark: [
+        "Birds-of-Paradise",
+        "Blackboard",
+        "Cobalt",
+        "Cobalt2",
+        "Dracula",
+        "IdleFingers",
+        "Monokai",
+        "Night-Owl",
+        "Sunburst",
+        "Tomorrow-Night-Eighties",
+        "Zenburnesque",
+    ],
 };
-export const colorsTheme = {
-  "build-in": "primary",
-  light: "neutral",
-  dark: "success",
+
+export const colorsTheme: OverridableColorTheme = {
+    "build-in": "success",
+    Dark: "warning",
+    Light: "danger",
 };
+
+export const colorsLang: OverridableColorLang = {
+    IntelliSenseable: "success",
+    Popular: "warning",
+    Other: "danger",
+};
+
 export function isLightTheme(theme: string): boolean {
-  const ltArray = [
-    "vs",
-    "hc-light",
-    "IPlastic",
-    "Katzenmilch",
-    "Solarized-light",
-  ];
-  if (ltArray.includes(theme)) return true;
-  return false;
+    const ltArray = ["vs", "hc-light", "IPlastic", "Katzenmilch", "Solarized-light"];
+    if (ltArray.includes(theme)) return true;
+    return false;
 }
-export const groupLang = {
-  IntelliSenseable: [
-    "css",
-    "html",
-    "json",
-    "javascript",
-    "less",
-    "scss",
-    "typescript",
-  ],
-  Popular: ["cpp", "csharp", "go", "markdown", "python", "sql"],
-  Other: [
-    "dart",
-    "dockerfile",
-    "fsharp",
-    "java",
-    "julia",
-    "kotlin",
-    "lua",
-    "objective-c",
-    "pascal",
-    "perl",
-    "pgsql",
-    "php",
-    "powershell",
-    "r",
-    "ruby",
-    "rust",
-    "shell",
-    "vb",
-    "xml",
-    "yaml",
-  ],
+
+export const groupLang: TypeGroupList = {
+    IntelliSenseable: ["css", "html", "json", "javascript", "less", "scss", "typescript"],
+    Popular: ["cpp", "csharp", "go", "markdown", "python", "sql", "xml", "yaml", "kotlin"],
+    Other: [
+        "dart",
+        "dockerfile",
+        "fsharp",
+        "java",
+        "julia",
+        "lua",
+        "objective-c",
+        "pascal",
+        "perl",
+        "pgsql",
+        "php",
+        "powershell",
+        "r",
+        "ruby",
+        "rust",
+        "shell",
+        "vb",
+    ],
 };
-export const colorsLang = {
-  IntelliSenseable: "primary",
-  Popular: "danger",
-  Other: "neutral",
-};
-export const groupLangText = {
-  css: "CSS",
-  html: "HTML",
-  json: "Json",
-  javascript: "JavaScript",
-  less: "Less",
-  scss: "Scss",
-  typescript: "TypeScript",
-  cpp: "C++",
-  csharp: "C#",
-  dart: "Dart",
-  dockerfile: "Dockerfile",
-  fsharp: "F#",
-  go: "Go",
-  java: "Java",
-  julia: "Julia",
-  kotlin: "Kotlin",
-  lua: "Lua",
-  markdown: "Markdown",
-  "objective-c": "Objective-C",
-  pascal: "Pascal",
-  perl: "Perl",
-  pgsql: "PostgreSQL",
-  php: "PHP",
-  powershell: "PowerShell",
-  python: "Python",
-  r: "R",
-  ruby: "Ruby",
-  rust: "Rust",
-  shell: "Shell",
-  sql: "SQL",
-  vb: "VB",
-  xml: "XML",
-  yaml: "Yaml",
+
+export const groupLangText: TypeStringKV = {
+    css: "CSS",
+    html: "HTML",
+    json: "Json",
+    javascript: "JavaScript",
+    less: "Less",
+    scss: "Scss",
+    typescript: "TypeScript",
+    cpp: "C++",
+    csharp: "C#",
+    dart: "Dart",
+    dockerfile: "Dockerfile",
+    fsharp: "F#",
+    go: "Go",
+    java: "Java",
+    julia: "Julia",
+    kotlin: "Kotlin",
+    lua: "Lua",
+    markdown: "Markdown",
+    "objective-c": "Objective-C",
+    pascal: "Pascal",
+    perl: "Perl",
+    pgsql: "PostgreSQL",
+    php: "PHP",
+    powershell: "PowerShell",
+    python: "Python",
+    r: "R",
+    ruby: "Ruby",
+    rust: "Rust",
+    shell: "Shell",
+    sql: "SQL",
+    vb: "VB",
+    xml: "XML",
+    yaml: "Yaml",
 };
 
 // 值得一提的是，根据monaco-editor的说法，整个支持的语言分为两组：
 
-// 具有丰富和验证的语言IntelliSense
-// TypeScript
-// JavaScript
-// CSS
-// LESS
-// SCSS
-// JSON
-// HTML
-
-// 仅具有基本语法着色的语言
-// XML
-// PHP
-// C#
-// C++
-// Razor
-// Markdown
-// Diff
-// Java
-// VB
-// CoffeeScript
-// Handlebars
-// Batch
-// Pug
-// F#
-// Lua
-// Powershell
-// Python
-// Ruby
-// SASS
-// R
-// Objective-C
+// 具有丰富和验证的语言IntelliSense ...
+// 仅具有基本语法着色的语言 ...
