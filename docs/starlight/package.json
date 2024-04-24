@@ -12,16 +12,16 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.5.10",
-    "@astrojs/starlight": "^0.21.2",
+    "@astrojs/starlight": "^0.21.5",
     "@vercel/speed-insights": "^1.0.10",
-    "astro": "^4.3.5",
+    "astro": "^4.6.4",
     "astro-feelback": "^0.3.4",
-    "sharp": "^0.32.5",
-    "starlight-links-validator": "^0.6.0",
-    "typescript": "^5.4.3"
+    "sharp": "^0.33.3",
+    "starlight-links-validator": "^0.8.0",
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
-    "@types/node": "20",
-    "sass": "^1.72.0"
+    "@types/node": "^20.12.7",
+    "sass": "^1.75.0"
   }
 }
