@@ -174,6 +174,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             nodeElement.querySelector("wbr").remove();
             // 光标位于引用结尾后 ctrl+b 偶尔会失效
             range = cloneRange;
+            // 会导致  protyle.toolbar.range 和 range 不一致，先在有问题的地方重置一下 https://github.com/siyuan-note/siyuan/issues/10933
         }
 
         if (!window.siyuan.menus.menu.element.classList.contains("fn__none") &&
@@ -597,6 +598,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             return;
         }
         const selectText = range.toString();
+
         // 上下左右光标移动
         if (!event.altKey && !event.shiftKey && isNotCtrl(event) && !event.isComposing && (event.key.indexOf("Arrow") > -1)) {
             // 需使用 editabled，否则代码块会把语言字数算入
@@ -777,7 +779,9 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                 const position = getSelectionOffset(editElement, protyle.wysiwyg.element, range);
                 if (event.key === "Delete" || matchHotKey("⌃D", event)) {
                     // 段末反向删除 https://github.com/siyuan-note/insider/issues/274
-                    if (position.end === editElement.textContent.length) {
+                    if (position.end === editElement.textContent.length ||
+                        // 软换行后删除 https://github.com/siyuan-note/siyuan/issues/11118
+                        (position.end === editElement.textContent.length - 1 && editElement.textContent.endsWith("\n"))) {
                         const nextElement = getNextBlock(getTopAloneElement(nodeElement));
                         if (nextElement) {
                             const nextRange = focusBlock(nextElement);
@@ -1243,7 +1247,8 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
                     return false;
                 }
                 if (matchHotKey(menuItem.hotkey, event)) {
-                    protyle.toolbar.range = getEditorRange(protyle.wysiwyg.element);
+                    // 设置 lastHTMLs 会导致  protyle.toolbar.range 和 range 不一致，需重置一下 https://github.com/siyuan-note/siyuan/issues/10933
+                    protyle.toolbar.range = range;
                     if (["block-ref"].includes(menuItem.name) && protyle.toolbar.range.toString() === "") {
                         return true;
                     }

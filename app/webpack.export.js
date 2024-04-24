@@ -32,7 +32,7 @@ module.exports = (env, argv) => {
             fallback: {
                 "path": require.resolve("path-browserify"),
             },
-            extensions: [".ts", ".js", ".scss"],
+            extensions: [".ts", ".js", ".jsx", ".tsx", ".scss"],
         },
         module: {
             rules: [

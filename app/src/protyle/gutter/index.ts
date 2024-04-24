@@ -34,8 +34,8 @@ import {cancelSB, genEmptyElement, getLangByType, insertEmptyBlock, jumpToParent
 import {countBlockWord} from "../../layout/status";
 /// #if !MOBILE
 import {openFileById} from "../../editor/util";
-import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
 /// #endif
+import MDDialog from "../../sillot/joyUI/com_/monaco-dailog-editor";
 import {Constants} from "../../constants";
 import {mathRender} from "../render/mathRender";
 import {duplicateBlock} from "../wysiwyg/commonHotkey";
@@ -44,7 +44,7 @@ import {hintMoveBlock} from "../hint/extend";
 import {makeCard, quickMakeCard} from "../../card/makeCard";
 import {transferBlockRef} from "../../menus/block";
 import {isMobile} from "../../util/functions";
-import {HiJoy} from "../../sillot/joyUI/com_/hi";
+// import {HiJoy} from "../../sillot/joyUI/com_/hi";
 import {AIActions} from "../../ai/actions";
 import {activeBlur, renderTextMenu, showKeyboardToolbarUtil} from "../../mobile/util/keyboardToolbar";
 import {hideTooltip} from "../../dialog/tooltip";
@@ -993,7 +993,7 @@ export class Gutter {
         nodeElement.classList.add("protyle-wysiwyg--select");
         countBlockWord([id], protyle.block.rootID);
         const SillotExtSubmennu: IMenu[] = [];
-        /// #if !MOBILE
+
         SillotExtSubmennu.push({
             label: "KMD 源码编辑",
             click() {
@@ -1005,12 +1005,12 @@ export class Gutter {
                   nodeID: id,
                   lang: "markdown",
                   theme: initTheme,
-                  readonly: true,
+                  readonly: window.siyuan ? window.siyuan.config.readonly : true,
                   editable: false,
                 });
             }
         });
-        /// #endif
+
         window.siyuan.menus.menu.append(new MenuItem({
             label: "汐洛扩展菜单",
             icon: "iconMore",

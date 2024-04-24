@@ -296,6 +296,7 @@ export const transactionError = () => {
     });
 };
 
+let statusMobileTimeout:number;
 export const progressStatus = (data: IWebSocketData) => {
     // window.sout.tracker("invoked"); // 这里调用频繁
     const statusElement = document.querySelector("#status") as HTMLElement;
@@ -306,9 +307,10 @@ export const progressStatus = (data: IWebSocketData) => {
         if (!document.querySelector("#keyboardToolbar").classList.contains("fn__none")) {
             return;
         }
+        clearTimeout(statusMobileTimeout);
         statusElement.innerHTML = data.msg;
         statusElement.style.bottom = "0";
-        setTimeout(() => {
+        statusMobileTimeout = window.setTimeout(() => {
             statusElement.style.bottom = "";
         }, 5000);
         return;

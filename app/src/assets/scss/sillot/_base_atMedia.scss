@@ -1,0 +1,66 @@
+$display-default: none;
+$display-case-1: block;
+$display-case-2: flex;
+$breakpoints: (
+    's1': 100px,
+    's2': 200px,
+    's3': 300px,
+    's4': 400px,
+    's5': 500px,
+    's6': 600px,
+    's7': 700px,
+    's8': 800px,
+    's9': 900px,
+    'm0': 1000px,
+    'm1': 1100px,
+    'm2': 1200px,
+    'm3': 1300px,
+    'm4': 1400px,
+    'm5': 1500px,
+    'm6': 1600px,
+    'm7': 1700px,
+    'm8': 1800px,
+    'm9': 1900px,
+    'x0': 2000px,
+    'x1': 2100px,
+    'x2': 2200px,
+);
+
+
+// 创建一个混合宏来生成媒体查询样式
+@mixin display-media-queries($display-type,$breakpoint-map) {
+    @each $name,$value in $breakpoint-map {
+        .SC_atMedia2Show_#{$display-type}_width {
+            &_more_#{$name} {
+                display: $display-default !important;
+                @media (min-width: $value) {
+                    display: $display-type !important;
+                }
+            }
+            &_less_#{$name} {
+                display: $display-default !important;
+                @media (max-width: $value) {
+                    display: $display-type !important;
+                }
+            }
+        }
+        .SC_atMedia2Show_#{$display-type}_height {
+            &_more_#{$name} {
+                display: $display-default !important;
+                @media (min-height: $value) {
+                    display: $display-type !important;
+                }
+            }
+            &_less_#{$name} {
+                display: $display-default !important;
+                @media (max-height: $value) {
+                    display: $display-type !important;
+                }
+            }
+        }
+    }
+}
+
+// 使用混合宏为两种显示情况生成样式
+@include display-media-queries($display-case-1,$breakpoints);
+@include display-media-queries($display-case-2,$breakpoints);
