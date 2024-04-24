@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.31.1250",
+  "version": "0.31.1300",
   "syv": "3.0.12",
   "sypv": "[]",
   "description": "Build Your Eternal Digital Garden",
@@ -86,7 +86,7 @@
     "@babel/preset-react": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
     "@babel/runtime": "^7.24.4",
-    "@biomejs/biome": "1.7.0",
+    "@biomejs/biome": "1.7.1",
     "@electron-forge/cli": "^7.4.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
@@ -170,7 +170,7 @@
     "@monaco-editor/loader": "^1.4.0",
     "electron-fetch": "^1.9.1",
     "electron-store": "^8.1.0",
-    "monaco-editor": "^0.47.0",
+    "monaco-editor": "^0.48.0",
     "monaco-editor-nls": "^3.1.0"
   },
   "resolutions": {

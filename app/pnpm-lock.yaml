@@ -16,7 +16,7 @@ importers:
         version: 2.1.2(electron@30.0.1)
       '@monaco-editor/loader':
         specifier: ^1.4.0
-        version: 1.4.0(monaco-editor@0.47.0)
+        version: 1.4.0(monaco-editor@0.48.0)
       electron-fetch:
         specifier: ^1.9.1
         version: 1.9.1
@@ -24,8 +24,8 @@ importers:
         specifier: ^8.1.0
         version: 8.2.0
       monaco-editor:
-        specifier: ^0.47.0
-        version: 0.47.0
+        specifier: ^0.48.0
+        version: 0.48.0
       monaco-editor-nls:
         specifier: ^3.1.0
         version: 3.1.0
@@ -55,8 +55,8 @@ importers:
         specifier: ^7.24.4
         version: 7.24.4
       '@biomejs/biome':
-        specifier: 1.7.0
-        version: 1.7.0
+        specifier: 1.7.1
+        version: 1.7.1
       '@electron-forge/cli':
         specifier: ^7.4.0
         version: 7.4.0(encoding@0.1.13)
@@ -188,7 +188,7 @@ importers:
         version: 2.9.0(webpack@5.91.0(esbuild@0.20.2)(webpack-cli@5.1.4))
       monaco-editor-webpack-plugin:
         specifier: ^7.1.0
-        version: 7.1.0(monaco-editor@0.47.0)(webpack@5.91.0(esbuild@0.20.2)(webpack-cli@5.1.4))
+        version: 7.1.0(monaco-editor@0.48.0)(webpack@5.91.0(esbuild@0.20.2)(webpack-cli@5.1.4))
       npm-check:
         specifier: ^6.0.1
         version: 6.0.1
@@ -215,7 +215,7 @@ importers:
         version: 4.24.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-monaco-editor:
         specifier: ^0.55.0
-        version: 0.55.0(@types/react@18.2.79)(monaco-editor@0.47.0)(react@18.2.0)
+        version: 0.55.0(@types/react@18.2.79)(monaco-editor@0.48.0)(react@18.2.0)
       react-spinners:
         specifier: ^0.13.8
         version: 0.13.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -956,55 +956,55 @@ packages:
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
 
-  '@biomejs/biome@1.7.0':
-    resolution: {integrity: sha512-mejiRhnAq6UrXtYvjWJUKdstcT58n0/FfKemFf3d2Ou0HxOdS88HQmWtQ/UgyZvOEPD572YbFTb6IheyROpqkw==}
+  '@biomejs/biome@1.7.1':
+    resolution: {integrity: sha512-wb2UNoFXcgaMdKXKT5ytsYntaogl2FSTjDt20CZynF3v7OXQUcIpTrr+be3XoOGpoZRj3Ytq9TSpmplUREXmeA==}
     engines: {node: '>=14.21.3'}
     hasBin: true
 
-  '@biomejs/cli-darwin-arm64@1.7.0':
-    resolution: {integrity: sha512-12TaeaKHU4SAZt0fQJ2bYk1jUb4foope7LmgDE5p3c0uMxd3mFkg1k7G721T+K6UHYULcSOQDsNNM8DhYi8Irg==}
+  '@biomejs/cli-darwin-arm64@1.7.1':
+    resolution: {integrity: sha512-qfLrIIB58dkgiY/1tgG6fSCBK22PZaSIf6blweZBsG6iMij05mEuJt50ne+zPnNFNUmt8t43NC/qOXT3iFHQBA==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [darwin]
 
-  '@biomejs/cli-darwin-x64@1.7.0':
-    resolution: {integrity: sha512-6Qq1BSIB0cpp0cQNqO/+EiUV7FE3jMpF6w7+AgIBXp0oJxUWb2Ff0RDZdO9bfzkimXD58j0vGpNHMGnCcjDV2Q==}
+  '@biomejs/cli-darwin-x64@1.7.1':
+    resolution: {integrity: sha512-OGeyNsEcp5VnKbF9/TBjPCTHNEOm7oHegEve07U3KZmzqfpw2Oe3i9DVW8t6vvj1TYbrwWYCld25H34kBDY7Vg==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [darwin]
 
-  '@biomejs/cli-linux-arm64-musl@1.7.0':
-    resolution: {integrity: sha512-pwIY80nU7SAxrVVZ6HD9ah1pruwh9ZqlSR0Nvbg4ZJqQa0POhiB+RJx7+/1Ml2mTZdrl8kb/YiwQpD16uwb5wg==}
+  '@biomejs/cli-linux-arm64-musl@1.7.1':
+    resolution: {integrity: sha512-giH0/CzLOJ+wbxLxd5Shnr5xQf5fGnTRWLDe3lzjaF7IplVydNCEeZJtncB01SvyA6DAFJsvQ4LNxzAOQfEVCg==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [linux]
 
-  '@biomejs/cli-linux-arm64@1.7.0':
-    resolution: {integrity: sha512-GwSci7xBJ2j1CrdDXDUVXnUtrvypEz/xmiYPpFeVdlX5p95eXx+7FekPPbJfhGGw5WKSsKZ+V8AAlbN+kUwJWw==}
+  '@biomejs/cli-linux-arm64@1.7.1':
+    resolution: {integrity: sha512-MQDf5wErj1iBvlcxCyOa0XqZYN8WJrupVgbNnqhntO3yVATg8GxduVUn1fDSaolznkDRsj7Pz3Xu1esBFwvfmg==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [linux]
 
-  '@biomejs/cli-linux-x64-musl@1.7.0':
-    resolution: {integrity: sha512-KzCA0mW4LSbCd7XZWaEJvTOTTBjfJoVEXkfq1fsXxww1HB+ww5PGMbhbIcbYCsj2CTJUifeD5hOkyuBVppU1xQ==}
+  '@biomejs/cli-linux-x64-musl@1.7.1':
+    resolution: {integrity: sha512-ySNDtPhsLxU125IFHHAxfpoHBpkM56s4mEXeO70GZtgZay/o1h8IUPWCWf5Z7gKgc4jwgYN1U1U9xabI3hZVAg==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [linux]
 
-  '@biomejs/cli-linux-x64@1.7.0':
-    resolution: {integrity: sha512-1y+odKQsyHcw0JCGRuqhbx7Y6jxOVSh4lGIVDdJxW1b55yD22DY1kcMEfhUte6f95OIc2uqfkwtiI6xQAiZJdw==}
+  '@biomejs/cli-linux-x64@1.7.1':
+    resolution: {integrity: sha512-3wmCsGcC3KZ4pfTknXHfyMMlXPMhgfXVAcG5GlrR+Tq2JGiAw0EUydaLpsSBEbcG7IxH6OiUZEJZ95kAycCHBA==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [linux]
 
-  '@biomejs/cli-win32-arm64@1.7.0':
-    resolution: {integrity: sha512-AvLDUYZBpOUFgS/mni4VruIoVV3uSGbKSkZQBPXsHgL0w4KttLll3NBrVanmWxOHsom6C6ocHLyfAY8HUc8TXg==}
+  '@biomejs/cli-win32-arm64@1.7.1':
+    resolution: {integrity: sha512-8hIDakEqZn0i6+388noYKdZ0ZrovTwnvMU/Qp/oJou0G7EPVdXupOe0oxiQSdRN0W7f6CS/yjPCYuVGzDG6r0g==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [win32]
 
-  '@biomejs/cli-win32-x64@1.7.0':
-    resolution: {integrity: sha512-Pylm00BAAuLVb40IH9PC17432BTsY8K4pSUvhvgR1eaalnMaD6ug9SYJTTzKDbT6r24MPAGCTiSZERyhGkGzFQ==}
+  '@biomejs/cli-win32-x64@1.7.1':
+    resolution: {integrity: sha512-3W9k3uH6Ea6VOpAS9xkkAlS0LTfnGQjmIUCegZ8SDtK2NgJ1gO+qdEkGJb0ltahusFTN1QxJ107dM7ASA9IUEg==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
@@ -4324,8 +4324,8 @@ packages:
       monaco-editor: '>= 0.31.0'
       webpack: ^4.5.0 || 5.x
 
-  monaco-editor@0.47.0:
-    resolution: {integrity: sha512-VabVvHvQ9QmMwXu4du008ZDuyLnHs9j7ThVFsiJoXSOQk18+LF89N4ADzPbFenm0W4V2bGHnFBztIRQTgBfxzw==}
+  monaco-editor@0.48.0:
+    resolution: {integrity: sha512-goSDElNqFfw7iDHMg8WDATkfcyeLTNpBHQpO8incK6p5qZt5G/1j41X0xdGzpIkGojGXM+QiRQyLjnfDVvrpwA==}
 
   mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
@@ -6962,39 +6962,39 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@biomejs/biome@1.7.0':
+  '@biomejs/biome@1.7.1':
     optionalDependencies:
-      '@biomejs/cli-darwin-arm64': 1.7.0
-      '@biomejs/cli-darwin-x64': 1.7.0
-      '@biomejs/cli-linux-arm64': 1.7.0
-      '@biomejs/cli-linux-arm64-musl': 1.7.0
-      '@biomejs/cli-linux-x64': 1.7.0
-      '@biomejs/cli-linux-x64-musl': 1.7.0
-      '@biomejs/cli-win32-arm64': 1.7.0
-      '@biomejs/cli-win32-x64': 1.7.0
+      '@biomejs/cli-darwin-arm64': 1.7.1
+      '@biomejs/cli-darwin-x64': 1.7.1
+      '@biomejs/cli-linux-arm64': 1.7.1
+      '@biomejs/cli-linux-arm64-musl': 1.7.1
+      '@biomejs/cli-linux-x64': 1.7.1
+      '@biomejs/cli-linux-x64-musl': 1.7.1
+      '@biomejs/cli-win32-arm64': 1.7.1
+      '@biomejs/cli-win32-x64': 1.7.1
 
-  '@biomejs/cli-darwin-arm64@1.7.0':
+  '@biomejs/cli-darwin-arm64@1.7.1':
     optional: true
 
-  '@biomejs/cli-darwin-x64@1.7.0':
+  '@biomejs/cli-darwin-x64@1.7.1':
     optional: true
 
-  '@biomejs/cli-linux-arm64-musl@1.7.0':
+  '@biomejs/cli-linux-arm64-musl@1.7.1':
     optional: true
 
-  '@biomejs/cli-linux-arm64@1.7.0':
+  '@biomejs/cli-linux-arm64@1.7.1':
     optional: true
 
-  '@biomejs/cli-linux-x64-musl@1.7.0':
+  '@biomejs/cli-linux-x64-musl@1.7.1':
     optional: true
 
-  '@biomejs/cli-linux-x64@1.7.0':
+  '@biomejs/cli-linux-x64@1.7.1':
     optional: true
 
-  '@biomejs/cli-win32-arm64@1.7.0':
+  '@biomejs/cli-win32-arm64@1.7.1':
     optional: true
 
-  '@biomejs/cli-win32-x64@1.7.0':
+  '@biomejs/cli-win32-x64@1.7.1':
     optional: true
 
   '@develar/schema-utils@2.6.5':
@@ -7711,9 +7711,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@monaco-editor/loader@1.4.0(monaco-editor@0.47.0)':
+  '@monaco-editor/loader@1.4.0(monaco-editor@0.48.0)':
     dependencies:
-      monaco-editor: 0.47.0
+      monaco-editor: 0.48.0
       state-local: 1.0.7
 
   '@mui/base@5.0.0-alpha.127(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
@@ -11014,13 +11014,13 @@ snapshots:
 
   monaco-editor-nls@3.1.0: {}
 
-  monaco-editor-webpack-plugin@7.1.0(monaco-editor@0.47.0)(webpack@5.91.0(esbuild@0.20.2)(webpack-cli@5.1.4)):
+  monaco-editor-webpack-plugin@7.1.0(monaco-editor@0.48.0)(webpack@5.91.0(esbuild@0.20.2)(webpack-cli@5.1.4)):
     dependencies:
       loader-utils: 2.0.4
-      monaco-editor: 0.47.0
+      monaco-editor: 0.48.0
       webpack: 5.91.0(esbuild@0.20.2)(webpack-cli@5.1.4)
 
-  monaco-editor@0.47.0: {}
+  monaco-editor@0.48.0: {}
 
   mrmime@2.0.0: {}
 
@@ -11795,10 +11795,10 @@ snapshots:
       react-draggable: 4.4.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       sortablejs: 1.15.2
 
-  react-monaco-editor@0.55.0(@types/react@18.2.79)(monaco-editor@0.47.0)(react@18.2.0):
+  react-monaco-editor@0.55.0(@types/react@18.2.79)(monaco-editor@0.48.0)(react@18.2.0):
     dependencies:
       '@types/react': 18.2.79
-      monaco-editor: 0.47.0
+      monaco-editor: 0.48.0
       prop-types: 15.8.1
       react: 18.2.0
 

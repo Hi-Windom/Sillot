@@ -1,0 +1,35 @@
+---
+title: electron 调试
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+:::note
+
+通过 Debugtron 可查看 main.js 的 console 输出
+
+:::
+
+开发调试使用下面的指令：
+
+<Tabs>
+<TabItem label="pnpm">
+
+```sh
+pnpm run start
+```
+
+</TabItem>
+</Tabs>
+
+或者
+
+<Tabs>
+<TabItem label="pnpm">
+
+```sh
+pnpm run dlv
+```
+
+</TabItem>
+</Tabs>

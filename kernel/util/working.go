@@ -45,7 +45,7 @@ import (
 var Mode = "prod"
 
 const (
-	Ver       = "0.30"
+	Ver       = "0.31"
 	VerC      = Ver + ".999" // 用于检查版本更新
 	VerSY     = "3.0.11"     // 思源版本号
 	IsInsider = true
