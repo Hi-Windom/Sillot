@@ -85,7 +85,7 @@ jobs:
           echo "release_version=v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}" >> $GITHUB_OUTPUT
           changelog1=$(python scripts/parse-changelog-HEAD.py -t ${{ github.ref }} -b ${{ steps.thisLatestRelease.outputs.release }} ${{ env.repo_owner }}/${{ env.repo_name }})
           changelog2=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ env.repo_name }})
-          changelog3=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ matrix.string.repo_name_android }})
+          changelog3=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ env.repo_name_android }})
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "release_body_sillot<<$EOF" >> $GITHUB_ENV
           echo "$changelog1" >> $GITHUB_ENV
@@ -318,14 +318,14 @@ jobs:
         uses: K-Sillot/rm@master
         if: contains( matrix.config.suffix, 'apk')
         with:
-          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ matrix.string.repo_name_android }}
+          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
 
       - name: Checkout android repo
         uses: actions/checkout@v4
         if: contains( matrix.config.suffix, 'apk')
         with:
-          repository: ${{ env.repo_owner }}/${{ matrix.string.repo_name_android }}
-          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ matrix.string.repo_name_android }}
+          repository: ${{ env.repo_owner }}/${{ env.repo_name_android }}
+          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
 
       - name: Before android build
         if: contains( matrix.config.suffix, 'apk')
@@ -336,7 +336,7 @@ jobs:
 
       - name: Build with Gradle
         if: contains( matrix.config.suffix, 'apk')
-        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ matrix.string.repo_name_android }}
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
         run: ./gradlew assembleOfficialAction --quiet --stacktrace
         continue-on-error: false
 
@@ -345,7 +345,7 @@ jobs:
         name: Sign APK
         id: sign_app
         with:
-          releaseDirectory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ matrix.string.repo_name_android }}/app/build/outputs/apk/official/action
+          releaseDirectory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}/app/build/outputs/apk/official/action
           signingKeyBase64: ${{ secrets.APK_SIGN_KEY_JKS_BASE64 }}
           alias: ${{ secrets.APK_SIGN_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.APK_SIGN_KEY_JKS_PW }}
