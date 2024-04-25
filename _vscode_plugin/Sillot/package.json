@@ -2,7 +2,7 @@
     "name": "sillot",
     "displayName": "汐洛 Sillot",
     "description": "汐洛官方插件",
-    "version": "0.1.1010",
+    "version": "0.1.1020",
     "repository": "https://github.com/Hi-Windom/Sillot",
     "engines": {
         "vscode": "^1.88.0"
