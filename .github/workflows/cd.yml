@@ -11,18 +11,12 @@ env:
   repo_name_android: "Sillot-android"
   repo_name: "Sillot"
   repo_owner: "Hi-Windom"
+  package_json: "app/package.json"
 
 jobs:
   create_release:
     name: Create Release
     runs-on: ubuntu-latest
-    strategy:
-        matrix:
-          string:
-            - repo_name_android: "Sillot-android"
-              repo_name: "Sillot"
-              repo_owner: "Hi-Windom"
-              package_json: "app/package.json"
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       release_version: ${{ steps.release_info.outputs.release_version }}
@@ -43,31 +37,31 @@ jobs:
         uses: sergeysova/jq-action@v2
         id: version
         with:
-          cmd: "jq .version ${{ matrix.string.package_json }} -r"
+          cmd: "jq .version ${{ env.package_json }} -r"
 
       - name: Extract SiYuan version from package.json
         uses: sergeysova/jq-action@v2
         id: syv
         with:
-          cmd: "jq .syv ${{ matrix.string.package_json }} -r"
+          cmd: "jq .syv ${{ env.package_json }} -r"
 
       - name: Extract SiYuan version from package.json
         uses: sergeysova/jq-action@v2
         id: sypv
         with:
-            cmd: "jq .sypv ${{ matrix.string.package_json }} -r"
+            cmd: "jq .sypv ${{ env.package_json }} -r"
 
       - name: Extract packageManager from package.json
         uses: sergeysova/jq-action@v2
         id: packageManager
         with:
-            cmd: "jq .packageManager ${{ matrix.string.package_json }} -r"
+            cmd: "jq .packageManager ${{ env.package_json }} -r"
 
       - name: Extract actionInstallCommand from package.json
         uses: sergeysova/jq-action@v2
         id: actionInstallCommand
         with:
-            cmd: "jq .actionInstallCommand ${{ matrix.string.package_json }} -r"
+            cmd: "jq .actionInstallCommand ${{ env.package_json }} -r"
 
       - id: thisLatestRelease
         uses: K-Sillot/github-action-get-latest-release@master
@@ -169,6 +163,9 @@ jobs:
             suffix: "apk"
 
     steps:
+      - name: test
+        run: |
+          echo "${{ matrix.config.build_args }}"
       - name: Enable long paths for windows # 如果路径超过了 260 个字符（对于 .pnpm 几乎不可避免），可能会遇到问题。GitHub Actions 的 windows-latest 已经支持长路径。
         if: contains( matrix.config.goos, 'windows')
         run: |
