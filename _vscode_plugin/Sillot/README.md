@@ -6,7 +6,7 @@
 
 描述您的扩展的具体功能，包括您的扩展正在运行的屏幕截图。图像路径是相对于这个README文件。
 例如，如果在扩展项目工作空间下有一个图像子文件夹：
-![功能X](images/feature-x.png)
+![功能X](https://raw.githubusercontent.com/Hi-Windom/Sillot/master/app/stage/icon.png)
 
 > 提示：许多流行的扩展使用动画。这是展示您的扩展的绝佳方式！我们推荐简短、专注的动画，易于跟随。
 

@@ -1,7 +1,31 @@
 import * as vscode from "vscode";
 import { Log } from "./utils/log";
+let lastChangedDocument: vscode.TextDocument | null = null;
 
 export function activate(context: vscode.ExtensionContext) {
+    // 监听编辑器切换事件
+    vscode.window.onDidChangeActiveTextEditor(editor => {
+        if (editor) {
+            Log.d("onDidChangeActiveTextEditor", editor.document.fileName);
+        }
+    });
+
+    // 监听文档内容变化事件
+    vscode.workspace.onDidChangeTextDocument(event => {
+        if (event.contentChanges.length > 0 && !event.document.uri.toString().startsWith("output:")) {
+            const currentDocument = event.document;
+
+            // 检查文档是否和上一次相同
+            if (currentDocument !== lastChangedDocument) {
+                // 如果不同，更新跟踪变量并输出日志
+                lastChangedDocument = currentDocument;
+                Log.d("onDidChangeTextDocument", "uri : " + event.document.uri);
+            } else {
+                // 如果相同，不做任何事情
+            }
+        }
+    });
+
     // "sillot" 是扩展的标识符，而 "helloWorld" 是命令的名称。这意味着这个命令是由名为 sillot 的扩展提供的。在 package.json 文件的 "contributes" 部分，需要正确注册该命令
     const disposable = vscode.commands.registerCommand("sillot.helloWorld", () => {
         // The code you place here will be executed every time your command is executed
@@ -40,6 +64,32 @@ export function activate(context: vscode.ExtensionContext) {
     // context.subscriptions.push(disposable3);
     context.subscriptions.push(vscode.languages.registerHoverProvider("sy", new SyHoverProvider()));
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider("sy", new SyCompletionItemProvider()));
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider("dosc", new SyCompletionItemProvider()));
+
+    const disposable5 = vscode.commands.registerCommand("sillot.pickEXE", () => {
+
+        vscode.window
+            .showOpenDialog({
+                title: "选择可执行文件",
+                canSelectFiles: true,
+                canSelectFolders: false,
+                canSelectMany: false,
+                filters: { Executables: ["exe"] },
+            })
+            .then(fileUri => {
+                if (!fileUri || fileUri.length === 0) {
+                    // 用户取消了选择，不做任何操作
+                    return;
+                }
+                Log.Channel.show();
+
+                // 获取用户选择的exe文件的路径
+                const exePath = fileUri[0].fsPath;
+                Log.i("exePath", exePath.toString());
+            });
+    });
+
+    context.subscriptions.push(disposable5);
 }
 
 // 当你的扩展被禁用时，这个方法将被调用
