@@ -167,9 +167,6 @@ jobs:
             suffix: "apk"
 
     steps:
-      - name: test
-        run: |
-          echo "${{ matrix.config.build_args_prefix }} github.com/${{ env.repo_owner }}/${{ env.repo_name }}/kernel/util.${{ matrix.config.build_args_suffix }}"
       - name: Enable long paths for windows # 如果路径超过了 260 个字符（对于 .pnpm 几乎不可避免），可能会遇到问题。GitHub Actions 的 windows-latest 已经支持长路径。
         if: contains( matrix.config.goos, 'windows')
         run: |
