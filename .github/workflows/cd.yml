@@ -6,7 +6,7 @@ on:
     tags:
       - "v*-sillot"
 
-variables:
+env:
   repo_name_android: "Sillot-android"
   repo_name: "Sillot"
   repo_owner: "Hi-Windom"
