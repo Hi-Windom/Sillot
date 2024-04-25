@@ -132,7 +132,7 @@ jobs:
           - os: ubuntu-20.04
             name: ubuntu build linux.AppImage
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/kernel/util.Mode=prod"
+            build_args: "-s -w -X github.com/${{ string.repo_owner }}/${{ string.repo_name }}/kernel/util.Mode=prod"
             electron_args: "dist-linux"
             goos: "linux"
             goarch: "amd64"
@@ -140,7 +140,7 @@ jobs:
           - os: ubuntu-20.04
             name: ubuntu build linux.tar.gz
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/kernel/util.Mode=prod"
+            build_args: "-s -w -X github.com/${{ string.repo_owner }}/${{ string.repo_name }}/kernel/util.Mode=prod"
             electron_args: "dist-linux"
             goos: "linux"
             goarch: "amd64"
@@ -148,7 +148,7 @@ jobs:
           - os: windows-latest
             name: windows build win.exe
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
-            build_args: "-s -w -H=windowsgui -X github.com/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/kernel/util.Mode=prod"
+            build_args: "-s -w -H=windowsgui -X github.com/${{ string.repo_owner }}/${{ string.repo_name }}/kernel/util.Mode=prod"
             electron_args: "dist"
             goos: "windows"
             gobin: "bin"
@@ -158,7 +158,7 @@ jobs:
           - os: windows-latest
             name: windows build android.apk
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
-            build_args: "-s -w -H=windowsgui -X github.com/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/kernel/util.Mode=prod"
+            build_args: "-s -w -H=windowsgui -X github.com/${{ string.repo_owner }}/${{ string.repo_name }}/kernel/util.Mode=prod"
             electron_args: "dist"
             goos: "windows"
             gobin: "bin"
