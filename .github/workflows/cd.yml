@@ -6,6 +6,7 @@ on:
     tags:
       - "v*-sillot"
 
+# ref https://docs.github.com/zh/actions/learn-github-actions/variables
 env:
   repo_name_android: "Sillot-android"
   repo_name: "Sillot"
