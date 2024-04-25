@@ -47,10 +47,10 @@
 </div>
 <div id="message" class="b3-snackbars"></div>
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
-<div id="app2" data-bind="react" data-lib="monaco-editor"></div>
 <div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
-<div id="app4" data-bind="react" data-lib="react-music-player"></div>
 <div id="app5" data-bind="react" data-lib="joyUI"></div>
+<div id="app2" data-bind="react" data-lib="monaco-editor"></div>
+<div id="app4" data-bind="react" data-lib="react-music-player"></div>
 <canvas class="canvas" id="tencent-pag" style="position:absolute;display:none;"></canvas>
 <script src="https://cdn.jsdelivr.net/npm/libpag@latest/lib/libpag.min.js"></script>
 <script>

@@ -2,6 +2,15 @@
 // <%= code %>会对code进行html转义；
 // <%- code %>将不会进行转义
 
+const __SiYuan_Common__ = `<%- ndom.SiYuan.commonMenu %>
+<%- ndom.SiYuan.message %>`;
+
+const __Sillot_Common__ = "<%- ndom.Sillot.SillotOverlay %>";
+
+const __ReactApp_Common__ = `<%- ndom.ReactApp.app1 %>
+<%- ndom.ReactApp.app3 %>
+<%- ndom.ReactApp.app5 %>`;
+
 const AppIndex = /*html*/ `<!DOCTYPE html>
 <html>
 <head>
@@ -19,14 +28,11 @@ const AppIndex = /*html*/ `<!DOCTYPE html>
 <%- ndom.SiYuan.dockBottom %>
 <%- ndom.SiYuan.status %>
 <%- ndom.Sillot.SillotDrawer %>
-<%- ndom.Sillot.SillotOverlay %>
-<%- ndom.SiYuan.commonMenu %>
-<%- ndom.SiYuan.message %>
-<%- ndom.ReactApp.app1 %>
+${__Sillot_Common__}
+${__SiYuan_Common__}
+${__ReactApp_Common__}
 <%- ndom.ReactApp.app2 %>
-<%- ndom.ReactApp.app3 %>
 <%- ndom.ReactApp.app4 %>
-<%- ndom.ReactApp.app5 %>
 <%- ndom.PAG %>
 <%- scripts.loadingRefresh %>
 <%- scripts.Clarity %>
@@ -47,12 +53,9 @@ const AppWindow = /*html*/ `<!DOCTYPE html>
 <body class="<%- classes.body.app %>">
 <%- ndom.SiYuan.appWindowLayouts %>
 <%- ndom.SiYuan.status %>
-<%- ndom.SiYuan.commonMenu %>
-<%- ndom.SiYuan.message %>
-<%- ndom.Sillot.SillotOverlay %>
-<%- ndom.ReactApp.app1 %>
-<%- ndom.ReactApp.app3 %>
-<%- ndom.ReactApp.app5 %>
+${__SiYuan_Common__}
+${__Sillot_Common__}
+${__ReactApp_Common__}
 </body>
 </html>
 `;
@@ -75,12 +78,9 @@ const DesktopIndex = /*html*/ `<!DOCTYPE html>
 <%- ndom.SiYuan.dockerPanel %>
 <%- ndom.SiYuan.dockBottom %>
 <%- ndom.SiYuan.status %>
-<%- ndom.SiYuan.commonMenu %>
-<%- ndom.SiYuan.message %>
-<%- ndom.Sillot.SillotOverlay %>
-<%- ndom.ReactApp.app1 %>
-<%- ndom.ReactApp.app3 %>
-<%- ndom.ReactApp.app5 %>
+${__SiYuan_Common__}
+${__Sillot_Common__}
+${__ReactApp_Common__}
 <%- ndom.PAG %>
 <%- scripts.Clarity %>
 </body>
@@ -104,12 +104,9 @@ const DockerIndex = /*html*/ `<!DOCTYPE html>
 <%- ndom.SiYuan.dockerPanel %>
 <%- ndom.SiYuan.dockBottom %>
 <%- ndom.SiYuan.status %>
-<%- ndom.SiYuan.commonMenu %>
-<%- ndom.SiYuan.message %>
-<%- ndom.Sillot.SillotOverlay %>
-<%- ndom.ReactApp.app1 %>
-<%- ndom.ReactApp.app3 %>
-<%- ndom.ReactApp.app5 %>
+${__SiYuan_Common__}
+${__Sillot_Common__}
+${__ReactApp_Common__}
 <%- ndom.PAG %>
 <%- scripts.Clarity %>
 </body>
@@ -133,15 +130,12 @@ const MobileIndex = /*html*/ `<!DOCTYPE html>
 <%- ndom.SiYuan.mobile.sidebar %>
 <%- ndom.SiYuan.mobile.menu %>
 <%- ndom.SiYuan.mobile.model %>
-<%- ndom.SiYuan.commonMenu %>
-<%- ndom.SiYuan.message %>
+${__SiYuan_Common__}
 <%- ndom.SiYuan.mobile.status %>
 <%- ndom.SiYuan.mobile.keyboardToolbar %>
 <%- ndom.SiYuan.mobile.sideMask %>
-<%- ndom.Sillot.SillotOverlay %>
-<%- ndom.ReactApp.app1 %>
-<%- ndom.ReactApp.app3 %>
-<%- ndom.ReactApp.app5 %>
+${__Sillot_Common__}
+${__ReactApp_Common__}
 <%- scripts.Clarity %>
 </body>
 </html>
@@ -175,4 +169,4 @@ exports.default = {
             template: MobileIndex,
         },
     },
-}
+};
