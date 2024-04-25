@@ -1,0 +1,92 @@
+{
+    "name": "sillot",
+    "displayName": "汐洛 Sillot",
+    "description": "汐洛官方插件",
+    "version": "0.1.1010",
+    "repository": "https://github.com/Hi-Windom/Sillot",
+    "engines": {
+        "vscode": "^1.88.0"
+    },
+    "categories": ["Programming Languages", "Snippets"],
+    "activationEvents": [
+        "onDidChangeTextDocument",
+        "onLanguage:plaintext",
+        "onLanguage:json",
+        "onLanguage:go",
+        "onLanguage:javascript",
+        "onLanguage:typescript",
+        "onLanguage:yaml",
+        "onLanguage:markdown",
+        "onLanguage:astro",
+        "onLanguage:csharp",
+        "onLanguage:kotlin",
+        "onLanguage:css",
+        "onLanguage:less",
+        "onLanguage:scss",
+        "onLanguage:python",
+        "workspaceContains:**/.editorconfig"
+    ],
+    "main": "./dist/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "sillot.helloWorld",
+                "title": "Hello World",
+                "category": "Sillot"
+            }
+        ],
+        "languages": [
+            {
+                "id": "dosc",
+                "aliases": ["csod", "ds"],
+                "extensions": [".dosc"],
+                "configuration": "./src/_dosc.language-configuration.json"
+            },
+            {
+                "id": "sy",
+                "aliases": ["SY", "sy"],
+                "extensions": [".sy"],
+                "configuration": "./src/_sy.language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "sy",
+                "scopeName": "source.sy",
+                "path": "./src/sy.tmLanguage.json"
+            }
+        ]
+    },
+    "vsce": {
+        "baseImagesUrl": "https://my.custom/base/images/url",
+        "dependencies": false,
+        "yarn": false
+    },
+    "scripts": {
+        "vscode:prepublish": "pnpm run package",
+        "compile": "webpack",
+        "watch": "webpack --watch",
+        "package": "webpack --mode production --devtool hidden-source-map",
+        "vsce:package": "pnpm vsce package",
+        "compile-tests": "tsc -p . --outDir out",
+        "watch-tests": "tsc -p . -w --outDir out",
+        "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+        "lint": "eslint src --ext ts",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@types/mocha": "^10.0.6",
+        "@types/node": "18.x",
+        "@types/vscode": "^1.88.0",
+        "@typescript-eslint/eslint-plugin": "^7.4.0",
+        "@typescript-eslint/parser": "^7.4.0",
+        "@vscode/test-cli": "^0.0.8",
+        "@vscode/test-electron": "^2.3.9",
+        "@vscode/vsce": "^2.26.0",
+        "eslint": "^8.57.0",
+        "ts-loader": "^9.5.1",
+        "typescript": "^5.3.3",
+        "webpack": "^5.91.0",
+        "webpack-cli": "^5.1.4"
+    }
+}

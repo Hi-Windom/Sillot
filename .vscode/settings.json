@@ -3,6 +3,7 @@
   "deno.enable": false,
   "files.exclude": {
     "_sili": true,
+    "_vscode_plugin": true,
     "docs": true,
     "kernel": true,
     "app/appearance": true

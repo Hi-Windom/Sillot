@@ -17,6 +17,10 @@
       "name": "司丽🤍/_sili 🗂️"
     },
     {
+      "path": "../_vscode_plugin", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
+      "name": "汐洛 VSC 插件🤍/_vscode_plugin 🗂️"
+    },
+    {
       "path": "../docs", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
       "name": "汐洛宝典🤍/docs 🗂️"
     },
@@ -30,9 +34,9 @@
     }
   ],
   "settings": {
-    "files.associations": {
-      "*.sy": "json"
-    },
+    // "files.associations": {
+    //   "*.sy": "json"
+    // },
     "workbench.editor.wrapTabs": true,
     "search.exclude": {
       "**/.history": true
@@ -47,17 +51,17 @@
       // Chinese (Simplified) (简体中文) Language Pack for Visual Studio Code
       "ms-ceintl.vscode-language-pack-zh-hans", // VSCode官方汉化
       // Material Icon Theme
-      "PKief.material-icon-theme", // Material Design Icons 文件图标主题
+      "PKief.material-icon-theme", // Material Design Icons 文件图标主题，支持 .sy 文件显示思源笔记图标
       // vscode-icons
-      "vscode-icons-team.vscode-icons", // 很全的官方文件图标主题
+      "vscode-icons-team.vscode-icons", // 很全的官方文件图标主题，支持 .sy 文件显示思源笔记图标
       // VSCode Great Icons
       "emmanuelbeziat.vscode-great-icons", // 很不错的一款文件图标主题
       // Fluent Icons
       "miguelsolorio.fluent-icons", // 现代扁平风的一款文件图标主题，捆绑了产品图标主题（还可以）
       // Gruvbox Material Icon Theme
       "JonathanHarty.gruvbox-material-icon-theme", // 蛮有意思的一款文件图标主题
-      // Atom Material Icons
-      "atommaterial.a-file-icon-vscode", // 很全的一款文件图标主题，捆绑了产品图标主题（还可以）。区分了 index.ts 非常好用。
+      // Atom Material Icons ~当前默认文件图标主题
+      "atommaterial.a-file-icon-vscode", // 很全的一款文件图标主题，捆绑了产品图标主题（还可以），支持 .sy 文件显示思源笔记图标。区分了 index.ts 非常好用。
       // GitHub Theme
       "GitHub.github-vscode-theme", // 不错的一款颜色主题，[GitHub Dark Dimmed] [GitHub Dark Colorblind] 提供了不错的视觉观感
       // Winter is Coming Theme

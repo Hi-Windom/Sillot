@@ -43,3 +43,4 @@ yarn.lock
 /app/jestCD
 /app/out
 /app/dist-electron
+**/node_modules
