@@ -128,7 +128,8 @@ jobs:
           - os: ubuntu-20.04
             name: ubuntu build linux.AppImage
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/$repo_owner/$repo_name/kernel/util.Mode=prod"
+            build_args_prefix: "-s -w -X"
+            build_args_suffix: "Mode=prod"
             electron_args: "dist-linux"
             goos: "linux"
             goarch: "amd64"
@@ -136,7 +137,8 @@ jobs:
           - os: ubuntu-20.04
             name: ubuntu build linux.tar.gz
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/$repo_owner/$repo_name/kernel/util.Mode=prod"
+            build_args_prefix: "-s -w -X"
+            build_args_suffix: "Mode=prod"
             electron_args: "dist-linux"
             goos: "linux"
             goarch: "amd64"
@@ -144,7 +146,8 @@ jobs:
           - os: windows-latest
             name: windows build win.exe
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
-            build_args: "-s -w -H=windowsgui -X github.com/$repo_owner/$repo_name/kernel/util.Mode=prod"
+            build_args_prefix: "-s -w -H=windowsgui -X"
+            build_args_suffix: "Mode=prod"
             electron_args: "dist"
             goos: "windows"
             gobin: "bin"
@@ -154,7 +157,8 @@ jobs:
           - os: windows-latest
             name: windows build android.apk
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
-            build_args: "-s -w -H=windowsgui -X github.com/$repo_owner/$repo_name/kernel/util.Mode=prod"
+            build_args_prefix: "-s -w -H=windowsgui -X"
+            build_args_suffix: "Mode=prod"
             electron_args: "dist"
             goos: "windows"
             gobin: "bin"
@@ -165,7 +169,7 @@ jobs:
     steps:
       - name: test
         run: |
-          echo "${{ matrix.config.build_args }}"
+          echo "${{ matrix.config.build_args_prefix }} github.com/${{ env.repo_owner }}/${{ env.repo_name }}/kernel/util.${{ matrix.config.build_args_suffix }}"
       - name: Enable long paths for windows # 如果路径超过了 260 个字符（对于 .pnpm 几乎不可避免），可能会遇到问题。GitHub Actions 的 windows-latest 已经支持长路径。
         if: contains( matrix.config.goos, 'windows')
         run: |
@@ -251,7 +255,7 @@ jobs:
 
       - name: Building Kernel
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
-        run: go build --tags fts5 -o "${{ matrix.config.kernel_path }}" -v -ldflags "${{ matrix.config.build_args }}"
+        run: go build --tags fts5 -o "${{ matrix.config.kernel_path }}" -v -ldflags "${{ matrix.config.build_args_prefix }} github.com/${{ env.repo_owner }}/${{ env.repo_name }}/kernel/util.${{ matrix.config.build_args_suffix }}"
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/kernel
         env:
           GO111MODULE: on
