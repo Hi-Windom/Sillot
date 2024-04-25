@@ -115,7 +115,9 @@
       // Font Switcher
       "evan-buss.font-switcher", // 快速字体切换
       // Microsoft Edge Tools for VS Code
-      "ms-edgedevtools.vscode-edge-devtools" // Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, 与本工作区的契合仍有待研究
+      "ms-edgedevtools.vscode-edge-devtools",  // Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, 与本工作区的契合仍有待研究
+      // es6-string-html
+      "tobermory.es6-string-html", // 高亮 js/ts 中的 /*html*/ 字符串
     ],
     "unwantedRecommendations": [
       "oderwat.indent-rainbow", // 花里胡哨影响观感
