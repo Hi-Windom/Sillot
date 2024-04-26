@@ -1,8 +1,67 @@
 import * as vscode from "vscode";
+import fs from "fs-extra";
+import json5 from "json5";
 import { Log } from "./utils/log";
 import { SyCompletionItemProvider, SyHoverProvider } from "./provider/sy";
+import { IssueCompletionItems } from "./provider/db/Issue";
+import { UserCompletionItems } from "./provider/db/User";
+import { ClassCompletionItems } from "./provider/db/Class";
+import { ConstantCompletionItems } from "./provider/db/Constant";
+import { EnumCompletionItems } from "./provider/db/Enum";
+import { EnumMemberCompletionItems } from "./provider/db/EnumMember";
+import { EventCompletionItems } from "./provider/db/Event";
+import { FieldCompletionItems } from "./provider/db/Field";
+import { FileCompletionItems } from "./provider/db/File";
+import { FolderCompletionItems } from "./provider/db/Folder";
+import { FunctionCompletionItems } from "./provider/db/Function";
+import { InterfaceCompletionItems } from "./provider/db/Interface";
+import { KeywordCompletionItems } from "./provider/db/Keyword";
+import { MethodCompletionItems } from "./provider/db/Method";
+import { ModuleCompletionItems } from "./provider/db/Module";
+import { OperatorCompletionItems } from "./provider/db/Operator";
+import { PropertyCompletionItems } from "./provider/db/Property";
+import { SnippetCompletionItems } from "./provider/db/Snippet";
+import { StructCompletionItems } from "./provider/db/Struct";
+import { TypeParameterCompletionItems } from "./provider/db/TypeParameter";
+import { VariableCompletionItems } from "./provider/db/Variable";
 
 let lastChangedDocument: vscode.TextDocument | null = null;
+
+class fileCompletionItemProvider implements vscode.CompletionItemProvider {
+    private completionItems: vscode.CompletionItem[] = [];
+    constructor(completionItems: vscode.CompletionItem[]) {
+        this.completionItems = completionItems;
+    }
+    provideCompletionItems(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext
+    ): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
+        return this.completionItems;
+    }
+}
+// 序列化并保存到文件
+async function saveCompletionItemsToFile(filePath: string, items: Array<vscode.CompletionItem>) {
+
+    // 使用 json5.stringify 格式化 JSON，使其更易读
+    const serializedItems = json5.stringify(items, null, 2);
+
+    // 使用 fs-extra 写入文件
+    await fs.writeFile(filePath, serializedItems, "utf-8");
+}
+
+// 从文件反序列化
+async function loadCompletionItemsFromFile(filePath: string): Promise<Array<vscode.CompletionItem>> {
+    // 使用 fs-extra 读取文件
+    const serializedItems = await fs.readFile(filePath, "utf-8");
+
+    // 使用 json5.parse 反序列化 JSON
+    const items: Array<vscode.CompletionItem> = json5.parse(serializedItems);
+
+    // 返回反序列化后的数组
+    return items;
+}
 
 export function activate(context: vscode.ExtensionContext) {
     // 监听编辑器切换事件
@@ -39,6 +98,93 @@ export function activate(context: vscode.ExtensionContext) {
         Log.d("洛");
         Log.a("汐洛", `${Log.Channel.logLevel}`);
     });
+    const 测试序列化字典 = vscode.commands.registerCommand("sillot.测试序列化字典", async () => {
+        vscode.window.showInformationMessage("Hello World from Sillot!");
+        const completionItems: vscode.CompletionItem[] = [];
+
+        const arraysToMerge = [
+            IssueCompletionItems,
+            UserCompletionItems,
+            TypeParameterCompletionItems,
+            OperatorCompletionItems,
+            EventCompletionItems,
+            StructCompletionItems,
+            ConstantCompletionItems,
+            EnumMemberCompletionItems,
+            FolderCompletionItems,
+            FileCompletionItems,
+            SnippetCompletionItems,
+            KeywordCompletionItems,
+            EnumCompletionItems,
+            PropertyCompletionItems,
+            ModuleCompletionItems,
+            InterfaceCompletionItems,
+            ClassCompletionItems,
+            VariableCompletionItems,
+            FieldCompletionItems,
+            FunctionCompletionItems,
+            MethodCompletionItems,
+        ];
+
+        for (const arr of arraysToMerge) {
+            for (const i of arr) {
+                completionItems.push(i);
+            }
+        }
+        vscode.window
+            .showOpenDialog({
+                title: "选择保存路径",
+                canSelectFiles: false,
+                canSelectFolders: true,
+                canSelectMany: false,
+            })
+            .then(async fileUri => {
+                if (!fileUri || fileUri.length === 0) {
+                    // 用户取消了选择，不做任何操作
+                    return;
+                }
+                Log.Channel.show();
+                const filePath = fileUri[0].fsPath;
+                Log.i("filePath", filePath.toString());
+
+                vscode.window
+                    .showInputBox({
+                        title: "保存文件名",
+                        prompt: "请输入要保存的文件名（不含后缀名）",
+                        placeHolder: "SavedFileCompletionItemProvider",
+                        ignoreFocusOut: true, // 避免丢失焦点
+                    })
+                    .then(async f => {
+                        const filename = f ? f : "SavedFileCompletionItemProvider";
+                        await saveCompletionItemsToFile(filePath + `/${filename}.json`, completionItems);
+                        Log.i(filename, filePath);
+                    });
+            });
+    });
+    const 测试反序列化字典 = vscode.commands.registerCommand("sillot.测试反序列化字典", async () => {
+        vscode.window.showInformationMessage("Hello World from Sillot!");
+        vscode.window
+            .showOpenDialog({
+                title: "选择要导入的字典",
+                canSelectFiles: true,
+                canSelectFolders: false,
+                canSelectMany: false,
+            })
+            .then(async fileUri => {
+                if (!fileUri || fileUri.length === 0) {
+                    // 用户取消了选择，不做任何操作
+                    return;
+                }
+                Log.Channel.show();
+                const filePath = fileUri[0].fsPath;
+                Log.i("filePath", filePath.toString());
+                const loadedItems = await loadCompletionItemsFromFile(filePath);
+                context.subscriptions.push(
+                    vscode.languages.registerCompletionItemProvider("dosc", new fileCompletionItemProvider(loadedItems))
+                );
+                Log.i("registerCompletionItemProvider", "dosc");
+            });
+    });
     const disposable2 = vscode.workspace.onDidChangeTextDocument(event => {
         // vscode.window.showInformationMessage(`${event.document.fileName}`);
         // 这里添加你不想直接编辑的文件路径
@@ -64,12 +210,13 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(disposable);
     context.subscriptions.push(disposable2);
     // context.subscriptions.push(disposable3);
+    context.subscriptions.push(测试序列化字典);
+    context.subscriptions.push(测试反序列化字典);
     context.subscriptions.push(vscode.languages.registerHoverProvider("sy", new SyHoverProvider()));
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider("sy", new SyCompletionItemProvider()));
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider("dosc", new SyCompletionItemProvider()));
+    // context.subscriptions.push(vscode.languages.registerCompletionItemProvider("dosc", new SyCompletionItemProvider()));
 
     const disposable5 = vscode.commands.registerCommand("sillot.pickEXE", () => {
-
         vscode.window
             .showOpenDialog({
                 title: "选择可执行文件",
@@ -100,5 +247,3 @@ export function deactivate() {
         Log.Channel.dispose();
     }
 }
-
-
