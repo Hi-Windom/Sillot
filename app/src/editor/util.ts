@@ -719,7 +719,7 @@ export const openLink = (protyle: IProtyle, aLink: string, event: MouseEvent | K
                 (linkPathname.endsWith(".pdf") && !linkAddress.startsWith("file://")))
         ) {
             if (event && event.altKey) {
-                openAsset(protyle.app, linkAddress, parseInt(getSearch("page", linkAddress)));
+                openAsset(protyle.app, linkAddress, Number.parseInt(getSearch("page", linkAddress)));
             } else if (ctrlIsPressed) {
                 /// #if !BROWSER
                 openBy(linkAddress, "folder");
@@ -733,7 +733,7 @@ export const openLink = (protyle: IProtyle, aLink: string, event: MouseEvent | K
                 openByMobile(linkAddress);
                 /// #endif
             } else {
-                openAsset(protyle.app, linkPathname, parseInt(getSearch("page", linkAddress)), "right");
+                openAsset(protyle.app, linkPathname, Number.parseInt(getSearch("page", linkAddress)), "right");
             }
         } else {
             /// #if !BROWSER
