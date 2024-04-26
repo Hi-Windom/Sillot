@@ -2,7 +2,7 @@
     "name": "sillot",
     "displayName": "汐洛 Sillot",
     "description": "汐洛官方插件",
-    "version": "0.1.1200",
+    "version": "0.1.1300",
     "preview": true,
     "repository": "https://github.com/Hi-Windom/Sillot",
     "publisher": "Hi-Windom",
@@ -72,7 +72,7 @@
             },
             {
                 "command": "sillot.openPackageOnNpm",
-                "title": "openPackageOnNpm",
+                "title": "Open Package on NPM",
                 "category": "Sillot"
             },
             {
@@ -91,6 +91,15 @@
                 "category": "Sillot"
             }
         ],
+        "menus": {
+            "editor/context": [
+                {
+                    "when": "editorHasSelection && resourceLangId == typescript",
+                    "command": "sillot.openPackageOnNpm",
+                    "group": "navigation"
+                }
+            ]
+        },
         "viewsContainers": {
             "activitybar": [
                 {

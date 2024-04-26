@@ -97,14 +97,35 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
             ? vscode.workspace.workspaceFolders[0].uri.fsPath
             : vscode.extensions.getExtension("Hi-Windom.sillot")?.extensionPath;
-    vscode.commands.registerCommand("sillot.openPackageOnNpm", moduleName =>
-        vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(`https://www.npmjs.com/package/${moduleName}`))
-    );
+
+    const disposable77 = vscode.commands.registerCommand("sillot.openPackageOnNpm", moduleName => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showInformationMessage("No open text editor");
+            return;
+        }
+
+        const selection = editor.selection;
+        const text = editor.document.getText(selection);
+        if (!text) {
+            vscode.window.showInformationMessage("No text selected");
+            return;
+        }
+
+        // Ensure the selected text is a valid package name
+        if (!/^[\w.-]+$/.test(text)) {
+            vscode.window.showErrorMessage("Invalid package name");
+            return;
+        }
+        vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(`https://www.npmjs.com/package/${text}`));
+    });
+
+    context.subscriptions.push(disposable77);
     // Samples of `window.registerTreeDataProvider`
     const nodeDependenciesProvider = new DepNodeProvider(rootPath);
     vscode.window.registerTreeDataProvider("nodeDependencies", nodeDependenciesProvider);
     const jsonOutlineProvider = new JsonOutlineProvider(context);
-	vscode.window.registerTreeDataProvider('jsonOutline', jsonOutlineProvider);
+    vscode.window.registerTreeDataProvider("jsonOutline", jsonOutlineProvider);
     // Samples of `window.createView`
     // new FtpExplorer(context);
     new FileExplorer(context);
