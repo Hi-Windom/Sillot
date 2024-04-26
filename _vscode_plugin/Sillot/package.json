@@ -53,7 +53,7 @@
                 "codelens-sample.enableCodeLens": {
                     "type": "boolean",
                     "default": true
-                  },
+                },
                 "typescript.useCodeSnippetsOnMethodSuggest": {
                     "type": "boolean",
                     "default": false,
@@ -99,12 +99,12 @@
                 "title": "Enable CodeLens",
                 "command": "codelens-sample.enableCodeLens",
                 "category": "CodeLens Sample"
-              },
-              {
+            },
+            {
                 "title": "Disable Codelens",
                 "command": "codelens-sample.disableCodeLens",
                 "category": "CodeLens Sample"
-              }
+            }
         ],
         "menus": {
             "editor/context": [
@@ -205,7 +205,9 @@
         "watch-tests": "tsc -p . -w --outDir out",
         "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
         "lint": "eslint src --ext ts --fix",
-        "test": "vscode-test"
+        "test": "vscode-test",
+        "b:lint": "biome lint ./src --config-path ../../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-lint'",
+        "b:check": "biome check ./src --config-path ../../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-check'"
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.4",

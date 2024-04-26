@@ -1,0 +1,7 @@
+packages:
+  - '_vscode_plugin/*'
+  - 'app'
+  - 'docs/starlight'
+  - '../sofillBuilder'
+  # exclude packages that are inside test directories
+  - '!**/test/**'
