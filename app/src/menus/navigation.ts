@@ -29,6 +29,9 @@ import {makeCard} from "../card/makeCard";
 import {transaction} from "../protyle/wysiwyg/transaction";
 import {emitOpenMenu} from "../plugin/EventBus";
 import {openByMobile} from "../protyle/util/compatibility";
+import {openSearchAV} from "../protyle/render/av/relation";
+// import * as dayjs from "dayjs";
+import {formatDate} from "sofill/mid";
 
 const initMultiMenu = (selectItemElements: NodeListOf<Element>, app: App) => {
     window.sout.tracker("invoked");
@@ -43,6 +46,43 @@ const initMultiMenu = (selectItemElements: NodeListOf<Element>, app: App) => {
     window.siyuan.menus.menu.append(movePathToMenu(getTopPaths(
         Array.from(selectItemElements)
     )));
+    const blockIDs: string[] = [];
+    selectItemElements.forEach(item => {
+        const id = item.getAttribute("data-node-id");
+        if (id) {
+            blockIDs.push(id);
+        }
+    });
+    if (blockIDs.length > 0) {
+        window.siyuan.menus.menu.append(new MenuItem({
+            label: window.siyuan.languages.addToDatabase,
+            accelerator: window.siyuan.config.keymap.general.addToDatabase.custom,
+            icon: "iconDatabase",
+            click: () => {
+                openSearchAV("", selectItemElements[0] as HTMLElement, (listItemElement) => {
+                    const avID = listItemElement.dataset.avId;
+                    const srcs: IOperationSrcs[] = [];
+                    blockIDs.forEach(id => {
+                        srcs.push({
+                            id,
+                            isDetached: false
+                        });
+                    });
+                    transaction(undefined, [{
+                        action: "insertAttrViewBlock",
+                        avID,
+                        ignoreFillFilter: true,
+                        srcs,
+                        blockID: listItemElement.dataset.blockId
+                    }, {
+                        action: "doUpdateUpdated",
+                        id: listItemElement.dataset.blockId,
+                        data: formatDate(new Date(), 'yyyyMMddHHmmss'),
+                    }]);
+                });
+            }
+        }).element);
+    }
     window.siyuan.menus.menu.append(new MenuItem({
         icon: "iconTrashcan",
         label: window.siyuan.languages.delete,
@@ -52,13 +92,6 @@ const initMultiMenu = (selectItemElements: NodeListOf<Element>, app: App) => {
         }
     }).element);
 
-    const blockIDs: string[] = [];
-    selectItemElements.forEach(item => {
-        const id = item.getAttribute("data-node-id");
-        if (id) {
-            blockIDs.push(id);
-        }
-    });
     if (blockIDs.length === 0) {
         return window.siyuan.menus.menu;
     }
@@ -444,6 +477,30 @@ export const initFileMenu = (app: App, notebookId: string, pathString: string, l
         window.siyuan.menus.menu.append(movePathToMenu(getTopPaths(
             Array.from(fileElement.querySelectorAll(".b3-list-item--focus"))
         )));
+        window.siyuan.menus.menu.append(new MenuItem({
+            label: window.siyuan.languages.addToDatabase,
+            accelerator: window.siyuan.config.keymap.general.addToDatabase.custom,
+            icon: "iconDatabase",
+            click: () => {
+                openSearchAV("", liElement as HTMLElement, (listItemElement) => {
+                    const avID = listItemElement.dataset.avId;
+                    transaction(undefined, [{
+                        action: "insertAttrViewBlock",
+                        avID,
+                        ignoreFillFilter: true,
+                        srcs: [{
+                            id,
+                            isDetached: false
+                        }],
+                        blockID: listItemElement.dataset.blockId
+                    }, {
+                        action: "doUpdateUpdated",
+                        id: listItemElement.dataset.blockId,
+                        data: formatDate(new Date(), 'yyyyMMddHHmmss'),
+                    }]);
+                });
+            }
+        }).element);
         window.siyuan.menus.menu.append(new MenuItem({
             icon: "iconTrashcan",
             label: window.siyuan.languages.delete,

@@ -11,54 +11,54 @@
 </head>
 <body class="branch--Sillot body--app fn__flex-column">
 <div id="loading" class="b3-dialog b3-dialog--open">
-    <div class="b3-dialog__scrim" style="background-color: #212224"></div>
-    <img style="position: absolute;width: 36vh;" src="../../icon.png">
+<div class="b3-dialog__scrim" style="background-color: #212224"></div>
+<img style="position: absolute;width: 36vh;" src="../../icon.png">
     <button onclick="window.location.reload()" id="loadingRefresh"
-            style="display: none;position: absolute;bottom: 16px;background: transparent;border: 1px solid #4285f4;color: #4285f4;border-radius: 4px;line-height: 20px;padding: 4px 8px;">
-        Click to Refresh<br>点　击　刷　新
-    </button>
+        style="display: none;position: absolute;bottom: 16px;background: transparent;border: 1px solid #4285f4;color: #4285f4;border-radius: 4px;line-height: 20px;padding: 4px 8px;">
+    Click to Refresh<br>点　击　刷　新
+</button>
 </div>
 <div id="toolbar" class="toolbar fn__flex"></div>
 <div class="fn__flex-1 fn__flex">
-    <div id="dockLeft" class="dock dock--vertical"></div>
-    <div id="layouts" class="layout fn__flex-1"></div>
-    <div id="dockRight" class="dock dock--vertical"></div>
+<div id="dockLeft" class="dock dock--vertical"></div>
+<div id="layouts" class="layout fn__flex-1"></div>
+<div id="dockRight" class="dock dock--vertical"></div>
 </div>
 <div id="dockBottom" class="dock fn__none"></div>
 <div id="status" class="fn__flex status"></div>
 <div id="SillotDrawer" style="position: fixed;bottom: 0;right: 0;z-index: 9999;"></div>
 <div id="SillotOverlay" style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        display: none;
-    "></div>
-    
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: none;
+"></div>
+
 <div id="commonMenu" class="b3-menu fn__none">
-    <div class="b3-menu__title fn__none">
-        <svg class="b3-menu__icon"><use xlink:href="#iconLeft"></use></svg>
-        <span class="b3-menu__label"></span>
-    </div>
-    <div class="b3-menu__items"></div>
+<div class="b3-menu__title fn__none">
+    <svg class="b3-menu__icon"><use xlink:href="#iconLeft"></use></svg>
+    <span class="b3-menu__label"></span>
+</div>
+<div class="b3-menu__items"></div>
 </div>
 <div id="message" class="b3-snackbars"></div>
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
-<div id="app2" data-bind="react" data-lib="monaco-editor"></div>
 <div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
-<div id="app4" data-bind="react" data-lib="react-music-player"></div>
 <div id="app5" data-bind="react" data-lib="joyUI"></div>
+<div id="app2" data-bind="react" data-lib="monaco-editor"></div>
+<div id="app4" data-bind="react" data-lib="react-music-player"></div>
 <canvas class="canvas" id="tencent-pag" style="position:absolute;display:none;"></canvas>
-      <script src="https://cdn.jsdelivr.net/npm/libpag@latest/lib/libpag.min.js"></script>
-      <script>
-        window.onload = async () => {
-            // 实例化 PAG
-            window.PAG = await window.libpag.PAGInit();
-        };
-       </script>
+<script src="https://cdn.jsdelivr.net/npm/libpag@latest/lib/libpag.min.js"></script>
+<script>
+  window.onload = async () => {
+      // 实例化 PAG
+      window.PAG = await window.libpag.PAGInit();
+  };
+ </script>
 <script>
     setTimeout(() => {
         const refreshElement = document.getElementById("loadingRefresh")

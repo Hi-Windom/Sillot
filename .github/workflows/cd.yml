@@ -6,17 +6,17 @@ on:
     tags:
       - "v*-sillot"
 
+# ref https://docs.github.com/zh/actions/learn-github-actions/variables
+env:
+  repo_name_android: "Sillot-android"
+  repo_name: "Sillot"
+  repo_owner: "Hi-Windom"
+  package_json: "app/package.json"
+
 jobs:
   create_release:
     name: Create Release
     runs-on: ubuntu-latest
-    strategy:
-        matrix:
-          string:
-            - repo_name_android: "Sillot-android"
-              repo_name: "Sillot"
-              repo_owner: "Hi-Windom"
-              package_json: "app/package.json"
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       release_version: ${{ steps.release_info.outputs.release_version }}
@@ -30,38 +30,38 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.11"
       - run: pip install PyGithub
 
       - name: Extract Sillot version from package.json
         uses: sergeysova/jq-action@v2
         id: version
         with:
-          cmd: "jq .version ${{ matrix.string.package_json }} -r"
+          cmd: "jq .version ${{ env.package_json }} -r"
 
       - name: Extract SiYuan version from package.json
         uses: sergeysova/jq-action@v2
         id: syv
         with:
-          cmd: "jq .syv ${{ matrix.string.package_json }} -r"
+          cmd: "jq .syv ${{ env.package_json }} -r"
 
       - name: Extract SiYuan version from package.json
         uses: sergeysova/jq-action@v2
         id: sypv
         with:
-            cmd: "jq .sypv ${{ matrix.string.package_json }} -r"
+            cmd: "jq .sypv ${{ env.package_json }} -r"
 
       - name: Extract packageManager from package.json
         uses: sergeysova/jq-action@v2
         id: packageManager
         with:
-            cmd: "jq .packageManager ${{ matrix.string.package_json }} -r"
+            cmd: "jq .packageManager ${{ env.package_json }} -r"
 
       - name: Extract actionInstallCommand from package.json
         uses: sergeysova/jq-action@v2
         id: actionInstallCommand
         with:
-            cmd: "jq .actionInstallCommand ${{ matrix.string.package_json }} -r"
+            cmd: "jq .actionInstallCommand ${{ env.package_json }} -r"
 
       - id: thisLatestRelease
         uses: K-Sillot/github-action-get-latest-release@master
@@ -83,9 +83,9 @@ jobs:
         run: |
           echo "release_title=$(git show --format=%s --no-patch | head -1)" >> $GITHUB_OUTPUT
           echo "release_version=v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}" >> $GITHUB_OUTPUT
-          changelog1=$(python scripts/parse-changelog-HEAD.py -t ${{ github.ref }} -b ${{ steps.thisLatestRelease.outputs.release }} ${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }})
-          changelog2=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }})
-          changelog3=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }})
+          changelog1=$(python scripts/parse-changelog-HEAD.py -t ${{ github.ref }} -b ${{ steps.thisLatestRelease.outputs.release }} ${{ env.repo_owner }}/${{ env.repo_name }})
+          changelog2=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ env.repo_name }})
+          changelog3=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ env.repo_name_android }})
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "release_body_sillot<<$EOF" >> $GITHUB_ENV
           echo "$changelog1" >> $GITHUB_ENV
@@ -124,15 +124,12 @@ jobs:
     needs: create_release
     strategy:
       matrix:
-        string:
-          - repo_name_android: "Sillot-android"
-            repo_name: "Sillot"
-            repo_owner: "Hi-Windom"
         config:
           - os: ubuntu-20.04
             name: ubuntu build linux.AppImage
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+            build_args_prefix: "-s -w -X"
+            build_args_suffix: "Mode=prod"
             electron_args: "dist-linux"
             goos: "linux"
             goarch: "amd64"
@@ -140,7 +137,8 @@ jobs:
           - os: ubuntu-20.04
             name: ubuntu build linux.tar.gz
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
-            build_args: "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+            build_args_prefix: "-s -w -X"
+            build_args_suffix: "Mode=prod"
             electron_args: "dist-linux"
             goos: "linux"
             goarch: "amd64"
@@ -148,7 +146,8 @@ jobs:
           - os: windows-latest
             name: windows build win.exe
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
-            build_args: "-s -w -H=windowsgui -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+            build_args_prefix: "-s -w -H=windowsgui -X"
+            build_args_suffix: "Mode=prod"
             electron_args: "dist"
             goos: "windows"
             gobin: "bin"
@@ -158,7 +157,8 @@ jobs:
           - os: windows-latest
             name: windows build android.apk
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
-            build_args: "-s -w -H=windowsgui -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod"
+            build_args_prefix: "-s -w -H=windowsgui -X"
+            build_args_suffix: "Mode=prod"
             electron_args: "dist"
             goos: "windows"
             gobin: "bin"
@@ -177,7 +177,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}
+          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}
 
       - name: Set up MingGW
         uses: msys2/setup-msys2@v2
@@ -186,19 +186,20 @@ jobs:
           install: p7zip mingw-w64-x86_64-lua
 
       - name: Set up TDM-GCC
-        run: msys2 -c "bash ${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/scripts/get-tdm-gcc.sh tdm https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm-1/tdm-gcc-10.3.0.exe" && echo "CC=${{ github.workspace }}/tdm/bin/gcc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        run: msys2 -c "bash ${{ env.repo_owner }}/${{ env.repo_name }}/scripts/get-tdm-gcc.sh tdm https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm-1/tdm-gcc-10.3.0.exe" && echo "CC=${{ github.workspace }}/tdm/bin/gcc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         if: contains( matrix.config.goarch, '386')
         working-directory: ${{ github.workspace }}
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+            go-version-file: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/kernel/go.mod
+      - run: go version
 
       - name: Set up goversioninfo
         run: go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo && go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
         if: contains( matrix.config.goos, 'windows')
-        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/kernel
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/kernel
         env:
           GO111MODULE: on
           CGO_ENABLED: 1
@@ -213,46 +214,46 @@ jobs:
 
       - name: Install Node pnpm
         run: npm install -g ${{ needs.create_release.outputs.packageManager }}
-        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 
       - name: Change NPMRC File
         run: pnpm config set registry https://registry.npmjs.org/ --location project
-        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
       - name: Install Node Dependencies
         run: ${{ needs.create_release.outputs.actionInstallCommand }}
-        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 
       - name: Building UI
         run: pnpm run build
-        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 
       - name: Remove Build Directory
         uses: K-Sillot/rm@master
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
-          path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/build
+          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/build
 
       - name: Remove Kernel Directory for Linux
         uses: K-Sillot/rm@master
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
-          path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/kernel-linux
+          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/kernel-linux
 
       - name: Remove Kernel Directory for Windows
         uses: K-Sillot/rm@master
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
-          path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/kernel
+          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/kernel
 
       - name: Generate Icon Resource and Properties/Version Info For Windows
         run: ${{ github.workspace }}\go\${{ matrix.config.gobin }}\goversioninfo -platform-specific=true -icon="resource\icon.ico" -manifest="resource\goversioninfo.exe.manifest"
         if: ${{ contains( matrix.config.goos, 'windows') && !contains( matrix.config.suffix, 'apk') }}
-        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/kernel
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/kernel
 
       - name: Building Kernel
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
-        run: go build --tags fts5 -o "${{ matrix.config.kernel_path }}" -v -ldflags "${{ matrix.config.build_args }}"
-        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/kernel
+        run: go build --tags fts5 -o "${{ matrix.config.kernel_path }}" -v -ldflags "${{ matrix.config.build_args_prefix }} github.com/${{ env.repo_owner }}/${{ env.repo_name }}/kernel/util.${{ matrix.config.build_args_suffix }}"
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/kernel
         env:
           GO111MODULE: on
           CGO_ENABLED: 1
@@ -263,7 +264,7 @@ jobs:
       - name: Building Electron
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         run: pnpm run ${{ matrix.config.electron_args }}
-        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 
       - name: Upload Release Asset for Windows & Linux
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
@@ -272,16 +273,16 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             upload_url: ${{ needs.create_release.outputs.upload_url }}
-            asset_name: ${{ matrix.string.repo_name }}-${{ needs.create_release.outputs.release_version }}-${{ matrix.config.suffix }}
-            asset_path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/build/${{ matrix.string.repo_name }}-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}
+            asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-${{ matrix.config.suffix }}
+            asset_path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/build/${{ env.repo_name }}-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}
 
       - name: zip WinPortable
         uses: thedoctor0/zip-release@0.7.1
         if: ${{ contains( matrix.config.goos, 'windows') && !contains( matrix.config.suffix, 'apk') }}
         with:
           type: 'zip'
-          filename: ${{ matrix.string.repo_name }}-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
-          path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}/app/build/win-unpacked/
+          filename: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
+          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/build/win-unpacked/
           exclusions: '*.git*'
           recursive_exclusions: 'LICENSES.chromium.html'
 
@@ -292,8 +293,8 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             upload_url: ${{ needs.create_release.outputs.upload_url }}
-            asset_name: ${{ matrix.string.repo_name }}-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
-            asset_path: ${{ matrix.string.repo_name }}-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
+            asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
+            asset_path: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-win_Portable_.zip
 
 
       # Manual setup is required when the built-in version does not work correctly in windows2022
@@ -318,25 +319,25 @@ jobs:
         uses: K-Sillot/rm@master
         if: contains( matrix.config.suffix, 'apk')
         with:
-          path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}
+          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
 
       - name: Checkout android repo
         uses: actions/checkout@v4
         if: contains( matrix.config.suffix, 'apk')
         with:
-          repository: ${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}
-          path: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}
+          repository: ${{ env.repo_owner }}/${{ env.repo_name_android }}
+          path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
 
       - name: Before android build
         if: contains( matrix.config.suffix, 'apk')
         run: |
-            cd ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name }}
+            cd ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}
             .\scripts\sillot-android-build-action.bat
         continue-on-error: false
 
       - name: Build with Gradle
         if: contains( matrix.config.suffix, 'apk')
-        working-directory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
         run: ./gradlew assembleOfficialAction --quiet --stacktrace
         continue-on-error: false
 
@@ -345,7 +346,7 @@ jobs:
         name: Sign APK
         id: sign_app
         with:
-          releaseDirectory: ${{ github.workspace }}/${{ matrix.string.repo_owner }}/${{ matrix.string.repo_name_android }}/app/build/outputs/apk/official/action
+          releaseDirectory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}/app/build/outputs/apk/official/action
           signingKeyBase64: ${{ secrets.APK_SIGN_KEY_JKS_BASE64 }}
           alias: ${{ secrets.APK_SIGN_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.APK_SIGN_KEY_JKS_PW }}
@@ -361,8 +362,8 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             upload_url: ${{ needs.create_release.outputs.upload_url }}
-            asset_name: ${{ matrix.string.repo_name }}-${{ needs.create_release.outputs.release_version }}-beta_github.apk
-            asset_path: ${{steps.sign_app.outputs.signedReleaseFile}}
+            asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-beta_github.apk
+            asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
 
       - name: Upload logs if failure
         if: failure()

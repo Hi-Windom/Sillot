@@ -38,6 +38,9 @@ set GOARCH=amd64
 @REM you can use `go mod tidy` to update kernel dependency bofore build
 go mod tidy
 go build --tags fts5 -v -o "../app/kernel/SiYuan-Sillot-Kernel.exe" -ldflags "-s -w -H=windowsgui" .
+if errorlevel 1 (
+    exit /b %errorlevel%
+)
 
 cd ..
 
@@ -45,6 +48,9 @@ echo ===== Building Electron =====
 echo 'for first run, maybe you need to run `pnpm config set electron_mirror "https://npm.taobao.org/mirrors/electron/"`'
 cd app
 call pnpm run dist
+if errorlevel 1 (
+    exit /b %errorlevel%
+)
 
 cd ..
 

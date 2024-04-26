@@ -77,7 +77,7 @@ export abstract class Constants extends SConst { // Sillot extend
     // size
     public static readonly SIZE_SCROLL_TB: number = 24;
     public static readonly SIZE_SCROLL_STEP: number = 256;
-    public static readonly SIZE_LINK_TEXT_MAX: number = 24;
+    public static readonly SIZE_LINK_TEXT_MAX: number = 64;
     public static readonly SIZE_TOOLBAR_HEIGHT: number = isMobile() ? 0 : 32;
     public static readonly SIZE_GET_MAX = 102400;
     public static readonly SIZE_UNDO = 64;

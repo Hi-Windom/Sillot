@@ -1,0 +1,233 @@
+{
+    "name": "sillot",
+    "displayName": "汐洛 Sillot",
+    "description": "汐洛官方插件",
+    "version": "0.1.1310",
+    "preview": true,
+    "repository": "https://github.com/Hi-Windom/Sillot",
+    "publisher": "Hi-Windom",
+    "icon": "media/icon.png",
+    "galleryBanner": {
+        "color": "#C80000",
+        "theme": "dark"
+    },
+    "keywords": [
+        "ms-ceintl.vscode-language-pack-zh-hans"
+    ],
+    "extensionDependencies": [],
+    "markdown": "github",
+    "engines": {
+        "vscode": "^1.88.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Snippets",
+        "Extension Packs"
+    ],
+    "activationEvents": [
+        "onDidChangeTextDocument",
+        "onDidChangeActiveTextEditor",
+        "onLanguage:plaintext",
+        "onLanguage:json",
+        "onLanguage:jsonc",
+        "onLanguage:go",
+        "onLanguage:javascript",
+        "onLanguage:typescript",
+        "onLanguage:yaml",
+        "onLanguage:markdown",
+        "onLanguage:astro",
+        "onLanguage:csharp",
+        "onLanguage:kotlin",
+        "onLanguage:css",
+        "onLanguage:less",
+        "onLanguage:scss",
+        "onLanguage:python",
+        "workspaceContains:**/.editorconfig"
+    ],
+    "main": "./dist/extension.js",
+    "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "汐洛插件配置",
+            "properties": {
+                "codelens-sample.enableCodeLens": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                "typescript.useCodeSnippetsOnMethodSuggest": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Complete functions with their parameter signature."
+                },
+                "sillot.typescript.tsdk": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "default": null,
+                    "markdownDescription": "Specifies the folder path containing the tsserver and `lib*.d.ts` files to use."
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "sillot.helloWorld",
+                "title": "Hello World",
+                "category": "Sillot"
+            },
+            {
+                "command": "sillot.openPackageOnNpm",
+                "title": "Open Package on NPM",
+                "category": "Sillot"
+            },
+            {
+                "command": "sillot.测试序列化字典",
+                "title": "测试序列化字典",
+                "category": "Sillot"
+            },
+            {
+                "command": "sillot.测试反序列化字典",
+                "title": "测试反序列化字典",
+                "category": "Sillot"
+            },
+            {
+                "command": "sillot.pickEXE",
+                "title": "pickEXE",
+                "category": "Sillot"
+            },
+            {
+                "title": "Enable CodeLens",
+                "command": "codelens-sample.enableCodeLens",
+                "category": "CodeLens Sample"
+              },
+              {
+                "title": "Disable Codelens",
+                "command": "codelens-sample.disableCodeLens",
+                "category": "CodeLens Sample"
+              }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "when": "editorHasSelection && resourceLangId == typescript",
+                    "command": "sillot.openPackageOnNpm",
+                    "group": "navigation"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "package-explorer",
+                    "title": "汐洛插件面板",
+                    "icon": "media/dep.svg"
+                }
+            ]
+        },
+        "views": {
+            "package-explorer": [
+                {
+                    "id": "nodeDependencies",
+                    "name": "Node Dependencies",
+                    "icon": "media/dep.svg",
+                    "contextualTitle": "Package Explorer"
+                }
+            ],
+            "explorer": [
+                {
+                    "id": "jsonOutline",
+                    "name": "Json Outline",
+                    "when": "jsonOutlineEnabled"
+                },
+                {
+                    "id": "ftpExplorer",
+                    "name": "FTP Explorer"
+                },
+                {
+                    "id": "fileExplorer",
+                    "name": "File Explorer"
+                },
+                {
+                    "id": "testView",
+                    "name": "Test View"
+                },
+                {
+                    "id": "testViewDragAndDrop",
+                    "name": "Test View Drag and Drop"
+                }
+            ]
+        },
+        "languages": [
+            {
+                "id": "dosc",
+                "aliases": [
+                    "csod",
+                    "ds"
+                ],
+                "extensions": [
+                    ".dosc"
+                ],
+                "configuration": "./src/_dosc.language-configuration.json"
+            },
+            {
+                "id": "sy",
+                "aliases": [
+                    "SY",
+                    "sy"
+                ],
+                "extensions": [
+                    ".sy"
+                ],
+                "configuration": "./src/_sy.language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "sy",
+                "scopeName": "source.sy",
+                "path": "./src/sy.tmLanguage.json"
+            }
+        ]
+    },
+    "vsce": {
+        "baseImagesUrl": "https://raw.githubusercontent.com/Hi-Windom/Sillot/master/app/stage/icon.png",
+        "dependencies": false,
+        "yarn": false
+    },
+    "scripts": {
+        "vscode:prepublish": "pnpm run package",
+        "compile": "webpack",
+        "watch": "webpack --watch",
+        "package": "webpack --mode production --devtool hidden-source-map",
+        "vsce:package": "pnpm vsce package",
+        "vsce:login": "pnpm vsce login Hi-Windom",
+        "compile-tests": "tsc -p . --outDir out",
+        "watch-tests": "tsc -p . -w --outDir out",
+        "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+        "lint": "eslint src --ext ts --fix",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^11.0.4",
+        "@types/mocha": "^10.0.6",
+        "@types/node": "18.x",
+        "@types/vscode": "^1.88.0",
+        "@typescript-eslint/eslint-plugin": "^7.4.0",
+        "@typescript-eslint/parser": "^7.4.0",
+        "@vscode/test-cli": "^0.0.8",
+        "@vscode/test-electron": "^2.3.9",
+        "@vscode/vsce": "^2.26.0",
+        "eslint": "^8.57.0",
+        "jsonc-parser": "^3.2.1",
+        "mkdirp": "^3.0.1",
+        "rimraf": "^5.0.5",
+        "ts-loader": "^9.5.1",
+        "typescript": "^5.3.3",
+        "webpack": "^5.91.0",
+        "webpack-cli": "^5.1.4"
+    },
+    "dependencies": {
+        "fs-extra": "^11.2.0",
+        "json5": "^2.2.3"
+    }
+}

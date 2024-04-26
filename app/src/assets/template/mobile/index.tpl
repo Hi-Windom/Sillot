@@ -10,84 +10,84 @@
 </head>
 <body class="branch--Sillot body--mobile fn__flex-column">
 <div id="loading" class="b3-dialog b3-dialog--open">
-    <div class="b3-dialog__scrim" style="background-color: #212224"></div>
-    <img style="position: absolute;width: 36vh;" src="../../icon.png">
+<div class="b3-dialog__scrim" style="background-color: #212224"></div>
+<img style="position: absolute;width: 36vh;" src="../../icon.png">
 </div>
 <div class="toolbar toolbar--border">
-          <svg id="toolbarFile" class="toolbar__icon">
-              <use xlink:href="#iconMenu"></use>
-          </svg>
-          <input class="toolbar__title fn__hidden" id="toolbarName">
-          <svg id="toolbarSync" class="toolbar__icon toolbar__icon-deactivate fn__none">
-              <use xlink:href="#iconCloudSucc"></use>
-          </svg>
-          <svg id="toolbarConsole" class="toolbar__icon" data-mode="0">
-              <use xlink:href="#iconBug"></use>
-          </svg>
-					<svg id="toolbarOpenBy" class="toolbar__icon fn__none" data-mode="0">
-              <use xlink:href="#iconOpen"></use>
-          </svg>
-          <svg id="toolbarMore" class="toolbar__icon">
-              <use xlink:href="#iconMore"></use>
-          </svg>
-      </div>
+      <svg id="toolbarFile" class="toolbar__icon">
+          <use xlink:href="#iconMenu"></use>
+      </svg>
+      <input class="toolbar__title fn__hidden" id="toolbarName">
+      <svg id="toolbarSync" class="toolbar__icon toolbar__icon-deactivate fn__none">
+          <use xlink:href="#iconCloudSucc"></use>
+      </svg>
+      <svg id="toolbarConsole" class="toolbar__icon" data-mode="0">
+          <use xlink:href="#iconBug"></use>
+      </svg>
+                <svg id="toolbarOpenBy" class="toolbar__icon fn__none" data-mode="0">
+          <use xlink:href="#iconOpen"></use>
+      </svg>
+      <svg id="toolbarMore" class="toolbar__icon">
+          <use xlink:href="#iconMore"></use>
+      </svg>
+  </div>
 <div id="editor" class="fn__none fn__flex-1"></div>
 <div id="empty" class="b3-list--mobile"></div>
 <div id="sidebar" class="side-panel fn__flex-column">
-    <div class="toolbar toolbar--border" style="-webkit-user-select: none">
-        <svg data-type="sidebar-file-tab" class="toolbar__icon toolbar__icon--active"><use xlink:href="#iconFiles"></use></svg>
-        <svg data-type="sidebar-outline-tab" class="toolbar__icon"><use xlink:href="#iconAlignCenter"></use></svg>
-        <svg data-type="sidebar-bookmark-tab" class="toolbar__icon"><use xlink:href="#iconBookmark"></use></svg>
-        <svg data-type="sidebar-tag-tab" class="toolbar__icon"><use xlink:href="#iconTags"></use></svg>
-        <svg data-type="sidebar-backlink-tab" class="toolbar__icon"><use xlink:href="#iconLink"></use></svg>
-        <svg data-type="sidebar-inbox-tab" class="toolbar__icon"><use xlink:href="#iconInbox"></use></svg>
-        <svg data-menu="true" data-type="sidebar-plugin-tab" class="toolbar__icon"><use xlink:href="#iconPlugin"></use></svg>
-        <span class="fn__flex-1"></span>
-        <svg class="toolbar__icon"><use xlink:href="#iconRight"></use></svg>
-    </div>
-    <div class="fn__flex-1 b3-list--mobile">
-        <div class="fn__flex-column" data-type="sidebar-file"></div>
-        <div class="fn__flex-column fn__none" data-type="sidebar-outline"></div>
-        <div class="fn__flex-column fn__none" data-type="sidebar-bookmark"></div>
-        <div class="fn__flex-column fn__none" data-type="sidebar-tag"></div>
-        <div class="fn__flex-column fn__none" data-type="sidebar-backlink"></div>
-        <div class="fn__flex-column fn__none" data-type="sidebar-inbox"></div>
-        <div class="fn__flex-column fn__none" data-type="sidebar-plugin"></div>
-    </div>
+<div class="toolbar toolbar--border" style="-webkit-user-select: none">
+    <svg data-type="sidebar-file-tab" class="toolbar__icon toolbar__icon--active"><use xlink:href="#iconFiles"></use></svg>
+    <svg data-type="sidebar-outline-tab" class="toolbar__icon"><use xlink:href="#iconAlignCenter"></use></svg>
+    <svg data-type="sidebar-bookmark-tab" class="toolbar__icon"><use xlink:href="#iconBookmark"></use></svg>
+    <svg data-type="sidebar-tag-tab" class="toolbar__icon"><use xlink:href="#iconTags"></use></svg>
+    <svg data-type="sidebar-backlink-tab" class="toolbar__icon"><use xlink:href="#iconLink"></use></svg>
+    <svg data-type="sidebar-inbox-tab" class="toolbar__icon"><use xlink:href="#iconInbox"></use></svg>
+    <svg data-menu="true" data-type="sidebar-plugin-tab" class="toolbar__icon"><use xlink:href="#iconPlugin"></use></svg>
+    <span class="fn__flex-1"></span>
+    <svg class="toolbar__icon"><use xlink:href="#iconRight"></use></svg>
+</div>
+<div class="fn__flex-1 b3-list--mobile">
+    <div class="fn__flex-column" data-type="sidebar-file"></div>
+    <div class="fn__flex-column fn__none" data-type="sidebar-outline"></div>
+    <div class="fn__flex-column fn__none" data-type="sidebar-bookmark"></div>
+    <div class="fn__flex-column fn__none" data-type="sidebar-tag"></div>
+    <div class="fn__flex-column fn__none" data-type="sidebar-backlink"></div>
+    <div class="fn__flex-column fn__none" data-type="sidebar-inbox"></div>
+    <div class="fn__flex-column fn__none" data-type="sidebar-plugin"></div>
+</div>
 </div>
 <div id="menu" class="b3-menu b3-menu--fullscreen"></div>
 <div id="model" class="side-panel side-panel--all fn__flex-column">
-    <div class="toolbar toolbar--border">
-        <svg class="toolbar__icon"><use xlink:href="#iconMenu"></use></svg>
-        <span class="toolbar__text"></span>
-        <svg id="modelClose" class="toolbar__icon">
-            <use xlink:href="#iconCloseRound"></use>
-        </svg>
-    </div>
-    <div id="modelMain" class="fn__flex-1"></div>
+<div class="toolbar toolbar--border">
+    <svg class="toolbar__icon"><use xlink:href="#iconMenu"></use></svg>
+    <span class="toolbar__text"></span>
+    <svg id="modelClose" class="toolbar__icon">
+        <use xlink:href="#iconCloseRound"></use>
+    </svg>
+</div>
+<div id="modelMain" class="fn__flex-1"></div>
 </div>
 <div id="commonMenu" class="b3-menu fn__none">
-    <div class="b3-menu__title fn__none">
-        <svg class="b3-menu__icon"><use xlink:href="#iconLeft"></use></svg>
-        <span class="b3-menu__label"></span>
-    </div>
-    <div class="b3-menu__items"></div>
+<div class="b3-menu__title fn__none">
+    <svg class="b3-menu__icon"><use xlink:href="#iconLeft"></use></svg>
+    <span class="b3-menu__label"></span>
+</div>
+<div class="b3-menu__items"></div>
 </div>
 <div id="message" class="b3-snackbars"></div>
 <div id="status" class="status"></div>
 <div id="keyboardToolbar" class="keyboard fn__none"></div>
 <div class="side-mask fn__none"></div>
 <div id="SillotOverlay" style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        display: none;
-    "></div>
-    
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: none;
+"></div>
+
 <div id="app1" data-bind="react" data-lib="react-toastify"></div>
 <div id="app3" data-bind="react" data-lib="react-hot-toast"></div>
 <div id="app5" data-bind="react" data-lib="joyUI"></div>

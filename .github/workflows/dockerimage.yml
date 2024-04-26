@@ -11,17 +11,19 @@ on:
     branches:
         - master
 
+# ref https://docs.github.com/zh/actions/learn-github-actions/variables
+env:
+    repo_name_android: "Sillot-android"
+    repo_name: "Sillot"
+    repo_owner: "Hi-Windom"
+    package_json: "app/package.json"
+    docker_hub_owner: "soltus"
+    docker_hub_repo: "sillot"
+
 jobs:
   build:
     name: build
     runs-on: ubuntu-latest
-    strategy:
-        matrix:
-          string:
-            - repo_name_android: "Sillot-android"
-              repo_name: "Sillot"
-              repo_owner: "Hi-Windom"
-              package_json: "app/package.json"
     permissions:
       packages: write
       contents: read
@@ -37,7 +39,7 @@ jobs:
         uses: sergeysova/jq-action@v2
         id: version
         with:
-          cmd: "jq .version ${{ matrix.string.package_json }} -r"
+          cmd: "jq .version ${{ env.package_json }} -r"
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
@@ -70,18 +72,18 @@ jobs:
       - name: Build the Docker image use Workflow Dispatch inputs' version
         if: ${{ github.event_name == 'workflow_dispatch' && !github.event.inputs.image_tag == '' }}
         run: |
-          docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:${{ github.event.inputs.image_tag }}-sillot .
+          docker buildx build --push --platform linux/amd64 -t ${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }}:latest -t ${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }}:${{ github.event.inputs.image_tag }}-sillot .
       - name: Build the Docker image use package_json version
         if: ${{ github.event_name == 'push' || github.event.inputs.image_tag == '' }}
         run: |
-          docker buildx build --push --platform linux/amd64 -t soltus/sillot:latest -t soltus/sillot:${{ steps.version.outputs.value }}-sillot .
+          docker buildx build --push --platform linux/amd64 -t ${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }}:latest -t ${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }}:${{ steps.version.outputs.value }}-sillot .
 
       - name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PWD }}
-          repository: soltus/sillot # 这是 docker hub 的不是 github 的
+          repository: ${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }} # 这是 docker hub 的不是 github 的
           readme-filepath: ./.github/README.md
           short-description: ${{ github.event.repository.description }}
           enable-url-completion: false

@@ -217,12 +217,6 @@ func InitConf() {
 		Conf.FileTree.MaxOpenTabCount = 32
 	}
 	Conf.FileTree.DocCreateSavePath = strings.TrimSpace(Conf.FileTree.DocCreateSavePath)
-	if "../" == Conf.FileTree.DocCreateSavePath {
-		Conf.FileTree.DocCreateSavePath = "../Untitled"
-	}
-	if "/" == Conf.FileTree.DocCreateSavePath {
-		Conf.FileTree.DocCreateSavePath = "/Untitled"
-	}
 	util.UseSingleLineSave = Conf.FileTree.UseSingleLineSave
 
 	util.CurrentCloudRegion = Conf.CloudRegion
@@ -267,6 +261,10 @@ func InitConf() {
 	if 0 > Conf.Editor.BackmentionExpandCount {
 		Conf.Editor.BackmentionExpandCount = 0
 	}
+	if nil == Conf.Editor.Markdown {
+		Conf.Editor.Markdown = &util.Markdown{}
+	}
+	util.MarkdownSettings = Conf.Editor.Markdown
 
 	if nil == Conf.Export {
 		Conf.Export = conf.NewExport()
