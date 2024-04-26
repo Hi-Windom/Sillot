@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.EnumMember
+const _kind = vscode.CompletionItemKind.EnumMember;
 
 /**
  * 枚举成员补全项

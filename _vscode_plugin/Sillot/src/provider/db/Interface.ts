@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Interface
+const _kind = vscode.CompletionItemKind.Interface;
 
 /**
  * 接口补全项

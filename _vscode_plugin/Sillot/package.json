@@ -21,7 +21,8 @@
     },
     "categories": [
         "Programming Languages",
-        "Snippets"
+        "Snippets",
+        "Extension Packs"
     ],
     "activationEvents": [
         "onDidChangeTextDocument",
@@ -189,7 +190,7 @@
         "compile-tests": "tsc -p . --outDir out",
         "watch-tests": "tsc -p . -w --outDir out",
         "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
-        "lint": "eslint src --ext ts",
+        "lint": "eslint src --ext ts --fix",
         "test": "vscode-test"
     },
     "devDependencies": {

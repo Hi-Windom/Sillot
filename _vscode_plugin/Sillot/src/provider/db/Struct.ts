@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Struct
+const _kind = vscode.CompletionItemKind.Struct;
 
 /**
  * 结构体补全项

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Module
+const _kind = vscode.CompletionItemKind.Module;
 
 /**
  * 模块补全项

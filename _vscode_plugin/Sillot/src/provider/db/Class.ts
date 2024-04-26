@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Class
+const _kind = vscode.CompletionItemKind.Class;
 
 const _ = new vscode.CompletionItem("Class", _kind);
 

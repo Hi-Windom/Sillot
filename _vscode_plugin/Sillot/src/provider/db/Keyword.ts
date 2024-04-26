@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Keyword
+const _kind = vscode.CompletionItemKind.Keyword;
 
 /**
  * 关键字补全项

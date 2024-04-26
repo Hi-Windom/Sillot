@@ -19,6 +19,11 @@
 - `semanticTokenModifiers`: 定义了可以应用于语义标记的修饰符，以进一步区分不同的语言元素。
   这些配置项使得VSCode能够更好地理解和处理特定语言的文件，提供更加丰富和准确的语言支持。在为sy文件创建语言配置时，您可以根据sy文件的实际语法特性来调整这些配置项。如果sy文件与JSON非常相似，您可以简单地使用JSON的语言配置，或者根据需要添加或修改特定的配置项。
 
-
-
 在 [Manage Extensions | Visual Studio Marketplace](https://marketplace.visualstudio.com/manage/publishers/hi-windom) 直接上传打包好的 vsix 文件即可发布/更新，一般来说不需要通过 cli 发布（vsce login 我试了不成功报错还是乱码我晕）
+
+
+### package.json 字段
+
+#### categories
+
+最多三个，多了无法上传成功（本地安装不影响）`Specified argument was out of the range of valid values. (Parameter 'start')`

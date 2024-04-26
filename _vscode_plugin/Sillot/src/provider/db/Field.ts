@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Field
+const _kind = vscode.CompletionItemKind.Field;
 
 const _ = new vscode.CompletionItem("Field", _kind);
 

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.TypeParameter
+const _kind = vscode.CompletionItemKind.TypeParameter;
 
 const _ = new vscode.CompletionItem("TypeParameter", _kind);
 

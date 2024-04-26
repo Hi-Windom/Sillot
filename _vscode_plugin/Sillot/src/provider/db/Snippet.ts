@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Snippet
+const _kind = vscode.CompletionItemKind.Snippet;
 
 /**
  * 代码片段补全项

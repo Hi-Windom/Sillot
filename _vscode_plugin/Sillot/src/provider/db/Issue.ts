@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Issue
+const _kind = vscode.CompletionItemKind.Issue;
 
 /**
  * 问题补全项

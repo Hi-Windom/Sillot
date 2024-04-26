@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.User
+const _kind = vscode.CompletionItemKind.User;
 
 /**
  * 用户定义的补全项

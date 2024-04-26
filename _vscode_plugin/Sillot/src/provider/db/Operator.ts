@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Operator
+const _kind = vscode.CompletionItemKind.Operator;
 
 /**
  * 运算符补全项

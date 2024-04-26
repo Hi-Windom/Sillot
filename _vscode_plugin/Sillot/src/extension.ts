@@ -69,29 +69,6 @@ async function loadCompletionItemsFromFile(filePath: string): Promise<Array<vsco
     return items;
 }
 
-// class MyTreeDataProvider implements vscode.TreeDataProvider<any> {
-//     onDidChangeTreeData?: vscode.Event<any> | undefined;
-
-//     getParent?(element: any) {
-//         throw new Error("Method not implemented.");
-//     }
-//     resolveTreeItem?(item: vscode.TreeItem, element: any, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TreeItem> {
-//         throw new Error("Method not implemented.");
-//     }
-//     getTreeItem(element: any) {
-//         // 返回树视图中的项
-//         return {
-//             label: element,
-//             collapsibleState: vscode.TreeItemCollapsibleState.None,
-//         };
-//     }
-
-//     getChildren(element: any) {
-//         // 返回树视图中的子项
-//         return Promise.resolve(["项1", "项2", "项3"]);
-//     }
-// }
-
 export function activate(context: vscode.ExtensionContext) {
     const rootPath =
         vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0

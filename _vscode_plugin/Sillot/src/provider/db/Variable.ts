@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Variable
+const _kind = vscode.CompletionItemKind.Variable;
 
 const _ = new vscode.CompletionItem("Variable", _kind);
 

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Constant
+const _kind = vscode.CompletionItemKind.Constant;
 
 /**
  * 常量补全项

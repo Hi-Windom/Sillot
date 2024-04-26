@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Folder
+const _kind = vscode.CompletionItemKind.Folder;
 
 /**
  * 文件夹补全项

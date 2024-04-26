@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Event
+const _kind = vscode.CompletionItemKind.Event;
 
 /**
  * 事件补全项

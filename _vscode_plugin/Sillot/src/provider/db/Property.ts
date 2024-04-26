@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const _kind = vscode.CompletionItemKind.Property
+const _kind = vscode.CompletionItemKind.Property;
 
 /**
  * 属性补全项
