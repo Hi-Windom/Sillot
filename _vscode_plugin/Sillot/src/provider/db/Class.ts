@@ -6,7 +6,7 @@ const _ = new vscode.CompletionItem("Class", _kind);
 /**
  * 类补全项
  */
-export const ClassCompletionItems : Array<vscode.CompletionItem> = [
+export const ClassCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Class1",
         kind: _kind,

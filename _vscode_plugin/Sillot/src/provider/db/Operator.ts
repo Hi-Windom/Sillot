@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.Operator;
 /**
  * 运算符补全项
  */
-export const OperatorCompletionItems : Array<vscode.CompletionItem> = [
+export const OperatorCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Operator1",
         kind: _kind,

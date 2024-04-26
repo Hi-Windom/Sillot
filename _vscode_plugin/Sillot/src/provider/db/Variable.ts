@@ -6,7 +6,7 @@ const _ = new vscode.CompletionItem("Variable", _kind);
 /**
  * 变量补全项
  */
-export const VariableCompletionItems : Array<vscode.CompletionItem> = [
+export const VariableCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Variable1",
         kind: _kind,

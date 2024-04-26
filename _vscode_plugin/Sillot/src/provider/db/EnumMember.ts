@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.EnumMember;
 /**
  * 枚举成员补全项
  */
-export const EnumMemberCompletionItems : Array<vscode.CompletionItem> = [
+export const EnumMemberCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "EnumMember1",
         kind: _kind,

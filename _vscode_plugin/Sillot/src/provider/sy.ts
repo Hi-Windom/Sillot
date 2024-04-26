@@ -85,7 +85,7 @@ export class SyCompletionItemProvider implements vscode.CompletionItemProvider {
             VariableCompletionItems,
             FieldCompletionItems,
             FunctionCompletionItems,
-            MethodCompletionItems
+            MethodCompletionItems,
         ];
 
         for (const arr of arraysToMerge) {

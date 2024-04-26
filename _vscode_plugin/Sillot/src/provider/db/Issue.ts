@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.Issue;
 /**
  * 问题补全项
  */
-export const IssueCompletionItems : Array<vscode.CompletionItem> = [
+export const IssueCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Issue1",
         kind: _kind,

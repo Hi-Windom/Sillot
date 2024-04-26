@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.Property;
 /**
  * 属性补全项
  */
-export const PropertyCompletionItems : Array<vscode.CompletionItem> = [
+export const PropertyCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Property1",
         kind: _kind,

@@ -6,7 +6,7 @@ const _ = new vscode.CompletionItem("TypeParameter", _kind);
 /**
  * 类型参数补全项
  */
-export const TypeParameterCompletionItems : Array<vscode.CompletionItem> = [
+export const TypeParameterCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "TypeParameter1",
         kind: _kind,

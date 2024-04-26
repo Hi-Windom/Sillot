@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.Event;
 /**
  * 事件补全项
  */
-export const EventCompletionItems : Array<vscode.CompletionItem> = [
+export const EventCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Event1",
         kind: _kind,

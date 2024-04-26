@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.Folder;
 /**
  * 文件夹补全项
  */
-export const FolderCompletionItems : Array<vscode.CompletionItem> = [
+export const FolderCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Folder1",
         kind: _kind,

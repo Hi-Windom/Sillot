@@ -156,7 +156,6 @@ export function activate(context: vscode.ExtensionContext) {
         Log.d("洛");
         Log.a("汐洛", `${Log.Channel.logLevel}`);
 
-
         // 获取typescript.useCodeSnippetsOnMethodSuggest的值
         const test2 = vscode.workspace.getConfiguration("typescript").get("useCodeSnippetsOnMethodSuggest") as string;
 
@@ -332,19 +331,19 @@ export function activate(context: vscode.ExtensionContext) {
 
     const codelensProvider = new CodelensProvider();
 
-	vscode.languages.registerCodeLensProvider("*", codelensProvider);
+    vscode.languages.registerCodeLensProvider("*", codelensProvider);
 
-	vscode.commands.registerCommand("codelens-sample.enableCodeLens", () => {
-		vscode.workspace.getConfiguration("codelens-sample").update("enableCodeLens", true, true);
-	});
+    vscode.commands.registerCommand("codelens-sample.enableCodeLens", () => {
+        vscode.workspace.getConfiguration("codelens-sample").update("enableCodeLens", true, true);
+    });
 
-	vscode.commands.registerCommand("codelens-sample.disableCodeLens", () => {
-		vscode.workspace.getConfiguration("codelens-sample").update("enableCodeLens", false, true);
-	});
+    vscode.commands.registerCommand("codelens-sample.disableCodeLens", () => {
+        vscode.workspace.getConfiguration("codelens-sample").update("enableCodeLens", false, true);
+    });
 
-	vscode.commands.registerCommand("codelens-sample.codelensAction", (args: any) => {
-		vscode.window.showInformationMessage(`CodeLens action clicked with args=${args}`);
-	});
+    vscode.commands.registerCommand("codelens-sample.codelensAction", (args: any) => {
+        vscode.window.showInformationMessage(`CodeLens action clicked with args=${args}`);
+    });
 }
 
 // 当你的扩展被禁用时，这个方法将被调用

@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.Keyword;
 /**
  * 关键字补全项
  */
-export const KeywordCompletionItems : Array<vscode.CompletionItem> = [
+export const KeywordCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Keyword1",
         kind: _kind,
