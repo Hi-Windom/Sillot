@@ -1,21 +1,19 @@
 // A launch configuration that compiles the extension and then opens it inside a new window
 // Use IntelliSense to learn about possible attributes.
-// Hover to view descriptions of existing attributes.
-// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+// js 文件的更新并不会反应到插件上，还在头疼怎么解
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "Run Extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}"
-			],
-			"outFiles": [
-				"${workspaceFolder}/dist/**/*.js"
-			],
-			"preLaunchTask": "${defaultBuildTask}"
-		}
-	]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Sillot Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--disable-extensions", // 禁用其他插件，不要手欠在插件管理界面 Restart Extensions
+        "--extensionDevelopmentPath=${workspaceFolder}"
+      ],
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    }
+  ]
 }
