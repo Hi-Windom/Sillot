@@ -1,6 +1,6 @@
 ### [术语表和说明 | VS Code 插件开发中文文档 (rackar.github.io)](https://rackar.github.io/vscode-ext-doccn/)
 
-### language-configuration.json里的定义如何理解
+### language-configuration.json里的定义如何理解 😀
 
 `language-configuration.json` 文件是用于定义一种编程语言的特定行为的配置文件。它告诉VSCode如何处理这种语言的各种特性，例如注释、括号匹配、自动闭合字符对等。这个文件通常与 `package.json` 中的 `languages` 部分一起使用，以提供完整的语言支持。
 下面是 `language-configuration.json` 文件中的一些常见配置项的解释：

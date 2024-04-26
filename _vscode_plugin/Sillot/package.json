@@ -2,7 +2,7 @@
     "name": "sillot",
     "displayName": "汐洛 Sillot",
     "description": "汐洛官方插件",
-    "version": "0.1.1300",
+    "version": "0.1.1310",
     "preview": true,
     "repository": "https://github.com/Hi-Windom/Sillot",
     "publisher": "Hi-Windom",
@@ -50,6 +50,10 @@
             "type": "object",
             "title": "汐洛插件配置",
             "properties": {
+                "codelens-sample.enableCodeLens": {
+                    "type": "boolean",
+                    "default": true
+                  },
                 "typescript.useCodeSnippetsOnMethodSuggest": {
                     "type": "boolean",
                     "default": false,
@@ -90,7 +94,17 @@
                 "command": "sillot.pickEXE",
                 "title": "pickEXE",
                 "category": "Sillot"
-            }
+            },
+            {
+                "title": "Enable CodeLens",
+                "command": "codelens-sample.enableCodeLens",
+                "category": "CodeLens Sample"
+              },
+              {
+                "title": "Disable Codelens",
+                "command": "codelens-sample.disableCodeLens",
+                "category": "CodeLens Sample"
+              }
         ],
         "menus": {
             "editor/context": [
