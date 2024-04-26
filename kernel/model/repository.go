@@ -1354,6 +1354,7 @@ func processSyncMergeResult(exit, byHand bool, mergeResult *dejavu.MergeResult, 
 
 	//logSyncMergeResult(mergeResult)
 
+	var needReloadFiletree bool
 	if 0 < len(mergeResult.Conflicts) {
 		luteEngine := util.NewLute()
 		if Conf.Sync.GenerateConflictDoc {
@@ -1382,6 +1383,8 @@ func processSyncMergeResult(exit, byHand bool, mergeResult *dejavu.MergeResult, 
 				resetTree(tree, "Conflicted")
 				createTreeTx(tree)
 			}
+
+			needReloadFiletree = true
 		}
 
 		historyDir := filepath.Join(util.HistoryDir, mergeResult.Time.Format("2006-01-02-150405")+"-sync")
@@ -1408,7 +1411,7 @@ func processSyncMergeResult(exit, byHand bool, mergeResult *dejavu.MergeResult, 
 	var upserts, removes []string
 	var upsertTrees int
 	// 可能需要重新加载部分功能
-	var needReloadFlashcard, needReloadOcrTexts, needReloadFiletree, needReloadPlugin bool
+	var needReloadFlashcard, needReloadOcrTexts, needReloadPlugin bool
 	for _, file := range mergeResult.Upserts {
 		upserts = append(upserts, file.Path)
 		if strings.HasPrefix(file.Path, "/storage/riff/") {
@@ -1472,7 +1475,7 @@ func processSyncMergeResult(exit, byHand bool, mergeResult *dejavu.MergeResult, 
 	}
 
 	if needReloadFiletree {
-		util.BroadcastByType("filetree", "reloadFiletree", 0, "", nil)
+		util.PushReloadFiletree()
 	}
 
 	if exit { // 退出时同步不用推送事件
