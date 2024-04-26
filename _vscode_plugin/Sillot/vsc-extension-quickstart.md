@@ -2,7 +2,6 @@
 
 ### language-configuration.json里的定义如何理解
 
-
 `language-configuration.json` 文件是用于定义一种编程语言的特定行为的配置文件。它告诉VSCode如何处理这种语言的各种特性，例如注释、括号匹配、自动闭合字符对等。这个文件通常与 `package.json` 中的 `languages` 部分一起使用，以提供完整的语言支持。
 下面是 `language-configuration.json` 文件中的一些常见配置项的解释：
 
@@ -19,3 +18,7 @@
 - `semanticTokenScopes`: 定义了语义标记的范围，用于为不同的语言元素提供不同的颜色。
 - `semanticTokenModifiers`: 定义了可以应用于语义标记的修饰符，以进一步区分不同的语言元素。
   这些配置项使得VSCode能够更好地理解和处理特定语言的文件，提供更加丰富和准确的语言支持。在为sy文件创建语言配置时，您可以根据sy文件的实际语法特性来调整这些配置项。如果sy文件与JSON非常相似，您可以简单地使用JSON的语言配置，或者根据需要添加或修改特定的配置项。
+
+
+
+在 [Manage Extensions | Visual Studio Marketplace](https://marketplace.visualstudio.com/manage/publishers/hi-windom) 直接上传打包好的 vsix 文件即可发布/更新，一般来说不需要通过 cli 发布（vsce login 我试了不成功报错还是乱码我晕）

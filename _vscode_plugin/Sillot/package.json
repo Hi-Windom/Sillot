@@ -2,8 +2,9 @@
     "name": "sillot",
     "displayName": "汐洛 Sillot",
     "description": "汐洛官方插件",
-    "version": "0.1.1020",
+    "version": "0.1.1100",
     "repository": "https://github.com/Hi-Windom/Sillot",
+    "publisher": "Hi-Windom",
     "engines": {
         "vscode": "^1.88.0"
     },
@@ -95,6 +96,7 @@
         "watch": "webpack --watch",
         "package": "webpack --mode production --devtool hidden-source-map",
         "vsce:package": "pnpm vsce package",
+        "vsce:login": "pnpm vsce login Hi-Windom",
         "compile-tests": "tsc -p . --outDir out",
         "watch-tests": "tsc -p . -w --outDir out",
         "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
