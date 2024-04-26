@@ -4,6 +4,7 @@ export abstract class Log {
     private static LN = 0;
     private static 分隔符 = " > ";
     private static ChannelName = "汐洛插件日志";
+    private static TAG = "[汐洛插件]: ";
     public static Channel: vscode.LogOutputChannel = vscode.window.createOutputChannel(Log.ChannelName, { log: true });
     constructor() {
         if (!Log.Channel) {
@@ -18,7 +19,7 @@ export abstract class Log {
     static t(tag: string, message: string): void;
     static t(...args: [string] | [string, string]): void {
         if (Log.Channel.logLevel > 1) {
-            vscode.window.showInformationMessage(args[0]);
+            console.trace(Log.TAG, args[0]); // DevTools查看
             return;
         }
         if (args.length === 1) {
@@ -31,7 +32,7 @@ export abstract class Log {
     static d(tag: string, message: string): void;
     static d(...args: [string] | [string, string]): void {
         if (Log.Channel.logLevel > 2) {
-            vscode.window.showInformationMessage(args[0]);
+            console.debug(Log.TAG, args[0]); // DevTools查看
             return;
         }
         if (args.length === 1) {
@@ -44,7 +45,7 @@ export abstract class Log {
     static a(tag: string, message: string): void;
     static a(...args: [string] | [string, string]): void {
         if (Log.Channel.logLevel > 3) {
-            vscode.window.showInformationMessage(args[0]);
+            console.log(Log.TAG, args[0]); // DevTools查看
             return;
         }
         if (args.length === 1) {
@@ -57,7 +58,7 @@ export abstract class Log {
     static i(tag: string, message: string): void;
     static i(...args: [string] | [string, string]): void {
         if (Log.Channel.logLevel > 3) {
-            vscode.window.showInformationMessage(args[0]);
+            console.info(Log.TAG, args[0]); // DevTools查看
             return;
         }
         if (args.length === 1) {
@@ -83,6 +84,7 @@ export abstract class Log {
     static e(tag: string, message: string): void;
     static e(...args: [string] | [string, string]): void {
         if (args.length === 1) {
+            console.error(Log.TAG, args[0]); // DevTools查看
             Log.Channel?.error(Log.开个好头(args[0]));
         } else if (args.length === 2) {
             Log.Channel?.error(`${Log.开个好头(args[0])}${Log.分隔符}${args[1]}`);

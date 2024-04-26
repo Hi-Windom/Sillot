@@ -24,8 +24,15 @@ import { SnippetCompletionItems } from "./provider/db/Snippet";
 import { StructCompletionItems } from "./provider/db/Struct";
 import { TypeParameterCompletionItems } from "./provider/db/TypeParameter";
 import { VariableCompletionItems } from "./provider/db/Variable";
+import path from "path";
+import { DepNodeProvider } from "./nodeDependencies";
+import { FileExplorer } from "./fileExplorer";
+import { TestView } from "./testView";
+import { TestViewDragAndDrop } from "./testViewDragAndDrop";
+import { JsonOutlineProvider } from "./jsonOutline";
 
 let lastChangedDocument: vscode.TextDocument | null = null;
+let myWebviewPanel: vscode.WebviewPanel | undefined;
 
 class fileCompletionItemProvider implements vscode.CompletionItemProvider {
     private completionItems: vscode.CompletionItem[] = [];
@@ -43,7 +50,6 @@ class fileCompletionItemProvider implements vscode.CompletionItemProvider {
 }
 // 序列化并保存到文件
 async function saveCompletionItemsToFile(filePath: string, items: Array<vscode.CompletionItem>) {
-
     // 使用 json5.stringify 格式化 JSON，使其更易读
     const serializedItems = json5.stringify(items, null, 2);
 
@@ -63,7 +69,57 @@ async function loadCompletionItemsFromFile(filePath: string): Promise<Array<vsco
     return items;
 }
 
+// class MyTreeDataProvider implements vscode.TreeDataProvider<any> {
+//     onDidChangeTreeData?: vscode.Event<any> | undefined;
+
+//     getParent?(element: any) {
+//         throw new Error("Method not implemented.");
+//     }
+//     resolveTreeItem?(item: vscode.TreeItem, element: any, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TreeItem> {
+//         throw new Error("Method not implemented.");
+//     }
+//     getTreeItem(element: any) {
+//         // 返回树视图中的项
+//         return {
+//             label: element,
+//             collapsibleState: vscode.TreeItemCollapsibleState.None,
+//         };
+//     }
+
+//     getChildren(element: any) {
+//         // 返回树视图中的子项
+//         return Promise.resolve(["项1", "项2", "项3"]);
+//     }
+// }
+
 export function activate(context: vscode.ExtensionContext) {
+    const rootPath =
+        vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
+            ? vscode.workspace.workspaceFolders[0].uri.fsPath
+            : vscode.extensions.getExtension("Hi-Windom.sillot")?.extensionPath;
+    vscode.commands.registerCommand("sillot.openPackageOnNpm", moduleName =>
+        vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(`https://www.npmjs.com/package/${moduleName}`))
+    );
+    // Samples of `window.registerTreeDataProvider`
+    const nodeDependenciesProvider = new DepNodeProvider(rootPath);
+    vscode.window.registerTreeDataProvider("nodeDependencies", nodeDependenciesProvider);
+    const jsonOutlineProvider = new JsonOutlineProvider(context);
+	vscode.window.registerTreeDataProvider('jsonOutline', jsonOutlineProvider);
+    // Samples of `window.createView`
+    // new FtpExplorer(context);
+    new FileExplorer(context);
+
+    // Test View
+    new TestView(context);
+
+    // new TestViewDragAndDrop(context);
+
+    const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    statusBarItem.text = "汐洛插件运行中";
+    statusBarItem.tooltip = "This is my custom status bar item";
+    statusBarItem.command = "sillot.helloWorld"; // 可选的命令
+    statusBarItem.show();
+
     // 监听编辑器切换事件
     vscode.window.onDidChangeActiveTextEditor(editor => {
         if (editor) {
@@ -97,6 +153,17 @@ export function activate(context: vscode.ExtensionContext) {
         Log.e("汐");
         Log.d("洛");
         Log.a("汐洛", `${Log.Channel.logLevel}`);
+
+        // 获取配置对象
+        const configuration = vscode.workspace.getConfiguration("Hi-Windom.sillot");
+
+        // 获取typescript.useCodeSnippetsOnMethodSuggest的值
+        const test2 = configuration.get("typescript.useCodeSnippetsOnMethodSuggest") as string;
+
+        // 获取sillot.typescript.tsdk的值
+        const test1 = configuration.get("sillot.typescript.tsdk") as string;
+        Log.w(test1);
+        Log.w(test2);
     });
     const 测试序列化字典 = vscode.commands.registerCommand("sillot.测试序列化字典", async () => {
         vscode.window.showInformationMessage("Hello World from Sillot!");

@@ -2,3 +2,4 @@
 **.vsix
 **/protected.txt
 **/test.dosc
+**/SavedFileCompletionItemProvider.json
