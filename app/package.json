@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.31.1910",
+  "version": "0.31.1920",
   "syv": "3.0.12",
   "sypv": "[]",
   "description": "Build Your Eternal Digital Garden",
@@ -10,7 +10,7 @@
   "main": "./electron/main.js",
   "engines": {
     "node": ">=20.11.1",
-    "pnpm": ">=9.0.0"
+    "pnpm": ">=9.0.4"
   },
   "packageManager": "pnpm@9.0.6",
   "actionInstallCommand": "pnpm install --no-frozen-lockfile",
