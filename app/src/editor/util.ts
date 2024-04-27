@@ -707,7 +707,7 @@ export const openBy = (url: string, type: "folder" | "app") => {
     /// #endif
 };
 
-export const openLink = (protyle: IProtyle, aLink: string, event: MouseEvent | KeyboardEvent, ctrlIsPressed = false) => {
+export const openLink = (protyle: IProtyle, aLink: string, event?: MouseEvent, ctrlIsPressed = false) => {
     let linkAddress = Lute.UnEscapeHTMLStr(aLink);
     /// #if MOBILE
     openByMobile(linkAddress);
