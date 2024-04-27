@@ -1,14 +1,14 @@
 {
     "name": "sillot",
     "displayName": "汐洛 Sillot",
-    "description": "汐洛官方插件",
-    "version": "0.1.1310",
+    "description": "汐洛（Sillot）孵化自思源笔记（siyuan-note），致力于服务智慧新彖乄。此插件为汐洛官方插件，提供多功能一体化集成。",
+    "version": "0.1.1400",
     "preview": true,
     "repository": "https://github.com/Hi-Windom/Sillot",
     "publisher": "Hi-Windom",
     "icon": "media/icon.png",
     "galleryBanner": {
-        "color": "#C80000",
+        "color": "#131824",
         "theme": "dark"
     },
     "keywords": [

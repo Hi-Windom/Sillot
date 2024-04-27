@@ -21,9 +21,14 @@
 
 在 [Manage Extensions | Visual Studio Marketplace](https://marketplace.visualstudio.com/manage/publishers/hi-windom) 直接上传打包好的 vsix 文件即可发布/更新，一般来说不需要通过 cli 发布（vsce login 我试了不成功报错还是乱码我晕）
 
-
 ### package.json 字段
 
 #### categories
 
 最多三个，多了无法上传成功（本地安装不影响）`Specified argument was out of the range of valid values. (Parameter 'start')`
+
+第一个将作为插件市场归类的依据
+
+#### galleryBanner
+
+只在[网页版](https://marketplace.visualstudio.com/items?itemName=Hi-Windom.sillot)有效，VSCode里是看不到效果的
