@@ -97,7 +97,7 @@
       // 盤古之白
       "doggy8088.pangu2", // 這個擴充套件會自動替你在文件中所有的中文字和半形的英文、數字、符號之間插入空白。
       // Git Emoji Commit 中文版
-      "maixiaojie.git-emoji-zh", // 起到一个建议提示的作用，很遗憾不能自动填充
+      "maixiaojie.git-emoji-zh", // 需要在命令面板使用才能自动填充，命令为 [git emoji commit message]
       ////
       ////
       //// 不包含在 Sillot.code-profile 中
