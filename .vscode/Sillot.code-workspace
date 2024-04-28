@@ -6,15 +6,11 @@
     },
     {
       "path": "../kernel", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "思源内核🤍/kernel 🗂️"
+      "name": "汐洛版思源内核🤍/kernel 🗂️"
     },
     {
       "path": "../app/appearance", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "思源美化🤍/app/appearance 🗂️"
-    },
-    {
-      "path": "../_sili", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "司丽🤍/_sili 🗂️"
+      "name": "汐洛版思源美化🤍/app/appearance 🗂️"
     },
     {
       "path": "../_vscode_plugin/Sillot", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
@@ -31,6 +27,14 @@
     {
       "path": "../../sofillBuilder", // 沁棘开发仓库（暂未开源）
       "name": "沁棘🤍../sofillBuilder 🗂️"
+    },
+    {
+      "path": "../_sili", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
+      "name": "司丽🤍/_sili 🗂️"
+    },
+    {
+      "path": "../pkgs/siyuan", // 思源本源
+      "name": "思源🤍../siyuan 🗂️"
     }
   ],
   "settings": {
@@ -125,7 +129,7 @@
       // YAML
       "redhat.vscode-yaml", // yaml 插件
       // Package Manager Enhancer
-      "YuTengjing.package-manager-enhancer", // 主要图他 pnpm-workspace.yaml codeLens
+      "YuTengjing.package-manager-enhancer", // 非常好用，前端必备
       // Output Colorizer
       "IBM.output-colorizer", // log 文件高亮
     ],
