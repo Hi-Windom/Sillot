@@ -7,7 +7,7 @@
 		"id": "20200813004551-gm0pbn1",
 		"title": "快捷键",
 		"type": "doc",
-		"updated": "20240426233401"
+		"updated": "20240428230058"
 	},
 	"Children": [
 		{
@@ -8649,7 +8649,7 @@
 			"Properties": {
 				"colgroup": "||",
 				"id": "20201227133317-yv5msrs",
-				"updated": "20231116104159"
+				"updated": "20240428230716"
 			},
 			"Children": [
 				{
@@ -8884,6 +8884,60 @@
 								{
 									"Type": "NodeText",
 									"Data": "任务列表"
+								}
+							]
+						}
+					]
+				},
+				{
+					"Type": "NodeTableRow",
+					"Data": "tr",
+					"Children": [
+						{
+							"Type": "NodeTableCell",
+							"Data": "td",
+							"Children": [
+								{
+									"Type": "NodeText",
+									"Data": "插入末尾子项"
+								}
+							]
+						},
+						{
+							"Type": "NodeTableCell",
+							"Data": "td",
+							"Children": [
+								{
+									"Type": "NodeText",
+									"Data": "​"
+								},
+								{
+									"Type": "NodeTextMark",
+									"TextMarkType": "kbd",
+									"TextMarkTextContent": "Alt+Enter"
+								},
+								{
+									"Type": "NodeText",
+									"Data": "​ / "
+								},
+								{
+									"Type": "NodeTextMark",
+									"TextMarkType": "kbd",
+									"TextMarkTextContent": "⌥Enter"
+								},
+								{
+									"Type": "NodeText",
+									"Data": "​"
+								}
+							]
+						},
+						{
+							"Type": "NodeTableCell",
+							"Data": "td",
+							"Children": [
+								{
+									"Type": "NodeBr",
+									"Data": "br"
 								}
 							]
 						}
@@ -10728,7 +10782,7 @@
 			"Properties": {
 				"colgroup": "||",
 				"id": "20221105225614-a4zp7mm",
-				"updated": "20221105230438"
+				"updated": "20240428230058"
 			},
 			"Children": [
 				{
@@ -11084,7 +11138,7 @@
 							"Children": [
 								{
 									"Type": "NodeText",
-									"Data": "折叠/展开所有子集"
+									"Data": "折叠/展开所有子级"
 								}
 							]
 						},
