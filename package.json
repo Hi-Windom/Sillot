@@ -9,7 +9,7 @@
     "b:siyuan": "",
     "dep:check": "pnpm outdated --filter *",
     "dev:docs": "pnpm --filter ./docs/starlight run dev",
-    "git:tag": "pnpm --filter ./app run git:tag",
+    "git:tag-app": "pnpm --filter ./app run git:tag",
     "test": "pnpm -r run test"
   },
   "keywords": [],
