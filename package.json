@@ -4,11 +4,13 @@
   "description": "汐洛 pnpm 工作区",
   "packageManager": "pnpm@9.0.6",
   "scripts": {
-    "test": "pnpm -r run test",
     "cli": "node ./package.cli.mjs",
-    "git:tag": "pnpm --filter ./app run git:tag",
     "b:lint-app": "pnpm --filter ./app run b:lint",
-    "b:siyuan": ""
+    "b:siyuan": "",
+    "dep:check": "pnpm outdated --filter *",
+    "dev:docs": "pnpm --filter ./docs/starlight run dev",
+    "git:tag": "pnpm --filter ./app run git:tag",
+    "test": "pnpm -r run test"
   },
   "keywords": [],
   "author": "",
