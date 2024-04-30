@@ -1,8 +1,7 @@
 import os
 import re
 from argparse import ArgumentParser
-from collections import defaultdict
-from scripts._pkg import Const as C
+from _pkg import Const as C
 from _pkg import Utils as U
 
 def generate_msg_from_repo(repo_name, tag_name, lastestRelease):
