@@ -1,0 +1,12 @@
+{
+    "等效于 dayjs().format(\"YYYYMMDDHHmmss\")": {
+        "prefix": [
+            "formatDate_newDate",
+            "dayjs().format"
+        ],
+        "body": [
+            "formatDate(new Date($1), 'yyyyMMddHHmmss')"
+        ],
+        "description": "等效于 dayjs().format(\"YYYYMMDDHHmmss\")\nformatDate 是 sofill/mid 中的一个代理函数，最终调用 date-fns 库的 format 函数"
+    }
+}

@@ -1,5 +1,9 @@
 ### [术语表和说明 | VS Code 插件开发中文文档 (rackar.github.io)](https://rackar.github.io/vscode-ext-doccn/)
 
+.vscodeignore 文件
+
+类似于 .gitignore ，用于定义哪些文件不被打包到插件里。
+
 ### language-configuration.json里的定义如何理解 😀
 
 `language-configuration.json` 文件是用于定义一种编程语言的特定行为的配置文件。它告诉VSCode如何处理这种语言的各种特性，例如注释、括号匹配、自动闭合字符对等。这个文件通常与 `package.json` 中的 `languages` 部分一起使用，以提供完整的语言支持。
@@ -32,3 +36,15 @@
 #### galleryBanner
 
 只在[网页版](https://marketplace.visualstudio.com/items?itemName=Hi-Windom.sillot)有效，VSCode里是看不到效果的
+
+#### contributes
+
+这是非常重要的字段，是插件作出贡献的地方，包含多个子字段
+
+##### grammars：语法高亮
+
+嘿嘿
+
+##### snippets：代码片段
+
+注意："path": "./snippets/sofill.json" 这里的路径不能在 ./src 目录下（这是因为 .vscodeignore 中忽略了 src，因此 src 里最好只包含源代码）

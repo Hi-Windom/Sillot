@@ -1,0 +1,92 @@
+{
+    "name": "siyuan as json",
+    "scopeName": "source.sy",
+    "patterns": [
+        {
+            "include": "#value"
+        }
+    ],
+    "repository": {
+        "value": {
+            "patterns": [
+                {
+                    "include": "#object"
+                },
+                {
+                    "include": "#array"
+                },
+                {
+                    "include": "#string"
+                },
+                {
+                    "include": "#number"
+                },
+                {
+                    "include": "#null"
+                },
+                {
+                    "include": "#true"
+                },
+                {
+                    "include": "#false"
+                }
+            ]
+        },
+        "object": {
+            "begin": "\\{",
+            "end": "\\}",
+            "patterns": [
+                {
+                    "include": "#pair"
+                }
+            ]
+        },
+        "pair": {
+            "match": "\\s*\"(\\\\.|[^\"])*\"\\s*:\\s*\"(\\\\.|[^\"])*\"\\s*",
+            "captures": {
+                "1": {
+                    "name": "string.quoted.double.json"
+                },
+                "2": {
+                    "name": "string.quoted.double.json"
+                }
+            }
+        },
+        "array": {
+            "begin": "\\[",
+            "end": "\\]",
+            "patterns": [
+                {
+                    "include": "#value"
+                }
+            ]
+        },
+        "string": {
+            "begin": "\"",
+            "end": "\"",
+            "name": "string.quoted.double.json",
+            "patterns": [
+                {
+                    "match": "\\\\(x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|.)",
+                    "name": "constant.character.escape.json"
+                }
+            ]
+        },
+        "number": {
+            "match": "-?(0|[1-9]\\d*)(\\.(\\d+)([eE][-+]?\\d+)?)?",
+            "name": "constant.numeric.json"
+        },
+        "null": {
+            "match": "\\bnull\\b",
+            "name": "constant.language.null.json"
+        },
+        "true": {
+            "match": "\\btrue\\b",
+            "name": "constant.language.boolean.true.json"
+        },
+        "false": {
+            "match": "\\bfalse\\b",
+            "name": "constant.language.boolean.false.json"
+        }
+    }
+}

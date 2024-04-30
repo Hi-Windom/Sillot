@@ -2,7 +2,7 @@
     "name": "sillot",
     "displayName": "汐洛 Sillot",
     "description": "汐洛（Sillot）孵化自思源笔记（siyuan-note），致力于服务智慧新彖乄。此插件为汐洛官方插件，提供多功能一体化集成。",
-    "version": "0.1.1500",
+    "version": "0.1.1600",
     "preview": true,
     "repository": "https://github.com/Hi-Windom/Sillot",
     "publisher": "Hi-Windom",
@@ -167,7 +167,7 @@
                 "extensions": [
                     ".dosc"
                 ],
-                "configuration": "./src/_dosc.language-configuration.json"
+                "configuration": "./languages/_dosc.language-configuration.json"
             },
             {
                 "id": "sy",
@@ -178,14 +178,24 @@
                 "extensions": [
                     ".sy"
                 ],
-                "configuration": "./src/_sy.language-configuration.json"
+                "configuration": "./languages/_sy.language-configuration.json"
             }
         ],
         "grammars": [
             {
                 "language": "sy",
                 "scopeName": "source.sy",
-                "path": "./src/sy.tmLanguage.json"
+                "path": "./grammars/sy.tmLanguage.json"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "javascript",
+                "path": "./snippets/sofill.json"
+            },
+            {
+                "language": "typescript",
+                "path": "./snippets/sofill.json"
             }
         ]
     },
