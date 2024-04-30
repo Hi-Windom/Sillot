@@ -10,13 +10,9 @@ import {Search} from "../../search";
 /// #if !MOBILE
 import {Custom} from "../../layout/dock/Custom";
 import {getAllModels} from "../../layout/getAll";
-import {openSearchAV} from "../../protyle/render/av/relation";
-import {transaction} from "../../protyle/wysiwyg/transaction";
-import {focusByRange} from "../../protyle/util/selection";
-import {hasClosestBlock, hasClosestByClassName} from "../../protyle/util/hasClosest";
-// import * as dayjs from "dayjs";
-import { formatDate } from "sofill/mid";
+import {hasClosestByClassName} from "../../protyle/util/hasClosest";
 import type {Files} from "../../layout/dock/Files";
+import {addEditorToDatabase, addFilesToDatabase} from "../../protyle/render/av/addToDatabase";
 /// #endif
 
 export const commandPanel = (app: App) => {
@@ -41,14 +37,16 @@ export const commandPanel = (app: App) => {
     dialog.element.setAttribute("data-key", Constants.DIALOG_COMMANDPANEL);
     const listElement = dialog.element.querySelector("#commands");
     /// #if !MOBILE
-//     let html = ""
-//     Object.keys(window.siyuan.config.keymap.general).forEach((key) => {
-//         html += `<li class="b3-list-item" data-command="${key}">
-//     <span class="b3-list-item__text">${window.siyuan.languages[key]}</span>
-//     <span class="b3-list-item__meta${isMobile() ? " fn__none" : ""}">${updateHotkeyTip(window.siyuan.config.keymap.general[key].custom)}</span>
-// </li>`;
-//     });
-//     listElement.insertAdjacentHTML("beforeend", html);
+    let html = ""
+    Object.keys(window.siyuan.config.keymap.general).forEach((key) => {
+        if (["addToDatabase"].includes(key)) {
+            html += `<li class="b3-list-item" data-command="${key}">
+    <span class="b3-list-item__text">${window.siyuan.languages[key]}</span>
+    <span class="b3-list-item__meta${isMobile() ? " fn__none" : ""}">${updateHotkeyTip(window.siyuan.config.keymap.general[key].custom)}</span>
+</li>`;
+        }
+    });
+    listElement.insertAdjacentHTML("beforeend", html);
     /// #endif
     app.plugins.forEach(plugin => {
         plugin.commands.forEach(command => {
@@ -257,99 +255,9 @@ export const execByCommand = (options: {
     switch (options.command) {
         case "addToDatabase":
             if (!isFileFocus) {
-                if (protyle.title?.editElement.contains(range.startContainer)) {
-                    openSearchAV("", protyle.breadcrumb.element, (listItemElement) => {
-                        const avID = listItemElement.dataset.avId;
-                        transaction(protyle, [{
-                            action: "insertAttrViewBlock",
-                            avID,
-                            ignoreFillFilter: true,
-                            srcs: [{
-                                id: protyle.block.rootID,
-                                isDetached: false
-                            }],
-                            blockID: listItemElement.dataset.blockId
-                        }, {
-                            action: "doUpdateUpdated",
-                            id: listItemElement.dataset.blockId,
-                            data: formatDate(new Date(), 'yyyyMMddHHmmss'),
-                        }], [{
-                            action: "removeAttrViewBlock",
-                            srcIDs: [protyle.block.rootID],
-                            avID,
-                        }]);
-                        focusByRange(range);
-                    });
-                } else {
-                    const selectElement: Element[] = [];
-                    protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select").forEach(item => {
-                        selectElement.push(item);
-                    });
-                    if (selectElement.length === 0) {
-                        const nodeElement = hasClosestBlock(range.startContainer);
-                        if (nodeElement) {
-                            selectElement.push(nodeElement);
-                        }
-                    }
-                    if (selectElement.length === 0) {
-                        return;
-                    }
-                    openSearchAV("", selectElement[0] as HTMLElement, (listItemElement) => {
-                        const srcIDs: string[] = [];
-                        const srcs: IOperationSrcs[] = [];
-                        selectElement.forEach(item => {
-                            srcIDs.push(item.getAttribute("data-node-id"));
-                            srcs.push({
-                                id: item.getAttribute("data-node-id"),
-                                isDetached: false
-                            });
-                        });
-                        const avID = listItemElement.dataset.avId;
-                        transaction(protyle, [{
-                            action: "insertAttrViewBlock",
-                            avID,
-                            ignoreFillFilter: true,
-                            srcs,
-                            blockID: listItemElement.dataset.blockId
-                        }, {
-                            action: "doUpdateUpdated",
-                            id: listItemElement.dataset.blockId,
-                            data: formatDate(new Date(), 'yyyyMMddHHmmss'),
-                        }], [{
-                            action: "removeAttrViewBlock",
-                            srcIDs,
-                            avID,
-                        }]);
-                        focusByRange(range);
-                    });
-                }
+                addEditorToDatabase(protyle, range);
             } else {
-                const srcs: IOperationSrcs[] = [];
-                fileLiElements.forEach(item => {
-                    const id = item.getAttribute("data-node-id");
-                    if (id) {
-                        srcs.push({
-                            id,
-                            isDetached: false
-                        });
-                    }
-                });
-                if (srcs.length > 0) {
-                    openSearchAV("", fileLiElements[0] as HTMLElement, (listItemElement) => {
-                        const avID = listItemElement.dataset.avId;
-                        transaction(undefined, [{
-                            action: "insertAttrViewBlock",
-                            avID,
-                            ignoreFillFilter: true,
-                            srcs,
-                            blockID: listItemElement.dataset.blockId
-                        }, {
-                            action: "doUpdateUpdated",
-                            id: listItemElement.dataset.blockId,
-                            data: formatDate(new Date(), 'yyyyMMddHHmmss'),
-                        }]);
-                    });
-                }
+                addFilesToDatabase(fileLiElements);
             }
             break;
     }

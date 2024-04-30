@@ -530,11 +530,10 @@ func duplicateDoc(c *gin.Context) {
 		return
 	}
 
-	p := tree.Path
 	notebook := tree.Box
 	box := model.Conf.Box(notebook)
 	model.DuplicateDoc(tree)
-	pushCreate(box, p, tree.Root.ID, arg)
+	pushCreate(box, tree.Path, tree.ID, arg)
 
 	ret.Data = map[string]interface{}{
 		"id":       tree.Root.ID,
