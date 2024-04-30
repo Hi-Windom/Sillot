@@ -49,9 +49,9 @@ const replaceDirect = (hotKey: string, keyCode: string) => {
         if (item === Constants.ZWSP) {
             hotKeys[index] = keyCode;
         }
-    })
+    });
     return hotKeys;
-}
+};
 
 export const matchHotKey = (hotKey: string, event: KeyboardEvent) => {
     // window.sout.tracker("invoked"); // 这里调用频繁

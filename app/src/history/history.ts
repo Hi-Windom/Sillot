@@ -35,34 +35,34 @@ const renderDoc = (element: HTMLElement, currentPage: number) => {
     const docElement = element.querySelector('.history__text[data-type="docPanel"]');
     const assetElement = element.querySelector('.history__text[data-type="assetPanel"]');
     const mdElement = element.querySelector('.history__text[data-type="mdPanel"]') as HTMLTextAreaElement;
-    docElement.classList.add("fn__none");
+    const listElement = element.querySelector(".b3-list");
+    assetElement.classList.add("fn__none");
     mdElement.classList.add("fn__none");
+    docElement.classList.add("fn__none");
     if (typeElement.value === "2") {
         notebookElement.setAttribute("disabled", "disabled");
-        assetElement.classList.remove("fn__none");
         if (window.siyuan.storage[Constants.LOCAL_HISTORY].type !== 2) {
             opElement.value = "all";
         }
-        opElement.querySelector('option[value="clean"]').classList.remove("fn__none")
-        opElement.querySelector('option[value="update"]').classList.remove("fn__none")
-        opElement.querySelector('option[value="delete"]').classList.add("fn__none")
-        opElement.querySelector('option[value="format"]').classList.add("fn__none")
-        opElement.querySelector('option[value="sync"]').classList.remove("fn__none")
-        opElement.querySelector('option[value="replace"]').classList.add("fn__none")
-        opElement.querySelector('option[value="outline"]').classList.add("fn__none")
+        opElement.querySelector('option[value="clean"]').classList.remove("fn__none");
+        opElement.querySelector('option[value="update"]').classList.remove("fn__none");
+        opElement.querySelector('option[value="delete"]').classList.add("fn__none");
+        opElement.querySelector('option[value="format"]').classList.add("fn__none");
+        opElement.querySelector('option[value="sync"]').classList.remove("fn__none");
+        opElement.querySelector('option[value="replace"]').classList.add("fn__none");
+        opElement.querySelector('option[value="outline"]').classList.add("fn__none");
     } else {
         notebookElement.removeAttribute("disabled");
-        assetElement.classList.add("fn__none");
         if (window.siyuan.storage[Constants.LOCAL_HISTORY].type === 2) {
             opElement.value = "all";
         }
-        opElement.querySelector('option[value="clean"]').classList.add("fn__none")
-        opElement.querySelector('option[value="update"]').classList.remove("fn__none")
-        opElement.querySelector('option[value="delete"]').classList.remove("fn__none")
-        opElement.querySelector('option[value="format"]').classList.remove("fn__none")
-        opElement.querySelector('option[value="sync"]').classList.remove("fn__none")
-        opElement.querySelector('option[value="replace"]').classList.remove("fn__none")
-        opElement.querySelector('option[value="outline"]').classList.remove("fn__none")
+        opElement.querySelector('option[value="clean"]').classList.add("fn__none");
+        opElement.querySelector('option[value="update"]').classList.remove("fn__none");
+        opElement.querySelector('option[value="delete"]').classList.remove("fn__none");
+        opElement.querySelector('option[value="format"]').classList.remove("fn__none");
+        opElement.querySelector('option[value="sync"]').classList.remove("fn__none");
+        opElement.querySelector('option[value="replace"]').classList.remove("fn__none");
+        opElement.querySelector('option[value="outline"]').classList.remove("fn__none");
     }
     window.siyuan.storage[Constants.LOCAL_HISTORY] = {
         notebookId: notebookElement.value,
@@ -84,9 +84,7 @@ const renderDoc = (element: HTMLElement, currentPage: number) => {
         }
         nextElement.nextElementSibling.nextElementSibling.textContent = `${currentPage}/${response.data.pageCount || 1}`;
         if (response.data.histories.length === 0) {
-            element.lastElementChild.lastElementChild.previousElementSibling.classList.add("fn__none");
-            element.lastElementChild.lastElementChild.classList.add("fn__none");
-            element.lastElementChild.firstElementChild.innerHTML = `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
+            listElement.innerHTML = `<li class="b3-list--empty">${window.siyuan.languages.emptyContent}</li>`;
             return;
         }
         let logsHTML = "";
@@ -96,7 +94,7 @@ const renderDoc = (element: HTMLElement, currentPage: number) => {
     <span style="padding-left: 4px" class="b3-list-item__text">${formatDate(Number.parseInt(item) * 1000, 'yyyy-MM-dd HH:mm:ss')}</span>
 </li>`;
         });
-        element.lastElementChild.firstElementChild.innerHTML = logsHTML;
+        listElement.innerHTML = logsHTML;
     });
 };
 
@@ -654,6 +652,7 @@ const bindEvent = (app: App, element: Element, dialog?: Dialog) => {
             } else if (target.classList.contains("b3-list-item") && (type === "assets" || type === "doc")) {
                 const dataPath = target.getAttribute("data-path");
                 if (type === "assets") {
+                    assetElement.classList.remove("fn__none");
                     assetElement.innerHTML = renderAssetsPreview(dataPath);
                 } else if (type === "doc") {
                     fetchPost("/api/history/getDocHistoryContent", {

@@ -761,4 +761,4 @@ export const openLink = (protyle: IProtyle, aLink: string, event?: MouseEvent, c
         /// #endif
     }
     /// #endif
-}
+};

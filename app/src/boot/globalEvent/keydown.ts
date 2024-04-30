@@ -59,7 +59,6 @@ import {reloadProtyle} from "../../protyle/util/reload";
 import {fullscreen, updateReadonly} from "../../protyle/breadcrumb/action";
 import {openRecentDocs} from "../../business/openRecentDocs";
 import type {App} from "../../index";
-import {commandPanel} from "../../plugin/commandPanel";
 import {openBacklink, openGraph, openOutline, toggleDockBar} from "../../layout/dock/util";
 import {workspaceMenu} from "../../menus/workspace";
 import {resize} from "../../protyle/util/resize";
@@ -73,10 +72,8 @@ import {searchKeydown} from "./searchKeydown";
 import {openNewWindow} from "../../window/openNewWindow";
 import {historyKeydown} from "../../history/keydown";
 import {zoomOut} from "../../menus/protyle";
-import {openSearchAV} from "../../protyle/render/av/relation";
-// import * as dayjs from "dayjs";
-import {formatDate} from "sofill/mid";
 import {getPlainText} from "../../protyle/util/paste";
+import {commandPanel, execByCommand} from "./commandPanel";
 
 const switchDialogEvent = (app: App, event: MouseEvent) => {
     window.sout.tracker("invoked");
@@ -319,69 +316,12 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
         return true;
     }
     if (!isFileFocus && matchHotKey(window.siyuan.config.keymap.general.addToDatabase.custom, event)) {
-        if (protyle.title?.editElement.contains(range.startContainer)) {
-            openSearchAV("", protyle.breadcrumb.element, (listItemElement) => {
-                const avID = listItemElement.dataset.avId;
-                transaction(protyle, [{
-                    action: "insertAttrViewBlock",
-                    avID,
-                    ignoreFillFilter: true,
-                    srcs: [{
-                        id: protyle.block.rootID,
-                        isDetached: false
-                    }],
-                    blockID: listItemElement.dataset.blockId
-                }, {
-                    action: "doUpdateUpdated",
-                    id: listItemElement.dataset.blockId,
-                    data: formatDate(new Date(), 'yyyyMMddHHmmss'),
-                }], [{
-                    action: "removeAttrViewBlock",
-                    srcIDs: [protyle.block.rootID],
-                    avID,
-                }]);
-                focusByRange(range);
-            });
-        } else {
-            const selectElement: Element[] = [];
-            protyle.wysiwyg.element.querySelectorAll(".protyle-wysiwyg--select").forEach(item => {
-                selectElement.push(item);
-            });
-            if (selectElement.length === 0) {
-                const nodeElement = hasClosestBlock(range.startContainer);
-                if (nodeElement) {
-                    selectElement.push(nodeElement);
-                }
-            }
-            openSearchAV("", selectElement[0] as HTMLElement, (listItemElement) => {
-                const srcIDs: string[] = [];
-                const srcs: IOperationSrcs[] = [];
-                selectElement.forEach(item => {
-                    srcIDs.push(item.getAttribute("data-node-id"));
-                    srcs.push({
-                        id: item.getAttribute("data-node-id"),
-                        isDetached: false
-                    });
-                });
-                const avID = listItemElement.dataset.avId;
-                transaction(protyle, [{
-                    action: "insertAttrViewBlock",
-                    avID,
-                    ignoreFillFilter: true,
-                    srcs,
-                    blockID: listItemElement.dataset.blockId
-                }, {
-                    action: "doUpdateUpdated",
-                    id: listItemElement.dataset.blockId,
-                    data: formatDate(new Date(), 'yyyyMMddHHmmss'),
-                }], [{
-                    action: "removeAttrViewBlock",
-                    srcIDs,
-                    avID,
-                }]);
-                focusByRange(range);
-            });
-        }
+        execByCommand({
+            command: "addToDatabase",
+            app,
+            protyle,
+            previousRange: range
+        });
         event.preventDefault();
         return true;
     }
@@ -699,32 +639,11 @@ const fileTreeKeydown = (app: App, event: KeyboardEvent) => {
 
 
     if (matchHotKey(window.siyuan.config.keymap.general.addToDatabase.custom, event)) {
-        const srcs: IOperationSrcs[] = [];
-        liElements.forEach(item => {
-            const id = item.getAttribute("data-node-id");
-            if (id) {
-                srcs.push({
-                    id,
-                    isDetached: false
-                });
-            }
+        execByCommand({
+            command: "addToDatabase",
+            app,
+            fileLiElements: liElements
         });
-        if (srcs.length > 0) {
-            openSearchAV("", liElements[0] as HTMLElement, (listItemElement) => {
-                const avID = listItemElement.dataset.avId;
-                transaction(undefined, [{
-                    action: "insertAttrViewBlock",
-                    avID,
-                    ignoreFillFilter: true,
-                    srcs,
-                    blockID: listItemElement.dataset.blockId
-                }, {
-                    action: "doUpdateUpdated",
-                    id: listItemElement.dataset.blockId,
-                    data: dayjs().format("YYYYMMDDHHmmss"),
-                }]);
-            });
-        }
         event.preventDefault();
         return true;
     }

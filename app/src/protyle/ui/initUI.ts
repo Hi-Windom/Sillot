@@ -11,7 +11,7 @@ export const initUI = (protyle: IProtyle) => {
     window.sout?.tracker("invoked");
     protyle.contentElement = document.createElement("div");
     protyle.contentElement.className = "protyle-content";
-    protyle.contentElement.innerHTML = `<div class="protyle-top"></div>`
+    protyle.contentElement.innerHTML = "<div class=\"protyle-top\"></div>";
     if (protyle.options.render.background) {
         protyle.contentElement.firstElementChild.appendChild(protyle.background.element);
     }

@@ -1458,7 +1458,7 @@ func processSyncMergeResult(exit, byHand bool, mergeResult *dejavu.MergeResult, 
 	}
 
 	if needReloadOcrTexts {
-		LoadAssetsTexts()
+		util.LoadAssetsTexts()
 	}
 
 	if needReloadPlugin {

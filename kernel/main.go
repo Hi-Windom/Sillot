@@ -43,7 +43,7 @@ func main() {
 	model.BootSyncData()
 	model.InitBoxes()
 	model.LoadFlashcards()
-	model.LoadAssetsTexts()
+	util.LoadAssetsTexts()
 
 	util.SetBooted()
 	util.PushClearAllMsg()

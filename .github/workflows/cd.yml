@@ -125,7 +125,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             name: ubuntu build linux.AppImage
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
             build_args_prefix: "-s -w -X"
@@ -134,7 +134,7 @@ jobs:
             goos: "linux"
             goarch: "amd64"
             suffix: "linux.AppImage"
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             name: ubuntu build linux.tar.gz
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
             build_args_prefix: "-s -w -X"
