@@ -132,6 +132,8 @@
       "YuTengjing.package-manager-enhancer", // 非常好用，前端必备
       // Output Colorizer
       "IBM.output-colorizer", // log 文件高亮
+      // Partial Diff
+      "ryu1kn.partial-diff", // 右键菜单对比命令，很好用
     ],
     "unwantedRecommendations": [
       "oderwat.indent-rainbow", // 花里胡哨影响观感
