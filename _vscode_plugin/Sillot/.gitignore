@@ -1,6 +1,6 @@
 **/dist/
 **/out/
 **.vsix
-**/protected.txt
-**/test.dosc
 **/SavedFileCompletionItemProvider.json
+/.vscode-test
+src/test/files

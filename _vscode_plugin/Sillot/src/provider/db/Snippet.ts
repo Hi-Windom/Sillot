@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.Snippet;
 /**
  * 代码片段补全项
  */
-export const SnippetCompletionItems : Array<vscode.CompletionItem> = [
+export const SnippetCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Snippet1",
         kind: _kind,

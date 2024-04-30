@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.Module;
 /**
  * 模块补全项
  */
-export const ModuleCompletionItems : Array<vscode.CompletionItem> = [
+export const ModuleCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Module1",
         kind: _kind,

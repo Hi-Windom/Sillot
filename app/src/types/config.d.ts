@@ -307,6 +307,11 @@ declare namespace Config {
     export interface IEditor {
 
         /**
+         * Whether to allow to execute javascript in the HTML block
+         */
+        allowHTMLBLockScript: boolean;
+
+        /**
          * Markdown configuration
          */
         markdown: IMarkdown;
@@ -1351,8 +1356,11 @@ declare namespace Config {
         appDir: string;
         /**
          * Boot automatically
+         * - `0`: Do not boot automatically
+         * - `1`: Boot automatically
+         * - `2`: Boot automatically + Minimize UI
          */
-        autoLaunch: boolean;
+        autoLaunch2: number;
         /**
          * The absolute path of the `conf` directory of the current workspace
          */

@@ -1,0 +1,32 @@
+{
+  "name": "Sillot-workspace",
+  "version": "1.0.0",
+  "description": "汐洛 pnpm 工作区",
+  "packageManager": "pnpm@9.0.6",
+  "scripts": {
+    "cli": "node ./package.cli.mjs",
+    "b:lint-app": "pnpm --filter ./app run b:lint",
+    "b:siyuan": "",
+    "dep:check": "pnpm outdated --filter *",
+    "dev:docs": "pnpm --filter ./docs/starlight run dev",
+    "git:tag-app": "pnpm --filter ./app run git:tag",
+    "vsce:package": "pnpm --filter ./_vscode_plugin/Sillot run vsce:package",
+    "test": "pnpm -r run test"
+  },
+  "keywords": [],
+  "author": "",
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^4.7.4",
+    "webpack": "^5.91.0",
+    "webpack-bundle-analyzer": "^4.10.1",
+    "webpack-cli": "^5.1.4",
+    "@biomejs/biome": "1.7.1",
+    "shelljs": "^0.8.5",
+    "iconv-lite": "^0.6.3",
+    "inquirer": "^9.2.20",
+    "ora": "^8.0.1"
+  }
+}

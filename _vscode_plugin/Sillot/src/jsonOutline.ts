@@ -99,7 +99,9 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
         if (offset && this.tree) {
             const path = json.getLocation(this.text, offset).path;
             const node = json.findNodeAtLocation(this.tree, path);
-            if (node) {return Promise.resolve(this.getChildrenOffsets(node));}
+            if (node) {
+                return Promise.resolve(this.getChildrenOffsets(node));
+            }
         }
         return Promise.resolve(this.tree ? this.getChildrenOffsets(this.tree) : []);
     }

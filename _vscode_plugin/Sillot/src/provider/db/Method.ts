@@ -6,7 +6,7 @@ const _ = new vscode.CompletionItem("Method", _kind);
 /**
  * 方法补全项
  */
-export const MethodCompletionItems : Array<vscode.CompletionItem> = [
+export const MethodCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Method1",
         kind: _kind,

@@ -6,7 +6,7 @@ const _ = new vscode.CompletionItem("Field", _kind);
 /**
  * 字段补全项
  */
-export const FieldCompletionItems : Array<vscode.CompletionItem> = [
+export const FieldCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Field1",
         kind: _kind,

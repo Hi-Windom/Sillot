@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.File;
 /**
  * 文件补全项
  */
-export const FileCompletionItems : Array<vscode.CompletionItem> = [
+export const FileCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "File1",
         kind: _kind,

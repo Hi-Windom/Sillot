@@ -112,23 +112,17 @@ func (conf *AppConf) SetUser(user *conf.User) {
 func InitConf() {
 	initLang()
 
-	windowStateConf := filepath.Join(util.ConfDir, "windowState.json")
-	if !gulu.File.IsExist(windowStateConf) {
-		if err := gulu.File.WriteFileSafer(windowStateConf, []byte("{}"), 0644); nil != err {
-			logging.LogErrorf("create [windowState.json] failed: %s", err)
-		}
-	}
-
 	Conf = &AppConf{LogLevel: "debug", m: &sync.Mutex{}}
 	confPath := filepath.Join(util.ConfDir, "conf.json")
 	if gulu.File.IsExist(confPath) {
-		data, err := os.ReadFile(confPath)
-		if nil != err {
+		if data, err := os.ReadFile(confPath); nil != err {
 			logging.LogErrorf("load conf [%s] failed: %s", confPath, err)
-		}
-		err = gulu.JSON.UnmarshalJSON(data, Conf)
-		if err != nil {
-			logging.LogErrorf("parse conf [%s] failed: %s", confPath, err)
+		} else {
+			if err = gulu.JSON.UnmarshalJSON(data, Conf); err != nil {
+				logging.LogErrorf("parse conf [%s] failed: %s", confPath, err)
+			} else {
+				logging.LogInfof("loaded conf [%s]", confPath)
+			}
 		}
 	}
 
@@ -627,7 +621,7 @@ func Close(force, setCurrentWorkspace bool, execInstallPkg int) (exitCode int) {
 	Conf.Close()
 	sql.CloseDatabase()
 	treenode.SaveBlockTree(false)
-	SaveAssetsTexts()
+	util.SaveAssetsTexts()
 	clearWorkspaceTemp()
 	clearCorruptedNotebooks()
 	clearPortJSON()
@@ -689,7 +683,7 @@ func Close2(force, setCurrentWorkspace bool) (exitCode int) {
 	Conf.Close()
 	sql.CloseDatabase()
 	treenode.SaveBlockTree(false)
-	SaveAssetsTexts()
+	util.SaveAssetsTexts()
 	clearWorkspaceTemp()
 	clearCorruptedNotebooks()
 	clearPortJSON()

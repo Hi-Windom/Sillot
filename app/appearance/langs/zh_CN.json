@@ -1,4 +1,9 @@
 {
+  "allowHTMLBLockScript": "允许执行 HTML 块内脚本",
+  "allowHTMLBLockScriptTip": "启用后将不对 HTML 块中的代码进行安全过滤，请注意潜在的 XSS 攻击风险",
+  "autoLaunchMode0": "不自动启动",
+  "autoLaunchMode1": "开机后自动启动",
+  "autoLaunchMode2": "开机后自动启动并最小化主界面",
   "editorMarkdownInlineSup": "Markdown 行级上标语法",
   "editorMarkdownInlineSupTip": "启用后将支持 <code class='fn__code'>^foo^</code> 行级上标语法输入",
   "editorMarkdownInlineSub": "Markdown 行级下标语法",
@@ -1221,7 +1226,7 @@
     "task.database.index.ref": "执行数据库索引引用",
     "task.database.index.fix": "执行数据库索引订正",
     "task.ocr.image": "执行图片 OCR 提取文本",
-    "task.history.generateDoc": "执行生成文件历史",
+    "task.history.generateFile": "执行生成文件历史",
     "task.history.database.index.full": "执行历史数据库重建索引",
     "task.history.database.index.commit": "执行历史数据库索引提交",
     "task.database.index.embedBlock": "执行数据库索引嵌入块",
@@ -1491,8 +1496,8 @@
     "241": "不支持拖拽为自己的子标题",
     "242": "当前数据库中已经存在该绑定块",
     "243": "仅列出前 [%d] 个标签（含子标签），如需调整请修改 [设置 - 文档树 - 最大列出数量]",
-    "244": "上次使用后未正常退出，建议执行一次 [文档树 - 重建索引]",
-    "245": "上次使用后未正常退出，建议执行一次 [文档树 - 重建索引]，正常退出需使用右侧栏面板中的 [退出应用]",
+    "244": "上次使用后未正常退出，建议执行一次 [文档树 - 重建索引]。以后请完整退出程序后再关闭电脑",
+    "245": "上次使用后未正常退出，建议执行一次 [文档树 - 重建索引]。以后请使用右侧栏面板中的 [退出应用] 进行正常退出",
     "246": "文档标题不能包含 /，已经使用 _ 替换"
   }
 }

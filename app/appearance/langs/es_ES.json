@@ -1,4 +1,9 @@
 {
+  "allowHTMLBLockScript": "Permitir la ejecución de scripts dentro de bloques HTML",
+  "allowHTMLBLockScriptTip": "Después de habilitarlo, el script en el bloque HTML no se desinfectará. Tenga en cuenta el riesgo potencial de ataques XSS",
+  "autoLaunchMode0": "No iniciar automáticamente",
+  "autoLaunchMode1": "Inicio automático después del arranque",
+  "autoLaunchMode2": "Iniciar automáticamente y minimizar la interfaz principal después del arranque",
   "editorMarkdownInlineSup": "Sintaxis de superíndice en línea de Markdown",
   "editorMarkdownInlineSupTip": "Después de habilitar, se admitirá la entrada de sintaxis de superíndice en línea <code class='fn__code'>^foo^</code>",
   "editorMarkdownInlineSub": "Sintaxis del subíndice en línea de Markdown",
@@ -1219,7 +1224,7 @@
     "task.database.index.ref": "Ejecutar referencia de índice de base de datos",
     "task.database.index.fix": "Ejecutar corrección del índice de la base de datos",
     "task.ocr.image": "Ejecutar OCR de imagen para extraer texto",
-    "task.history.generateDoc": "Ejecutar base de datos de historial generar doc",
+    "task.history.generateFile": "Ejecutar base de datos de historial generar doc",
     "task.history.database.index.full": "Ejecutar el índice de reconstrucción de la base de datos del historial",
     "task.history.database.index.commit": "Ejecutar la confirmación del índice de la base de datos del historial",
     "task.database.index.embedBlock": "Ejecutar bloque de incrustación de índice de base de datos",
@@ -1489,8 +1494,8 @@
     "241": "No se admite arrastrar a su subtítulo",
     "242": "El bloque de enlace ya existe en la base de datos actual",
     "243": "Enumere solo las primeras [%d] etiquetas (incluidas las subetiquetas), modifique [Configuración - Árbol de documentos - Número máximo a listar]",
-    "244": "No salió normalmente después del último uso. Se recomienda ejecutar [Árbol de documentos - Reconstruir índice]",
-    "245": "No salió normalmente después del último uso. Se recomienda ejecutar [Árbol de documentos - Reconstruir índice]. Para salir normalmente, necesita usar [Salir de la aplicación] en el panel derecho",
+    "244": "No salió normalmente después del último uso. Se recomienda ejecutar [Árbol de documentos - Reconstruir índice]. En el futuro, salga del programa por completo antes de apagar la computadora",
+    "245": "No salió normalmente después del último uso. Se recomienda ejecutar [Árbol de documentos - Reconstruir índice]. En el futuro, utilice [Salir de la aplicación] en el panel derecho para salir normalmente",
     "246": "El título del documento no puede contener / y ha sido reemplazado por _"
   }
 }

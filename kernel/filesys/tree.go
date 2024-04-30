@@ -36,6 +36,14 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
+// abbreviateData abbreviates the data if it's too long.
+func _abbreviateData(data string) string {
+	if len(data) > 500 {
+		return data[:100] + "\n\n...\n\n" + data[len(data)-100:]
+	}
+	return data
+}
+
 func LoadTree(boxID, p string, luteEngine *lute.Lute) (ret *parse.Tree, err error) {
 	filePath := filepath.Join(util.DataDir, boxID, p)
 	data, err := filelock.ReadFile(filePath)
@@ -50,6 +58,7 @@ func LoadTree(boxID, p string, luteEngine *lute.Lute) (ret *parse.Tree, err erro
 
 func LoadTreeByData(data []byte, boxID, p string, luteEngine *lute.Lute) (ret *parse.Tree, err error) {
 	if !strings.HasPrefix(string(data), "{") || !strings.HasSuffix(string(data), "}") { // 非法JSON
+		logging.LogErrorf("LoadTreeByData() invalid json from [%s], use {} continue :\n```json\n %s \n```", p, _abbreviateData(string(data)))
 		data = []byte("{}")
 	}
 	ret = parseJSON2Tree(boxID, p, data, luteEngine)

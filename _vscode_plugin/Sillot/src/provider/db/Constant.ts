@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.Constant;
 /**
  * 常量补全项
  */
-export const ConstantCompletionItems : Array<vscode.CompletionItem> = [
+export const ConstantCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Constant1",
         kind: _kind,

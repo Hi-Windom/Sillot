@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.Interface;
 /**
  * 接口补全项
  */
-export const InterfaceCompletionItems : Array<vscode.CompletionItem> = [
+export const InterfaceCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Interface1",
         kind: _kind,

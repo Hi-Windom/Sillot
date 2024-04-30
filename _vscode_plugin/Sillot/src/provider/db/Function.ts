@@ -6,7 +6,7 @@ const _ = new vscode.CompletionItem("Function", _kind);
 /**
  * 函数补全项
  */
-export const FunctionCompletionItems : Array<vscode.CompletionItem> = [
+export const FunctionCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "Function1",
         kind: _kind,

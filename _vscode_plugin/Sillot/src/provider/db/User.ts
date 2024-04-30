@@ -4,7 +4,7 @@ const _kind = vscode.CompletionItemKind.User;
 /**
  * 用户定义的补全项
  */
-export const UserCompletionItems : Array<vscode.CompletionItem> = [
+export const UserCompletionItems: Array<vscode.CompletionItem> = [
     {
         label: "User1",
         kind: _kind,

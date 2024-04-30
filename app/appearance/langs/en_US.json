@@ -1,4 +1,9 @@
 {
+  "allowHTMLBLockScript": "Allow execution of scripts within HTML blocks",
+  "allowHTMLBLockScriptTip": "After enabling, the script in the HTML block will not be sanitized, Please be aware of the potential risk of XSS attacks",
+  "autoLaunchMode0": "Do not launch automatically",
+  "autoLaunchMode1": "Auto launch after booting",
+  "autoLaunchMode2": "Auto launch and minimize the main interface after booting",
   "editorMarkdownInlineSup": "Markdown inline superscript syntax",
   "editorMarkdownInlineSupTip": "After enabling, <code class='fn__code'>^foo^</code> inline superscript syntax input will be supported",
   "editorMarkdownInlineSub": "Markdown inline subscript syntax",
@@ -1219,7 +1224,7 @@
     "task.database.index.ref": "Execute database index reference",
     "task.database.index.fix": "Execute database index fix",
     "task.ocr.image": "Execute image OCR to extract text",
-    "task.history.generateDoc": "Execute history database generate doc",
+    "task.history.generateFile": "Execute history database generate doc",
     "task.history.database.index.full": "Execute history database rebuild index",
     "task.history.database.index.commit": "Execute history database index commit",
     "task.database.index.embedBlock": "Execute database index embed block",
@@ -1489,8 +1494,8 @@
     "241": "Drag to its subheading is not supported",
     "242": "The binding block already exists in the current database",
     "243": "Only list the first [%d] tags (including subtags), if you need to adjust, please modify [Settings - Doc Tree - Maximum number to list]",
-    "244": "It did not exit normally after the last use. It is recommended to execute [Doc Tree - Rebuild Index]",
-    "245": "It did not exit normally after the last use. It is recommended to execute [Doc Tree - Rebuild Index]. To exit normally, you need to use [Exit Application] in the right panel",
+    "244": "It did not exit normally after the last use. It is recommended to execute [Doc Tree - Rebuild Index]. In the future, please exit the program completely before shutting down the computer",
+    "245": "It did not exit normally after the last use. It is recommended to execute [Doc Tree - Rebuild Index]. In the future, please use [Exit Application] in the right panel to exit normally",
     "246": "The document title cannot contain / and has been replaced with _"
   }
 }

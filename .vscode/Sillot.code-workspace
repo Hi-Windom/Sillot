@@ -6,23 +6,19 @@
     },
     {
       "path": "../kernel", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "思源内核🤍/kernel 🗂️"
+      "name": "汐洛版思源内核🤍/kernel 🗂️"
     },
     {
       "path": "../app/appearance", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "思源美化🤍/app/appearance 🗂️"
-    },
-    {
-      "path": "../_sili", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "司丽🤍/_sili 🗂️"
+      "name": "汐洛版思源美化🤍/app/appearance 🗂️"
     },
     {
       "path": "../_vscode_plugin/Sillot", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
       "name": "汐洛 VSC 插件🤍/_vscode_plugin/Sillot 🗂️"
     },
     {
-      "path": "../docs", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "汐洛宝典🤍/docs 🗂️"
+      "path": "../docs/starlight", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
+      "name": "汐洛宝典🤍/docs/starlight 🗂️"
     },
     {
       "path": "../../Sillot-android", // 开发在 Android Studio 完成，这里列出只是方便 Git 管理
@@ -31,6 +27,14 @@
     {
       "path": "../../sofillBuilder", // 沁棘开发仓库（暂未开源）
       "name": "沁棘🤍../sofillBuilder 🗂️"
+    },
+    {
+      "path": "../_sili", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
+      "name": "司丽🤍/_sili 🗂️"
+    },
+    {
+      "path": "../_pkgs/siyuan", // 思源本源
+      "name": "思源🤍../siyuan 🗂️"
     }
   ],
   "settings": {
@@ -97,7 +101,7 @@
       // 盤古之白
       "doggy8088.pangu2", // 這個擴充套件會自動替你在文件中所有的中文字和半形的英文、數字、符號之間插入空白。
       // Git Emoji Commit 中文版
-      "maixiaojie.git-emoji-zh", // 起到一个建议提示的作用，很遗憾不能自动填充
+      "maixiaojie.git-emoji-zh", // 需要在命令面板使用才能自动填充，命令为 [git emoji commit message]
       ////
       ////
       //// 不包含在 Sillot.code-profile 中
@@ -122,6 +126,12 @@
       "ms-edgedevtools.vscode-edge-devtools",  // Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, 与本工作区的契合仍有待研究
       // es6-string-html
       "tobermory.es6-string-html", // 高亮 js/ts 中的 /*html*/ 字符串
+      // YAML
+      "redhat.vscode-yaml", // yaml 插件
+      // Package Manager Enhancer
+      "YuTengjing.package-manager-enhancer", // 非常好用，前端必备
+      // Output Colorizer
+      "IBM.output-colorizer", // log 文件高亮
     ],
     "unwantedRecommendations": [
       "oderwat.indent-rainbow", // 花里胡哨影响观感

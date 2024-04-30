@@ -16,8 +16,7 @@ import {
     setLastNodeRange,
 } from "../util/selection";
 import {Constants} from "../../constants";
-import {getSearch, isMobile} from "../../util/functions";
-import {isLocalPath, pathPosix} from "../../util/pathName";
+import {isMobile} from "../../util/functions";
 import {genEmptyElement} from "../../block/util";
 import {previewDocImage} from "../preview/image";
 import {
@@ -47,7 +46,7 @@ import {
 import {transaction, updateTransaction} from "./transaction";
 import {hideElements} from "../ui/hideElements";
 /// #if !BROWSER
-import {ipcRenderer, shell} from "electron";
+import {ipcRenderer} from "electron";
 /// #endif
 import {getEnableHTML, removeEmbed} from "./removeEmbed";
 import {keydown} from "./keydown";
@@ -59,13 +58,13 @@ import {blockRender} from "../render/blockRender";
 /// #if !MOBILE
 import {getAllModels} from "../../layout/getAll";
 import {pushBack} from "../../util/backForward";
-import {openAsset, openBy, openFileById, openLink} from "../../editor/util";
+import {openFileById, openLink} from "../../editor/util";
 import {openGlobalSearch} from "../../search/util";
 /// #else
 import {popSearch} from "../../mobile/menu/search";
 /// #endif
 import {BlockPanel} from "../../block/Panel";
-import {isInIOS, isOnlyMeta, openByMobile} from "../util/compatibility";
+import {isInIOS, isOnlyMeta} from "../util/compatibility";
 import {MenuItem} from "../../menus/Menu";
 import {fetchPost} from "../../util/fetch";
 import {onGet} from "../util/onGet";
@@ -1571,7 +1570,7 @@ export class WYSIWYG {
                 } else if (types.includes("inline-memo")) {
                     protyle.toolbar.showRender(protyle, target);
                     return false;
-                } else if (types.includes("a") && !protyle.disabled) {
+                } else if (types.includes("a")) {
                     linkMenu(protyle, target);
                     if (window.siyuan.config.editor.floatWindowMode === 0 &&
                         target.getAttribute("data-href")?.startsWith("siyuan://blocks")) {
@@ -2164,17 +2163,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 event.preventDefault();
                 const fileIds = fileElement.getAttribute("data-id").split("/");
                 const linkAddress = `assets/${fileIds[1]}`;
-                /// #if MOBILE
-                openByMobile(linkAddress);
-                /// #else
-                if (ctrlIsPressed) {
-                    openBy(linkAddress, "folder");
-                } else if (event.shiftKey) {
-                    openBy(linkAddress, "app");
-                } else {
-                    openAsset(protyle.app, linkAddress, fileIds[2], "right");
-                }
-                /// #endif
+                openLink(protyle, linkAddress, event, ctrlIsPressed);
                 return;
             }
 

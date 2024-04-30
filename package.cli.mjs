@@ -132,10 +132,10 @@ function doit(obj) {
             console.warn("\n建议暂时退出杀毒软件，避免弹窗影响体验\n");
             switch (answers.b) {
                 case works.a01.a0101:
-                    exeHandler("cd .. && .\\scripts\\sillot-win-build.bat", true);
+                    exeHandler(".\\scripts\\sillot-win-build.bat", true);
                     break;
                 case works.a01.a0102:
-                    exeHandler("cd .. && .\\scripts\\sillot-android-build.bat", true);
+                    exeHandler(".\\scripts\\sillot-android-build.bat", true);
                     break;
                 case works.a01.a0103:
                     inquirer
@@ -155,19 +155,19 @@ function doit(obj) {
                             switch (answers.b) {
                                 case "Github milestone":
                                     exeHandler(
-                                        `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w github`,
+                                        `python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w github`,
                                         true
                                     );
                                     break;
                                 case "local changelog":
                                     exeHandler(
-                                        `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w local`,
+                                        `python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w local`,
                                         true
                                     );
                                     break;
                                 default:
                                     exeHandler(
-                                        `cd .. && python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w local_zh`,
+                                        `python .\\scripts\\parse-changelog2File-sillot.py -t ${V} -v ${SYV} -w local_zh`,
                                         true
                                     );
                                     break;
