@@ -1,8 +1,8 @@
 {
     "newDate -> yyyyMMddHHmmss": {
         "prefix": [
-            "formatDate_newDate",
-            "dayjs().format"
+            "⏰formatDate_newDate",
+            "⏰dayjs().format"
         ],
         "body": [
             "formatDate(new Date($1), 'yyyyMMddHHmmss')"
@@ -11,8 +11,8 @@
     },
     "newDate -> yyyy-MM-dd HH:mm:ss": {
         "prefix": [
-            "formatDate_newDate",
-            "dayjs().format"
+            "⏰formatDate_newDate",
+            "⏰dayjs().format"
         ],
         "body": [
             "formatDate(new Date($1), 'yyyy-MM-dd HH:mm:ss')"
@@ -21,8 +21,8 @@
     },
     "newDate -> yyyy-MM-dd": {
         "prefix": [
-            "formatDate_newDate",
-            "dayjs().format"
+            "⏰formatDate_newDate",
+            "⏰dayjs().format"
         ],
         "body": [
             "formatDate(new Date($1), 'yyyy-MM-dd')"
@@ -31,8 +31,8 @@
     },
     "numberInt -> yyyyMMddHHmmss": {
         "prefix": [
-            "formatDate_numberInt",
-            "dayjs().format"
+            "⏰formatDate_numberInt",
+            "⏰dayjs().format"
         ],
         "body": [
             "formatDate(Number.parseInt($1) * 1000, 'yyyyMMddHHmmss')"
@@ -41,8 +41,8 @@
     },
     "numberInt -> yyyy-MM-dd HH:mm:ss": {
         "prefix": [
-            "formatDate_numberInt",
-            "dayjs().format"
+            "⏰formatDate_numberInt",
+            "⏰dayjs().format"
         ],
         "body": [
             "formatDate(Number.parseInt($1) * 1000, 'yyyy-MM-dd HH:mm:ss')"
@@ -51,8 +51,8 @@
     },
     "numberInt -> yyyy-MM-dd": {
         "prefix": [
-            "formatDate_numberInt",
-            "dayjs().format"
+            "⏰formatDate_numberInt",
+            "⏰dayjs().format"
         ],
         "body": [
             "formatDate(Number.parseInt($1) * 1000, 'yyyy-MM-dd')"
