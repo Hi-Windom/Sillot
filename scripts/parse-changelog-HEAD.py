@@ -15,6 +15,7 @@ docmap = {
     "Refactor": "开发重构 | Refactor",
     "Abolishment": "移除废止 | Abolishment",
     "Shinning": "闪亮之名 | Shinning",
+    "VSCE": "VSCode 扩展相关 | VSCE",
 }
 
 

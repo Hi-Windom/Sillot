@@ -1,5 +1,5 @@
 {
-    "等效于 dayjs().format(\"YYYYMMDDHHmmss\")": {
+    "newDate -> yyyyMMddHHmmss": {
         "prefix": [
             "formatDate_newDate",
             "dayjs().format"
@@ -7,6 +7,56 @@
         "body": [
             "formatDate(new Date($1), 'yyyyMMddHHmmss')"
         ],
-        "description": "等效于 dayjs().format(\"YYYYMMDDHHmmss\")\nformatDate 是 sofill/mid 中的一个代理函数，最终调用 date-fns 库的 format 函数"
+        "description": "等效于 dayjs().format(\"YYYYMMDDHHmmss\")\tformatDate 是 sofill/mid 中的一个代理函数，最终调用 date-fns 库的 format 函数"
+    },
+    "newDate -> yyyy-MM-dd HH:mm:ss": {
+        "prefix": [
+            "formatDate_newDate",
+            "dayjs().format"
+        ],
+        "body": [
+            "formatDate(new Date($1), 'yyyy-MM-dd HH:mm:ss')"
+        ],
+        "description": "等效于 dayjs().format(\"YYYY-MM-DD HH:mm:ss\")\tformatDate 是 sofill/mid 中的一个代理函数，最终调用 date-fns 库的 format 函数"
+    },
+    "newDate -> yyyy-MM-dd": {
+        "prefix": [
+            "formatDate_newDate",
+            "dayjs().format"
+        ],
+        "body": [
+            "formatDate(new Date($1), 'yyyy-MM-dd')"
+        ],
+        "description": "等效于 dayjs().format(\"YYYY-MM-DD\")\tformatDate 是 sofill/mid 中的一个代理函数，最终调用 date-fns 库的 format 函数"
+    },
+    "numberInt -> yyyyMMddHHmmss": {
+        "prefix": [
+            "formatDate_numberInt",
+            "dayjs().format"
+        ],
+        "body": [
+            "formatDate(Number.parseInt($1) * 1000, 'yyyyMMddHHmmss')"
+        ],
+        "description": "等效于 dayjs(parseInt() * 1000).format(\"YYYYMMDDHHmmss\")\tformatDate 是 sofill/mid 中的一个代理函数，最终调用 date-fns 库的 format 函数"
+    },
+    "numberInt -> yyyy-MM-dd HH:mm:ss": {
+        "prefix": [
+            "formatDate_numberInt",
+            "dayjs().format"
+        ],
+        "body": [
+            "formatDate(Number.parseInt($1) * 1000, 'yyyy-MM-dd HH:mm:ss')"
+        ],
+        "description": "等效于 dayjs(parseInt() * 1000).format(\"YYYY-MM-DD HH:mm:ss\")\tformatDate 是 sofill/mid 中的一个代理函数，最终调用 date-fns 库的 format 函数"
+    },
+    "numberInt -> yyyy-MM-dd": {
+        "prefix": [
+            "formatDate_numberInt",
+            "dayjs().format"
+        ],
+        "body": [
+            "formatDate(Number.parseInt($1) * 1000, 'yyyy-MM-dd')"
+        ],
+        "description": "等效于 dayjs(parseInt() * 1000).format(\"YYYY-MM-DD\")\tformatDate 是 sofill/mid 中的一个代理函数，最终调用 date-fns 库的 format 函数"
     }
 }
