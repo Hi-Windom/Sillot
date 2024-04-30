@@ -1,4 +1,5 @@
 #!/bin/bash
+# 汐洛仅实现在 windows 平台的构建，linux 自行探索
 
 echo 'Building UI'
 cd app

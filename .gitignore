@@ -44,3 +44,4 @@ yarn.lock
 /app/out
 /app/dist-electron
 **/node_modules
+**.pyc
