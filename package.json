@@ -10,7 +10,7 @@
     "dep:check": "pnpm outdated --filter *",
     "dev:docs": "pnpm --filter ./docs/starlight run dev",
     "git:tag-app": "pnpm --filter ./app run git:tag",
-    "vsce:package": "pnpm --filter ./_vscode_plugin/Sillot run vsce:package",
+    "vsce:sillot": "pnpm --filter ./_vscode_plugin/Sillot run vsce:package",
     "test": "pnpm -r run test"
   },
   "keywords": [],
