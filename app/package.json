@@ -26,7 +26,7 @@
     "check:electron": "pnpm install electron@alpha",
     "gentpl": "node ./scripts/genTPL.js && echo '危险覆写操作警告：git 提交前请确认'",
     "build": "pnpm run gentpl && pnpm run '/build:.*/'",
-    "docker:build": "pnpm run build:mobile && pnpm run build-docker",
+    "docker:build": "pnpm run build:export && pnpm run build:desktop && pnpm run build:mobile && pnpm run build-docker",
     "build-docker": "webpack --mode production --config webpack.docker.js",
     "build:app": "webpack --mode production",
     "build:mobile": "webpack --mode production --config webpack.mobile.js",
