@@ -20,7 +20,6 @@
     "dlv": "echo '注意：dlv debug 是否在独立终端运行中（需要在dlv里执行continue）？没有请先启动（终端工作路径是 kernel/main.go 所在目录），不需要内核调试则应该运行 pnpm run start 命令\n' && pause && NODE_ENV=development MODE=dlv electron-forge start",
     "v": "pnpm version && echo '\npnpm:' && pnpm -v && echo '\n'",
     "git:tag": "node pushTagsByDate.cjs",
-    "git:proxy": "git config --global http.proxy http://127.0.0.1:7890 && git config --global https.proxy http://127.0.0.1:7890 && echo '7890是 clash 默认端口'",
     "link:sofill": "pnpm install ../../sofillBuilder/out -D && echo '仅用于开发调试，推送前请恢复'",
     "unlink:sofill": "pnpm uninstall sofill && pnpm i sofill -D",
     "check:electron": "pnpm install electron@alpha",
