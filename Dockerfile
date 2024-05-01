@@ -25,9 +25,9 @@ ENV CGO_ENABLED=1
 RUN apk add --no-cache gcc musl-dev && \
     cd kernel && go build --tags fts5 -v -ldflags "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod" && \
     mkdir /opt/Sillot/ && \
-    find /Hi-Windom/Sillot/app/appearance/langs -type f -name 'zh_CHT.json' -exec rm {} && \
-    find /Hi-Windom/Sillot/app/appearance/langs -type f -name 'fr_FR.json' -exec rm {} && \
-    find /Hi-Windom/Sillot/app/appearance/langs -type f -name 'es_ES.json' -exec rm {} && \
+    rm /Hi-Windom/Sillot/app/appearance/langs/zh_CHT.json && \
+    rm /Hi-Windom/Sillot/app/appearance/langs/fr_FR.json && \
+    rm /Hi-Windom/Sillot/app/appearance/langs/es_ES.json && \
     mv /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
