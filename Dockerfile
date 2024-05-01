@@ -27,7 +27,7 @@ RUN apk add --no-cache gcc musl-dev && \
     mkdir /opt/Sillot/ && \
     # mv /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
     # -a选项表示归档模式，保持符号链接、权限、时间戳等，-v表示详细输出。
-    rsync -av --exclude='zh_CHT.json' --exclude='fr_FR.json' --exclude='es_ES.json' /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/
+    rsync -av --exclude='zh_CHT.json' --exclude='fr_FR.json' --exclude='es_ES.json' /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/changelogs/ /opt/Sillot/ && \
