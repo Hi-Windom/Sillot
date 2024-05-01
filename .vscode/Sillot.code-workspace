@@ -38,9 +38,10 @@
     }
   ],
   "settings": {
-    // "files.associations": {
-    //   "*.sy": "json"
-    // },
+    "files.associations": {
+    //   "*.sy": "json",
+      "*.tmTheme": "xml"
+    },
     "workbench.editor.wrapTabs": true,
     "search.exclude": {
       "**/.history": true
