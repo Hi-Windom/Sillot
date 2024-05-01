@@ -48,3 +48,20 @@
 ##### snippets：代码片段
 
 注意："path": "./snippets/sofill.json" 这里的路径不能在 ./src 目录下（这是因为 .vscodeignore 中忽略了 src，因此 src 里最好只包含源代码）
+
+
+vscode.CompletionItem
+
+举例：
+
+```json
+{
+        label: "sillot",
+        insertText: "Sillot",
+        documentation: "汐洛",
+        detail: "汐洛（Sillot）孵化自思源笔记（siyuan-note），致力于服务智慧新彖乄",
+        kind: vscode.CompletionItemKind.User,
+}
+```
+
+label 匹配用户输入，当 insertText不存在时也是输出

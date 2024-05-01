@@ -42,15 +42,23 @@
             ]
         },
         "pair": {
-            "match": "\\s*\"(\\\\.|[^\"])*\"\\s*:\\s*\"(\\\\.|[^\"])*\"\\s*",
-            "captures": {
-                "1": {
-                    "name": "string.quoted.double.json"
-                },
-                "2": {
+            "begin": "\"",
+            "end": "\"\\s*:\\s*\"",
+            "beginCaptures": {
+                "0": {
                     "name": "string.quoted.double.json"
                 }
-            }
+            },
+            "endCaptures": {
+                "0": {
+                    "name": "string.quoted.double.json"
+                }
+            },
+            "patterns": [
+                {
+                    "include": "#value"
+                }
+            ]
         },
         "array": {
             "begin": "\\[",

@@ -30,7 +30,13 @@ import {getContenteditableElement, getTopAloneElement, isNotEditBlock} from "../
 import {formatDate} from "sofill/mid";
 import {isInvalidStringStrict} from "sofill/api"
 import {fetchPost, fetchSyncPost} from "../../util/fetch";
-import {cancelSB, genEmptyElement, getLangByType, insertEmptyBlock, jumpToParentNext} from "../../block/util";
+import {
+    cancelSB,
+    genEmptyElement,
+    getLangByType,
+    insertEmptyBlock,
+    jumpToParent,
+} from "../../block/util";
 import {countBlockWord} from "../../layout/status";
 /// #if !MOBILE
 import {openFileById} from "../../editor/util";
@@ -1628,25 +1634,25 @@ export class Gutter {
         window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
         const SSSubmennu: IMenu[] = []; // https://github.com/Hi-Windom/Sillot/issues/175
         if (!protyle.options.backlinkData) {
-            SSSubmennu.push({ // 聚焦
+            SSSubmennu.push({
+                label: window.siyuan.languages.enter, // 聚焦
                 accelerator: `${updateHotkeyTip(window.siyuan.config.keymap.general.enter.custom)}/${updateHotkeyTip("⌘Click")}`,
-                label: window.siyuan.languages.enter,
                 click: () => {
                     zoomOut({protyle, id});
                 }
             });
-            SSSubmennu.push({ // 聚焦到上层
+            SSSubmennu.push({
+                label: window.siyuan.languages.enterBack, // 聚焦到上层
                 accelerator: window.siyuan.config.keymap.general.enterBack.custom,
-                label: window.siyuan.languages.enterBack,
                 click: () => {
                     enterBack(protyle, id);
                 }
             });
         }
         if (!protyle.disabled) {
-            window.siyuan.menus.menu.append(new MenuItem({ // 起始插入行
+            window.siyuan.menus.menu.append(new MenuItem({
                 icon: "iconBefore",
-                label: window.siyuan.languages["insert-before"],
+                label: window.siyuan.languages["insert-before"], // 起始插入行
                 accelerator: window.siyuan.config.keymap.editor.general.insertBefore.custom,
                 click() {
                     hideElements(["select"], protyle);
@@ -1654,9 +1660,9 @@ export class Gutter {
                     insertEmptyBlock(protyle, "beforebegin", id);
                 }
             }).element);
-            window.siyuan.menus.menu.append(new MenuItem({ // 末尾插入行
+            window.siyuan.menus.menu.append(new MenuItem({
                 icon: "iconAfter",
-                label: window.siyuan.languages["insert-after"],
+                label: window.siyuan.languages["insert-after"], // 末尾插入行
                 accelerator: window.siyuan.config.keymap.editor.general.insertAfter.custom,
                 click() {
                     hideElements(["select"], protyle);
@@ -1669,17 +1675,36 @@ export class Gutter {
                 transferBlockRef(id);
             }
         }
-        SSSubmennu.push({ // 跳转到上一层级的下一个块
-            label: window.siyuan.languages.jumpToParentNext,
+        SSSubmennu.push({
+            label: window.siyuan.languages.jumpToParentNext, // 跳转到上一层级的下一个块
             accelerator: window.siyuan.config.keymap.editor.general.jumpToParentNext.custom,
             click() {
                 hideElements(["select"], protyle);
-                jumpToParentNext(protyle, nodeElement);
+                jumpToParent(protyle, nodeElement, "next");
             }
         });
+        SSSubmennu.push({
+            label: window.siyuan.languages.jumpToParentPrev, // 跳转到父块的上一个块
+            accelerator: window.siyuan.config.keymap.editor.general.jumpToParentPrev.custom,
+            click() {
+                hideElements(["select"], protyle);
+                jumpToParent(protyle, nodeElement, "previous");
+            }
+        });
+        SSSubmennu.push({
+            label: window.siyuan.languages.jumpToParent, // 跳转到父块
+            accelerator: window.siyuan.config.keymap.editor.general.jumpToParent.custom,
+            click() {
+                hideElements(["select"], protyle);
+                jumpToParent(protyle, nodeElement, "parent");
+            }
+        });
+
+        window.siyuan.menus.menu.append(new MenuItem({type: "separator"}).element);
+
         if (type !== "NodeThematicBreak") {
-            SSSubmennu.push({ // 折叠/展开
-                label: window.siyuan.languages.fold,
+            SSSubmennu.push({
+                label: window.siyuan.languages.fold, // 折叠/展开
                 accelerator: `${updateHotkeyTip(window.siyuan.config.keymap.editor.general.collapse.custom)}/${updateHotkeyTip("⌥Click")}`,
                 click() {
                     setFold(protyle, nodeElement);

@@ -20,6 +20,7 @@ import { VariableCompletionItems } from "./db/Variable";
 import { FieldCompletionItems } from "./db/Field";
 import { FunctionCompletionItems } from "./db/Function";
 import { MethodCompletionItems } from "./db/Method";
+import { GenericCompletionItems_1 } from "./db/_GenericEntity";
 
 export class SyHoverProvider implements vscode.HoverProvider {
     public provideHover(
@@ -62,37 +63,30 @@ export class SyCompletionItemProvider implements vscode.CompletionItemProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext
     ): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
-        const completionItems: vscode.CompletionItem[] = [];
-
-        const arraysToMerge = [
-            IssueCompletionItems,
-            UserCompletionItems,
-            TypeParameterCompletionItems,
-            OperatorCompletionItems,
-            EventCompletionItems,
-            StructCompletionItems,
-            ConstantCompletionItems,
-            EnumMemberCompletionItems,
-            FolderCompletionItems,
-            FileCompletionItems,
-            SnippetCompletionItems,
-            KeywordCompletionItems,
-            EnumCompletionItems,
-            PropertyCompletionItems,
-            ModuleCompletionItems,
-            InterfaceCompletionItems,
-            ClassCompletionItems,
-            VariableCompletionItems,
-            FieldCompletionItems,
-            FunctionCompletionItems,
-            MethodCompletionItems,
+        const completionItems = [
+            ...GenericCompletionItems_1,
+            ...IssueCompletionItems,
+            ...UserCompletionItems,
+            ...TypeParameterCompletionItems,
+            ...OperatorCompletionItems,
+            ...EventCompletionItems,
+            ...StructCompletionItems,
+            ...ConstantCompletionItems,
+            ...EnumMemberCompletionItems,
+            ...FolderCompletionItems,
+            ...FileCompletionItems,
+            ...SnippetCompletionItems,
+            ...KeywordCompletionItems,
+            ...EnumCompletionItems,
+            ...PropertyCompletionItems,
+            ...ModuleCompletionItems,
+            ...InterfaceCompletionItems,
+            ...ClassCompletionItems,
+            ...VariableCompletionItems,
+            ...FieldCompletionItems,
+            ...FunctionCompletionItems,
+            ...MethodCompletionItems,
         ];
-
-        for (const arr of arraysToMerge) {
-            for (const i of arr) {
-                completionItems.push(i);
-            }
-        }
 
         // 示例
         const _ = new vscode.CompletionItem("绛亽主控巴枀普通开放平台");
@@ -106,4 +100,79 @@ export class SyCompletionItemProvider implements vscode.CompletionItemProvider {
 
         return completionItems;
     }
+}
+
+export class SyCodeActionProvider implements vscode.CodeActionProvider {
+    provideCodeActions(document: vscode.TextDocument, range: vscode.Range, context: vscode.CodeActionContext, token: vscode.CancellationToken): vscode.ProviderResult<(vscode.Command | vscode.CodeAction)[]> {
+        // 过滤出当前范围内的诊断
+        const diagnostics = context.diagnostics.filter(d => d.range.intersection(range) !== null);
+
+        // 为每个诊断创建代码操作
+        const codeActions: vscode.CodeAction[] = diagnostics.map(diagnostic => {
+            const action = new vscode.CodeAction('Fix JSON error', vscode.CodeActionKind.QuickFix);
+            action.edit = new vscode.WorkspaceEdit();
+            action.edit.delete(document.uri, diagnostic.range);
+            action.diagnostics = [diagnostic];
+            return action;
+        });
+
+        return codeActions;
+    }
+}
+
+export class SySemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
+    onDidChangeSemanticTokens?: vscode.Event<void> | undefined;
+    provideDocumentSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SemanticTokens> {
+        throw new Error("Method not implemented.");
+    }
+    provideDocumentSemanticTokensEdits?(document: vscode.TextDocument, previousResultId: string, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SemanticTokens | vscode.SemanticTokensEdits> {
+        throw new Error("Method not implemented.");
+    }
+    provideSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SemanticTokens> {
+        const tokensBuilder = new vscode.SemanticTokensBuilder();
+
+        const text = document.getText();
+        const lines = text.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const errors = this.checkLine(line, i);
+            for (const error of errors) {
+                tokensBuilder.push(error.range.start.line, error.range.start.character, error.range.end.character - error.range.start.character, error.type, 0);
+            }
+        }
+
+        return tokensBuilder.build();
+    }
+
+    private checkLine(line: string, lineNumber: number): { range: vscode.Range; type: number }[] {
+        const errors: { range: vscode.Range; type: number }[] = [];
+
+        // 添加语法检查逻辑，比如检查尾随逗号
+        if (line.trim().endsWith(',')) {
+            const index = line.lastIndexOf(',');
+            errors.push({
+                range: new vscode.Range(lineNumber, index, lineNumber, index + 1),
+                type: 1, // 使用一个唯一的类型来表示尾随逗号错误
+            });
+        }
+
+        return errors;
+    }
+}
+
+export function checkSpelling(document: vscode.TextDocument): vscode.Diagnostic[] {
+    const diagnostics: vscode.Diagnostic[] = [];
+
+    for (let i = 0; i < document.lineCount; i++) {
+        const line = document.lineAt(i);
+        const words = line.text.split(/\s+/);
+        for (const word of words) {
+            if (!/^[a-zA-Z]+$/.test(word)) {
+                const range = new vscode.Range(line.range.start, line.range.start.translate(0, word.length));
+                diagnostics.push(new vscode.Diagnostic(range, 'Invalid word', vscode.DiagnosticSeverity.Error));
+            }
+        }
+    }
+
+    return diagnostics;
 }

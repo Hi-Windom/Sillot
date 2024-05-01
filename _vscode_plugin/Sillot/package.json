@@ -2,7 +2,7 @@
     "name": "sillot",
     "displayName": "汐洛 Sillot",
     "description": "汐洛（Sillot）孵化自思源笔记（siyuan-note），致力于服务智慧新彖乄。此插件为汐洛官方插件，提供多功能一体化集成。",
-    "version": "0.1.1610",
+    "version": "0.1.1700",
     "preview": true,
     "repository": "https://github.com/Hi-Windom/Sillot",
     "publisher": "Hi-Windom",
@@ -42,10 +42,23 @@
         "onLanguage:less",
         "onLanguage:scss",
         "onLanguage:python",
+        "onLanguage:xml",
         "workspaceContains:**/.editorconfig"
     ],
     "main": "./dist/extension.js",
     "contributes": {
+        "themes": [
+			{
+				"label": "Sample Light",
+				"uiTheme": "vs",
+				"path": "./theme/Sample_Light.tmTheme"
+			},
+			{
+				"label": "Sample Dark",
+				"uiTheme": "vs-dark",
+				"path": "./theme/Sample_Dark.tmTheme"
+			}
+		],
         "configuration": {
             "type": "object",
             "title": "汐洛插件配置",
@@ -70,6 +83,16 @@
             }
         },
         "commands": [
+            {
+				"command": "extension.getGitHubUser",
+				"title": "Get GitHub User",
+				"category": "GitHub 认证 (共享)"
+			},
+            {
+				"command": "sillot.getGitHubUser",
+				"title": "Get GitHub User",
+				"category": "GitHub 认证 (独占)"
+			},
             {
                 "command": "sillot.helloWorld",
                 "title": "Hello World",
@@ -181,6 +204,47 @@
                 "configuration": "./languages/_sy.language-configuration.json"
             }
         ],
+        "codeActions": [
+            {
+                "languages": [
+                    "sy"
+                ],
+                "provider": "SyCodeActionProvider",
+                "providedCodeActionKinds": [
+                    "quickfix",
+                    "refactor",
+                    "source",
+                    "organizeImports"
+                ],
+                "actions": {
+                    "kind": "quickfix",
+                    "title": "Fix sy error",
+                    "description": "Fixes a JSON error in the current file"
+                }
+            }
+        ],
+        "semanticTokenTypes": [
+            {
+                "id": "type",
+                "description": "Type names",
+                "defaultLegend": {
+                    "tokenType": "type"
+                }
+            },
+            {
+                "id": "trailingComma",
+                "description": "Trailing commas in JSON",
+                "defaultLegend": {
+                    "tokenType": "trailingComma"
+                }
+            }
+        ],
+        "semanticTokenModifiers": [
+            {
+                "id": "error",
+                "description": "Indicates an error"
+            }
+        ],
         "grammars": [
             {
                 "language": "sy",
@@ -239,6 +303,7 @@
         "webpack-cli": "^5.1.4"
     },
     "dependencies": {
+        "@octokit/rest": "^20.1.0",
         "fs-extra": "^11.2.0",
         "json5": "^2.2.3"
     }

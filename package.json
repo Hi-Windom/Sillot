@@ -5,12 +5,14 @@
   "packageManager": "pnpm@9.0.6",
   "scripts": {
     "cli": "node ./package.cli.mjs",
-    "b:lint-app": "pnpm --filter ./app run b:lint",
-    "b:siyuan": "",
+    "app:b:lint": "pnpm --filter ./app run b:lint",
+    "app:gentpl": "pnpm --filter ./app run gentpl",
+    "app:git:tag": "pnpm --filter ./app run git:tag",
+    "siyuan:b:lint": "",
     "dep:check": "pnpm outdated --filter *",
     "dev:docs": "pnpm --filter ./docs/starlight run dev",
-    "git:tag-app": "pnpm --filter ./app run git:tag",
     "vsce:sillot": "pnpm --filter ./_vscode_plugin/Sillot run vsce:package",
+    "git:proxy": "git config --global http.proxy http://127.0.0.1:7890 && git config --global https.proxy http://127.0.0.1:7890 && echo '7890是 clash 默认端口'",
     "test": "pnpm -r run test"
   },
   "keywords": [],

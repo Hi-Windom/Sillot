@@ -84,7 +84,7 @@ func Boot() {
 	readOnly := flag.String("readonly", "false", "read-only mode")
 	accessAuthCode := flag.String("accessAuthCode", "", "access auth code")
 	ssl := flag.Bool("ssl", false, "for https and wss")
-	lang := flag.String("lang", "", "zh_CN/en_US")
+	lang := flag.String("lang", "", "zh_CN/en_US/ja_JP")
 	mode := flag.String("mode", "prod", "dev/prod")
 	flag.Parse()
 
