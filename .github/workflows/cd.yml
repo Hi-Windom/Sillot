@@ -24,46 +24,47 @@ jobs:
       packageManager: ${{ steps.packageManager.outputs.value }}
       actionInstallCommand: ${{ steps.actionInstallCommand.outputs.value }}
     steps:
-      - name: Checkout repository
+      - name: ☄️ Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: 🔨 Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: pip install PyGithub
 
-      - name: Extract Sillot version from package.json
+      - name: 💫 Extract version from package.json
         uses: sergeysova/jq-action@v2
         id: version
         with:
           cmd: "jq .version ${{ env.package_json }} -r"
 
-      - name: Extract SiYuan version from package.json
+      - name: 💫 Extract syv from package.json
         uses: sergeysova/jq-action@v2
         id: syv
         with:
           cmd: "jq .syv ${{ env.package_json }} -r"
 
-      - name: Extract SiYuan version from package.json
+      - name: 💫 Extract sypv from package.json
         uses: sergeysova/jq-action@v2
         id: sypv
         with:
             cmd: "jq .sypv ${{ env.package_json }} -r"
 
-      - name: Extract packageManager from package.json
+      - name: 💫 Extract packageManager from package.json
         uses: sergeysova/jq-action@v2
         id: packageManager
         with:
             cmd: "jq .packageManager ${{ env.package_json }} -r"
 
-      - name: Extract actionInstallCommand from package.json
+      - name: 💫 Extract actionInstallCommand from package.json
         uses: sergeysova/jq-action@v2
         id: actionInstallCommand
         with:
             cmd: "jq .actionInstallCommand ${{ env.package_json }} -r"
 
-      - id: thisLatestRelease
+      - name: 💫 Set thisLatestRelease
+        id: thisLatestRelease
         uses: K-Sillot/github-action-get-latest-release@master
         with:
           # owner: Hi-Windom
@@ -72,7 +73,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           excludes: prerelease, draft
 
-      - name: Gather Sillot Release Information
+      - name: 📃 Gather Sillot Release Information
         id: release_info
         # https://github.com/Hi-Windom/Sillot/issues/373
         # 注意：创建或更新环境变量的步骤无权访问新值；$GITHUB_OUTPUT 需要定义步骤 id 才能稍后检索输出值，$GITHUB_ENV 则不需要
@@ -95,7 +96,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Gather SiYuan Release Information
+      - name: 📃 Gather SiYuan Release Information
         id: release_info_siyuan
         run: |
           changelog=$(python scripts/parse-changelog.py -t v${{ steps.syv.outputs.value }} -a "${{ steps.sypv.outputs.value }}" siyuan-note/siyuan)
@@ -106,7 +107,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Release
+      - name: 🚩 Create Release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
@@ -167,36 +168,36 @@ jobs:
             suffix: "apk"
 
     steps:
-      - name: Enable long paths for windows # 如果路径超过了 260 个字符（对于 .pnpm 几乎不可避免），可能会遇到问题。GitHub Actions 的 windows-latest 已经支持长路径。
+      - name: ✅ Enable long paths for windows # 如果路径超过了 260 个字符（对于 .pnpm 几乎不可避免），可能会遇到问题。GitHub Actions 的 windows-latest 已经支持长路径。
         if: contains( matrix.config.goos, 'windows')
         run: |
           Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled'
           Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1
 
-      - name: Checkout repository and submodules
+      - name: 📦 Checkout repository and submodules
         uses: actions/checkout@v4
         with:
           submodules: recursive
           path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}
 
-      - name: Set up MingGW
+      - name: 🔨 Set up MingGW
         uses: msys2/setup-msys2@v2
         if: contains( matrix.config.goos, 'windows')
         with:
           install: p7zip mingw-w64-x86_64-lua
 
-      - name: Set up TDM-GCC
+      - name: 🔨 Set up TDM-GCC
         run: msys2 -c "bash ${{ env.repo_owner }}/${{ env.repo_name }}/scripts/get-tdm-gcc.sh tdm https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm-1/tdm-gcc-10.3.0.exe" && echo "CC=${{ github.workspace }}/tdm/bin/gcc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         if: contains( matrix.config.goarch, '386')
         working-directory: ${{ github.workspace }}
 
-      - name: Set up Go
+      - name: 🔨 Set up Go
         uses: actions/setup-go@v5
         with:
             go-version-file: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/kernel/go.mod
       - run: go version
 
-      - name: Set up goversioninfo
+      - name: 🔨 Set up goversioninfo
         run: go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo && go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
         if: contains( matrix.config.goos, 'windows')
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/kernel
@@ -207,50 +208,50 @@ jobs:
           GOPATH: ${{ github.workspace }}/go
           GOARCH: ${{ matrix.config.goarch }}
 
-      - name: Set up Node
+      - name: 🔨 Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install Node pnpm
+      - name: 🔨 Install Node pnpm
         run: npm install -g ${{ needs.create_release.outputs.packageManager }}
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 
-      - name: Change NPMRC File
+      - name: ✍️ Change NPMRC File
         run: pnpm config set registry https://registry.npmjs.org/ --location project
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
       - name: Install Node Dependencies
         run: ${{ needs.create_release.outputs.actionInstallCommand }}
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 
-      - name: Building UI
+      - name: 🔥 Building UI
         run: pnpm run build
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 
-      - name: Remove Build Directory
+      - name: 🗑️ Remove Build Directory
         uses: K-Sillot/rm@master
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
           path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/build
 
-      - name: Remove Kernel Directory for Linux
+      - name: 🗑️ Remove Kernel Directory for Linux
         uses: K-Sillot/rm@master
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
           path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/kernel-linux
 
-      - name: Remove Kernel Directory for Windows
+      - name: 🗑️ Remove Kernel Directory for Windows
         uses: K-Sillot/rm@master
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
           path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/kernel
 
-      - name: Generate Icon Resource and Properties/Version Info For Windows
+      - name: 💫 Generate Icon Resource and Properties/Version Info For Windows
         run: ${{ github.workspace }}\go\${{ matrix.config.gobin }}\goversioninfo -platform-specific=true -icon="resource\icon.ico" -manifest="resource\goversioninfo.exe.manifest"
         if: ${{ contains( matrix.config.goos, 'windows') && !contains( matrix.config.suffix, 'apk') }}
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/kernel
 
-      - name: Building Kernel
+      - name: 🔥 Building Kernel
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         run: go build --tags fts5 -o "${{ matrix.config.kernel_path }}" -v -ldflags "${{ matrix.config.build_args_prefix }} github.com/${{ env.repo_owner }}/${{ env.repo_name }}/kernel/util.${{ matrix.config.build_args_suffix }}"
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/kernel
@@ -261,12 +262,12 @@ jobs:
           GOPATH: ${{ github.workspace }}/go
           GOARCH: ${{ matrix.config.goarch }}
 
-      - name: Building Electron
+      - name: 🔥 Building Electron
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         run: pnpm run ${{ matrix.config.electron_args }}
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 
-      - name: Upload Release Asset for Windows & Linux
+      - name: 📤 Upload Release Asset for Windows & Linux
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         uses: shogo82148/actions-upload-release-asset@v1
         env:
@@ -276,7 +277,7 @@ jobs:
             asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-${{ matrix.config.suffix }}
             asset_path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/build/${{ env.repo_name }}-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}
 
-      - name: zip WinPortable
+      - name: 📦 Packing zip WinPortable
         uses: thedoctor0/zip-release@0.7.1
         if: ${{ contains( matrix.config.goos, 'windows') && !contains( matrix.config.suffix, 'apk') }}
         with:
@@ -286,7 +287,7 @@ jobs:
           exclusions: '*.git*'
           recursive_exclusions: 'LICENSES.chromium.html'
 
-      - name: Upload WinPortable to release asset
+      - name: 📤 Upload WinPortable to release asset
         if: ${{ contains(matrix.config.goos, 'windows') && !contains( matrix.config.suffix, 'apk') }}
         uses: shogo82148/actions-upload-release-asset@v1
         env:
@@ -298,7 +299,7 @@ jobs:
 
 
       # Manual setup is required when the built-in version does not work correctly in windows2022
-      - name: Setup JDK
+      - name: 🔨 Setup JDK
         uses: actions/setup-java@v3
         if: contains( matrix.config.suffix, 'apk')
         continue-on-error: true
@@ -306,44 +307,44 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
           overwrite-settings: true
-      - name: Setup Android SDK
+      - name: 🔨 Setup Android SDK
         uses: android-actions/setup-android@v3.2.0
         if: contains( matrix.config.suffix, 'apk')
-      - name: Install Android NDK
+      - name: 🔨 Install Android NDK
         uses: nttld/setup-ndk@v1
         if: contains( matrix.config.suffix, 'apk')
         with:
           ndk-version: r25b
           add-to-path: true
-      - name: Remove android Directory
+      - name: 🗑️ Remove android Directory
         uses: K-Sillot/rm@master
         if: contains( matrix.config.suffix, 'apk')
         with:
           path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
 
-      - name: Checkout android repo
+      - name: ☄️ Checkout android repo
         uses: actions/checkout@v4
         if: contains( matrix.config.suffix, 'apk')
         with:
           repository: ${{ env.repo_owner }}/${{ env.repo_name_android }}
           path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
 
-      - name: Before android build
+      - name: 💥 Prepare android build
         if: contains( matrix.config.suffix, 'apk')
         run: |
             cd ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}
             .\scripts\sillot-android-build-action.bat
         continue-on-error: false
 
-      - name: Build with Gradle
+      - name: 🔥 Build with Gradle
         if: contains( matrix.config.suffix, 'apk')
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
         run: ./gradlew assembleOfficialAction --quiet --stacktrace
         continue-on-error: false
 
-      - uses: noriban/sign-android-release@v5
+      - name: 🌠 Sign APK
+        uses: noriban/sign-android-release@v5
         if: contains( matrix.config.suffix, 'apk')
-        name: Sign APK
         id: sign_app
         with:
           releaseDirectory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}/app/build/outputs/apk/official/action
@@ -355,7 +356,7 @@ jobs:
           # override default build-tools version -- optional
           BUILD_TOOLS_VERSION: "34.0.0"
 
-      - name: Upload APK to release asset
+      - name: 📤 Upload APK to release asset
         if: contains( matrix.config.suffix, 'apk')
         uses: shogo82148/actions-upload-release-asset@v1
         env:
@@ -365,7 +366,7 @@ jobs:
             asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-beta_github.apk
             asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
 
-      - name: Upload logs if failure
+      - name: 📤 Upload logs if failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
