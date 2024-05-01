@@ -220,7 +220,8 @@ jobs:
       - name: ✍️ Change NPMRC File
         run: pnpm config set registry https://registry.npmjs.org/ --location project
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
-      - name: Install Node Dependencies
+
+      - name: 🚀 Install Node Dependencies
         run: ${{ needs.create_release.outputs.actionInstallCommand }}
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 

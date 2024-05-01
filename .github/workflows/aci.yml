@@ -17,9 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     name: afterCI action
     steps:
-    - name: Install dependencies
+    - name: 🚀 Install dependencies
       run: npm install axios
-    - name: Get Latest Release Assets
+    - name: 🧲 Get Latest Release Assets
       id: latest_release
       uses: actions/github-script@v7
       with:
