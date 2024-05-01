@@ -31,7 +31,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install PyGithub
+
+      - name: 🚀 Install PyGithub
+        run: pip install PyGithub
 
       - name: 💫 Extract version from package.json
         uses: sergeysova/jq-action@v2
@@ -174,7 +176,7 @@ jobs:
           Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled'
           Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1
 
-      - name: 📦 Checkout repository and submodules
+      - name: ☄️ Checkout repository and submodules
         uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -195,7 +197,8 @@ jobs:
         uses: actions/setup-go@v5
         with:
             go-version-file: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/kernel/go.mod
-      - run: go version
+      - name: ✅ Go version
+        run: go version
 
       - name: 🔨 Set up goversioninfo
         run: go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo && go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
@@ -220,7 +223,8 @@ jobs:
       - name: ✍️ Change NPMRC File
         run: pnpm config set registry https://registry.npmjs.org/ --location project
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
-      - name: Install Node Dependencies
+
+      - name: 🚀 Install Node Dependencies
         run: ${{ needs.create_release.outputs.actionInstallCommand }}
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 

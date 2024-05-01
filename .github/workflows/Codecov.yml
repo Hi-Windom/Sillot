@@ -17,32 +17,32 @@ jobs:
               repo_owner: "Hi-Windom"
               package_json: "app/package.json"
     steps:
-      - name: Checkout repository and submodules
+      - name: ☄️ Checkout repository and submodules
         uses: actions/checkout@v4
         with:
             submodules: recursive
-      - name: Extract packageManager from package.json
+      - name: 💫 Extract packageManager from package.json
         uses: sergeysova/jq-action@v2
         id: packageManager
         with:
             cmd: "jq .packageManager ${{ matrix.string.package_json }} -r"
-      - name: Extract actionInstallCommand from package.json
+      - name: 💫 Extract actionInstallCommand from package.json
         uses: sergeysova/jq-action@v2
         id: actionInstallCommand
         with:
             cmd: "jq .actionInstallCommand ${{ matrix.string.package_json }} -r"
-      - name: Set up Node
+      - name: 🔨 Set up Node
         uses: actions/setup-node@v4
         with:
             node-version: 20
-      - name: Install Node pnpm
+      - name: 🔨 Install Node pnpm
         run: npm install -g ${{ steps.packageManager.outputs.value }}
         working-directory: app
-      - name: Install dependencies
+      - name: 🚀 Install dependencies
         run: ${{ steps.actionInstallCommand.outputs.value }}
         working-directory: app
-      - name: Run tests and collect coverage
+      - name: 💥 Run tests and collect coverage
         run: pnpm run test
         working-directory: app
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+      - name: 📤 Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
