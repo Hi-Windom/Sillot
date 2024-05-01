@@ -1122,6 +1122,7 @@
   "checkUpdate": "Check update",
   "currentVer": "Current version",
   "downloadLatestVer": "<a href=\"https://b3log.org/siyuan/en/download.html\", target=\"_blank\">Download the latest version</a>",
+  "baseSY": "Based on SiYuan",
   "themeLight": "Light",
   "themeDark": "Dark",
   "themeOS": "Follow the system",

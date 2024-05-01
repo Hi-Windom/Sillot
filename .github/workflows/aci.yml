@@ -51,7 +51,7 @@ jobs:
             return data.upload_url;
       continue-on-error: false
 
-    - name: Generate Hash for Assets
+    - name: 💥 Generate Hash for Assets
       id: generate_hash
       # 使用了 awk 的内置函数 toupper() 来将哈希值转换为大写，同时使用空格作为字段分隔符。awk 会将每一行的第一个字段（哈希值）转换为大写，并且保留第二个字段（文件名）
       run: |
@@ -60,7 +60,7 @@ jobs:
           find . -type f -name 'Sillot-*' -exec sha256sum {} + | awk '{print toupper($1), $2}' > Assets_SHA256_Sum.txt
       continue-on-error: false
 
-    - name: Upload Assets_MD5_Sum.txt File to Release Asset
+    - name: 📤 Upload Assets_MD5_Sum.txt File to Release Asset
       uses: shogo82148/actions-upload-release-asset@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -69,7 +69,7 @@ jobs:
           asset_path: ./Assets_MD5_Sum.txt
           asset_name: Assets_MD5_Sum.txt
 
-    - name: Upload Assets_SHA256_Sum.txt File to Release Asset
+    - name: 📤 Upload Assets_SHA256_Sum.txt File to Release Asset
       uses: shogo82148/actions-upload-release-asset@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
