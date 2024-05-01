@@ -40,7 +40,8 @@
   "settings": {
     "files.associations": {
     //   "*.sy": "json",
-      "*.tmTheme": "xml"
+      "*.tmTheme": "xml",
+      "*.tpl": "html"
     },
     "workbench.editor.wrapTabs": true,
     "search.exclude": {

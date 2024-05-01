@@ -374,7 +374,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable99);
 
     context.subscriptions.push(vscode.languages.registerColorProvider({ language: 'xml' }, new ColorPickerProvider())); // 记得在 .vscode 中把 .tmTheme 文件视为 xml
+    context.subscriptions.push(vscode.languages.registerColorProvider({ language: 'json' }, new ColorPickerProvider()));
     context.subscriptions.push(vscode.languages.registerColorProvider({ language: 'typescript' }, new ColorPickerProvider()));
+    context.subscriptions.push(vscode.languages.registerColorProvider({ language: 'html' }, new ColorPickerProvider()));
 }
 
 // 当你的扩展被禁用时，这个方法将被调用
