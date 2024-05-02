@@ -39,7 +39,11 @@
     {
       "path": "../_pkgs/siyuan", // 思源本源
       "name": "思源🤍../siyuan 🗂️"
-    }
+    },
+    {
+        "path": "../_pkgs/siyuan-android", // 思源本源
+        "name": "思源安卓🤍../siyuan-android 🗂️"
+      }
   ],
   "settings": {
     "files.associations": {
