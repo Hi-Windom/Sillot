@@ -266,7 +266,7 @@
                 "path": "./snippets/md.json"
             },
             {
-                "language": "typescript",
+                "language": "mdx",
                 "path": "./snippets/md.json"
             }
         ]
