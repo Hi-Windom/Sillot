@@ -15,7 +15,7 @@ android_kernelRoot = [name_root,
                       "app",
                       "libs"]  # 根据实际路径更改此项
 targetRoot = os.path.join(os.path.dirname(
-    cwd), *android_baseRoot)
+    cwd), *android_baseRoot) # type: ignore
 target = os.path.join(targetRoot, name_zip)
 appRoot = os.path.join(cwd, "app")
 dir_list = [os.path.join(appRoot, "appearance"),

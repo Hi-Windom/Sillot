@@ -49,7 +49,6 @@
 
 注意："path": "./snippets/sofill.json" 这里的路径不能在 ./src 目录下（这是因为 .vscodeignore 中忽略了 src，因此 src 里最好只包含源代码）
 
-
 vscode.CompletionItem
 
 举例：
@@ -65,3 +64,32 @@ vscode.CompletionItem
 ```
 
 label 匹配用户输入，当 insertText不存在时也是输出
+
+### vscode.CompletionItemProvider
+
+> 在 VS Code 中，当一个特定的语言或文件类型被打开时，可以有多个扩展为其提供语言功能，如语法高亮、代码补全、悬停信息等。然而，对于某些功能，如代码补全（Completion Item Provider），VS Code 会选择一个“活动的”提供者来处理用户的输入。
+
+> 这意味着，尽管可以有多个扩展注册了同一个语言或文件类型的 Completion Item Provider，但 VS Code 会在这些提供者中选择一个来响应自动完成请求。通常，选择哪个提供者取决于提供者的注册方式和它们的优先级。
+
+举例：
+
+```json
+{
+        label: "☄️",
+        filterText: "彗星 检出仓库",
+        insertText: "☄️",
+        documentation: "☄️ 彗星：检出仓库",
+        detail: "Github Action 步骤名称开头的 emoji",
+        kind: vscode.CompletionItemKind.User,
+}
+```
+
+label是显示在自动补全主框里的内容
+
+filterText可以理解为输入联想，用空格分割关键词
+
+insertText就是自动完成的内容了
+
+documentation是自动补全副框里的主要内容
+
+detail是自动补全副框里的次要内容（非显著颜色的就是了）；当自动补全副框处于关闭状态时，他会显示在主框

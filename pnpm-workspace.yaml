@@ -1,5 +1,5 @@
 packages:
-  - '_vscode_plugin/*'
+  - '.vscode/extensions/*'
   - './app'
   - './pkgs/siyuan/app'
   - './docs/starlight'

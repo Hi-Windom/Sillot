@@ -35,6 +35,7 @@ import { CodelensProvider } from "./CodelensProvider";
 import { GenericCompletionItemProvider } from "./provider/_Generic";
 import { Credentials } from "./auth/github";
 import { ColorPickerProvider } from "./provider/_ColorPicker";
+import { YamlCompletionItemProvider } from "./provider/yaml";
 
 let lastChangedDocument: vscode.TextDocument | null = null;
 let myWebviewPanel: vscode.WebviewPanel | undefined;
@@ -281,14 +282,21 @@ export async function activate(context: vscode.ExtensionContext) {
     // context.subscriptions.push(disposable3);
     context.subscriptions.push(测试序列化字典);
     context.subscriptions.push(测试反序列化字典);
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('*', new GenericCompletionItemProvider()));
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider("*", new GenericCompletionItemProvider()));
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider("yaml", new YamlCompletionItemProvider()));
     context.subscriptions.push(vscode.languages.registerHoverProvider("sy", new SyHoverProvider()));
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider("sy", new SyCompletionItemProvider()));
-    context.subscriptions.push(vscode.languages.registerCodeActionsProvider({ language: 'sy' }, new SyCodeActionProvider()));
-    context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'sy' }, new SySemanticTokensProvider(), new vscode.SemanticTokensLegend([
-        'type',
-        'trailingComma', // 表示尾随逗号错误
-    ])));
+    context.subscriptions.push(vscode.languages.registerCodeActionsProvider({ language: "sy" }, new SyCodeActionProvider()));
+    context.subscriptions.push(
+        vscode.languages.registerDocumentSemanticTokensProvider(
+            { language: "sy" },
+            new SySemanticTokensProvider(),
+            new vscode.SemanticTokensLegend([
+                "type",
+                "trailingComma", // 表示尾随逗号错误
+            ])
+        )
+    );
     // context.subscriptions.push(vscode.languages.registerCompletionItemProvider("dosc", new SyCompletionItemProvider()));
 
     const disposable5 = vscode.commands.registerCommand("sillot.pickEXE", () => {
@@ -354,29 +362,29 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage(`CodeLens action clicked with args=${args}`);
     });
     const credentials = new Credentials();
-	await credentials.initialize(context);
-    const disposable99 = vscode.commands.registerCommand('extension.getGitHubUser', async () => {
-		/**
-		 * Octokit (https://github.com/octokit/rest.js#readme) is a library for making REST API
-		 * calls to GitHub. It provides convenient typings that can be helpful for using the API.
-		 * 
-		 * Documentation on GitHub's REST API can be found here: https://docs.github.com/en/rest
-		 */
-		const octokit = await credentials.getOctokit();
-		const userInfo = await octokit.users.getAuthenticated();
+    await credentials.initialize(context);
+    const disposable99 = vscode.commands.registerCommand("extension.getGitHubUser", async () => {
+        /**
+         * Octokit (https://github.com/octokit/rest.js#readme) is a library for making REST API
+         * calls to GitHub. It provides convenient typings that can be helpful for using the API.
+         *
+         * Documentation on GitHub's REST API can be found here: https://docs.github.com/en/rest
+         */
+        const octokit = await credentials.getOctokit();
+        const userInfo = await octokit.users.getAuthenticated();
 
-		vscode.window.showInformationMessage(`Logged into GitHub as ${userInfo.data.login}`);
-	});
-    const disposable88 = vscode.commands.registerCommand('sillot.getGitHubUser', async () => {
-		vscode.window.showInformationMessage("这个还没有实现嘞");
-	});
+        vscode.window.showInformationMessage(`Logged into GitHub as ${userInfo.data.login}`);
+    });
+    const disposable88 = vscode.commands.registerCommand("sillot.getGitHubUser", async () => {
+        vscode.window.showInformationMessage("这个还没有实现嘞");
+    });
     context.subscriptions.push(disposable88);
-	context.subscriptions.push(disposable99);
+    context.subscriptions.push(disposable99);
 
-    context.subscriptions.push(vscode.languages.registerColorProvider({ language: 'xml' }, new ColorPickerProvider())); // 记得在 .vscode 中把 .tmTheme 文件视为 xml
-    context.subscriptions.push(vscode.languages.registerColorProvider({ language: 'json' }, new ColorPickerProvider()));
-    context.subscriptions.push(vscode.languages.registerColorProvider({ language: 'typescript' }, new ColorPickerProvider()));
-    context.subscriptions.push(vscode.languages.registerColorProvider({ language: 'html' }, new ColorPickerProvider()));
+    context.subscriptions.push(vscode.languages.registerColorProvider({ language: "xml" }, new ColorPickerProvider())); // 记得在 .vscode 中把 .tmTheme 文件视为 xml
+    context.subscriptions.push(vscode.languages.registerColorProvider({ language: "json" }, new ColorPickerProvider()));
+    context.subscriptions.push(vscode.languages.registerColorProvider({ language: "typescript" }, new ColorPickerProvider()));
+    context.subscriptions.push(vscode.languages.registerColorProvider({ language: "html" }, new ColorPickerProvider()));
 }
 
 // 当你的扩展被禁用时，这个方法将被调用
