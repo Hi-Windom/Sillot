@@ -52,9 +52,28 @@
       "*.tpl": "html"
     },
     "workbench.editor.wrapTabs": true,
+    "terminal.integrated.gpuAcceleration": "auto",
+    "scm.workingSets.enabled": true,
+    "scm.workingSets.default": "current",
+    "editor.guides.indentation": true,
+    "editor.stickyScroll.enabled": true,
+    "editor.minimap.side": "left", // 显示在左侧更专注
+    "editor.minimap.enabled": true,
+    "workbench.editor.titleScrollbarSizing": "large",
+    "workbench.editor.openPositioning": "right",
+    "workbench.editor.showTabs": "multiple",
+    "workbench.editor.enablePreview": true, // 启用或禁用预览编辑器
+    "workbench.editor.closeEmptyGroups": false, // 关闭编辑器组的最后一个编辑器是否关闭该组本身
+    "workbench.editor.customLabels.enabled": true, // REF https://code.visualstudio.com/docs/getstarted/userinterface#_customize-tab-labels
+    "workbench.editor.customLabels.patterns": {
+        "**/src/**/index.ts": "${dirname}/${filename} 💕"
+    },
     "search.exclude": {
       "**/.history": true
-    }
+    },
+    // 实验性设置
+    "notebook.experimental.remoteSave": true,
+    "markdown.experimental.updateLinksOnPaste": true
   },
   "extensions": {
     "recommendations": [
