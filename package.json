@@ -11,7 +11,7 @@
     "siyuan:b:lint": "",
     "dep:check": "pnpm outdated --filter *",
     "dev:docs": "pnpm --filter ./docs/starlight run dev",
-    "vsce:sillot": "pnpm --filter ./_vscode_plugin/Sillot run vsce:package",
+    "vsce:sillot": "pnpm --filter ./.vscode/extensions/Sillot run vsce:package",
     "git:proxy": "git config --global http.proxy http://127.0.0.1:7890 && git config --global https.proxy http://127.0.0.1:7890 && echo '7890是 clash 默认端口'",
     "test": "pnpm -r run test"
   },
