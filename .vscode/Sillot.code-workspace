@@ -51,6 +51,13 @@
       "*.tmTheme": "xml",
       "*.tpl": "html"
     },
+    "[markdown]":{
+      "editor.quickSuggestions": {
+        "other":"on",
+        "comments": "on",
+        "strings": "on"
+      } // 也可以直接设置为 "editor.quickSuggestions": true (忽略警告)
+    },
     "workbench.editor.wrapTabs": true,
     "terminal.integrated.gpuAcceleration": "auto",
     "scm.workingSets.enabled": true,

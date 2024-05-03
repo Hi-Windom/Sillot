@@ -3,4 +3,4 @@
 **.vsix
 **/SavedFileCompletionItemProvider.json
 /.vscode-test
-src/test/files
+test

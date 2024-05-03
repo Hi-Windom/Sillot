@@ -1,0 +1,10 @@
+{
+    "--- title ---": {
+        "prefix": ["title"],
+        "body": [
+            "---\ntitle: $1\n---\n",
+            "$2"
+        ],
+        "description": "快速插入头部"
+    }
+}
