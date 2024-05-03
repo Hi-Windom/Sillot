@@ -30,12 +30,14 @@ import { FileExplorer } from "./fileExplorer";
 import { TestView } from "./testView";
 import { TestViewDragAndDrop } from "./testViewDragAndDrop";
 import { JsonOutlineProvider } from "./jsonOutline";
-import { subscribeToDocumentChanges, EMOJI_MENTION } from "./diagnostics";
+import { EMOJI_MENTION, subscribeToDocumentChanges } from "./diagnostics";
 import { CodelensProvider } from "./CodelensProvider";
 import { GenericCompletionItemProvider } from "./provider/_Generic";
 import { Credentials } from "./auth/github";
 import { ColorPickerProvider } from "./provider/_ColorPicker";
 import { YamlCompletionItemProvider } from "./provider/yaml";
+import { FontMapList, apply花字Transformation } from "./context/花字";
+import { C } from "./extension.const";
 
 let lastChangedDocument: vscode.TextDocument | null = null;
 let myWebviewPanel: vscode.WebviewPanel | undefined;
@@ -81,7 +83,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const rootPath =
         vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
             ? vscode.workspace.workspaceFolders[0].uri.fsPath
-            : vscode.extensions.getExtension("Hi-Windom.sillot")?.extensionPath;
+            : vscode.extensions.getExtension(C.extensionId)?.extensionPath;
 
     const disposable77 = vscode.commands.registerCommand("sillot.openPackageOnNpm", moduleName => {
         const editor = vscode.window.activeTextEditor;
@@ -102,7 +104,7 @@ export async function activate(context: vscode.ExtensionContext) {
             vscode.window.showErrorMessage("Invalid package name");
             return;
         }
-        vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(`https://www.npmjs.com/package/${text}`));
+        vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(`${C.npmjs}/package/${text}`));
     });
 
     context.subscriptions.push(disposable77);
@@ -120,9 +122,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // new TestViewDragAndDrop(context);
 
+    const extensionVersion = vscode.extensions.getExtension(C.extensionId)?.packageJSON.version;
     const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    statusBarItem.text = "汐洛插件运行中";
-    statusBarItem.tooltip = "This is my custom status bar item";
+    statusBarItem.text = `Sillot ${extensionVersion}`;
+    statusBarItem.tooltip = "汐洛扩展运行中";
     statusBarItem.command = "sillot.helloWorld"; // 可选的命令
     statusBarItem.show();
 
@@ -151,14 +154,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // "sillot" 是扩展的标识符，而 "helloWorld" 是命令的名称。这意味着这个命令是由名为 sillot 的扩展提供的。在 package.json 文件的 "contributes" 部分，需要正确注册该命令
     const disposable = vscode.commands.registerCommand("sillot.helloWorld", () => {
-        // The code you place here will be executed every time your command is executed
-        // Display a message box to the user
-        vscode.window.showInformationMessage("Hello World from Sillot!");
-        Log.i("你");
-        Log.w("好");
-        Log.e("汐");
-        Log.d("洛");
-        Log.a("汐洛", `${Log.Channel.logLevel}`);
+        // vscode.window.showInformationMessage("Hello World from Sillot!");
+        Log.e("Hi, Sillot", `${Log.Channel.logLevel}`);
 
         // 获取typescript.useCodeSnippetsOnMethodSuggest的值
         const test2 = vscode.workspace.getConfiguration("typescript").get("useCodeSnippetsOnMethodSuggest") as string;
@@ -299,6 +296,14 @@ export async function activate(context: vscode.ExtensionContext) {
     );
     // context.subscriptions.push(vscode.languages.registerCompletionItemProvider("dosc", new SyCompletionItemProvider()));
 
+    FontMapList.forEach((c, i) => {
+        context.subscriptions.push(
+            vscode.commands.registerCommand(`汐洛.花字.${c}`, () => {
+                apply花字Transformation(c);
+            })
+        );
+    })
+
     const disposable5 = vscode.commands.registerCommand("sillot.pickEXE", () => {
         vscode.window
             .showOpenDialog({
@@ -434,7 +439,11 @@ export class Emojizer implements vscode.CodeActionProvider {
 
     private createCommand(): vscode.CodeAction {
         const action = new vscode.CodeAction("Learn more...", vscode.CodeActionKind.Empty);
-        action.command = { command: COMMAND, title: "Learn more about emojis", tooltip: "This will open the unicode emoji page." };
+        action.command = {
+            command: COMMAND,
+            title: "Learn more about emojis",
+            tooltip: "This will open the unicode emoji page.",
+        };
         return action;
     }
 }
@@ -459,7 +468,11 @@ export class Emojinfo implements vscode.CodeActionProvider {
 
     private createCommandCodeAction(diagnostic: vscode.Diagnostic): vscode.CodeAction {
         const action = new vscode.CodeAction("Learn more...", vscode.CodeActionKind.QuickFix);
-        action.command = { command: COMMAND, title: "Learn more about emojis", tooltip: "This will open the unicode emoji page." };
+        action.command = {
+            command: COMMAND,
+            title: "Learn more about emojis",
+            tooltip: "This will open the unicode emoji page.",
+        };
         action.diagnostics = [diagnostic];
         action.isPreferred = true;
         return action;
