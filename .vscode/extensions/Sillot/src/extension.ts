@@ -24,7 +24,7 @@ import { SnippetCompletionItems } from "./provider/db/Snippet";
 import { StructCompletionItems } from "./provider/db/Struct";
 import { TypeParameterCompletionItems } from "./provider/db/TypeParameter";
 import { VariableCompletionItems } from "./provider/db/Variable";
-import path from "path";
+import path, { resolve } from "path";
 import { DepNodeProvider } from "./nodeDependencies";
 import { FileExplorer } from "./fileExplorer";
 import { TestView } from "./testView";
@@ -59,27 +59,124 @@ class fileCompletionItemProvider implements vscode.CompletionItemProvider {
     }
 }
 // 序列化并保存到文件
-async function saveCompletionItemsToFile(filePath: string, items: Array<vscode.CompletionItem>) {
+async function saveCompletionItemsToFile(filePath: string, items: Array<vscode.CompletionItem> | { [key: string]: any }) {
     // 使用 json5.stringify 格式化 JSON，使其更易读
-    const serializedItems = json5.stringify(items, null, 2);
+    const serializedItems = json5.stringify(items, {
+        space: 2,
+        quote: '"',
+    });
 
     // 使用 fs-extra 写入文件
     await fs.writeFile(filePath, serializedItems, "utf-8");
 }
 
 // 从文件反序列化
-async function loadCompletionItemsFromFile(filePath: string): Promise<Array<vscode.CompletionItem>> {
+async function loadCompletionItemsFromFile(filePath: string): Promise<any> {
     // 使用 fs-extra 读取文件
     const serializedItems = await fs.readFile(filePath, "utf-8");
 
     // 使用 json5.parse 反序列化 JSON
-    const items: Array<vscode.CompletionItem> = json5.parse(serializedItems);
+    const items = json5.parse(serializedItems);
 
     // 返回反序列化后的数组
     return items;
 }
 
 export async function activate(context: vscode.ExtensionContext) {
+    const disposable555 = vscode.commands.registerCommand("汐洛.同步更新版本", () => {
+        vscode.window.showInputBox({ prompt: "Enter new version" }).then(async version => {
+            if (version) {
+                const wname = vscode.workspace.name;
+                if (wname && vscode.workspace.workspaceFile) {
+                    const pkgMapFile = `${path.dirname(vscode.workspace.workspaceFile.fsPath)}/${C.PackageJsonMapping}`;
+                    Log.d(wname, pkgMapFile);
+                    if (!(await fs.exists(pkgMapFile))) {
+                        vscode.window.showWarningMessage("package.json 映射不存在，请先添加");
+                        return;
+                    }
+
+                    const pkgMap: { [key: string]: any } = await loadCompletionItemsFromFile(pkgMapFile);
+                    const paths: string[] = pkgMap[wname];
+                    // 创建快速选择框
+                    const quickPick = vscode.window.createQuickPick();
+                    quickPick.title = "选择要更新版本的文件";
+                    // quickPick.items = [{ label: "Option 1" }, { label: "Option 2" }, { label: "Option 3" }];
+                    quickPick.items = paths.map(path => ({ label: path }));
+                    quickPick.canSelectMany = true; // 允许多选
+
+                    // 显示快速选择框并等待用户选择
+                    const selectedOptions: string[] = await new Promise(resolve => {
+                        quickPick.onDidAccept(() => {
+                            resolve(quickPick.selectedItems.map(item => item.label));
+                            quickPick.dispose();
+                        });
+                        quickPick.onDidHide(() => {
+                            resolve([]);
+                            quickPick.dispose();
+                        });
+                        quickPick.show();
+                    });
+
+                    if (selectedOptions.length > 0) {
+                        Log.d(`Version: ${version}, Selected options:${selectedOptions.join(", ")}`);
+                    } else {
+                        resolve();
+                    }
+                    // 遍历映射并更新版本号
+                    selectedOptions.forEach(async (value: string, index: number) => {
+                        Log.d("汐洛.同步更新版本", value);
+                        if (await fs.exists(value)) {
+                            const pkgContent = fs.readJSONSync(value);
+                            pkgContent.version = version;
+                            fs.writeFileSync(value, JSON.stringify(pkgContent, null, 2));
+                            Log.d(`${version} -> ${value}`);
+                        } else {
+                            vscode.window.showWarningMessage(`已跳过无效映射 ${value}`);
+                        }
+                    });
+                    vscode.window.showInformationMessage("Version updated in all package.json files.");
+                } else {
+                    vscode.window.showWarningMessage("当前不在工作区环境");
+                }
+            }
+        });
+    });
+
+    context.subscriptions.push(disposable555);
+
+    const addMappingDisposable = vscode.commands.registerCommand("汐洛.addPackageJsonMapping", async (uri: vscode.Uri) => {
+        if (uri?.fsPath.endsWith("package.json")) {
+            const wname = vscode.workspace.name;
+            if (wname && vscode.workspace.workspaceFile) {
+                Log.d(wname, uri.fsPath);
+                let pkgMap: { [key: string]: any } = {};
+                const pkgMapFile = `${path.dirname(vscode.workspace.workspaceFile.fsPath)}/${C.PackageJsonMapping}`;
+                if (await fs.exists(pkgMapFile)) {
+                    pkgMap = await loadCompletionItemsFromFile(pkgMapFile);
+                }
+                if (!pkgMap[wname]) {
+                    pkgMap[wname] = [];
+                }
+                if (pkgMap[wname].includes(uri.fsPath)) {
+                    vscode.window.showInformationMessage("当前 package.json 映射已存在");
+                } else {
+                    pkgMap[wname].push(uri.fsPath);
+                    saveCompletionItemsToFile(pkgMapFile, pkgMap);
+                    vscode.window.showInformationMessage(`已映射到工作区 ${wname}`);
+                    vscode.window.showWarningMessage(
+                        `注意：目前使用绝对路径，因此移动项目后请手动修改工作区配置文件同目录下的 ${C.PackageJsonMapping} 文件`
+                    );
+                }
+            } else {
+                vscode.window.showWarningMessage("当前不在工作区环境");
+            }
+        } else {
+            vscode.window.showErrorMessage("Right-click command must be executed on a package.json file.");
+        }
+    });
+
+    context.subscriptions.push(addMappingDisposable);
+
     const rootPath =
         vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
             ? vscode.workspace.workspaceFolders[0].uri.fsPath
@@ -302,7 +399,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 apply花字Transformation(c);
             })
         );
-    })
+    });
 
     const disposable5 = vscode.commands.registerCommand("sillot.pickEXE", () => {
         vscode.window
