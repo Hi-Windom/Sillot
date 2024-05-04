@@ -1,411 +1,428 @@
 {
-    "name": "sillot",
-    "displayName": "汐洛 Sillot",
-    "description": "汐洛（Sillot）孵化自思源笔记（siyuan-note），致力于服务智慧新彖乄。此插件为汐洛官方插件，提供多功能一体化集成。",
-    "version": "0.1.2000",
-    "preview": true,
-    "repository": "https://github.com/Hi-Windom/Sillot",
-    "publisher": "Hi-Windom",
-    "icon": "media/icon.png",
-    "galleryBanner": {
-        "color": "#131824",
-        "theme": "dark"
-    },
-    "keywords": [
-        "ms-ceintl.vscode-language-pack-zh-hans"
+  "name": "sillot",
+  "displayName": "汐洛 Sillot",
+  "description": "汐洛（Sillot）孵化自思源笔记（siyuan-note），致力于服务智慧新彖乄。此插件为汐洛官方插件，提供多功能一体化集成。",
+  "version": "0.32.2000",
+  "preview": true,
+  "repository": "https://github.com/Hi-Windom/Sillot",
+  "publisher": "Hi-Windom",
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#131824",
+    "theme": "dark"
+  },
+  "keywords": [
+    "ms-ceintl.vscode-language-pack-zh-hans"
+  ],
+  "extensionDependencies": [],
+  "markdown": "github",
+  "engines": {
+    "vscode": "^1.88.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Extension Packs"
+  ],
+  "activationEvents": [
+    "onDidChangeTextDocument",
+    "onDidChangeActiveTextEditor",
+    "onLanguage:plaintext",
+    "onLanguage:json",
+    "onLanguage:jsonc",
+    "onLanguage:go",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:yaml",
+    "onLanguage:markdown",
+    "onLanguage:astro",
+    "onLanguage:csharp",
+    "onLanguage:kotlin",
+    "onLanguage:css",
+    "onLanguage:less",
+    "onLanguage:scss",
+    "onLanguage:python",
+    "onLanguage:xml",
+    "workspaceContains:**/.editorconfig"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "themes": [
+      {
+        "label": "Sample Light",
+        "uiTheme": "vs",
+        "path": "./theme/Sample_Light.tmTheme"
+      },
+      {
+        "label": "Sample Dark",
+        "uiTheme": "vs-dark",
+        "path": "./theme/Sample_Dark.tmTheme"
+      }
     ],
-    "extensionDependencies": [],
-    "markdown": "github",
-    "engines": {
-        "vscode": "^1.88.0"
-    },
-    "categories": [
-        "Programming Languages",
-        "Snippets",
-        "Extension Packs"
-    ],
-    "activationEvents": [
-        "onDidChangeTextDocument",
-        "onDidChangeActiveTextEditor",
-        "onLanguage:plaintext",
-        "onLanguage:json",
-        "onLanguage:jsonc",
-        "onLanguage:go",
-        "onLanguage:javascript",
-        "onLanguage:typescript",
-        "onLanguage:yaml",
-        "onLanguage:markdown",
-        "onLanguage:astro",
-        "onLanguage:csharp",
-        "onLanguage:kotlin",
-        "onLanguage:css",
-        "onLanguage:less",
-        "onLanguage:scss",
-        "onLanguage:python",
-        "onLanguage:xml",
-        "workspaceContains:**/.editorconfig"
-    ],
-    "main": "./dist/extension.js",
-    "contributes": {
-        "themes": [
-			{
-				"label": "Sample Light",
-				"uiTheme": "vs",
-				"path": "./theme/Sample_Light.tmTheme"
-			},
-			{
-				"label": "Sample Dark",
-				"uiTheme": "vs-dark",
-				"path": "./theme/Sample_Dark.tmTheme"
-			}
-		],
-        "configuration": {
-            "type": "object",
-            "title": "汐洛插件配置",
-            "properties": {
-                "codelens-sample.enableCodeLens": {
-                    "type": "boolean",
-                    "default": true
-                },
-                "typescript.useCodeSnippetsOnMethodSuggest": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Complete functions with their parameter signature."
-                },
-                "sillot.typescript.tsdk": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "default": null,
-                    "markdownDescription": "Specifies the folder path containing the tsserver and `lib*.d.ts` files to use."
-                }
-            }
+    "configuration": {
+      "type": "object",
+      "title": "汐洛插件配置",
+      "properties": {
+        "codelens-sample.enableCodeLens": {
+          "type": "boolean",
+          "default": true
         },
-        "commands": [
-            {
-				"command": "extension.getGitHubUser",
-				"title": "Get GitHub User",
-				"category": "GitHub 认证 (共享)"
-			},
-            {
-				"command": "sillot.getGitHubUser",
-				"title": "Get GitHub User",
-				"category": "GitHub 认证 (独占)"
-			},
-            {
-                "command": "sillot.helloWorld",
-                "title": "Hello World",
-                "category": "Sillot"
-            },
-            {
-                "command": "sillot.openPackageOnNpm",
-                "title": "Open Package on NPM",
-                "category": "Sillot"
-            },
-            {
-                "command": "sillot.测试序列化字典",
-                "title": "测试序列化字典",
-                "category": "Sillot"
-            },
-            {
-                "command": "sillot.测试反序列化字典",
-                "title": "测试反序列化字典",
-                "category": "Sillot"
-            },
-            {
-                "command": "sillot.pickEXE",
-                "title": "pickEXE",
-                "category": "Sillot"
-            },
-            {
-                "title": "Enable CodeLens",
-                "command": "codelens-sample.enableCodeLens",
-                "category": "CodeLens Sample"
-            },
-            {
-                "title": "Disable Codelens",
-                "command": "codelens-sample.disableCodeLens",
-                "category": "CodeLens Sample"
-            },
-            {
-                "command": "汐洛.花字.样式_反转大小写",
-                "title": "♻️ 应用样式_反转大小写 abcABC... ⚠️ 恢复默认字体",
-                "category": "Sillot"
-            },
-            {
-                "command": "汐洛.花字.样式_转大写",
-                "title": "♻️ 应用样式_转大写 ABCABC... ⚠️ 恢复默认字体",
-                "category": "Sillot"
-            },
-            {
-                "command": "汐洛.花字.样式_转小写",
-                "title": "♻️ 应用样式_转小写 abcabc... ⚠️ 恢复默认字体",
-                "category": "Sillot"
-            },
-            {
-                "command": "汐洛.花字.字体_默认",
-                "title": "♻️ 应用字体_默认 ABCabc...",
-                "category": "Sillot"
-            },
-            {
-                "command": "汐洛.花字.字体_手写体",
-                "title": "♻️ 应用字体_手写体 𝓐𝓑𝓒𝒶𝒷𝒸...",
-                "category": "Sillot"
-            },
-            {
-                "command": "汐洛.花字.字体_粗体",
-                "title": "♻️ 应用字体_粗体 𝗔𝗕𝗖𝗮𝗯𝗰...",
-                "category": "Sillot"
-            },
-            {
-                "command": "汐洛.花字.字体_德文尖角",
-                "title": "♻️ 应用字体_德文尖角 𝕬𝕭𝕮𝔞𝔟𝔠...",
-                "category": "Sillot"
-            },
-            {
-                "command": "汐洛.花字.字体_斜体",
-                "title": "♻️ 应用字体_斜体 𝘈𝘉𝘊𝘢𝘣𝘤...",
-                "category": "Sillot"
-            },
-            {
-                "command": "汐洛.花字.字体_等宽",
-                "title": "♻️ 应用字体_等宽 𝙰𝙱𝙲𝚊𝚋𝚌...",
-                "category": "Sillot"
-            },
-            {
-                "command": "汐洛.花字.字体_删除线",
-                "title": "♻️ 应用字体_删除线 𝙰𝙱𝙲𝚊𝚋𝚌...",
-                "category": "Sillot"
-            }
-        ],
-        "submenus": [
-            {
-              "id": "汐洛.花字",
-              "label": "🦢 汐洛花字菜单 - Sillot 🌸 Menu"
-            }
+        "typescript.useCodeSnippetsOnMethodSuggest": {
+          "type": "boolean",
+          "default": false,
+          "description": "Complete functions with their parameter signature."
+        },
+        "sillot.typescript.tsdk": {
+          "type": [
+            "string",
+            "null"
           ],
-        "menus": {
-            "汐洛.花字": [
-                {
-                    "command": "汐洛.花字.样式_反转大小写"
-                  },
-                  {
-                    "command": "汐洛.花字.样式_转大写"
-                  },
-                  {
-                    "command": "汐洛.花字.样式_转小写"
-                  },
-                  {
-                    "command": "汐洛.花字.字体_默认"
-                  },
-                  {
-                    "command": "汐洛.花字.字体_手写体"
-                  },
-                  {
-                    "command": "汐洛.花字.字体_粗体"
-                  },
-                  {
-                    "command": "汐洛.花字.字体_德文尖角"
-                  },
-                  {
-                    "command": "汐洛.花字.字体_斜体"
-                  },
-                  {
-                    "command": "汐洛.花字.字体_等宽"
-                  },
-                  {
-                    "command": "汐洛.花字.字体_删除线"
-                  }
-            ],
-            "editor/context": [
-                {
-                    "when": "editorHasSelection && resourceLangId == typescript",
-                    "command": "sillot.openPackageOnNpm",
-                    "group": "navigation"
-                },
-                {
-                  "when": "editorHasSelection",
-                  "submenu": "汐洛.花字",
-                  "group": "navigation"
-                }
-            ]
+          "default": null,
+          "markdownDescription": "Specifies the folder path containing the tsserver and `lib*.d.ts` files to use."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "extension.getGitHubUser",
+        "title": "Get GitHub User",
+        "category": "GitHub 认证 (共享)"
+      },
+      {
+        "command": "sillot.getGitHubUser",
+        "title": "Get GitHub User",
+        "category": "GitHub 认证 (独占)"
+      },
+      {
+        "command": "sillot.helloWorld",
+        "title": "Hello World",
+        "category": "Sillot"
+      },
+      {
+        "command": "sillot.openPackageOnNpm",
+        "title": "Open Package on NPM",
+        "category": "Sillot"
+      },
+      {
+        "command": "sillot.测试序列化字典",
+        "title": "测试序列化字典",
+        "category": "Sillot"
+      },
+      {
+        "command": "sillot.测试反序列化字典",
+        "title": "测试反序列化字典",
+        "category": "Sillot"
+      },
+      {
+        "command": "sillot.pickEXE",
+        "title": "pickEXE",
+        "category": "Sillot"
+      },
+      {
+        "title": "Enable CodeLens",
+        "command": "codelens-sample.enableCodeLens",
+        "category": "CodeLens Sample"
+      },
+      {
+        "title": "Disable Codelens",
+        "command": "codelens-sample.disableCodeLens",
+        "category": "CodeLens Sample"
+      },
+      {
+        "command": "汐洛.花字.样式_反转大小写",
+        "title": "♻️ 应用样式_反转大小写 abcABC... ⚠️ 恢复默认字体",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.花字.样式_转大写",
+        "title": "♻️ 应用样式_转大写 ABCABC... ⚠️ 恢复默认字体",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.花字.样式_转小写",
+        "title": "♻️ 应用样式_转小写 abcabc... ⚠️ 恢复默认字体",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.花字.字体_默认",
+        "title": "♻️ 应用字体_默认 ABCabc...",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.花字.字体_手写体",
+        "title": "♻️ 应用字体_手写体 𝓐𝓑𝓒𝒶𝒷𝒸...",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.花字.字体_粗体",
+        "title": "♻️ 应用字体_粗体 𝗔𝗕𝗖𝗮𝗯𝗰...",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.花字.字体_德文尖角",
+        "title": "♻️ 应用字体_德文尖角 𝕬𝕭𝕮𝔞𝔟𝔠...",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.花字.字体_斜体",
+        "title": "♻️ 应用字体_斜体 𝘈𝘉𝘊𝘢𝘣𝘤...",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.花字.字体_等宽",
+        "title": "♻️ 应用字体_等宽 𝙰𝙱𝙲𝚊𝚋𝚌...",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.花字.字体_删除线",
+        "title": "♻️ 应用字体_删除线 𝙰𝙱𝙲𝚊𝚋𝚌...",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.同步更新版本",
+        "title": "汐洛 🤍 同步更新版本",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.addPackageJsonMapping",
+        "title": "汐洛 🤍 添加包JSON映射",
+        "category": "Sillot"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "汐洛.花字",
+        "label": "🦢 汐洛花字菜单 - Sillot 🌸 Menu"
+      }
+    ],
+    "menus": {
+      "汐洛.花字": [
+        {
+          "command": "汐洛.花字.样式_反转大小写"
         },
-        "viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "package-explorer",
-                    "title": "汐洛插件面板",
-                    "icon": "media/dep.svg"
-                }
-            ]
+        {
+          "command": "汐洛.花字.样式_转大写"
         },
-        "views": {
-            "package-explorer": [
-                {
-                    "id": "nodeDependencies",
-                    "name": "Node Dependencies",
-                    "icon": "media/dep.svg",
-                    "contextualTitle": "Package Explorer"
-                }
-            ],
-            "explorer": [
-                {
-                    "id": "jsonOutline",
-                    "name": "Json Outline",
-                    "when": "jsonOutlineEnabled"
-                },
-                {
-                    "id": "ftpExplorer",
-                    "name": "FTP Explorer"
-                },
-                {
-                    "id": "fileExplorer",
-                    "name": "File Explorer"
-                },
-                {
-                    "id": "testView",
-                    "name": "Test View"
-                },
-                {
-                    "id": "testViewDragAndDrop",
-                    "name": "Test View Drag and Drop"
-                }
-            ]
+        {
+          "command": "汐洛.花字.样式_转小写"
         },
+        {
+          "command": "汐洛.花字.字体_默认"
+        },
+        {
+          "command": "汐洛.花字.字体_手写体"
+        },
+        {
+          "command": "汐洛.花字.字体_粗体"
+        },
+        {
+          "command": "汐洛.花字.字体_德文尖角"
+        },
+        {
+          "command": "汐洛.花字.字体_斜体"
+        },
+        {
+          "command": "汐洛.花字.字体_等宽"
+        },
+        {
+          "command": "汐洛.花字.字体_删除线"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "editorHasSelection && resourceLangId == typescript",
+          "command": "sillot.openPackageOnNpm",
+          "group": "navigation"
+        },
+        {
+          "when": "editorHasSelection",
+          "submenu": "汐洛.花字",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "resourceLangId == json && resourceFilename == package.json",
+          "command": "汐洛.addPackageJsonMapping",
+          "group": "navigation"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "package-explorer",
+          "title": "汐洛插件面板",
+          "icon": "media/dep.svg"
+        }
+      ]
+    },
+    "views": {
+      "package-explorer": [
+        {
+          "id": "nodeDependencies",
+          "name": "Node Dependencies",
+          "icon": "media/dep.svg",
+          "contextualTitle": "Package Explorer"
+        }
+      ],
+      "explorer": [
+        {
+          "id": "jsonOutline",
+          "name": "Json Outline",
+          "when": "jsonOutlineEnabled"
+        },
+        {
+          "id": "ftpExplorer",
+          "name": "FTP Explorer"
+        },
+        {
+          "id": "fileExplorer",
+          "name": "File Explorer"
+        },
+        {
+          "id": "testView",
+          "name": "Test View"
+        },
+        {
+          "id": "testViewDragAndDrop",
+          "name": "Test View Drag and Drop"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "dosc",
+        "aliases": [
+          "csod",
+          "ds"
+        ],
+        "extensions": [
+          ".dosc"
+        ],
+        "configuration": "./languages/_dosc.language-configuration.json"
+      },
+      {
+        "id": "sy",
+        "aliases": [
+          "SY",
+          "sy"
+        ],
+        "extensions": [
+          ".sy"
+        ],
+        "configuration": "./languages/_sy.language-configuration.json"
+      }
+    ],
+    "codeActions": [
+      {
         "languages": [
-            {
-                "id": "dosc",
-                "aliases": [
-                    "csod",
-                    "ds"
-                ],
-                "extensions": [
-                    ".dosc"
-                ],
-                "configuration": "./languages/_dosc.language-configuration.json"
-            },
-            {
-                "id": "sy",
-                "aliases": [
-                    "SY",
-                    "sy"
-                ],
-                "extensions": [
-                    ".sy"
-                ],
-                "configuration": "./languages/_sy.language-configuration.json"
-            }
+          "sy"
         ],
-        "codeActions": [
-            {
-                "languages": [
-                    "sy"
-                ],
-                "provider": "SyCodeActionProvider",
-                "providedCodeActionKinds": [
-                    "quickfix",
-                    "refactor",
-                    "source",
-                    "organizeImports"
-                ],
-                "actions": {
-                    "kind": "quickfix",
-                    "title": "Fix sy error",
-                    "description": "Fixes a JSON error in the current file"
-                }
-            }
+        "provider": "SyCodeActionProvider",
+        "providedCodeActionKinds": [
+          "quickfix",
+          "refactor",
+          "source",
+          "organizeImports"
         ],
-        "semanticTokenTypes": [
-            {
-                "id": "type",
-                "description": "Type names",
-                "defaultLegend": {
-                    "tokenType": "type"
-                }
-            },
-            {
-                "id": "trailingComma",
-                "description": "Trailing commas in JSON",
-                "defaultLegend": {
-                    "tokenType": "trailingComma"
-                }
-            }
-        ],
-        "semanticTokenModifiers": [
-            {
-                "id": "error",
-                "description": "Indicates an error"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "sy",
-                "scopeName": "source.sy",
-                "path": "./grammars/sy.tmLanguage.json"
-            }
-        ],
-        "snippets": [
-            {
-                "language": "javascript",
-                "path": "./snippets/sofill.json"
-            },
-            {
-                "language": "typescript",
-                "path": "./snippets/sofill.json"
-            },
-            {
-                "language": "markdown",
-                "path": "./snippets/md.json"
-            },
-            {
-                "language": "mdx",
-                "path": "./snippets/md.json"
-            }
-        ]
-    },
-    "vsce": {
-        "baseImagesUrl": "https://raw.githubusercontent.com/Hi-Windom/Sillot/master/app/stage/icon.png",
-        "dependencies": false,
-        "yarn": false
-    },
-    "scripts": {
-        "vscode:prepublish": "pnpm run package",
-        "compile": "webpack",
-        "watch": "webpack --watch",
-        "package": "webpack --mode production --devtool hidden-source-map",
-        "vsce:package": "pnpm vsce package",
-        "vsce:login": "pnpm vsce login Hi-Windom",
-        "compile-tests": "tsc -p . --outDir out",
-        "watch-tests": "tsc -p . -w --outDir out",
-        "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
-        "lint": "eslint src --ext ts --fix",
-        "test": "vscode-test",
-        "b:lint": "biome lint ./src --config-path ../../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-lint'",
-        "b:check": "biome check ./src --config-path ../../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-check'"
-    },
-    "devDependencies": {
-        "@types/fs-extra": "^11.0.4",
-        "@types/mocha": "^10.0.6",
-        "@types/node": "18.x",
-        "@types/vscode": "^1.88.0",
-        "@typescript-eslint/eslint-plugin": "^7.4.0",
-        "@typescript-eslint/parser": "^7.4.0",
-        "@vscode/test-cli": "^0.0.8",
-        "@vscode/test-electron": "^2.3.9",
-        "@vscode/vsce": "^2.26.0",
-        "eslint": "^8.57.0",
-        "jsonc-parser": "^3.2.1",
-        "mkdirp": "^3.0.1",
-        "rimraf": "^5.0.5",
-        "ts-loader": "^9.5.1",
-        "typescript": "^5.3.3",
-        "webpack": "^5.91.0",
-        "webpack-cli": "^5.1.4"
-    },
-    "dependencies": {
-        "@octokit/rest": "^20.1.0",
-        "fs-extra": "^11.2.0",
-        "json5": "^2.2.3"
-    }
+        "actions": {
+          "kind": "quickfix",
+          "title": "Fix sy error",
+          "description": "Fixes a JSON error in the current file"
+        }
+      }
+    ],
+    "semanticTokenTypes": [
+      {
+        "id": "type",
+        "description": "Type names",
+        "defaultLegend": {
+          "tokenType": "type"
+        }
+      },
+      {
+        "id": "trailingComma",
+        "description": "Trailing commas in JSON",
+        "defaultLegend": {
+          "tokenType": "trailingComma"
+        }
+      }
+    ],
+    "semanticTokenModifiers": [
+      {
+        "id": "error",
+        "description": "Indicates an error"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sy",
+        "scopeName": "source.sy",
+        "path": "./grammars/sy.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "javascript",
+        "path": "./snippets/sofill.json"
+      },
+      {
+        "language": "typescript",
+        "path": "./snippets/sofill.json"
+      },
+      {
+        "language": "markdown",
+        "path": "./snippets/md.json"
+      },
+      {
+        "language": "mdx",
+        "path": "./snippets/md.json"
+      }
+    ]
+  },
+  "vsce": {
+    "baseImagesUrl": "https://raw.githubusercontent.com/Hi-Windom/Sillot/master/app/stage/icon.png",
+    "dependencies": false,
+    "yarn": false
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "vsce:package": "pnpm vsce package",
+    "vsce:login": "pnpm vsce login Hi-Windom",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "lint": "eslint src --ext ts --fix",
+    "test": "vscode-test",
+    "b:lint": "biome lint ./src --config-path ../../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-lint'",
+    "b:check": "biome check ./src --config-path ../../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-check'"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.88.0",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "@vscode/test-cli": "^0.0.8",
+    "@vscode/test-electron": "^2.3.9",
+    "@vscode/vsce": "^2.26.0",
+    "eslint": "^8.57.0",
+    "jsonc-parser": "^3.2.1",
+    "mkdirp": "^3.0.1",
+    "rimraf": "^5.0.5",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.1.0",
+    "fs-extra": "^11.2.0",
+    "json5": "^2.2.3"
+  }
 }
