@@ -24,7 +24,7 @@ def generate_msg_from_repo(repo_name, tag_name):
 
     gh = github.Github(token, base_url=f"https://{hostname}")
     repo = gh.get_repo(repo_name)
-    milestone = U.find_milestone(repo, tag_name)
+    milestone = U.find_milestone(repo, tag_name, 2)
 
     for issue in repo.get_issues(state="closed", milestone=milestone): # type: ignore
         # REF https://pygithub.readthedocs.io/en/latest/github_objects/Issue.html#github.Issue.Issue
