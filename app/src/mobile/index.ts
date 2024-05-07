@@ -27,6 +27,8 @@ import {saveScroll} from "../protyle/scroll/saveScroll";
 import {removeBlock} from "../protyle/wysiwyg/remove";
 import {isNotEditBlock} from "../protyle/wysiwyg/getBlock";
 import {updateCardHV} from "../card/util";
+import {mobileKeydown} from "./util/keydown";
+import {correctHotkey} from "../boot/globalEvent/commonHotkey";
 import { exportIDB } from "../sillot/util/sillot-idb-backup-and-restore";
 import {hideAllElements, hideElements} from "../protyle/ui/hideElements";
 
@@ -99,8 +101,8 @@ class App {
             updateCardHV();
         });
         fetchPost("/api/system/getConf", {}, async (confResponse) => {
-            confResponse.data.conf.keymap = Constants.SIYUAN_KEYMAP;
             window.siyuan.config = confResponse.data.conf;
+            correctHotkey(siyuanApp);
             await loadPlugins(this);
             getLocalStorage(() => {
                 fetchGet(`/appearance/langs/${window.siyuan.config.appearance.lang}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages: IObject) => {
@@ -132,6 +134,9 @@ class App {
             document.addEventListener("touchend", (event) => {
                 handleTouchEnd(event, siyuanApp);
             }, false);
+            window.addEventListener("keydown", (event) => {
+                mobileKeydown(siyuanApp, event);
+            });
             // 移动端删除键 https://github.com/siyuan-note/siyuan/issues/9259
             window.addEventListener("keydown", (event) => {
                 if (getSelection().rangeCount > 0) {
