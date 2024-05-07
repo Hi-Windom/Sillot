@@ -24,21 +24,14 @@ def generate_msg_from_repo(repo_name, tag_name):
 
     gh = github.Github(token, base_url=f"https://{hostname}")
     repo = gh.get_repo(repo_name)
-    milestone = U.find_milestone(repo, tag_name)
+    milestone = U.find_milestone(repo, tag_name, 2)
 
     for issue in repo.get_issues(state="closed", milestone=milestone): # type: ignore
         # REF https://pygithub.readthedocs.io/en/latest/github_objects/Issue.html#github.Issue.Issue
-        desc_mapping[get_issue_first_label(issue)].append(
+        desc_mapping[U.get_issue_first_label(issue, C.docmap_sillot)].append(
             {"title": issue.title, "url": issue.html_url}
         )
     U.generate_msg(desc_mapping, C.docmap_sillot)
-
-def get_issue_first_label(issue):
-    """Get the first label from issue, if no labels, return empty string."""
-    for label in issue.get_labels():
-        if label.name in C.docmap_sillot:
-            return label.name
-    return ""
 
 if __name__ == "__main__":
     parser = ArgumentParser(

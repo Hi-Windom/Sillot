@@ -7,12 +7,13 @@ def quote_versions_v2(s):
     """
     return ast.literal_eval(re.sub(r'(\b\d+(\.\d+){1,2}\b)', r'"\1"', s))
 
-def find_milestone(repo, title):
+def find_milestone(repo, title, len=0):
     """Find the milestone in a repository that is similar to milestone title
 
     Args:
         repo (github.repository.Repository): The repository to search
         title (str): the title to match
+        len: 版本号长度限制，默认 0 不限制
 
     Returns:
         The milestone which title matches the given argument.
@@ -22,7 +23,10 @@ def find_milestone(repo, title):
     pat = re.search("v([0-9.]+)", thisRelease)
     if not pat:
         return None
-    version = ".".join(pat.group(1).split(".")[:2])
+    if len > 0:
+        version = ".".join(pat.group(1).split(".")[:2])
+    else:
+        version = ".".join(pat.group(1).split(".")[:])
 
     # REF https://docs.github.com/en/rest/issues/milestones?apiVersion=2022-11-28#list-milestones
     for milestone in repo.get_milestones(state="all"):
