@@ -24,7 +24,7 @@ def find_milestone(repo, title, len=0):
     if not pat:
         return None
     if len > 0:
-        version = ".".join(pat.group(1).split(".")[:2])
+        version = ".".join(pat.group(1).split(".")[:len])
     else:
         version = ".".join(pat.group(1).split(".")[:])
 
