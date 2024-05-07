@@ -51,7 +51,7 @@ def get_issue_first_label(issue, docmap):
             return label.name
     return ""
 
-def generate_header_from_repo(repo_name, tag_name, lastestRelease, action_file, HEADER):
+def generate_header_from_repo(repo_name, tag_name, lastestRelease, action_file, HEADER=''):
     thisRelease = tag_name.split("/")[-1]
     pat = re.search("v([0-9.]+)", thisRelease)
     if not pat:
