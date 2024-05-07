@@ -248,7 +248,7 @@ interface IPluginSettingOption {
     title: string
     description?: string
     actionElement?: HTMLElement
-    direction?: "column"|"row"
+    direction?: "column" | "row"
 
     createActionElement?(): HTMLElement
 }
@@ -865,6 +865,7 @@ interface IAVCell {
 }
 
 interface IAVCellValue {
+    keyID?: string,
     id?: string,
     type: TAVCol,
     isDetached?: boolean,

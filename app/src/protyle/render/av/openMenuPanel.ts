@@ -932,7 +932,7 @@ export const openMenuPanel = (options: {
                     event.stopPropagation();
                     break;
                 } else if (type === "goSearchAV") {
-                    openSearchAV(avID, target);
+                    openSearchAV(avID, target, undefined, false);
                     event.preventDefault();
                     event.stopPropagation();
                     break;
@@ -1252,6 +1252,10 @@ export const openMenuPanel = (options: {
                     }
                     event.preventDefault();
                     event.stopPropagation();
+                    break;
+                }
+                // 有错误日志，没找到重现步骤，需先判断一下
+                if (!target || !target.parentElement) {
                     break;
                 }
                 target = target.parentElement;

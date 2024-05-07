@@ -954,7 +954,10 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
         accelerator: "⌘C",
         icon: "iconCopy",
         click() {
-            writeText(protyle.lute.BlockDOM2StdMd(assetElement.outerHTML));
+            let content = protyle.lute.BlockDOM2StdMd(assetElement.outerHTML);
+            // The file name encoding is abnormal after copying the image and pasting it https://github.com/siyuan-note/siyuan/issues/11246
+            content = content.replace(/%20/g, " ");
+            writeText(content);
         }
     }).element);
     window.siyuan.menus.menu.append(new MenuItem({
@@ -971,7 +974,10 @@ export const imgMenu = (protyle: IProtyle, range: Range, assetElement: HTMLEleme
             accelerator: "⌘X",
             label: window.siyuan.languages.cut,
             click() {
-                writeText(protyle.lute.BlockDOM2StdMd(assetElement.outerHTML));
+                let content = protyle.lute.BlockDOM2StdMd(assetElement.outerHTML);
+                // The file name encoding is abnormal after copying the image and pasting it https://github.com/siyuan-note/siyuan/issues/11246
+                content = content.replace(/%20/g, " ");
+                writeText(content);
                 (assetElement as HTMLElement).outerHTML = "<wbr>";
                 nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
                 updateTransaction(protyle, id, nodeElement.outerHTML, html);
