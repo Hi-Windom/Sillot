@@ -27,30 +27,10 @@ def generate_msg_from_repo(repo_name, tag_name, otherReleaseArray):
     milestone = U.find_milestone(repo, tag_name)
     for issue in repo.get_issues(state="closed", milestone=milestone):  # type: ignore
           # REF https://pygithub.readthedocs.io/en/latest/github_objects/Issue.html#github.Issue.Issue
-        desc_mapping[get_issue_first_label(issue)].append(
+        desc_mapping[U.get_issue_first_label(issue, C.docmap_siyuan)].append(
               {"title": issue.title, "url": issue.html_url}
           )
     U.generate_msg(desc_mapping, C.docmap_siyuan)
-
-def get_issue_first_label(issue):
-    """Get the first label from issue, if no labels, return empty string."""
-    for label in issue.get_labels():
-        if label.name in C.docmap_siyuan:
-            return label.name
-    return ""
-
-
-def generate_msg(desc_mapping):
-    """Print changelogs from direction."""
-    print()
-    for header in C.docmap_siyuan:
-        if not desc_mapping[header]:
-            continue
-        print(f"#### {C.docmap_siyuan[header]}\n")
-        for item in desc_mapping[header]:
-            print(f"* [{item['title']}]({item['url']})")
-        print()
-
 
 if __name__ == "__main__":
     parser = ArgumentParser(
