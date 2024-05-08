@@ -370,6 +370,13 @@ jobs:
             asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-beta_github.apk
             asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
 
+      - name: 📤 Upload APK to Pgyer
+        if: contains( matrix.config.suffix, 'apk')
+        uses: PGYER/pgyer-upload-app-action@v1.3
+        with:
+            _api_key: ${{ secrets.PGYER_API_KEY }}
+            appFilePath: ${{ steps.sign_app.outputs.signedReleaseFile }}
+
       - name: 📤 Upload logs if failure
         if: failure()
         uses: actions/upload-artifact@v4
