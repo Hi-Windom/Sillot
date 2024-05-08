@@ -1,16 +1,17 @@
-name: afterCI change release
+name: after CI/CD change to release
 
 on:
-  # workflow_run:
-  #     workflows: ["Sillot CI/CD"]
-  #     types:
-  #       - completed
   workflow_dispatch:
   release:
     types: [released]
     # https://docs.github.com/zh/actions/using-workflows/events-that-trigger-workflows#release
     # 注意：触发使用的配置是 released 时的 aci.yml 内容，与主分支或者后续更新无关。
 
+# ref https://docs.github.com/zh/actions/learn-github-actions/variables
+env:
+    repo_name: "Sillot"
+    repo_owner: "Hi-Windom"
+    package_json: "app/package.json"
 
 jobs:
   test:
@@ -30,7 +31,7 @@ jobs:
           script: |
             const axios = require('axios');
             const fs = require('fs');
-            const { data } = await github.rest.repos.getLatestRelease({ owner: 'Hi-Windom', repo: 'Sillot' });
+            const { data } = await github.rest.repos.getLatestRelease({ owner: '${{ env.repo_owner }}', repo: '${{ env.repo_name }}' });
             async function downloadAsset(asset) {
                 const url = asset.browser_download_url;
                 const path = `${asset.name}`;
@@ -56,8 +57,8 @@ jobs:
       # 使用了 awk 的内置函数 toupper() 来将哈希值转换为大写，同时使用空格作为字段分隔符。awk 会将每一行的第一个字段（哈希值）转换为大写，并且保留第二个字段（文件名）
       run: |
           ls
-          find . -type f -name 'Sillot-*' -exec md5sum {} + | awk '{print toupper($1), $2}' > Assets_MD5_Sum.txt
-          find . -type f -name 'Sillot-*' -exec sha256sum {} + | awk '{print toupper($1), $2}' > Assets_SHA256_Sum.txt
+          find . -type f -name '${{ env.repo_name }}-*' -exec md5sum {} + | awk '{print toupper($1), $2}' > Assets_MD5_Sum.txt
+          find . -type f -name '${{ env.repo_name }}-*' -exec sha256sum {} + | awk '{print toupper($1), $2}' > Assets_SHA256_Sum.txt
       continue-on-error: false
 
     - name: 📤 Upload Assets_MD5_Sum.txt File to Release Asset
