@@ -38,6 +38,9 @@ lerna-debug.log*
 package-lock.json
 yarn.lock
 
+# workflows
+**/__pycache__
+
 # Sillot extend
 **/.history
 /app/jestCD

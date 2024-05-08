@@ -18,6 +18,7 @@ import {showMessage} from "../../dialog/message";
 import {avRender} from "../render/av/render";
 import {hideTooltip} from "../../dialog/tooltip";
 import {stickyRow} from "../render/av/row";
+import {updateReadonly as updateReadonlyMethod} from "../breadcrumb/action";
 
 export const onGet = (options: {
     data: IWebSocketData,
@@ -208,6 +209,9 @@ const setHTML = (options: {
         }
         protyle.element.removeAttribute("disabled-forever");
         setReadonlyByConfig(protyle, updateReadonly);
+        if (options.action.includes(Constants.CB_GET_OPENNEW) && window.siyuan.config.editor.readOnly) {
+            updateReadonlyMethod(protyle.breadcrumb.element.parentElement.querySelector('.block__icon[data-type="readonly"]'), protyle);
+        }
     }
 
     focusElementById(protyle, options.action, options.scrollAttr);
@@ -227,7 +231,7 @@ const setHTML = (options: {
         protyle.app.plugins.forEach(item => {
             item.eventBus.emit("loaded-protyle-dynamic", {
                 protyle,
-                positon: options.action.includes(Constants.CB_GET_APPEND) ? "afterend" : "beforebegin"
+                position: options.action.includes(Constants.CB_GET_APPEND) ? "afterend" : "beforebegin"
             });
         });
         return;

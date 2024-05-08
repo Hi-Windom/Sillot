@@ -1087,6 +1087,10 @@ func renderAttributeViewTable(attrView *av.AttributeView, view *av.View, query s
 				if nil != tableCell.Value && nil != tableCell.Value.Relation {
 					tableCell.Value.Relation.Contents = nil
 				}
+			case av.KeyTypeText: // 渲染文本列
+				if nil != tableCell.Value && nil != tableCell.Value.Text {
+					tableCell.Value.Text.Content = util.EscapeHTML(tableCell.Value.Text.Content)
+				}
 			}
 
 			treenode.FillAttributeViewTableCellNilValue(tableCell, rowID, col.ID)
@@ -2897,6 +2901,11 @@ func updateAttributeViewColumn(operation *Operation) (err error) {
 			if keyValues.Key.ID == operation.ID {
 				keyValues.Key.Name = strings.TrimSpace(operation.Name)
 				keyValues.Key.Type = colType
+
+				for _, value := range keyValues.Values {
+					value.Type = colType
+				}
+
 				break
 			}
 		}

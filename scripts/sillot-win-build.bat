@@ -44,7 +44,7 @@ if errorlevel 1 (
 
 cd ..
 
-echo ===== Building Electron =====
+echo ===== Building Electron App =====
 echo 'for first run, maybe you need to run `pnpm config set electron_mirror "https://npm.taobao.org/mirrors/electron/"`'
 cd app
 call pnpm run dist
