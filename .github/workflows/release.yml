@@ -15,9 +15,9 @@ env:
     name_SHA256: "Assets_SHA256_Sum.txt"
 
 jobs:
-  test:
+  release_action:
     runs-on: ubuntu-latest
-    name: afterCI action
+    name: Release Action
     steps:
     - name: 🚀 Install dependencies
       run: npm install axios
