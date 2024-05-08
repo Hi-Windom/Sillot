@@ -109,10 +109,10 @@ export const newFile = (optios: {
                     openFileById({
                         app: optios.app,
                         id: response.data,
-                        action: [Constants.CB_GET_CONTEXT]
+                        action: [Constants.CB_GET_CONTEXT, Constants.CB_GET_OPENNEW]
                     });
                     /// #else
-                    openMobileFileById(optios.app, response.data, [Constants.CB_GET_CONTEXT]);
+                    openMobileFileById(optios.app, response.data, [Constants.CB_GET_CONTEXT, Constants.CB_GET_OPENNEW]);
                     /// #endif
                 });
             } else {
@@ -130,10 +130,10 @@ export const newFile = (optios: {
                         openFileById({
                             app: optios.app,
                             id: response.data,
-                            action: [Constants.CB_GET_CONTEXT]
+                            action: [Constants.CB_GET_CONTEXT, Constants.CB_GET_OPENNEW]
                         });
                         /// #else
-                        openMobileFileById(optios.app, response.data, [Constants.CB_GET_CONTEXT]);
+                        openMobileFileById(optios.app, response.data, [Constants.CB_GET_CONTEXT, Constants.CB_GET_OPENNEW]);
                         /// #endif
                     });
                 });
@@ -153,10 +153,10 @@ export const newFile = (optios: {
                     openFileById({
                         app: optios.app,
                         id: response.data,
-                        action: [Constants.CB_GET_CONTEXT]
+                        action: [Constants.CB_GET_CONTEXT, Constants.CB_GET_OPENNEW]
                     });
                     /// #else
-                    openMobileFileById(optios.app, response.data, [Constants.CB_GET_CONTEXT]);
+                    openMobileFileById(optios.app, response.data, [Constants.CB_GET_CONTEXT, Constants.CB_GET_OPENNEW]);
                     /// #endif
                 });
                 return;
@@ -175,9 +175,9 @@ export const newFile = (optios: {
                 sorts: optios.paths
             }, () => {
                 /// #if !MOBILE
-                openFileById({app: optios.app, id, action: [Constants.CB_GET_CONTEXT]});
+                openFileById({app: optios.app, id, action: [Constants.CB_GET_CONTEXT, Constants.CB_GET_OPENNEW]});
                 /// #else
-                openMobileFileById(optios.app, id, [Constants.CB_GET_CONTEXT]);
+                openMobileFileById(optios.app, id, [Constants.CB_GET_CONTEXT, Constants.CB_GET_OPENNEW]);
                 /// #endif
             });
         }

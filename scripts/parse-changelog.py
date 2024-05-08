@@ -5,6 +5,9 @@ from collections import defaultdict
 from _pkg import Const as C
 from _pkg import Utils as U
 import github  # type: ignore # pip install PyGithub
+from _pkg import Const as C
+from _pkg import Utils as U
+import github  # type: ignore # pip install PyGithub
 
 def generate_msg_from_repo(repo_name, tag_name, otherReleaseArray):
     """Generate changelog messages from repository and tag name.
@@ -17,6 +20,7 @@ def generate_msg_from_repo(repo_name, tag_name, otherReleaseArray):
         repo_name (str): The repository name
         tag_name (str): the tag name
     """
+    hostname = os.getenv("GITHUB_HOST") or C.hostname
     hostname = os.getenv("GITHUB_HOST") or C.hostname
     token = os.getenv("GITHUB_TOKEN")
     desc_mapping = defaultdict(list)
