@@ -1,7 +1,7 @@
 {
   "name": "starlight",
   "type": "module",
-  "version": "0.32.2220",
+  "version": "0.33.1110",
   "scripts": {
     "test": "echo 'Test your sister day by day'",
     "dev": "astro dev",
