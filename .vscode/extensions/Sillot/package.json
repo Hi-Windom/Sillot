@@ -187,7 +187,19 @@
         "command": "汐洛.addPackageJsonMapping",
         "title": "汐洛 🤍 添加包JSON映射",
         "category": "Sillot"
-      }
+      },
+      {
+        "command": "extension.gitEmoji",
+        "title": "汐洛 🤍 git emoji commit message",
+        "icon": {
+            "dark": "media/git-emoji.svg",
+            "light": "media/git-emoji_light.svg"
+        }
+    },
+    {
+        "command": "extension.switching",
+        "title": "汐洛 🤍 git emoji label switching"
+    }
     ],
     "submenus": [
       {
@@ -246,7 +258,14 @@
           "command": "汐洛.addPackageJsonMapping",
           "group": "navigation"
         }
-      ]
+      ],
+      "scm/title": [
+        {
+            "when": "scmProvider == git",
+            "command": "extension.gitEmoji",
+            "group": "navigation"
+        }
+    ]
     },
     "viewsContainers": {
       "activitybar": [
