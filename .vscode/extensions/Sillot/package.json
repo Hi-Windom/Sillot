@@ -2,7 +2,7 @@
   "name": "sillot",
   "displayName": "汐洛 Sillot",
   "description": "汐洛（Sillot）孵化自思源笔记（siyuan-note），致力于服务智慧新彖乄。此插件为汐洛官方插件，提供多功能一体化集成。",
-  "version": "0.33.1120",
+  "version": "0.33.1500",
   "preview": true,
   "repository": "https://github.com/Hi-Windom/Sillot",
   "publisher": "Hi-Windom",
@@ -25,6 +25,7 @@
     "Extension Packs"
   ],
   "activationEvents": [
+    "onDidChangeExtensions",
     "onDidChangeTextDocument",
     "onDidChangeActiveTextEditor",
     "onLanguage:plaintext",
@@ -187,6 +188,18 @@
         "command": "汐洛.addPackageJsonMapping",
         "title": "汐洛 🤍 添加包JSON映射",
         "category": "Sillot"
+      },
+      {
+        "command": "extension.gitEmoji",
+        "title": "汐洛 🤍 git emoji commit message",
+        "icon": {
+          "dark": "media/git-emoji.svg",
+          "light": "media/git-emoji_light.svg"
+        }
+      },
+      {
+        "command": "extension.switching",
+        "title": "汐洛 🤍 git emoji label switching"
       }
     ],
     "submenus": [
@@ -244,6 +257,13 @@
         {
           "when": "resourceLangId == json && resourceFilename == package.json",
           "command": "汐洛.addPackageJsonMapping",
+          "group": "navigation"
+        }
+      ],
+      "scm/title": [
+        {
+          "when": "scmProvider == git",
+          "command": "extension.gitEmoji",
           "group": "navigation"
         }
       ]

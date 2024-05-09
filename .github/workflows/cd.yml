@@ -281,7 +281,7 @@ jobs:
             asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-${{ matrix.config.suffix }}
             asset_path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/build/${{ env.repo_name }}-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}
 
-      - name: 📦 Packing zip WinPortable
+      - name: 📦 Packing WinPortable zip
         uses: thedoctor0/zip-release@0.7.1
         if: ${{ contains( matrix.config.goos, 'windows') && !contains( matrix.config.suffix, 'apk') }}
         with:
@@ -340,11 +340,25 @@ jobs:
             .\scripts\sillot-android-build-action.bat
         continue-on-error: false
 
+    # 暂时不需要额外安装最新版 Gradle
+    #   - name: 🔨 Setup Gradle
+    #     if: contains( matrix.config.suffix, 'apk')
+    #     uses: gradle/actions/setup-gradle@v3
+    #     with:
+    #       gradle-version: '8.7'
+
       - name: 🔥 Build with Gradle
         if: contains( matrix.config.suffix, 'apk')
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
-        run: ./gradlew assembleOfficialAction --quiet --stacktrace
+        run: ./gradlew assembleOfficialAction -profile --quiet --stacktrace
         continue-on-error: false
+
+      - name: 📤 Upload Gradle profile reports to artifact
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+            name: Gradle_profile_reports
+            path: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}/build/reports/profile/
 
       - name: 🌠 Sign APK
         uses: noriban/sign-android-release@v5
@@ -360,7 +374,7 @@ jobs:
           # override default build-tools version -- optional
           BUILD_TOOLS_VERSION: "34.0.0"
 
-      - name: 📤 Upload APK to release asset
+      - name: 📤 Upload APK to release assets
         if: contains( matrix.config.suffix, 'apk')
         uses: shogo82148/actions-upload-release-asset@v1
         env:
@@ -370,8 +384,9 @@ jobs:
             asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-beta_github.apk
             asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
 
-      - name: 📤 Upload logs if failure
+      - name: 📤 Upload logs to artifact if failure
         if: failure()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
             name: logs

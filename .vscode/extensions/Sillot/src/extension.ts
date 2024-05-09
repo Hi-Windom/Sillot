@@ -38,6 +38,8 @@ import { ColorPickerProvider } from "./provider/_ColorPicker";
 import { YamlCompletionItemProvider } from "./provider/yaml";
 import { FontMapList, apply花字Transformation } from "./context/花字";
 import { C } from "./extension.const";
+import { add_module_git_emoji_zh } from "./modules/git_emoji_zh";
+import { unwantedRecommendations_check_by_id } from "./task/unwantedRecommendations";
 
 let lastChangedDocument: vscode.TextDocument | null = null;
 let myWebviewPanel: vscode.WebviewPanel | undefined;
@@ -83,6 +85,18 @@ async function loadCompletionItemsFromFile(filePath: string): Promise<any> {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
+    if (vscode.workspace.workspaceFile) {
+        unwantedRecommendations_check_by_id(vscode.workspace.workspaceFile.fsPath)
+    }
+    // 监听扩展状态变化事件
+    context.subscriptions.push(
+        vscode.extensions.onDidChange(() => {
+            if (vscode.workspace.workspaceFile) {
+                unwantedRecommendations_check_by_id(vscode.workspace.workspaceFile.fsPath)
+            }
+        })
+    );
+    add_module_git_emoji_zh(context)
     const disposable555 = vscode.commands.registerCommand("汐洛.同步更新版本", () => {
         vscode.window.showInputBox({ prompt: "Enter new version" }).then(async version => {
             if (version) {
