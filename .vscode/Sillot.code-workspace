@@ -177,10 +177,12 @@
       "esbenp.prettier-vscode", // 本工作区使用 biome 方案，不需要 prettier
       "rvest.vs-code-prettier-eslint", // 本工作区使用 biome 方案，不需要 eslint
       "dbaeumer.vscode-eslint", // 本工作区使用 biome 方案，不需要 eslint
-      "hayden.extension-pack-manager", // 不适用本工作区
-      "felipecaputo.git-project-manager", // 不适用本工作区
-      "donjayamanne.githistory", // 不适用本工作区
-      "DavidAnson.vscode-markdownlint", // 不适用本工作区
+      // 不适用本工作区 ::开始
+      "hayden.extension-pack-manager",
+      "felipecaputo.git-project-manager",
+      "donjayamanne.githistory",
+      "DavidAnson.vscode-markdownlint",
+      // 不适用本工作区 ::结束
       "vscjava.vscode-java-pack", // 避免自动推荐，有需要的自己会安装
       "vscjava.vscode-gradle", // 避免自动推荐，有需要的自己会安装
       "googlecloudtools.cloudcode", // 避免自动推荐，有需要的自己会安装
@@ -192,7 +194,8 @@
       "ms-vscode.PowerShell", // 避免自动推荐，有需要的自己会安装
       "DotJoshJohnson.xml", // 避免自动推荐，有需要的自己会安装
       "ms-azuretools.vscode-docker", // 避免自动推荐，有需要的自己会安装
-      "ms-python.vscode-pylance" // 推荐的插件包已集成此插件，无需单独推荐
+      "ms-python.vscode-pylance", // 推荐的插件包已集成此插件，无需单独推荐
+      "maixiaojie.git-emoji-zh", // 该扩展已集成在汐洛扩展
     ]
   }
 }

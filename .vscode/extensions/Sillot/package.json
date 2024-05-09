@@ -25,6 +25,7 @@
     "Extension Packs"
   ],
   "activationEvents": [
+    "onDidChangeExtensions",
     "onDidChangeTextDocument",
     "onDidChangeActiveTextEditor",
     "onLanguage:plaintext",
