@@ -4,7 +4,7 @@ import type {Tab} from "./Tab";
 /// #endif
 import {processMessage} from "../util/processMessage";
 import {kernelError, reloadSync} from "../dialog/processSystem";
-import {App} from "../index";
+import type {App} from "../index";
 
 // export class Model {
 //     public ws: WebSocket;
@@ -116,14 +116,25 @@ export class Model {
     /// #endif
     public app: App;
 
-    constructor(options: ModelOptions) {
+    constructor(options: {
+        app: App;
+        id: string;
+        type?: TWS;
+        callback?: () => void;
+        msgCallback?: (data: IWebSocketData) => void;
+    }) {
         this.app = options.app;
         if (options.msgCallback) {
             this.connect(options);
         }
     }
 
-    private connect(options: ModelOptions) {
+    private connect(options: {
+        id: string;
+        type?: TWS;
+        callback?: () => void;
+        msgCallback?: (data: IWebSocketData) => void;
+    }) {
         const websocketURL = `${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/ws`;
         this.ws = new WebSocket(`${websocketURL}?app=${Constants.SIYUAN_APPID}&id=${options.id}${options.type ? "&type=" + options.type : ""}`);
         this.ws.onopen = () => {
@@ -159,8 +170,7 @@ export class Model {
                     this.connect({
                         id: options.id,
                         type: options.type,
-                        msgCallback: options.msgCallback,
-                        app: new App
+                        msgCallback: options.msgCallback
                     });
                 }, 3000);
             }
@@ -192,10 +202,3 @@ export class Model {
     }
 }
 
-interface ModelOptions {
-    app: App;
-    id: string;
-    type?: TWS;
-    callback?: () => void;
-    msgCallback?: (data: IWebSocketData) => void;
-}
