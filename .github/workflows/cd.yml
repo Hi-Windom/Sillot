@@ -53,6 +53,12 @@ jobs:
         with:
             cmd: "jq .sypv ${{ env.package_json }} -r"
 
+      - name: 💫 Extract electronVersion from package.json
+        uses: sergeysova/jq-action@v2
+        id: electronVersion
+        with:
+                cmd: "jq .devDependencies.electron ${{ env.package_json }} -r"
+
       - name: 💫 Extract packageManager from package.json
         uses: sergeysova/jq-action@v2
         id: packageManager
@@ -86,7 +92,7 @@ jobs:
         run: |
           echo "release_title=$(git show --format=%s --no-patch | head -1)" >> $GITHUB_OUTPUT
           echo "release_version=v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}" >> $GITHUB_OUTPUT
-          changelog1=$(python scripts/parse-changelog-HEAD.py -t ${{ github.ref }} -b ${{ steps.thisLatestRelease.outputs.release }} ${{ env.repo_owner }}/${{ env.repo_name }})
+          changelog1=$(python scripts/parse-changelog-HEAD.py -t ${{ github.ref }} -b ${{ steps.thisLatestRelease.outputs.release }} -e ${{ steps.electronVersion.outputs.value }} ${{ env.repo_owner }}/${{ env.repo_name }})
           changelog2=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ env.repo_name }})
           changelog3=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ env.repo_name_android }})
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
