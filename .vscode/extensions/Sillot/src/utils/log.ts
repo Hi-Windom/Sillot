@@ -3,8 +3,8 @@ import * as vscode from "vscode";
 export abstract class Log {
     private static LN = 0;
     private static 分隔符 = " > ";
-    private static ChannelName = "汐洛插件日志";
-    private static TAG = "[汐洛插件]: ";
+    private static ChannelName = "汐洛扩展日志";
+    private static TAG = "[汐洛扩展]: ";
     public static Channel: vscode.LogOutputChannel = vscode.window.createOutputChannel(Log.ChannelName, { log: true });
     constructor() {
         if (!Log.Channel) {
