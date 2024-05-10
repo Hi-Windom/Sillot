@@ -241,9 +241,7 @@ ${getTypeByCellElement(item) === "block" ? ' data-detached="true"' : ""}><span c
 
 export const stickyRow = (blockElement: HTMLElement, elementRect: DOMRect, status: "top" | "bottom" | "all") => {
     window.sout.tracker("invoked");
-    if (blockElement.querySelector(".av__title").getAttribute("contenteditable") === "false") {
-        return;
-    }
+    // 只读模式下也需固定 https://github.com/siyuan-note/siyuan/issues/11338
     const scrollRect = blockElement.querySelector(".av__scroll").getBoundingClientRect();
     const headerElement = blockElement.querySelector(".av__row--header") as HTMLElement;
     if (headerElement && (status === "top" || status === "all")) {

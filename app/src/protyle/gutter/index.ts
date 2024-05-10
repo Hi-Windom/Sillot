@@ -271,6 +271,11 @@ export class Gutter {
                         data: blockElement.getAttribute("updated")
                     }]);
                     insertAttrViewBlockAnimation(protyle, blockElement, srcIDs, previousID, avID);
+                    if (event.altKey) {
+                        this.element.querySelectorAll("button").forEach(item => {
+                            item.dataset.rowId = srcIDs[0];
+                        });
+                    }
                     blockElement.setAttribute("updated", newUpdated);
                 } else {
                     avContextmenu(protyle, rowElement as HTMLElement, {
@@ -285,7 +290,7 @@ export class Gutter {
             }
             if (isOnlyMeta(event)) {
                 zoomOut({protyle, id});
-            } else if (event.altKey && !protyle.disabled) {
+            } else if (event.altKey) {
                 let foldElement: Element;
                 Array.from(protyle.wysiwyg.element.querySelectorAll(`[data-node-id="${id}"]`)).find(item => {
                     if (!hasClosestByAttribute(item.parentElement, "data-type", "NodeBlockQueryEmbed") &&
