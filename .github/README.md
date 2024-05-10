@@ -72,7 +72,7 @@
 <h2><a href="https://github.com/orgs/Hi-Windom/projects/2/views/2">汐洛路线图（Sillot Roadmap）</a></h2>
 <h2><a href="https://github.com/orgs/Hi-Windom/projects/3/views/2">汐洛安卓路线图（Sillot Android Roadmap）</a></h2>
 <h2><a href="https://github.com/orgs/Hi-Windom/projects/4/views/2">汐洛社区路线图（Sillot Community Roadmap）</a></h2>
-<h2><a href="https://github.com/orgs/Hi-Windom/projects/6/views/2">汐洛 VSC 插件路线图（Sillot VSCode Plugin Roadmap）</a></h2>
+<h2><a href="https://github.com/orgs/Hi-Windom/projects/6/views/2">汐洛扩展路线图（Sillot Extention Roadmap）</a></h2>
 </p>
 
 <p align="center">
