@@ -16,7 +16,7 @@ import {getAllModels} from "../../layout/getAll";
 import type {Files} from "../../layout/dock/Files";
 import {Search} from "../../search";
 import {openSetting} from "../../config";
-import {Tab} from "../../layout/Tab";
+import type {Tab} from "../../layout/Tab";
 /// #endif
 import {openHistory} from "../../history/history";
 import {addEditorToDatabase, addFilesToDatabase} from "../../protyle/render/av/addToDatabase";

@@ -66,7 +66,7 @@ const renderDoc = (element: HTMLElement, currentPage: number) => {
     }
     window.siyuan.storage[Constants.LOCAL_HISTORY] = {
         notebookId: notebookElement.value,
-        type: parseInt(typeElement.value),
+        type: Number.parseInt(typeElement.value),
         operation: opElement.value
     };
     setStorageVal(Constants.LOCAL_HISTORY, window.siyuan.storage[Constants.LOCAL_HISTORY]);

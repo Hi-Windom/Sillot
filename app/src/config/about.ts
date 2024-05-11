@@ -366,7 +366,7 @@ ${
         /// #if !BROWSER
         const autoLaunchElement = about.element.querySelector("#autoLaunch") as HTMLInputElement;
         autoLaunchElement.addEventListener("change", () => {
-            const autoLaunchMode = parseInt(autoLaunchElement.value);
+            const autoLaunchMode = Number.parseInt(autoLaunchElement.value);
             fetchPost("/api/system/setAutoLaunch", {autoLaunch: autoLaunchMode}, () => {
                 window.siyuan.config.system.autoLaunch2 = autoLaunchMode;
                 ipcRenderer.send(Constants.SIYUAN_AUTO_LAUNCH, {

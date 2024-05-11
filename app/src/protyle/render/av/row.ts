@@ -117,7 +117,7 @@ export const insertAttrViewBlockAnimation = (protyle: IProtyle, blockElement: El
         if (getTypeByCellElement(item) === "lineNumber") {
             const lineNumberValue = item.querySelector(".av__celltext")?.getAttribute("data-value")
             if (lineNumberValue) {
-                lineNumber = (parseInt(lineNumberValue) + 1).toString();
+                lineNumber = (Number.parseInt(lineNumberValue) + 1).toString();
             }
         }
         colHTML += `<div class="av__cell" data-col-id="${item.dataset.colId}" 
