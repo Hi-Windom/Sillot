@@ -17,7 +17,7 @@ export const openLink = (protyle: IProtyle, aLink: string, event?: MouseEvent, c
             linkAddress = `assets/${pdfAddress[1]}`;
             pdfParams = pdfAddress[2];
         } else {
-            pdfParams = parseInt(getSearch("page", linkAddress));
+            pdfParams = Number.parseInt(getSearch("page", linkAddress));
             linkAddress = linkAddress.split("?page")[0];
         }
     }

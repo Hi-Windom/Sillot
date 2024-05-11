@@ -117,7 +117,7 @@ export const insertAttrViewBlockAnimation = (protyle: IProtyle, blockElement: El
         if (getTypeByCellElement(item) === "lineNumber") {
             const lineNumberValue = item.querySelector(".av__celltext")?.getAttribute("data-value")
             if (lineNumberValue) {
-                lineNumber = (parseInt(lineNumberValue) + 1).toString();
+                lineNumber = (Number.parseInt(lineNumberValue) + 1).toString();
             }
         }
         colHTML += `<div class="av__cell" data-col-id="${item.dataset.colId}" 
@@ -372,9 +372,12 @@ export const setPageSize = (options: {
 
 export const deleteRow = (blockElement: HTMLElement, protyle: IProtyle) => {
     window.sout.tracker("invoked");
+    const rowElements = blockElement.querySelectorAll(".av__row--select:not(.av__row--header)");
+    if (rowElements.length === 0) {
+        return;
+    }
     const avID = blockElement.getAttribute("data-av-id");
     const undoOperations: IOperation[] = [];
-    const rowElements = blockElement.querySelectorAll(".av__row--select:not(.av__row--header)");
     const blockIds: string[] = [];
     rowElements.forEach(item => {
         blockIds.push(item.querySelector(".av__cell[data-block-id]").getAttribute("data-block-id"));

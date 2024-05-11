@@ -1,4 +1,4 @@
-import {App} from "../../index";
+import type {App} from "../../index";
 import {execByCommand} from "../../boot/globalEvent/commandPanel";
 import {matchHotKey} from "../../protyle/util/hotKey";
 import {getCurrentEditor} from "../editor";
