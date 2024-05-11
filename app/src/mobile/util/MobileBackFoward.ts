@@ -131,7 +131,8 @@ export const goForward = () => {
         return;
     }
     if (window.JSAndroid && forwardStack.length < 2) {
-        window.JSAndroid.exitSillotAndroid();
+        window.location.href = 'siyuan://api/system/exit';
+        // window.JSAndroid.exitSillotAndroid();
         return;
     }
     if (forwardStack.length < 2) {
@@ -174,7 +175,8 @@ export const goBack = () => {
     }
     if (window.JSAndroid && window.siyuan.backStack.length < 1) {
         if (document.querySelector('#message [data-id="exitTip"]')) {
-            window.JSAndroid.exitSillotAndroid();
+            window.location.href = 'siyuan://api/system/exit';
+            // window.JSAndroid.exitSillotAndroid();
         } else {
             showMessage(window.siyuan.languages.exitSillotAndroid, 3000, "info", "exitTip");
         }
