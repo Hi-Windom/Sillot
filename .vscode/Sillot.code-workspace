@@ -183,17 +183,19 @@
       "donjayamanne.githistory",
       "DavidAnson.vscode-markdownlint",
       // 不适用本工作区 ::结束
-      "vscjava.vscode-java-pack", // 避免自动推荐，有需要的自己会安装
-      "vscjava.vscode-gradle", // 避免自动推荐，有需要的自己会安装
-      "googlecloudtools.cloudcode", // 避免自动推荐，有需要的自己会安装
-      "github.copilot", // 避免自动推荐，有需要的自己会安装
-      "ms-kubernetes-tools.vscode-kubernetes-tools", // 避免自动推荐，有需要的自己会安装
-      "firefox-devtools.vscode-firefox-debug", // 避免自动推荐，有需要的自己会安装
-      "github.vscode-pull-request-github", // 避免自动推荐，有需要的自己会安装
-      "ms-vscode-remote.remote-wsl", // 避免自动推荐，有需要的自己会安装
-      "ms-vscode.PowerShell", // 避免自动推荐，有需要的自己会安装
-      "DotJoshJohnson.xml", // 避免自动推荐，有需要的自己会安装
-      "ms-azuretools.vscode-docker", // 避免自动推荐，有需要的自己会安装
+      // 避免自动推荐，有需要的自己会安装 ::开始
+      "vscjava.vscode-java-pack",
+      "vscjava.vscode-gradle",
+      "googlecloudtools.cloudcode",
+      "github.copilot",
+      "ms-kubernetes-tools.vscode-kubernetes-tools",
+      "firefox-devtools.vscode-firefox-debug",
+      "github.vscode-pull-request-github",
+      "ms-vscode-remote.remote-wsl",
+      "ms-vscode.PowerShell",
+      "DotJoshJohnson.xml",
+      "ms-azuretools.vscode-docker",
+      // 避免自动推荐，有需要的自己会安装 ::结束
       "ms-python.vscode-pylance", // 推荐的插件包已集成此插件，无需单独推荐
       "maixiaojie.git-emoji-zh", // 该扩展已集成在汐洛扩展
     ]
