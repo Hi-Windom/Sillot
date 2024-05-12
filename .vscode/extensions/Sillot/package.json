@@ -394,10 +394,6 @@
       {
         "language": "markdown",
         "path": "./snippets/md.json"
-      },
-      {
-        "language": "mdx",
-        "path": "./snippets/md.json"
       }
     ]
   },
