@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import fs from "fs-extra";
 import json5 from "json5";
 
-export async function unwantedRecommendations_check_by_id(profilePath: string) {
+export async function add_task_unwantedRecommendations_check_by_id(profilePath: string) {
     const serializedItems = await fs.readFile(profilePath, "utf-8");
     const wp_json = json5.parse(serializedItems);
     if (wp_json.extensions?.unwantedRecommendations) {
