@@ -102,6 +102,10 @@ func GetAttributeViewPrimaryKeyValues(avID, keyword string, page, pageSize int) 
 		end = len(keyValues.Values)
 	}
 	keyValues.Values = keyValues.Values[start:end]
+
+	sort.Slice(keyValues.Values, func(i, j int) bool {
+		return keyValues.Values[i].Block.Updated > keyValues.Values[j].Block.Updated
+	})
 	return
 }
 
@@ -2220,6 +2224,7 @@ func (tx *Transaction) doInsertAttrViewBlock(operation *Operation) (ret *TxErr) 
 func AddAttributeViewBlock(tx *Transaction, srcs []map[string]interface{}, avID, blockID, previousBlockID string, ignoreFillFilter bool) (err error) {
 	slices.Reverse(srcs) // https://github.com/siyuan-note/siyuan/issues/11286
 
+	now := time.Now().UnixMilli()
 	for _, src := range srcs {
 		srcID := src["id"].(string)
 		isDetached := src["isDetached"].(bool)
@@ -2241,14 +2246,14 @@ func AddAttributeViewBlock(tx *Transaction, srcs []map[string]interface{}, avID,
 		if nil != src["content"] {
 			srcContent = src["content"].(string)
 		}
-		if avErr := addAttributeViewBlock(avID, blockID, previousBlockID, srcID, srcContent, isDetached, ignoreFillFilter, tree, tx); nil != avErr {
+		if avErr := addAttributeViewBlock(now, avID, blockID, previousBlockID, srcID, srcContent, isDetached, ignoreFillFilter, tree, tx); nil != avErr {
 			return avErr
 		}
 	}
 	return
 }
 
-func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID, addingBlockContent string, isDetached, ignoreFillFilter bool, tree *parse.Tree, tx *Transaction) (err error) {
+func addAttributeViewBlock(now int64, avID, blockID, previousBlockID, addingBlockID, addingBlockContent string, isDetached, ignoreFillFilter bool, tree *parse.Tree, tx *Transaction) (err error) {
 	var node *ast.Node
 	if !isDetached {
 		node = treenode.GetNodeInTree(tree, addingBlockID)
@@ -2271,8 +2276,6 @@ func addAttributeViewBlock(avID, blockID, previousBlockID, addingBlockID, adding
 	if !isDetached {
 		addingBlockContent = getNodeRefText(node)
 	}
-
-	now := time.Now().UnixMilli()
 
 	// 检查是否重复添加相同的块
 	blockValues := attrView.GetBlockKeyValues()
@@ -2964,7 +2967,13 @@ func RemoveAttributeViewKey(avID, keyID string) (err error) {
 		if removedKey.Relation.IsTwoWay {
 			// 删除双向关联的目标列
 
-			destAv, _ := av.ParseAttributeView(removedKey.Relation.AvID)
+			var destAv *av.AttributeView
+			if avID == removedKey.Relation.AvID {
+				destAv = attrView
+			} else {
+				destAv, _ = av.ParseAttributeView(removedKey.Relation.AvID)
+			}
+
 			if nil != destAv {
 				destAvRelSrcAv := false
 				for i, keyValues := range destAv.KeyValues {
@@ -2990,8 +2999,10 @@ func RemoveAttributeViewKey(avID, keyID string) (err error) {
 					}
 				}
 
-				av.SaveAttributeView(destAv)
-				util.PushReloadAttrView(destAv.ID)
+				if destAv != attrView {
+					av.SaveAttributeView(destAv)
+					util.PushReloadAttrView(destAv.ID)
+				}
 
 				if !destAvRelSrcAv {
 					av.RemoveAvRel(destAv.ID, attrView.ID)
@@ -3252,7 +3263,14 @@ func UpdateAttributeViewCell(tx *Transaction, avID, keyID, rowID, cellID string,
 	if nil != key && av.KeyTypeRelation == key.Type && nil != key.Relation && key.Relation.IsTwoWay {
 		// 双向关联需要同时更新目标字段的值
 
-		if destAv, _ := av.ParseAttributeView(key.Relation.AvID); nil != destAv {
+		var destAv *av.AttributeView
+		if avID == key.Relation.AvID {
+			destAv = attrView
+		} else {
+			destAv, _ = av.ParseAttributeView(key.Relation.AvID)
+		}
+
+		if nil != destAv {
 			// relationChangeMode
 			// 0：关联列值不变（仅排序），不影响目标值
 			// 1：关联列值增加，增加目标值
@@ -3304,7 +3322,9 @@ func UpdateAttributeViewCell(tx *Transaction, avID, keyID, rowID, cellID string,
 				}
 			}
 
-			av.SaveAttributeView(destAv)
+			if destAv != attrView {
+				av.SaveAttributeView(destAv)
+			}
 		}
 	}
 
