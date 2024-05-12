@@ -39,7 +39,9 @@ import { YamlCompletionItemProvider } from "./provider/yaml";
 import { FontMapList, apply花字Transformation } from "./context/花字";
 import { C } from "./extension.const";
 import { add_module_git_emoji_zh } from "./modules/git_emoji_zh";
-import { unwantedRecommendations_check_by_id } from "./task/unwantedRecommendations";
+import { add_task_unwantedRecommendations_check_by_id } from "./task/unwantedRecommendations";
+import { loadCompletionItemsFromFile, saveCompletionItemsToFile } from "./utils/json";
+import { add_task_同步更新版本 } from "./task/同步更新版本";
 
 let lastChangedDocument: vscode.TextDocument | null = null;
 let myWebviewPanel: vscode.WebviewPanel | undefined;
@@ -60,103 +62,21 @@ class fileCompletionItemProvider implements vscode.CompletionItemProvider {
         return this.completionItems;
     }
 }
-// 序列化并保存到文件
-async function saveCompletionItemsToFile(filePath: string, items: Array<vscode.CompletionItem> | { [key: string]: any }) {
-    // 使用 json5.stringify 格式化 JSON，使其更易读
-    const serializedItems = json5.stringify(items, {
-        space: 2,
-        quote: '"',
-    });
-
-    // 使用 fs-extra 写入文件
-    await fs.writeFile(filePath, serializedItems, "utf-8");
-}
-
-// 从文件反序列化
-async function loadCompletionItemsFromFile(filePath: string): Promise<any> {
-    // 使用 fs-extra 读取文件
-    const serializedItems = await fs.readFile(filePath, "utf-8");
-
-    // 使用 json5.parse 反序列化 JSON
-    const items = json5.parse(serializedItems);
-
-    // 返回反序列化后的数组
-    return items;
-}
 
 export async function activate(context: vscode.ExtensionContext) {
     if (vscode.workspace.workspaceFile) {
-        unwantedRecommendations_check_by_id(vscode.workspace.workspaceFile.fsPath)
+        add_task_unwantedRecommendations_check_by_id(vscode.workspace.workspaceFile.fsPath);
     }
     // 监听扩展状态变化事件
     context.subscriptions.push(
         vscode.extensions.onDidChange(() => {
             if (vscode.workspace.workspaceFile) {
-                unwantedRecommendations_check_by_id(vscode.workspace.workspaceFile.fsPath)
+                add_task_unwantedRecommendations_check_by_id(vscode.workspace.workspaceFile.fsPath);
             }
         })
     );
-    add_module_git_emoji_zh(context)
-    const disposable555 = vscode.commands.registerCommand("汐洛.同步更新版本", () => {
-        vscode.window.showInputBox({ prompt: "Enter new version" }).then(async version => {
-            if (version) {
-                const wname = vscode.workspace.name;
-                if (wname && vscode.workspace.workspaceFile) {
-                    const pkgMapFile = `${path.dirname(vscode.workspace.workspaceFile.fsPath)}/${C.PackageJsonMapping}`;
-                    Log.d(wname, pkgMapFile);
-                    if (!(await fs.exists(pkgMapFile))) {
-                        vscode.window.showWarningMessage("package.json 映射不存在，请先添加");
-                        return;
-                    }
-
-                    const pkgMap: { [key: string]: any } = await loadCompletionItemsFromFile(pkgMapFile);
-                    const paths: string[] = pkgMap[wname];
-                    // 创建快速选择框
-                    const quickPick = vscode.window.createQuickPick();
-                    quickPick.title = "选择要更新版本的文件";
-                    // quickPick.items = [{ label: "Option 1" }, { label: "Option 2" }, { label: "Option 3" }];
-                    quickPick.items = paths.map(path => ({ label: path }));
-                    quickPick.canSelectMany = true; // 允许多选
-
-                    // 显示快速选择框并等待用户选择
-                    const selectedOptions: string[] = await new Promise(resolve => {
-                        quickPick.onDidAccept(() => {
-                            resolve(quickPick.selectedItems.map(item => item.label));
-                            quickPick.dispose();
-                        });
-                        quickPick.onDidHide(() => {
-                            resolve([]);
-                            quickPick.dispose();
-                        });
-                        quickPick.show();
-                    });
-
-                    if (selectedOptions.length > 0) {
-                        Log.d(`Version: ${version}, Selected options:${selectedOptions.join(", ")}`);
-                    } else {
-                        resolve();
-                    }
-                    // 遍历映射并更新版本号
-                    selectedOptions.forEach(async (value: string, index: number) => {
-                        Log.d("汐洛.同步更新版本", value);
-                        if (await fs.exists(value)) {
-                            const pkgContent = fs.readJSONSync(value);
-                            pkgContent.version = version;
-                            fs.writeFileSync(value, JSON.stringify(pkgContent, null, 2));
-                            Log.d(`${version} -> ${value}`);
-                        } else {
-                            vscode.window.showWarningMessage(`已跳过无效映射 ${value}`);
-                        }
-                    });
-                    vscode.window.showInformationMessage("Version updated in all package.json files.");
-                } else {
-                    vscode.window.showWarningMessage("当前不在工作区环境");
-                }
-            }
-        });
-    });
-
-    context.subscriptions.push(disposable555);
+    add_module_git_emoji_zh(context);
+    add_task_同步更新版本(context);
 
     const addMappingDisposable = vscode.commands.registerCommand("汐洛.addPackageJsonMapping", async (uri: vscode.Uri) => {
         if (uri?.fsPath.endsWith("package.json")) {
