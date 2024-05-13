@@ -27,13 +27,15 @@ const runCode = (code: string, sourceURL: string) => {
     return window.eval("(function anonymous(require, module, exports){".concat(code, "\n})\n//# sourceURL=").concat(sourceURL, "\n"));
 };
 
-export const loadPlugins = async (app: App) => {
+export const loadPlugins = async (app: App, names?: string[]) => {
     window.sout.tracker("invoked");
     const response = await fetchSyncPost("/api/petal/loadPetals", {frontend: getFrontend()});
     let css = "";
     // 为加快启动速度，不进行 await
     response.data.forEach((item: IPluginData) => {
-        loadPluginJS(app, item);
+        if (!names || (names && names.includes(item.name))) {
+            loadPluginJS(app, item);
+        }
         css += item.css || "" + "\n";
     });
     const pluginsStyle = document.getElementById("pluginsStyle");
@@ -204,14 +206,16 @@ export const afterLoadPlugin = (plugin: Plugin) => {
     /// #endif
 };
 
-export const reloadPlugin = (app: App) => {
+export const reloadPlugin = async (app: App, data: { upsertPlugins: string[], removePlugins: string[] }) => {
     window.sout.tracker("invoked");
-    app.plugins.forEach((item) => {
-        uninstall(this, item.name);
+    data.removePlugins.concat(data.upsertPlugins).forEach((item) => {
+        uninstall(app, item);
     });
-    loadPlugins(this).then(() => {
+    loadPlugins(app, data.upsertPlugins).then(() => {
         app.plugins.forEach(item => {
-            afterLoadPlugin(item);
+            if (data.upsertPlugins.includes(item.name)) {
+                afterLoadPlugin(item);
+            }
         });
     });
     /// #if !MOBILE
