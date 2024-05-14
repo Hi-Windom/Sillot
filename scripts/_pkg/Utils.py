@@ -76,6 +76,6 @@ def print_taget2siyuan(tag_name, otherReleaseArray):
             print(f'''[v{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v})  ''', end="")
     print(f'''
 
-## ⚓ [{tag_name}](https://github.com/siyuan-note/siyuan/releases/tag/{tag_name}) 主要变化
+## ⚓ [{tag_name}](https://github.com/siyuan-note/siyuan/releases/tag/{tag_name}) 值得注意的变化
 
 ''')

@@ -9,24 +9,15 @@ docmap_sillot = {
     "Shinning": "闪亮之名 | Shinning",
     "VSCE": "VSCode 扩展相关 | VSCE",
 }
-docmap_siyuan = {
-    "Feature": "引入特性 | Feature",
-    "Enhancement": "改进功能 | Enhancement",
-    "Bug": "修复错误 | Bugfix",
-    "Document": "文档相关 | Document",
-    "Refactor": "开发重构 | Refactor",
-    "Abolishment": "移除废止 | Abolishment",
-    "Development": "Development",
-}
 # 仅关注核心部分
-docmap_siyuan_core = {
+docmap_siyuan = {
     "Feature": "引入特性 | Feature",
     "Enhancement": "改进功能 | Enhancement",
     # "Bug": "修复错误 | Bugfix",
     # "Document": "文档相关 | Document",
     "Refactor": "开发重构 | Refactor",
     "Abolishment": "移除废止 | Abolishment",
-    # "Development": "Development",
+    "Development": "开发者相关 | Development",
 }
 
 repo_siyuan = "siyuan-note/siyuan"
