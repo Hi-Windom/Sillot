@@ -1,6 +1,6 @@
 import {newDailyNote} from "../../../util/mount";
 import {openHistory} from "../../../history/history";
-import {Editor} from "../../../editor";
+import type {Editor} from "../../../editor";
 /// #if MOBILE
 import {openDock} from "../../../mobile/dock/util";
 import {popMenu} from "../../../mobile/menu";
@@ -12,9 +12,9 @@ import {getAllTabs} from "../../../layout/getAll";
 import {getInstanceById} from "../../../layout/util";
 import {closeTabByType, getActiveTab, getDockByType, switchTabByIndex} from "../../../layout/tabUtil";
 import {openSetting} from "../../../config";
-import {Tab} from "../../../layout/Tab";
+import type {Tab} from "../../../layout/Tab";
 /// #endif
-import {App} from "../../../index";
+import type {App} from "../../../index";
 import {Constants} from "../../../constants";
 import {setReadOnly} from "../../../config/util/setReadOnly";
 
