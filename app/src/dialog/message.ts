@@ -48,7 +48,7 @@ export const showMessage = (message: string, timeout = 6000, type = "info", mess
     const messageVersion = message + (type === "error" ? " v" + Constants.SIYUAN_VERSION : "");
     if (existElement) {
         window.clearTimeout(Number.parseInt(existElement.getAttribute("data-timeoutid")));
-        existElement.innerHTML = `<div class="b3-snackbar__content${timeout === 0 ? " b3-snackbar__content--close" : ""}">${messageVersion}</div>${timeout === 0 ? '<svg class="b3-snackbar__close"><use xlink:href="#iconCloseRound"></use></svg>' : ""}`;
+        existElement.innerHTML = `<div data-type="textMenu" class="b3-snackbar__content${timeout === 0 ? " b3-snackbar__content--close" : ""}">${messageVersion}</div>${timeout === 0 ? '<svg class="b3-snackbar__close"><use xlink:href="#iconCloseRound"></use></svg>' : ""}`;
         if (type === "error") {
             existElement.classList.add("b3-snackbar--error");
         } else {
@@ -62,7 +62,7 @@ export const showMessage = (message: string, timeout = 6000, type = "info", mess
         }
         return;
     }
-    let messageHTML = `<div data-id="${id}" class="b3-snackbar--hide b3-snackbar${type === "error" ? " b3-snackbar--error" : ""}"><div class="b3-snackbar__content${timeout === 0 ? " b3-snackbar__content--close" : ""}">${messageVersion}</div>`;
+    let messageHTML = `<div data-id="${id}" class="b3-snackbar--hide b3-snackbar${type === "error" ? " b3-snackbar--error" : ""}"><div data-type="textMenu" class="b3-snackbar__content${timeout === 0 ? " b3-snackbar__content--close" : ""}">${messageVersion}</div>`;
     if (timeout === 0) {
         messageHTML += '<svg class="b3-snackbar__close"><use xlink:href="#iconCloseRound"></use></svg>';
     } else if (timeout !== -1) { // -1 时需等待请求完成后手动关闭
@@ -72,6 +72,7 @@ export const showMessage = (message: string, timeout = 6000, type = "info", mess
         messageHTML = messageHTML.replace("<div data-id", `<div data-timeoutid="${timeoutId}" data-id`);
     }
     messagesElement.parentElement.classList.add("b3-snackbars--show");
+    messagesElement.parentElement.style.zIndex = (++window.siyuan.zIndex).toString();
     messagesElement.insertAdjacentHTML("afterbegin", messageHTML + "</div>");
     setTimeout(() => {
         messagesElement.querySelectorAll(".b3-snackbar--hide").forEach(item => {

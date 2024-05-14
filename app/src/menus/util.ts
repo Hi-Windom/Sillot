@@ -32,7 +32,6 @@ export const exportAsset = (src: string) => {
     /// #endif
 };
 
-
 export const openEditorTab = (app: App, ids: string[], notebookId?: string, pathString?: string) => {
     window.sout.tracker("invoked");
     /// #if !MOBILE

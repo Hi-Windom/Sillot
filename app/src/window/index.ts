@@ -54,7 +54,7 @@ class App {
                     if (data) {
                         switch (data.cmd) {
                             case "reloadPlugin":
-                                reloadPlugin(this);
+                                reloadPlugin(this, data.data);
                                 break;
                             case "syncMergeResult":
                                 reloadSync(this, data.data);

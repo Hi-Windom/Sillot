@@ -451,7 +451,9 @@ ${padHTML}
                         }, getResponse => {
                             onGet({data: getResponse, protyle});
                         });
+                        /// #if !MOBILE
                         saveLayout();
+                        /// #endif
                     }
                 }, {
                     current: !protyle.preview.element.classList.contains("fn__none"),
@@ -461,7 +463,9 @@ ${padHTML}
                     click: () => {
                         setEditMode(protyle, "preview");
                         window.siyuan.menus.menu.remove();
+                        /// #if !MOBILE
                         saveLayout();
+                        /// #endif
                     }
                 }]
             }).element);
