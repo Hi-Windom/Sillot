@@ -116,7 +116,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
     private hoverForCode(key: string, filePath: string, lang: string) {
         const resources = getResources(filePath);
         const KeyValue = resources.find(item => item.key === key)?.value;
-        console.log(key, KeyValue, resources)
+        // console.log(key, KeyValue, resources)
         if (KeyValue) {
             const fileUri = vscode.Uri.file(filePath); // 可以进一步调整到 key 所在行，但是没必要
             const keyValueText = `[${lang}](${fileUri}) : **${KeyValue}**  \n\n`;
