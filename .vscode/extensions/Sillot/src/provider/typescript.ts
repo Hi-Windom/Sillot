@@ -44,26 +44,49 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
             const sillotJsoncContent = fs.readFileSync(sillotJsoncPath, "utf-8");
             const sillotJson = json5.parse(sillotJsoncContent);
 
-            // 解析zh_CN字段
-            const zhCNField = sillotJson.i18n.siyuan.ts["window_siyuan_languages"].zh_CN;
-            if (!zhCNField || zhCNField.length === 0) {
-                return null;
-            }
-            // 解析路径
-            let zhCNJsonPath: string;
-            if (zhCNField[0] === "$workspaceFileDir") {
-                zhCNJsonPath = workspaceFileDir;
-            } else {
-                zhCNJsonPath = workspaceFileDir;
+            const _key = this.expressionChain.replace(targetExpression, "");
+            // 遍历.sillot.jsonc文件中的所有语言
+            const languages = sillotJson.i18n.siyuan.ts["window_siyuan_languages"];
+            let combinedHoverText = new vscode.MarkdownString();
+            let hasMatches = false;
+            const _hasOwnProperty = Object.prototype.hasOwnProperty;
+            for (const lang in languages) {
+                if (_hasOwnProperty.call(languages, lang)) {
+                    // 解析每种语言的路径
+                    let langPath: string;
+                    const langField = languages[lang];
+                    if (langField[0] === "$workspaceFileDir") {
+                        langPath = workspaceFileDir;
+                    } else {
+                        langPath = langField[0];
+                    }
+
+                    // 拼接所有路径片段并处理相对路径
+                    for (let i = 1; i < langField.length; i++) {
+                        langPath = path.resolve(langPath, langField[i]);
+                    }
+
+                    // 调用hoverForCode为每种语言生成Hover信息
+                    const [keyValueText] = this.hoverForCode(_key, langPath, lang);
+
+                    if (keyValueText) {
+                        combinedHoverText.appendMarkdown(keyValueText);
+                        hasMatches = true;
+                    }
+                }
             }
 
-            // 拼接所有路径片段并处理相对路径
-            for (let i = 1; i < zhCNField.length; i++) {
-                zhCNJsonPath = path.resolve(zhCNJsonPath, zhCNField[i]);
+            // 如果有任何匹配，添加文件路径
+            if (hasMatches) {
+                combinedHoverText.appendMarkdown(
+                    `${this.expressionChain} \n\n**config this in .sillot.json at**: ` + workspaceFileDir + "  \n\n"
+                );
             }
-            const _key = this.expressionChain.replace(targetExpression, "");
-            Log.i(`hoverForCode ${_key}, ${zhCNJsonPath}`);
-            return this.hoverForCode(_key, zhCNJsonPath);
+
+            // 创建最终的Hover对象
+            const combinedHover = new vscode.Hover(combinedHoverText);
+
+            return combinedHover;
         }
         Log.i("检查是否是`window.siyuan.languages`的属性访问 成功");
 
@@ -75,26 +98,20 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
         return program.getSourceFile(filePath);
     }
 
-    private hoverForCode(key: string, filePath: string) {
+    private hoverForCode(key: string, filePath: string, lang: string) {
         const resources = getResources(filePath);
-        console.log(key, resources);
-        let hasMatch = false;
-        const hoverText: vscode.MarkdownString = new vscode.MarkdownString();
-        const KeyValue = resources.find(item => item.key === key).value;
+        const KeyValue = resources.find(item => item.key === key)?.value;
 
-        console.log(KeyValue);
         if (KeyValue) {
-            if (!hasMatch) {
-                hoverText.appendMarkdown(`**filePath**: ${filePath}  \n\n\n`);
-            }
-            hoverText.appendMarkdown(`- **${key}**: ${KeyValue}  \n\n`);
-            hasMatch = true;
+            const fileUri = vscode.Uri.file(filePath); // 可以进一步调整到 key 所在行，但是没必要
+            const keyValueText = `[${lang}](${fileUri}) : **${KeyValue}**  \n\n`;
+            return [keyValueText];
         }
-        if (!hasMatch) {
-            hoverText.appendMarkdown("**Language definition not found!**");
-        }
-        return new vscode.Hover(hoverText);
+
+        // 如果没有找到对应的KeyValue，返回空字符串
+        return [""];
     }
+
     private 给我搜(文档: vscode.TextDocument, 位置: vscode.Position, 目标表达式: string, 模式: "equal" | "startWith"): ts.Node | undefined {
         const createSourceFileFromDocument = (文档: vscode.TextDocument): ts.SourceFile => {
             const 文件名 = 文档.uri.toString();
