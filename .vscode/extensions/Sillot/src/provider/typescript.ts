@@ -4,6 +4,7 @@ import fs from "fs-extra";
 import json5 from "json5";
 import * as path from "path";
 import { Log } from "../utils/log";
+import { C } from "../extension.const";
 
 export function registerHoverProvider_window_siyuan_languages(context: vscode.ExtensionContext) {
     const provider = new SiyuanHoverProvider();
@@ -14,6 +15,13 @@ export function registerHoverProvider_window_siyuan_languages(context: vscode.Ex
 
 class SiyuanHoverProvider implements vscode.HoverProvider {
     private expressionChain: string | undefined = undefined;
+    private 源文件!: ts.SourceFile;
+    private createSourceFileFromDocument = (文档: vscode.TextDocument): ts.SourceFile => {
+        const 文件名 = 文档.uri.toString();
+        const 文本 = 文档.getText();
+        return ts.createSourceFile(文件名, 文本, ts.ScriptTarget.ESNext, true);
+    };
+
     provideHover(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -22,6 +30,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
         const range = document.getWordRangeAtPosition(position);
         const word = document.getText(range);
         const filePath = document.uri.fsPath;
+        this.源文件 = this.createSourceFileFromDocument(document);
 
         // 使用TypeScript Compiler API解析文件
         const sourceFile = this.getSourceFile(filePath);
@@ -31,66 +40,72 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
         Log.i(`使用TypeScript Compiler API解析 ${filePath} 成功`);
 
         // 查找包含当前位置的表达式
-        const targetExpression = "window.siyuan.languages.";
-
-        const node = this.给我搜(document, position, targetExpression, "startWith");
-        Log.i("查找包含当前位置的表达式 成功", String(node?.kind));
-
-        if (vscode.workspace.workspaceFile && this.expressionChain) {
-            Log.i(`解析属性访问表达式${this.expressionChain} 成功`);
+        if (vscode.workspace.workspaceFile) {
+            const _hasOwnProperty = Object.prototype.hasOwnProperty;
             // 读取.sillot.jsonc文件
             const workspaceFileDir = path.dirname(vscode.workspace.workspaceFile.fsPath);
             const sillotJsoncPath = path.join(workspaceFileDir, ".sillot.jsonc");
             const sillotJsoncContent = fs.readFileSync(sillotJsoncPath, "utf-8");
             const sillotJson = json5.parse(sillotJsoncContent);
+            let combinedHover: vscode.Hover | null = null;
+            // 获取所有targetExpressions
+            const targetExpressions = Object.keys(sillotJson.i18n.hover.ts);
+            console.log("targetExpressions", targetExpressions);
+            for (const t of targetExpressions) {
+                console.log("t", t);
+                const node = this.给我搜(position, t, "startWith"); // 主要是给 this.expressionChain 赋值
+                Log.i("查找包含当前位置的表达式 成功", String(node?.kind));
+                // 检查当前节点是否属于某个targetExpression
+                if (this.expressionChain && sillotJson.i18n?.hover?.ts[t]) {
+                    const _key = this.expressionChain.replace(t, "");
+                    const languages = sillotJson.i18n.hover.ts[t];
 
-            const _key = this.expressionChain.replace(targetExpression, "");
-            // 遍历.sillot.jsonc文件中的所有语言
-            const languages = sillotJson.i18n.siyuan.ts["window_siyuan_languages"];
-            let combinedHoverText = new vscode.MarkdownString();
-            let hasMatches = false;
-            const _hasOwnProperty = Object.prototype.hasOwnProperty;
-            for (const lang in languages) {
-                if (_hasOwnProperty.call(languages, lang)) {
-                    // 解析每种语言的路径
-                    let langPath: string;
-                    const langField = languages[lang];
-                    if (langField[0] === "$workspaceFileDir") {
-                        langPath = workspaceFileDir;
-                    } else {
-                        langPath = langField[0];
+                    let combinedHoverText = new vscode.MarkdownString();
+                    let hasMatches = false;
+
+                    for (const lang in languages) {
+                        if (_hasOwnProperty.call(languages, lang)) {
+                            // 解析每种语言的路径
+                            let langPath: string;
+                            const langField = languages[lang];
+                            if (langField[0] === "$workspaceFileDir") {
+                                langPath = workspaceFileDir;
+                            } else {
+                                langPath = langField[0];
+                            }
+
+                            // 拼接所有路径片段并处理相对路径
+                            for (let i = 1; i < langField.length; i++) {
+                                langPath = path.resolve(langPath, langField[i]);
+                            }
+
+                            // 调用hoverForCode为每种语言生成Hover信息
+                            const [keyValueText] = this.hoverForCode(_key, langPath, lang);
+
+                            if (keyValueText) {
+                                combinedHoverText.appendMarkdown(keyValueText);
+                                hasMatches = true;
+                            }
+                        }
                     }
 
-                    // 拼接所有路径片段并处理相对路径
-                    for (let i = 1; i < langField.length; i++) {
-                        langPath = path.resolve(langPath, langField[i]);
-                    }
-
-                    // 调用hoverForCode为每种语言生成Hover信息
-                    const [keyValueText] = this.hoverForCode(_key, langPath, lang);
-
-                    if (keyValueText) {
-                        combinedHoverText.appendMarkdown(keyValueText);
-                        hasMatches = true;
+                    if (hasMatches) {
+                        const fileUri = vscode.Uri.file(sillotJsoncPath);
+                        combinedHoverText.appendMarkdown(
+                            `${this.expressionChain} \n\n---\n\nconfig this in **[${C.extension_configFileName_workspace}](${fileUri})**\n\n`
+                        );
+                        // 创建最终的Hover对象
+                        combinedHover = new vscode.Hover(combinedHoverText);
+                        // 找到了直接返回，不需要考虑后面的 targetExpression
+                        return combinedHover;
                     }
                 }
+                this.expressionChain = undefined; // 重置 this.expressionChain
             }
 
-            // 如果有任何匹配，添加文件路径
-            if (hasMatches) {
-                combinedHoverText.appendMarkdown(
-                    `${this.expressionChain} \n\n**config this in .sillot.json at**: ` + workspaceFileDir + "  \n\n"
-                );
-            }
-
-            // 创建最终的Hover对象
-            const combinedHover = new vscode.Hover(combinedHoverText);
-
-            return combinedHover;
+            // 返回最终的Hover对象
+            return null;
         }
-        Log.i("检查是否是`window.siyuan.languages`的属性访问 成功");
-
-        return null;
     }
 
     private getSourceFile(filePath: string): ts.SourceFile | undefined {
@@ -112,23 +127,15 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
         return [""];
     }
 
-    private 给我搜(文档: vscode.TextDocument, 位置: vscode.Position, 目标表达式: string, 模式: "equal" | "startWith"): ts.Node | undefined {
-        const createSourceFileFromDocument = (文档: vscode.TextDocument): ts.SourceFile => {
-            const 文件名 = 文档.uri.toString();
-            const 文本 = 文档.getText();
-            return ts.createSourceFile(文件名, 文本, ts.ScriptTarget.ESNext, true);
-        };
-
-        const 源文件 = createSourceFileFromDocument(文档);
+    private 给我搜(位置: vscode.Position, 目标表达式: string, 模式: "equal" | "startWith"): ts.Node | undefined {
         const isPositionWithinNode = (位置: vscode.Position, 节点: ts.Node): boolean => {
-            let 开始 = 源文件.getLineAndCharacterOfPosition(节点.getStart());
-            let 结束 = 源文件.getLineAndCharacterOfPosition(节点.getEnd());
+            let 开始 = this.源文件.getLineAndCharacterOfPosition(节点.getStart());
+            let 结束 = this.源文件.getLineAndCharacterOfPosition(节点.getEnd());
 
             // 如果是元素访问表达式，调整结束位置以包含方括号
             if (ts.isElementAccessExpression(节点)) {
-                结束 = 源文件.getLineAndCharacterOfPosition(节点.argumentExpression.getEnd());
+                结束 = this.源文件.getLineAndCharacterOfPosition(节点.argumentExpression.getEnd());
             }
-
             return 开始.line <= 位置.line && 位置.line <= 结束.line && 开始.character <= 位置.character && 位置.character <= 结束.character;
         };
 
@@ -137,7 +144,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
                 return false;
             }
             this.expressionChain = buildExpressionChain(节点);
-            console.log("doesExpressionMatch", this.expressionChain);
+            console.log("doesExpressionMatch", this.expressionChain, 目标表达式);
             if (!this.expressionChain) {
                 return false;
             }
@@ -164,7 +171,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
             return undefined;
         };
 
-        return traverseAndFindNode(源文件);
+        return traverseAndFindNode(this.源文件);
     }
 }
 
@@ -225,9 +232,9 @@ function getResources(filePath: string) {
 function buildExpressionChain(node: ts.Node): string | undefined {
     let expressionChain = "";
     let current: ts.Node | undefined = node;
-    console.log("buildExpressionChain", node.getText());
+    // console.log("buildExpressionChain", node.getText());
     while (current) {
-        console.log("buildExpressionChain current", current.getText());
+        // console.log("buildExpressionChain current", current.getText());
         if (ts.isPropertyAccessExpression(current)) {
             // 如果当前节点是属性访问表达式，获取属性名并添加到链的前面
             expressionChain = "." + current.name.text + expressionChain;

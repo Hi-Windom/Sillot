@@ -1,14 +1,19 @@
 {
     "i18n": {
-        "siyuan": {
+        "hover": {
             "ts": {
-                "window_siyuan_languages": {
+                "window.siyuan.languages.": {
                     "zh_CN": ["$workspaceFileDir", "../app/appearance/langs/zh_CN.json"],
                     "en_US": ["$workspaceFileDir", "../app/appearance/langs/en_US.json"],
                     "zh_CHT": ["$workspaceFileDir", "../app/appearance/langs/zh_CHT.json"],
                     "ja_JP": ["$workspaceFileDir", "../app/appearance/langs/ja_JP.json"],
                     "es_ES": ["$workspaceFileDir", "../app/appearance/langs/es_ES.json"],
                     "fr_FR": ["$workspaceFileDir", "../app/appearance/langs/fr_FR.json"]
+                },
+                "window.sillot.languages.": {
+                    "zh_CN": ["$workspaceFileDir", "../app/appearance/langs/zh_CN.json"],
+                    "en_US": ["$workspaceFileDir", "../app/appearance/langs/en_US.json"],
+                    "ja_JP": ["$workspaceFileDir", "../app/appearance/langs/ja_JP.json"]
                 }
             }
         }
