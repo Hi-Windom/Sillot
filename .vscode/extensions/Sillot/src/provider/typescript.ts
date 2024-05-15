@@ -116,7 +116,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
     private hoverForCode(key: string, filePath: string, lang: string) {
         const resources = getResources(filePath);
         const KeyValue = resources.find(item => item.key === key)?.value;
-
+        console.log(key, KeyValue, resources)
         if (KeyValue) {
             const fileUri = vscode.Uri.file(filePath); // 可以进一步调整到 key 所在行，但是没必要
             const keyValueText = `[${lang}](${fileUri}) : **${KeyValue}**  \n\n`;
@@ -242,7 +242,12 @@ function buildExpressionChain(node: ts.Node): string | undefined {
         } else if (ts.isElementAccessExpression(current)) {
             // 如果当前节点是元素访问表达式，获取索引并添加到链的前面
             const argument = current.argumentExpression;
-            if (ts.isStringLiteral(argument) || ts.isNumericLiteral(argument)) {
+            if (ts.isStringLiteral(argument)) {
+                // 将字符串索引转换为属性访问的形式
+                expressionChain = "." + argument.text + expressionChain;
+                current = current.expression;
+            } else if (ts.isNumericLiteral(argument)) {
+                // 数值索引保持不变
                 expressionChain = `[${argument.text}]` + expressionChain;
                 current = current.expression;
             } else {
