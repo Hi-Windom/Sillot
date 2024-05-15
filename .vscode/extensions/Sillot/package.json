@@ -2,7 +2,7 @@
   "name": "sillot",
   "displayName": "汐洛 Sillot",
   "description": "汐洛彖夲肜矩阵（Sillot T☳Converbenk Matrix）为智慧新彖务服务。此插件为汐洛官方插件，提供多功能一体化集成。",
-  "version": "0.34.1000",
+  "version": "0.34.1100",
   "preview": true,
   "repository": "https://github.com/Hi-Windom/Sillot",
   "publisher": "Hi-Windom",
@@ -182,6 +182,11 @@
       {
         "command": "汐洛.同步更新版本",
         "title": "汐洛 🤍 同步更新版本",
+        "category": "Sillot"
+      },
+      {
+        "command": "汐洛.同步更新packageManager",
+        "title": "汐洛 🤍 同步更新packageManager",
         "category": "Sillot"
       },
       {
@@ -440,5 +445,6 @@
     "@octokit/rest": "^20.1.0",
     "fs-extra": "^11.2.0",
     "json5": "^2.2.3"
-  }
+  },
+  "packageManager": "pnpm@9.1.1"
 }

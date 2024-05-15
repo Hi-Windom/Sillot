@@ -93,6 +93,7 @@ import {
 import {openEmojiPanel, unicode2Emoji} from "../../emoji";
 import {openLink} from "../../editor/openLink";
 import {mathRender} from "../render/mathRender";
+import {editAssetItem} from "../render/av/asset";
 
 export class WYSIWYG {
     public lastHTMLs: { [key: string]: string } = {};
@@ -1546,6 +1547,35 @@ export class WYSIWYG {
                 /// #endif
                 return false;
             }
+            const avCellElement = hasClosestByClassName(target, "av__cell");
+            if (avCellElement) {
+                if (getTypeByCellElement(avCellElement) === "mAsset") {
+                    const assetImgElement = hasClosestByClassName(target, "av__cellassetimg") || hasClosestByClassName(target, "av__celltext--url");
+                    if (assetImgElement) {
+                        let index = 0;
+                        Array.from(avCellElement.children).find((item, i) => {
+                            if (item === assetImgElement) {
+                                index = i;
+                                return true;
+                            }
+                        });
+                        editAssetItem({
+                            protyle,
+                            cellElements: [avCellElement],
+                            blockElement: hasClosestBlock(assetImgElement) as HTMLElement,
+                            content: target.tagName === "IMG" ? target.getAttribute("src") : target.getAttribute("data-url"),
+                            type: target.tagName === "IMG" ? "image" : "file",
+                            name: target.tagName === "IMG" ? "" : target.textContent,
+                            index,
+                            rect: target.getBoundingClientRect()
+                        });
+                        event.stopPropagation();
+                        event.preventDefault();
+                        return;
+                    }
+                }
+            }
+
             // 在 span 前面，防止单元格哪 block-ref 被修改
             const avRowElement = hasClosestByClassName(target, "av__row");
             if (avRowElement && avContextmenu(protyle, avRowElement, {

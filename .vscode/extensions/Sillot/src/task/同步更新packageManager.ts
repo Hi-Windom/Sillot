@@ -5,8 +5,8 @@ import { Log } from "../utils/log";
 import { C } from "../extension.const";
 import { loadCompletionItemsFromFile } from "../utils/json";
 
-export function add_task_同步更新版本(context: vscode.ExtensionContext) {
-    const TAG = "汐洛.同步更新版本";
+export function add_task_同步更新packageManager(context: vscode.ExtensionContext) {
+    const TAG = "汐洛.同步更新packageManager";
     const disposable = vscode.commands.registerCommand(TAG, async () => {
         const wname = vscode.workspace.name;
         if (wname && vscode.workspace.workspaceFile) {
@@ -47,24 +47,24 @@ export function add_task_同步更新版本(context: vscode.ExtensionContext) {
             const versionPromises = selectedOptions.map(async (value: string) => {
                 if (await fs.exists(value)) {
                     const pkgContent = fs.readJSONSync(value);
-                    return pkgContent.version;
+                    return pkgContent.packageManager;
                 }
                 return null; // 如果文件不存在，返回null
             });
 
             Promise.all(versionPromises).then(versions => {
                 // 过滤掉null值
-                const validVersions = versions.filter(version => version !== null);
-                vscode.window.showInputBox({ prompt: `输入新版本: (当前版本: ${validVersions.join(", ")})` }).then(async version => {
-                    if (version) {
+                const validVersions = versions.filter(packageManager => packageManager !== null);
+                vscode.window.showInputBox({ prompt: `输入新版本: (当前版本: ${validVersions.join(", ")})` }).then(async packageManager => {
+                    if (packageManager) {
                         // 遍历映射并更新版本号
                         selectedOptions.forEach(async (value: string, index: number) => {
                             Log.d(TAG, value);
                             if (await fs.exists(value)) {
                                 const pkgContent = fs.readJSONSync(value);
-                                pkgContent.version = version;
+                                pkgContent.packageManager = packageManager;
                                 fs.writeFileSync(value, JSON.stringify(pkgContent, null, 2));
-                                Log.d(`${version} ->${value}`);
+                                Log.d(`${packageManager} ->${value}`);
                             } else {
                                 vscode.window.showWarningMessage(`已跳过无效映射 ${value}`);
                             }

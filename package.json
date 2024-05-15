@@ -1,8 +1,8 @@
 {
   "name": "Sillot-workspace",
-  "version": "1.0.0",
+  "version": "0.34.1100",
   "description": "汐洛 pnpm 工作区",
-  "packageManager": "pnpm@9.0.6",
+  "packageManager": "pnpm@9.1.1",
   "scripts": {
     "cli": "node ./package.cli.mjs",
     "app:b:lint": "pnpm --filter ./app run b:lint",

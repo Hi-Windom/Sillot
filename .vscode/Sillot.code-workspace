@@ -170,6 +170,8 @@
       "IBM.output-colorizer", // log 文件高亮
       // Partial Diff
       "ryu1kn.partial-diff", // 右键菜单对比命令，很好用
+      // NPM Imported Package Links
+      "MainaWycliffe.view-package-on-npm", // 好用，但有点占地方，因此仅推荐
     ],
     "unwantedRecommendations": [
       "oderwat.indent-rainbow", // 花里胡哨影响观感

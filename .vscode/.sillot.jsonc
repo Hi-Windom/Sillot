@@ -1,0 +1,11 @@
+{
+    "i18n": {
+        "siyuan": {
+            "ts": {
+                "window_siyuan_languages": {
+                    "zh_CN": ["$vscode.workspace.workspaceFile", "../app/appearance/langs/zh_CN.json"]
+                }
+            }
+        }
+    }
+}
