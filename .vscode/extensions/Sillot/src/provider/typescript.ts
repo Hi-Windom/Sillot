@@ -6,11 +6,11 @@ import * as path from "path";
 import { Log } from "../utils/log";
 import { C } from "../extension.const";
 
-export function registerHoverProvider_window_siyuan_languages(context: vscode.ExtensionContext) {
+export function registerHoverProvider_链式调用国际化(context: vscode.ExtensionContext) {
     const provider = new SiyuanHoverProvider();
     const registration = vscode.languages.registerHoverProvider("typescript", provider);
     context.subscriptions.push(registration);
-    Log.i("registerHoverProvider_window_siyuan_languages 成功");
+    Log.i("registerHoverProvider_链式调用国际化 成功");
 }
 
 class SiyuanHoverProvider implements vscode.HoverProvider {
