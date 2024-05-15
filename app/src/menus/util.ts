@@ -165,10 +165,10 @@ export const openEditorTab = (app: App, ids: string[], notebookId?: string, path
     /// #endif
 };
 
-export const copyPNG = (imgElement: HTMLImageElement) => {
+export const copyPNGByLink = (link:string) => {
     window.sout.tracker("invoked");
     if (isInAndroid()) {
-        window.JSAndroid.writeImageClipboard(imgElement.getAttribute("src"));
+        window.JSAndroid.writeImageClipboard(link);
         return;
     } else {
         const canvas = document.createElement("canvas");
@@ -186,6 +186,7 @@ export const copyPNG = (imgElement: HTMLImageElement) => {
                 ]);
             }, "image/png", 1);
         };
-        tempElement.src = imgElement.getAttribute("src");
+        tempElement.src = link;
     }
 };
+
