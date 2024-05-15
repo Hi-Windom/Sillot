@@ -34,11 +34,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
         const targetExpression = "window.siyuan.languages.";
 
         const node = this.给我搜(document, position, targetExpression, "startWith");
-        Log.i(String(node?.kind));
-        // if (!node || node.kind !== ts.SyntaxKind.PropertyAccessExpression) {
-        //     return null;
-        // }
-        Log.i("查找包含当前位置的表达式 成功");
+        Log.i("查找包含当前位置的表达式 成功", String(node?.kind));
 
         if (vscode.workspace.workspaceFile && this.expressionChain) {
             Log.i(`解析属性访问表达式${this.expressionChain} 成功`);
