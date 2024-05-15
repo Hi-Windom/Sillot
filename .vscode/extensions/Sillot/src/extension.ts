@@ -42,6 +42,7 @@ import { add_module_git_emoji_zh } from "./modules/git_emoji_zh";
 import { add_task_unwantedRecommendations_check_by_id } from "./task/unwantedRecommendations";
 import { loadCompletionItemsFromFile, saveCompletionItemsToFile } from "./utils/json";
 import { add_task_同步更新版本 } from "./task/同步更新版本";
+import { registerHoverProvider_window_siyuan_languages } from "./provider/typescript";
 
 let lastChangedDocument: vscode.TextDocument | null = null;
 let myWebviewPanel: vscode.WebviewPanel | undefined;
@@ -77,6 +78,7 @@ export async function activate(context: vscode.ExtensionContext) {
     );
     add_module_git_emoji_zh(context);
     add_task_同步更新版本(context);
+    registerHoverProvider_window_siyuan_languages(context);
 
     const addMappingDisposable = vscode.commands.registerCommand("汐洛.addPackageJsonMapping", async (uri: vscode.Uri) => {
         if (uri?.fsPath.endsWith("package.json")) {
