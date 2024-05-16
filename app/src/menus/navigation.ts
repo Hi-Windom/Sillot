@@ -236,20 +236,11 @@ export const initNavigationMenu = (app: App, liElement: HTMLElement) => {
         icon: "iconSearch",
         click() {
             /// #if MOBILE
-            const localData = window.siyuan.storage[Constants.LOCAL_SEARCHDATA];
             popSearch(app, {
-                removed: localData.removed,
-                sort: localData.sort,
-                group: localData.group,
                 hasReplace: false,
-                method: localData.method,
                 hPath: getNotebookName(notebookId),
                 idPath: [notebookId],
-                k: localData.k,
-                r: localData.r,
                 page: 1,
-                types: Object.assign({}, localData.types),
-                replaceTypes: Object.assign({}, localData.replaceTypes)
             });
             /// #else
             openSearch({
@@ -267,20 +258,11 @@ export const initNavigationMenu = (app: App, liElement: HTMLElement) => {
             icon: "iconReplace",
             click() {
                 /// #if MOBILE
-                const localData = window.siyuan.storage[Constants.LOCAL_SEARCHDATA];
                 popSearch(app, {
-                    removed: localData.removed,
-                    sort: localData.sort,
-                    group: localData.group,
                     hasReplace: true,
-                    method: localData.method,
                     hPath: getNotebookName(notebookId),
                     idPath: [notebookId],
-                    k: localData.k,
-                    r: localData.r,
                     page: 1,
-                    types: Object.assign({}, localData.types),
-                    replaceTypes: Object.assign({}, localData.replaceTypes)
                 });
                 /// #else
                 openSearch({
@@ -572,20 +554,11 @@ export const initFileMenu = (app: App, notebookId: string, pathString: string, l
                     notebook: notebookId,
                     path: searchPath + ".sy"
                 });
-                const localData = window.siyuan.storage[Constants.LOCAL_SEARCHDATA];
                 popSearch(app, {
-                    removed: localData.removed,
-                    sort: localData.sort,
-                    group: localData.group,
                     hasReplace: false,
-                    method: localData.method,
                     hPath: pathPosix().join(getNotebookName(notebookId), response.data),
                     idPath: [pathPosix().join(notebookId, searchPath)],
-                    k: localData.k,
-                    r: localData.r,
                     page: 1,
-                    types: Object.assign({}, localData.types),
-                    replaceTypes: Object.assign({}, localData.replaceTypes)
                 });
                 /// #else
                 openSearch({
@@ -608,20 +581,11 @@ export const initFileMenu = (app: App, notebookId: string, pathString: string, l
                     notebook: notebookId,
                     path: searchPath + ".sy"
                 });
-                const localData = window.siyuan.storage[Constants.LOCAL_SEARCHDATA];
                 popSearch(app, {
-                    removed: localData.removed,
-                    sort: localData.sort,
-                    group: localData.group,
                     hasReplace: true,
-                    method: localData.method,
                     hPath: pathPosix().join(getNotebookName(notebookId), response.data),
                     idPath: [pathPosix().join(notebookId, searchPath)],
-                    k: localData.k,
-                    r: localData.r,
                     page: 1,
-                    types: Object.assign({}, localData.types),
-                    replaceTypes: Object.assign({}, localData.replaceTypes)
                 });
                 /// #else
                 openSearch({
