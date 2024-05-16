@@ -1,4 +1,4 @@
-# usage example: python scripts/parse-changelog2File-sillot.py -t v0.19 -v v2.8.5 -w local_zh
+# ..
 import os
 import re
 from argparse import ArgumentParser
@@ -109,10 +109,21 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--syv", help="siyuan version to filter issues.")
     parser.add_argument(
         "-w", "--where", help="where to find siyuan changelog.")
+
     args = parser.parse_args()
+
+    # 获取用户输入的 tag
+    tag = input("Please enter the Sillot version ( e.g. v0.33 ): ")
+
+    # 获取用户输入的 syv
+    syv = input("Please enter the siyuan version ( e.g. v3.0.14 ): ")
+
+    # 获取用户输入的 where
+    where = input("Please enter where to find the siyuan changelog ( github | local | local_zh ): ")
+
     work = None
     try:
-        output = output.replace("eee", args.tag+"-sillot")
+        output = output.replace("eee", tag + "-sillot")
         outputDst = os.path.abspath(os.path.join(
             os.path.dirname(__file__), "..", "app", "changelogs", output))
         with open(outputDst, 'w', encoding='utf8') as file:
@@ -121,15 +132,15 @@ if __name__ == "__main__":
         docmap = C.docmap_sillot
         work = f"gen from {C.repo_sillot} -> "
         print(work, outputDst)
-        generate_msg_from_repo_local(C.repo_sillot, args.tag)
+        generate_msg_from_repo_local(C.repo_sillot, tag)
         AT = f'## [@SiYuan](https://github.com/{C.repo_siyuan})\n\n'
-        if (args.where == "local_zh"):
-            _f = f"{args.syv}_zh_CN.md"
+        if where == "local_zh":
+            _f = f"{syv}/{syv}_zh_CN.md"
             work = f"gen from {_f} -> "
             print(work, outputDst)
             generate_msg_from_local(_f)
-        elif (args.where == "local"):
-            _f = f"{args.syv}.md"
+        elif where == "local":
+            _f = f"{syv}/{syv}.md"
             work = f"gen from {_f} -> "
             print(work, outputDst)
             generate_msg_from_local(_f)
@@ -137,7 +148,7 @@ if __name__ == "__main__":
             docmap = C.docmap_siyuan
             work = f"gen from {C.repo_siyuan} -> "
             print(work, outputDst)
-            generate_msg_from_repo_local(C.repo_siyuan, args.syv)
+            generate_msg_from_repo_local(C.repo_siyuan, syv)
         print("parse-changelog2File-sillot done")
     except AssertionError as e:
         print(work, e)

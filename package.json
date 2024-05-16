@@ -5,6 +5,7 @@
   "packageManager": "pnpm@9.1.1",
   "scripts": {
     "cli": "node ./package.cli.mjs",
+    "app:build": "pnpm --filter ./app run gentpl && pnpm --filter ./app run /build:.*/",
     "app:b:lint": "pnpm --filter ./app run b:lint",
     "app:gentpl": "pnpm --filter ./app run gentpl",
     "app:git:tag": "pnpm --filter ./app run git:tag",

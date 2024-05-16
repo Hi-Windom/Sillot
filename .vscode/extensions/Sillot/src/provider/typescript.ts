@@ -5,6 +5,7 @@ import json5 from "json5";
 import * as path from "path";
 import { Log } from "../utils/log";
 import { C } from "../extension.const";
+import { flattenJson, readJSONFile } from "../utils/json";
 
 export function registerHoverProvider_链式调用国际化(context: vscode.ExtensionContext) {
     const provider = new SiyuanHoverProvider();
@@ -45,8 +46,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
             // 读取.sillot.jsonc文件
             const workspaceFileDir = path.dirname(vscode.workspace.workspaceFile.fsPath);
             const sillotJsoncPath = path.join(workspaceFileDir, ".sillot.jsonc");
-            const sillotJsoncContent = fs.readFileSync(sillotJsoncPath, "utf-8");
-            const sillotJson = json5.parse(sillotJsoncContent);
+            const sillotJson = readJSONFile(sillotJsoncPath);
             let combinedHover: vscode.Hover | null = null;
             // 获取所有targetExpressions
             const targetExpressions = Object.keys(sillotJson.i18n.hover.ts);
@@ -173,54 +173,6 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
 
         return traverseAndFindNode(this.源文件);
     }
-}
-
-function readJSONFile(filePath: string): any {
-    try {
-        const content = fs.readFileSync(filePath, "utf-8");
-        return JSON.parse(content);
-    } catch (e) {
-        vscode.window.showErrorMessage(String(e));
-        return null;
-    }
-}
-
-function flattenJson(jsonData: { [x: string]: any } | any[], parentKey = ""): any[] {
-    let resources: any[] = [];
-    let newKey: string;
-
-    if (Array.isArray(jsonData)) {
-        jsonData.forEach((item, index) => {
-            newKey = parentKey ? `${parentKey}[${index}]` : `[${index}]`;
-            if (typeof item === "object") {
-                resources = resources.concat(flattenJson(item, newKey));
-            } else {
-                resources.push({
-                    key: newKey,
-                    value: item,
-                });
-            }
-        });
-    } else if (jsonData !== null && typeof jsonData === "object") {
-        for (const key in jsonData) {
-            // Check if the key is a numeric string and treat it as an array index
-            if (/^\d+$/.test(key)) {
-                newKey = parentKey ? `${parentKey}[${key}]` : `[${key}]`;
-            } else {
-                newKey = parentKey ? `${parentKey}.${key}` : key;
-            }
-            if (typeof jsonData[key] === "object") {
-                resources = resources.concat(flattenJson(jsonData[key], newKey));
-            } else {
-                resources.push({
-                    key: newKey,
-                    value: jsonData[key],
-                });
-            }
-        }
-    }
-
-    return resources;
 }
 
 function getResources(filePath: string) {

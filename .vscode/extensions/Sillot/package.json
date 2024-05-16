@@ -17,7 +17,7 @@
   "extensionDependencies": [],
   "markdown": "github",
   "engines": {
-    "vscode": "^1.88.0"
+    "vscode": "^1.89.0"
   },
   "categories": [
     "Programming Languages",
@@ -44,7 +44,7 @@
     "onLanguage:scss",
     "onLanguage:python",
     "onLanguage:xml",
-    "workspaceContains:**/.editorconfig"
+    "workspaceContains:**/.sillot.jsonc"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -205,6 +205,10 @@
       {
         "command": "extension.switching",
         "title": "汐洛 🤍 git emoji label switching"
+      },
+      {
+        "command": "sillot.运行工作区脚本文件",
+        "title": "汐洛 🤍 运行工作区脚本文件"
       }
     ],
     "submenus": [
@@ -425,24 +429,24 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/mocha": "^10.0.6",
-    "@types/node": "18.x",
-    "@types/vscode": "^1.88.0",
-    "@typescript-eslint/eslint-plugin": "^7.4.0",
-    "@typescript-eslint/parser": "^7.4.0",
+    "@types/node": "~18.19.33",
+    "@types/vscode": "^1.89.0",
+    "@typescript-eslint/eslint-plugin": "^7.9.0",
+    "@typescript-eslint/parser": "^7.9.0",
     "@vscode/test-cli": "^0.0.8",
-    "@vscode/test-electron": "^2.3.9",
-    "@vscode/vsce": "^2.26.0",
+    "@vscode/test-electron": "^2.3.10",
+    "@vscode/vsce": "^2.26.1",
     "eslint": "^8.57.0",
     "jsonc-parser": "^3.2.1",
     "mkdirp": "^3.0.1",
-    "rimraf": "^5.0.5",
+    "rimraf": "^5.0.7",
     "ts-loader": "^9.5.1",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.5",
     "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@octokit/rest": "^20.1.0",
+    "@octokit/rest": "^20.1.1",
     "fs-extra": "^11.2.0",
     "json5": "^2.2.3"
   },
