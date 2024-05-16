@@ -90,15 +90,6 @@ export function add_task_运行工作区脚本文件(context: vscode.ExtensionCo
 
                                 // 运行.脚本文件
                                 terminal.sendText(cmd);
-                                // if (selectedBatFile.endsWith(".bat")) {
-                                //     terminal.sendText(selectedBatFileUri);
-                                // } else if (selectedBatFile.endsWith(".py")) {
-                                //     terminal.sendText(`ptyhon ${selectedBatFileUri}`);
-                                // } else if (selectedBatFile.endsWith(".js")) {
-                                //     terminal.sendText(`node ${selectedBatFileUri}`);
-                                // } else {
-                                //     terminal.sendText(selectedBatFileUri);
-                                // }
                                 terminal.show();
                                 vscode.window.showInformationMessage("terminal process started.");
                             });
