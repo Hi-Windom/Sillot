@@ -5,6 +5,7 @@ import json5 from "json5";
 import * as path from "path";
 import { Log } from "../utils/log";
 import { C } from "../extension.const";
+import { flattenJson, readJSONFile } from "../utils/json";
 
 export function registerHoverProvider_链式调用国际化(context: vscode.ExtensionContext) {
     const provider = new SiyuanHoverProvider();
@@ -45,8 +46,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
             // 读取.sillot.jsonc文件
             const workspaceFileDir = path.dirname(vscode.workspace.workspaceFile.fsPath);
             const sillotJsoncPath = path.join(workspaceFileDir, ".sillot.jsonc");
-            const sillotJsoncContent = fs.readFileSync(sillotJsoncPath, "utf-8");
-            const sillotJson = json5.parse(sillotJsoncContent);
+            const sillotJson = readJSONFile(sillotJsoncPath);
             let combinedHover: vscode.Hover | null = null;
             // 获取所有targetExpressions
             const targetExpressions = Object.keys(sillotJson.i18n.hover.ts);
@@ -116,7 +116,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
     private hoverForCode(key: string, filePath: string, lang: string) {
         const resources = getResources(filePath);
         const KeyValue = resources.find(item => item.key === key)?.value;
-
+        // console.log(key, KeyValue, resources)
         if (KeyValue) {
             const fileUri = vscode.Uri.file(filePath); // 可以进一步调整到 key 所在行，但是没必要
             const keyValueText = `[${lang}](${fileUri}) : **${KeyValue}**  \n\n`;
@@ -175,54 +175,6 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
     }
 }
 
-function readJSONFile(filePath: string): any {
-    try {
-        const content = fs.readFileSync(filePath, "utf-8");
-        return JSON.parse(content);
-    } catch (e) {
-        vscode.window.showErrorMessage(String(e));
-        return null;
-    }
-}
-
-function flattenJson(jsonData: { [x: string]: any } | any[], parentKey = ""): any[] {
-    let resources: any[] = [];
-    let newKey: string;
-
-    if (Array.isArray(jsonData)) {
-        jsonData.forEach((item, index) => {
-            newKey = parentKey ? `${parentKey}[${index}]` : `[${index}]`;
-            if (typeof item === "object") {
-                resources = resources.concat(flattenJson(item, newKey));
-            } else {
-                resources.push({
-                    key: newKey,
-                    value: item,
-                });
-            }
-        });
-    } else if (jsonData !== null && typeof jsonData === "object") {
-        for (const key in jsonData) {
-            // Check if the key is a numeric string and treat it as an array index
-            if (/^\d+$/.test(key)) {
-                newKey = parentKey ? `${parentKey}[${key}]` : `[${key}]`;
-            } else {
-                newKey = parentKey ? `${parentKey}.${key}` : key;
-            }
-            if (typeof jsonData[key] === "object") {
-                resources = resources.concat(flattenJson(jsonData[key], newKey));
-            } else {
-                resources.push({
-                    key: newKey,
-                    value: jsonData[key],
-                });
-            }
-        }
-    }
-
-    return resources;
-}
-
 function getResources(filePath: string) {
     const jsonData = readJSONFile(filePath);
     const resources = flattenJson(jsonData);
@@ -242,7 +194,12 @@ function buildExpressionChain(node: ts.Node): string | undefined {
         } else if (ts.isElementAccessExpression(current)) {
             // 如果当前节点是元素访问表达式，获取索引并添加到链的前面
             const argument = current.argumentExpression;
-            if (ts.isStringLiteral(argument) || ts.isNumericLiteral(argument)) {
+            if (ts.isStringLiteral(argument)) {
+                // 将字符串索引转换为属性访问的形式
+                expressionChain = "." + argument.text + expressionChain;
+                current = current.expression;
+            } else if (ts.isNumericLiteral(argument)) {
+                // 数值索引保持不变
                 expressionChain = `[${argument.text}]` + expressionChain;
                 current = current.expression;
             } else {

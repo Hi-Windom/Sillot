@@ -1,4 +1,4 @@
-import type * as vscode from "vscode";
+import * as vscode from "vscode";
 import fs from "fs-extra";
 import json5 from "json5";
 import path, { resolve } from "path";
@@ -26,4 +26,53 @@ export async function loadCompletionItemsFromFile(filePath: string): Promise<any
 
     // 返回反序列化后的数组
     return items;
+}
+
+
+export function readJSONFile(filePath: string): any {
+    try {
+        const content = fs.readFileSync(filePath, "utf-8");
+        return json5.parse(content);
+    } catch (e) {
+        vscode.window.showErrorMessage(String(e));
+        return null;
+    }
+}
+
+export function flattenJson(jsonData: { [x: string]: any } | any[], parentKey = ""): any[] {
+    let resources: any[] = [];
+    let newKey: string;
+
+    if (Array.isArray(jsonData)) {
+        jsonData.forEach((item, index) => {
+            newKey = parentKey ? `${parentKey}[${index}]` : `[${index}]`;
+            if (typeof item === "object") {
+                resources = resources.concat(flattenJson(item, newKey));
+            } else {
+                resources.push({
+                    key: newKey,
+                    value: item,
+                });
+            }
+        });
+    } else if (jsonData !== null && typeof jsonData === "object") {
+        for (const key in jsonData) {
+            // Check if the key is a numeric string and treat it as an array index
+            if (/^\d+$/.test(key)) {
+                newKey = parentKey ? `${parentKey}[${key}]` : `[${key}]`;
+            } else {
+                newKey = parentKey ? `${parentKey}.${key}` : key;
+            }
+            if (typeof jsonData[key] === "object") {
+                resources = resources.concat(flattenJson(jsonData[key], newKey));
+            } else {
+                resources.push({
+                    key: newKey,
+                    value: jsonData[key],
+                });
+            }
+        }
+    }
+
+    return resources;
 }
