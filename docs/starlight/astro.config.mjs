@@ -62,6 +62,6 @@ export default defineConfig({
         }),
     ],
     components: {
-        FeedbackComponent: "./src/components/FeedbackComponent.astro",
+        FeedbackComponent: "./src/components/Waline.astro",
     },
 });
