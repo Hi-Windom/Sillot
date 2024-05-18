@@ -35,9 +35,9 @@ export default defineConfig({
                 },
                 // 英文文档在 `src/content/docs/en/` 中。
                 en: { label: "English", lang: "en" },
-                ja: { label: "日本語", lang: "ja" },
-                es: { label: "Español", lang: "es" },
-                ru: { label: "Русский", lang: "ru" },
+                // ja: { label: "日本語", lang: "ja" },
+                // es: { label: "Español", lang: "es" },
+                // ru: { label: "Русский", lang: "ru" },
             },
             sidebar: [
                 // REF https://starlight.astro.build/zh-cn/guides/sidebar/

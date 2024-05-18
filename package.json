@@ -1,6 +1,6 @@
 {
   "name": "Sillot-workspace",
-  "version": "0.34.1310",
+  "version": "0.34.1320",
   "description": "汐洛 pnpm 工作区",
   "packageManager": "pnpm@9.1.1",
   "scripts": {
@@ -11,7 +11,8 @@
     "app:git:tag": "pnpm --filter ./app run git:tag",
     "siyuan:b:lint": "",
     "dep:check": "pnpm outdated --filter *",
-    "dev:docs": "pnpm --filter ./docs/starlight run dev",
+    "docs:dev": "pnpm --filter ./docs/starlight run dev",
+    "docs:build": "pnpm --filter ./docs/starlight run build",
     "vsce:sillot": "pnpm --filter ./.vscode/extensions/Sillot run vsce:package",
     "git:proxy": "git config --global http.proxy http://127.0.0.1:7890 && git config --global https.proxy http://127.0.0.1:7890 && echo '7890是 clash for windows 默认端口'",
     "test": "pnpm -r run test"
