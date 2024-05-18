@@ -7,6 +7,9 @@ import {getEditorRange} from "../../util/selection";
 import {Constants} from "../../../constants";
 
 export const openViewMenu = (options: { protyle: IProtyle, blockElement: HTMLElement, element: HTMLElement }) => {
+    if (options.protyle.disabled) {
+        return;
+    }
     window.sout.tracker("invoked");
     const menu = new Menu("av-view");
     if (menu.isOpen) {
@@ -227,7 +230,7 @@ export const getSwitcherHTML = (views: IAVView[], viewId: string) => {
     return `<div class="b3-menu__items">
 <button class="b3-menu__item" data-type="av-add">
     <svg class="b3-menu__icon"><use xlink:href="#iconAdd"></use></svg>
-    <span class="b3-menu__label">${window.siyuan.languages.new}</span>
+    <span class="b3-menu__label">${window.siyuan.languages.newView}</span>
 </button>
 <button class="b3-menu__separator"></button>
 ${html}

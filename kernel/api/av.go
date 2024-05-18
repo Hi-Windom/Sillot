@@ -27,6 +27,18 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 
+func getAttributeViewKeysByAvID(c *gin.Context) {
+	ret := gulu.Ret.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	arg, ok := util.JsonArg(c, ret)
+	if !ok {
+		return
+	}
+	avID := arg["avID"].(string)
+	ret.Data = model.GetAttributeViewKeysByAvID(avID)
+}
+
 func getMirrorDatabaseBlocks(c *gin.Context) {
 	ret := gulu.Ret.NewResult()
 	defer c.JSON(http.StatusOK, ret)

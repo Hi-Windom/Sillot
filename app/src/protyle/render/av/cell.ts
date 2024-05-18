@@ -14,6 +14,7 @@ import {genAVValueHTML} from "./blockAttr";
 import {Constants} from "../../../constants";
 import {hintRef} from "../../hint/extend";
 import {pathPosix} from "../../../util/pathName";
+import {mergeAddOption} from "./select";
 
 const renderCellURL = (urlContent: string) => {
     window.sout.tracker("invoked");
@@ -523,7 +524,8 @@ const updateCellValueByInput = (protyle: IProtyle, type: TAVCol, blockElement: H
     });
 };
 
-export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, value?: any, cElements?: HTMLElement[]) => {
+export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, value?: any, cElements?: HTMLElement[],
+                                 columns?: IAVColumn[]) => {
     window.sout.tracker("invoked");
     const doOperations: IOperation[] = [];
     const undoOperations: IOperation[] = [];
@@ -545,7 +547,7 @@ export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, va
             });
         }
     }
-
+    const isCustomAttr = hasClosestByClassName(cellElements[0], "custom-attr");
     cellElements.forEach((item: HTMLElement, elementIndex) => {
         const rowElement = hasClosestByClassName(item, "av__row");
         if (!rowElement) {
@@ -596,6 +598,11 @@ export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, va
             (cellValue.type === "relation" && typeof cellValue.relation === "string")) {
             return;
         }
+        if (columns && (type === "select" || type === "mSelect")) {
+            const operations = mergeAddOption(columns.find(e => e.id === colId), cellValue, avID);
+            doOperations.push(...operations.doOperations);
+            undoOperations.push(...operations.undoOperations);
+        }
         if (objEquals(cellValue, oldValue)) {
             return;
         }
@@ -627,10 +634,10 @@ export const updateCellsValue = (protyle: IProtyle, nodeElement: HTMLElement, va
             rowID,
             data: oldValue
         });
-        if (!hasClosestByClassName(cellElements[0], "custom-attr")) {
-            updateAttrViewCellAnimation(item, cellValue);
-        } else {
+        if (isCustomAttr) {
             item.innerHTML = genAVValueHTML(cellValue);
+        } else {
+            updateAttrViewCellAnimation(item, cellValue);
         }
     });
     if (doOperations.length > 0) {
