@@ -59,9 +59,9 @@ export default defineConfig({
                     autogenerate: { directory: "依赖更新" },
                 },
             ],
+            components: {
+                Footer: "./src/components/MyFooter.astro",
+            },
         }),
     ],
-    components: {
-        FeedbackComponent: "./src/components/Waline.astro",
-    },
 });
