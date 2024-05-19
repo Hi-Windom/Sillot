@@ -1,0 +1,72 @@
+---
+title: 项目环境变量
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Code } from '@astrojs/starlight/components';
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<Aside>
+这里列出作为参考，注意操作系统是 Windows
+</Aside>
+<Aside type="caution" title="警告">
+  文件夹路径相关的需要根据实际情况修改；Administrator是示例用户名，需替换为实际用户名
+</Aside>
+<Aside type="danger">用户级和系统级都是唯一的</Aside>
+
+<Steps>
+
+1. #### 缓存路径变量
+
+    <Aside>是中文名系统账号时此项有用，因为中文名路径并不总是受支持</Aside>
+    <Tabs>
+    <TabItem label="用户级" icon="heart">
+        <Code code={`// %SystemRoot% 系统会自动识别，也可以替换为具体路径\nTEMP=%SystemRoot%\\TEMP // 可以换成非系统级缓存路径\nTMP=%SystemRoot%\\TEMP // 同上，临时缓存路径`} lang="js" title="Administrator 的用户变量" mark={['=']} />
+    </TabItem>
+    <TabItem label="系统级" icon="seti:windows">
+        <Code code={`// %SystemRoot% 系统会自动识别，也可以替换为具体路径\nTEMP=%SystemRoot%\\TEMP // 可以换成非系统级缓存路径\nTMP=%SystemRoot%\\TEMP // 同上，临时缓存路径`} lang="js" title="系统变量" mark={['=']} />
+    </TabItem>
+    </Tabs>
+
+2. #### 特殊变量 Path 项
+
+    <Tabs>
+    <TabItem label="用户级">
+    ```diff lang="powershell" title="Administrator 的用户变量 > Path"
+    ...
+    +C:\Users\Administrator\go\bin
+    +C:\Users\Administrator\.deno\bin  # deno 可执行文件目录
+    ...
+    ```
+    </TabItem>
+    <TabItem label="系统级">
+    ```diff lang="powershell" title="系统变量 > Path"
+    ...
+    +C:\Program Files\GitHub CLI\
+    +C:\Users\Administrator\.g\bin  # go 版本管理工具 g
+    +D:\X-S01\nodejs\
+    +D:\X-S01\TortoiseGit\bin  # Git 工具，极少用到
+    ...
+    ```
+    </TabItem>
+    </Tabs>
+
+3. #### 其他变量
+
+    <Tabs>
+    <TabItem label="用户级">
+        - `__SILLOT_PYTHON_PATH__`：值为 `D:\X-S01\conda3\envs\vsc\Scripts`，在 `vscode` 配置文件中被引用。
+        - `GITHUB_TOKEN`：需谨慎使用，存储到变量意味着任何代码都可读取，一般在 `action` 中使用，无需在开发环境配置。
+        - `GOROOT`：值为 `C:\Users\Administrator\.g\go`。
+        - `G_MIRROR`：`https://golang.google.cn/dl/`。
+    </TabItem>
+    <TabItem label="系统级">
+        - `ANDROID_HOME`：值为 `C:\Users\Administrator\AppData\Local\Android\Sdk`，`Sillot-android` 开发需要。
+        - `ANDROID_NDK_HOME`：值为 `C:\Users\Administrator\AppData\Local\Android\Sdk\ndk\25.2.9519653`，`Sillot-android` 开发需要。
+        - `JAVA_HOME`：值为 `C:\Program Files\Microsoft\jdk-17.0.6.10-hotspot\`，`Sillot-android` 开发需要。
+    </TabItem>
+    </Tabs>
+
+</Steps>
