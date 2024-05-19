@@ -17,5 +17,11 @@
                 }
             }
         }
+    },
+    "git": {
+        "tag": {
+            "prefix": "v",
+            "suffix": "-sillot"
+        }
     }
 }

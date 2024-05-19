@@ -444,6 +444,7 @@
     "jsonc-parser": "^3.2.1",
     "mkdirp": "^3.0.1",
     "rimraf": "^5.0.7",
+    "sofill": "^1.1.10",
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
     "webpack": "^5.91.0",

@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import fs from "fs-extra";
-const { promisify } = require("node:util");
-const exec = promisify(require("node:child_process").exec);
+import { formatDate } from "sofill/mid";
+import { readJSONFile } from "../utils/json";
 
 export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionContext) {
     const TAG = "汐洛.添加并推送Git_Tag";
@@ -68,20 +68,35 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
                         vscode.window.showWarningMessage(jj.text);
                         return;
                     case "runCMD": {
+                        if (!jj.cmd[0]) return;
                         const terminal = vscode.window.createTerminal({
-                            name: jj.text,
+                            name: `${jj.text} - ${formatDate(new Date(), "HHmmss")}`,
                             cwd: selectedProject,
                             hideFromUser: false,
                         });
+                        let prefix = "";
+                        let sufix = "";
+                        if (vscode.workspace.workspaceFile) {
+                            // 读取.sillot.jsonc文件
+                            const workspaceFileDir = path.dirname(vscode.workspace.workspaceFile.fsPath);
+                            const sillotJsoncPath = path.join(workspaceFileDir, ".sillot.jsonc");
+                            const sillotJson = readJSONFile(sillotJsoncPath);
+                            if (sillotJson.git?.tag?.prefix) {
+                                prefix = sillotJson.git.tag.prefix;
+                            }
+                            if (sillotJson.git?.tag?.sufix) {
+                                sufix = sillotJson.git.tag.suffix;
+                            }
+                        }
                         if (jj.text === "git_tag") {
                             const cmd =
-                                jj.cmd.length === 1
-                                    ? `git -C ${selectedProject} tag ${jj.cmd[0]}`
-                                    : `git -C ${selectedProject} tag ${jj.cmd[0]} -m "${jj.cmd[1]}"`;
+                                jj.cmd.length[1]
+                                    ? `git -C ${selectedProject} tag ${prefix}${jj.cmd[0]}${sufix}`
+                                    : `git -C ${selectedProject} tag ${prefix}${jj.cmd[0]}${sufix} -m "${jj.cmd[1]}"`;
                             terminal.sendText(cmd);
                         }
                         if (jj.text === "git_tag_push") {
-                            terminal.sendText(`git push origin ${jj.cmd}`);
+                            terminal.sendText(`git push origin ${jj.cmd[0]}`);
                         }
                         terminal.show();
                         return;
