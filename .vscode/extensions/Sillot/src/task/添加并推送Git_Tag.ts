@@ -88,14 +88,15 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
                                 suffix = sillotJson.git.tag.suffix;
                             }
                         }
+                        const _tag = `${prefix}${jj.cmd[0]}${suffix}`
                         if (jj.text === "git_tag") {
                             const cmd = jj.cmd[1]
-                                ? `git -C ${selectedProject} tag ${prefix}${jj.cmd[0]}${suffix} -m "${jj.cmd[1]}"`
-                                : `git -C ${selectedProject} tag ${prefix}${jj.cmd[0]}${suffix}`;
+                                ? `git -C ${selectedProject} tag ${_tag} -m "${jj.cmd[1]}"`
+                                : `git -C ${selectedProject} tag ${_tag}`;
                             terminal.sendText(cmd);
                         }
                         if (jj.text === "git_tag_push") {
-                            terminal.sendText(`git push origin ${jj.cmd[0]}`);
+                            terminal.sendText(`git push origin ${_tag}`);
                         }
                         terminal.show();
                         return;
