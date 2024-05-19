@@ -1,3 +1,9 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Footer.astro';
+---
+
+<Default {...Astro.props}><slot /></Default>
 <link
     rel="stylesheet"
     href="https://unpkg.com/@waline/client@v3/dist/waline.css"
@@ -11,6 +17,6 @@
       el: '#waline',
       serverURL: 'https://sillot-waline-server.vercel.app',
       dark: 'auto',
-      wordLimit: [5, 2000]
+      wordLimit: [3, 2000]
     });
   </script>
