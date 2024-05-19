@@ -467,6 +467,9 @@ importers:
       '@astrojs/starlight':
         specifier: 0.23.1
         version: 0.23.1(astro@4.8.6(@types/node@20.12.7)(less@4.2.0)(sass@1.75.0)(terser@5.31.0)(typescript@5.4.5))
+      '@lorenzo_lewis/starlight-multi-sidebar':
+        specifier: ^0.0.4
+        version: 0.0.4(@astrojs/starlight@0.23.1(astro@4.8.6(@types/node@20.12.7)(less@4.2.0)(sass@1.75.0)(terser@5.31.0)(typescript@5.4.5)))(astro@4.8.6(@types/node@20.12.7)(less@4.2.0)(sass@1.75.0)(terser@5.31.0)(typescript@5.4.5))
       '@vercel/speed-insights':
         specifier: ^1.0.10
         version: 1.0.10(react@18.3.1)
@@ -2103,6 +2106,12 @@ packages:
   '@ljharb/through@2.3.13':
     resolution: {integrity: sha512-/gKJun8NNiWGZJkGzI/Ragc53cOdcLNdzjLaIa+GEjguQs0ulsurx8WN0jijdK9yPqDvziX995sMRLyLt1uZMQ==}
     engines: {node: '>= 0.4'}
+
+  '@lorenzo_lewis/starlight-multi-sidebar@0.0.4':
+    resolution: {integrity: sha512-ncZYKiDwBynxHPjl2w591oy0qfLADt6k2lt9slhqZ65vZsxNlOF9pjhdvQP0LzqeI0B02Eng8VOrAVMpuJF38A==}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.16.0'
+      astro: '>=4.0.0'
 
   '@malept/cross-spawn-promise@1.1.1':
     resolution: {integrity: sha512-RTBGWL5FWQcg9orDOCcp4LvItNzUPcyEU9bwaeJX0rJ1IQxzucC48Y0/sQLp/g6t99IQgAlGIaesJS+gTn7tVQ==}
@@ -10401,6 +10410,11 @@ snapshots:
   '@ljharb/through@2.3.13':
     dependencies:
       call-bind: 1.0.7
+
+  '@lorenzo_lewis/starlight-multi-sidebar@0.0.4(@astrojs/starlight@0.23.1(astro@4.8.6(@types/node@20.12.7)(less@4.2.0)(sass@1.75.0)(terser@5.31.0)(typescript@5.4.5)))(astro@4.8.6(@types/node@20.12.7)(less@4.2.0)(sass@1.75.0)(terser@5.31.0)(typescript@5.4.5))':
+    dependencies:
+      '@astrojs/starlight': 0.23.1(astro@4.8.6(@types/node@20.12.7)(less@4.2.0)(sass@1.75.0)(terser@5.31.0)(typescript@5.4.5))
+      astro: 4.8.6(@types/node@20.12.7)(less@4.2.0)(sass@1.75.0)(terser@5.31.0)(typescript@5.4.5)
 
   '@malept/cross-spawn-promise@1.1.1':
     dependencies:

@@ -14,6 +14,7 @@
   "dependencies": {
     "@astrojs/check": "^0.5.10",
     "@astrojs/starlight": "0.23.1",
+    "@lorenzo_lewis/starlight-multi-sidebar": "^0.0.4",
     "@vercel/speed-insights": "^1.0.10",
     "astro": "^4.8.6",
     "astro-feelback": "^0.3.4",
