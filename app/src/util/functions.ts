@@ -94,7 +94,7 @@ export const objEquals = (a: any, b: any): boolean => {
 export const duplicateNameAddOne = (name:string) => {
     const nameMatch = name.match(/^(.*) \((\d+)\)$/);
     if (nameMatch) {
-        name = `${nameMatch[1]} (${parseInt(nameMatch[2]) + 1})`;
+        name = `${nameMatch[1]} (${Number.parseInt(nameMatch[2]) + 1})`;
     } else {
         name = `${name} (1)`;
     }
