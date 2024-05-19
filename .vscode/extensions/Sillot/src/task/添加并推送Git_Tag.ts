@@ -75,7 +75,7 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
                             hideFromUser: false,
                         });
                         let prefix = "";
-                        let sufix = "";
+                        let suffix = "";
                         if (vscode.workspace.workspaceFile) {
                             // 读取.sillot.jsonc文件
                             const workspaceFileDir = path.dirname(vscode.workspace.workspaceFile.fsPath);
@@ -84,15 +84,15 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
                             if (sillotJson.git?.tag?.prefix) {
                                 prefix = sillotJson.git.tag.prefix;
                             }
-                            if (sillotJson.git?.tag?.sufix) {
-                                sufix = sillotJson.git.tag.suffix;
+                            if (sillotJson.git?.tag?.suffix) {
+                                suffix = sillotJson.git.tag.suffix;
                             }
                         }
                         if (jj.text === "git_tag") {
                             const cmd =
-                                jj.cmd.length[1]
-                                    ? `git -C ${selectedProject} tag ${prefix}${jj.cmd[0]}${sufix}`
-                                    : `git -C ${selectedProject} tag ${prefix}${jj.cmd[0]}${sufix} -m "${jj.cmd[1]}"`;
+                                jj.cmd[1]
+                                    ? `git -C ${selectedProject} tag ${prefix}${jj.cmd[0]}${suffix}`
+                                    : `git -C ${selectedProject} tag ${prefix}${jj.cmd[0]}${suffix} -m "${jj.cmd[1]}"`;
                             terminal.sendText(cmd);
                         }
                         if (jj.text === "git_tag_push") {
