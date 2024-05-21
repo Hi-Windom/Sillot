@@ -588,7 +588,7 @@ export const mergeAddOption = (column: IAVColumn, cellValue: IAVCellValue, avID:
             }
         });
         if (!needAdd) {
-            const newColor = ((column.options?.length || 0) % 13 + 1).toString()
+            const newColor = ((column.options?.length || 0) % 13 + 1).toString();
             column.options.push({
                 name: item.content,
                 color: newColor
@@ -599,7 +599,7 @@ export const mergeAddOption = (column: IAVColumn, cellValue: IAVCellValue, avID:
                 id: column.id,
                 avID,
                 data: column.options
-            })
+            });
             undoOperations.push({
                 action: "removeAttrViewColOption",
                 id: column.id,
@@ -612,4 +612,4 @@ export const mergeAddOption = (column: IAVColumn, cellValue: IAVCellValue, avID:
         doOperations,
         undoOperations
     };
-}
+};

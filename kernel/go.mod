@@ -13,7 +13,7 @@ require (
 	github.com/88250/epub v0.0.0-20230830085737-c19055cd1f48
 	github.com/88250/go-humanize v0.0.0-20240424102817-4f78fac47ea7
 	github.com/88250/gulu v1.2.3-0.20240505150113-bc43bd50f866
-	github.com/88250/lute v1.7.7-0.20240518021146-7847ee928e31
+	github.com/88250/lute v1.7.7-0.20240520140444-22dd5810b592
 	github.com/88250/pdfcpu v0.3.14-0.20230401044135-c7369a99720c
 	github.com/88250/vitess-sqlparser v0.0.0-20210205111146-56a2ded2aba1
 	github.com/ClarkThan/ahocorasick v0.0.0-20231011042242-30d1ef1347f4
@@ -38,6 +38,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0
 	github.com/goccy/go-json v0.10.2
 	github.com/gofrs/flock v0.8.1
+	github.com/gorilla/css v1.0.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/imroc/req/v3 v3.43.5
 	github.com/jinzhu/copier v0.4.0
@@ -64,11 +65,12 @@ require (
 	github.com/spf13/cast v1.6.0
 	github.com/steambap/captcha v1.4.1
 	github.com/studio-b12/gowebdav v0.9.0
+	github.com/vanng822/css v1.0.1
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	github.com/xrash/smetrics v0.0.0-20240312152122-5f08fbb34913
 	github.com/xuri/excelize/v2 v2.8.1
 	golang.org/x/image v0.16.0
-	golang.org/x/mobile v0.0.0-20240506190922-a1a533f289d3
+	golang.org/x/mobile v0.0.0-20240520174638-fa72addaaa1b
 	golang.org/x/mod v0.17.0
 	golang.org/x/text v0.15.0
 	golang.org/x/time v0.5.0
@@ -176,7 +178,7 @@ require github.com/siyuan-note/encryption v0.0.0-20231219001248-1e028a4d13b4
 
 replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20231214121541-e7f54c482950
 
-//replace github.com/88250/lute => D:\gogogo\src\github.com\88250\lute
+//replace github.com/88250/lute => F:\golang\gopath\src\github.com\88250\lute
 //replace github.com/siyuan-note/dejavu => D:\88250\dejavu
 //replace github.com/siyuan-note/riff => D:\88250\riff
 //replace github.com/siyuan-note/httpclient => D:\88250\httpclient
