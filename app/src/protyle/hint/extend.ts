@@ -286,9 +286,6 @@ export const hintSlash = (key: string, protyle: IProtyle) => {
 
 export const hintTag = (key: string, protyle: IProtyle): IHintData[] => {
     window.sout.tracker("invoked");
-    if (!window.siyuan.config.editor.markdown.inlineTag) {
-        return [];
-    }
     protyle.hint.genLoading(protyle);
     fetchPost("/api/search/searchTag", {
         k: key,
