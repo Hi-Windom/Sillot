@@ -178,7 +178,7 @@ require github.com/siyuan-note/encryption v0.0.0-20231219001248-1e028a4d13b4
 
 replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20231214121541-e7f54c482950
 
-replace github.com/88250/lute => F:\golang\gopath\src\github.com\88250\lute
+// replace github.com/88250/lute => F:\golang\gopath\src\github.com\88250\lute
 
 //replace github.com/siyuan-note/dejavu => D:\88250\dejavu
 //replace github.com/siyuan-note/riff => D:\88250\riff
