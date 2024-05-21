@@ -4,18 +4,18 @@ import { readJSONFile } from "../utils/json";
 import { resolveSystemPath } from "../utils/path";
 
 export function add_task_terminal_here(context: vscode.ExtensionContext) {
-    let disposable = vscode.commands.registerCommand("sillot.terminalHere.create", async () => {
-        let editor = vscode.window.activeTextEditor;
+    const disposable = vscode.commands.registerCommand("sillot.terminalHere.create", async () => {
+        const editor = vscode.window.activeTextEditor;
         if (!editor) {
             return;
         }
 
-        let document = editor.document;
+        const document = editor.document;
         if (!document) {
             return;
         }
 
-        let uri = document.uri;
+        const uri = document.uri;
         if (!uri) {
             return;
         }
