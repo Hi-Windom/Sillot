@@ -82,7 +82,7 @@ export const loadAssets = (data: Config.IAppearance) => {
     setCodeTheme();
 
     const themeScriptElement = document.getElementById("themeScript");
-    const themeScriptAddress = `/appearance/themes/${data.mode === 1 ? data.themeDark : data.themeLight}/____/__js__.js?v=${data.themeVer}`;
+    const themeScriptAddress = `/appearance/themes/${data.mode === 1 ? data.themeDark : data.themeLight}/theme.js?v=${data.themeVer}`;
     if (themeScriptElement) {
         // https://github.com/siyuan-note/siyuan/issues/10341
         themeScriptElement.remove();
