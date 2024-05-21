@@ -1,6 +1,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightLinksValidator from "starlight-links-validator";
+import starlightMultiSidebar from "@lorenzo_lewis/starlight-multi-sidebar";
 
 // https://astro.build/config
 export default defineConfig({
@@ -20,6 +21,11 @@ export default defineConfig({
             logo: {
                 src: "./src/assets/icon.svg",
             },
+            plugins: [
+                starlightMultiSidebar({
+                    switcherStyle: "dropdown",
+                }),
+            ],
             social: {
                 github: "https://github.com/Hi-Windom/Sillot",
             },
@@ -42,10 +48,6 @@ export default defineConfig({
             sidebar: [
                 // REF https://starlight.astro.build/zh-cn/guides/sidebar/
                 {
-                    label: "Guides",
-                    autogenerate: { directory: "/guides" },
-                },
-                {
                     label: "Reference",
                     collapsed: true, // 默认折叠分组
                     autogenerate: { directory: "reference" },
@@ -57,6 +59,16 @@ export default defineConfig({
                 {
                     label: "依赖更新",
                     autogenerate: { directory: "依赖更新" },
+                },
+                {
+                    label: "汐洛用户指南",
+                    collapsed: true, // 默认折叠分组
+                    autogenerate: { directory: "guides/sillot" },
+                },
+                {
+                    label: "思源笔记用户指南",
+                    collapsed: true, // 默认折叠分组
+                    autogenerate: { directory: "guides/siyuan" },
                 },
             ],
             components: {

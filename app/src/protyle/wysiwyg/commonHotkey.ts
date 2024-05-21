@@ -197,6 +197,10 @@ export const duplicateBlock = (nodeElements: Element[], protyle: IProtyle) => {
     let focusElement: Element;
     const doOperations: IOperation[] = [];
     const undoOperations: IOperation[] = [];
+    let starIndex: number;
+    if (nodeElements[nodeElements.length - 1].getAttribute("data-subtype") === "o") {
+        starIndex = Number.parseInt(nodeElements[nodeElements.length - 1].getAttribute("data-marker"), 10);
+    }
     nodeElements.reverse().forEach((item, index) => {
         const tempElement = item.cloneNode(true) as HTMLElement;
         if (index === 0) {
@@ -208,8 +212,13 @@ export const duplicateBlock = (nodeElements: Element[], protyle: IProtyle) => {
             childItem.setAttribute("data-node-id", Lute.NewNodeID());
         });
         item.classList.remove("protyle-wysiwyg--select");
-        if (tempElement.dataset.type ==="NodeHTMLBlock") {
-            const phElement  = tempElement.querySelector("protyle-html");
+        if (typeof starIndex === "number") {
+            const orderIndex = starIndex + (nodeElements.length - index);
+            tempElement.setAttribute("data-marker", (orderIndex) + ".");
+            tempElement.querySelector(".protyle-action--order").textContent = (orderIndex) + ".";
+        }
+        if (tempElement.dataset.type === "NodeHTMLBlock") {
+            const phElement = tempElement.querySelector("protyle-html");
             const content = phElement.getAttribute("data-content");
             phElement.setAttribute("data-content", "");
             nodeElements[0].after(tempElement);
@@ -228,6 +237,31 @@ export const duplicateBlock = (nodeElements: Element[], protyle: IProtyle) => {
             id: newId,
         });
     });
+    if (typeof starIndex === "number") {
+        let nextElement = focusElement.nextElementSibling;
+        starIndex = starIndex + nodeElements.length;
+        while (nextElement) {
+            if (nextElement.getAttribute("data-subtype") === "o") {
+                starIndex++;
+                const id = nextElement.getAttribute("data-node-id");
+                undoOperations.push({
+                    action: "update",
+                    id,
+                    data: nextElement.outerHTML,
+                });
+                nextElement.setAttribute("data-marker", starIndex + ".");
+                nextElement.querySelector(".protyle-action--order").textContent = starIndex + ".";
+                doOperations.push({
+                    action: "update",
+                    data: nextElement.outerHTML,
+                    id,
+                });
+                nextElement = nextElement.nextElementSibling;
+            } else {
+                break;
+            }
+        }
+    }
     transaction(protyle, doOperations, undoOperations);
     focusBlock(focusElement);
     scrollCenter(protyle);

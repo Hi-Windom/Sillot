@@ -15,7 +15,6 @@ import type {App} from "../index";
 import {Constants} from "../constants";
 import {textMenu} from "./text";
 
-
 export class Menus {
     public menu: Menu;
 
