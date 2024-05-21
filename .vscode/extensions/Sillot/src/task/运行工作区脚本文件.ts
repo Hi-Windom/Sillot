@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 
+// TODO: 支持选择终端路径（.sillot.jsonc 没有定义则忽略）
 export function add_task_运行工作区脚本文件(context: vscode.ExtensionContext) {
     const disposable = vscode.commands.registerCommand("sillot.运行工作区脚本文件", async () => {
         let batFiles: vscode.Uri[] | undefined = undefined;

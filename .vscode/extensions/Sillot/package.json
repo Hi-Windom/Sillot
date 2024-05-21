@@ -213,6 +213,10 @@
       {
         "command": "汐洛.添加并推送Git_Tag",
         "title": "汐洛 🤍 添加并推送Git_Tag"
+      },
+      {
+        "command": "sillot.terminalHere.create",
+        "title": "汐洛 🤍 Terminal Here"
       }
     ],
     "submenus": [

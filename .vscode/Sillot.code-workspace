@@ -116,8 +116,6 @@
       "johnpapa.winteriscoming", // 不错的一款颜色主题，[Winter is Coming (Dark Blue)] 提供了不错的视觉观感
       // Office Viewer(Markdown Editor)
       "cweijan.vscode-office", // View word,excel files and using WYSIWYG editor for markdown. 捆绑了颜色主题（不推荐）和文件图标主题（ Material Icon 青春版）
-      // Terminal Here
-      "tyriar.vscode-terminal-here", // 在当前文件路径打开一个终端
       // EditorConfig for VS Code
       "editorconfig.editorconfig", // 项目通用配置
       // gitignore
@@ -207,7 +205,11 @@
       "ms-azuretools.vscode-docker",
       // 避免自动推荐，有需要的自己会安装 ::结束
       "ms-python.vscode-pylance", // 推荐的插件包已集成此插件，无需单独推荐
-      "maixiaojie.git-emoji-zh", // 该扩展已集成在汐洛扩展
+      // 已集成在汐洛扩展 ::开始
+      "maixiaojie.git-emoji-zh",
+      // Terminal Here
+      "tyriar.vscode-terminal-here",
+      // 已集成在汐洛扩展 ::结束
     ]
   }
 }
