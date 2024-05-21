@@ -21,7 +21,11 @@ export default defineConfig({
             logo: {
                 src: "./src/assets/icon.svg",
             },
-            plugins: [starlightMultiSidebar],
+            plugins: [
+                starlightMultiSidebar({
+                    switcherStyle: "dropdown",
+                }),
+            ],
             social: {
                 github: "https://github.com/Hi-Windom/Sillot",
             },
@@ -44,27 +48,27 @@ export default defineConfig({
             sidebar: [
                 // REF https://starlight.astro.build/zh-cn/guides/sidebar/
                 {
-                    label: '开发者',
-                    items: [
-                        {
-                            label: "Reference",
-                            collapsed: true, // 默认折叠分组
-                            autogenerate: { directory: "reference" },
-                        },
-                        {
-                            label: "汐洛宝典",
-                            autogenerate: { directory: "汐洛宝典" },
-                        },
-                        {
-                            label: "依赖更新",
-                            autogenerate: { directory: "依赖更新" },
-                        },
-                    ]
+                    label: "Reference",
+                    collapsed: true, // 默认折叠分组
+                    autogenerate: { directory: "reference" },
                 },
                 {
-                    label: "用户",
+                    label: "汐洛宝典",
+                    autogenerate: { directory: "汐洛宝典" },
+                },
+                {
+                    label: "依赖更新",
+                    autogenerate: { directory: "依赖更新" },
+                },
+                {
+                    label: "汐洛用户指南",
                     collapsed: true, // 默认折叠分组
-                    autogenerate: { directory: "/guides" },
+                    autogenerate: { directory: "guides/sillot" },
+                },
+                {
+                    label: "思源笔记用户指南",
+                    collapsed: true, // 默认折叠分组
+                    autogenerate: { directory: "guides/siyuan" },
                 },
             ],
             components: {
