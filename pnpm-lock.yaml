@@ -207,7 +207,7 @@ importers:
     dependencies:
       '@electron/remote':
         specifier: ^2.1.0
-        version: 2.1.2(electron@31.0.0-beta.5)
+        version: 2.1.2(electron@30.0.6)
       '@monaco-editor/loader':
         specifier: ^1.4.0
         version: 1.4.0(monaco-editor@0.48.0)
@@ -330,8 +330,8 @@ importers:
         specifier: ^3.1.10
         version: 3.1.10
       electron:
-        specifier: 31.0.0-beta.5
-        version: 31.0.0-beta.5
+        specifier: 30.0.6
+        version: 30.0.6
       electron-builder:
         specifier: 24.9.1
         version: 24.9.1
@@ -4213,8 +4213,8 @@ packages:
   electron-to-chromium@1.4.772:
     resolution: {integrity: sha512-jFfEbxR/abTTJA3ci+2ok1NTuOBBtB4jH+UT6PUmRN+DY3WSD4FFRsgoVQ+QNIJ0T7wrXwzsWCI2WKC46b++2A==}
 
-  electron@31.0.0-beta.5:
-    resolution: {integrity: sha512-AMPfY3FJKZ+FrTtI/I2z3+pBd4lvLi2nBPCzGMI0BXac7InSqDv8GtpkjD1dhF+mPqSRYMV4taqtOAeTyuUiIw==}
+  electron@30.0.6:
+    resolution: {integrity: sha512-PkhEPFdpYcTzjAO3gMHZ+map7g2+xCrMDedo/L1i0ir2BRXvAB93IkTJX497U6Srb/09r2cFt+k20VPNVCdw3Q==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -9804,9 +9804,9 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@electron/remote@2.1.2(electron@31.0.0-beta.5)':
+  '@electron/remote@2.1.2(electron@30.0.6)':
     dependencies:
-      electron: 31.0.0-beta.5
+      electron: 30.0.6
 
   '@electron/universal@1.4.1':
     dependencies:
@@ -12865,7 +12865,7 @@ snapshots:
 
   electron-to-chromium@1.4.772: {}
 
-  electron@31.0.0-beta.5:
+  electron@30.0.6:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.12.7
