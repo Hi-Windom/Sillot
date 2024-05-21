@@ -46,6 +46,7 @@ import { registerHoverProvider_链式调用国际化 } from "./provider/typescri
 import { add_task_同步更新packageManager } from "./task/同步更新packageManager";
 import { add_task_运行工作区脚本文件 } from "./task/运行工作区脚本文件";
 import { add_task_添加并推送Git_Tag } from "./task/添加并推送Git_Tag";
+import { add_task_terminal_here } from "./task/terminal-here";
 
 let lastChangedDocument: vscode.TextDocument | null = null;
 let myWebviewPanel: vscode.WebviewPanel | undefined;
@@ -84,6 +85,7 @@ export async function activate(context: vscode.ExtensionContext) {
     add_task_同步更新packageManager(context);
     add_task_运行工作区脚本文件(context);
     add_task_添加并推送Git_Tag(context);
+    add_task_terminal_here(context);
     registerHoverProvider_链式调用国际化(context);
 
     const addMappingDisposable = vscode.commands.registerCommand("汐洛.addPackageJsonMapping", async (uri: vscode.Uri) => {

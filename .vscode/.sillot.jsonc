@@ -23,5 +23,8 @@
             "prefix": "v",
             "suffix": "-sillot"
         }
+    },
+    "terminal": {
+        "shellPathList": ["%SystemRoot%\\System32\\cmd.exe", "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"]
     }
 }
