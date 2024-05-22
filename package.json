@@ -2,7 +2,7 @@
   "name": "Sillot-workspace",
   "version": "0.35.1000",
   "description": "汐洛 pnpm 工作区",
-  "packageManager": "pnpm@9.1.1",
+  "packageManager": "pnpm@9.1.2",
   "scripts": {
     "cli": "node ./package.cli.mjs",
     "app:build": "pnpm -F ./app run gentpl && pnpm -F ./app run /build:.*/",

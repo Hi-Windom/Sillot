@@ -12,7 +12,7 @@
     "node": ">=20.11.1",
     "pnpm": ">=9.1.0"
   },
-  "packageManager": "pnpm@9.1.1",
+  "packageManager": "pnpm@9.1.2",
   "actionInstallCommand": "pnpm install --no-frozen-lockfile",
   "scripts": {
     "test": "echo 'Test your sister day by day'",
