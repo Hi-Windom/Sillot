@@ -141,7 +141,6 @@ ${
             <svg><use xlink:href="#iconCopy"></use></svg>${window.siyuan.languages.copy}
         </button>
     </div>
-    <div class="b3-label__text" id="tokenTip">${window.siyuan.languages.about14.replace("${token}", window.siyuan.config.api.token)}</div>
 </div>
 
 ` : ""

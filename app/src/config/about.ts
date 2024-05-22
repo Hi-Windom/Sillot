@@ -17,6 +17,25 @@ import {isAppMode} from "sofill/env"
 export const about = {
     element: undefined as Element,
     genHTML: () => {
+        const checkUpdateHTML = window.siyuan.config.system.isMicrosoftStore ? `<div class="fn__flex b3-label config__item">
+    <div class="fn__flex-1">
+        ${window.siyuan.languages.currentVer} v${Constants.SIYUAN_VERSION}（${window.siyuan.languages.baseSY} v${Constants.SIYUAN_ORIGIN_VERSION}）
+        <span id="isInsider"></span>
+        <div class="b3-label__text">${window.siyuan.languages.isMsStoreVerTip}</div>
+    </div>
+</div>` : `<div class="fn__flex b3-label config__item">
+    <div class="fn__flex-1">
+        ${window.siyuan.languages.currentVer} v${Constants.SIYUAN_VERSION}（${window.siyuan.languages.baseSY} v${Constants.SIYUAN_ORIGIN_VERSION}）
+        <span id="isInsider"></span>
+        <div class="b3-label__text">${window.siyuan.languages.downloadLatestVer}</div>
+    </div>
+    <div class="fn__space"></div>
+    <div class="fn__flex-center fn__size200 config__item-line">
+        <button id="checkUpdateBtn" class="b3-button b3-button--outline fn__block">
+            <svg><use xlink:href="#iconRefresh"></use></svg>${window.siyuan.languages.checkUpdate}
+        </button>
+    </div>
+</div>`;
         return `<div class="fn__flex b3-label config__item${isBrowser() || window.siyuan.config.system.isMicrosoftStore || "std" !== window.siyuan.config.system.container || "linux" === window.siyuan.config.system.os ? " fn__none" : ""}">
     <div class="fn__flex-1">
         ${window.siyuan.languages.autoLaunch}
@@ -147,24 +166,15 @@ ${
         <svg><use xlink:href="#iconUpload"></use></svg>${window.siyuan.languages.export}
     </button>
 </div>
-<div class="fn__flex b3-label config__item">
+${checkUpdateHTML}
+${ isAppMode() ? `
+<div class="fn__flex config__item  b3-label">
     <div class="fn__flex-1">
-        ${window.siyuan.languages.currentVer} v${Constants.SIYUAN_VERSION}（${window.siyuan.languages.baseSY} v${Constants.SIYUAN_ORIGIN_VERSION}）
-        <span id="isInsider"></span>
-        <div class="b3-label__text">${window.siyuan.languages.downloadLatestVer}</div>
+        ${window.siyuan.languages.about13}
+         <div class="b3-label__text" id="tokenTip">${window.siyuan.languages.about14.replace("${token}", window.siyuan.config.api.token)}</div>
     </div>
-    <div class="fn__space"></div>
-    <div class="fn__flex-center fn__size200 config__item-line">
-        <button id="checkUpdateBtn" class="b3-button b3-button--outline fn__block">
-            <svg><use xlink:href="#iconRefresh"></use></svg>${window.siyuan.languages.checkUpdate}
-        </button>
-    </div>
-</div>
-${
-    isAppMode() ? `<div class="fn__flex config__item  b3-label">
-<div class="fn__flex-1">
-    ${window.siyuan.languages.about13}
-     <div class="b3-label__text" id="tokenTip">${window.siyuan.languages.about14.replace("${token}", window.siyuan.config.api.token)}</div>
+    <span class="fn__space"></span>
+    <input class="b3-text-field fn__flex-center fn__size200" id="token" value="${window.siyuan.config.api.token}">
 </div>
 <span class="fn__space"></span>
 <input class="b3-text-field fn__flex-center fn__size200" id="token" value="${window.siyuan.config.api.token}">

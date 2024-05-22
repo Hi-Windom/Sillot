@@ -260,6 +260,10 @@ func CheckUpdate(showMsg bool) {
 		return
 	}
 
+	if Conf.System.IsMicrosoftStore {
+		return
+	}
+
 	result, err := util.GetSillotReleasesResult(showMsg)
 	if nil != err {
 		return
