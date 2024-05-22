@@ -52,26 +52,46 @@ export function add_task_同步更新packageManager(context: vscode.ExtensionCon
                 return null; // 如果文件不存在，返回null
             });
 
-            Promise.all(versionPromises).then(versions => {
+            Promise.all(versionPromises).then(async versions => {
                 // 过滤掉null值
                 const validVersions = versions.filter(packageManager => packageManager !== null);
-                vscode.window.showInputBox({ prompt: `输入新版本: (当前版本: ${validVersions.join(", ")})` }).then(async packageManager => {
-                    if (packageManager) {
-                        // 遍历映射并更新版本号
-                        selectedOptions.forEach(async (value: string, index: number) => {
-                            Log.d(TAG, value);
-                            if (await fs.exists(value)) {
-                                const pkgContent = fs.readJSONSync(value);
-                                pkgContent.packageManager = packageManager;
-                                fs.writeFileSync(value, JSON.stringify(pkgContent, null, 2));
-                                Log.d(`${packageManager} ->${value}`);
-                            } else {
-                                vscode.window.showWarningMessage(`已跳过无效映射 ${value}`);
-                            }
-                        });
-                        vscode.window.showInformationMessage("所有 package.json 文件的版本已更新。");
-                    }
-                });
+                // 获取用户输入的版本号
+                const packageManager = await getUserInput_packageManagerx(validVersions);
+                if (packageManager) {
+                    // 遍历映射并更新版本号
+                    selectedOptions.forEach(async (value: string, index: number) => {
+                        Log.d(TAG, value);
+                        if (await fs.exists(value)) {
+                            const pkgContent = fs.readJSONSync(value);
+                            pkgContent.packageManager = packageManager;
+                            fs.writeFileSync(value, JSON.stringify(pkgContent, null, 2));
+                            Log.d(`${packageManager} ->${value}`);
+                        } else {
+                            vscode.window.showWarningMessage(`已跳过无效映射 ${value}`);
+                        }
+                    });
+                    vscode.window.showInformationMessage("所有 package.json 文件的版本已更新。");
+                } else {
+                    vscode.window.showInformationMessage("操作已取消。");
+                    return;
+                }
+                // vscode.window.showInputBox({ prompt: `输入新版本: (当前版本: ${validVersions.join(", ")})` }).then(async packageManager => {
+                //     if (packageManager) {
+                //         // 遍历映射并更新版本号
+                //         selectedOptions.forEach(async (value: string, index: number) => {
+                //             Log.d(TAG, value);
+                //             if (await fs.exists(value)) {
+                //                 const pkgContent = fs.readJSONSync(value);
+                //                 pkgContent.packageManager = packageManager;
+                //                 fs.writeFileSync(value, JSON.stringify(pkgContent, null, 2));
+                //                 Log.d(`${packageManager} ->${value}`);
+                //             } else {
+                //                 vscode.window.showWarningMessage(`已跳过无效映射 ${value}`);
+                //             }
+                //         });
+                //         vscode.window.showInformationMessage("所有 package.json 文件的版本已更新。");
+                //     }
+                // });
             });
         } else {
             vscode.window.showWarningMessage("当前不在工作区环境");
@@ -79,4 +99,34 @@ export function add_task_同步更新packageManager(context: vscode.ExtensionCon
     });
 
     context.subscriptions.push(disposable);
+}
+
+async function getUserInput_packageManagerx(validVersions: any[]) {
+    // 正则表达式模式，用于校验用户输入
+    const packagePattern = /^[\w/.-]+@([0-9]+)(?:\.([0-9]+)(?:\.([0-9]+))?)?$/;
+    const packagePatternStrict = /^(npm|pnpm|yarn|bun)@[0-9]+\.[0-9]+\.[0-9]+$/;
+    let userInput: string | undefined = undefined;
+    while (true) {
+        userInput = await vscode.window.showInputBox({
+            prompt: `格式为 <package manager name>@<version>  (当前版本: ${validVersions.join(", ")})`,
+            value: userInput, // 将上一次的用户输入作为新输入框的默认值
+        });
+
+        // 如果用户取消了输入
+        if (userInput === undefined) {
+            return null;
+        }
+        // 格式正确，返回
+        if (userInput && packagePatternStrict.test(userInput)) {
+            return userInput;
+        }
+        if (userInput && packagePattern.test(userInput)) {
+            // https://nodejs.cn/api-v20/packages/packagemanager.html
+            vscode.window.showWarningMessage(
+                `当前启用了严格模式，只接受 ${packagePatternStrict}`
+            );
+        } else {
+            vscode.window.showWarningMessage(`${userInput} 不符合格式要求 <package manager name>@<version>`);
+        }
+    }
 }
