@@ -61,14 +61,24 @@ export default defineConfig({
                     autogenerate: { directory: "依赖更新" },
                 },
                 {
-                    label: "汐洛用户指南",
+                    label: "汐洛绞架用户指南",
                     collapsed: true, // 默认折叠分组
-                    autogenerate: { directory: "guides/sillot" },
+                    autogenerate: { directory: "guides/汐洛绞架" },
                 },
                 {
                     label: "思源笔记用户指南",
                     collapsed: true, // 默认折叠分组
                     autogenerate: { directory: "guides/siyuan" },
+                },
+                {
+                    label: "风颂用户指南",
+                    collapsed: true, // 默认折叠分组
+                    autogenerate: { directory: "guides/风颂" },
+                },
+                {
+                    label: "汐洛扩展用户指南",
+                    collapsed: true, // 默认折叠分组
+                    autogenerate: { directory: "guides/汐洛扩展" },
                 },
             ],
             components: {
