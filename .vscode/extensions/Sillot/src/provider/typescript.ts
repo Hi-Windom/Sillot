@@ -60,7 +60,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
                     const _key = this.expressionChain.replace(t, "");
                     const languages = sillotJson.i18n.hover.ts[t];
 
-                    let combinedHoverText = new vscode.MarkdownString();
+                    const combinedHoverText = new vscode.MarkdownString();
                     let hasMatches = false;
 
                     for (const lang in languages) {
