@@ -178,8 +178,8 @@
       "ryu1kn.partial-diff", // 右键菜单对比命令，很好用
       // NPM Imported Package Links
       "MainaWycliffe.view-package-on-npm", // 好用，但有点占地方，因此仅推荐
-      // CodeTime
-      "Jannchie.codetime", // 统计个人编程数据，需要配置TOKEN
+      // WakaTime
+      "WakaTime.vscode-wakatime", // 统计个人编程数据，需要配置TOKEN
     ],
     "unwantedRecommendations": [
       "oderwat.indent-rainbow", // 花里胡哨影响观感
@@ -187,7 +187,6 @@
       "esbenp.prettier-vscode", // 本工作区使用 biome 方案，不需要 prettier
       "rvest.vs-code-prettier-eslint", // 本工作区使用 biome 方案，不需要 eslint
       "dbaeumer.vscode-eslint", // 本工作区使用 biome 方案，不需要 eslint
-      "WakaTime.vscode-wakatime", // 本工作区使用 CodeTime 方案，不需要 WakaTime
       // 不适用本工作区 ::开始
       "hayden.extension-pack-manager",
       "felipecaputo.git-project-manager",
