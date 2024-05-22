@@ -175,9 +175,6 @@ ${ isAppMode() ? `
     </div>
     <span class="fn__space"></span>
     <input class="b3-text-field fn__flex-center fn__size200" id="token" value="${window.siyuan.config.api.token}">
-</div>
-<span class="fn__space"></span>
-<input class="b3-text-field fn__flex-center fn__size200" id="token" value="${window.siyuan.config.api.token}">
 </div>` : ""
 }
 <div class="b3-label${(window.siyuan.config.system.container === "std" || window.siyuan.config.system.container === "docker") ? "" : " fn__none"}">
