@@ -48,6 +48,20 @@
 </p>
 
 <p align="center">
+<a href="https://github.com/Hi-Windom/Sillot/pulse"><img alt="Insights（注意当前设置 master 为默认分支）" src="https://repobeats.axiom.co/api/embed/708cdf00c747155e49ff28c0c0024e17a28e5705.svg" /></a>
+</p>
+
+<p align="center">
+    <a href="https://star-history.com/#Hi-Windom/Sillot&Date">
+        <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hi-Windom/Sillot&type=Date&theme=dark" />
+            <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Hi-Windom/Sillot&type=Date" />
+            <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Hi-Windom/Sillot&type=Date" />
+        </picture>
+    </a>
+</p>
+
+<p align="center">
 <br><br>
 <a href="https://github.com/siyuan-note/siyuan">思源（SiYuan）</a> | <a href="README_Sillot.md">汐洛（Sillot）</a>
 </p>
