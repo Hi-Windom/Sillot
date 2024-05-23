@@ -138,6 +138,7 @@ const splitSubMenu = (app: App, tab: Tab) => {
     if (wndsTemp.length > 1) {
         subMenus.push({
             label: window.siyuan.languages.unsplit,
+            accelerator: window.siyuan.config.keymap.general.unsplit.custom,
             click: () => {
                 let layout = tab.parent.parent;
                 while (layout.id !== window.siyuan.layout.centerLayout.id) {
@@ -155,6 +156,7 @@ const splitSubMenu = (app: App, tab: Tab) => {
         });
         subMenus.push({
             label: window.siyuan.languages.unsplitAll,
+            accelerator: window.siyuan.config.keymap.general.unsplitAll.custom,
             click: () => {
                 unsplitWnd(window.siyuan.layout.centerLayout, window.siyuan.layout.centerLayout, false);
                 resizeTabs();
@@ -223,7 +225,7 @@ export const initTabMenu = (app: App, tab: Tab) => {
     return window.siyuan.menus.menu;
 };
 
-const unsplitWnd = (target: Wnd | Layout, layout: Layout, onlyWnd: boolean) => {
+export const unsplitWnd = (target: Wnd | Layout, layout: Layout, onlyWnd: boolean) => {
     window.sout.tracker("invoked");
     let wnd: Wnd = target as Wnd;
     while (wnd instanceof Layout) {

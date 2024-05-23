@@ -50,7 +50,6 @@
   * [Does it support data synchronization through a third-party sync disk?](#does-it-support-data-synchronization-through-a-third-party-sync-disk)
   * [Is SiYuan open source?](#is-siyuan-open-source)
   * [How to upgrade to a new version?](#how-to-upgrade-to-a-new-version)
-  * [Is there any note for deleting docs?](#is-there-any-note-for-deleting-docs)
   * [How can I just wrap and not start a new paragraph?](#how-can-i-just-wrap-and-not-start-a-new-paragraph)
   * [What if some blocks (such as paragraph blocks in list items) cannot find the block icon?](#what-if-some-blocks-such-as-paragraph-blocks-in-list-items-cannot-find-the-block-icon)
   * [How to share notes?](#how-to-share-notes)
@@ -321,10 +320,6 @@ For more details, please refer to [Development Guide](https://github.com/siyuan-
 * If it is installed by manual installation package, please download the installation package again to install
 
 You can <kbd>Check update</kbd> in <kbd>Settings</kbd> - <kbd>About</kbd> - <kbd>Current Version</kbd>, or pay attention to [Official Download](https://b3log.org/siyuan/en/download.html) or [GitHub Releases](https://github.com/siyuan-note/siyuan/releases) to get the new version.
-
-### Is there any note for deleting docs?
-
-After deletion, the doc will not appear in the operating system's recycle bin, but will be deleted directly. When deleted, SiYuan will generate data history.
 
 ### How can I just wrap and not start a new paragraph?
 
