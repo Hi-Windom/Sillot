@@ -5,7 +5,7 @@ import {renderBacklink} from "../wysiwyg/renderBacklink";
 import {hasClosestByClassName} from "./hasClosest";
 import {preventScroll} from "../scroll/preventScroll";
 
-export const reloadProtyle = (protyle: IProtyle, focus: boolean) => {
+export const reloadProtyle = (protyle: IProtyle, focus: boolean, updateReadonly?: boolean) => {
     window.sout.tracker("invoked");
     if (!protyle.preview.element.classList.contains("fn__none")) {
         protyle.preview.render(protyle);
@@ -52,7 +52,8 @@ export const reloadProtyle = (protyle: IProtyle, focus: boolean) => {
         getDocByScroll({
             protyle,
             focus,
-            scrollAttr: saveScroll(protyle, true)
+            scrollAttr: saveScroll(protyle, true),
+            updateReadonly
         });
     }
 };

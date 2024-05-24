@@ -71,6 +71,7 @@ import {filterHotkey} from "./commonHotkey";
 import {setReadOnly} from "../../config/util/setReadOnly";
 import {copyPNGByLink} from "../../menus/util";
 import {globalCommand} from "./command/global";
+import {duplicateCompletely} from "../../protyle/render/av/action";
 
 const switchDialogEvent = (app: App, event: MouseEvent) => {
     window.sout.tracker("invoked");
@@ -448,6 +449,15 @@ const editKeydown = (app: App, event: KeyboardEvent) => {
         } else {
             copyPlainText(range.toString());
         }
+        event.preventDefault();
+        return true;
+    }
+    if (matchHotKey(window.siyuan.config.keymap.editor.general.duplicateCompletely.custom, event)) {
+        const nodeElement = hasClosestBlock(range.startContainer);
+        if (!nodeElement || !nodeElement.classList.contains("av")) {
+            return false;
+        }
+        duplicateCompletely(protyle, nodeElement);
         event.preventDefault();
         return true;
     }

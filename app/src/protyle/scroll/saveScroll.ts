@@ -49,7 +49,8 @@ export const getDocByScroll = (options: {
     scrollAttr: IScrollAttr,
     mergedOptions?: IOptions,
     cb?: () => void
-    focus?: boolean
+    focus?: boolean,
+    updateReadonly?: boolean
 }) => {
     window.sout.tracker("invoked");
     let actions: string[] = [];
@@ -82,7 +83,8 @@ export const getDocByScroll = (options: {
                         protyle: options.protyle,
                         action: actions,
                         scrollAttr: options.scrollAttr,
-                        afterCB: options.cb
+                        afterCB: options.cb,
+                        updateReadonly: options.updateReadonly
                     });
                 });
             } else {
@@ -92,7 +94,8 @@ export const getDocByScroll = (options: {
                     protyle: options.protyle,
                     action: actions,
                     scrollAttr: options.scrollAttr,
-                    afterCB: options.cb
+                    afterCB: options.cb,
+                    updateReadonly: options.updateReadonly
                 });
             }
         });
@@ -111,7 +114,8 @@ export const getDocByScroll = (options: {
             protyle: options.protyle,
             action: actions,
             scrollAttr: options.scrollAttr,
-            afterCB: options.cb
+            afterCB: options.cb,
+            updateReadonly: options.updateReadonly
         });
     });
 };
