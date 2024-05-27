@@ -1,0 +1,13 @@
+---
+languages:
+  css:
+    extensions:
+      - ".scss"
+exclude_paths:
+  - ".bundle/**"
+  - "spec/**/*"
+  - "benchmarks/**/*"
+  - "**.min.js"
+  - "**/tests/**"
+  - "**.md"
+# REF https://docs.codacy.com/repositories-configure/codacy-configuration-file/
