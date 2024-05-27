@@ -853,7 +853,7 @@ func FullTextSearchBlock(query string, boxes, paths []string, types map[string]b
 
 	beforeLen := 36
 	var blocks []*Block
-	orderByClause := buildOrderBy(method, orderBy)
+	orderByClause := buildOrderBy(query, method, orderBy)
 	switch method {
 	case 1: // 查询语法
 		filter := buildTypeFilter(types)
@@ -992,7 +992,7 @@ func buildPathsFilter(paths []string) string {
 	return builder.String()
 }
 
-func buildOrderBy(method, orderBy int) string {
+func buildOrderBy(query string, method, orderBy int) string {
 	switch orderBy {
 	case 1:
 		return "ORDER BY created ASC"
@@ -1014,7 +1014,14 @@ func buildOrderBy(method, orderBy int) string {
 		}
 		return "ORDER BY rank" // 默认是按相关度降序
 	default:
-		return "ORDER BY sort ASC, updated DESC" // Improve search default sort https://github.com/siyuan-note/siyuan/issues/8624
+		clause := "ORDER BY CASE " +
+			"WHEN name = '${keyword}' THEN 10 " +
+			"WHEN alias = '${keyword}' THEN 20 " +
+			"WHEN name LIKE '%${keyword}%' THEN 50 " +
+			"WHEN alias LIKE '%${keyword}%' THEN 60 " +
+			"ELSE 65535 END ASC, sort ASC, updated DESC"
+		clause = strings.ReplaceAll(clause, "${keyword}", strings.ReplaceAll(query, "'", "''"))
+		return clause
 	}
 }
 
@@ -1153,30 +1160,30 @@ func fullTextSearchRefBlock(keyword string, beforeLen int, onlyDoc bool) (ret []
 	// HintHint面板排序完全匹配优先 #10
 	// 当在 Order by 中使用Case语句时： ASC，数字越小权重越高； DESC，数字越大权重越高
 	orderCase1 := `
-	when name LIKE '%${keyword}%' then 55
-	when alias LIKE '%${keyword}%' then 55
-	when content LIKE '%${keyword}%' and type = 'd' then 60
-	when content LIKE '%${keyword}%' and type != 'd' then 70
-	when fcontent LIKE '%${keyword}%' and type = 'i' then 100
-	when memo LIKE '%${keyword}%' then 100
+	WHEN name LIKE '%${keyword}%' THEN 55
+	WHEN alias LIKE '%${keyword}%' THEN 55
+	WHEN content LIKE '%${keyword}%' and type = 'd' THEN 60
+	WHEN content LIKE '%${keyword}%' and type != 'd' THEN 70
+	WHEN fcontent LIKE '%${keyword}%' and type = 'i' THEN 100
+	WHEN memo LIKE '%${keyword}%' THEN 100
 	`
 	orderCase2 := `
-	when name LIKE '${keyword}*' then 40
-	when alias LIKE '${keyword}*' then 45
-	when content LIKE '${keyword}*' and type = 'd' then 25
-	when content LIKE '${keyword}*' and type != 'd' then 50
-	when fcontent LIKE '${keyword}*' and type = 'i' then 60
-	when memo LIKE '${keyword}*' then 65
+	WHEN name LIKE '${keyword}*' THEN 40
+	WHEN alias LIKE '${keyword}*' THEN 45
+	WHEN content LIKE '${keyword}*' and type = 'd' THEN 25
+	WHEN content LIKE '${keyword}*' and type != 'd' THEN 50
+	WHEN fcontent LIKE '${keyword}*' and type = 'i' THEN 60
+	WHEN memo LIKE '${keyword}*' THEN 65
 	`
 	orderCase3 := `
-	when name = '${keyword}' then 10
-	when alias = '${keyword}' then 20
-	when content = '${keyword}' and type = 'd' then 1
-	when content = '${keyword}' and type != 'd' then 5
-	when fcontent = '${keyword}' and type = 'i' then 25
-	when memo = '${keyword}' then 30
+	WHEN name = '${keyword}' THEN 10
+	WHEN alias = '${keyword}' THEN 20
+	WHEN content = '${keyword}' and type = 'd' THEN 1
+	WHEN content = '${keyword}' and type != 'd' THEN 5
+	WHEN fcontent = '${keyword}' and type = 'i' THEN 25
+	WHEN memo = '${keyword}' THEN 30
 	`
-	orderBy := ` order by case` + orderCase1 + orderCase2 + orderCase3 + `else 65535 end ASC, sort ASC, length ASC`
+	orderBy := ` ORDER BY CASE` + orderCase1 + orderCase2 + orderCase3 + `ELSE 65535 END ASC, sort ASC, length ASC`
 	orderBy = strings.ReplaceAll(orderBy, "${keyword}", strings.ReplaceAll(keyword, "'", "''"))
 	stmt += orderBy + " LIMIT " + strconv.Itoa(Conf.Search.Limit)
 	blocks := sql.SelectBlocksRawStmtNoParse(stmt, Conf.Search.Limit)

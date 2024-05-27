@@ -2045,7 +2045,6 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
             }
             const range = getEditorRange(this.element);
             // 需放在嵌入块之前，否则嵌入块内的引用、链接、pdf 双链无法点击打开 https://ld246.com/article/1630479789513
-            const blockRefElement = hasClosestByAttribute(event.target, "data-type", "block-ref");
             const aElement = hasClosestByAttribute(event.target, "data-type", "a") ||
                 hasClosestByClassName(event.target, "av__celltext--url");   // 数据库中资源文件、链接、电话、邮箱单元格
             let aLink = aElement ? (aElement.getAttribute("data-href") || "") : "";
@@ -2060,6 +2059,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 }
             }
 
+            const blockRefElement = hasClosestByAttribute(event.target, "data-type", "block-ref");
             if (blockRefElement || aLink.startsWith("siyuan://blocks/")) {
                 event.stopPropagation();
                 event.preventDefault();
@@ -2075,6 +2075,8 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     refBlockId = aLink.substring(16, 38);
                 }
                 checkFold(refBlockId, (zoomIn, action) => {
+                    // 块引用跳转后需要短暂高亮目标块 https://github.com/siyuan-note/siyuan/issues/11542
+                    action.push(Constants.CB_GET_HL);
                     /// #if MOBILE
                     console.warn(`refBlockId : ${refBlockId}`); // 文档中直接点击双链
                     const toolbarOpenBy = document.querySelector("#toolbarOpenBy");
