@@ -1,7 +1,7 @@
 {
   "name": "starlight",
   "type": "module",
-  "version": "0.35.1810",
+  "version": "0.35.1820",
   "scripts": {
     "test": "echo 'Test your sister day by day'",
     "dev": "astro dev",
@@ -26,5 +26,5 @@
     "@types/node": "^20.12.7",
     "sass": "^1.75.0"
   },
-  "packageManager": "pnpm@9.1.2"
+  "packageManager": "pnpm@9.1.3"
 }
