@@ -356,7 +356,8 @@ jobs:
       - name: 🔥 Build with Gradle
         if: contains( matrix.config.suffix, 'apk')
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
-        run: ./gradlew assembleOfficialAction -profile --quiet --stacktrace
+        # 禁用多渠道使用 assembleAction ，启用多渠道则使用 assembleOfficialAction
+        run: ./gradlew assembleAction -profile --quiet --stacktrace
         continue-on-error: false
 
       - name: 📤 Upload Gradle profile reports to artifact
