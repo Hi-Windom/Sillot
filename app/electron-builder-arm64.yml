@@ -3,7 +3,7 @@ appId: "sc.windom.sillot"
 asar: false
 compression: "store"
 copyright: "© 2024 Hi-Windom"
-artifactName: "Sillot-${version}-${os}.${ext}"
+artifactName: "siyuan-${version}-${os}-arm64.${ext}"
 extraMetadata:
   main: "electron/main.js"
 directories:
@@ -16,7 +16,7 @@ extraFiles:
 win:
   icon: "src/assets/icon.ico"
   extraResources:
-    - from: "kernel"
+    - from: "kernel-arm64"
       to: "kernel"
   requestedExecutionLevel: "asInvoker"
   # certificateSubjectName: "Yunnan Liandi Technology Co., Ltd."
@@ -26,6 +26,7 @@ win:
   rfc3161TimeStampServer: "http://timestamp.entrust.net/TSS/RFC3161sha2TS"
   target:
     - target: "nsis"
+      arch: "arm64"
 nsis:
   oneClick: false
   perMachine: false
@@ -57,7 +58,7 @@ extraResources:
     filter: "!**/{.DS_Store}"
   - from: "appearance/langs"
     to: "appearance/langs"
-    filter: "!**/{.DS_Store,zh_CHT.json,fr_FR.json,es_ES.json}"
+    filter: "!**/{.DS_Store}"
   - from: "appearance/emojis"
     to: "appearance/emojis"
     filter: "!**/{.DS_Store}"
@@ -75,5 +76,3 @@ extraResources:
     filter: "!**/{.DS_Store}"
   - from: "pandoc/pandoc-windows-amd64.zip"
     to: "pandoc.zip"
-  - from: "apps/deno/deno-x86_64-pc-windows-msvc.zip"
-    to: "deno.zip"

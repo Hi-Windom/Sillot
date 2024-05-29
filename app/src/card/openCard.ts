@@ -178,7 +178,6 @@ export const bindCardEvent = async (options: {
         action: [Constants.CB_GET_ALL],
         render: {
             background: false,
-            title: false,
             gutter: true,
             breadcrumbDocName: true,
         },

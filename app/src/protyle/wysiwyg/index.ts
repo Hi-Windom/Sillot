@@ -2074,9 +2074,11 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                 } else if (aElement) {
                     refBlockId = aLink.substring(16, 38);
                 }
-                checkFold(refBlockId, (zoomIn, action) => {
+                checkFold(refBlockId, (zoomIn, action, isRoot) => {
                     // 块引用跳转后需要短暂高亮目标块 https://github.com/siyuan-note/siyuan/issues/11542
-                    action.push(Constants.CB_GET_HL);
+                    if (!isRoot) {
+                        action.push(Constants.CB_GET_HL);
+                    }
                     /// #if MOBILE
                     console.warn(`refBlockId : ${refBlockId}`); // 文档中直接点击双链
                     const toolbarOpenBy = document.querySelector("#toolbarOpenBy");

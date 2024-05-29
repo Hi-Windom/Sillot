@@ -59,6 +59,7 @@ export const openMobileFileById = (app: App, id: string, action = [Constants.CB_
             action,
             render: {
                 scroll: true,
+                title: true,
                 background: true,
                 gutter: true,
             },
@@ -68,6 +69,7 @@ export const openMobileFileById = (app: App, id: string, action = [Constants.CB_
             }
         };
         if (window.siyuan.mobile.editor) {
+            window.siyuan.mobile.editor.protyle.title.element.removeAttribute("data-render");
             pushBack();
             addLoading(window.siyuan.mobile.editor.protyle);
             if (window.siyuan.mobile.editor.protyle.block.rootID !== data.data.rootID) {
@@ -106,7 +108,6 @@ export const openMobileFileById = (app: App, id: string, action = [Constants.CB_
         } else {
             window.siyuan.mobile.editor = new Protyle(app, document.getElementById("editor"), protyleOptions);
         }
-        (document.getElementById("toolbarName") as HTMLInputElement).value = data.data.rootTitle === window.siyuan.languages.untitled ? "" : data.data.rootTitle;
         setEditor();
         closePanel();
     });
