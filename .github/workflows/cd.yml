@@ -12,6 +12,10 @@ env:
   repo_name: "Sillot"
   repo_owner: "Hi-Windom"
   package_json: "app/package.json"
+  android_gradle_build_output: "action"
+  android_gradle_build_params: "assembleAction -profile --quiet --stacktrace"
+#   android_gradle_build_params: "assembleOfficialAction -profile --quiet --stacktrace" # 多渠道时
+#   android_gradle_build_output: "build/outputs/apk/official/action" # 多渠道时
 
 jobs:
   create_release:
@@ -356,7 +360,7 @@ jobs:
       - name: 🔥 Build with Gradle
         if: contains( matrix.config.suffix, 'apk')
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}
-        run: ./gradlew assembleOfficialAction -profile --quiet --stacktrace
+        run: ./gradlew ${{ env.android_gradle_build_params }}
         continue-on-error: false
 
       - name: 📤 Upload Gradle profile reports to artifact
@@ -371,7 +375,7 @@ jobs:
         if: contains( matrix.config.suffix, 'apk')
         id: sign_app
         with:
-          releaseDirectory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}/app/build/outputs/apk/official/action
+          releaseDirectory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name_android }}/app/${{ env.android_gradle_build_output }}
           signingKeyBase64: ${{ secrets.APK_SIGN_KEY_JKS_BASE64 }}
           alias: ${{ secrets.APK_SIGN_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.APK_SIGN_KEY_JKS_PW }}

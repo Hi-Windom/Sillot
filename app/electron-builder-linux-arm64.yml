@@ -3,7 +3,7 @@ appId: "sc.windom.sillot"
 asar: false
 compression: "store"
 copyright: "© 2024 Hi-Windom"
-artifactName: "Sillot-${version}-${os}.${ext}"
+artifactName: "siyuan-${version}-${os}-arm64.${ext}"
 extraMetadata:
   main: "electron/main.js"
 directories:
@@ -18,11 +18,13 @@ linux:
   icon: "src/assets/icon.png"
   category: "Utility"
   extraResources:
-    - from: "kernel-linux"
+    - from: "kernel-linux-arm64"
       to: "kernel"
   target:
     - target: "tar.gz"
+      arch: "arm64"
     - target: "AppImage"
+      arch: "arm64"
 
 extraResources:
   - from: "changelogs"
@@ -31,7 +33,7 @@ extraResources:
     to: "stage"
   - from: "guide"
     to: "guide"
-    filter: "!**/{.DS_Store,.git,.gitignore,.idea,20211226090932-5lcq56f}"
+    filter: "!**/{.DS_Store,.git,.gitignore,.idea}"
   - from: "appearance/boot"
     to: "appearance/boot"
     filter: "!**/{.DS_Store}"
@@ -40,7 +42,7 @@ extraResources:
     filter: "!**/{.DS_Store}"
   - from: "appearance/langs"
     to: "appearance/langs"
-    filter: "!**/{.DS_Store,zh_CHT.json,fr_FR.json,es_ES.json}"
+    filter: "!**/{.DS_Store}"
   - from: "appearance/emojis"
     to: "appearance/emojis"
     filter: "!**/{.DS_Store}"
@@ -50,13 +52,11 @@ extraResources:
   - from: "appearance/themes/daylight"
     to: "appearance/themes/daylight"
     filter: "!**/{.DS_Store,custom.css}"
-  - from: "src/assets/fonts"
-    to: "appearance/fonts"
-    filter: "!**/{.DS_Store}"
   - from: "appearance/themes/_lnco"
     to: "appearance/themes/lnco"
     filter: "!**/{.DS_Store,custom.css}"
+  - from: "src/assets/fonts"
+    to: "appearance/fonts"
+    filter: "!**/{.DS_Store}"
   - from: "pandoc/pandoc-linux-amd64.zip"
     to: "pandoc.zip"
-  - from: "apps/deno/deno-x86_64-unknown-linux-gnu.zip"
-    to: "deno.zip"
