@@ -35,7 +35,7 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
                 TAG,
                 /*html*/ `<h2>${TAG}</h2>
                 <h3>目标 git 本地仓库：${selectedProject}</h3>
-                <input id="git_tag" placeholder="请输入 git tag"/><br>
+                <input id="git_tag" placeholder="请输入 git tag" oninput="checkInput(this)"/><span class="error-message"></span><br>
                 <textarea id="git_tag_description" data-vscode-context='{"webviewSection": "editor", "preventDefaultContextMenuItems": true}' placeholder="描述（可选）"></textarea><br>
                 <button onClick="runCMD('git_tag')">提交</button><button onClick="runCMD('git_tag_push')">推送到远端</button>
         <button onClick="closeModal()">关闭面板</button>
@@ -47,6 +47,29 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
             window.vscode.postMessage({ message: 'runCMD', text: text, cmd: [tagElement.value, descriptionElement.value] });
         }
         function closeModal() {window.vscode.postMessage({ message: 'closeModal' });}
+        function checkInput(inputElement) {
+            const value = inputElement.value;
+            const illegalChars = ['。', ',', '/', '，', '、'];
+            let hasIllegalChar = false;
+            let illegalCharMessage = "疑似输入非法字符: ";
+
+            for (let char of illegalChars) {
+            if (value.includes(char)) {
+                hasIllegalChar = true;
+                illegalCharMessage += char + " ";
+            }
+            }
+
+            const messageElement = inputElement.nextElementSibling;
+
+            if (hasIllegalChar) {
+            inputElement.classList.add('error-input');
+            messageElement.textContent = illegalCharMessage;
+            } else {
+            inputElement.classList.remove('error-input');
+            messageElement.textContent = "";
+            }
+        }
         </script>
         `,
                 iconPath
@@ -89,7 +112,7 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
                                 suffix = sillotJson.git.tag.suffix;
                             }
                         }
-                        const _tag = `${prefix}${jj.cmd[0]}${suffix}`
+                        const _tag = `${prefix}${jj.cmd[0]}${suffix}`;
                         if (jj.text === "git_tag") {
                             const cmd = jj.cmd[1]
                                 ? `git -C ${selectedProject} tag ${_tag} -m "${jj.cmd[1]}"`
@@ -121,6 +144,14 @@ export function showCustomModal(tag: string, body: string, iconPath: string | un
       <html>
       <head>
       <style>
+        .error-input {
+            border: 2px solid red;
+            margin-right: 3px;
+        }
+        .error-message {
+            color: red;
+            font-size: 1.31em;
+        }
       </style>
       </head>
         <body>
