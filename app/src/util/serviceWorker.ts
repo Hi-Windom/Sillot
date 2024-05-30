@@ -1,18 +1,28 @@
 // https://github.com/siyuan-note/siyuan/pull/8012
-export const registerServiceWorker = (scriptURL: string, scope = "/", workerType: WorkerType = "module") => {
+export const registerServiceWorker = (
+    scriptURL: string,
+    options: RegistrationOptions = {
+        scope: "/",
+        type: "classic",
+        updateViaCache: "all",
+    },
+) => {
+
     // window.sout.tracker("invoked"); 这里未初始化sout不能使用
-    if (!("serviceWorker" in navigator) || typeof (navigator.serviceWorker) === "undefined" ||
-        !("caches" in window) || !("fetch" in window)) {
+    if (!("serviceWorker" in window.navigator)
+        || !("caches" in window)
+        || !("fetch" in window)
+        || navigator.serviceWorker == null
+    ) {
         return;
     }
+
     // REF https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration
     window.navigator.serviceWorker
-        .register(scriptURL, {
-            scope,
-            type: workerType,
-        }).then(registration => {
-        registration.update();
-    }).catch(e => {
-        console.debug(`Registration failed with ${e}`);
-    });
+        .register(scriptURL, options)
+        .then(registration => {
+            registration.update();
+        }).catch(e => {
+            console.debug(`Registration failed with ${e}`);
+        });
 };

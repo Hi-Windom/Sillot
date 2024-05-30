@@ -12,7 +12,7 @@ env:
   repo_name: "Sillot"
   repo_owner: "Hi-Windom"
   package_json: "app/package.json"
-  android_gradle_build_output: "action"
+  android_gradle_build_output: "build/outputs/apk/action"
   android_gradle_build_params: "assembleAction -profile --quiet --stacktrace"
 #   android_gradle_build_params: "assembleOfficialAction -profile --quiet --stacktrace" # 多渠道时
 #   android_gradle_build_output: "build/outputs/apk/official/action" # 多渠道时
