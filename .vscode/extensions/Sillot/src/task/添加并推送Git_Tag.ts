@@ -34,6 +34,7 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
             currentPanel = showCustomModal(
                 TAG,
                 /*html*/ `<h2>${TAG}</h2>
+                <h3>目标 git 本地仓库：${selectedProject}</h3>
                 <input id="git_tag" placeholder="请输入 git tag"/><br>
                 <textarea id="git_tag_description" data-vscode-context='{"webviewSection": "editor", "preventDefaultContextMenuItems": true}' placeholder="描述（可选）"></textarea><br>
                 <button onClick="runCMD('git_tag')">提交</button><button onClick="runCMD('git_tag_push')">推送到远端</button>
