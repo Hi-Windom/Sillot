@@ -1,3 +1,5 @@
+USER root
+
 FROM node:20 as NODE_BUILD
 WORKDIR /Hi-Windom/Sillot/
 ADD . /Hi-Windom/Sillot/
