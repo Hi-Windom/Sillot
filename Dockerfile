@@ -30,11 +30,11 @@ RUN apk add --no-cache gcc musl-dev && \
     rm /Hi-Windom/Sillot/app/appearance/langs/zh_CHT.json && \
     rm /Hi-Windom/Sillot/app/appearance/langs/fr_FR.json && \
     rm /Hi-Windom/Sillot/app/appearance/langs/es_ES.json && \
-    mv /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
-    mv /Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
-    mv /Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
-    mv /Hi-Windom/Sillot/app/changelogs/ /opt/Sillot/ && \
-    mv /Hi-Windom/Sillot/kernel/kernel /opt/Sillot/ && \
+    # mv /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
+    # mv /Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
+    # mv /Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
+    # mv /Hi-Windom/Sillot/app/changelogs/ /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/ /opt/Sillot/ && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 
 FROM soltus/jupyter-binder-python:latest
