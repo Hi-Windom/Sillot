@@ -19,7 +19,7 @@ RUN apt-get purge -y jq
 RUN apt-get autoremove -y
 RUN rm -rf /var/lib/apt/lists/*
 
-FROM golang:alpine as GO_BUILD
+FROM golang:bullseye as GO_BUILD
 WORKDIR /Hi-Windom/Sillot/
 COPY --from=NODE_BUILD /Hi-Windom/Sillot/ /Hi-Windom/Sillot/
 ENV GO111MODULE=on
