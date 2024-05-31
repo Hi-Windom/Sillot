@@ -1,5 +1,5 @@
-ARG USER_UID=58131
-
+ARG NB_USER=jovyan
+ARG NB_UID=1000
 FROM node:20 as NODE_BUILD
 WORKDIR /Hi-Windom/Sillot/
 ADD . /Hi-Windom/Sillot/
@@ -38,15 +38,16 @@ RUN apk add --no-cache gcc musl-dev && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 
 FROM soltus/jupyter-binder-python:latest
-COPY --from=denoland/deno:bin-1.44.0 /deno /usr/local/bin/deno
+COPY --from=denoland/deno:bin /deno /usr/local/bin/deno
 LABEL maintainer="Soltus<694357845@qq.com>"
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
-ENV PATH=$PATH:/opt/Sillot/bin
-RUN apk add --no-cache ca-certificates tzdata && chown -R sillot:sillot /opt/Sillot/
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates tzdata && rm -rf /var/lib/apt/lists/*
+RUN chown -R ${NB_UID} /opt/Sillot/
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
 EXPOSE 58131
 
+USER ${NB_UID}
 ENTRYPOINT [ "/opt/Sillot/kernel" ]
