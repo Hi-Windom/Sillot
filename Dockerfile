@@ -43,10 +43,10 @@ LABEL maintainer="Soltus<694357845@qq.com>"
 
 USER root
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends ca-certificates tzdata && sudo rm -rf /var/lib/apt/lists/*
-USER ${NB_UID}
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
-RUN chown -R ${NB_UID} /opt/Sillot/
+RUN sudo chown -R ${NB_UID} /opt/Sillot/
+USER ${NB_UID}
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
