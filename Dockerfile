@@ -52,7 +52,7 @@ RUN sudo apt-get update && \
     sudo rm -rf /var/lib/apt/lists/*
 
 RUN sudo chown -R root:root /opt/Sillot/
-RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno /tini /opt/Sillot/docker-sillot-entrypoint.sh
+RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno /tini /opt/Sillot/Docker_entry.sh
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
@@ -61,4 +61,4 @@ LABEL maintainer="Soltus<694357845@qq.com>"
 
 ENV SILLOT_ARGS_KERNEL="--accessAuthCode 58131"
 ENV SILLOT_ARGS_JUPYTER="--port=8888 --ip=* --no-browser --allow-root"
-ENTRYPOINT [ "/tini", "--", "/opt/Sillot/docker-sillot-entrypoint.sh" ]
+ENTRYPOINT [ "/tini", "--", "/opt/Sillot/Docker_entry.sh" ]
