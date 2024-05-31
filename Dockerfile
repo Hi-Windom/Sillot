@@ -48,9 +48,8 @@ RUN sudo apt-get update && \
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates tzdata && \
     sudo rm -rf /var/lib/apt/lists/*
 
-RUN sudo chown -R ${NB_USER} /opt/Sillot/
+RUN sudo chown -R root:root /opt/Sillot/
 RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno
-USER ${NB_USER}
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
