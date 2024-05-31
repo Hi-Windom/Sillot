@@ -29,7 +29,7 @@
       "name": "沁棘🤍../sofillBuilder 🗂️"
     },
     {
-      "path": "../../winsaybuilder", // 沁棘开发仓库（暂未开源）
+      "path": "../../winsaybuilder", // 风颂开发仓库（暂未开源）
       "name": "风颂🤍../winsaybuilder 🗂️"
     },
     {
@@ -45,7 +45,7 @@
       "name": "思源🤍../siyuan 🗂️"
     },
     {
-        "path": "../_pkgs/siyuan-android", // 思源本源
+        "path": "../_pkgs/siyuan-android", // 思源安卓本源
         "name": "思源安卓🤍../siyuan-android 🗂️"
       }
   ],
