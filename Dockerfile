@@ -1,3 +1,5 @@
+ARG USER_UID=58131
+
 FROM node:20 as NODE_BUILD
 WORKDIR /Hi-Windom/Sillot/
 ADD . /Hi-Windom/Sillot/
@@ -42,7 +44,7 @@ WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
 ENV PATH=$PATH:/opt/Sillot/bin
 USER root
-RUN sudo addgroup --gid 1000 sillot && sudo adduser --uid 1000 --ingroup sillot --disabled-password sillot && sudo apk add --no-cache ca-certificates tzdata && sudo chown -R sillot:sillot /opt/Sillot/
+RUN sudo addgroup --gid ${USER_UID} sillot && sudo adduser --uid ${USER_UID} --ingroup sillot --disabled-password sillot && sudo apk add --no-cache ca-certificates tzdata && sudo chown -R sillot:sillot /opt/Sillot/
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
