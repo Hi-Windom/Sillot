@@ -22,12 +22,10 @@ WORKDIR /Hi-Windom/Sillot/
 COPY --from=NODE_BUILD /Hi-Windom/Sillot/ /Hi-Windom/Sillot/
 COPY --from=denoland/deno:bin /deno /opt/Sillot/bin/deno
 RUN chmod +x /opt/Sillot/bin/deno
-ENV PATH=$PATH:/opt/Sillot/bin
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1
 RUN apk add --no-cache gcc musl-dev && \
     cd kernel && go build --tags fts5 -v -ldflags "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod" && \
-    mkdir /opt/Sillot/ && \
     rm /Hi-Windom/Sillot/app/appearance/langs/zh_CHT.json && \
     rm /Hi-Windom/Sillot/app/appearance/langs/fr_FR.json && \
     rm /Hi-Windom/Sillot/app/appearance/langs/es_ES.json && \
@@ -40,9 +38,9 @@ RUN apk add --no-cache gcc musl-dev && \
 
 FROM alpine:latest
 LABEL maintainer="Soltus<694357845@qq.ocm>"
-
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
+ENV PATH=$PATH:/opt/Sillot/bin
 RUN addgroup --gid 1000 sillot && adduser --uid 1000 --ingroup sillot --disabled-password sillot && apk add --no-cache ca-certificates tzdata && chown -R sillot:sillot /opt/Sillot/
 
 ENV TZ=Asia/Shanghai
