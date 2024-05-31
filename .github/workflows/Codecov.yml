@@ -1,11 +1,7 @@
 name: Codecov
 
 on:
-  push:
-    branches:
-      - master
-  # pull_request_target:
-  #   types: [opened, edited]
+    workflow_dispatch:
 
 jobs:
   check-branch:
