@@ -54,6 +54,7 @@ export function add_task_terminal_here(context: vscode.ExtensionContext) {
                 cwd: path.dirname(uri.fsPath),
             }).show(false);
         }
+        vscode.window.showInformationMessage("注意：如果需要重载终端的环境变量，请不要通过 utools 等方式重启 vscode ");
     });
 
     context.subscriptions.push(disposable);

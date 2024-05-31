@@ -37,9 +37,13 @@
       "name": "司丽🤍/_sili 🗂️"
     },
     {
-        "path": "../../Sillot-Be", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
+        "path": "../../Sillot-Be", // 维护中
         "name": "汐洛 Chrome 扩展🤍../Sillot-Be 🗂️"
       },
+      {
+          "path": "../../sino", // deno 汐洛版
+          "name": "汐诺🤍../sino 🗂️"
+        },
     {
       "path": "../_pkgs/siyuan", // 思源本源
       "name": "思源🤍../siyuan 🗂️"
@@ -50,6 +54,7 @@
       }
   ],
   "settings": {
+    "rust-analyzer.cargo.features": ["__runtime_js_sources"], // https://docs.deno.com/runtime/manual/references/contributing/
     "files.associations": {
     //   "*.sy": "json",
       "*.tmTheme": "xml",
