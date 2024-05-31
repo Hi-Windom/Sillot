@@ -45,7 +45,7 @@ LABEL maintainer="Soltus<694357845@qq.com>"
 
 USER root
 RUN sudo apt-get update && \
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates tzdata-geo && \
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates tzdata && \
     sudo rm -rf /var/lib/apt/lists/*
 
 RUN sudo chown -R ${NB_UID} /opt/Sillot/
