@@ -43,12 +43,10 @@ LABEL maintainer="Soltus<694357845@qq.com>"
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
 ENV PATH=$PATH:/opt/Sillot/bin
-USER root
-RUN sudo addgroup --gid ${USER_UID} sillot && sudo adduser --uid ${USER_UID} --ingroup sillot --disabled-password sillot && sudo apk add --no-cache ca-certificates tzdata && sudo chown -R sillot:sillot /opt/Sillot/
+RUN apk add --no-cache ca-certificates tzdata && chown -R sillot:sillot /opt/Sillot/
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
 EXPOSE 58131
 
-USER sillot
 ENTRYPOINT [ "/opt/Sillot/kernel" ]
