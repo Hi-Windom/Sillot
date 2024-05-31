@@ -30,11 +30,11 @@ RUN apk add --no-cache gcc musl-dev && \
     rm /Hi-Windom/Sillot/app/appearance/langs/zh_CHT.json && \
     rm /Hi-Windom/Sillot/app/appearance/langs/fr_FR.json && \
     rm /Hi-Windom/Sillot/app/appearance/langs/es_ES.json && \
-    # mv /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
-    # mv /Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
-    # mv /Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
-    # mv /Hi-Windom/Sillot/app/changelogs/ /opt/Sillot/ && \
-    mv /Hi-Windom/Sillot/ /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/app/changelogs/ /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/kernel/kernel /opt/Sillot/ && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 
 FROM soltus/jupyter-binder-python:latest
@@ -44,9 +44,12 @@ COPY --from=denoland/deno:bin /deno /usr/local/bin/deno
 LABEL maintainer="Soltus<694357845@qq.com>"
 
 USER root
-RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends ca-certificates tzdata && sudo rm -rf /var/lib/apt/lists/*
+RUN sudo apt-get update && \
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates tzdata-geo && \
+    sudo rm -rf /var/lib/apt/lists/*
+
 RUN sudo chown -R ${NB_UID} /opt/Sillot/
-RUN sudo chmod +x /usr/local/bin/deno
+RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno
 USER ${NB_UID}
 
 ENV TZ=Asia/Shanghai
