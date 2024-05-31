@@ -42,8 +42,10 @@ COPY --from=denoland/deno:bin /deno /usr/local/bin/deno
 LABEL maintainer="Soltus<694357845@qq.com>"
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates tzdata && rm -rf /var/lib/apt/lists/*
-RUN chown -R ${NB_UID} /opt/Sillot/
+
+USER root
+RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends ca-certificates tzdata && sudo rm -rf /var/lib/apt/lists/*
+RUN sudo chown -R ${NB_UID} /opt/Sillot/
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
