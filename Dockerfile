@@ -48,7 +48,7 @@ RUN sudo apt-get update && \
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates tzdata && \
     sudo rm -rf /var/lib/apt/lists/*
 
-# RUN sudo chown -R ${NB_UID}:${NB_UID} /opt/Sillot/
+RUN sudo chown -R ${NB_UID}:${NB_UID} /opt/Sillot/
 RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno
 USER ${NB_UID}
 
