@@ -24,7 +24,7 @@ WORKDIR /Hi-Windom/Sillot/
 COPY --from=NODE_BUILD /Hi-Windom/Sillot/ /Hi-Windom/Sillot/
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1
-RUN apk add --no-cache gcc musl-dev && \
+RUN apt-get install -y --no-install-recommends gcc musl-dev && \
     cd kernel && go build --tags fts5 -v -ldflags "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod" && \
     mkdir /opt/Sillot/ && \
     rm /Hi-Windom/Sillot/app/appearance/langs/zh_CHT.json && \
