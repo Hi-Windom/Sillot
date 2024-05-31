@@ -36,7 +36,8 @@ RUN apk add --no-cache gcc musl-dev && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 
 FROM alpine:latest
-LABEL maintainer="Liang Ding<845765@qq.com> Soltus<694357845@qq.ocm>"
+COPY --from=denoland/deno:bin-1.44.0 /deno /usr/local/bin/deno
+LABEL maintainer="Soltus<694357845@qq.ocm>"
 
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
