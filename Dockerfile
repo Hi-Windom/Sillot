@@ -46,7 +46,7 @@ LABEL maintainer="Soltus<694357845@qq.com>"
 USER root
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends ca-certificates tzdata && sudo rm -rf /var/lib/apt/lists/*
 RUN sudo chown -R ${NB_UID} /opt/Sillot/
-RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno
+RUN sudo chmod +x /usr/local/bin/deno
 USER ${NB_UID}
 
 ENV TZ=Asia/Shanghai
