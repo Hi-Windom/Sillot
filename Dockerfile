@@ -20,6 +20,9 @@ RUN rm -rf /var/lib/apt/lists/*
 FROM golang:alpine as GO_BUILD
 WORKDIR /Hi-Windom/Sillot/
 COPY --from=NODE_BUILD /Hi-Windom/Sillot/ /Hi-Windom/Sillot/
+COPY --from=denoland/deno:bin /deno /opt/Sillot/bin/deno
+RUN chmod +x /opt/Sillot/bin/deno
+ENV PATH=$PATH:/opt/Sillot/bin
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1
 RUN apk add --no-cache gcc musl-dev && \
@@ -40,9 +43,6 @@ LABEL maintainer="Soltus<694357845@qq.ocm>"
 
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
-COPY --from=denoland/deno:bin /deno /opt/Sillot/bin/deno
-RUN chmod +x /opt/Sillot/bin/deno
-ENV PATH=$PATH:/opt/Sillot/bin
 RUN addgroup --gid 1000 sillot && adduser --uid 1000 --ingroup sillot --disabled-password sillot && apk add --no-cache ca-certificates tzdata && chown -R sillot:sillot /opt/Sillot/
 
 ENV TZ=Asia/Shanghai
