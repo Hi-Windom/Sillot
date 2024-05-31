@@ -42,8 +42,8 @@ FROM soltus/jupyter-binder-python:latest
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
 COPY --from=denoland/deno:bin /deno /usr/local/bin/deno
-COPY --from=tini /tini /tini
-LABEL maintainer="Soltus<694357845@qq.com>"
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 
 USER root
 RUN sudo apt-get update && \
@@ -56,6 +56,7 @@ RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno /tini
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
 EXPOSE 58131
+LABEL maintainer="Soltus<694357845@qq.com>"
 
 ENTRYPOINT [ "/tini", "--" ]
 CMD ["sh", "-c", "/opt/Sillot/kernel & jupyter lab --port=8888 --ip=* --no-browser --allow-root"]
