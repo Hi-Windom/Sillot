@@ -36,7 +36,8 @@ RUN apk add --no-cache gcc musl-dev && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 
 FROM alpine:latest
-COPY --from=denoland/deno:bin-1.44.0 /deno /usr/local/bin/deno
+COPY --from=denoland/deno:bin-1.44.0 /deno /Hi-Windom/Sillot/kernel/deno
+ENV PATH=$PATH:/Hi-Windom/Sillot/kernel
 LABEL maintainer="Soltus<694357845@qq.ocm>"
 
 WORKDIR /opt/Sillot/
