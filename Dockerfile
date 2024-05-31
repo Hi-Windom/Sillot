@@ -36,12 +36,12 @@ RUN apk add --no-cache gcc musl-dev && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 
 FROM alpine:latest
-COPY --from=denoland/deno:bin-1.44.0 /deno /Hi-Windom/Sillot/kernel/deno
-ENV PATH=$PATH:/Hi-Windom/Sillot/kernel
 LABEL maintainer="Soltus<694357845@qq.ocm>"
 
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
+COPY --from=denoland/deno:bin-1.44.0 /deno /opt/Sillot/bin/deno
+ENV PATH=$PATH:/opt/Sillot/bin
 RUN addgroup --gid 1000 sillot && adduser --uid 1000 --ingroup sillot --disabled-password sillot && apk add --no-cache ca-certificates tzdata && chown -R sillot:sillot /opt/Sillot/
 
 ENV TZ=Asia/Shanghai
