@@ -42,6 +42,7 @@ FROM soltus/jupyter-binder-python:latest
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
 COPY --from=denoland/deno:bin /deno /usr/local/bin/deno
+COPY --from=tini /tini /tini
 LABEL maintainer="Soltus<694357845@qq.com>"
 
 USER root
@@ -50,10 +51,11 @@ RUN sudo apt-get update && \
     sudo rm -rf /var/lib/apt/lists/*
 
 RUN sudo chown -R root:root /opt/Sillot/
-RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno
+RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno /tini
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
 EXPOSE 58131
 
-ENTRYPOINT [ "/opt/Sillot/kernel" ]
+ENTRYPOINT [ "/tini", "--" ]
+CMD ["sh", "-c", "/opt/Sillot/kernel & jupyter lab --port=8888 --ip=* --no-browser --allow-root"]
