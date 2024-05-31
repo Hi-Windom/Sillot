@@ -36,6 +36,7 @@ RUN apt-get update && \
     mv /Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/changelogs/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/kernel/kernel /opt/Sillot/ && \
+    mv /Hi-Windom/Sillot/Docker_entry.sh /opt/Sillot/ && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 
 FROM soltus/jupyter-binder-python:latest
@@ -51,12 +52,13 @@ RUN sudo apt-get update && \
     sudo rm -rf /var/lib/apt/lists/*
 
 RUN sudo chown -R root:root /opt/Sillot/
-RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno /tini
+RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno /tini /opt/Sillot/docker-sillot-entrypoint.sh
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
 EXPOSE 58131
 LABEL maintainer="Soltus<694357845@qq.com>"
 
-ENTRYPOINT [ "/tini", "--" ]
-CMD ["sh", "-c", "/opt/Sillot/kernel & jupyter lab --port=8888 --ip=* --no-browser --allow-root"]
+ENV SILLOT_ARGS_KERNEL="--accessAuthCode 58131"
+ENV SILLOT_ARGS_JUPYTER="--port=8888 --ip=* --no-browser --allow-root"
+ENTRYPOINT [ "/tini", "--", "/opt/Sillot/docker-sillot-entrypoint.sh" ]
