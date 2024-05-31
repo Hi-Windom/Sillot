@@ -1,5 +1,3 @@
-USER root
-
 FROM node:20 as NODE_BUILD
 WORKDIR /Hi-Windom/Sillot/
 ADD . /Hi-Windom/Sillot/
@@ -39,11 +37,12 @@ RUN apk add --no-cache gcc musl-dev && \
 
 FROM soltus/jupyter-binder-python:latest
 COPY --from=denoland/deno:bin-1.44.0 /deno /usr/local/bin/deno
-LABEL maintainer="Soltus<694357845@qq.ocm>"
+LABEL maintainer="Soltus<694357845@qq.com>"
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
 ENV PATH=$PATH:/opt/Sillot/bin
-RUN addgroup --gid 1000 sillot && adduser --uid 1000 --ingroup sillot --disabled-password sillot && apk add --no-cache ca-certificates tzdata && chown -R sillot:sillot /opt/Sillot/
+USER root
+RUN sudo addgroup --gid 1000 sillot && sudo adduser --uid 1000 --ingroup sillot --disabled-password sillot && sudo apk add --no-cache ca-certificates tzdata && sudo chown -R sillot:sillot /opt/Sillot/
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
