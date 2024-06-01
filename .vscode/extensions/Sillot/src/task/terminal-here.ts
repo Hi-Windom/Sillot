@@ -22,7 +22,6 @@ export function add_task_terminal_here(context: vscode.ExtensionContext) {
 
         let useChoice: string | undefined = undefined;
         if (vscode.workspace.workspaceFile) {
-            const _hasOwnProperty = Object.prototype.hasOwnProperty;
             // 读取.sillot.jsonc文件
             const workspaceFileDir = path.dirname(vscode.workspace.workspaceFile.fsPath);
             const sillotJsoncPath = path.join(workspaceFileDir, ".sillot.jsonc");
