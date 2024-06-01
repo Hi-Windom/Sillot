@@ -59,6 +59,7 @@ ENV RUN_IN_CONTAINER=true
 EXPOSE 58131
 LABEL maintainer="Soltus<694357845@qq.com>"
 
+# 默认值，用户应当修改
 ENV SILLOT_ARGS_KERNEL="--accessAuthCode 58131"
 ENV SILLOT_ARGS_JUPYTER="--port=8888 --ip=* --no-browser --allow-root"
 ENTRYPOINT [ "/tini", "--", "/opt/Sillot/Docker_entry.sh" ]

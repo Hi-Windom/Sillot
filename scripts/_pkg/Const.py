@@ -27,7 +27,6 @@ hostname = "api.github.com"
 
 HEADER_sillot = '''
 
-# ❤️ 欢迎共建汐洛 694357845@qq.com
 # 🚧 汐洛仅用于开发者测试，不要用来存储重要数据！
 
 🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)    📦 [VSCode Extension](https://marketplace.visualstudio.com/items?itemName=Hi-Windom.sillot)    📦 [Chromium Browser Extension（维护中）](https://github.com/K-Sillot/Sillot-Be/releases)
