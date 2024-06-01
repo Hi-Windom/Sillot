@@ -4,8 +4,8 @@
 
 <p align="center">
 <br><br>
-<a href="../Sillot-android/README.md">汐洛安卓</a> | 汐洛绞架 | <a href="../compatibility/README.md">兼容性</a>
-| <a href="../document/README.md">文档</a> | <a href="../roadmap/README.md">路线图</a>
+<a href="../Sillot-android">汐洛安卓</a> | 汐洛绞架 | <a href="../compatibility">兼容性</a>
+| <a href="../document">文档</a> | <a href="../roadmap">路线图</a>
 </p>
 
 <p align="center">
