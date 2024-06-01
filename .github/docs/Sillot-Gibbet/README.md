@@ -1,11 +1,17 @@
 <p align="center">
-<img alt="Sillot" src="../../app/stage/icon.png">
+<img alt="Sillot" src="../../../app/stage/icon.png">
 </p>
 
 <p align="center">
 <br><br>
-<a href="README_Sillot-android.md">汐洛安卓</a> | 汐洛绞架 | <a href="compatibility.md">兼容性</a>
-| <a href="document.md">文档</a> | <a href="roadmap.md">路线图</a>
+<a href="../Sillot-android/README.md">汐洛安卓</a> | 汐洛绞架 | <a href="../compatibility/README.md">兼容性</a>
+| <a href="../document/README.md">文档</a> | <a href="../roadmap/README.md">路线图</a>
+</p>
+
+<p align="center">
+<br><br>
+<img alt="split" src="../../split.png"/>
+<br><br><br>
 </p>
 
 ## About

@@ -57,8 +57,8 @@
 
 <p align="center">
 <br><br>
-<a href="./docs/README_Sillot-android.md">汐洛安卓</a> | <a href="./docs/README_Sillot-Gibbet.md">汐洛绞架</a> | <a href="./docs/compatibility.md">兼容性</a>
-| <a href="./docs/document.md">文档</a> | <a href="./docs/roadmap.md">路线图</a>
+<a href="./docs/Sillot-android/README.md">汐洛安卓</a> | <a href="./docs/Sillot-Gibbet/README.md">汐洛绞架</a> | <a href="./docs/compatibility/README.md">兼容性</a>
+| <a href="./docs/document/README.md">文档</a> | <a href="./docs/roadmap/README.md">路线图</a>
 </p>
 
 <p align="center">
