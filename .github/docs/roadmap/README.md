@@ -1,5 +1,5 @@
-<p align="center" style="height:58px">
-<img alt="Sillot" src="../../../app/stage/icon.png">
+<p align="center">
+<img alt="Sillot" src="../../../app/stage/icon.png" style="height:58px">
 </p>
 
 <p align="center">
