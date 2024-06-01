@@ -36,6 +36,9 @@ def find_milestone(repo, title, len=0):
 def generate_msg(desc_mapping, docmap):
     """Print changelogs from direction."""
     print()
+    if not desc_mapping:
+        print("~~空空~~")
+        return
     for header in docmap:
         if not desc_mapping[header]:
             continue
