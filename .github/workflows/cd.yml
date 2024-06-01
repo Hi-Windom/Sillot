@@ -125,7 +125,7 @@ jobs:
         with:
           name: ${{ steps.release_info.outputs.release_version }}
           tag: ${{ github.ref }}
-          body: "${{ env.release_body_sillot }}\n---\n${{ env.release_body_siyuan }}\n---\n\n\n"
+          body: "${{ env.release_body_sillot }}\n\n---\n\n${{ env.release_body_siyuan }}\n\n---\n\n\n"
           generateReleaseNotes: true
           draft: false
           prerelease: true
