@@ -52,25 +52,13 @@
 </p>
 
 <p align="center">
-    <a href="https://star-history.com/#Hi-Windom/Sillot&Date">
-        <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hi-Windom/Sillot&type=Date&theme=dark" />
-            <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Hi-Windom/Sillot&type=Date" />
-            <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Hi-Windom/Sillot&type=Date" />
-        </picture>
-    </a>
+<img alt="Sillot" src="../app/stage/icon.png">
 </p>
 
 <p align="center">
 <br><br>
-<a href="https://github.com/siyuan-note/siyuan">思源（SiYuan）</a> | <a href="README_Sillot.md">汐洛（Sillot）</a>
-</p>
-
-## 📚 文档
-
-<p align="center">
-<h2>正常访问<a href="https://sillot.db.sc.cn/"> https://sillot.db.sc.cn/ </a></h2>
-<h2>代理访问<a href="https://sillot-docs.db.sc.cn/"> https://sillot-docs.db.sc.cn/ </a></h2>
+<a href="./docs/README_Sillot-android.md">汐洛安卓</a> | <a href="./docs/README_Sillot-Gibbet.md">汐洛绞架</a> | <a href="./docs/compatibility.md">兼容性</a>
+| <a href="./docs/compatibility.md">文档</a> | <a href="./docs/compatibility.md">路线图</a>
 </p>
 
 <p align="center">
@@ -78,37 +66,3 @@
 <img alt="split" src="./split.png"/>
 <br><br><br>
 </p>
-
-## 🔭 Roadmap
-
-<p align="center">
-<h2><a href="https://github.com/orgs/Hi-Windom/projects/2/views/2">汐洛路线图（Sillot Roadmap）</a></h2>
-<h2><a href="https://github.com/orgs/Hi-Windom/projects/3/views/2">汐洛安卓路线图（Sillot Android Roadmap）</a></h2>
-<h2><a href="https://github.com/orgs/Hi-Windom/projects/4/views/2">汐洛社区路线图（Sillot Community Roadmap）</a></h2>
-<h2><a href="https://github.com/orgs/Hi-Windom/projects/6/views/2">汐洛扩展路线图（Sillot Extentions Roadmap）</a></h2>
-</p>
-
-<p align="center">
-<br><br>
-<img alt="split" src="./split.png"/>
-<br><br><br>
-</p>
-
-## 🌐 兼容性
-
-<span>
-<img src="https://img.shields.io/badge/Chromium 94+-black?logo=Google Chrome&logoColor=white" title="Chromium 94+" height="31"/><img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title="Windows 10+" height="31"/><img src="https://img.shields.io/badge/Android 12+-black?logo=android" title="Android 12+" height="31"/>
-</span>
-<img src="../screenshots/sillot/es2022.png"/>
-
-<p align="center">
-<br><br>
-<img alt="split" src="./split.png"/>
-<br><br><br>
-</p>
-
-## 🛠️ 贡献者
-
-<a href="https://github.com/Hi-Windom/Sillot/graphs/contributors">
-   <img src="https://contrib.rocks/image?repo=Hi-Windom/Sillot" />
-</a>
