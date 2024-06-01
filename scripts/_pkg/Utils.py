@@ -40,8 +40,8 @@ def generate_msg(desc_mapping, docmap):
         if not desc_mapping[header]:
             continue
         print(f"#### {docmap[header]}\n")
-        for item in desc_mapping[header]:
-            print(f"* [{item['title']}]({item['url']})")
+        items = [f"[{item['title']}]({item['url']})" for item in desc_mapping[header]]
+        print(" | ".join(items))
         print()
 
 def get_issue_first_label(issue, docmap):
