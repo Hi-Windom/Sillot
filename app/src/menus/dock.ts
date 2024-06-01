@@ -14,7 +14,6 @@ const moveMenuItem = (label: string, target: Element) => {
             } else if (label.indexOf("moveToBottom") > -1) {
                 window.siyuan.layout.bottomDock.add(label.endsWith("Left") ? 0 : 1, target);
             }
-            saveLayout();
         }
     });
 };
