@@ -1,10 +1,9 @@
 {
   "name": "sillot",
-  "version": "0.35.2500",
+  "version": "0.35.2510",
   "syv": "3.0.17",
   "sypv": "[3.0.16]",
   "description": "Build Your Eternal Digital Garden",
-  "author": "Hi-Windom",
   "homepage": "https://sillot.db.sc.cn",
   "repository": "https://github.com/Hi-Windom/Sillot",
   "main": "./electron/main.js",
@@ -56,6 +55,11 @@
     "note-taking",
     "notebook"
   ],
+  "author": {
+    "name": "Hi-Windom",
+    "email": "694357845@qq.com",
+    "url": "https://ld246.com/member/soltus"
+  },
   "maintainers": [
     {
       "name": "Liang Ding",
