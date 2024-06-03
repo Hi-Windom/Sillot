@@ -167,7 +167,6 @@ interface Window {
     JSAndroid: {
         // sillot extend
         openURLuseDefaultApp(): void
-        showWifi(): void
         setMMKV(key: string, value: string): void
         showBiometricPrompt(): void
         requestPermissionActivity(id: string, Msg: string, cb: string): boolean

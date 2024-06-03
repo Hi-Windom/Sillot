@@ -45,7 +45,7 @@
 汐洛绞架始终坚持精品路线，从不在任何一个细节上妥协。专注于为目标用户提供最好的使用体验，这是实现极致优雅的必由之路。汐洛绞架尊重非目标用户的声音，但并不关心。
 
 <p align="center">
-<img alt="framework" src="../screenshots/sillot/booting1.png">
+<img alt="booting-demo" src="../../../screenshots/sillot/booting1.png">
 </p>
 
 ## 开发者友好
@@ -69,7 +69,3 @@ go install github.com/ofabry/go-callvis
 注意事项：
 
 1. tpl 模板直接合并冲突没有作用，汐洛绞架是通过 JS 生成的 tpl ，因此需要修改 genTPLData.js 等 JS 文件
-
-<p align="center">
-<img alt="split" src="./split.png">
-</p>

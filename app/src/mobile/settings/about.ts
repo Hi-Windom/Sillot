@@ -376,9 +376,6 @@ ${
                 fetchPost("/api/import/importData", formData);
             });
             const networkServeElement = modelMainElement.querySelector("#networkServe") as HTMLInputElement;
-            if(networkServeElement.checked){
-                window.JSAndroid?.showWifi();
-            }
             networkServeElement.addEventListener("change", () => {
                 fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
                     if(networkServeElement.checked){
