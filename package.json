@@ -1,6 +1,6 @@
 {
   "name": "Sillot-workspace",
-  "version": "0.35.2600",
+  "version": "0.35.2700",
   "description": "汐洛 pnpm 工作区",
   "packageManager": "pnpm@9.1.4",
   "scripts": {
