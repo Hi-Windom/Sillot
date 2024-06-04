@@ -1,5 +1,4 @@
 import {MenuItem} from "./Menu";
-import {saveLayout} from "../layout/util";
 
 const moveMenuItem = (label: string, target: Element) => {
     window.sout.tracker("invoked");
