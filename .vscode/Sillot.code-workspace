@@ -1,28 +1,34 @@
 {
   "folders": [
     {
-      "path": "..",
-      "name": "汐洛🤍/ 🗂️"
+      "path": "..", // 必填
+      "name": "汐洛🤍/ 🗂️", // 必填
+      "url": "https://github.com/Hi-Windom/Sillot" // 仅描述，无效字段
     },
     {
       "path": "../kernel", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "汐洛版思源内核🤍/kernel 🗂️"
+      "name": "汐洛绞架内核🤍/kernel 🗂️",
+      "url": "https://github.com/Hi-Windom/Sillot/kernel"
     },
     {
       "path": "../app/appearance", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "汐洛版思源美化🤍/app/appearance 🗂️"
+      "name": "汐洛绞架美化🤍/app/appearance 🗂️",
+      "url": "https://github.com/Hi-Windom/Sillot/app/appearance"
     },
     {
       "path": "../.vscode/extensions/Sillot", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "汐洛 VSC 扩展🤍/.vscode/extensions/Sillot 🗂️"
+      "name": "汐洛 VSC 扩展🤍/.vscode/extensions/Sillot 🗂️",
+      "url": "https://github.com/Hi-Windom/Sillot/.vscode/extensions/Sillot"
     },
     {
       "path": "../docs/starlight", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "汐洛宝典🤍/docs/starlight 🗂️"
+      "name": "汐洛宝典🤍/docs/starlight 🗂️",
+      "url": "https://github.com/Hi-Windom/Sillot/docs/starlight"
     },
     {
       "path": "../../Sillot-android", // 开发在 Android Studio 完成，这里列出只是方便 Git 管理
-      "name": "汐洛安卓🤍../Sillot-android 🗂️"
+      "name": "汐洛安卓🤍../Sillot-android 🗂️",
+      "url": "https://github.com/Hi-Windom/Sillot-android"
     },
     {
       "path": "../../sofillBuilder", // 沁棘开发仓库（暂未开源）
