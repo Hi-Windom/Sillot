@@ -520,7 +520,7 @@ func androidReboot(c *gin.Context) {
 		force = forceArg.(bool)
 	}
 
-	exitCode := model.Close2(force, true)
+	exitCode := model.Close(force, true, 1)
 	ret.Code = exitCode
 	switch exitCode {
 	case 0:
