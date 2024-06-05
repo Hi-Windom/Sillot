@@ -34,12 +34,6 @@ export const initDevOptions = () => {
                         event.stopPropagation();
                         break;
                     }
-                    // if (target.id === "JSAndroid_androidReboot") {
-                    //     window.JSAndroid?.androidReboot();
-                    //     event.preventDefault();
-                    //     event.stopPropagation();
-                    //     break;
-                    // }
                 }
             })
         }
@@ -70,10 +64,6 @@ function genHTML() {
         <div class="fn__hr"></div>
         <button class="b3-button b3-button--outline fn__block" id="JSAndroid_androidReboot">
         androidReboot
-        </button>
-        <div class="fn__hr"></div>
-        <button class="b3-button b3-button--outline fn__block" id="JSAndroid_restartSillotAndroid">
-        restartSillotAndroid
         </button>
         <div class="fn__hr"></div>
         <button class="b3-button b3-button--outline fn__block" id="JSAndroid_exitSillotAndroid">

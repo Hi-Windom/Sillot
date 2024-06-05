@@ -163,10 +163,6 @@ export const kernelError = () => {
     if (document.querySelector("#errorLog")) {
         return;
     }
-    if (window.JSAndroid) {
-        window.JSAndroid.androidReboot();
-        return;
-    }
     let iosReStart = "";
     if (isInIOS()) {
         iosReStart = `<div class="fn__hr"></div><div class="fn__flex"><div class="fn__flex-1"></div><button class="b3-button">${window.siyuan.languages.retry}</button></div>`;

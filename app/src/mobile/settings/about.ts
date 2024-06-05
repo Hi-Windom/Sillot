@@ -379,9 +379,9 @@ ${
             networkServeElement.addEventListener("change", () => {
                 fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
                     if(networkServeElement.checked){
-                        window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量","coldRestart");
+                        window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量", "androidReboot");
                     } else {
-                        window.Sillot?.androidRestartSiYuan();
+                        window.JSAndroid?.androidReboot();
                     }
                 });
             });

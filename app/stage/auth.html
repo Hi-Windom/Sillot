@@ -452,7 +452,6 @@
             const {ipcRenderer} = require('electron')
             ipcRenderer.send('siyuan-quit', window.location.port)
         } catch (e) {
-            window.JSAndroid?.exitSillotAndroid()
             if ((window.webkit && window.webkit.messageHandlers) || window.JSAndroid) {
                 window.location.href = 'siyuan://api/system/exit'
             } else {
@@ -464,6 +463,10 @@
     const exitSiYuan = () => {
         document.querySelector('#message').classList.add('b3-snackbar--show')
         document.querySelector('#message').firstElementChild.innerHTML = "{{.l8}}"
+        if (window.JSAndroid) {
+            window.location.href = 'siyuan://api/system/exit'
+            return
+        }
         try {
             fetch('/api/system/exit', {
                 method: 'POST',

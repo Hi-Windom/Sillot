@@ -327,9 +327,9 @@ ${ isAppMode() ? `
         networkServeElement.addEventListener("change", () => {
             fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
                 if (window.JSAndroid && networkServeElement.checked) { // 安卓平板
-                    window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量","coldRestart");
+                    window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量", "androidReboot");
                 } else if (window.JSAndroid) {
-                    window.Sillot?.androidRestartSiYuan();
+                    window.JSAndroid?.androidReboot();
                 } else {
                     exportLayout({
                     errorExit: true,
