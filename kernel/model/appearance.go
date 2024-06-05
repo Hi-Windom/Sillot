@@ -128,12 +128,12 @@ func loadThemes() {
 		if 0 == Conf.Appearance.Mode {
 			if Conf.Appearance.ThemeLight == name {
 				Conf.Appearance.ThemeVer = themeConf.Version
-				Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, name, "____", "__js__.js"))
+				Conf.Appearance.ThemeJS = util.EnableThemeJSByName(name)
 			}
 		} else {
 			if Conf.Appearance.ThemeDark == name {
 				Conf.Appearance.ThemeVer = themeConf.Version
-				Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, name, "____", "__js__.js"))
+				Conf.Appearance.ThemeJS = util.EnableThemeJSByName(name)
 			}
 		}
 

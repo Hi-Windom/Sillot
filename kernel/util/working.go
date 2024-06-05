@@ -224,6 +224,13 @@ var (
 	UIProcessIDs = sync.Map{} // UI 进程 ID
 )
 
+func EnableThemeJSByName(name string) bool {
+	return gulu.File.IsExist(filepath.Join(ThemesPath, name, "____", "__js__.js")) || gulu.File.IsExist(filepath.Join(ThemesPath, name, "theme.js"))
+}
+func EnableThemeJSByPath(path string) bool {
+	return gulu.File.IsExist(filepath.Join(path, "____", "__js__.js")) || gulu.File.IsExist(filepath.Join(path, "theme.js"))
+}
+
 func initWorkspaceDir(workspaceArg string) {
 	userHomeConfDir := filepath.Join(HomeDir, ".config", "sillot")
 	workspaceConf := filepath.Join(userHomeConfDir, "workspace.json")

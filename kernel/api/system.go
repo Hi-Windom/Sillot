@@ -354,9 +354,9 @@ func setAppearanceMode(c *gin.Context) {
 	mode := int(arg["mode"].(float64))
 	model.Conf.Appearance.Mode = mode
 	if 0 == mode {
-		model.Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, model.Conf.Appearance.ThemeLight, "____", "__js__.js"))
+		model.Conf.Appearance.ThemeJS = util.EnableThemeJSByName(model.Conf.Appearance.ThemeLight)
 	} else {
-		model.Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(util.ThemesPath, model.Conf.Appearance.ThemeDark, "____", "__js__.js"))
+		model.Conf.Appearance.ThemeJS = util.EnableThemeJSByName(model.Conf.Appearance.ThemeDark)
 	}
 	model.Conf.Save()
 
