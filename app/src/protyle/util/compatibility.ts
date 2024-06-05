@@ -17,18 +17,15 @@ export const openByMobile = (uri: string, from?: string) => {
           return;
         }
 				const toolbarOpenBy = document.querySelector("#toolbarOpenBy");
-				const toolbarConsole = document.querySelector("#toolbarConsole");
-				if (toolbarOpenBy && toolbarConsole) {
+				if (toolbarOpenBy) {
 					const existingUri = toolbarOpenBy.getAttribute("data-uri");
 
 					// 只有在首次调用时才更新uri和绑定事件
 					if (!existingUri) {
-							toolbarConsole.classList.add("fn__none");
 							toolbarOpenBy.classList.remove("fn__none");
                             toolbarOpenBy.removeAttribute("data-refBlockId"); // 避免冲突
 							toolbarOpenBy.addEventListener("click", () => {
 									toolbarOpenBy.classList.add("fn__none");
-									toolbarConsole.classList.remove("fn__none");
 									const updatedUri = toolbarOpenBy.getAttribute("data-uri");
 									if (updatedUri) {
 											window.JSAndroid.openExternal(updatedUri);

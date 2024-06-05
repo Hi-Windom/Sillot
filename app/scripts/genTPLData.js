@@ -60,7 +60,7 @@ const SiYuan = {
       <svg id="toolbarSync" class="toolbar__icon toolbar__icon-deactivate fn__none">
           <use xlink:href="#iconCloudSucc"></use>
       </svg>
-      <svg id="toolbarConsole" class="toolbar__icon" data-mode="0">
+      <svg id="toolbarConsole" class="toolbar__icon fn__none" data-mode="0">
           <use xlink:href="#iconBug"></use>
       </svg>
                 <svg id="toolbarOpenBy" class="toolbar__icon fn__none" data-mode="0">

@@ -21,6 +21,7 @@ import {newFile} from "../../util/newFile";
 import {afterLoadPlugin} from "../../plugin/loader";
 import {Menu} from "../../plugin/Menu";
 import {commandPanel} from "../../boot/globalEvent/command/panel";
+import { initDevOptions } from "../settings/devOptions";
 
 export const popMenu = () => {
     window.sout.tracker("invoked");
@@ -90,8 +91,11 @@ export const initRightMenu = (app: App) => {
         <svg class="b3-menu__icon"><use xlink:href="#iconHistory"></use></svg><span class="b3-menu__label">${window.siyuan.languages.dataHistory}</span>
     </div>
     <div class="b3-menu__separator${(isInAndroid() || isInIOS()) ? "" : " fn__none"}"></div>
-    <div class="b3-menu__item b3s-mobile-height-menu__item${(isInAndroid() || isInIOS()) ? "" : " fn__none"}" id="menuSafeQuit">
+    <div class="b3-menu__item b3s-mobile-height-menu__item${(isInAndroid() || isInIOS()) ? " fn__none" : " fn__none"}" id="menuSafeQuit">
         <svg class="b3-menu__icon"><use xlink:href="#iconQuit"></use></svg><span class="b3-menu__label">${window.siyuan.languages.safeQuit}</span>
+    </div>
+    <div class="b3-menu__item b3s-mobile-height-menu__item" id="menuDevOptions">
+        <svg class="b3-menu__icon"><use xlink:href="#iconBug"></use></svg><span class="b3-menu__label">开发者选项</span>
     </div>
     <div class="b3-menu__separator"></div>
     <div class="b3-menu__item b3s-mobile-height-menu__item${window.siyuan.config.readonly ? " fn__none" : ""}" id="menuEditor">
@@ -180,6 +184,11 @@ export const initRightMenu = (app: App) => {
             } else if (target.id === "menuSafeQuit") {
                 console.warn("(mobile) menuSafeQuit -> exitSiYuan() invoked");
                 exitSiYuan();
+                event.preventDefault();
+                event.stopPropagation();
+                break;
+            } else if (target.id === "menuDevOptions") {
+                initDevOptions();
                 event.preventDefault();
                 event.stopPropagation();
                 break;

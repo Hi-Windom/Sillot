@@ -2103,21 +2103,18 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     /// #if MOBILE
                     console.warn(`refBlockId : ${refBlockId}`); // 文档中直接点击双链
                     const toolbarOpenBy = document.querySelector("#toolbarOpenBy");
-                    const toolbarConsole = document.querySelector("#toolbarConsole");
-                    if (toolbarOpenBy && toolbarConsole) {
+                    if (toolbarOpenBy) {
                         const existingUri = toolbarOpenBy.getAttribute("data-refBlockId");
 
                         // 只有在首次调用时才更新uri和绑定事件
                         if (!existingUri) {
-                            toolbarConsole.classList.add("fn__none");
                             toolbarOpenBy.classList.remove("fn__none");
                             toolbarOpenBy.removeAttribute("data-uri"); // 避免冲突
                             toolbarOpenBy.addEventListener("click", () => {
                                 toolbarOpenBy.classList.add("fn__none");
-                                toolbarConsole.classList.remove("fn__none");
                                 const updatedUri = toolbarOpenBy.getAttribute("data-refBlockId");
                                 if (updatedUri) {
-                                    console.warn(`refBlockId : ${updatedUri} -> openMobileFileById() ? (toolbarOpenBy && toolbarConsole)`);
+                                    console.warn(`refBlockId : ${updatedUri} -> openMobileFileById() ? (toolbarOpenBy)`);
                                     toolbarOpenBy.removeAttribute("data-refBlockId");
                                     openMobileFileById(protyle.app, updatedUri, zoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
                                     activeBlur();
@@ -2150,7 +2147,7 @@ if  (tableElement && tableElement.isSameNode(item) && item.querySelector(".table
                     } else {
                         // 如果找不到元素，则直接调用
                         toolbarOpenBy.removeAttribute("data-refBlockId");
-                        console.warn(`refBlockId : ${refBlockId} -> openMobileFileById() ? not(toolbarOpenBy && toolbarConsole)`);
+                        console.warn(`refBlockId : ${refBlockId} -> openMobileFileById() ? not(toolbarOpenBy)`);
                         openMobileFileById(protyle.app, refBlockId, zoomIn ? [Constants.CB_GET_ALL, Constants.CB_GET_HL] : [Constants.CB_GET_HL, Constants.CB_GET_CONTEXT, Constants.CB_GET_ROOTSCROLL]);
                         activeBlur();
                         hideKeyboardToolbar();
