@@ -656,7 +656,7 @@ func Close(force, setCurrentWorkspace bool, execInstallPkg int) (exitCode int) {
 		time.Sleep(500 * time.Millisecond)
 		logging.LogInfof("exited kernel")
 		util.WebSocketServer.Close()
-		os.Exit(logging.ExitCodeOk)
+		os.Exit(logging.ExitCodeOk) // 这里必须强行终止，即使会导致安卓应用终止，原因：TCP堆栈通常会保持一段时间（称为TIME_WAIT状态）的端口状态，以确保所有的网络包都已经被正确处理，防止旧的连接状态干扰新连接。除非后续将安卓端改为随机端口。
 	}()
 	return
 }
