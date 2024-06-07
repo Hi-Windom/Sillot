@@ -154,16 +154,6 @@ export class App {
             }),
         };
         new SillotEnv();
-        window.Sillot.androidRestartSiYuan = ()=>{
-            const overlay = document.querySelector('#SillotOverlay') as HTMLElement;
-            overlay.style.display = "block";
-            exportIDB().then(() => {
-            hideAllElements(["util"]);
-            fetchPost("/api/sillot/androidReboot", {force: true}, (response) => {
-                window.location.href = "siyuan://androidRestartSiYuan";
-            });
-            })
-        };
 
         fetchPost("/api/system/getConf", {}, async (response) => {
             addScriptSync(`${Constants.PROTYLE_CDN}/js/lute/lute.min.js?v=${Constants.SIYUAN_VERSION}`, "protyleLuteScript");

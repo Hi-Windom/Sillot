@@ -62,7 +62,11 @@
 </p>
 
 <p align="center">
-<br><br>
+<br>
 <img alt="split" src="./split.png"/>
-<br><br><br>
+</p>
+
+<!-- https://github.com/kyechan99/capsule-render -->
+<p align="center">
+<img src="https://capsule-render.vercel.app/api?type=waving&color=timeGradient&height=300&&section=footer&text=Hi-Windom&fontSize=90&fontAlign=50&fontAlignY=70&desc=Power%20by%20&descAlign=50&descSize=30&descAlignY=40&animation=twinkling" />
 </p>

@@ -656,61 +656,7 @@ func Close(force, setCurrentWorkspace bool, execInstallPkg int) (exitCode int) {
 		time.Sleep(500 * time.Millisecond)
 		logging.LogInfof("exited kernel")
 		util.WebSocketServer.Close()
-		os.Exit(logging.ExitCodeOk)
-	}()
-	return
-}
-func Close2(force, setCurrentWorkspace bool) (exitCode int) {
-	exitLock.Lock()
-	defer exitLock.Unlock()
-
-	util.PushMsg(Conf.Language(95), 10000*60)
-
-	if !force {
-		if Conf.Sync.Enabled && 3 != Conf.Sync.Mode &&
-			((IsSubscriber() && conf.ProviderSiYuan == Conf.Sync.Provider) || conf.ProviderSiYuan != Conf.Sync.Provider) {
-			syncData(true, false)
-			if 0 != ExitSyncSucc {
-				exitCode = 1
-				return
-			}
-		}
-	}
-
-	// Close the user guide when exiting https://github.com/siyuan-note/siyuan/issues/10322
-	closeUserGuide()
-
-	util.IsExiting.Store(true)
-
-	Conf.Close()
-	sql.CloseDatabase()
-	treenode.SaveBlockTree(false)
-	util.SaveAssetsTexts()
-	clearWorkspaceTemp()
-	clearCorruptedNotebooks()
-	clearPortJSON()
-
-	if setCurrentWorkspace {
-		// 将当前工作空间放到工作空间列表的最后一个
-		// Open the last workspace by default https://github.com/siyuan-note/siyuan/issues/10570
-		workspacePaths, err := util.ReadWorkspacePaths()
-		if nil != err {
-			logging.LogErrorf("read workspace paths failed: %s", err)
-		} else {
-			workspacePaths = gulu.Str.RemoveElem(workspacePaths, util.WorkspaceDir)
-			workspacePaths = append(workspacePaths, util.WorkspaceDir)
-			util.WriteWorkspacePaths(workspacePaths)
-		}
-	}
-
-	util.UnlockWorkspace()
-
-	closeSyncWebSocket()
-	go func() {
-		time.Sleep(500 * time.Millisecond)
-		logging.LogInfof("exited kernel")
-		util.WebSocketServer.Close()
-		// os.Exit(logging.ExitCodeOk)
+		os.Exit(logging.ExitCodeOk) // 这里必须强行终止，即使会导致安卓应用终止，原因：TCP堆栈通常会保持一段时间（称为TIME_WAIT状态）的端口状态，以确保所有的网络包都已经被正确处理，防止旧的连接状态干扰新连接。除非后续将安卓端改为随机端口。
 	}()
 	return
 }

@@ -41,6 +41,7 @@ nsis:
   installerSidebar: "nsis/installerSidebar.bmp"
   uninstallerSidebar: "nsis/uninstallerSidebar.bmp"
 
+# 考虑安卓端，尽量避免 from: "appearance/themes/_lnco" to: "appearance/themes/lnco" 这种重命名的情况，保持一致性
 extraResources:
   - from: "changelogs"
     to: "changelogs"
@@ -67,7 +68,7 @@ extraResources:
   - from: "appearance/themes/daylight"
     to: "appearance/themes/daylight"
     filter: "!**/{.DS_Store,custom.css}"
-  - from: "appearance/themes/_lnco"
+  - from: "appearance/themes/lnco"
     to: "appearance/themes/lnco"
     filter: "!**/{.DS_Store,custom.css}"
   - from: "src/assets/fonts"

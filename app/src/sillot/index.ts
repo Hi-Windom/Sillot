@@ -24,7 +24,6 @@ export class SillotEnv {
       status: { IDBloaded: false, disableDocSetPadding: false },
       funs: { hljsRender: highlightRender },
       lute: null,
-      androidRestartSiYuan: null,
     };
     window.__ = {
       ace: null,

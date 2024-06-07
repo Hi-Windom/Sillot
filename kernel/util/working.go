@@ -47,7 +47,7 @@ var Mode = "prod"
 const (
 	Ver       = "0.35"
 	VerC      = Ver + ".999" // 用于检查版本更新
-	VerSY     = "3.1.0"      // 思源版本号
+	VerSY     = "3.0.17"     // 思源版本号
 	IsInsider = true
 	VerDeno   = "1.32.5"
 )
@@ -223,6 +223,13 @@ var (
 
 	UIProcessIDs = sync.Map{} // UI 进程 ID
 )
+
+func EnableThemeJSByName(name string) bool {
+	return gulu.File.IsExist(filepath.Join(ThemesPath, name, "____", "__js__.js")) || gulu.File.IsExist(filepath.Join(ThemesPath, name, "theme.js"))
+}
+func EnableThemeJSByPath(path string) bool {
+	return gulu.File.IsExist(filepath.Join(path, "____", "__js__.js")) || gulu.File.IsExist(filepath.Join(path, "theme.js"))
+}
 
 func initWorkspaceDir(workspaceArg string) {
 	userHomeConfDir := filepath.Join(HomeDir, ".config", "sillot")

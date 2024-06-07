@@ -24,7 +24,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/88250/gulu"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/bazaar"
 	"github.com/siyuan-note/siyuan/kernel/util"
@@ -429,7 +428,7 @@ func InstallBazaarTheme(repoURL, repoHash, themeName string, mode int, update bo
 			Conf.Appearance.ThemeDark = themeName
 		}
 		Conf.Appearance.Mode = mode
-		Conf.Appearance.ThemeJS = gulu.File.IsExist(filepath.Join(installPath, "____", "__js__.js"))
+		Conf.Appearance.ThemeJS = util.EnableThemeJSByPath(installPath)
 		Conf.Save()
 	}
 

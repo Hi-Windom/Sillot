@@ -1,8 +1,8 @@
 {
   "name": "sillot",
-  "version": "0.35.2600",
-  "syv": "3.0.17",
-  "sypv": "[3.0.16]",
+  "version": "0.35.2810",
+  "syv": "3.1.0",
+  "sypv": "[3.0.16, 3.0.17]",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://sillot.db.sc.cn",
   "repository": "https://github.com/Hi-Windom/Sillot",
@@ -11,7 +11,7 @@
     "node": ">=20.11.1",
     "pnpm": ">=9.1.0"
   },
-  "packageManager": "pnpm@9.1.4",
+  "packageManager": "pnpm@9.2.0",
   "actionInstallCommand": "pnpm install --no-frozen-lockfile",
   "scripts": {
     "test": "echo 'Test your sister day by day'",

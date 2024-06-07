@@ -61,7 +61,7 @@ extraResources:
   - from: "src/assets/fonts"
     to: "appearance/fonts"
     filter: "!**/{.DS_Store}"
-  - from: "appearance/themes/_lnco"
+  - from: "appearance/themes/lnco"
     to: "appearance/themes/lnco"
     filter: "!**/{.DS_Store,custom.css}"
   - from: "pandoc/pandoc-linux-amd64.zip"

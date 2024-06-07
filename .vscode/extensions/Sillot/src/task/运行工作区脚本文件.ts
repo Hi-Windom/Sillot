@@ -5,7 +5,7 @@ import * as path from "path";
 export function add_task_运行工作区脚本文件(context: vscode.ExtensionContext) {
     const disposable = vscode.commands.registerCommand("sillot.运行工作区脚本文件", async () => {
         let batFiles: vscode.Uri[] | undefined = undefined;
-        const limiter1 = 58;
+        const limiter1 = 31;
         const fileNameStartWith = "workspace-";
         // 使用 withProgress 显示进度
         vscode.window
