@@ -16,7 +16,6 @@ export const globalClick = (event: MouseEvent & { target: HTMLElement }) => {
         if (ghostElement.dataset.ghostType === "dock") {
             ghostElement.parentElement.querySelectorAll(".dock__item").forEach((item: HTMLElement) => {
                 item.style.opacity = "";
-                item.classList.add("b3-tooltips");
             });
             document.querySelector("#dockMoveItem")?.remove();
         } else {
