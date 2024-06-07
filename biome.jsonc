@@ -79,7 +79,7 @@
         "useSimplifiedLogicExpression": "off",
         "useLiteralKeys": "warn",
         "useOptionalChain": "warn",
-        "noForEach": "warn"
+        "noForEach": "off"
       },
       // 检测保证不正确或无用的代码的规则
       "correctness": {

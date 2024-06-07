@@ -1,5 +1,6 @@
 import {popSearch} from "./search";
 import {initAppearance} from "../settings/appearance";
+import { initAppearanceReact } from "../settings/appearance_react";
 import {closePanel} from "../util/closePanel";
 import {mountHelp, newDailyNote, newNotebook} from "../../util/mount";
 import {repos} from "../../config/repos";
@@ -162,7 +163,7 @@ export const initRightMenu = (app: App) => {
                 event.stopPropagation();
                 break;
             } else if (target.id === "menuAppearance") {
-                initAppearance();
+                initAppearanceReact();
                 event.preventDefault();
                 event.stopPropagation();
                 break;

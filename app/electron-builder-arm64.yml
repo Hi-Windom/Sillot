@@ -68,7 +68,7 @@ extraResources:
   - from: "appearance/themes/daylight"
     to: "appearance/themes/daylight"
     filter: "!**/{.DS_Store,custom.css}"
-  - from: "appearance/themes/_lnco"
+  - from: "appearance/themes/lnco"
     to: "appearance/themes/lnco"
     filter: "!**/{.DS_Store,custom.css}"
   - from: "src/assets/fonts"

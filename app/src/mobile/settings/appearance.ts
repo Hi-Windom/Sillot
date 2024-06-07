@@ -2,6 +2,10 @@ import {fetchPost} from "../../util/fetch";
 import {genLangOptions, genOptions} from "../../util/genOptions";
 import {openModel} from "../menu/model";
 
+/**
+ * 这个函数已经不再推荐使用，请使用新函数initAppearanceReact代。
+ * @deprecated since version 0.35, use initAppearanceReact instead
+ */
 export const initAppearance = () => {
     window.sout.tracker("invoked");
     openModel({

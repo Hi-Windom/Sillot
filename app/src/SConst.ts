@@ -1,10 +1,10 @@
 // biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 export abstract class SConst {
   public static readonly Themes = {
-    BuiltinThemeLight: "daylight", // 思源默认主题
-    BuiltinThemeDark: "midnight", // 思源默认主题
-    DefaultThemeLight: "lnco",
-    DefaultThemeDark: "lnco",
+    DefaultThemeLight: "daylight", // 思源默认主题
+    DefaultThemeDark: "midnight", // 思源默认主题
+    BuiltinThemeLight: "lnco",
+    BuiltinThemeDark: "lnco",
   };
 
   // 渲染进程调主进程
