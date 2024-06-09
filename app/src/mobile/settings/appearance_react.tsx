@@ -179,9 +179,6 @@ function SYLangSelector() {
                 value={_props.lang}
                 onChange={(e, v) => {
                     _props.setLang(v);
-                    // fetchGet(`/appearance/langs/${v}.json?v=${Constants.SIYUAN_VERSION}`, (lauguages: IObject) => {
-                    //     window.siyuan.languages = lauguages;
-                    // });
                 }}
             >
                 {window.siyuan.config.langs.map(lang => (
