@@ -166,6 +166,7 @@ interface Window {
     }) => Promise<any>;
     JSAndroid: {
         // sillot extend
+        getSystemTheme(): string
         openURLuseDefaultApp(): void
         setMMKV(key: string, value: string): void
         showBiometricPrompt(): void
