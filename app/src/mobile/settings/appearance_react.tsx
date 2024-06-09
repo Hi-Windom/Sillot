@@ -1,11 +1,11 @@
-import { Select, Option } from "@mui/joy";
+import { Select, Option, selectClasses } from "@mui/joy";
 import { CssVarsProvider, useColorScheme } from "@mui/joy/styles";
 import * as React from "react";
 import * as Client from "react-dom/client";
 import { openModel } from "../menu/model";
 import { fetchGet, fetchPost } from "../../util/fetch";
-import { Constants } from "../../constants";
-import { getThemeMode } from "../../util/assets";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import { Select_KeyboardArrowDown } from "../../sillot/joyUI/base/selector";
 
 interface SharedPropsContextValue {
     isFirstRenderRef: React.MutableRefObject<boolean>;
@@ -94,7 +94,7 @@ function SYAppearanceModeSelector() {
         <div className="b3-label">
             {window.siyuan.languages.appearance4}
             <div className="fn__hr" />
-            <Select
+            <Select_KeyboardArrowDown
                 value={String(_props.mode2)}
                 onChange={(e, v) => {
                     _props.setMode2(Number.parseInt(v));
@@ -103,7 +103,7 @@ function SYAppearanceModeSelector() {
                 <Option value="0">{window.siyuan.languages.themeLight}</Option>
                 <Option value="1">{window.siyuan.languages.themeDark}</Option>
                 <Option value="2">{window.siyuan.languages.themeOS}</Option>
-            </Select>
+            </Select_KeyboardArrowDown>
             <div className="b3-label__text">{window.siyuan.languages.appearance5}</div>
         </div>
     );
@@ -115,7 +115,7 @@ function SYThemmSelector() {
         <div className="b3-label">
             {window.siyuan.languages.theme}
             <div className="fn__hr" />
-            <Select
+            <Select_KeyboardArrowDown
                 value={_props.themeLight}
                 onChange={(e, v) => {
                     _props.setThemeLight(v);
@@ -126,10 +126,10 @@ function SYThemmSelector() {
                         {theme}
                     </Option>
                 ))}
-            </Select>
+            </Select_KeyboardArrowDown>
             <div className="b3-label__text">{window.siyuan.languages.theme11}</div>
             <div className="fn__hr" />
-            <Select
+            <Select_KeyboardArrowDown
                 value={_props.themeDark}
                 onChange={(e, v) => {
                     _props.setThemeDark(v);
@@ -140,7 +140,7 @@ function SYThemmSelector() {
                         {theme}
                     </Option>
                 ))}
-            </Select>
+            </Select_KeyboardArrowDown>
             <div className="b3-label__text">{window.siyuan.languages.theme12}</div>
         </div>
     );
@@ -152,7 +152,7 @@ function SYIconSelector() {
         <div className="b3-label">
             {window.siyuan.languages.icon}
             <div className="fn__hr" />
-            <Select
+            <Select_KeyboardArrowDown
                 value={_props.icon}
                 onChange={(e, v) => {
                     _props.setIcon(v);
@@ -163,7 +163,7 @@ function SYIconSelector() {
                         {icon}
                     </Option>
                 ))}
-            </Select>
+            </Select_KeyboardArrowDown>
             <div className="b3-label__text">{window.siyuan.languages.theme2}</div>
         </div>
     );
@@ -175,7 +175,7 @@ function SYLangSelector() {
         <div className="b3-label">
             {window.siyuan.languages.language}
             <div className="fn__hr" />
-            <Select
+            <Select_KeyboardArrowDown
                 value={_props.lang}
                 onChange={(e, v) => {
                     _props.setLang(v);
@@ -186,7 +186,7 @@ function SYLangSelector() {
                         {`${lang.label} (${lang.name})`}
                     </Option>
                 ))}
-            </Select>
+            </Select_KeyboardArrowDown>
             <div className="b3-label__text">{window.siyuan.languages.language1}</div>
         </div>
     );
