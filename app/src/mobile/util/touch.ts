@@ -44,6 +44,7 @@ export const handleTouchEnd = (event: TouchEvent, app: App) => {
         hasClosestByClassName(target, "viewer-container") ||
         hasClosestByClassName(target, "keyboard") ||
         hasClosestByAttribute(target, "id", "commonMenu")
+        || hasClosestByAttribute(target, "role", "listbox") || hasClosestByAttribute(target, "id", "model") // https://github.com/Hi-Windom/Sillot/issues/817
     ) {
         return;
     }
@@ -174,6 +175,7 @@ export const handleTouchMove = (event: TouchEvent) => {
         hasClosestByClassName(target, "keyboard") ||
         hasClosestByClassName(target, "viewer-container") ||
         hasClosestByAttribute(target, "id", "commonMenu") || firstXY === "y"
+        || hasClosestByAttribute(target, "role", "listbox") || hasClosestByAttribute(target, "id", "model") // https://github.com/Hi-Windom/Sillot/issues/817
     ) {
         return;
     }

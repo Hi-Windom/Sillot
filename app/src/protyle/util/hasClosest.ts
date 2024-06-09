@@ -66,6 +66,16 @@ export const hasTopClosestByAttribute = (element: Node, attr: string, value: str
     return closest || false;
 };
 
+/**
+ * 查找具有特定属性和值的最近的父元素
+ * 
+ * @param {Node} element - 起始元素，用于在其父元素中搜索
+ * @param {string} attr - 要检查的属性名
+ * @param {string | null} value - 要匹配的属性值，如果是null，则检查属性的存在
+ * @param {boolean} [top=false] - 是否在到达BODY元素之前停止搜索
+ * 
+ * @returns {boolean | HTMLElement} - 如果找到匹配的元素，则返回该元素；否则返回false
+ */
 export const hasClosestByAttribute = (element: Node, attr: string, value: string | null, top = false) => {
     // window.sout.tracker("invoked"); // 这里调用频繁
     if (!element) {
