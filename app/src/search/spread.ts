@@ -55,7 +55,7 @@ export const openSearch = async (options: {
     const exitDialog = window.siyuan.dialogs.find((item) => {
         // 再次打开
         if (item.element.querySelector("#searchList")) {
-            const searchElement = item.element.querySelector(".b3-dialog__body")
+            const searchElement = item.element.querySelector(".b3-dialog__body");
             const cloneData = JSON.parse(JSON.stringify(item.data)) as Config.IUILayoutTabSearchConfig;
             const selectText = getSelection().rangeCount > 0 ? getSelection().getRangeAt(0).toString() : undefined;
             if (selectText) {
@@ -72,12 +72,12 @@ export const openSearch = async (options: {
                 updateConfig(searchElement, cloneData, item.data, item.editors.edit);
             } else if (options.hotkey === Constants.DIALOG_SEARCH) {
                 cloneData.hasReplace = false;
-                const toPath = item.editors.edit.protyle.path
+                const toPath = item.editors.edit.protyle.path;
                 fetchPost("/api/filetree/getHPathsByPaths", {paths: [toPath]}, (response) => {
                     cloneData.idPath = [pathPosix().join(item.editors.edit.protyle.notebookId, toPath)];
                     cloneData.hPath = response.data[0];
-                    item.data.idPath = cloneData.idPath
-                    item.data.hPath = cloneData.hPath
+                    item.data.idPath = cloneData.idPath;
+                    item.data.hPath = cloneData.hPath;
                     updateConfig(searchElement, cloneData, item.data, item.editors.edit);
                 });
             }
