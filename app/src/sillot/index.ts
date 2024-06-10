@@ -24,6 +24,7 @@ export class SillotEnv {
       status: { IDBloaded: false, disableDocSetPadding: false },
       funs: { hljsRender: highlightRender },
       lute: null,
+      android: {},
     };
     window.__ = {
       ace: null,
@@ -50,15 +51,6 @@ export class SillotEnv {
 
     // 接下来即可照常使用 `console` 等方法
     console.log(window.vConsole.version);
-    document.querySelector("#toolbarConsole")?.addEventListener("click", () => {
-      if (document.querySelector("#toolbarConsole")?.getAttribute("data-mode") === "0") {
-        window.vConsole?.showSwitch();
-        document.querySelector("#toolbarConsole")?.setAttribute("data-mode", "1");
-      } else {
-        window.vConsole?.hideSwitch();
-        document.querySelector("#toolbarConsole")?.setAttribute("data-mode", "0");
-      }
-    });
     // 结束调试后，可移除掉
     // window.vConsole.destroy();
 

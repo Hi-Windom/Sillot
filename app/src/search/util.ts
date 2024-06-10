@@ -1078,7 +1078,7 @@ export const getQueryTip = (method: number) => {
     return methodTip;
 };
 
-const updateConfig = (element: Element, item: Config.IUILayoutTabSearchConfig, config: Config.IUILayoutTabSearchConfig,
+export const updateConfig = (element: Element, item: Config.IUILayoutTabSearchConfig, config: Config.IUILayoutTabSearchConfig,
                       edit: Protyle, clear = false) => {
     window.sout.tracker("invoked");
     const dialogElement = hasClosestByClassName(element, "b3-dialog--open");

@@ -17,8 +17,6 @@ import FormHelperText from "@mui/joy/FormHelperText";
 import ModalClose from "@mui/joy/ModalClose";
 import Typography from "@mui/joy/Typography";
 import Sheet from "@mui/joy/Sheet";
-import Switch from "@mui/joy/Switch";
-import Select, { selectClasses } from "@mui/joy/Select";
 import Option, { optionClasses } from "@mui/joy/Option";
 import Chip from "@mui/joy/Chip";
 import List from "@mui/joy/List";
@@ -27,7 +25,6 @@ import ListDivider from "@mui/joy/ListDivider";
 import ListItem from "@mui/joy/ListItem";
 import Check from "@mui/icons-material/Check";
 import CircularProgress from "@mui/joy/CircularProgress";
-import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
 import TuneIcon from "@mui/icons-material/TuneRounded";
 import SaveIcon from "@mui/icons-material/SaveOutlined";
 import loader from "@monaco-editor/loader";
@@ -66,6 +63,7 @@ import Solarizedlight from "./monacoThemes/Solarized-light";
 import Sunburst from "./monacoThemes/Sunburst";
 import TomorrowNightEighties from "./monacoThemes/Tomorrow-Night-Eighties";
 import Zenburnesque from "./monacoThemes/Zenburnesque";
+import { Select_KeyboardArrowDown } from "../base/selector";
 
 type InitConfig = {
     lang: string;
@@ -354,12 +352,11 @@ function renderOptions(
 function LangSelector() {
     const _props = React.useContext(SharedProps);
     return (
-        <Select
+        <Select_KeyboardArrowDown
             color="primary"
             placeholder="Language"
             defaultValue={_props.initConfig.lang}
             variant="soft"
-            indicator={<KeyboardArrowDown />}
             onChange={(e, newValue) =>
                 // _props.editor.updateOptions({ language: newValue }) 不行
                 {
@@ -388,29 +385,22 @@ function LangSelector() {
             sx={{
                 width: 240,
                 flex: 1,
-                [`& .${selectClasses.indicator}`]: {
-                    transition: "0.2s",
-                    [`&.${selectClasses.expanded}`]: {
-                        transform: "rotate(-180deg)",
-                    },
-                },
             }}
             style={{ minWidth: "16em", margin: "1% 0.3%" }} // 方便调试，写在joyUI提供的 sx 里也行
         >
             {renderOptions(groupLang, colorsLang, groupLangText)}
-        </Select>
+        </Select_KeyboardArrowDown>
     );
 }
 
 function LangSelectorMobile() {
     const _props = React.useContext(SharedProps);
     return (
-        <Select
+        <Select_KeyboardArrowDown
             color="primary"
             placeholder="Language"
             defaultValue={_props.initConfig.lang}
             variant="soft"
-            indicator={<KeyboardArrowDown />}
             onChange={(e, newValue) =>
                 // _props.editor.updateOptions({ language: newValue }) 不行
                 {
@@ -439,17 +429,11 @@ function LangSelectorMobile() {
             sx={{
                 width: 240,
                 flex: 1,
-                [`& .${selectClasses.indicator}`]: {
-                    transition: "0.2s",
-                    [`&.${selectClasses.expanded}`]: {
-                        transform: "rotate(-180deg)",
-                    },
-                },
             }}
             style={{ minWidth: "16em", margin: "1% 0.3%", maxHeight: "3.5em", width: "100%" }} // 方便调试，写在joyUI提供的 sx 里也行
         >
             {renderOptions(groupLang, colorsLang, groupLangText)}
-        </Select>
+        </Select_KeyboardArrowDown>
     );
 }
 
@@ -457,13 +441,12 @@ function ThemeSelector() {
     const _props = React.useContext(SharedProps);
     const { mode, setMode } = useColorScheme();
     return (
-        <Select
+        <Select_KeyboardArrowDown
             color="primary"
             className="SC_atMedia2Show_flex_width_more_m1"
             placeholder="Theme"
             defaultValue={_props.initConfig.theme || "markdown"}
             variant="soft"
-            indicator={<KeyboardArrowDown />}
             slotProps={{
                 listbox: {
                     component: "div",
@@ -486,12 +469,6 @@ function ThemeSelector() {
             sx={{
                 width: 240,
                 flex: 1,
-                [`& .${selectClasses.indicator}`]: {
-                    transition: "0.2s",
-                    [`&.${selectClasses.expanded}`]: {
-                        transform: "rotate(-180deg)",
-                    },
-                },
             }}
             style={{ minWidth: "20em", margin: "1% 0.3%" }}
             onChange={(e, newValue) => {
@@ -500,7 +477,7 @@ function ThemeSelector() {
             }}
         >
             {renderOptions(groupTheme, colorsTheme)}
-        </Select>
+        </Select_KeyboardArrowDown>
     );
 }
 
@@ -508,12 +485,11 @@ function ThemeSelectorMobile() {
     const _props = React.useContext(SharedProps);
     const { mode, setMode } = useColorScheme();
     return (
-        <Select
+        <Select_KeyboardArrowDown
             color="primary"
             placeholder="Theme"
             defaultValue={_props.initConfig.theme || "vs-dark"}
             variant="soft"
-            indicator={<KeyboardArrowDown />}
             slotProps={{
                 listbox: {
                     component: "div",
@@ -535,12 +511,6 @@ function ThemeSelectorMobile() {
             }
             sx={{
                 flex: 1,
-                [`& .${selectClasses.indicator}`]: {
-                    transition: "0.2s",
-                    [`&.${selectClasses.expanded}`]: {
-                        transform: "rotate(-180deg)",
-                    },
-                },
             }}
             style={{ minWidth: "20em", margin: "1% 0.3%", maxHeight: "3.5em", width: "100%" }}
             onChange={(e, newValue) => {
@@ -549,7 +519,7 @@ function ThemeSelectorMobile() {
             }}
         >
             {renderOptions(groupTheme, colorsTheme)}
-        </Select>
+        </Select_KeyboardArrowDown>
     );
 }
 

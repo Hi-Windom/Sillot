@@ -3,7 +3,13 @@ import {hasClosestBlock, hasClosestByAttribute, hasClosestByClassName, hasCloses
 import {formatDate} from "sofill/mid";
 import {transaction, updateTransaction} from "../wysiwyg/transaction";
 import {getContenteditableElement} from "../wysiwyg/getBlock";
-import {fixTableRange, focusBlock, focusByWbr, getEditorRange} from "./selection";
+import {
+    fixTableRange,
+    focusBlock,
+    focusByWbr,
+    getEditorRange,
+    getSelectionOffset,
+} from "./selection";
 import {Constants} from "../../constants";
 import {highlightRender} from "../render/highlightRender";
 import {scrollCenter} from "../../util/highlightById";
@@ -191,7 +197,8 @@ const processAV = (range: Range, html: string, protyle: IProtyle, blockElement: 
 
 export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
                            // 移动端插入嵌入块时，获取到的 range 为旧值
-                           useProtyleRange = false) => {
+                           useProtyleRange = false,
+                           insertByCursor = false) => {
     window.sout.tracker("invoked");
     if (html === "") {
         return;
@@ -334,7 +341,14 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
         }
     }
     let lastElement: Element;
-    Array.from(tempElement.content.children).reverse().forEach((item) => {
+    let insertBefore = false
+    if (!range.toString() && insertByCursor) {
+        const positon = getSelectionOffset(blockElement, protyle.wysiwyg.element, range)
+        if (positon.start === 0 && editableElement.textContent !== "") {
+            insertBefore = true;
+        }
+    }
+    (insertBefore ? Array.from(tempElement.content.children) : Array.from(tempElement.content.children).reverse()).forEach((item) => {
         let addId = item.getAttribute("data-node-id");
         if (addId === id) {
             doOperation.push({
@@ -364,14 +378,19 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
                 action: "insert",
                 data: item.outerHTML,
                 id: addId,
-                previousID: id
+                nextID: insertBefore ? id : undefined,
+                previousID: insertBefore ? undefined : id
             });
             undoOperation.push({
                 action: "delete",
                 id: addId,
             });
         }
-        blockElement.after(item);
+        if (insertBefore) {
+            blockElement.before(item);
+        } else {
+            blockElement.after(item);
+        }
         if (!lastElement) {
             lastElement = item;
         }

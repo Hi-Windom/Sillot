@@ -25,6 +25,7 @@ interface ISillot {
     hljsRender: any;
   };
   lute: Lute;
+  android: any
 }
 
 interface ISout {
