@@ -1,12 +1,16 @@
 import * as React from "react";
 import * as Client from "react-dom/client";
-import { Option } from "@mui/joy";
+import { CssVarsProvider, Option, useColorScheme } from "@mui/joy";
 import { Select_KeyboardArrowDown } from "../sillot/joyUI/base/selector";
 
 export const renderNewDailyNoteSelect = async (notebooks, defaultValue, container: HTMLElement) => {
     console.log("defaultValue", defaultValue);
     const root = Client.createRoot(container);
-    root.render(<Select_newDailyNote notebooks={notebooks} defaultValue={defaultValue} />);
+    root.render(
+        <CssVarsProvider>
+            <Select_newDailyNote notebooks={notebooks} defaultValue={defaultValue} />
+        </CssVarsProvider>
+    );
     if (!window.Sillot.android.NewDailyNoteSelectReactRoots) {
         window.Sillot.android.NewDailyNoteSelectReactRoots = [];
     }
@@ -15,7 +19,8 @@ export const renderNewDailyNoteSelect = async (notebooks, defaultValue, containe
 
 const Select_newDailyNote = ({ notebooks, defaultValue }) => {
     const [selectedNotebookId, setSelectedNotebookId] = React.useState("");
-
+    const { mode, setMode } = useColorScheme();
+    setMode(window.siyuan.config.appearance.mode === 0 ? "light" : "dark");
     const handleNotebookChange = (e, v) => {
         setSelectedNotebookId(v);
     };

@@ -42,6 +42,7 @@ function DevOptionsProvider() {
 function DevOptions() {
     const isFirstRenderRef = React.useRef(true); // 如果你只是想避免在初始化时执行副作用，可以使用useRef来存储一个标识，而不是使用状态变量。
     const { mode, setMode } = useColorScheme();
+    setMode(window.siyuan.config.appearance.mode === 0 ? "light" : "dark");
     return (
         <SharedProps.Provider
             value={{
