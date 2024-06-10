@@ -13,7 +13,7 @@ import {showMessage} from "../../dialog/message";
 import {getCurrentEditor} from "../editor";
 import {avRender} from "../../protyle/render/av/render";
 import {setTitle} from "../../dialog/processSystem";
-import { unmountReactRootsArray } from "../../sillot/util/react";
+import { unmountAllMobileSettingsPanelReactRoots } from "../../sillot/util/react";
 
 const forwardStack: IBackStack[] = [];
 
@@ -144,7 +144,7 @@ export const goForward = () => {
 
 export const goBack = () => {
     window.sout.tracker("invoked");
-    unmountReactRootsArray(window.Sillot.android?.AppearanceReactRoots);
+    unmountAllMobileSettingsPanelReactRoots();
     const editor = getCurrentEditor();
     if (window.siyuan.menus.menu.element.classList.contains("b3-menu--fullscreen") &&
         !window.siyuan.menus.menu.element.classList.contains("fn__none")) {

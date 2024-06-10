@@ -21,6 +21,28 @@ interface SharedPropsContextValue {
 }
 const SharedProps = React.createContext<SharedPropsContextValue | null>(null);
 
+
+/**
+ * 解决 https://github.com/Hi-Windom/Sillot/issues/814
+ */
+export const initAppearanceReact = () => {
+    window.sout.tracker("invoked");
+    openModel({
+        title: window.siyuan.languages.appearance,
+        icon: "iconTheme",
+        html: '<div id="appearanceSettingsContainer"></div>',
+        bindEvent: modelMainElement => {
+            const e = modelMainElement.querySelector("#appearanceSettingsContainer");
+            const root = Client.createRoot(e);
+            root.render(<AppearanceSettingsProvider />);
+            if (!window.Sillot.android.AppearanceReactRoots) {
+                window.Sillot.android.AppearanceReactRoots = []; // 初始化roots数组
+            }
+            window.Sillot.android.AppearanceReactRoots.push(root); // 在 window.goBakc() 、closePanel 和 closeModel 中 unmount
+        },
+    });
+};
+
 function AppearanceSettingsProvider() {
     // https://mui.com/joy-ui/customization/dark-mode/ 只能在嵌套里使用，这里套壳
     return (
@@ -190,25 +212,3 @@ function SYLangSelector() {
         </div>
     );
 }
-
-/**
- * 解决 https://github.com/Hi-Windom/Sillot/issues/814
- */
-export const initAppearanceReact = () => {
-    window.sout.tracker("invoked");
-    const appearanceHTML = '<div id="appearanceSettingsContainer"></div>'; // AppearanceSettingsProvider 组件将渲染到这里
-    openModel({
-        title: window.siyuan.languages.appearance,
-        icon: "iconTheme",
-        html: appearanceHTML,
-        bindEvent: modelMainElement => {
-            const e = modelMainElement.querySelector("#appearanceSettingsContainer");
-            const root = Client.createRoot(e);
-            root.render(<AppearanceSettingsProvider />);
-            if (!window.Sillot.android.roots) {
-                window.Sillot.android.AppearanceReactRoots = []; // 初始化roots数组
-            }
-            window.Sillot.android.AppearanceReactRoots.push(root); // 在 window.goBakc() 、closePanel 和 closeModel 中 unmount
-        },
-    });
-};

@@ -23,6 +23,7 @@ import {afterLoadPlugin} from "../../plugin/loader";
 import {Menu} from "../../plugin/Menu";
 import {commandPanel} from "../../boot/globalEvent/command/panel";
 import { initDevOptions } from "../settings/devOptions";
+import { initDevOptionsReact } from "../settings/devOptions_react";
 
 export const popMenu = () => {
     window.sout.tracker("invoked");
@@ -189,7 +190,7 @@ export const initRightMenu = (app: App) => {
                 event.stopPropagation();
                 break;
             } else if (target.id === "menuDevOptions") {
-                initDevOptions();
+                initDevOptionsReact();
                 event.preventDefault();
                 event.stopPropagation();
                 break;

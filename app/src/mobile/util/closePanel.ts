@@ -1,4 +1,4 @@
-import { unmountReactRootsArray } from "../../sillot/util/react";
+import { unmountAllMobileSettingsPanelReactRoots } from "../../sillot/util/react";
 import {activeBlur, hideKeyboardToolbar} from "./keyboardToolbar";
 
 export const closePanel = () => {
@@ -10,7 +10,7 @@ export const closePanel = () => {
     maskElement.classList.add("fn__none");
     maskElement.style.opacity = "";
     window.siyuan.menus.menu.remove();
-    unmountReactRootsArray(window.Sillot.android?.AppearanceReactRoots);
+    unmountAllMobileSettingsPanelReactRoots();
 };
 
 export const closeModel = () => {
@@ -18,5 +18,5 @@ export const closeModel = () => {
     document.getElementById("model").style.transform = "";
     activeBlur();
     hideKeyboardToolbar();
-    unmountReactRootsArray(window.Sillot.android?.AppearanceReactRoots);
+    unmountAllMobileSettingsPanelReactRoots();
 };
