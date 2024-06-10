@@ -1,10 +1,9 @@
-import { Select, Option, selectClasses } from "@mui/joy";
+import { Option } from "@mui/joy";
 import { CssVarsProvider, useColorScheme } from "@mui/joy/styles";
 import * as React from "react";
 import * as Client from "react-dom/client";
 import { openModel } from "../menu/model";
-import { fetchGet, fetchPost } from "../../util/fetch";
-import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import { fetchPost } from "../../util/fetch";
 import { Select_KeyboardArrowDown } from "../../sillot/joyUI/base/selector";
 
 interface SharedPropsContextValue {
@@ -203,10 +202,13 @@ export const initAppearanceReact = () => {
         icon: "iconTheme",
         html: appearanceHTML,
         bindEvent: modelMainElement => {
-            // 在模态框中渲染 AppearanceSettingsProvider 组件
             const e = modelMainElement.querySelector("#appearanceSettingsContainer");
             const root = Client.createRoot(e);
             root.render(<AppearanceSettingsProvider />);
+            if (!window.Sillot.android.roots) {
+                window.Sillot.android.AppearanceReactRoots = []; // 初始化roots数组
+            }
+            window.Sillot.android.AppearanceReactRoots.push(root); // 在 window.goBakc() 、closePanel 和 closeModel 中 unmount
         },
     });
 };
