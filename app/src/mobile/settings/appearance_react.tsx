@@ -36,7 +36,7 @@ export const initAppearanceReact = () => {
             const root = Client.createRoot(e);
             root.render(<AppearanceSettingsProvider />);
             if (!window.Sillot.android.AppearanceReactRoots) {
-                window.Sillot.android.AppearanceReactRoots = []; // 初始化roots数组
+                window.Sillot.android.AppearanceReactRoots = [];
             }
             window.Sillot.android.AppearanceReactRoots.push(root); // 在 window.goBakc() 、closePanel 和 closeModel 中 unmount
         },

@@ -23,7 +23,7 @@ export const initDevOptionsReact = () => {
             const root = Client.createRoot(e);
             root.render(<DevOptionsProvider />);
             if (!window.Sillot.android.DevOptionsReactRoots) {
-                window.Sillot.android.DevOptionsReactRoots = []; // 初始化roots数组
+                window.Sillot.android.DevOptionsReactRoots = [];
             }
             window.Sillot.android.DevOptionsReactRoots.push(root); // 在 window.goBakc() 、closePanel 和 closeModel 中 unmount
         },

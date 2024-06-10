@@ -6,6 +6,7 @@ import {isMobile} from "../util/functions";
 import {isNotCtrl} from "../protyle/util/compatibility";
 import type {Protyle} from "../protyle";
 import {Constants} from "../constants";
+import { unmountReactRootsArray } from "../sillot/util/react";
 
 export class Dialog {
     private destroyCallback: (options?: IObject) => void;
@@ -84,6 +85,7 @@ export class Dialog {
     }
 
     public destroy(options?: IObject) {
+        unmountReactRootsArray(window.Sillot.android?.NewDailyNoteSelectReactRoots);
         // av 修改列头emoji后点击关闭emoji图标
         if ((this.element.querySelector(".b3-dialog") as HTMLElement).style.zIndex < window.siyuan.menus.menu.element.style.zIndex) {
             // https://github.com/siyuan-note/siyuan/issues/6783
