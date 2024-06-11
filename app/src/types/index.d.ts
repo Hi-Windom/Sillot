@@ -173,6 +173,7 @@ interface Window {
         showBiometricPrompt(): void
         requestPermissionActivity(id: string, Msg: string, cb: string): boolean
         requestPermission(id: string, Msg: string): boolean
+        requestPermissionAll(): void
         exitSillotAndroid(): void
         androidReboot(): void
         savePictureByURL(uri: string): void

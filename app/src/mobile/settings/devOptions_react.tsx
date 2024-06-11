@@ -75,6 +75,21 @@ function DevOptions() {
             </div>
 
             <div className="b3-label">
+                权限申请
+                <div className="fn__hr" />
+                <Button
+                    className="b3-button fn__block"
+                    id="toggle_vConsole"
+                    onClick={() => {
+                        window.JSAndroid?.requestPermissionAll();
+                    }}
+                >
+                    批量申请合集
+                </Button>
+                <div className="b3-label__text">啦啦啦啦啦。</div>
+            </div>
+
+            <div className="b3-label">
                 使用非捆绑的前端产物
                 <div className="fn__hr" />
                 <Button className="b3-button fn__block" id="unbundled_web" disabled>
