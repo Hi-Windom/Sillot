@@ -25,7 +25,7 @@ export const initBar = (app: App) => {
     window.sout.tracker("invoked");
     const toolbarElement = document.getElementById("toolbar");
     toolbarElement.innerHTML = `
-<div id="barWorkspace" aria-label="${window.siyuan.languages.mainMenu} ${updateHotkeyTip(window.siyuan.config.keymap.general.mainMenu.custom)}" class="ariaLabel toolbar__item toolbar__item--active">
+<div id="barWorkspace" aria-label="${updateHotkeyTip(window.siyuan.config.keymap.general.mainMenu.custom)} <span class='ft__on-surface'>${window.siyuan.languages.mainMenu}</span>" class="ariaLabel toolbar__item toolbar__item--active">
     <span class="toolbar__text">${getWorkspaceName()}</span>
     <svg class="toolbar__svg"><use xlink:href="#iconDown"></use></svg>
 </div>
