@@ -69,7 +69,7 @@ export function add_task_同步更新版本(context: vscode.ExtensionContext) {
                             const versionParts = version.split(".");
                             if (versionParts.length === 2) {
                                 // 使用当前时间生成第三段版本号
-                                const timestamp = formatDate(new Date(), "yyyyMMddHHmmss");
+                                const timestamp = formatDate(new Date(), "yyMMddHH");
                                 version = `${version}.${timestamp}`;
                             }
                             // 遍历映射并更新版本号
