@@ -3,6 +3,7 @@ import * as path from "path";
 import fs from "fs-extra";
 import { formatDate } from "sofill/mid";
 import { readJSONFile } from "../utils/json";
+import { C } from "../extension.const";
 
 export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionContext) {
     const TAG = "汐洛.添加并推送Git_Tag";
@@ -31,9 +32,11 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
             currentPanel.reveal(columnToShowIn);
         } else {
             // Otherwise, create a new panel
+            const extensionVersion = vscode.extensions.getExtension(C.extensionId)?.packageJSON.version;
             currentPanel = showCustomModal(
                 TAG,
                 /*html*/ `<h2>${TAG}</h2>
+                <h3>当前 webview 载体扩展版本：${extensionVersion}</h3>
                 <h3>目标 git 本地仓库：${selectedProject}</h3>
                 <input id="git_tag" placeholder="请输入 git tag" oninput="checkInput(this)"/><span class="error-message"></span><br>
                 <textarea id="git_tag_description" data-vscode-context='{"webviewSection": "editor", "preventDefaultContextMenuItems": true}' placeholder="描述（可选）"></textarea><br>
@@ -54,20 +57,20 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
             let illegalCharMessage = "疑似输入非法字符: ";
 
             for (let char of illegalChars) {
-            if (value.includes(char)) {
-                hasIllegalChar = true;
-                illegalCharMessage += char + " ";
-            }
+                if (value.includes(char)) {
+                    hasIllegalChar = true;
+                    illegalCharMessage += char + " ";
+                }
             }
 
             const messageElement = inputElement.nextElementSibling;
 
             if (hasIllegalChar) {
-            inputElement.classList.add('error-input');
-            messageElement.textContent = illegalCharMessage;
-            } else {
-            inputElement.classList.remove('error-input');
-            messageElement.textContent = "";
+                inputElement.classList.add('error-input');
+                messageElement.textContent = illegalCharMessage;
+                } else {
+                inputElement.classList.remove('error-input');
+                messageElement.textContent = "";
             }
         }
         </script>
