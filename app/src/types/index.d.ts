@@ -167,6 +167,7 @@ interface Window {
     }) => Promise<any>;
     JSAndroid: {
         // sillot extend
+        toggleFullScreenState(): void
         buglyPost1(): void
         buglyPost2(): void
         getSystemTheme(): string

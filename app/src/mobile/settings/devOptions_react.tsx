@@ -114,7 +114,13 @@ function JSAndroidSplitButton() {
     const actionRef = React.useRef<() => void | null>(null);
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
-    const options = ["JSAndroid.androidReboot", "JSAndroid.exitSillotAndroid", "JSAndroid.buglyPost1", "JSAndroid.buglyPost2"];
+    const options = [
+        "JSAndroid.androidReboot",
+        "JSAndroid.exitSillotAndroid",
+        "JSAndroid.buglyPost1",
+        "JSAndroid.buglyPost2",
+        "JSAndroid.toggleFullScreenState",
+    ];
 
     const handleClick = e => {
         console.info(`You clicked ${options[selectedIndex]}`);
@@ -160,11 +166,7 @@ function JSAndroidSplitButton() {
             </ButtonGroup>
             <Menu open={open} onClose={() => setOpen(false)} anchorEl={anchorRef.current}>
                 {options.map((option, index) => (
-                    <MenuItem
-                        key={option}
-                        selected={index === selectedIndex}
-                        onClick={event => handleMenuItemClick(event, index)}
-                    >
+                    <MenuItem key={option} selected={index === selectedIndex} onClick={event => handleMenuItemClick(event, index)}>
                         {option}
                     </MenuItem>
                 ))}
