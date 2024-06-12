@@ -114,7 +114,7 @@ function JSAndroidSplitButton() {
     const actionRef = React.useRef<() => void | null>(null);
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
-    const options = ["JSAndroid.androidReboot", "JSAndroid.exitSillotAndroid"];
+    const options = ["JSAndroid.androidReboot", "JSAndroid.exitSillotAndroid", "JSAndroid.buglyPost1", "JSAndroid.buglyPost2"];
 
     const handleClick = e => {
         console.info(`You clicked ${options[selectedIndex]}`);

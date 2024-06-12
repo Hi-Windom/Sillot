@@ -167,6 +167,8 @@ interface Window {
     }) => Promise<any>;
     JSAndroid: {
         // sillot extend
+        buglyPost1(): void
+        buglyPost2(): void
         getSystemTheme(): string
         openURLuseDefaultApp(): void
         setMMKV(key: string, value: string): void
