@@ -120,6 +120,7 @@ function JSAndroidSplitButton() {
         "JSAndroid.buglyPost1",
         "JSAndroid.buglyPost2",
         "JSAndroid.toggleFullScreenState",
+        "JSAndroid.toggleDarkModeAuto",
     ];
 
     const handleClick = e => {

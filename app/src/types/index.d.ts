@@ -167,6 +167,7 @@ interface Window {
     }) => Promise<any>;
     JSAndroid: {
         // sillot extend
+        toggleDarkModeAuto(): void
         toggleFullScreenState(): void
         buglyPost1(): void
         buglyPost2(): void
