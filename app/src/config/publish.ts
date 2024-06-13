@@ -154,7 +154,7 @@ export const publish = {
                 input.addEventListener("change", () => {
                     const li = hasClosestByMatchTag(input, "LI");
                     if (li) {
-                        const index = parseInt(li.dataset.index);
+                        const index = Number.parseInt(li.dataset.index);
                         const name = input.dataset.name as keyof Config.IPublishAuthAccount;
                         if (name in window.siyuan.config.publish.auth.accounts[index]) {
                             window.siyuan.config.publish.auth.accounts[index][name] = input.value;
@@ -171,7 +171,7 @@ export const publish = {
                 remove.addEventListener("click", () => {
                     const li = hasClosestByMatchTag(remove, "LI");
                     if (li) {
-                        const index = parseInt(li.dataset.index);
+                        const index = Number.parseInt(li.dataset.index);
                         window.siyuan.config.publish.auth.accounts.splice(index, 1);
                         publish._savePublish();
                     }

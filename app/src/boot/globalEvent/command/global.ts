@@ -39,7 +39,7 @@ import {lockScreen} from "../../../dialog/processSystem";
 import {newFile} from "../../../util/newFile";
 import {openCard} from "../../../card/openCard";
 import {syncGuide} from "../../../sync/syncGuide";
-import {Wnd} from "../../../layout/Wnd";
+import type {Wnd} from "../../../layout/Wnd";
 import {unsplitWnd} from "../../../menus/tab";
 
 const selectOpenTab = () => {

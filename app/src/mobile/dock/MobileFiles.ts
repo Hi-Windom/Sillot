@@ -418,7 +418,7 @@ export class MobileFiles extends Model {
                         });
                         this.closeElement.lastElementChild.innerHTML = closeHTML;
                         const counterElement = this.closeElement.querySelector(".counter");
-                        counterElement.textContent = (parseInt(counterElement.textContent) + 1).toString();
+                        counterElement.textContent = (Number.parseInt(counterElement.textContent) + 1).toString();
                         counterElement.classList.remove("fn__none")
                     }
                 }
@@ -475,7 +475,7 @@ export class MobileFiles extends Model {
         if (liElement) {
             liElement.remove();
             const counterElement = this.closeElement.querySelector(".counter")
-            counterElement.textContent = (parseInt(counterElement.textContent) - 1).toString()
+            counterElement.textContent = (Number.parseInt(counterElement.textContent) - 1).toString()
             if (counterElement.textContent === "0") {
                 counterElement.classList.add("fn__none")
             }

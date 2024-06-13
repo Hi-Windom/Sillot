@@ -751,7 +751,7 @@ export class Files extends Model {
                         });
                         this.closeElement.lastElementChild.innerHTML = closeHTML;
                         const counterElement = this.closeElement.querySelector(".counter");
-                        counterElement.textContent = (parseInt(counterElement.textContent) + 1).toString();
+                        counterElement.textContent = (Number.parseInt(counterElement.textContent) + 1).toString();
                         counterElement.classList.remove("fn__none")
                     }
                 }
@@ -798,7 +798,7 @@ export class Files extends Model {
         const liElement = this.closeElement.querySelector(`li[data-url="${data.data.box.id}"]`) as HTMLElement;
         if (liElement) {
             const counterElement = this.closeElement.querySelector(".counter")
-            counterElement.textContent = (parseInt(counterElement.textContent) - 1).toString()
+            counterElement.textContent = (Number.parseInt(counterElement.textContent) - 1).toString()
             if (counterElement.textContent === "0") {
                 counterElement.classList.add("fn__none")
             }
