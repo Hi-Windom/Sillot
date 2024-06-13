@@ -8,3 +8,8 @@ export const unmountReactRootsArray = (roots) => {
         }
     }
 }
+
+export const unmountAllMobileSettingsPanelReactRoots = () => {
+    unmountReactRootsArray(window.Sillot.android?.AppearanceReactRoots);
+    unmountReactRootsArray(window.Sillot.android?.DevOptionsReactRoots);
+}

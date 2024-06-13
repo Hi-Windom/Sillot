@@ -8,7 +8,7 @@ import {Files} from "./dock/Files";
 import {Outline} from "./dock/Outline";
 import {Bookmark} from "./dock/Bookmark";
 import {Tag} from "./dock/Tag";
-import {getAllModels, getAllTabs} from "./getAll";
+import {getAllModels, getAllTabs, getAllWnds} from "./getAll";
 import {Asset} from "../asset";
 import {Search} from "../search";
 import {Dock} from "./dock";
@@ -54,6 +54,7 @@ export const setPanelFocus = (element: Element) => {
     });
     if (element.getAttribute("data-type") === "wnd") {
         element.classList.add("layout__wnd--active");
+        element.querySelector(".layout-tab-bar .item--focus")?.setAttribute("data-activetime", (new Date()).getTime().toString());
     } else {
         element.classList.add("layout__tab--active");
         Array.from(element.classList).find(item => {
@@ -126,14 +127,13 @@ export const switchWnd = (newWnd: Wnd, targetWnd: Wnd) => {
 
 export const getWndByLayout: (layout: Layout) => Wnd = (layout: Layout) => {
     window.sout.tracker("invoked");
-    for (let i = 0; i < layout.children.length; i++) {
-        const item = layout.children[i];
-        if (item instanceof Wnd) {
-            return item;
-        } else {
-            return getWndByLayout(item);
+    const wndsTemp: Wnd[] = [];
+    getAllWnds(layout, wndsTemp);
+    return wndsTemp.sort((a, b) => {
+        if (a.element.querySelector(".fn__flex .item--focus")?.getAttribute("data-activetime") > b.element.querySelector(".fn__flex .item--focus")?.getAttribute("data-activetime")) {
+            return -1;
         }
-    }
+    })[0];
 };
 
 const dockToJSON = (dock: Dock) => {
@@ -174,13 +174,17 @@ const dockToJSON = (dock: Dock) => {
 
 export const resetLayout = () => {
     window.sout.tracker("invoked");
-    fetchPost("/api/system/setUILayout", {layout: {}}, () => {
-        window.siyuan.storage[Constants.LOCAL_FILEPOSITION] = {};
-        setStorageVal(Constants.LOCAL_FILEPOSITION, window.siyuan.storage[Constants.LOCAL_FILEPOSITION]);
-        window.siyuan.storage[Constants.LOCAL_DIALOGPOSITION] = {};
-        setStorageVal(Constants.LOCAL_DIALOGPOSITION, window.siyuan.storage[Constants.LOCAL_DIALOGPOSITION]);
+    if (window.siyuan.config.readonly) {
         window.location.reload();
-    });
+    } else {
+        fetchPost("/api/system/setUILayout", {layout: {}}, () => {
+            window.siyuan.storage[Constants.LOCAL_FILEPOSITION] = {};
+            setStorageVal(Constants.LOCAL_FILEPOSITION, window.siyuan.storage[Constants.LOCAL_FILEPOSITION]);
+            window.siyuan.storage[Constants.LOCAL_DIALOGPOSITION] = {};
+            setStorageVal(Constants.LOCAL_DIALOGPOSITION, window.siyuan.storage[Constants.LOCAL_DIALOGPOSITION]);
+            window.location.reload();
+        });
+    }
 };
 
 let saveCount = 0;
@@ -217,10 +221,12 @@ export const saveLayout = () => {
         if (isWindow()) {
             sessionStorage.setItem("layout", JSON.stringify(layoutJSON));
         } else {
-            fetchPost("/api/system/setUILayout", {
-                layout: layoutJSON,
-                errorExit: false    // 后台不接受该参数，用于请求发生错误时退出程序
-            });
+            if (!window.siyuan.config.readonly) {
+                fetchPost("/api/system/setUILayout", {
+                    layout: layoutJSON,
+                    errorExit: false    // 后台不接受该参数，用于请求发生错误时退出程序
+                });
+            }
         }
     }
 };
@@ -257,12 +263,17 @@ export const exportLayout = (options: {
     getAllModels().editor.forEach(item => {
         saveScroll(item.editor.protyle);
     });
-    fetchPost("/api/system/setUILayout", {
-        layout: layoutJSON,
-        errorExit: options.errorExit    // 后台不接受该参数，用于请求发生错误时退出程序
-    }, () => {
+
+    if (window.siyuan.config.readonly) {
         options.cb();
-    });
+    } else {
+        fetchPost("/api/system/setUILayout", {
+            layout: layoutJSON,
+            errorExit: options.errorExit    // 后台不接受该参数，用于请求发生错误时退出程序
+        }, () => {
+            options.cb();
+        });
+    }
 };
 
 export const getAllLayout = () => {

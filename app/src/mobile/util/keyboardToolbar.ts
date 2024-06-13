@@ -440,11 +440,15 @@ export const showKeyboardToolbar = () => {
 };
 
 export const hideKeyboardToolbar = () => {
-    window.sout.tracker("invoked");
     if (showUtil) {
         return;
     }
     const toolbarElement = document.getElementById("keyboardToolbar");
+    if (window.Sillot?.android?.LockKeyboardToolbar) {
+        toolbarElement.classList.remove("fn__none");
+        console.log("LockKeyboardToolbar, cancel hideKeyboardToolbar")
+        return;
+    }
     if (toolbarElement.classList.contains("fn__none")) {
         return;
     }
@@ -461,6 +465,7 @@ export const hideKeyboardToolbar = () => {
     getCurrentEditor()?.protyle?.app.plugins.forEach(item => {
         item.eventBus.emit("mobile-keyboard-hide");
     });
+    window.sout.tracker("done");
 };
 
 export const activeBlur = () => {

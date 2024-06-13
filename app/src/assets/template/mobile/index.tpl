@@ -28,7 +28,7 @@
           <use xlink:href="#iconOpen"></use>
       </svg>
       <svg id="toolbarMore" class="toolbar__icon">
-          <use xlink:href="#iconMore"></use>
+          <use xlink:href="#iconSettings"></use>
       </svg>
   </div>
 <div id="editor" class="fn__none fn__flex-1"></div>

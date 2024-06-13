@@ -167,12 +167,17 @@ interface Window {
     }) => Promise<any>;
     JSAndroid: {
         // sillot extend
+        toggleDarkModeAuto(): void
+        toggleFullScreenState(): void
+        buglyPost1(): void
+        buglyPost2(): void
         getSystemTheme(): string
         openURLuseDefaultApp(): void
         setMMKV(key: string, value: string): void
         showBiometricPrompt(): void
         requestPermissionActivity(id: string, Msg: string, cb: string): boolean
         requestPermission(id: string, Msg: string): boolean
+        requestPermissionAll(): void
         exitSillotAndroid(): void
         androidReboot(): void
         savePictureByURL(uri: string): void

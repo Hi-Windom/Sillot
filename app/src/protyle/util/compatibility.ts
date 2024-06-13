@@ -340,6 +340,10 @@ export const getLocalStorage = (cb: () => void) => {
 
 export const setStorageVal = (key: string, val: any) => {
     window.sout.tracker("invoked");
+    if (window.siyuan.config.readonly) {
+        return;
+    }
+
     fetchPost("/api/storage/setLocalStorageVal", {
         app: Constants.SIYUAN_APPID,
         key,

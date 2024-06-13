@@ -141,7 +141,8 @@ audio:not([controls]) {
 a {
   outline: 0;
   text-decoration: none;
-  color: var(--b3-theme-primary);
+  filter: hue-rotate(58deg);
+//   color: var(--b3-theme-primary);
 }
 
 a:hover {

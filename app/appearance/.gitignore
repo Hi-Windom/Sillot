@@ -2,7 +2,7 @@ themes/*/custom.css
 themes/*
 !themes/daylight/
 !themes/midnight/
-!themes/_lnco/
+!themes/lnco/
 
 icons/
 !icons/ant/

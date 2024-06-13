@@ -9,6 +9,8 @@ import {setStorageVal} from "../protyle/util/compatibility";
 import {openFileById} from "../editor/util";
 import {openMobileFileById} from "../mobile/editor";
 import type {App} from "../index";
+import { renderNewDailyNoteSelect } from "./mount_react";
+import { closePanel } from "../mobile/util/closePanel";
 
 export const fetchNewDailyNote = (app: App, notebook: string) => {
     window.sout.tracker("-> notebook: ", notebook);
@@ -24,7 +26,7 @@ export const fetchNewDailyNote = (app: App, notebook: string) => {
     });
 };
 
-export const newDailyNote = (app: App) => {
+export const newDailyNote = async (app: App) => {
     const exit = window.siyuan.dialogs.find(item => {
         if (item.element.getAttribute("data-key") === Constants.DIALOG_DIALYNOTE) {
             item.destroy();
@@ -58,17 +60,11 @@ export const newDailyNote = (app: App) => {
     if (localNotebookId && localNotebookIsOpen && !isMobile()) {
         fetchNewDailyNote(app, localNotebookId);
     } else {
-        let optionsHTML = "";
-        window.siyuan.notebooks.forEach(item => {
-            if (!item.closed) {
-                optionsHTML += `<option value="${item.id}">${item.name}</option>`;
-            }
-        });
         const dialog = new Dialog({
             positionId: Constants.DIALOG_DIALYNOTE,
             title: window.siyuan.languages.plsChoose,
             content: `<div class="b3-dialog__content">
-    <select class="b3-select fn__block">${optionsHTML}</select>
+    <div id="renderNewDailyNoteSelect_container"/>
 </div>
 <div class="b3-dialog__action">
     <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
@@ -76,19 +72,21 @@ export const newDailyNote = (app: App) => {
 </div>`,
             width: isMobile() ? "92vw" : "520px",
         });
+        const renderNewDailyNoteSelect_container = dialog.element.querySelector("#renderNewDailyNoteSelect_container") as HTMLElement;
+        await renderNewDailyNoteSelect(window.siyuan.notebooks, localNotebookId, renderNewDailyNoteSelect_container);
         dialog.element.setAttribute("data-key", Constants.DIALOG_DIALYNOTE);
         const btnsElement = dialog.element.querySelectorAll(".b3-button");
-        const selectElement = dialog.element.querySelector(".b3-select") as HTMLSelectElement;
-        selectElement.value = localNotebookId;
         btnsElement[0].addEventListener("click", () => {
             dialog.destroy();
         });
         btnsElement[1].addEventListener("click", () => {
+            const selectElement = dialog.element.querySelector(".selectedNotebook > input") as HTMLSelectElement;
             const notebook = selectElement.value;
             window.siyuan.storage[Constants.LOCAL_DAILYNOTEID] = notebook;
             setStorageVal(Constants.LOCAL_DAILYNOTEID, window.siyuan.storage[Constants.LOCAL_DAILYNOTEID]);
             fetchNewDailyNote(app, notebook);
             dialog.destroy();
+            closePanel();
         });
     }
 };

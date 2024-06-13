@@ -219,6 +219,17 @@ func getConf(c *gin.Context) {
 		maskedConf.Sync.Stat = model.Conf.Language(53)
 	}
 
+	// REF: https://github.com/siyuan-note/siyuan/issues/11364
+	role := model.GetGinContextRole(c)
+	if model.IsReadOnlyRole(role) {
+		maskedConf.ReadOnly = true
+	}
+	if !model.IsValidRole(role, []model.Role{
+		model.RoleAdministrator,
+	}) {
+		model.HideConfSecret(maskedConf)
+	}
+
 	ret.Data = map[string]interface{}{
 		"conf":  maskedConf,
 		"start": !util.IsUILoaded,
