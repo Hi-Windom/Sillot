@@ -167,6 +167,8 @@ interface Window {
     }) => Promise<any>;
     JSAndroid: {
         // sillot extend
+        isMIUI(): boolean
+        isOriginOS(): boolean
         toggleDarkModeAuto(): void
         toggleFullScreenState(): void
         buglyPost1(): void

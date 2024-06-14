@@ -121,6 +121,8 @@ function JSAndroidSplitButton() {
         "JSAndroid.buglyPost2",
         "JSAndroid.toggleFullScreenState",
         "JSAndroid.toggleDarkModeAuto",
+        "JSAndroid.isMIUI",
+        "JSAndroid.isOriginOS",
     ];
 
     const handleClick = e => {
@@ -130,7 +132,8 @@ function JSAndroidSplitButton() {
         // 使用Object.prototype.hasOwnProperty来检查函数是否存在
         if (Object.prototype.hasOwnProperty.call(window.JSAndroid, functionName) && typeof window.JSAndroid[functionName] === "function") {
             // 调用对应的函数
-            window.JSAndroid[functionName]();
+            const result = window.JSAndroid[functionName]();
+            console.log(functionName, " -> ", result);
         }
     };
 
