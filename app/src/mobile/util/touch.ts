@@ -44,7 +44,7 @@ export const handleTouchEnd = (event: TouchEvent, app: App) => {
         hasClosestByClassName(target, "viewer-container") ||
         hasClosestByClassName(target, "keyboard") ||
         hasClosestByAttribute(target, "id", "commonMenu")
-        || hasClosestByAttribute(target, "role", "listbox") || hasClosestByAttribute(target, "id", "model") // https://github.com/Hi-Windom/Sillot/issues/817
+        || hasClosestByAttribute(target, "class", "base-Popper-root") || hasClosestByAttribute(target, "id", "model") // https://github.com/Hi-Windom/Sillot/issues/817
     ) {
         return;
     }
@@ -175,7 +175,7 @@ export const handleTouchMove = (event: TouchEvent) => {
         hasClosestByClassName(target, "keyboard") ||
         hasClosestByClassName(target, "viewer-container") ||
         hasClosestByAttribute(target, "id", "commonMenu") || firstXY === "y"
-        || hasClosestByAttribute(target, "role", "listbox") || hasClosestByAttribute(target, "id", "model") // https://github.com/Hi-Windom/Sillot/issues/817
+        || hasClosestByAttribute(target, "class", "base-Popper-root") || hasClosestByAttribute(target, "id", "model") // https://github.com/Hi-Windom/Sillot/issues/817 base-Popper-root 是 JoyUI 组件的一个共有类，比如 Select，这玩意生成在 document root 而不是 React.root ，所以需要处理……
     ) {
         return;
     }
