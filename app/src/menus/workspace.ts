@@ -28,6 +28,7 @@ import {openRecentDocs} from "../business/openRecentDocs";
 // import * as dayjs from "dayjs";
 import {formatDate} from "sofill/mid";
 import {isPadAppMode} from "sofill/env"
+import { initDevOptionsReact_Pad } from "../mobile/settings/devOptions_react";
 
 const editLayout = (layoutName?: string) => {
     const dialog = new Dialog({
@@ -486,10 +487,14 @@ export const workspaceMenu = (app: App, rect: DOMRect) => {
             }).element);
         }
         window.siyuan.menus.menu.append(new MenuItem({
-            label: "vConsole",
+            label: isPadAppMode() ? "开发者选项" : "vConsole",
             icon: "iconBug",
             click: () => {
-                window.vConsole?.show();
+                if (isPadAppMode()) {
+                    initDevOptionsReact_Pad();
+                } else {
+                    window.vConsole?.show();
+                }
             }
         }).element);
         window.siyuan.menus.menu.popup({x: rect.left, y: rect.bottom});

@@ -1,8 +1,9 @@
-import { Button, ButtonGroup, CssVarsProvider, IconButton, Menu, MenuItem, useColorScheme } from "@mui/joy";
+import { Button, ButtonGroup, CssVarsProvider, DialogTitle, FormControl, FormLabel, IconButton, Menu, MenuItem, Modal, ModalClose, ModalDialog, type ModalDialogProps, Switch, useColorScheme } from "@mui/joy";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { openModel } from "../menu/model";
 import * as React from "react";
 import * as Client from "react-dom/client";
+import { isPadAppMode } from "sofill/env";
 
 interface SharedPropsContextValue {
     isFirstRenderRef: React.MutableRefObject<boolean>;
@@ -30,11 +31,58 @@ export const initDevOptionsReact = () => {
     });
 };
 
+export const initDevOptionsReact_Pad = () => {
+    window.sout.tracker("invoked");
+    const e = document.body.querySelector("#app5");
+    const root = Client.createRoot(e);
+    root.render(<DevOptionsProvider_Pad />);
+};
+
 function DevOptionsProvider() {
     // https://mui.com/joy-ui/customization/dark-mode/ 只能在嵌套里使用，这里套壳
     return (
         <CssVarsProvider>
             <DevOptions />
+        </CssVarsProvider>
+    );
+}
+
+function DevOptionsProvider_Pad() {
+    // https://mui.com/joy-ui/customization/dark-mode/ 只能在嵌套里使用，这里套壳
+    const [layout, setLayout] = React.useState<ModalDialogProps['layout'] | undefined>(
+        undefined,
+      );
+      const [scroll, setScroll] = React.useState<boolean>(true);
+      React.useEffect(()=>{
+        setLayout('fullscreen');
+      }, [])
+    return (
+        <CssVarsProvider>
+                      <Modal
+            open={!!layout}
+            onClose={() => {
+              setLayout(undefined);
+            }}
+          >
+            <ModalDialog layout={layout}>
+              <ModalClose />
+              <DialogTitle>开发者选项</DialogTitle>
+              <FormControl
+                orientation="horizontal"
+                sx={{ bgcolor: 'background.level2', p: 1, borderRadius: 'sm' }}
+              >
+                <FormLabel>Container overflow</FormLabel>
+                <Switch
+                  checked={scroll}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    setScroll(event.target.checked)
+                  }
+                  sx={{ ml: 'auto' }}
+                />
+              </FormControl>
+              <DevOptions />
+            </ModalDialog>
+          </Modal>
         </CssVarsProvider>
     );
 }
@@ -50,18 +98,23 @@ function DevOptions() {
             }}
         >
             <div className="b3-label">
-                切换 vConsole 浮标是否显示
+                vConsole
                 <div className="fn__hr" />
                 <Button
                     className="b3-button fn__block"
                     id="toggle_vConsole"
                     onClick={() => {
-                        if (document.querySelector("#toolbarConsole")?.getAttribute("data-mode") === "0") {
+                        if (isPadAppMode()) {
+                            window.vConsole?.show();
+                            return;
+                        }
+                        const _e = document.querySelector("#toolbarConsole");
+                        if (_e?.getAttribute("data-mode") === "0") {
                             window.vConsole?.showSwitch();
-                            document.querySelector("#toolbarConsole")?.setAttribute("data-mode", "1");
+                            _e?.setAttribute("data-mode", "1");
                         } else {
                             window.vConsole?.hideSwitch();
-                            document.querySelector("#toolbarConsole")?.setAttribute("data-mode", "0");
+                            _e?.setAttribute("data-mode", "0");
                         }
                     }}
                 >
@@ -69,7 +122,7 @@ function DevOptions() {
                     <svg>
                         <use href="#iconTerminal" />
                     </svg>{" "}
-                    切换 vConsole 浮标是否显示
+                    {isPadAppMode() ? "打开 vConsole" : "切换 vConsole 浮标是否显示"}
                 </Button>
                 <div className="b3-label__text">如果已经显示，则隐藏；如果已经隐藏，则显示。</div>
             </div>
@@ -123,6 +176,7 @@ function JSAndroidSplitButton() {
         "JSAndroid.toggleDarkModeAuto",
         "JSAndroid.isMIUI",
         "JSAndroid.isOriginOS",
+        "JSAndroid.getUA",
     ];
 
     const handleClick = e => {
