@@ -181,6 +181,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
                 return true;
             }
         });
+        const oldScroll = menuElement.querySelector(".b3-menu__items").scrollTop;
         if (!cellElements) {
             menuElement.innerHTML = getEditHTML({protyle, data, colId, isCustomAttr});
             bindEditEvent({protyle, data, menuElement, isCustomAttr, blockID});
@@ -206,6 +207,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
             menuElement.innerHTML = getSelectHTML(data.view, cellElements);
             bindSelectEvent(protyle, data, menuElement, cellElements, blockElement);
         }
+        menuElement.querySelector(".b3-menu__items").scrollTop = oldScroll;
     });
     if (menu.isOpen) {
         return;
@@ -254,6 +256,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
                         return true;
                     }
                 });
+                const oldScroll = menuElement.querySelector(".b3-menu__items").scrollTop;
                 if (!cellElements) {
                     menuElement.innerHTML = getEditHTML({protyle, data, colId, isCustomAttr});
                     bindEditEvent({protyle, data, menuElement, isCustomAttr, blockID});
@@ -279,6 +282,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
                     menuElement.innerHTML = getSelectHTML(data.view, cellElements);
                     bindSelectEvent(protyle, data, menuElement, cellElements, blockElement);
                 }
+                menuElement.querySelector(".b3-menu__items").scrollTop = oldScroll;
             });
         }
     });
@@ -328,6 +332,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
                         return true;
                     }
                 });
+                const oldScroll = menuElement.querySelector(".b3-menu__items").scrollTop;
                 if (!cellElements) {
                     menuElement.innerHTML = getEditHTML({protyle, data, colId, isCustomAttr});
                     bindEditEvent({protyle, data, menuElement, isCustomAttr, blockID});
@@ -354,6 +359,7 @@ export const setColOption = (protyle: IProtyle, data: IAV, target: HTMLElement, 
                     menuElement.innerHTML = getSelectHTML(data.view, cellElements);
                     bindSelectEvent(protyle, data, menuElement, cellElements, blockElement);
                 }
+                menuElement.querySelector(".b3-menu__items").scrollTop = oldScroll;
                 name = inputElement.value;
                 color = (index + 1).toString();
                 return true;
@@ -533,9 +539,11 @@ export const addColOptionOrCell = (protyle: IProtyle, data: IAV, cellElements: H
     if (colData.type === "select") {
         menuElement.parentElement.remove();
     } else {
+        const oldScroll = menuElement.querySelector(".b3-menu__items").scrollTop;
         menuElement.innerHTML = getSelectHTML(data.view, cellElements);
         bindSelectEvent(protyle, data, menuElement, cellElements, blockElement);
         menuElement.querySelector("input").focus();
+        menuElement.querySelector(".b3-menu__items").scrollTop = oldScroll;
     }
 };
 
