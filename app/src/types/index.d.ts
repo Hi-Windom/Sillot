@@ -167,6 +167,7 @@ interface Window {
     }) => Promise<any>;
     JSAndroid: {
         // sillot extend
+        showInputMethodPicker(): void
         getUA(): string
         isMIUI(): boolean
         isOriginOS(): boolean

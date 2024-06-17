@@ -177,6 +177,7 @@ function JSAndroidSplitButton() {
         "JSAndroid.isMIUI",
         "JSAndroid.isOriginOS",
         "JSAndroid.getUA",
+        "JSAndroid.showInputMethodPicker",
     ];
 
     const handleClick = e => {
