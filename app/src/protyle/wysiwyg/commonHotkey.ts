@@ -322,29 +322,7 @@ export const alignImgCenter = (protyle: IProtyle, nodeElement: Element, assetEle
     window.sout.tracker("invoked");
     nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
     assetElements.forEach((item: HTMLElement) => {
-        item.style.display = "block";
-        let nextSibling = item.nextSibling;
-        while (nextSibling) {
-            if (nextSibling.textContent === "") {
-                nextSibling = nextSibling.nextSibling;
-            } else if (nextSibling.textContent === Constants.ZWSP) {
-                nextSibling.textContent = "";
-                break;
-            } else {
-                break;
-            }
-        }
-        let previous = item.previousSibling;
-        while (previous) {
-            if (previous.textContent === "") {
-                previous = previous.previousSibling;
-            } else if (previous.textContent === Constants.ZWSP) {
-                previous.textContent = "";
-                break;
-            } else {
-                break;
-            }
-        }
+        item.style.minWidth = "calc(100% - 0.1em)";
     });
     updateTransaction(protyle, id, nodeElement.outerHTML, html);
 };
@@ -353,13 +331,9 @@ export const alignImgLeft = (protyle: IProtyle, nodeElement: Element, assetEleme
     window.sout.tracker("invoked");
     nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
     assetElements.forEach((item: HTMLElement) => {
+        item.style.minWidth = "";
+        // 兼容历史居中问题
         item.style.display = "";
-        if (!hasNextSibling(item)) {
-            item.insertAdjacentText("afterend", Constants.ZWSP);
-        }
-        if (!hasPreviousSibling(item)) {
-            item.insertAdjacentText("beforebegin", Constants.ZWSP);
-        }
     });
     updateTransaction(protyle, id, nodeElement.outerHTML, html);
 };
