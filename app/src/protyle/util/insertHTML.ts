@@ -175,6 +175,11 @@ const processAV = (range: Range, html: string, protyle: IProtyle, blockElement: 
                     nextID: previousID,
                     isDetached: selectCellElement.dataset.detached === "true",
                 }]);
+                updateAttrViewCellAnimation(selectCellElement, {
+                    type: "block",
+                    isDetached: false,
+                    block: {content: contenteditableElement.firstElementChild.textContent, id: sourceId}
+                });
                 return;
             }
         }
