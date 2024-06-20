@@ -175,6 +175,11 @@ const processAV = (range: Range, html: string, protyle: IProtyle, blockElement: 
                     nextID: previousID,
                     isDetached: selectCellElement.dataset.detached === "true",
                 }]);
+                updateAttrViewCellAnimation(selectCellElement, {
+                    type: "block",
+                    isDetached: false,
+                    block: {content: contenteditableElement.firstElementChild.textContent, id: sourceId}
+                });
                 return;
             }
         }
@@ -341,9 +346,9 @@ export const insertHTML = (html: string, protyle: IProtyle, isBlock = false,
         }
     }
     let lastElement: Element;
-    let insertBefore = false
+    let insertBefore = false;
     if (!range.toString() && insertByCursor) {
-        const positon = getSelectionOffset(blockElement, protyle.wysiwyg.element, range)
+        const positon = getSelectionOffset(blockElement, protyle.wysiwyg.element, range);
         if (positon.start === 0 && editableElement.textContent !== "") {
             insertBefore = true;
         }

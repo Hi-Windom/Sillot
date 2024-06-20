@@ -528,7 +528,7 @@ const dragSb = async (protyle: IProtyle, sourceElements: Element[], targetElemen
                         item.protyle.undo.clear();
                         return true;
                     }
-                })
+                });
             }
             /// #endif
         }
@@ -712,7 +712,7 @@ const dragSame = async (protyle: IProtyle, sourceElements: Element[], targetElem
                         item.protyle.undo.clear();
                         return true;
                     }
-                })
+                });
             }
             /// #endif
         }

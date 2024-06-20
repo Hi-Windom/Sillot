@@ -292,6 +292,10 @@ export const showKeyboardToolbarUtil = (oldScrollTop: number) => {
 };
 
 const hideKeyboardToolbarUtil = () => {
+    if (window.Sillot?.android?.LockKeyboardToolbar) {
+        console.log("LockKeyboardToolbar, cancel hideKeyboardToolbarUtil")
+        return;
+    }
     window.sout.tracker("invoked");
     const toolbarElement = document.getElementById("keyboardToolbar");
     toolbarElement.style.height = "";
@@ -319,8 +323,13 @@ const renderKeyboardToolbar = () => {
                 document.activeElement.getAttribute("contenteditable") !== "true"
             )) {
             console.warn("renderKeyboardToolbar flag 1")
-            hideKeyboardToolbar();
-            return;
+            if (window.Sillot?.android?.LockKeyboardToolbar) {
+                // https://github.com/Hi-Windom/Sillot/issues/827
+                console.log("LockKeyboardToolbar, cancel hideKeyboardToolbar & return in renderKeyboardToolbar")
+            } else {
+                hideKeyboardToolbar();
+                return;
+            }
         }
         // 编辑器设置界面点击空白或关闭，焦点不知何故会飘移到编辑器上
         if (document.activeElement &&
