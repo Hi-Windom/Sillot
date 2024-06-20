@@ -34,6 +34,10 @@ import (
 	_ "golang.org/x/mobile/bind"
 )
 
+func StopKernel() {
+	model.Close(false, true, 1)
+}
+
 func StartKernelFast(container, appDir, workspaceBaseDir, localIPs string) {
 	go server.Serve(true)
 }

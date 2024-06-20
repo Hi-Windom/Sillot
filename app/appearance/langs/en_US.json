@@ -1141,6 +1141,7 @@
   "about10": "After enabling, it will automatically upload error information and diagnostic data through the <a href=\"https://sentry.io\" target=\"_blank\">Sentry</a> SDK, which does not involve personal privacy data so that developers can fix bugs. The application will be closed automatically after modification, please restart manually",
   "about11": "Network serving",
   "about12": "After enabling, other devices in the same LAN will be allowed to access. The application will be closed automatically after modification, please restart manually",
+  "about12Android": "After enabling, other devices in the same LAN will be allowed to access. In the Android application, in order to restart the kernel, other activities of Sillot will be killed. Please confirm that there is no unsaved content in other Sillot activities before restarting. ",
   "about13": "API token",
   "about14": "The token needs to be authenticated when calling the API<br>HTTP request header <code class=\"fn__code\">Authorization: token ${token}</code>",
   "about17": "Do not enable proxy when set to <code class='fn__code'>Direct connection</code>",
