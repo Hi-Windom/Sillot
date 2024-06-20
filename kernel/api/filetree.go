@@ -1005,3 +1005,7 @@ func pushCreate(box *model.Box, p, treeID string, arg map[string]interface{}) {
 	evt.Callback = arg["callback"]
 	util.PushEvent(evt)
 }
+
+func PushCreate(box *model.Box, p, treeID string, arg map[string]interface{}) {
+	pushCreate(box, p, treeID, arg)
+}
