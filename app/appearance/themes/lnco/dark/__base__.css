@@ -36,25 +36,25 @@ html[data-theme-mode="dark"] {
     /* 系统明亮模式 */
     @media (prefers-color-scheme: light) {
        /* 主色 */
-       --b3-theme-primary: #ffa300;
+       --b3-theme-primary: #ffa300ff;
        --b3-theme-primary-light: #ffa300b8;
        --b3-theme-primary-lighter: #ffa30094;
        --b3-theme-primary-lightest: #ffa3004f;
-       --b3-theme-secondary: #a48c8e;
+       --b3-theme-secondary: #a48c8eff;
        /*移动端省电要求*/
-       --b3-theme-background: #000000;
+       --b3-theme-background: #000000ff;
        --b3-theme-background-light: #000000b8;
        --b3-theme-surface: #000807e0;
        --b3-theme-surface-light: #00080794;
-       --b3-theme-surface-lighter: #0027224f;
-       --b3-theme-error: #820020;
+       --b3-theme-surface-lighter: #0008074f;
+       --b3-theme-error: #820020ff;
        /* 文字颜色 */
-       --b3-theme-on-primary: #000000;
-       --b3-theme-on-secondary: #00ab7c;
-       --b3-theme-on-background: #b3d8c9;
+       --b3-theme-on-primary: #000000ff;
+       --b3-theme-on-secondary: #00ab7cff;
+       --b3-theme-on-background: #b3d8c9ff;
        --b3-theme-on-surface: #00eee796;
-       --b3-theme-on-surface-light: #00faff;
-       --b3-theme-on-error: #00e2e6;
+       --b3-theme-on-surface-light: #8F9D69ff;
+       --b3-theme-on-error: #00e2e6ff;
     }
 
     /* 字体 */

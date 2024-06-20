@@ -35,24 +35,24 @@ html[data-theme-mode="light"] {
     /* 系统明亮模式 */
     @media (prefers-color-scheme: light) {
         /* 主色 */
-        --b3-theme-primary: #e6c829;
+        --b3-theme-primary: #e6c829ff;
         --b3-theme-primary-light: #e6c829e0;
         --b3-theme-primary-lighter: #e6c829ba;
         --b3-theme-primary-lightest: #e6c82985;
-        --b3-theme-secondary: #a48c8e;
+        --b3-theme-secondary: #a48c8eff;
         --b3-theme-background: #402020fa;
         --b3-theme-background-light: #402020d1;
-        --b3-theme-surface: #422424;
+        --b3-theme-surface: #422424ff;
         --b3-theme-surface-light: #422424c7;
         --b3-theme-surface-lighter: #422424ad;
         --b3-theme-error: #92123cf7;
         /* 文字颜色 */
-        --b3-theme-on-primary: #000000;
-        --b3-theme-on-secondary: #00ab7c;
-        --b3-theme-on-background: #dffcff;
-        --b3-theme-on-surface: #d2cee5;
+        --b3-theme-on-primary: #000000ff;
+        --b3-theme-on-secondary: #00ab7cff;
+        --b3-theme-on-background: #dffcffff;
+        --b3-theme-on-surface: #d2cee5ff;
         --b3-theme-on-surface-light: #90fbf5f0;
-        --b3-theme-on-error: #d7e0e0;
+        --b3-theme-on-error: #d7e0e0ff;
     }
 
     /* 字体 */
