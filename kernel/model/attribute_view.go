@@ -404,20 +404,9 @@ func SearchAttributeView(keyword string, excludeAvIDs []string) (ret []*SearchAt
 	}
 	blockIDs = gulu.Str.RemoveDuplicatedElem(blockIDs)
 
-	trees := map[string]*parse.Tree{}
+	trees := filesys.LoadTrees(blockIDs)
 	for _, blockID := range blockIDs {
-		bt := treenode.GetBlockTree(blockID)
-		if nil == bt {
-			continue
-		}
-
-		tree := trees[bt.RootID]
-		if nil == tree {
-			tree, _ = LoadTreeByBlockID(blockID)
-			if nil != tree {
-				trees[bt.RootID] = tree
-			}
-		}
+		tree := trees[blockID]
 		if nil == tree {
 			continue
 		}
@@ -1428,10 +1417,10 @@ func (tx *Transaction) doRemoveAttrViewView(operation *Operation) (ret *TxErr) {
 }
 
 func getMirrorBlocksNodes(avID string) (trees []*parse.Tree, nodes []*ast.Node) {
-	mirrorBlocks := treenode.GetMirrorAttrViewBlockIDs(avID)
+	mirrorBlockIDs := treenode.GetMirrorAttrViewBlockIDs(avID)
 	mirrorBlockTree := map[string]*parse.Tree{}
-	treeMap := map[string]*parse.Tree{}
-	for _, mirrorBlock := range mirrorBlocks {
+	treeCache := map[string]*parse.Tree{}
+	for _, mirrorBlock := range mirrorBlockIDs {
 		bt := treenode.GetBlockTree(mirrorBlock)
 		if nil == bt {
 			logging.LogErrorf("get block tree by block ID [%s] failed", mirrorBlock)
@@ -1445,22 +1434,22 @@ func getMirrorBlocksNodes(avID string) (trees []*parse.Tree, nodes []*ast.Node) 
 				logging.LogErrorf("load tree by block ID [%s] failed", mirrorBlock)
 				continue
 			}
-			treeMap[tree.ID] = tree
+			treeCache[tree.ID] = tree
 			mirrorBlockTree[mirrorBlock] = tree
 		}
 	}
 
-	for _, mirrorBlock := range mirrorBlocks {
-		tree := mirrorBlockTree[mirrorBlock]
-		node := treenode.GetNodeInTree(tree, mirrorBlock)
+	for _, mirrorBlockID := range mirrorBlockIDs {
+		tree := mirrorBlockTree[mirrorBlockID]
+		node := treenode.GetNodeInTree(tree, mirrorBlockID)
 		if nil == node {
-			logging.LogErrorf("get node in tree by block ID [%s] failed", mirrorBlock)
+			logging.LogErrorf("get node in tree by block ID [%s] failed", mirrorBlockID)
 			continue
 		}
 		nodes = append(nodes, node)
 	}
 
-	for _, tree := range treeMap {
+	for _, tree := range treeCache {
 		trees = append(trees, tree)
 	}
 	return
@@ -1702,21 +1691,21 @@ func getAvNames(avIDs string) (ret string) {
 
 func getAttrViewBoundNodes(attrView *av.AttributeView) (ret []*ast.Node) {
 	blockKeyValues := attrView.GetBlockKeyValues()
-	treeMap := map[string]*parse.Tree{}
+	treeCache := map[string]*parse.Tree{}
 	for _, blockKeyValue := range blockKeyValues.Values {
 		if blockKeyValue.IsDetached {
 			continue
 		}
 
 		var tree *parse.Tree
-		tree = treeMap[blockKeyValue.BlockID]
+		tree = treeCache[blockKeyValue.BlockID]
 		if nil == tree {
 			tree, _ = LoadTreeByBlockID(blockKeyValue.BlockID)
 		}
 		if nil == tree {
 			continue
 		}
-		treeMap[blockKeyValue.BlockID] = tree
+		treeCache[blockKeyValue.BlockID] = tree
 
 		node := treenode.GetNodeInTree(tree, blockKeyValue.BlockID)
 		if nil == node {
