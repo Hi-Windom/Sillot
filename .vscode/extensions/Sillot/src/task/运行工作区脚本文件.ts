@@ -138,7 +138,7 @@ class TerminalHandler {
         vscode.window.withProgress(
             {
                 location: vscode.ProgressLocation.Notification,
-                title: `💥 Run ${selectedBatFile} ...`,
+                title: `💥 Run ${selectedBatFile} ... 点击取消关闭终端`,
                 cancellable: true,
             },
             async (progress, token) => {
