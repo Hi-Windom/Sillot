@@ -173,6 +173,10 @@ func InvalidIDPattern(idArg string, result *gulu.Result) bool {
 	return true
 }
 
+func InvalidIDPatternMobile(idArg string) bool {
+	return !ast.IsNodeIDPattern(idArg)
+}
+
 func IsValidURL(str string) bool {
 	_, err := url.Parse(str)
 	return nil == err

@@ -133,6 +133,7 @@ type NotebookListResponse struct {
 }
 
 func GetNotebooks(flashcard bool) *NotebookListResponse {
+	// 本函数暂不校验参数合法性与有效性
 	logging.LogDebugf("(mobile) getNotebooks invoked")
 
 	var notebooks []*model.Box
@@ -178,6 +179,7 @@ type CreateDocWithMdResponse struct {
 }
 
 func CreateDocWithMd(paramsJSON string) *CreateDocWithMdResponse {
+	// 本函数暂不校验参数合法性与有效性
 	ret := &CreateDocWithMdResponse{}
 
 	var request CreateDocWithMdRequest
@@ -231,6 +233,129 @@ func CreateDocWithMd(paramsJSON string) *CreateDocWithMdResponse {
 	params["markdown"] = request.Markdown
 	params["withMath"] = request.WithMath
 	api.PushCreate(box, p, newID, params)
+
+	return ret
+}
+
+type AppendBlockRequest struct {
+	Data     string `json:"data"`
+	DataType string `json:"dataType"`
+	ParentID string `json:"parentID"`
+}
+
+type AppendBlockResponse struct {
+	Error string `json:"error"`
+}
+
+func AppendBlock(paramsJSON string) *AppendBlockResponse {
+	ret := &AppendBlockResponse{}
+
+	var request AppendBlockRequest
+	if err := json.Unmarshal([]byte(paramsJSON), &request); err != nil {
+		ret.Error = err.Error()
+		return ret
+	}
+
+	if util.InvalidIDPatternMobile(request.ParentID) {
+		logging.LogWarnf("AppendBlock -> InvalidIDPatternMobile : " + request.ParentID)
+		return ret
+	}
+
+	// 处理数据
+	if "markdown" == request.DataType {
+		luteEngine := util.NewLute()
+		var err error
+		request.Data, err = api.DataBlockDOM(request.Data, luteEngine)
+		if nil != err {
+			ret.Error = "data block DOM failed: " + err.Error()
+			return ret
+		}
+	}
+
+	// 创建事务
+	transactions := []*model.Transaction{
+		{
+			DoOperations: []*model.Operation{
+				{
+					Action:   "appendInsert",
+					Data:     request.Data,
+					ParentID: request.ParentID,
+				},
+			},
+		},
+	}
+
+	// 执行事务
+	model.PerformTransactions(&transactions)
+	// 等待文件写入完成
+	model.WaitForWritingFiles()
+	// 广播事务
+	api.BroadcastTransactions(transactions)
+
+	ret.Error = ""
+
+	return ret
+}
+
+type InsertBlockNextRequest struct {
+	Data       string `json:"data"`
+	DataType   string `json:"dataType"`
+	PreviousID string `json:"previousID"`
+}
+
+type InsertBlockNextResponse struct {
+	Error string `json:"error"`
+}
+
+func InsertBlockNext(paramsJSON string) *InsertBlockNextResponse {
+	ret := &InsertBlockNextResponse{}
+
+	// 假设 paramsJSON 是一个 JSON 字符串，我们将其反序列化为 InsertBlockRequest 结构体
+	var request InsertBlockNextRequest
+	if err := json.Unmarshal([]byte(paramsJSON), &request); err != nil {
+		// 处理错误
+		ret.Error = err.Error()
+		return ret
+	}
+
+	if util.InvalidIDPatternMobile(request.PreviousID) {
+		logging.LogWarnf("InsertBlockNext -> InvalidIDPatternMobile : " + request.PreviousID)
+		return ret
+	}
+
+	// 处理数据
+	if "markdown" == request.DataType {
+		luteEngine := util.NewLute()
+		var err error
+		request.Data, err = api.DataBlockDOM(request.Data, luteEngine)
+		if nil != err {
+			ret.Error = "data block DOM failed: " + err.Error()
+			return ret
+		}
+	}
+
+	// 创建事务
+	transactions := []*model.Transaction{
+		{
+			DoOperations: []*model.Operation{
+				{
+					Action:     "insert",
+					Data:       request.Data,
+					PreviousID: request.PreviousID,
+				},
+			},
+		},
+	}
+
+	// 执行事务
+	model.PerformTransactions(&transactions)
+	// 等待文件写入完成
+	model.WaitForWritingFiles()
+	// 广播事务
+	api.BroadcastTransactions(transactions)
+
+	// 设置响应数据
+	ret.Error = ""
 
 	return ret
 }
