@@ -681,3 +681,11 @@ func dataBlockDOM(data string, luteEngine *lute.Lute) (ret string, err error) {
 	}
 	return
 }
+
+func DataBlockDOM(data string, luteEngine *lute.Lute) (ret string, err error) {
+	return dataBlockDOM(data, luteEngine)
+}
+
+func BroadcastTransactions(transactions []*model.Transaction) {
+	broadcastTransactions(transactions)
+}
