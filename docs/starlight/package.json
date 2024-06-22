@@ -12,7 +12,7 @@
     "pcl:aahbf": "node addAllHeadByFilename.cjs"
   },
   "dependencies": {
-    "@astrojs/check": "^0.5.10",
+    "@astrojs/check": "^0.6.0",
     "@astrojs/starlight": "0.23.1",
     "@vercel/speed-insights": "^1.0.10",
     "astro": "^4.8.6",
