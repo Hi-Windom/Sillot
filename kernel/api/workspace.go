@@ -309,7 +309,8 @@ func setWorkspaceDir(c *gin.Context) {
 		return
 	}
 
-	if util.ContainerAndroid == util.Container || util.ContainerIOS == util.Container {
+	// https://github.com/Hi-Windom/Sillot-android/issues/31
+	if util.ContainerIOS == util.Container {
 		util.PushMsg(model.Conf.Language(42), 1000*15)
 		time.Sleep(time.Second * 1)
 		model.Close(false, false, 1)

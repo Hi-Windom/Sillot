@@ -1,7 +1,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightLinksValidator from "starlight-links-validator";
-import starlightMultiSidebar from "@lorenzo_lewis/starlight-multi-sidebar";
+import starlightUtils from "@lorenzo_lewis/starlight-utils";
 
 // https://astro.build/config
 export default defineConfig({
@@ -22,9 +22,9 @@ export default defineConfig({
                 src: "./src/assets/icon.svg",
             },
             plugins: [
-                starlightMultiSidebar({
+                starlightUtils({ multiSidebar: {
                     switcherStyle: "dropdown",
-                }),
+                } }),
             ],
             social: {
                 github: "https://github.com/Hi-Windom/Sillot",

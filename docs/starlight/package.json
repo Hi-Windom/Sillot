@@ -1,7 +1,7 @@
 {
   "name": "starlight",
   "type": "module",
-  "version": "0.35.24062203",
+  "version": "0.35.24062317",
   "scripts": {
     "test": "echo 'Test your sister day by day'",
     "dev": "astro dev",
@@ -12,19 +12,19 @@
     "pcl:aahbf": "node addAllHeadByFilename.cjs"
   },
   "dependencies": {
-    "@astrojs/check": "^0.5.10",
-    "@astrojs/starlight": "0.23.1",
-    "@vercel/speed-insights": "^1.0.10",
-    "astro": "^4.8.6",
     "astro-feelback": "^0.3.4",
     "sharp": "^0.33.3",
-    "starlight-links-validator": "^0.8.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.2"
   },
   "devDependencies": {
-    "@lorenzo_lewis/starlight-multi-sidebar": "^0.1.2",
-    "@types/node": "^20.12.7",
-    "sass": "^1.75.0"
+    "@astrojs/check": "^0.7.0",
+    "@astrojs/starlight": "0.24.4",
+    "@lorenzo_lewis/starlight-utils": "^0.1.1",
+    "@types/node": "^20.14.8",
+    "@vercel/speed-insights": "^1.0.12",
+    "astro": "^4.11.0",
+    "sass": "^1.77.6",
+    "starlight-links-validator": "^0.9.0"
   },
-  "packageManager": "pnpm@9.3.0"
+  "packageManager": "pnpm@9.4.0"
 }
