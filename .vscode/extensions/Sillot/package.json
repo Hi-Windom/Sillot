@@ -459,5 +459,5 @@
     "fs-extra": "^11.2.0",
     "json5": "^2.2.3"
   },
-  "packageManager": "pnpm@9.3.0"
+  "packageManager": "pnpm@9.4.0"
 }
