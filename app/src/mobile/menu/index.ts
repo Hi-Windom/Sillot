@@ -146,59 +146,59 @@ export const initRightMenu = (app: App) => {
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuCommand") {
+            } if (target.id === "menuCommand") {
                 closePanel();
                 commandPanel(app);
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuSearch") {
+            } if (target.id === "menuSearch") {
                 popSearch(app);
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuRecent") {
+            } if (target.id === "menuRecent") {
                 getRecentDocs(app);
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuAppearance") {
+            } if (target.id === "menuAppearance") {
                 initAppearanceReact();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuAI") {
+            } if (target.id === "menuAI") {
                 initAI();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuRiffCard") {
+            } if (target.id === "menuRiffCard") {
                 initRiffCard();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuEditor") {
+            } if (target.id === "menuEditor") {
                 initEditor();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuSafeQuit") {
+            } if (target.id === "menuSafeQuit") {
                 console.warn("(mobile) menuSafeQuit -> exitSiYuan() invoked");
                 exitSiYuan();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuDevOptions") {
+            } if (target.id === "menuDevOptions") {
                 initDevOptionsReact();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuAbout") {
+            } if (target.id === "menuAbout") {
                 initAbout();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuPlugin") {
+            } if (target.id === "menuPlugin") {
                 const menu = new Menu();
                 unPinsMenu.forEach(item => {
                     menu.addItem(item);
@@ -207,25 +207,25 @@ export const initRightMenu = (app: App) => {
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuNewDaily") {
+            } if (target.id === "menuNewDaily") {
                 newDailyNote(app);
                 // closePanel();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuCard") {
+            } if (target.id === "menuCard") {
                 openCard(app);
                 closePanel();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuNewNotebook") {
+            } if (target.id === "menuNewNotebook") {
                 newNotebook();
                 closePanel();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuNewDoc") {
+            } if (target.id === "menuNewDoc") {
                 newFile({
                     app,
                     useSavePath: true
@@ -234,22 +234,22 @@ export const initRightMenu = (app: App) => {
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuHelp") {
+            } if (target.id === "menuHelp") {
                 mountHelp();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "androidFeedback") {
+            } if (target.id === "androidFeedback") {
                 window.open('siyuan://androidFeedback', '_blank');
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuLock") {
+            } if (target.id === "menuLock") {
                 lockScreen(app);
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuSync") {
+            } if (target.id === "menuSync") {
                 openModel({
                     title: window.siyuan.languages.cloud,
                     icon: "iconCloud",
@@ -262,17 +262,17 @@ export const initRightMenu = (app: App) => {
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuSyncNow") {
+            } if (target.id === "menuSyncNow") {
                 syncGuide();
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuHistory") {
+            } if (target.id === "menuHistory") {
                 openHistory(app);
                 event.preventDefault();
                 event.stopPropagation();
                 break;
-            } else if (target.id === "menuAccount") {
+            } if (target.id === "menuAccount") {
                 event.preventDefault();
                 event.stopPropagation();
                 if (document.querySelector("#menuAccount img")) {

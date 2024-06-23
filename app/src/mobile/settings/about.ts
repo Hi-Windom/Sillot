@@ -11,6 +11,7 @@ import {openModel} from "../menu/model";
 import {setKey} from "../../sync/syncGuide";
 import {isBrowser} from "../../util/functions";
 import {isAppMode} from "sofill/env"
+import { rebootGibbetInAndroid } from "../util/android";
 
 export const initAbout = () => {
     window.sout.tracker("invoked");
@@ -175,7 +176,7 @@ ${
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "importKey") {
+                    } if (target.id === "importKey") {
                         const passwordDialog = new Dialog({
                             title: "🔑 " + window.siyuan.languages.key,
                             content: `<div class="b3-dialog__content">
@@ -205,7 +206,7 @@ ${
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "initKey") {
+                    } if (target.id === "initKey") {
                         confirmDialog("🔑 " + window.siyuan.languages.genKey, window.siyuan.languages.initRepoKeyTip, () => {
                             fetchPost("/api/repo/initRepoKey", {}, (response) => {
                                 window.siyuan.config.repo.key = response.data.key;
@@ -216,7 +217,7 @@ ${
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "initKeyByPW") {
+                    } if (target.id === "initKeyByPW") {
                         setKey(false, () => {
                             importKeyElement.parentElement.classList.add("fn__none");
                             importKeyElement.parentElement.nextElementSibling.classList.remove("fn__none");
@@ -224,13 +225,13 @@ ${
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "copyKey") {
+                    } if (target.id === "copyKey") {
                         showMessage(window.siyuan.languages.copied);
                         writeText(window.siyuan.config.repo.key);
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "removeKey") {
+                    } if (target.id === "removeKey") {
                         confirmDialog("⚠️ " + window.siyuan.languages.resetRepo, window.siyuan.languages.resetRepoTip, () => {
                             fetchPost("/api/repo/resetRepo", {}, () => {
                                 window.siyuan.config.repo.key = "";
@@ -243,34 +244,34 @@ ${
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "purgeRepo") {
+                    } if (target.id === "purgeRepo") {
                         confirmDialog("♻️ " + window.siyuan.languages.dataRepoPurge, window.siyuan.languages.dataRepoPurgeConfirm, () => {
                             fetchPost("/api/repo/purgeRepo");
                         });
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "tokenCopy") {
+                    } if (target.id === "tokenCopy") {
                         showMessage(window.siyuan.languages.copied);
                         writeText(window.siyuan.config.api.token);
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "exportData") {
+                    } if (target.id === "exportData") {
                         fetchPost("/api/export/exportData", {}, response => {
                             openByMobile(response.data.zip, "exportData");
                         });
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "exportLog") {
+                    } if (target.id === "exportLog") {
                         fetchPost("/api/system/exportLog", {}, (response) => {
                             openByMobile(response.data.zip, "exportLog");
                         });
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "openWorkspace") {
+                    } if (target.id === "openWorkspace") {
                         fetchPost("/api/system/getMobileWorkspaces", {}, (response) => {
                             let selectHTML = "";
                             response.data.forEach((item: string, index: number) => {
@@ -302,6 +303,7 @@ ${
                                     fetchPost("/api/system/setWorkspaceDir", {
                                         path: openPath
                                     }, () => {
+                                        if (isInAndroid) { rebootGibbetInAndroid(); return; }
                                         console.warn(`(mobile) initAbout ${btnsElement[1]}.onClick -> exitSiYuan() invoked (openWorkspace)`);
                                         exitSiYuan();
                                     });
@@ -311,7 +313,7 @@ ${
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.id === "creatWorkspace") {
+                    } if (target.id === "creatWorkspace") {
                         const createWorkspaceDialog = new Dialog({
                             title: window.siyuan.languages.new,
                             content: `<div class="b3-dialog__content">
@@ -341,7 +343,7 @@ ${
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.getAttribute("data-type") === "remove") {
+                    } if (target.getAttribute("data-type") === "remove") {
                         const removePath = target.parentElement.getAttribute("data-path");
                         fetchPost("/api/system/removeWorkspaceDir", {path: removePath}, () => {
                             genWorkspace(workspaceDirElement);
@@ -352,11 +354,12 @@ ${
                         event.preventDefault();
                         event.stopPropagation();
                         break;
-                    } else if (target.classList.contains("b3-list-item") && !target.classList.contains("b3-list-item--focus")) {
+                    } if (target.classList.contains("b3-list-item") && !target.classList.contains("b3-list-item--focus")) {
                         confirmDialog(window.siyuan.languages.confirm, `${pathPosix().basename(window.siyuan.config.system.workspaceDir)} -> ${pathPosix().basename(target.getAttribute("data-path"))}?`, () => {
                             fetchPost("/api/system/setWorkspaceDir", {
                                 path: target.getAttribute("data-path")
                             }, () => {
+                                if (isInAndroid) { rebootGibbetInAndroid(); return; }
                                 console.warn("(mobile) initAbout confirmDialog -> exitSiYuan() invoked (creatWorkspace)");
                                 exitSiYuan();
                             });
@@ -378,6 +381,7 @@ ${
             const networkServeElement = modelMainElement.querySelector("#networkServe") as HTMLInputElement;
             networkServeElement.addEventListener("change", () => {
                 fetchPost("/api/system/setNetworkServe", {networkServe: networkServeElement.checked}, () => {
+                    if (!isInAndroid) { exitSiYuan(); return; }
                     if(networkServeElement.checked){
                         window.JSAndroid?.requestPermissionActivity("Battery","注意：后台稳定伺服会消耗额外电量", "androidReboot");
                     } else {
