@@ -429,7 +429,7 @@ export class MobileFiles extends Model {
                 if (removeElement) {
                     removeElement.remove();
                     const counterElement = this.closeElement.querySelector(".counter");
-                    counterElement.textContent = (parseInt(counterElement.textContent) - 1).toString();
+                    counterElement.textContent = (Number.parseInt(counterElement.textContent) - 1).toString();
                     if (counterElement.textContent === "0")  {
                         counterElement.classList.add("fn__none");
                     }
