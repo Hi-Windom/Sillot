@@ -9,8 +9,9 @@ import { flattenJson, readJSONFile } from "../utils/json";
 
 export function registerHoverProvider_链式调用国际化(context: vscode.ExtensionContext) {
     const provider = new SiyuanHoverProvider();
-    const registration = vscode.languages.registerHoverProvider("typescript", provider);
-    context.subscriptions.push(registration);
+    const registrationForTS = vscode.languages.registerHoverProvider("typescript", provider);
+    const registrationForTSX = vscode.languages.registerHoverProvider("typescriptreact", provider);
+    context.subscriptions.push(registrationForTS, registrationForTSX);
     Log.i("registerHoverProvider_链式调用国际化 成功");
 }
 
@@ -50,9 +51,9 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
             let combinedHover: vscode.Hover | null = null;
             // 获取所有targetExpressions
             const targetExpressions = Object.keys(sillotJson.i18n.hover.ts);
-            console.log("targetExpressions", targetExpressions);
+            // console.log("targetExpressions", targetExpressions);
             for (const t of targetExpressions) {
-                console.log("t", t);
+                // console.log("t", t);
                 const node = this.给我搜(position, t, "startWith"); // 主要是给 this.expressionChain 赋值
                 Log.i("查找包含当前位置的表达式 成功", String(node?.kind));
                 // 检查当前节点是否属于某个targetExpression
@@ -144,7 +145,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
                 return false;
             }
             this.expressionChain = buildExpressionChain(节点);
-            console.log("doesExpressionMatch", this.expressionChain, 目标表达式);
+            // console.log("doesExpressionMatch", this.expressionChain, 目标表达式);
             if (!this.expressionChain) {
                 return false;
             }
@@ -158,7 +159,7 @@ class SiyuanHoverProvider implements vscode.HoverProvider {
         const traverseAndFindNode = (节点: ts.Node): ts.Node | undefined => {
             const _isPositionWithinNode = isPositionWithinNode(位置, 节点);
             const _doesExpressionMatch = doesExpressionMatch(节点, 目标表达式, 模式);
-            console.log("traverseAndFindNode", _isPositionWithinNode, _doesExpressionMatch);
+            // console.log("traverseAndFindNode", _isPositionWithinNode, _doesExpressionMatch);
             if (_isPositionWithinNode && _doesExpressionMatch) {
                 return 节点;
             }
