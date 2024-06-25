@@ -37,7 +37,14 @@ const updateTitle = (rootID: string, tab: Tab, protyle?: IProtyle) => {
     });
 };
 
-export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRootIDs: string[] }, hideMsg = true) => {
+export const reloadSync = (
+    app: App,
+    data: { upsertRootIDs: string[], removeRootIDs: string[] },
+    hideMsg = true,
+    // 同步的时候需要更新只读状态 https://github.com/siyuan-note/siyuan/issues/11517
+    // 调整大纲的时候需要使用现有状态 https://github.com/siyuan-note/siyuan/issues/11808
+    updateReadonly = true
+) => {
     window.sout.tracker("invoked");
     if (hideMsg) {
         hideMessage();
@@ -47,14 +54,14 @@ export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRoot
         if (data.removeRootIDs.includes(window.siyuan.mobile.popEditor.protyle.block.rootID)) {
             hideElements(["dialog"]);
         } else {
-            reloadProtyle(window.siyuan.mobile.popEditor.protyle, false);
+            reloadProtyle(window.siyuan.mobile.popEditor.protyle, false, updateReadonly);
         }
     }
     if (window.siyuan.mobile.editor) {
         if (data.removeRootIDs.includes(window.siyuan.mobile.editor.protyle.block.rootID)) {
             setEmpty(app);
         } else {
-            reloadProtyle(window.siyuan.mobile.editor.protyle, false);
+            reloadProtyle(window.siyuan.mobile.editor.protyle, false, updateReadonly);
             fetchPost("/api/block/getDocInfo", {
                 id: window.siyuan.mobile.editor.protyle.block.rootID
             }, (response) => {
@@ -74,7 +81,7 @@ export const reloadSync = (app: App, data: { upsertRootIDs: string[], removeRoot
                 id: item.editor.protyle.block.rootID,
             }, (response) => {
                 item.editor.protyle.wysiwyg.renderCustom(response.data.ial);
-                reloadProtyle(item.editor.protyle, false, true);
+                reloadProtyle(item.editor.protyle, false, updateReadonly);
                 updateTitle(item.editor.protyle.block.rootID, item.parent, item.editor.protyle);
             });
         } else if (data.removeRootIDs.includes(item.editor.protyle.block.rootID)) {
@@ -297,7 +304,7 @@ export const transactionError = () => {
     });
 };
 
-export const refreshFileTree = (cb?:() => void) => {
+export const refreshFileTree = (cb?: () => void) => {
     window.siyuan.storage[Constants.LOCAL_FILEPOSITION] = {};
     setStorageVal(Constants.LOCAL_FILEPOSITION, window.siyuan.storage[Constants.LOCAL_FILEPOSITION]);
     fetchPost("/api/filetree/refreshFiletree", {}, () => {
