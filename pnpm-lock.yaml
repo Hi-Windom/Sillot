@@ -461,9 +461,6 @@ importers:
       sharp:
         specifier: ^0.33.3
         version: 0.33.3
-      typescript:
-        specifier: ^5.5.2
-        version: 5.5.2
     devDependencies:
       '@astrojs/check':
         specifier: ^0.7.0
@@ -489,6 +486,9 @@ importers:
       starlight-links-validator:
         specifier: ^0.9.0
         version: 0.9.0(@astrojs/starlight@0.24.4(astro@4.11.0(@types/node@20.14.8)(less@4.2.0)(sass@1.77.6)(terser@5.31.0)(typescript@5.5.2)))(astro@4.11.0(@types/node@20.14.8)(less@4.2.0)(sass@1.77.6)(terser@5.31.0)(typescript@5.5.2))
+      typescript:
+        specifier: ^5.5.2
+        version: 5.5.2
 
 packages:
 
