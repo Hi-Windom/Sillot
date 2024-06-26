@@ -70,7 +70,7 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1
 	github.com/xuri/excelize/v2 v2.8.1
-	golang.org/x/image v0.17.0
+	golang.org/x/image v0.18.0
 	golang.org/x/mobile v0.0.0-20240520174638-fa72addaaa1b
 	golang.org/x/mod v0.18.0
 	golang.org/x/text v0.16.0
