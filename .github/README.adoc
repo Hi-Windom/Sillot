@@ -29,6 +29,12 @@ image:https://hits.b3log.org/Hi-Windom/Sillot.svg[
     link="https://github.com/Hi-Windom/Sillot"
     ]
 
+// 注意当前设置 master 为默认分支
+image:https://repobeats.axiom.co/api/embed/708cdf00c747155e49ff28c0c0024e17a28e5705.svg[
+    Insights,
+    link="https://github.com/Hi-Windom/Sillot/pulse"
+]
+
 image::../app/stage/icon.png[Sillot Logo]
 
 link:./docs/Sillot-android[汐洛安卓]
