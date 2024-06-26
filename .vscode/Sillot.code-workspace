@@ -95,7 +95,13 @@
     },
     // 实验性设置
     "notebook.experimental.remoteSave": true,
-    "markdown.experimental.updateLinksOnPaste": true
+    "markdown.experimental.updateLinksOnPaste": true,
+    // CodeGeeX 智能编程助手设置
+    "Codegeex.Chat.LanguagePreference": "中文",
+    "Codegeex.Comment.LanguagePreference": "中文",
+    "Codegeex.SidebarUI.LanguagePreference": "中文",
+    "Codegeex.CandidateNum": "2 (中)",
+    "Codegeex.CompletionModel": "CodeGeeX Pro[Beta]"
   },
   "extensions": {
     "recommendations": [
@@ -187,6 +193,8 @@
       "MainaWycliffe.view-package-on-npm", // 好用，但有点占地方，因此仅推荐
       // WakaTime
       "WakaTime.vscode-wakatime", // 统计个人编程数据，需要配置TOKEN
+      "asciidoctor.asciidoctor-vscode", // adoc 官方插件
+      "AMiner.codegeex", // CodeGeeX 智能编程助手
     ],
     "unwantedRecommendations": [
       "oderwat.indent-rainbow", // 花里胡哨影响观感
