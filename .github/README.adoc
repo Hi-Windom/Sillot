@@ -1,4 +1,13 @@
 //  github 根路径的 README.adoc 文件
+
+link:./docs/Sillot-android[汐洛安卓]
+| link:./docs/Sillot-Gibbet[汐洛绞架]
+| link:./docs/compatibility[兼容性]
+| link:./docs/document[文档]
+| link:./docs/roadmap[路线图]
+
+image::split.png[Split Image]
+
 image:https://img.shields.io/github/license/Hi-Windom/Sillot?style=flat&color=0080ff[license]
 image:https://img.shields.io/github/last-commit/Hi-Windom/Sillot?style=flat&logo=git&logoColor=white&color=0080ff[last-commit]
 image:https://img.shields.io/github/languages/top/Hi-Windom/Sillot?style=flat&color=0080ff[repo-top-language]
@@ -36,13 +45,5 @@ image:https://repobeats.axiom.co/api/embed/708cdf00c747155e49ff28c0c0024e17a28e5
 ]
 
 image::../app/stage/icon.png[Sillot Logo]
-
-link:./docs/Sillot-android[汐洛安卓]
-| link:./docs/Sillot-Gibbet[汐洛绞架]
-| link:./docs/compatibility[兼容性]
-| link:./docs/document[文档]
-| link:./docs/roadmap[路线图]
-
-image::split.png[Split Image]
 
 image::https://capsule-render.vercel.app/api?type=waving&color=timeGradient&height=300&&section=footer&text=Hi-Windom&fontSize=90&fontAlign=50&fontAlignY=70&desc=Power%20by%20&descAlign=50&descSize=30&descAlignY=40&animation=twinkling[Hi-Windom Footer]
