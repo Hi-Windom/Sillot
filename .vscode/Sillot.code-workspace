@@ -101,7 +101,8 @@
     "Codegeex.Comment.LanguagePreference": "中文",
     "Codegeex.SidebarUI.LanguagePreference": "中文",
     "Codegeex.CandidateNum": "2 (中)",
-    "Codegeex.CompletionModel": "CodeGeeX Pro[Beta]"
+    "Codegeex.CompletionModel": "CodeGeeX Pro[Beta]",
+    "asciidoc.antora.enableAntoraSupport": false
   },
   "extensions": {
     "recommendations": [
