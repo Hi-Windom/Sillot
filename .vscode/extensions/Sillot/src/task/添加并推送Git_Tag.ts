@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import fs from "fs-extra";
 import { formatDate } from "sofill/mid";
 import { readJSONFile } from "../utils/json";
 import { C } from "../extension.const";
+import { getUri, getNonce } from "../utils/webview";
 
 export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionContext) {
     const TAG = "汐洛.添加并推送Git_Tag";
@@ -38,42 +38,14 @@ export async function add_task_添加并推送Git_Tag(context: vscode.ExtensionC
                 /*html*/ `<h2>${TAG}</h2>
                 <h3>当前 webview 载体扩展版本：${extensionVersion}</h3>
                 <h3>目标 git 本地仓库：${selectedProject}</h3>
-                <input id="git_tag" placeholder="请输入 git tag" oninput="checkInput(this)"/><span class="error-message"></span><br>
-                <textarea id="git_tag_description" data-vscode-context='{"webviewSection": "editor", "preventDefaultContextMenuItems": true}' placeholder="描述（可选）"></textarea><br>
-                <button onClick="runCMD('git_tag')">提交</button><button onClick="runCMD('git_tag_push')">推送到远端</button>
-        <button onClick="closeModal()">关闭面板</button>
-        <script>
-        window.vscode = acquireVsCodeApi(); // acquireVsCodeApi 只能调用一次
-        function runCMD(text) {
-            const tagElement = document.getElementById('git_tag')
-            const descriptionElement = document.getElementById('git_tag_description')
-            window.vscode.postMessage({ message: 'runCMD', text: text, cmd: [tagElement.value, descriptionElement.value] });
-        }
-        function closeModal() {window.vscode.postMessage({ message: 'closeModal' });}
-        function checkInput(inputElement) {
-            const value = inputElement.value;
-            const illegalChars = ['。', ',', '/', '，', '、'];
-            let hasIllegalChar = false;
-            let illegalCharMessage = "疑似输入非法字符: ";
-
-            for (let char of illegalChars) {
-                if (value.includes(char)) {
-                    hasIllegalChar = true;
-                    illegalCharMessage += char + " ";
-                }
-            }
-
-            const messageElement = inputElement.nextElementSibling;
-
-            if (hasIllegalChar) {
-                inputElement.classList.add('error-input');
-                messageElement.textContent = illegalCharMessage;
-                } else {
-                inputElement.classList.remove('error-input');
-                messageElement.textContent = "";
-            }
-        }
-        </script>
+                <section id ="git-tag-form">
+                    <vscode-text-field id="git_tag" placeholder="请输入 git tag">标签名</vscode-text-field>
+                    <span class="error-message"></span><br>
+                    <vscode-text-area id="git_tag_description" data-vscode-context='{"webviewSection": "editor", "preventDefaultContextMenuItems": true}' placeholder="为空则自动使用最后一条提交的描述" resize="vertical" rows=5>描述（可选）</vscode-text-area><br>
+                    <vscode-button id="runCMD('git_tag')">提交</vscode-button>
+                    <vscode-button id="runCMD('git_tag_push')">推送到远端</vscode-button>
+                    <vscode-button id="closeModal()">关闭面板</vscode-button>
+                </section>
         `,
                 iconPath
             );
@@ -143,25 +115,24 @@ export function showCustomModal(tag: string, body: string, iconPath: string | un
         enableForms: true,
         retainContextWhenHidden: true, // webview被隐藏时保持状态，避免被重置.很高的内存开销 REF https://code.visualstudio.com/api/extension-guides/webview#retaincontextwhenhidden
     });
-    panel.webview.html = /*html*/ `
+    const extensionUri = vscode.extensions.getExtension(C.extensionId)?.extensionUri;
+    if (extensionUri) {
+        const jsUri = getUri(panel.webview, extensionUri, ["out", "webview.js"]);
+        const styleUri = getUri(panel.webview, extensionUri, ["out", "webview.css"]);
+        const nonce = getNonce();
+        panel.webview.html = /*html*/ `
       <html>
       <head>
-      <style>
-        .error-input {
-            border: 2px solid red;
-            margin-right: 3px;
-        }
-        .error-message {
-            color: red;
-            font-size: 1.31em;
-        }
-      </style>
+      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline' 'self' https:;">
+      <link rel="stylesheet" href="${styleUri}">
       </head>
         <body>
           ${body}
         </body>
+        <script type="module" nonce="${nonce}" src="${jsUri}"></script>
       </html>
     `;
+    }
     panel.webview.onDidReceiveMessage(jj => {
         console.log(jj);
         switch (jj.message) {
@@ -176,31 +147,4 @@ export function showCustomModal(tag: string, body: string, iconPath: string | un
         panel.iconPath = vscode.Uri.file(iconPath);
     }
     return panel;
-}
-
-/**
- * 获取某个扩展文件相对于webview需要的一种特殊路径格式
- * 形如：vscode-resource:/Users/toonces/projects/vscode-cat-coding/media/cat.gif
- * @param context 上下文
- * @param relativePath 扩展中某个文件相对于根目录的路径，如 images/test.jpg
- */
-function getExtensionFileVscodeResource(context: vscode.ExtensionContext, relativePath: string) {
-    const diskPath = vscode.Uri.file(path.join(context.extensionPath, relativePath));
-    return diskPath.with({ scheme: "vscode-resource" }).toString();
-}
-
-/**
- * 从某个HTML文件读取能被Webview加载的HTML内容
- * @param {*} context 上下文
- * @param {*} templatePath 相对于插件根目录的html文件相对路径
- */
-function getWebViewContent(context: vscode.ExtensionContext, templatePath: string) {
-    const resourcePath = path.join(context.extensionPath, templatePath);
-    const dirPath = path.dirname(resourcePath);
-    let html = fs.readFileSync(resourcePath, "utf-8");
-    // vscode不支持直接加载本地资源，需要替换成其专有路径格式，这里只是简单的将样式和JS的路径替换
-    html = html.replace(/(<link.+?href="|<script.+?src="|<img.+?src=")(.+?)"/g, (m: any, $1: string, $2: string) => {
-        return $1 + vscode.Uri.file(path.resolve(dirPath, $2)).with({ scheme: "vscode-resource" }).toString() + '"';
-    });
-    return html;
 }

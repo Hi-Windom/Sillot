@@ -1,0 +1,20 @@
+.error-input {
+    border: 2px solid red;
+    margin-right: 3px;
+}
+
+.error-message {
+    color: red;
+    font-size: 1.31em;
+}
+
+#git-tag-form {
+    display: grid;
+    grid-auto-flow: row;
+    grid-row-gap: 1.5rem;
+}
+
+#git_tag_description {
+    max-height: 20em;
+    overflow: auto;
+}
