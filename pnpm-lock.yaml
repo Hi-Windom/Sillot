@@ -204,7 +204,7 @@ importers:
     dependencies:
       '@electron/remote':
         specifier: ^2.1.0
-        version: 2.1.2(electron@32.0.0-alpha.3)
+        version: 2.1.2(electron@31.1.0)
       '@monaco-editor/loader':
         specifier: ^1.4.0
         version: 1.4.0(monaco-editor@0.50.0)
@@ -224,12 +224,6 @@ importers:
       '@babel/core':
         specifier: ^7.24.7
         version: 7.24.7
-      '@babel/plugin-proposal-nullish-coalescing-operator':
-        specifier: ^7.18.6
-        version: 7.18.6(@babel/core@7.24.7)
-      '@babel/plugin-proposal-optional-chaining':
-        specifier: ^7.21.0
-        version: 7.21.0(@babel/core@7.24.7)
       '@babel/plugin-transform-runtime':
         specifier: ^7.24.7
         version: 7.24.7(@babel/core@7.24.7)
@@ -327,8 +321,8 @@ importers:
         specifier: ^3.1.10
         version: 3.1.10
       electron:
-        specifier: 32.0.0-alpha.3
-        version: 32.0.0-alpha.3
+        specifier: 31.1.0
+        version: 31.1.0
       electron-builder:
         specifier: 24.9.1
         version: 24.9.1
@@ -810,20 +804,6 @@ packages:
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0
-
-  '@babel/plugin-proposal-nullish-coalescing-operator@7.18.6':
-    resolution: {integrity: sha512-wQxQzxYeJqHcfppzBDnm1yAY0jSRkUXR2z8RePZYrKwMKgMlE8+Z6LUno+bd6LvbGh8Gltvy74+9pIYkr+XkKA==}
-    engines: {node: '>=6.9.0'}
-    deprecated: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-nullish-coalescing-operator instead.
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
-
-  '@babel/plugin-proposal-optional-chaining@7.21.0':
-    resolution: {integrity: sha512-p4zeefM72gpmEe2fkUr/OnOXpWEf8nAgk7ZYVqqfFiyIG7oFfVZcCrU64hWn5xp4tQ9LkV4bTIa5rD0KANpKNA==}
-    engines: {node: '>=6.9.0'}
-    deprecated: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-optional-chaining instead.
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
 
   '@babel/plugin-proposal-private-property-in-object@7.21.0-placeholder-for-preset-env.2':
     resolution: {integrity: sha512-SOSkfJDddaM7mak6cPEpswyTRnuRltl429hMraQEglW+OkovnCzsiszTmsrlY//qLFjCpQDFRvjdm2wA5pPm9w==}
@@ -4335,8 +4315,8 @@ packages:
   electron-to-chromium@1.4.772:
     resolution: {integrity: sha512-jFfEbxR/abTTJA3ci+2ok1NTuOBBtB4jH+UT6PUmRN+DY3WSD4FFRsgoVQ+QNIJ0T7wrXwzsWCI2WKC46b++2A==}
 
-  electron@32.0.0-alpha.3:
-    resolution: {integrity: sha512-IaJZhhADEhUemMIuQDamYG2A8Ty0TDV151WwCIKfq4Mc+ZXX0bAnWv9Nul1WKTHPHcIaytKIm0t2nFC2eDwmBA==}
+  electron@31.1.0:
+    resolution: {integrity: sha512-TBOwqLxSxnx6+pH6GMri7R3JPH2AkuGJHfWZS0p1HsmN+Qr1T9b0IRJnnehSd/3NZAmAre4ft9Ljec7zjyKFJA==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -9043,19 +9023,6 @@ snapshots:
       '@babel/helper-environment-visitor': 7.24.7
       '@babel/helper-plugin-utils': 7.24.7
 
-  '@babel/plugin-proposal-nullish-coalescing-operator@7.18.6(@babel/core@7.24.7)':
-    dependencies:
-      '@babel/core': 7.24.7
-      '@babel/helper-plugin-utils': 7.24.0
-      '@babel/plugin-syntax-nullish-coalescing-operator': 7.8.3(@babel/core@7.24.7)
-
-  '@babel/plugin-proposal-optional-chaining@7.21.0(@babel/core@7.24.7)':
-    dependencies:
-      '@babel/core': 7.24.7
-      '@babel/helper-plugin-utils': 7.24.0
-      '@babel/helper-skip-transparent-expression-wrappers': 7.22.5
-      '@babel/plugin-syntax-optional-chaining': 7.8.3(@babel/core@7.24.7)
-
   '@babel/plugin-proposal-private-property-in-object@7.21.0-placeholder-for-preset-env.2(@babel/core@7.24.7)':
     dependencies:
       '@babel/core': 7.24.7
@@ -10122,9 +10089,9 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@electron/remote@2.1.2(electron@32.0.0-alpha.3)':
+  '@electron/remote@2.1.2(electron@31.1.0)':
     dependencies:
-      electron: 32.0.0-alpha.3
+      electron: 31.1.0
 
   '@electron/universal@1.4.1':
     dependencies:
@@ -11936,9 +11903,9 @@ snapshots:
       webpack: 5.91.0(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.91.0)
 
-  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))':
+  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))':
     dependencies:
-      webpack: 5.92.1(webpack-cli@5.1.4)
+      webpack: 5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1)
 
   '@webpack-cli/info@2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.91.0))(webpack@5.91.0(webpack-cli@5.1.4))':
@@ -11946,9 +11913,9 @@ snapshots:
       webpack: 5.91.0(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.91.0)
 
-  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))':
+  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))':
     dependencies:
-      webpack: 5.92.1(webpack-cli@5.1.4)
+      webpack: 5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1)
 
   '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.91.0))(webpack@5.91.0(webpack-cli@5.1.4))':
@@ -11956,9 +11923,9 @@ snapshots:
       webpack: 5.91.0(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.91.0)
 
-  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))':
+  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))':
     dependencies:
-      webpack: 5.92.1(webpack-cli@5.1.4)
+      webpack: 5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1)
 
   '@wixc3/board-core@2.5.0': {}
@@ -13311,7 +13278,7 @@ snapshots:
 
   electron-to-chromium@1.4.772: {}
 
-  electron@32.0.0-alpha.3:
+  electron@31.1.0:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.14.8
@@ -18371,9 +18338,9 @@ snapshots:
   webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1):
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))
-      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))
-      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))
+      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))
+      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))
+      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))
       colorette: 2.0.20
       commander: 10.0.1
       cross-spawn: 7.0.3
@@ -18382,7 +18349,7 @@ snapshots:
       import-local: 3.1.0
       interpret: 3.1.1
       rechoir: 0.8.0
-      webpack: 5.92.1(webpack-cli@5.1.4)
+      webpack: 5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4)
       webpack-merge: 5.10.0
     optionalDependencies:
       webpack-bundle-analyzer: 4.10.2
