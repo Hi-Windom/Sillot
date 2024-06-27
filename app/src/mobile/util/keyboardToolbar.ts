@@ -593,7 +593,7 @@ export const initKeyboardToolbar = () => {
         if (type === "undo") {
             protyle.undo.undo(protyle);
             return;
-        } else if (type === "redo") {
+        } if (type === "redo") {
             protyle.undo.redo(protyle);
             return;
         }
@@ -616,25 +616,25 @@ export const initKeyboardToolbar = () => {
                 preventRender = false;
             }, 1000);
             return;
-        } else if (type === "goinline") {
+        } if (type === "goinline") {
             buttonElement.classList.add("protyle-toolbar__item--current");
             const dynamicElements = document.querySelectorAll("#keyboardToolbar .keyboard__dynamic");
             dynamicElements[1].classList.remove("fn__none");
             dynamicElements[0].classList.add("fn__none");
             focusByRange(range);
             return;
-        } else if (["a", "block-ref", "inline-math", "inline-memo"].includes(type)) {
+        } if (["a", "block-ref", "inline-math", "inline-memo"].includes(type)) {
             if (!hasClosestByAttribute(range.startContainer, "data-type", "NodeCodeBlock")) {
                 hideElements(["util"], protyle);
                 protyle.toolbar.element.querySelector(`[data-type="${type}"]`).dispatchEvent(new CustomEvent("click"));
             }
             return;
-        } else if (buttonElement.classList.contains("keyboard__action") && ["strong", "em", "s", "code", "mark", "tag", "u", "sup", "clear", "sub", "kbd"].includes(type)) {
+        } if (buttonElement.classList.contains("keyboard__action") && ["strong", "em", "s", "code", "mark", "tag", "u", "sup", "clear", "sub", "kbd"].includes(type)) {
             if (!hasClosestByAttribute(range.startContainer, "data-type", "NodeCodeBlock")) {
                 protyle.toolbar.setInlineMark(protyle, type, "toolbar");
             }
             return;
-        } else if (type === "text") {
+        } if (type === "text") {
             if (buttonElement.classList.contains("protyle-toolbar__item--current")) {
                 hideKeyboardToolbarUtil();
                 focusByRange(range);
@@ -646,20 +646,20 @@ export const initKeyboardToolbar = () => {
                 showKeyboardToolbarUtil(oldScrollTop);
             }
             return;
-        } else if (type === "moveup") {
+        } if (type === "moveup") {
             moveToUp(protyle, nodeElement, range);
             focusByRange(range);
             return;
-        } else if (type === "movedown") {
+        } if (type === "movedown") {
             moveToDown(protyle, nodeElement, range);
             focusByRange(range);
             return;
-        } else if (type === "softLine") {
+        } if (type === "softLine") {
             range.extractContents();
             softEnter(range, nodeElement, protyle);
             focusByRange(range);
             return;
-        } else if (type === "add") {
+        } if (type === "add") {
             if (buttonElement.classList.contains("protyle-toolbar__item--current")) {
                 hideKeyboardToolbarUtil();
                 focusByRange(range);
@@ -671,17 +671,17 @@ export const initKeyboardToolbar = () => {
                 showKeyboardToolbarUtil(oldScrollTop);
             }
             return;
-        } else if (type === "block") {
+        } if (type === "block") {
             protyle.gutter.renderMenu(protyle, nodeElement);
             window.siyuan.menus.menu.fullscreen();
             activeBlur();
             hideKeyboardToolbar();
             return;
-        } else if (type === "outdent") {
+        } if (type === "outdent") {
             listOutdent(protyle, [nodeElement.parentElement], range);
             focusByRange(range);
             return;
-        } else if (type === "indent") {
+        } if (type === "indent") {
             listIndent(protyle, [nodeElement.parentElement], range);
             focusByRange(range);
             return;

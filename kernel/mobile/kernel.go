@@ -41,6 +41,7 @@ import (
 )
 
 // - 参数和返回值只能是简单类型，例如 string, bool，否则编译后不存在
+// GLM4 prompt: 修改为不依赖http的gomobile函数，参数与返回值只能是string等基本类型
 
 func StopKernel() {
 	model.Close(false, true, 1)
@@ -358,4 +359,16 @@ func InsertBlockNext(paramsJSON string) *InsertBlockNextResponse {
 	ret.Error = ""
 
 	return ret
+}
+
+func IncSyncOnce() {
+	model.IncSync()
+}
+
+func ReindexAssetContentOnce() {
+	model.ReindexAssetContent()
+}
+
+func UpdateAssets() {
+	cache.LoadAssets()
 }
