@@ -1,11 +1,12 @@
 import shutil
 import os
 import tempfile
+
 cwd = os.getcwd()
 temp_dir = tempfile.mkdtemp()
 name_zip = 'app.zip'
 name_aar = 'kernel.aar'
-name_root = 'Sillot-android' # 注意：该文件夹需要与此项目根目录（Sillot）平级（即位于同一个父文件夹）
+name_root = 'Sillot-android'  # 注意：该文件夹需要与此项目根目录（Sillot）平级（即位于同一个父文件夹）
 android_baseRoot = [name_root,
                     "app",
                     "src",
@@ -25,21 +26,37 @@ dir_list = [os.path.join(appRoot, "appearance"),
 kernel_src = os.path.join(cwd, "kernel", name_aar)
 kernel_dst = os.path.join(os.path.dirname(
     cwd), *android_kernelRoot)
+
 if not os.path.exists(targetRoot):
     print('create dir ', targetRoot)
     os.makedirs(targetRoot, exist_ok=True)
 if not os.path.exists(kernel_dst):
     print('create dir ', kernel_dst)
     os.makedirs(kernel_dst, exist_ok=True)
+
+# 复制目录列表中的目录，但特殊处理 appearance 目录
 for d in dir_list:
     t = os.path.join(temp_dir, os.path.basename(d))
     print(d, ' -> ', t)
-    shutil.copytree(d, t)
+    if os.path.basename(d) == "appearance":
+        shutil.copytree(d, t)
+        # 删除 langs 目录中除了 zh_CN.json 和 en_US.json 的所有文件
+        langs_dir = os.path.join(t, "langs")
+        if os.path.exists(langs_dir):
+            for file in os.listdir(langs_dir):
+                if file not in ["zh_CN.json", "en_US.json"]:
+                    file_path = os.path.join(langs_dir, file)
+                    print(f"remove {file_path}")
+                    os.remove(file_path)
+    else:
+        # 复制其他目录
+        shutil.copytree(d, t)
+
 if os.path.exists(target):
     print('remove old app.zip at ', target)
     os.remove(target)
 
-print('make achive app.zip to ', target)
+print('make archive app.zip to ', target)
 base_name = os.path.join(targetRoot, 'app')  # 完整路径（不包含扩展名）
 root_dir = temp_dir  # 要压缩的目录或文件
 shutil.make_archive(base_name, "zip", root_dir)
