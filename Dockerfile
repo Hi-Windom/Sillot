@@ -28,9 +28,10 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential && \
     cd kernel && go build --tags fts5 -v -ldflags "-s -w" && \
     mkdir /opt/Sillot/ && \
-    rm /Hi-Windom/Sillot/app/appearance/langs/zh_CHT.json && \
-    rm /Hi-Windom/Sillot/app/appearance/langs/fr_FR.json && \
     rm /Hi-Windom/Sillot/app/appearance/langs/es_ES.json && \
+    rm /Hi-Windom/Sillot/app/appearance/langs/fr_FR.json && \
+    rm /Hi-Windom/Sillot/app/appearance/langs/ja_JP.json && \
+    rm /Hi-Windom/Sillot/app/appearance/langs/zh_CHT.json && \
     mv /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
