@@ -712,7 +712,7 @@ export const contentMenu = (protyle: IProtyle, nodeElement: Element) => {
             if (inlineTypes.includes("code") || inlineTypes.includes("kbd")) {
                 window.siyuan.menus.menu.append(new MenuItem({
                     label: window.siyuan.languages.copy,
-                    icon:"iconCopy",
+                    icon: "iconCopy",
                     click() {
                         writeText(protyle.lute.BlockDOM2StdMd(inlineElement.outerHTML));
                     }
@@ -2092,7 +2092,7 @@ export const tableMenu = (protyle: IProtyle, nodeElement: Element, cellElement: 
     return {menus, removeMenus, insertMenus, otherMenus, other2Menus};
 };
 
-export const setFold = (protyle: IProtyle, nodeElement: Element, isOpen?: boolean, isRemove?: boolean) => {
+export const setFold = (protyle: IProtyle, nodeElement: Element, isOpen?: boolean, isRemove?: boolean, addLoading = true) => {
     window.sout.tracker("invoked");
     if (nodeElement.getAttribute("data-type") === "NodeListItem" && nodeElement.childElementCount < 4) {
         // 没有子列表或多个块的列表项不进行折叠
@@ -2139,7 +2139,9 @@ export const setFold = (protyle: IProtyle, nodeElement: Element, isOpen?: boolea
     const id = nodeElement.getAttribute("data-node-id");
     if (nodeElement.getAttribute("data-type") === "NodeHeading") {
         if (hasFold) {
-            nodeElement.insertAdjacentHTML("beforeend", '<div spin="1" style="text-align: center"><img width="24px" height="24px" src="/stage/loading-pure.svg"></div>');
+            if (addLoading) {
+                nodeElement.insertAdjacentHTML("beforeend", '<div spin="1" style="text-align: center"><img width="24px" height="24px" src="/stage/loading-pure.svg"></div>');
+            }
             transaction(protyle, [{
                 action: "unfoldHeading",
                 id,
