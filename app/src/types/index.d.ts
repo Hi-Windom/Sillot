@@ -171,7 +171,6 @@ interface Window {
         getUA(): string
         isMIUI(): boolean
         isOriginOS(): boolean
-        toggleDarkModeAuto(): void
         toggleFullScreenState(): void
         buglyPost1(): void
         buglyPost2(): void
