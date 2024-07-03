@@ -1156,12 +1156,12 @@ func fullTextSearchRefBlock(keyword string, beforeLen int, onlyDoc bool) (ret []
 
 	if ignoreLines := getRefSearchIgnoreLines(); 0 < len(ignoreLines) {
 		// Support ignore search results https://github.com/siyuan-note/siyuan/issues/10089
-		notLike := bytes.Buffer{}
+		buf := bytes.Buffer{}
 		for _, line := range ignoreLines {
-			notLike.WriteString(" AND ")
-			notLike.WriteString(line)
+			buf.WriteString(" AND ")
+			buf.WriteString(line)
 		}
-		stmt += notLike.String()
+		stmt += buf.String()
 	}
 
 	// HintHint面板排序完全匹配优先 #10
@@ -1288,12 +1288,12 @@ func fullTextSearchByFTS(query, boxFilter, pathFilter, typeFilter, orderBy strin
 
 	if ignoreLines := getSearchIgnoreLines(); 0 < len(ignoreLines) {
 		// Support ignore search results https://github.com/siyuan-note/siyuan/issues/10089
-		notLike := bytes.Buffer{}
+		buf := bytes.Buffer{}
 		for _, line := range ignoreLines {
-			notLike.WriteString(" AND ")
-			notLike.WriteString(line)
+			buf.WriteString(" AND ")
+			buf.WriteString(line)
 		}
-		stmt += notLike.String()
+		stmt += buf.String()
 	}
 
 	stmt += " " + orderBy

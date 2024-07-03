@@ -736,18 +736,8 @@ export class Gutter {
             accelerator: "⌘X",
             icon: "iconCut",
             click: () => {
-                if (isNotEditBlock(selectsElement[0])) {
-                    let html = "";
-                    selectsElement.forEach(item => {
-                        html += removeEmbed(item);
-                    });
-                    writeText(protyle.lute.BlockDOM2StdMd(html).trimEnd());
-                    protyle.breadcrumb?.hide();
-                    removeBlock(protyle, selectsElement[0], getEditorRange(selectsElement[0]), "remove");
-                } else {
-                    focusByRange(getEditorRange(selectsElement[0]));
-                    document.execCommand("cut");
-                }
+                focusBlock(selectsElement[0]);
+                document.execCommand("cut");
             }
         }).element);
         window.siyuan.menus.menu.append(new MenuItem({
@@ -1088,6 +1078,7 @@ export class Gutter {
             turnIntoSubmenu.push(this.turnsOneInto({
                 icon: "iconParagraph",
                 label: window.siyuan.languages.paragraph,
+                accelerator: window.siyuan.config.keymap.editor.heading.paragraph.custom,
                 protyle,
                 nodeElement,
                 id,
@@ -1155,6 +1146,7 @@ export class Gutter {
             turnIntoSubmenu.push(this.turnsOneInto({
                 icon: "iconParagraph",
                 label: window.siyuan.languages.paragraph,
+                accelerator: window.siyuan.config.keymap.editor.heading.paragraph.custom,
                 protyle,
                 nodeElement,
                 id,
@@ -1236,14 +1228,8 @@ export class Gutter {
                 accelerator: "⌘X",
                 icon: "iconCut",
                 click: () => {
-                    if (isNotEditBlock(nodeElement)) {
-                        writeText(protyle.lute.BlockDOM2StdMd(removeEmbed(nodeElement)).trimEnd());
-                        removeBlock(protyle, nodeElement, getEditorRange(nodeElement), "remove");
-                        protyle.breadcrumb?.hide();
-                    } else {
-                        focusByRange(getEditorRange(nodeElement));
-                        document.execCommand("cut");
-                    }
+                    focusBlock(nodeElement);
+                    document.execCommand("cut");
                 }
             }).element);
             window.siyuan.menus.menu.append(new MenuItem({
@@ -2059,7 +2045,7 @@ data-type="${type}" data-subtype="${nodeElement.getAttribute("data-subtype")}" d
                 if (type === "NodeListItem" && nodeElement.childElementCount > 3 || type === "NodeHeading") {
                     const fold = nodeElement.getAttribute("fold");
                     foldHTML = `<button class="ariaLabel" data-position="right" aria-label="${window.siyuan.languages.fold}" 
-data-type="fold"><svg style="width:10px${fold && fold === "1" ? "" : ";transform:rotate(90deg)"}"><use xlink:href="#iconPlay"></use></svg></button>`;
+data-type="fold" style="cursor:inherit;"><svg style="width:10px${fold && fold === "1" ? "" : ";transform:rotate(90deg)"}"><use xlink:href="#iconPlay"></use></svg></button>`;
                 }
                 if (type === "NodeListItem" || type === "NodeList") {
                     listItem = nodeElement;

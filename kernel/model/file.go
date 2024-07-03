@@ -1312,11 +1312,11 @@ func GetFullHPathByID(id string) (hPath string, err error) {
 	}
 
 	box := Conf.Box(tree.Box)
-	var boxName string
-	if nil != box {
-		boxName = box.Name
+	if nil == box {
+		err = ErrBoxNotFound
+		return
 	}
-	hPath = boxName + tree.HPath
+	hPath = box.Name + tree.HPath
 	return
 }
 
@@ -1638,11 +1638,8 @@ func removeDoc(box *Box, p string, luteEngine *lute.Lute) {
 			continue
 		}
 
-		// 刷新文档关联的数据库 https://github.com/siyuan-note/siyuan/issues/11731
 		syncDelete2AttributeView(removeTree.Root)
-
-		// 解绑数据库关联
-		removeAvBlockRel(removeTree.Root)
+		syncDelete2Block(removeTree.Root)
 	}
 
 	if existChildren {

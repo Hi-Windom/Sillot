@@ -83,21 +83,6 @@ const promiseTransaction = () => {
             document.getElementById("toolbarSync").classList.remove("fn__none");
         }
         /// #endif
-        if (response.data[0].doOperations[0].action === "setAttrs") {
-            const gutterFoldElement = protyle.gutter.element.querySelector('[data-type="fold"]');
-            if (gutterFoldElement) {
-                gutterFoldElement.removeAttribute("disabled");
-            }
-            // 仅在 alt+click 箭头折叠时才会触发
-            protyle.wysiwyg.element.querySelectorAll('[data-type="NodeBlockQueryEmbed"]').forEach((item) => {
-                if (item.querySelector(`[data-node-id="${response.data[0].doOperations[0].id}"]`)) {
-                    item.removeAttribute("data-render");
-                    blockRender(protyle, item);
-                }
-            });
-            return;
-        }
-
         let range: Range;
         if (getSelection().rangeCount > 0) {
             range = getSelection().getRangeAt(0);
@@ -907,7 +892,7 @@ export const turnsIntoTransaction = (options: {
     selectsElement.forEach((item, index) => {
         if ((options.type === "Blocks2Ps" || options.type === "Blocks2Hs") &&
             item.getAttribute("data-type") === "NodeHeading" && item.getAttribute("fold") === "1") {
-            setFold(options.protyle, item);
+            setFold(options.protyle, item, undefined, undefined, false);
         }
         item.classList.remove("protyle-wysiwyg--select");
         item.removeAttribute("select-start");
@@ -1131,14 +1116,20 @@ export const transaction = (protyle: IProtyle, doOperations: IOperation[], undoO
             protyle.model.headElement.classList.remove("item--unupdate");
         }
         protyle.updated = true;
-
         if (needDebounce) {
             protyle.undo.replace(doOperations, protyle);
         } else {
             protyle.undo.add(doOperations, undoOperations, protyle);
         }
     }
-    if (doOperations.length === 1 && doOperations[0].action === "unfoldHeading") {
+    window.clearTimeout(transactionsTimeout);
+    // 加速折叠 https://github.com/siyuan-note/siyuan/issues/11828
+    if (doOperations.length === 1 && (
+        doOperations[0].action === "unfoldHeading" ||
+        (doOperations[0].action === "setAttrs" && doOperations[0].data.startsWith('{"fold":'))
+    )) {
+        // 防止 needDebounce 为 true
+        protyle.transactionTime = time + Constants.TIMEOUT_INPUT * 2;
         fetchPost("/api/transactions", {
             session: protyle.id,
             app: Constants.SIYUAN_APPID,
@@ -1150,7 +1141,18 @@ export const transaction = (protyle: IProtyle, doOperations: IOperation[], undoO
             response.data[0].doOperations.forEach((operation: IOperation) => {
                 if (operation.action === "unfoldHeading" || operation.action === "foldHeading") {
                     processFold(operation, protyle);
-                    return;
+                } else if (operation.action === "setAttrs") {
+                    const gutterFoldElement = protyle.gutter.element.querySelector('[data-type="fold"]');
+                    if (gutterFoldElement) {
+                        gutterFoldElement.removeAttribute("disabled");
+                    }
+                    // 仅在 alt+click 箭头折叠时才会触发
+                    protyle.wysiwyg.element.querySelectorAll('[data-type="NodeBlockQueryEmbed"]').forEach((item) => {
+                        if (item.querySelector(`[data-node-id="${operation.id}"]`)) {
+                            item.removeAttribute("data-render");
+                            blockRender(protyle, item);
+                        }
+                    });
                 }
             });
         })
@@ -1168,7 +1170,6 @@ export const transaction = (protyle: IProtyle, doOperations: IOperation[], undoO
         });
     }
     protyle.transactionTime = time;
-    window.clearTimeout(transactionsTimeout);
     transactionsTimeout = window.setTimeout(() => {
         promiseTransaction();
     }, Constants.TIMEOUT_INPUT * 2);

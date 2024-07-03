@@ -13,7 +13,7 @@ require (
 	github.com/88250/epub v0.0.0-20230830085737-c19055cd1f48
 	github.com/88250/go-humanize v0.0.0-20240424102817-4f78fac47ea7
 	github.com/88250/gulu v1.2.3-0.20240612035750-c9cf5f7a4d02
-	github.com/88250/lute v1.7.7-0.20240624141038-a066485dd2b3
+	github.com/88250/lute v1.7.7-0.20240702084201-ee02f916d4a8
 	github.com/88250/pdfcpu v0.3.14-0.20230401044135-c7369a99720c
 	github.com/88250/vitess-sqlparser v0.0.0-20210205111146-56a2ded2aba1
 	github.com/ClarkThan/ahocorasick v0.0.0-20231011042242-30d1ef1347f4
@@ -37,7 +37,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-ole/go-ole v1.3.0
 	github.com/goccy/go-json v0.10.3
-	github.com/gofrs/flock v0.9.0
+	github.com/gofrs/flock v0.10.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/gorilla/css v1.0.1
 	github.com/gorilla/websocket v1.5.3
@@ -59,7 +59,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/siyuan-note/dejavu v0.0.0-20240626145351-e4f9b0821aaf
 	github.com/siyuan-note/eventbus v0.0.0-20240627125516-396fdb0f0f97
-	github.com/siyuan-note/filelock v0.0.0-20240505150405-3de3a406d257
+	github.com/siyuan-note/filelock v0.0.0-20240629145917-7545564cf0a4
 	github.com/siyuan-note/httpclient v0.0.0-20240626145026-29585d45a51c
 	github.com/siyuan-note/logging v0.0.0-20240505035402-6430d57006a2
 	github.com/siyuan-note/riff v0.0.0-20240502024535-718add51db67
@@ -89,7 +89,7 @@ require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef // indirect
-	github.com/aws/aws-sdk-go v1.54.9 // indirect
+	github.com/aws/aws-sdk-go v1.54.11 // indirect
 	github.com/bytedance/sonic v1.11.9 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
