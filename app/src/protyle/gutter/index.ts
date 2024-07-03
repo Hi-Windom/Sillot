@@ -1078,6 +1078,7 @@ export class Gutter {
             turnIntoSubmenu.push(this.turnsOneInto({
                 icon: "iconParagraph",
                 label: window.siyuan.languages.paragraph,
+                accelerator: window.siyuan.config.keymap.editor.heading.paragraph.custom,
                 protyle,
                 nodeElement,
                 id,
@@ -1145,6 +1146,7 @@ export class Gutter {
             turnIntoSubmenu.push(this.turnsOneInto({
                 icon: "iconParagraph",
                 label: window.siyuan.languages.paragraph,
+                accelerator: window.siyuan.config.keymap.editor.heading.paragraph.custom,
                 protyle,
                 nodeElement,
                 id,
@@ -2043,7 +2045,7 @@ data-type="${type}" data-subtype="${nodeElement.getAttribute("data-subtype")}" d
                 if (type === "NodeListItem" && nodeElement.childElementCount > 3 || type === "NodeHeading") {
                     const fold = nodeElement.getAttribute("fold");
                     foldHTML = `<button class="ariaLabel" data-position="right" aria-label="${window.siyuan.languages.fold}" 
-data-type="fold"><svg style="width:10px${fold && fold === "1" ? "" : ";transform:rotate(90deg)"}"><use xlink:href="#iconPlay"></use></svg></button>`;
+data-type="fold" style="cursor:inherit;"><svg style="width:10px${fold && fold === "1" ? "" : ";transform:rotate(90deg)"}"><use xlink:href="#iconPlay"></use></svg></button>`;
                 }
                 if (type === "NodeListItem" || type === "NodeList") {
                     listItem = nodeElement;
