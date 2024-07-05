@@ -119,7 +119,7 @@ export const initRightMenu = (app: App) => {
         <svg class="b3-menu__icon"><use xlink:href="#iconPlugin"></use></svg><span class="b3-menu__label">${window.siyuan.languages.plugin}</span>
     </div>
     <div class="b3-menu__separator"></div>
-    <div class="b3-menu__item b3s-mobile-height-menu__item${isIPhone() ? " fn__none" : ""}" id="menuHelp">
+    <div class="b3-menu__item b3s-mobile-height-menu__item${(isIPhone() || window.siyuan.config.readonly) ? " fn__none" : ""}" id="menuHelp">
         <svg class="b3-menu__icon"><use xlink:href="#iconHelp"></use></svg><span class="b3-menu__label">${window.siyuan.languages.userGuide}</span>
     </div>
     <a class="b3-menu__item b3s-mobile-height-menu__item" id="androidFeedback">
