@@ -240,7 +240,8 @@ export const removeBlock = (protyle: IProtyle, blockElement: Element, range: Ran
         return;
     }
 
-    if (blockElement.parentElement.classList.contains("li") && blockElement.previousElementSibling.classList.contains("protyle-action")) {
+    if (blockElement.parentElement.classList.contains("li") && blockElement.getAttribute("data-type") !== "NodeHeading" &&
+        blockElement.previousElementSibling.classList.contains("protyle-action")) {
         removeLi(protyle, blockElement, range, type === "Delete");
         return;
     }
