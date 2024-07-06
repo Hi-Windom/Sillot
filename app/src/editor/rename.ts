@@ -8,6 +8,7 @@ import {getAssetName, getDisplayName, pathPosix, setNotebookName} from "../util/
 import {fetchPost} from "../util/fetch";
 import {Constants} from "../constants";
 import {showTooltip} from "../dialog/tooltip";
+import {getAllEditor, getAllModels} from "../layout/getAll";
 
 export const validateName = (name: string, targetElement?: HTMLElement) => {
     window.sout.tracker("invoked");
@@ -137,7 +138,19 @@ export const renameAsset = (assetPath: string) => {
             dialog.destroy();
             return false;
         }
-        fetchPost("/api/asset/renameAsset", {oldPath: assetPath, newName: inputElement.value});
+
+        fetchPost("/api/asset/renameAsset", {oldPath: assetPath, newName: inputElement.value}, (response) => {
+            getAllModels().asset.forEach(item => {
+                if (item.path === assetPath) {
+                    item.path = response.data.newPath;
+                    item.parent.updateTitle(getDisplayName(response.data.newPath));
+                }
+            });
+            getAllEditor().forEach(item => {
+                item.reload(false);
+            });
+            dialog.destroy();
+        });
     });
 };
 
