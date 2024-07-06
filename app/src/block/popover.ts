@@ -142,7 +142,7 @@ export const initBlockPopover = (app: App) => {
 const hidePopover = (event: MouseEvent & { path: HTMLElement[] }) => {
     // window.sout.tracker("invoked"); // 这里调用频繁
     // pad 端点击后 event.target 不会更新。
-    const target = isTouchDevice() ? document.elementFromPoint(event.clientX, event.clientY) : event.target as HTMLElement
+    const target = isTouchDevice() ? document.elementFromPoint(event.clientX, event.clientY) : event.target as HTMLElement;
     if (!target) {
         return false;
     }

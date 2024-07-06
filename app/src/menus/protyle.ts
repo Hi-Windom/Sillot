@@ -659,7 +659,7 @@ export const contentMenu = (protyle: IProtyle, nodeElement: Element) => {
     protyle.toolbar.showContent(protyle, range, nodeElement);
     /// #else
     const oldHTML = nodeElement.outerHTML;
-    const id = nodeElement.getAttribute("data-node-id")
+    const id = nodeElement.getAttribute("data-node-id");
     if (range.toString() !== "" || (range.cloneContents().childNodes[0] as HTMLElement)?.classList?.contains("emoji")) {
         window.siyuan.menus.menu.append(new MenuItem({
             icon: "iconCopy",
@@ -1642,7 +1642,7 @@ export const inlineMathMenu = (protyle: IProtyle, element: Element) => {
         y: rect.top + 26,
         h: 26
     });
-}
+};
 
 const genImageWidthMenu = (label: string, assetElement: HTMLElement, imgElement: HTMLElement, protyle: IProtyle, id: string, nodeElement: HTMLElement, html: string) => {
     window.sout.tracker("invoked");
@@ -1888,7 +1888,7 @@ export const tableMenu = (protyle: IProtyle, nodeElement: Element, cellElement: 
         }
     });
     const menus: IMenu[] = [];
-    menus.push(...otherMenus)
+    menus.push(...otherMenus);
     menus.push({
         type: "separator"
     });
@@ -1964,7 +1964,7 @@ export const tableMenu = (protyle: IProtyle, nodeElement: Element, cellElement: 
             return true;
         }
     });
-    const insertMenus = []
+    const insertMenus = [];
     insertMenus.push({
         icon: "iconBefore",
         label: window.siyuan.languages.insertRowAbove,
@@ -2003,8 +2003,8 @@ export const tableMenu = (protyle: IProtyle, nodeElement: Element, cellElement: 
             }
         });
     }
-    menus.push(...insertMenus)
-    const other2Menus: IMenu[] = []
+    menus.push(...insertMenus);
+    const other2Menus: IMenu[] = [];
     if (((!hasNone || (hasNone && !hasRowSpan && hasColSpan)) &&
             (!previousHasNone || (previousHasNone && !previousHasRowSpan && previousHasColSpan))) ||
         ((!hasNone || (hasNone && !hasRowSpan && hasColSpan)) &&
@@ -2066,7 +2066,7 @@ export const tableMenu = (protyle: IProtyle, nodeElement: Element, cellElement: 
             type: "separator"
         });
     }
-    const removeMenus = []
+    const removeMenus = [];
     if (cellElement.parentElement.parentElement.tagName !== "THEAD" &&
         ((!hasNone && !hasRowSpan) || (hasNone && !hasRowSpan && hasColSpan))) {
         removeMenus.push({
