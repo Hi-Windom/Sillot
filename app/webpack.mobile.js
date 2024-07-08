@@ -1,10 +1,12 @@
 const path = require("path");
+const fs = require('fs');
 const webpack = require("webpack");
 const pkg = require("./package.json");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 // const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const CircularDependencyPlugin = require('circular-dependency-plugin')
 const { EsbuildPlugin } = require("esbuild-loader");
 
 module.exports = (env, argv) => {
@@ -149,6 +151,25 @@ module.exports = (env, argv) => {
     },
     plugins: [
       // new BundleAnalyzerPlugin(),
+      new CircularDependencyPlugin(
+        {
+          exclude: /node_modules/,
+          include: /src\\plugin/,
+          failOnError: false,
+          allowAsyncCycles: false,
+          cwd: process.cwd(),
+          onStart({ compilation }) {
+            const logFilePath = path.resolve(__dirname, 'webpack.mobile.js.cyc_le_detection.sillot.ltx');
+            fs.writeFileSync(logFilePath, '');
+            compilation.warnings.push(new Error('start detecting webpack modules cycles --> ' + logFilePath))
+          },
+          onDetected({ module: webpackModuleRecord, paths, compilation }) {
+            compilation.warnings.push(new Error(paths.join(' -> ')))
+            const logFilePath = path.resolve(__dirname, 'webpack.mobile.js.cyc_le_detection.sillot.ltx');
+            fs.appendFileSync(logFilePath, paths.join(' -> ') + '\n\n\n');
+          },
+        }
+      ),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
         cleanOnceBeforeBuildPatterns: [
