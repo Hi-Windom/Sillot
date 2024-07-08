@@ -175,7 +175,8 @@ interface Window {
         buglyPost1(): void
         buglyPost2(): void
         getSystemTheme(): string
-        openURLuseDefaultApp(): void
+        openURLuseDefaultApp(url: string): void
+        openURLUseSB(url: string): void
         setMMKV(key: string, value: string): void
         showBiometricPrompt(): void
         requestPermissionActivity(id: string, Msg: string, cb: string): boolean
