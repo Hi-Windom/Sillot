@@ -22,11 +22,22 @@ module.exports = (env, argv) => {
       "main": "./src/mobile/index.ts",
     },
     optimization: {
-      splitChunks: {
-        chunks: "all",
+        splitChunks: {
+          chunks: "all",
+        },
+        minimize: true,
+        minimizer: [
+          new EsbuildPlugin({
+            minify: false,
+            minifyWhitespace: true,
+            minifyIdentifiers: false,
+            minifySyntax: false,
+            keepNames: true,
+            // !minifyIdentifiers + keepNames保留全部标识符，体积稍微增大
+            target: ["es2022"],
+          }),
+        ],
       },
-      minimize: false,
-    },
     resolve: {
       fallback: {
         "path": require.resolve("path-browserify"),
@@ -51,11 +62,6 @@ module.exports = (env, argv) => {
             {
               loader: "esbuild-loader",
               options: {
-                minify: false,
-                minifyWhitespace: false,
-                minifyIdentifiers: false,
-                minifySyntax: false,
-                keepNames: true,
                 target: ["es2022"],
               },
             },
