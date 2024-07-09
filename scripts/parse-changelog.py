@@ -33,7 +33,7 @@ def generate_msg_from_repo(repo_name, tag_name, otherReleaseArray):
             desc_mapping[U.get_issue_first_label(issue, C.docmap_siyuan)].append(
                 {"title": issue.title, "url": issue.html_url}
             )
-        U.generate_msg(desc_mapping, C.docmap_siyuan)
+    U.generate_msg(desc_mapping, C.docmap_siyuan)
 
 if __name__ == "__main__":
     parser = ArgumentParser(
