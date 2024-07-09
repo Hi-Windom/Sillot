@@ -177,7 +177,9 @@ interface Window {
         getSystemTheme(): string
         openURLuseDefaultApp(url: string): void
         openURLUseSB(url: string): void
-        setMMKV(key: string, value: string): void
+        setKV(key: string, value: string): void
+        getKV(key: string): string
+        getKVBoolean(key: string): boolean
         showBiometricPrompt(): void
         requestPermissionActivity(id: string, Msg: string, cb: string): boolean
         requestPermission(id: string, Msg: string): boolean
