@@ -5,9 +5,6 @@ from collections import defaultdict
 from _pkg import Const as C
 from _pkg import Utils as U
 import github  # type: ignore # pip install PyGithub
-from _pkg import Const as C
-from _pkg import Utils as U
-import github  # type: ignore # pip install PyGithub
 
 def generate_msg_from_repo(repo_name, tag_name, otherReleaseArray):
     """Generate changelog messages from repository and tag name.
@@ -27,14 +24,16 @@ def generate_msg_from_repo(repo_name, tag_name, otherReleaseArray):
 
     gh = github.Github(token, base_url=f"https://{hostname}")
     repo = gh.get_repo(repo_name)
-    U.print_taget2siyuan(tag_name, otherReleaseArray)
-    milestone = U.find_milestone(repo, tag_name)
-    for issue in repo.get_issues(state="closed", milestone=milestone):  # type: ignore
-          # REF https://pygithub.readthedocs.io/en/latest/github_objects/Issue.html#github.Issue.Issue
-        desc_mapping[U.get_issue_first_label(issue, C.docmap_siyuan)].append(
-              {"title": issue.title, "url": issue.html_url}
-          )
-    U.generate_msg(desc_mapping, C.docmap_siyuan)
+    arr = U.print_taget2siyuan(tag_name, otherReleaseArray)
+    arr.append(tag_name)
+    for v in arr:
+        milestone = U.find_milestone(repo, v)
+        for issue in repo.get_issues(state="closed", milestone=milestone):  # type: ignore
+            # REF https://pygithub.readthedocs.io/en/latest/github_objects/Issue.html#github.Issue.Issue
+            desc_mapping[U.get_issue_first_label(issue, C.docmap_siyuan)].append(
+                {"title": issue.title, "url": issue.html_url}
+            )
+        U.generate_msg(desc_mapping, C.docmap_siyuan)
 
 if __name__ == "__main__":
     parser = ArgumentParser(
