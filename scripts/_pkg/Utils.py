@@ -74,10 +74,10 @@ def generate_header_from_repo(repo_name, tag_name, lastestRelease, electron_vers
 def print_taget2siyuan(tag_name, otherReleaseArray) -> List[str]:
     print('# [@SiYuan](https://github.com/siyuan-note/siyuan)\n')
     print(f'''## ⚓ ''', end="")
-    arr = quote_versions_v2(otherReleaseArray)
+    arr = ["v" + version for version in quote_versions_v2(otherReleaseArray)]
     if len(arr) > 0:
         for v in arr:
-            print(f'''[v{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v})  ''', end="")
+            print(f'''[{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v})  ''', end="")
     print(f'''[{tag_name}](https://github.com/siyuan-note/siyuan/releases/tag/{tag_name}) 值得注意的变化
 
 ''')
