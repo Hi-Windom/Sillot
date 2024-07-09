@@ -4,22 +4,31 @@ import {Plugin} from "./index";
 /// #if !MOBILE
 import {resizeTopBar, saveLayout} from "../layout/util";
 /// #endif
-import {API} from "./API";
 import {getFrontend, isMobile, isWindow} from "../util/functions";
 import {Constants} from "../constants";
 import {uninstall} from "./uninstall";
 
-const requireFunc = (key: string) => {
-    const modules = {
-        siyuan: API
+const globalScope = typeof global !== 'undefined' ? global : self;
+// 动态引入替换 import {API} from "./API"; 在循环引用中安全（为了安卓端考虑）。
+// webpackMode: "eager" 表示不拆分以避免额外的网络请求
+import(
+    /* webpackMode: "eager" */
+    "./API"
+).then((module) => {
+    window.sout?.tracker("API loaded");
+    const requireFunc = (key: string) => {
+        const modules = {
+            siyuan: module.API
+        };
+        // @ts-ignore
+        return modules[key]
+            ?? window.require?.(key);
     };
-    // @ts-ignore
-    return modules[key]
-        ?? window.require?.(key);
-};
-if (window.require instanceof Function) {
-    requireFunc.__proto__ = window.require;
-}
+    globalScope.requireFunc = requireFunc;
+    if (window.require instanceof Function) {
+        requireFunc.__proto__ = window.require;
+    }
+})
 
 const runCode = (code: string, sourceURL: string) => {
     window.sout.tracker("-> code:", code);
@@ -33,7 +42,7 @@ export const loadPlugins = async (app: App, names?: string[]) => {
     let css = "";
     // 为加快启动速度，不进行 await
     response.data.forEach((item: IPluginData) => {
-        if (!names || (names && names.includes(item.name))) {
+        if (!names || (names?.includes(item.name))) {
             loadPluginJS(app, item);
         }
         css += item.css || "" + "\n";
@@ -51,7 +60,7 @@ const loadPluginJS = async (app: App, item: IPluginData) => {
     const exportsObj: { [key: string]: any } = {};
     const moduleObj = {exports: exportsObj};
     try {
-        runCode(item.js, "plugin:" + encodeURIComponent(item.name))(requireFunc, moduleObj, exportsObj);
+        runCode(item.js, "plugin:" + encodeURIComponent(item.name))(globalScope.requireFunc, moduleObj, exportsObj);
     } catch (e) {
         console.error(`plugin ${item.name} run error:`, e);
         return;
