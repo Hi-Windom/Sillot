@@ -60,7 +60,10 @@
       }
   ],
   "settings": {
+    // 非工作区设置，需要在用户设置中修改 ::开始
+    "workbench.experimental.enableNewProfilesUI": true, // since vscode 1.91.0
     "rust-analyzer.cargo.features": ["__runtime_js_sources"], // https://docs.deno.com/runtime/manual/references/contributing/
+    // 非工作区设置，需要在用户设置中修改 ::结束
     "files.associations": {
     //   "*.sy": "json",
       "*.tmTheme": "xml",
@@ -94,6 +97,7 @@
       "**/.history": true
     },
     // 实验性设置
+    "scm.experimental.showHistoryGraph": true, // since vscode 1.91.0
     "notebook.experimental.remoteSave": true,
     "markdown.experimental.updateLinksOnPaste": true,
     // CodeGeeX 智能编程助手设置
