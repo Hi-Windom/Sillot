@@ -12,6 +12,7 @@ env:
   repo_name: "Sillot"
   repo_owner: "Hi-Windom"
   package_json: "app/package.json"
+  pnpm_ws: "pnpm-workspace.yaml"
   android_gradle_build_output: "build/outputs/apk/action"
   android_gradle_build_params: "assembleAction -profile --quiet --stacktrace"
 #   android_gradle_build_params: "assembleOfficialAction -profile --quiet --stacktrace" # 多渠道时
@@ -57,11 +58,11 @@ jobs:
         with:
             cmd: "jq .sypv ${{ env.package_json }} -r"
 
-      - name: 💫 Extract electronVersion from package.json
-        uses: sergeysova/jq-action@v2
+      - name: 💫 Extract electronVersion from pnpm-workspace.yaml
+        uses: mikefarah/yq@v4
         id: electronVersion
         with:
-                cmd: "jq .devDependencies.electron ${{ env.package_json }} -r"
+            cmd: "yq .catalog.electron ${{ env.pnpm_ws }}"
 
       - name: 💫 Extract packageManager from package.json
         uses: sergeysova/jq-action@v2
