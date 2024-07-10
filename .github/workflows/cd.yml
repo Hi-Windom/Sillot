@@ -205,19 +205,19 @@ jobs:
 
       - name: 🔨 Install Node pnpm
         run: npm install -g ${{ needs.create_release.outputs.packageManager }}
-        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}
 
       - name: ✍️ Change NPMRC File
         run: pnpm config set registry https://registry.npmjs.org/ --location project
-        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}
 
       - name: 🚀 Install Node Dependencies
         run: ${{ needs.create_release.outputs.actionInstallCommand }}
-        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}
 
       - name: 🔥 Building UI
-        run: pnpm run build
-        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
+        run: pnpm run app:build
+        working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}
 
       - name: 🗑️ Remove Build Directory
         uses: K-Sillot/rm@master

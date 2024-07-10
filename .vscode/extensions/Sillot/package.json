@@ -2,7 +2,7 @@
   "name": "sillot",
   "displayName": "汐洛 Sillot",
   "description": "汐洛彖夲肜矩阵（Sillot T☳Converbenk Matrix）为智慧新彖务服务。此插件为汐洛官方插件，提供多功能一体化集成。",
-  "version": "0.35.24070923-dev1",
+  "version": "0.35.24070923-dev2",
   "preview": true,
   "repository": "https://github.com/Hi-Windom/Sillot",
   "publisher": "Hi-Windom",
@@ -436,9 +436,9 @@
     "b:check": "biome check ./src --config-path ../../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-check'"
   },
   "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
+    "@types/fs-extra": "catalog:",
     "@types/mocha": "^10.0.6",
-    "@types/node": "~20.14.8",
+    "@types/node": "catalog:",
     "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.9.0",
     "@typescript-eslint/parser": "^7.9.0",
@@ -450,16 +450,16 @@
     "jsonc-parser": "^3.2.1",
     "mkdirp": "^3.0.1",
     "rimraf": "^5.0.7",
-    "sofill": "^1.1.10",
+    "sofill": "catalog:",
     "ts-loader": "^9.5.1",
-    "typescript": "^5.5.2",
-    "webpack": "^5.91.0",
-    "webpack-cli": "^5.1.4"
+    "typescript": "catalog:",
+    "webpack": "catalog:",
+    "webpack-cli": "catalog:"
   },
   "dependencies": {
     "@octokit/rest": "^20.1.1",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "fs-extra": "^11.2.0",
+    "fs-extra": "catalog:",
     "json5": "^2.2.3"
   },
   "packageManager": "pnpm@9.5.0"
