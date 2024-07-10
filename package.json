@@ -13,7 +13,7 @@
     "docs:dev": "pnpm -F ./docs/starlight run dev",
     "docs:build": "pnpm -F ./docs/starlight run build",
     "vsce:sillot": "pnpm -F ./.vscode/extensions/Sillot run vsce:package",
-    "git:proxy": "git config --global http.proxy http://127.0.0.1:7890 && git config --global https.proxy http://127.0.0.1:7890 && echo '7890是 clash for windows 默认端口'",
+    "git:proxy": "git config --global http.proxy http://127.0.0.1:7897 && git config --global https.proxy http://127.0.0.1:7897 && echo '7897是 Clash Verge 默认端口'",
     "test": "pnpm -r run test"
   },
   "keywords": [],
