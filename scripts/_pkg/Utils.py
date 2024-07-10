@@ -1,6 +1,7 @@
 import re, ast
+from typing import List
 
-def quote_versions_v2(s):
+def quote_versions_v2(s) -> List[str]:
     """
     支持一个或两个点号分隔的版本号，请确保格式正确，本函数不做校验
     字符串示例: "[3.0.7, 3.0.6, 3.0, 3.1]"
@@ -70,15 +71,14 @@ def generate_header_from_repo(repo_name, tag_name, lastestRelease, electron_vers
 
 {HEADER}'''
 
-def print_taget2siyuan(tag_name, otherReleaseArray):
-    print('# [@SiYuan](https://github.com/siyuan-note/siyuan)\n')
-    arr = quote_versions_v2(otherReleaseArray)
+def print_taget2siyuan(tag_name, otherReleaseArray) -> List[str]:
+    print('# [@思源笔记](https://github.com/siyuan-note/siyuan)\n')
+    print(f'''## ⚓ ''', end="")
+    arr = ["v" + version for version in quote_versions_v2(otherReleaseArray)]
     if len(arr) > 0:
-        print('''### 非目标思源版本更新：''', end="")
         for v in arr:
-            print(f'''[v{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v})  ''', end="")
-    print(f'''
-
-## ⚓ [{tag_name}](https://github.com/siyuan-note/siyuan/releases/tag/{tag_name}) 值得注意的变化
+            print(f'''[{v}](https://github.com/siyuan-note/siyuan/releases/tag/{v})  ''', end="")
+    print(f'''[{tag_name}](https://github.com/siyuan-note/siyuan/releases/tag/{tag_name}) 值得注意的变化
 
 ''')
+    return arr

@@ -1,7 +1,7 @@
 {
   "name": "starlight",
   "type": "module",
-  "version": "0.35.24070922",
+  "version": "0.35.24070923-dev2",
   "scripts": {
     "test": "echo 'Test your sister day by day'",
     "dev": "astro dev",
@@ -19,12 +19,12 @@
     "@astrojs/check": "^0.7.0",
     "@astrojs/starlight": "0.24.4",
     "@lorenzo_lewis/starlight-utils": "^0.1.1",
-    "@types/node": "^20.14.8",
+    "@types/node": "catalog:",
     "@vercel/speed-insights": "^1.0.12",
     "astro": "^4.11.0",
     "sass": "^1.77.6",
     "starlight-links-validator": "^0.9.0",
-    "typescript": "^5.5.2"
+    "typescript": "catalog:"
   },
-  "packageManager": "pnpm@9.4.0"
+  "packageManager": "pnpm@9.5.0"
 }

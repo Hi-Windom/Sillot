@@ -6,3 +6,24 @@ packages:
   - '../sofillBuilder'
   # exclude packages that are inside test directories
   - '!**/test/**'
+
+# Default catalogs
+catalog:
+  "@types/node": ^20.14.8
+  "@types/react": ^18.3.1
+  "@types/react-dom": ^18.3.0
+  "@types/fs-extra": ^11.0.4
+  "@mui/icons-material": ^5.15.20
+  "@mui/material": ^5.15.20
+  "@mui/joy": 5.0.0-beta.36
+  typescript: ^5.5.2
+  react: 18.3.1
+  react-dom: 18.3.1
+  electron: 31.1.0
+  electron-builder: 24.9.1
+  date-fns: ^3.6.0
+  sofill: ^1.1.10
+  webpack: ^5.92.1
+  webpack-cli: ^5.1.4
+  rollup: ^4.18.0
+  fs-extra: ^11.2.0
