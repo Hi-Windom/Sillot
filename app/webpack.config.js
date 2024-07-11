@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const pkg = require("./package.json");
+const MonacoPlugin = require('./webpack/monacoPlugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
@@ -147,6 +148,9 @@ module.exports = (env, argv) => {
     },
     plugins: [
       // new BundleAnalyzerPlugin(),
+      new MonacoPlugin({
+        folderNames: ['monaco-editor/dev', 'monaco-editor/esm', 'monaco-editor/min-maps']
+      }),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
         cleanOnceBeforeBuildPatterns: [

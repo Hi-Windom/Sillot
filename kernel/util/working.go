@@ -17,7 +17,6 @@
 package util
 
 import (
-	"bytes"
 	"errors"
 	"flag"
 	"fmt"
@@ -25,7 +24,6 @@ import (
 	"mime"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -50,7 +48,6 @@ const (
 	VerC      = Ver + ".999" // 用于检查版本更新
 	VerSY     = "3.1.1"      // 思源版本号
 	IsInsider = true
-	VerDeno   = "1.32.5"
 )
 
 var (
@@ -147,7 +144,6 @@ func Boot() {
 	}
 
 	initPathDir()
-	go initDeno()
 
 	bootBanner := figure.NewColorFigure("Sillot", "isometric3", "green", true)
 	logging.LogInfof("\n" + bootBanner.String())
@@ -216,7 +212,6 @@ var (
 	HistoryDBPath      string        // SQLite 历史数据库文件路径
 	AssetContentDBPath string        // SQLite 资源文件内容数据库文件路径
 	BlockTreeDBPath    string        // 区块树数据库文件路径
-	DenoBinPath        string        // Deno 可执行文件路径
 	AppearancePath     string        // 配置目录下的外观目录 appearance/ 路径
 	ThemesPath         string        // 配置目录下的外观目录下的 themes/ 路径
 	IconsPath          string        // 配置目录下的外观目录下的 icons/ 路径
@@ -444,70 +439,6 @@ func initMime() {
 
 	// 文档数据文件
 	mime.AddExtensionType(".sy", "application/json")
-}
-
-func initDeno() {
-	if ContainerStd != Container {
-		return
-	}
-
-	denoDir := filepath.Join(WorkspaceDir, "bin")
-	if gulu.OS.IsWindows() {
-		DenoBinPath = filepath.Join(denoDir, "deno.exe")
-	} else if gulu.OS.IsDarwin() || gulu.OS.IsLinux() {
-		DenoBinPath = filepath.Join(denoDir, "deno")
-	}
-	denoVer := getDenoVer(DenoBinPath)
-	if strings.HasPrefix(denoVer, VerDeno+" (") { // 版本匹配
-		logging.LogInfof("exist built-in deno [ver=%s, bin=%s]", denoVer, DenoBinPath)
-		return
-	}
-
-	denoZip := filepath.Join(WorkingDir, "deno.zip")
-	if "dev" == Mode || !gulu.File.IsExist(denoZip) {
-		if gulu.OS.IsWindows() {
-			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-x86_64-pc-windows-msvc.zip")
-		} else if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" { // Apple M series chip
-			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-aarch64-apple-darwin.zip")
-		} else if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
-			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-x86_64-apple-darwin.zip")
-		} else if gulu.OS.IsLinux() {
-			denoZip = filepath.Join(WorkingDir, "apps", "deno", "deno-x86_64-unknown-linux-gnu.zip")
-		} else {
-			logging.LogErrorf("initDeno failed, not in support platform")
-			return
-		}
-	}
-	if err := gulu.Zip.Unzip(denoZip, denoDir); nil != err {
-		logging.LogErrorf("unzip deno failed: %s", err)
-		return
-	}
-
-	if gulu.OS.IsDarwin() || gulu.OS.IsLinux() {
-		exec.Command("chmod", "+x", DenoBinPath).CombinedOutput()
-	}
-	denoVer = getDenoVer(DenoBinPath)
-	logging.LogInfof("initialized built-in deno [ver=%s, bin=%s]", denoVer, DenoBinPath)
-}
-
-func getDenoVer(binPath string) (ret string) {
-	if "" == binPath {
-		return
-	}
-
-	cmd := exec.Command(binPath, "--version")
-	gulu.CmdAttr(cmd)
-	data, err := cmd.CombinedOutput()
-	if nil == err && strings.HasPrefix(string(data), "deno") {
-		parts := bytes.Split(data, []byte("\n"))
-		if 0 < len(parts) {
-			ret = strings.TrimPrefix(string(parts[0]), "deno")
-			ret = strings.ReplaceAll(ret, ".exe", "")
-			ret = strings.TrimSpace(ret)
-		}
-		return
-	}
-	return
 }
 
 func GetDataAssetsAbsPath() (ret string) {

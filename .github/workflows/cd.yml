@@ -141,6 +141,7 @@ jobs:
         config:
           - os: windows-latest
             name: windows build win.exe
+            kernel_path_upx: "app/kernel/SiYuan-Sillot-Kernel.exe"
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
             build_args_prefix: "-s -w -H=windowsgui -X"
             build_args_suffix: "Mode=prod"
@@ -152,6 +153,7 @@ jobs:
             suffix: "win.exe"
           - os: windows-latest
             name: windows build android.apk
+            kernel_path_upx: "app/kernel/SiYuan-Sillot-Kernel.exe"
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
             build_args_prefix: "-s -w -H=windowsgui -X"
             build_args_suffix: "Mode=prod"
@@ -254,6 +256,14 @@ jobs:
           GOPATH: ${{ github.workspace }}/go
           GOARCH: ${{ matrix.config.goarch }}
 
+      - name: 🔥 Compress Kernel
+        uses: crazy-max/ghaction-upx@v3
+        if: ${{ !contains( matrix.config.suffix, 'apk') }}
+        with:
+            version: latest
+            files: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/${{ matrix.config.kernel_path_upx }}
+            args: -9
+
       - name: 🔥 Building Electron
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         run: pnpm run ${{ matrix.config.electron_args }}
@@ -342,6 +352,7 @@ jobs:
         continue-on-error: false
 
       - name: 📤 Upload Gradle profile reports to artifact
+        if: contains( matrix.config.suffix, 'apk')
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:

@@ -40,7 +40,7 @@ nsis:
   warningsAsErrors: false
   installerSidebar: "nsis/installerSidebar.bmp"
   uninstallerSidebar: "nsis/uninstallerSidebar.bmp"
-
+electronLanguages: ['zh-CN', 'en-US']
 # 考虑安卓端，尽量避免 from: "appearance/themes/_lnco" to: "appearance/themes/lnco" 这种重命名的情况，保持一致性
 extraResources:
   - from: "changelogs"
@@ -78,5 +78,3 @@ extraResources:
     filter: "!**/{.DS_Store}"
   - from: "pandoc/pandoc-windows-amd64.zip"
     to: "pandoc.zip"
-  - from: "apps/deno/deno-x86_64-pc-windows-msvc.zip"
-    to: "deno.zip"
