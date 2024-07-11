@@ -260,10 +260,11 @@ jobs:
         working-directory: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app
 
       - name: 🔥 Compress binaries
-        uses: svenstaro/upx-action@v2
+        uses: crazy-max/ghaction-upx@v3
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
-            file: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/build/${{ env.repo_name }}-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}
+            version: latest
+            files: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/build/${{ env.repo_name }}-${{ needs.create_release.outputs.version }}-${{ matrix.config.suffix }}
             args: -9
 
       - name: 📤 Upload Release Asset for Windows & Linux
