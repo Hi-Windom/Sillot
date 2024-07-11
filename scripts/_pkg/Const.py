@@ -1,13 +1,14 @@
+# 海文东标准
 docmap_sillot = {
-    "Feature": "引入特性 | Feature",
-    "Enhancement": "改进功能 | Enhancement",
-    "Bug": "修复错误 | Bugfix",
-    "Security": "安全相关 | Security",
-    "Document": "文档相关 | Document",
-    "Refactor": "开发重构 | Refactor",
-    "Abolishment": "移除废止 | Abolishment",
-    "Shinning": "闪亮之名 | Shinning",
-    "VSCE": "VSCode 扩展相关 | VSCE",
+    "- - - Abolishment ❌": "移除废止 ❌",
+    "- - - Assess 🛸": "评估调研 🛸",
+    "- - - Bug 🩸": "修复错误 🩸",
+    "- - - Enhancement 🎢": "改进优化 🎢",
+    "- - - Ext 🧩": "插件扩展 🧩",
+    "- - - Feature 🧮": "功能特性 🧮",
+    "- - - Refactor ♻️": "破坏重构 ♻️",
+    "- - - Security ☢️": "安全更新 ☢️",
+    "- - - Shinning 🍭": "闪亮之名 🍭",
 }
 # 仅关注核心部分
 docmap_siyuan = {
