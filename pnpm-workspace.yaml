@@ -19,7 +19,7 @@ catalog:
   typescript: ^5.5.2
   react: 18.3.1
   react-dom: 18.3.1
-  electron: 31.1.0 # 在 cd.yml 工作流中需要读取，因此不要用任何版本前缀
+  electron: 31.2.0 # 在 cd.yml 工作流中需要读取，因此不要用任何版本前缀
   electron-builder: 24.9.1
   date-fns: ^3.6.0
   sofill: ^1.1.10
