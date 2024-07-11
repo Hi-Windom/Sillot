@@ -123,19 +123,20 @@ function Loader(props: { nodeID: string; initConfig: InitConfig }) {
     React.useEffect(
         () => {
             /// #if !BROWSER
-            const pp = path.join(__dirname, "../../app/node_modules/monaco-editor/min/vs"); // 思源路径特殊
-            // console.log(pp)
+            const pp = path.join(__dirname, "../../app/node_modules/monaco-editor/min/vs"); // electron
+            /// #endif
             loader.config({
+                /// #if !BROWSER
                 paths: {
                     vs: uriFromPath(pp),
                 },
+                /// #endif
                 "vs/nls": {
                     availableLanguages: {
                         "*": "zh-cn",
                     },
                 },
             });
-            /// #endif
             loader.init().then(monacoInstance => {
                 monacoInstance.editor.defineTheme("Birds-of-Paradise", BirdsofParadise); // 不要放到箭头函数里
                 monacoInstance.editor.defineTheme("Blackboard", Blackboard);
