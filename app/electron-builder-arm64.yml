@@ -41,7 +41,7 @@ nsis:
   warningsAsErrors: false
   installerSidebar: "nsis/installerSidebar.bmp"
   uninstallerSidebar: "nsis/uninstallerSidebar.bmp"
-
+electronLanguages: ['zh-CN', 'en-US']
 extraResources:
   - from: "changelogs"
     to: "changelogs"
