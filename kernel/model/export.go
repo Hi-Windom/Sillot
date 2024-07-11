@@ -33,8 +33,6 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/88250/pdfcpu/pkg/font"
-
 	"github.com/88250/gulu"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/editor"
