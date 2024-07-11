@@ -256,7 +256,7 @@ jobs:
           GOPATH: ${{ github.workspace }}/go
           GOARCH: ${{ matrix.config.goarch }}
 
-      - name: 🔥 Compress kernel binaries
+      - name: 🔥 Compress Kernel
         uses: crazy-max/ghaction-upx@v3
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         with:
