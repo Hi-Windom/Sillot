@@ -254,6 +254,13 @@ jobs:
           GOPATH: ${{ github.workspace }}/go
           GOARCH: ${{ matrix.config.goarch }}
 
+      - name: 🔥 Compress binaries
+        uses: svenstaro/upx-action@v2
+        if: ${{ !contains( matrix.config.suffix, 'apk') }}
+        with:
+            file: ${{ github.workspace }}/${{ env.repo_owner }}/${{ env.repo_name }}/app/kernel/SiYuan-Sillot-Kernel.exe
+            args: -9
+
       - name: 🔥 Building Electron
         if: ${{ !contains( matrix.config.suffix, 'apk') }}
         run: pnpm run ${{ matrix.config.electron_args }}
