@@ -61,6 +61,9 @@
   ],
   "settings": {
     // 非工作区设置，需要在用户设置中修改 ::开始
+    "security.allowedUNCHosts": [
+        "wsl.localhost" // 允许查看，保存是另外的权限
+    ],
     "workbench.experimental.enableNewProfilesUI": true, // since vscode 1.91.0
     "rust-analyzer.cargo.features": ["__runtime_js_sources"], // https://docs.deno.com/runtime/manual/references/contributing/
     // 非工作区设置，需要在用户设置中修改 ::结束
