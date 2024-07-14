@@ -324,10 +324,16 @@ func SearchRefBlock(id, rootID, keyword string, beforeLen int, isSquareBrackets,
 
 		ignoreLines := getRefSearchIgnoreLines()
 		refs := sql.QueryRefsRecent(onlyDoc, ignoreLines)
+		var btsID []string
+		for _, ref := range refs {
+			btsID = append(btsID, ref.DefBlockRootID)
+		}
+		btsID = gulu.Str.RemoveDuplicatedElem(btsID)
+		bts := treenode.GetBlockTrees(btsID)
 		for _, ref := range refs {
 			tree := cachedTrees[ref.DefBlockRootID]
 			if nil == tree {
-				tree, _ = LoadTreeByBlockID(ref.DefBlockRootID)
+				tree, _ = loadTreeByBlockTree(bts[ref.DefBlockRootID])
 			}
 			if nil == tree {
 				continue
@@ -360,10 +366,16 @@ func SearchRefBlock(id, rootID, keyword string, beforeLen int, isSquareBrackets,
 
 	ret = fullTextSearchRefBlock(keyword, beforeLen, onlyDoc)
 	tmp := ret[:0]
+	var btsID []string
+	for _, b := range ret {
+		btsID = append(btsID, b.RootID)
+	}
+	btsID = gulu.Str.RemoveDuplicatedElem(btsID)
+	bts := treenode.GetBlockTrees(btsID)
 	for _, b := range ret {
 		tree := cachedTrees[b.RootID]
 		if nil == tree {
-			tree, _ = LoadTreeByBlockID(b.RootID)
+			tree, _ = loadTreeByBlockTree(bts[b.RootID])
 		}
 		if nil == tree {
 			continue
@@ -376,7 +388,7 @@ func SearchRefBlock(id, rootID, keyword string, beforeLen int, isSquareBrackets,
 			// `((` 引用候选中排除当前块的父块 https://github.com/siyuan-note/siyuan/issues/4538
 			tree := cachedTrees[b.RootID]
 			if nil == tree {
-				tree, _ = LoadTreeByBlockID(b.RootID)
+				tree, _ = loadTreeByBlockTree(bts[b.RootID])
 				cachedTrees[b.RootID] = tree
 			}
 			if nil != tree {
@@ -889,11 +901,17 @@ func FullTextSearchBlock(query string, boxes, paths []string, types map[string]b
 		rootMap := map[string]bool{}
 		var rootIDs []string
 		contentSorts := map[string]int{}
+		var btsID []string
+		for _, b := range blocks {
+			btsID = append(btsID, b.RootID)
+		}
+		btsID = gulu.Str.RemoveDuplicatedElem(btsID)
+		bts := treenode.GetBlockTrees(btsID)
 		for _, b := range blocks {
 			if _, ok := rootMap[b.RootID]; !ok {
 				rootMap[b.RootID] = true
 				rootIDs = append(rootIDs, b.RootID)
-				tree, _ := LoadTreeByBlockID(b.RootID)
+				tree, _ := loadTreeByBlockTree(bts[b.RootID])
 				if nil == tree {
 					continue
 				}
