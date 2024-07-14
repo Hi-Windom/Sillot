@@ -30,6 +30,8 @@ HEADER_sillot = '''
 
 # 🚧 汐洛仅用于开发者测试，不要用来存储重要数据！
 
+# ❄️ [国内用户推荐使用阿里云盘下载](https://sillot.db.sc.cn/汐洛宝典/下载/#阿里云盘)
+
 🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)    📦 [VSCode Extension](https://marketplace.visualstudio.com/items?itemName=Hi-Windom.sillot)    📦 [Chromium Browser Extension（维护中）](https://github.com/K-Sillot/Sillot-Be/releases)
 
 <span>
