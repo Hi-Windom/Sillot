@@ -26,6 +26,11 @@
       "url": "https://github.com/Hi-Windom/Sillot/docs/starlight"
     },
     {
+        "path": "../../walinejs-deta-starter", // 
+        "name": "walinejs-deta-starter🤍../walinejs-deta-starter 🗂️",
+        "url": "https://github.com/Hi-Windom/walinejs-deta-starter"
+      },
+    {
       "path": "../../Sillot-android", // 开发在 Android Studio 完成，这里列出只是方便 Git 管理
       "name": "汐洛安卓🤍../Sillot-android 🗂️",
       "url": "https://github.com/Hi-Windom/Sillot-android"
