@@ -621,6 +621,7 @@ export abstract class Constants extends SConst { // Sillot extend
         "strong": true,
         "inlineMath": false,
         "inlineMemo": true,
+        "blockRef": false,
         "kbd": true,
         "mark": true,
         "s": true,
