@@ -13,7 +13,9 @@
 </p>
 
 <span>
-<img src="https://img.shields.io/badge/Chromium 94+-black?logo=Google Chrome&logoColor=white" title="Chromium 94+" height="31"/><img src="https://img.shields.io/badge/Windows 10+-black?logo=Windows 11" title="Windows 10+" height="31"/><img src="https://img.shields.io/badge/Android 12+-black?logo=android" title="Android 12+" height="31"/>
+<img src="https://img.shields.io/badge/Chromium 114+-black?logo=Google Chrome" title="Chromium" height="31"/>
+<img src="https://img.shields.io/badge/Windows 10+-black?logo=nsis" title="Windows" height="31"/>
+<img src="https://img.shields.io/badge/Linux TODO-black?logo=linux" title="linux" height="31"/>
+<img src="https://img.shields.io/badge/Android 12+-black?logo=android" title="Android" height="31"/>
+<img src="https://img.shields.io/badge/HarmonyOS TODO-black?logo=harmonyos" title="harmonyos" height="31"/>
 </span>
-<img src="../../../screenshots/sillot/es2022.png"/>
-
