@@ -35,7 +35,7 @@ set GOARCH=amd64
 
 @REM you can use `go mod tidy` to update kernel dependency bofore build
 go mod tidy
-go build --tags fts5 -v -o "../app/kernel/SiYuan-Sillot-Kernel.exe" -ldflags "-s -w -H=windowsgui" .
+call %~dp0\_sillot-gibbet-kernel-win.bat
 if errorlevel 1 (
     exit /b %errorlevel%
 )

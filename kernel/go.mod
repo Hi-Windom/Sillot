@@ -1,6 +1,6 @@
 module github.com/siyuan-note/siyuan/kernel
 
-go 1.22
+go 1.22.0
 
 // [$ g install x.yy.z] or [$ g use x.yy.z]  # ref https://github.com/voidint/g
 // VSCode 的GO工具链安装/升级失败导致报错多半是因为：golang.org 在国内由于一些 众所周知的 原因无法直接访问，可以先运行下面的命令
@@ -58,6 +58,7 @@ require (
 	github.com/sashabaranov/go-openai v1.26.2
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/siyuan-note/dejavu v0.0.0-20240710114654-4025d0084e9d
+	github.com/siyuan-note/encryption v0.0.0-20231219001248-1e028a4d13b4
 	github.com/siyuan-note/eventbus v0.0.0-20240627125516-396fdb0f0f97
 	github.com/siyuan-note/filelock v0.0.0-20240629145917-7545564cf0a4
 	github.com/siyuan-note/httpclient v0.0.0-20240626145026-29585d45a51c
@@ -174,8 +175,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-require github.com/siyuan-note/encryption v0.0.0-20231219001248-1e028a4d13b4
 
 replace github.com/mattn/go-sqlite3 => github.com/88250/go-sqlite3 v1.14.13-0.20231214121541-e7f54c482950
 
