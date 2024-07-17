@@ -140,7 +140,7 @@
     "rollup-plugin-postcss": "^4.0.2",
     "rxjs": "^7.8.1",
     "safer-buffer": "^2.1.2",
-    "sass": "^1.77.6",
+    "sass": "catalog:",
     "sass-loader": "^14.1.1",
     "socket.io": "^4.7.5",
     "sofill": "catalog:",
