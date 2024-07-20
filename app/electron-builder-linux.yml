@@ -17,7 +17,7 @@ extraFiles:
 linux:
   icon: "src/assets/icon.icns"
   category: "Utility"
-  executableName: "sillot"
+  executableName: "Sillot"
   desktop: {
     "Name": "Sillot",
     "Comment": "Refactor your thinking",
