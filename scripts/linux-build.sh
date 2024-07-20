@@ -23,15 +23,5 @@ export GOARCH=amd64
 export CC=~/x86_64-linux-musl-cross/bin/x86_64-linux-musl-gcc
 go build -buildmode=pie --tags fts5 -v -o "../app/kernel-linux/SiYuan-Sillot-Kernel" -ldflags "-s -w -extldflags -static-pie" .
 
-echo 'Building Kernel arm64'
-export GOARCH=arm64
-export CC=~/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc
-go build -buildmode=pie --tags fts5 -v -o "../app/kernel-linux-arm64/SiYuan-Sillot-Kernel" -ldflags "-s -w -extldflags -static-pie" .
-cd ..
-
 echo 'Building Electron App amd64'
-cd app
-pnpm run dist-linux
-echo 'Building Electron App arm64'
-pnpm run dist-linux-arm64
-cd ..
+pnpm -F ./app run dist-linux
