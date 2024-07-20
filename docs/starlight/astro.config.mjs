@@ -13,6 +13,7 @@ export default defineConfig({
             errorOnRelativeLinks: false,
         }),
     ],
+    vite: {},
     integrations: [
         // [src/content/docs/] 将由 starlight 负责样式，[src/pages/] 则不受影响，在自定义页面中使用 Starlight 布局，请使用 <StarlightPage /> 组件包装页面内容。
         // REF https://starlight.astro.build/zh-cn/guides/pages/
