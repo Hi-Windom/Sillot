@@ -1,6 +1,6 @@
 {
   "name": "sillot",
-  "version": "0.35.24071614",
+  "version": "0.35.24072019",
   "syv": "3.1.2",
   "sypv": "[3.0.16, 3.0.17, 3.1.0, 3.1.1]",
   "description": "Build Your Eternal Digital Garden",
@@ -140,7 +140,7 @@
     "rollup-plugin-postcss": "^4.0.2",
     "rxjs": "^7.8.1",
     "safer-buffer": "^2.1.2",
-    "sass": "^1.77.6",
+    "sass": "catalog:",
     "sass-loader": "^14.1.1",
     "socket.io": "^4.7.5",
     "sofill": "catalog:",

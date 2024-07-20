@@ -27,6 +27,9 @@ catalogs:
     '@types/react-dom':
       specifier: ^18.3.0
       version: 18.3.0
+    astro:
+      specifier: ^4.11.0
+      version: 4.11.0
     date-fns:
       specifier: ^3.6.0
       version: 3.6.0
@@ -48,6 +51,9 @@ catalogs:
     rollup:
       specifier: ^4.18.0
       version: 4.18.0
+    sass:
+      specifier: ^1.77.6
+      version: 1.77.6
     sofill:
       specifier: ^1.1.10
       version: 1.1.10
@@ -465,7 +471,7 @@ importers:
         specifier: ^2.1.2
         version: 2.1.2
       sass:
-        specifier: ^1.77.6
+        specifier: 'catalog:'
         version: 1.77.6
       sass-loader:
         specifier: ^14.1.1
@@ -535,10 +541,10 @@ importers:
         specifier: ^1.0.12
         version: 1.0.12(react@18.3.1)
       astro:
-        specifier: ^4.11.0
+        specifier: 'catalog:'
         version: 4.11.0(@types/node@20.14.8)(less@4.2.0)(sass@1.77.6)(terser@5.31.0)(typescript@5.5.2)
       sass:
-        specifier: ^1.77.6
+        specifier: 'catalog:'
         version: 1.77.6
       starlight-links-validator:
         specifier: ^0.9.0
@@ -2570,6 +2576,7 @@ packages:
     resolution: {integrity: sha512-ADm/xt86JUnmAfA9mBqFcRp//RVRt1ohGOYF6yL+IFCYqOBNwy5lbEK05xTsEoJq+/tJzg8ICUtS82WinJRuIw==}
     cpu: [arm]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-arm-gnueabihf@4.18.0':
     resolution: {integrity: sha512-C/zbRYRXFjWvz9Z4haRxcTdnkPt1BtCkz+7RtBSuNmKzMzp3ZxdM28Mpccn6pt28/UWUCTXa+b0Mx1k3g6NOMA==}
@@ -2581,6 +2588,7 @@ packages:
     resolution: {integrity: sha512-tJfJaXPiFAG+Jn3cutp7mCs1ePltuAgRqdDZrzb1aeE3TktWWJ+g7xK9SNlaSUFw6IU4QgOxAY4rA+wZUT5Wfg==}
     cpu: [arm]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-arm-musleabihf@4.18.0':
     resolution: {integrity: sha512-l3m9ewPgjQSXrUMHg93vt0hYCGnrMOcUpTz6FLtbwljo2HluS4zTXFy2571YQbisTnfTKPZ01u/ukJdQTLGh9A==}
@@ -2592,6 +2600,7 @@ packages:
     resolution: {integrity: sha512-7dy1BzQkgYlUTapDTvK997cgi0Orh5Iu7JlZVBy1MBURk7/HSbHkzRnXZa19ozy+wwD8/SlpJnOOckuNZtJR9w==}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-arm64-gnu@4.18.0':
     resolution: {integrity: sha512-rJ5D47d8WD7J+7STKdCUAgmQk49xuFrRi9pZkWoRD1UeSMakbcepWXPF8ycChBoAqs1pb2wzvbY6Q33WmN2ftw==}
@@ -2603,6 +2612,7 @@ packages:
     resolution: {integrity: sha512-zsFwdUw5XLD1gQe0aoU2HVceI6NEW7q7m05wA46eUAyrkeNYExObfRFQcvA6zw8lfRc5BHtan3tBpo+kqEOxmg==}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-arm64-musl@4.18.0':
     resolution: {integrity: sha512-be6Yx37b24ZwxQ+wOQXXLZqpq4jTckJhtGlWGZs68TgdKXJgw54lUUoFYrg6Zs/kjzAQwEwYbp8JxZVzZLRepQ==}
@@ -2614,6 +2624,7 @@ packages:
     resolution: {integrity: sha512-p8C3NnxXooRdNrdv6dBmRTddEapfESEUflpICDNKXpHvTjRRq1J82CbU5G3XfebIZyI3B0s074JHMWD36qOW6w==}
     cpu: [ppc64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-powerpc64le-gnu@4.18.0':
     resolution: {integrity: sha512-hNVMQK+qrA9Todu9+wqrXOHxFiD5YmdEi3paj6vP02Kx1hjd2LLYR2eaN7DsEshg09+9uzWi2W18MJDlG0cxJA==}
@@ -2625,6 +2636,7 @@ packages:
     resolution: {integrity: sha512-Lh/8ckoar4s4Id2foY7jNgitTOUQczwMWNYi+Mjt0eQ9LKhr6sK477REqQkmy8YHY3Ca3A2JJVdXnfb3Rrwkng==}
     cpu: [riscv64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-riscv64-gnu@4.18.0':
     resolution: {integrity: sha512-ROCM7i+m1NfdrsmvwSzoxp9HFtmKGHEqu5NNDiZWQtXLA8S5HBCkVvKAxJ8U+CVctHwV2Gb5VUaK7UAkzhDjlg==}
@@ -2636,6 +2648,7 @@ packages:
     resolution: {integrity: sha512-1xwwn9ZCQYuqGmulGsTZoKrrn0z2fAur2ujE60QgyDpHmBbXbxLaQiEvzJWDrscRq43c8DnuHx3QorhMTZgisQ==}
     cpu: [s390x]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-s390x-gnu@4.18.0':
     resolution: {integrity: sha512-0UyyRHyDN42QL+NbqevXIIUnKA47A+45WyasO+y2bGJ1mhQrfrtXUpTxCOrfxCR4esV3/RLYyucGVPiUsO8xjg==}
@@ -2647,6 +2660,7 @@ packages:
     resolution: {integrity: sha512-LuOGGKAJ7dfRtxVnO1i3qWc6N9sh0Em/8aZ3CezixSTM+E9Oq3OvTsvC4sm6wWjzpsIlOCnZjdluINKESflJLA==}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-x64-gnu@4.18.0':
     resolution: {integrity: sha512-xuglR2rBVHA5UsI8h8UbX4VJ470PtGCf5Vpswh7p2ukaqBGFTnsfzxUBetoWBWymHMxbIG0Cmx7Y9qDZzr648w==}
@@ -2658,6 +2672,7 @@ packages:
     resolution: {integrity: sha512-ch86i7KkJKkLybDP2AtySFTRi5fM3KXp0PnHocHuJMdZwu7BuyIKi35BE9guMlmTpwwBTB3ljHj9IQXnTCD0vA==}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-x64-musl@4.18.0':
     resolution: {integrity: sha512-LKaqQL9osY/ir2geuLVvRRs+utWUNilzdE90TpyoX0eNqPzWjRm14oMEE+YLve4k/NAqCdPkGYDaDF5Sw+xBfg==}
@@ -2724,9 +2739,6 @@ packages:
     resolution: {integrity: sha512-yHSKYidqJMV9nADqg78GYA+cZ0hS1twANAjiFibQdXj9aGzD+s/IzIFEIi/U/OBLvWYg/SCw0QVozi2vTlKFDQ==}
     cpu: [x64]
     os: [win32]
-
-  '@shikijs/core@1.6.0':
-    resolution: {integrity: sha512-NIEAi5U5R7BLkbW1pG/ZKu3eb1lzc3/+jD0lFsuxMT7zjaf9bbNwdNyMr7zh/Zl8EXQtQ+MYBAt5G+JLu+5DlA==}
 
   '@shikijs/core@1.9.0':
     resolution: {integrity: sha512-cbSoY8P/jgGByG8UOl3jnP/CWg/Qk+1q+eAKWtcrU3pNoILF8wTsLB0jT44qUBV8Ce1SvA9uqcM9Xf+u3fJFBw==}
@@ -2863,9 +2875,6 @@ packages:
 
   '@types/lodash@4.17.0':
     resolution: {integrity: sha512-t7dhREVv6dbNj0q17X12j7yDG4bD/DHYX7o5/DbDxobP0HnGPgpRz2Ej77aL7TZT3DSw13fqUTj8J4mMnqa7WA==}
-
-  '@types/mdast@4.0.3':
-    resolution: {integrity: sha512-LsjtqsyF+d2/yFOYaN22dHZI1Cpwkrj+g06G8+qtUKlhovPW89YhqSnfKtMbkgmEtYpH2gydRNULd6y8mciAFg==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -7471,9 +7480,6 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
-  shiki@1.6.0:
-    resolution: {integrity: sha512-P31ROeXcVgW/k3Z+vUUErcxoTah7ZRaimctOpzGuqAntqnnSmx1HOsvnbAB8Z2qfXPRhw61yptAzCsuKOhTHwQ==}
-
   shiki@1.9.0:
     resolution: {integrity: sha512-i6//Lqgn7+7nZA0qVjoYH0085YdNk4MC+tJV4bo+HgjgRMJ0JmkLZzFAuvVioJqLkcGDK5GAMpghZEZkCnwxpQ==}
 
@@ -8916,7 +8922,7 @@ snapshots:
 
   '@babel/helper-module-imports@7.24.3':
     dependencies:
-      '@babel/types': 7.24.0
+      '@babel/types': 7.24.7
 
   '@babel/helper-module-imports@7.24.7':
     dependencies:
@@ -8982,7 +8988,7 @@ snapshots:
 
   '@babel/helper-skip-transparent-expression-wrappers@7.22.5':
     dependencies:
-      '@babel/types': 7.24.0
+      '@babel/types': 7.24.7
 
   '@babel/helper-skip-transparent-expression-wrappers@7.24.7':
     dependencies:
@@ -9138,12 +9144,12 @@ snapshots:
   '@babel/plugin-syntax-nullish-coalescing-operator@7.8.3(@babel/core@7.24.4)':
     dependencies:
       '@babel/core': 7.24.4
-      '@babel/helper-plugin-utils': 7.24.0
+      '@babel/helper-plugin-utils': 7.24.7
 
   '@babel/plugin-syntax-nullish-coalescing-operator@7.8.3(@babel/core@7.24.7)':
     dependencies:
       '@babel/core': 7.24.7
-      '@babel/helper-plugin-utils': 7.24.0
+      '@babel/helper-plugin-utils': 7.24.7
 
   '@babel/plugin-syntax-numeric-separator@7.10.4(@babel/core@7.24.7)':
     dependencies:
@@ -9163,12 +9169,12 @@ snapshots:
   '@babel/plugin-syntax-optional-chaining@7.8.3(@babel/core@7.24.4)':
     dependencies:
       '@babel/core': 7.24.4
-      '@babel/helper-plugin-utils': 7.24.0
+      '@babel/helper-plugin-utils': 7.24.7
 
   '@babel/plugin-syntax-optional-chaining@7.8.3(@babel/core@7.24.7)':
     dependencies:
       '@babel/core': 7.24.7
-      '@babel/helper-plugin-utils': 7.24.0
+      '@babel/helper-plugin-utils': 7.24.7
 
   '@babel/plugin-syntax-private-property-in-object@7.14.5(@babel/core@7.24.7)':
     dependencies:
@@ -10392,7 +10398,7 @@ snapshots:
   '@expressive-code/plugin-shiki@0.35.3':
     dependencies:
       '@expressive-code/core': 0.35.3
-      shiki: 1.6.0
+      shiki: 1.9.0
 
   '@expressive-code/plugin-text-markers@0.35.3':
     dependencies:
@@ -11321,8 +11327,6 @@ snapshots:
   '@rometools/cli-win32-x64@12.1.3':
     optional: true
 
-  '@shikijs/core@1.6.0': {}
-
   '@shikijs/core@1.9.0': {}
 
   '@sillot/bridge@0.0.3': {}
@@ -11476,10 +11480,6 @@ snapshots:
       '@types/node': 20.14.8
 
   '@types/lodash@4.17.0': {}
-
-  '@types/mdast@4.0.3':
-    dependencies:
-      '@types/unist': 3.0.2
 
   '@types/mdast@4.0.4':
     dependencies:
@@ -11893,19 +11893,19 @@ snapshots:
       '@webassemblyjs/ast': 1.12.1
       '@xtuc/long': 4.2.2
 
-  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))':
+  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))':
     dependencies:
-      webpack: 5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4)
+      webpack: 5.92.1(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1)
 
-  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))':
+  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))':
     dependencies:
-      webpack: 5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4)
+      webpack: 5.92.1(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1)
 
-  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))':
+  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))':
     dependencies:
-      webpack: 5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4)
+      webpack: 5.92.1(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1)
 
   '@wixc3/board-core@2.5.0': {}
@@ -15351,7 +15351,7 @@ snapshots:
 
   mdast-util-definitions@6.0.0:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       '@types/unist': 3.0.2
       unist-util-visit: 5.0.0
 
@@ -15370,7 +15370,7 @@ snapshots:
 
   mdast-util-find-and-replace@3.0.1:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       escape-string-regexp: 5.0.0
       unist-util-is: 6.0.0
       unist-util-visit-parents: 6.0.1
@@ -15394,7 +15394,7 @@ snapshots:
 
   mdast-util-gfm-autolink-literal@2.0.0:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       ccount: 2.0.1
       devlop: 1.1.0
       mdast-util-find-and-replace: 3.0.1
@@ -15402,7 +15402,7 @@ snapshots:
 
   mdast-util-gfm-footnote@2.0.0:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       devlop: 1.1.0
       mdast-util-from-markdown: 2.0.0
       mdast-util-to-markdown: 2.1.0
@@ -15412,7 +15412,7 @@ snapshots:
 
   mdast-util-gfm-strikethrough@2.0.0:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       mdast-util-from-markdown: 2.0.0
       mdast-util-to-markdown: 2.1.0
     transitivePeerDependencies:
@@ -15420,7 +15420,7 @@ snapshots:
 
   mdast-util-gfm-table@2.0.0:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       devlop: 1.1.0
       markdown-table: 3.0.3
       mdast-util-from-markdown: 2.0.0
@@ -15430,7 +15430,7 @@ snapshots:
 
   mdast-util-gfm-task-list-item@2.0.0:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       devlop: 1.1.0
       mdast-util-from-markdown: 2.0.0
       mdast-util-to-markdown: 2.1.0
@@ -15507,7 +15507,7 @@ snapshots:
   mdast-util-to-hast@13.1.0:
     dependencies:
       '@types/hast': 3.0.4
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       '@ungap/structured-clone': 1.2.0
       devlop: 1.1.0
       micromark-util-sanitize-uri: 2.0.0
@@ -15529,7 +15529,7 @@ snapshots:
 
   mdast-util-to-string@4.0.0:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
 
   mdn-data@2.0.14: {}
 
@@ -16982,7 +16982,7 @@ snapshots:
 
   remark-gfm@4.0.0:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       mdast-util-gfm: 3.0.0
       micromark-extension-gfm: 3.0.0
       remark-parse: 11.0.0
@@ -17000,7 +17000,7 @@ snapshots:
 
   remark-parse@11.0.0:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       mdast-util-from-markdown: 2.0.0
       micromark-util-types: 2.0.0
       unified: 11.0.4
@@ -17010,7 +17010,7 @@ snapshots:
   remark-rehype@11.1.0:
     dependencies:
       '@types/hast': 3.0.4
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       mdast-util-to-hast: 13.1.0
       unified: 11.0.4
       vfile: 6.0.1
@@ -17030,7 +17030,7 @@ snapshots:
 
   remark-stringify@11.0.0:
     dependencies:
-      '@types/mdast': 4.0.3
+      '@types/mdast': 4.0.4
       mdast-util-to-markdown: 2.1.0
       unified: 11.0.4
 
@@ -17436,10 +17436,6 @@ snapshots:
       glob: 7.2.3
       interpret: 1.4.0
       rechoir: 0.6.2
-
-  shiki@1.6.0:
-    dependencies:
-      '@shikijs/core': 1.6.0
 
   shiki@1.9.0:
     dependencies:
@@ -18337,9 +18333,9 @@ snapshots:
   webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1):
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))
-      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))
-      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4))
+      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))
+      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))
+      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.2)(webpack@5.92.1))(webpack@5.92.1(webpack-cli@5.1.4))
       colorette: 2.0.20
       commander: 10.0.1
       cross-spawn: 7.0.3
@@ -18348,7 +18344,7 @@ snapshots:
       import-local: 3.1.0
       interpret: 3.1.1
       rechoir: 0.8.0
-      webpack: 5.92.1(esbuild@0.21.5)(webpack-cli@5.1.4)
+      webpack: 5.92.1(webpack-cli@5.1.4)
       webpack-merge: 5.10.0
     optionalDependencies:
       webpack-bundle-analyzer: 4.10.2

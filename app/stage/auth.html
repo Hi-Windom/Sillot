@@ -513,7 +513,7 @@
             return response.json()
         }).then((response) => {
             if (0 === response.code) {
-                window.JSAndroid?.setMMKV("AppCheckInState","unlockScreen")
+                window.JSAndroid?.setKV("AppCheckInState","unlockScreen")
                 const url = new URL(window.location)
                 window.location.href = url.searchParams.get("to") || "/"
                 return
@@ -601,7 +601,7 @@
             Biometric.style.display = 'none';
             BiometricTip.style.display = 'none';
         } else {
-            window.JSAndroid?.setMMKV("AppCheckInState","lockScreen")
+            window.JSAndroid?.setKV("AppCheckInState","lockScreen")
         }
 
         // 用于授权页保持连接，避免非常驻内存内核自动退出 https://github.com/siyuan-note/insider/issues/1099
