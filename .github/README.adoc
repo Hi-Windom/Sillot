@@ -12,6 +12,8 @@ image:https://img.shields.io/github/license/Hi-Windom/Sillot?style=flat&color=00
 image:https://img.shields.io/github/last-commit/Hi-Windom/Sillot?style=flat&logo=git&logoColor=white&color=0080ff[last-commit]
 image:https://img.shields.io/github/languages/top/Hi-Windom/Sillot?style=flat&color=0080ff[repo-top-language]
 image:https://img.shields.io/github/languages/count/Hi-Windom/Sillot?style=flat&color=0080ff[repo-language-count]
+image:https://img.shields.io/github/repo-size/Hi-Windom/Sillot?style=flat-square[GitHub repo size]
+image:https://img.shields.io/github/languages/code-size/Hi-Windom/Sillot.svg?style=flat-square[GitHub code size]
 
 image:https://app.codacy.com/project/badge/Grade/3106acfdbc5041118d800c5b4f2f935d[
     codacy,
