@@ -34,7 +34,7 @@ linux:
       arch: "arm64"
     - target: "deb"
       arch: "arm64"
-
+electronLanguages: ['zh-CN', 'en-US']
 extraResources:
   - from: "changelogs"
     to: "changelogs"
