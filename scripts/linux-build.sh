@@ -2,9 +2,7 @@
 # 汐洛仅实现在 windows 平台的构建，linux 自行探索
 
 echo 'Building UI'
-cd app
-pnpm install && pnpm run build
-cd ..
+pnpm pnpm install && pnpm run app:build
 
 echo 'Cleaning Builds'
 rm -rf app/build
