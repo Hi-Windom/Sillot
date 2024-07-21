@@ -1,3 +1,4 @@
+import json
 import os
 import re, ast
 from argparse import ArgumentParser
@@ -34,6 +35,13 @@ def generate_msg_from_repo(repo_name, tag_name, otherReleaseArray):
                 {"title": issue.title, "url": issue.html_url}
             )
     U.generate_msg(desc_mapping, C.docmap_siyuan)
+
+     # 将desc_mapping转换为JSON格式并写入文件
+    filename = "siyuan_desc_mapping.json"
+    with open(filename, 'w') as file:
+        json.dump(desc_mapping, file, indent=4)
+
+    # 文件已经准备好上传，接下来的步骤将在GitHub Actions工作流文件中执行
 
 if __name__ == "__main__":
     parser = ArgumentParser(

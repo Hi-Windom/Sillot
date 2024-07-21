@@ -132,6 +132,12 @@ jobs:
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 📤 Upload artifact siyuan_desc_mapping.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: siyuan_desc_mapping.json
+          path: siyuan_desc_mapping.json
+
   build:
     runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.name }}
