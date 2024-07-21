@@ -144,9 +144,11 @@ jobs:
     needs: create_release
     strategy:
       matrix:
+        # suffix 需要与 electron builder 配置中的 artifactName 匹配
         config:
           - os: ubuntu-20.04
             name: ubuntu build linux.AppImage
+            kernel_path_upx: "app/kernel-linux/SiYuan-Sillot-Kernel"
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
             build_args_prefix: "-s -w -X"
             build_args_suffix: "Mode=prod"
@@ -156,6 +158,7 @@ jobs:
             suffix: "linux-amd64.AppImage"
           - os: ubuntu-20.04
             name: ubuntu build linux.tar.gz
+            kernel_path_upx: "app/kernel-linux/SiYuan-Sillot-Kernel"
             kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
             build_args_prefix: "-s -w -X"
             build_args_suffix: "Mode=prod"
@@ -174,7 +177,7 @@ jobs:
             gobin: "bin"
             mingwsys: "MINGW64"
             goarch: "amd64"
-            suffix: "win-amd64.exe"
+            suffix: "win-x64.exe"
           - os: windows-latest
             name: windows build android.apk
             kernel_path_upx: "app/kernel/SiYuan-Sillot-Kernel.exe"

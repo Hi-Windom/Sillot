@@ -3,7 +3,7 @@ appId: "sc.windom.sillot"
 asar: false
 compression: "store"
 copyright: "© 2024 Hi-Windom"
-artifactName: "Sillot-${version}-${os}.${ext}"
+artifactName: "Sillot-${version}-${os}-${arch}.${ext}"
 extraMetadata:
   main: "electron/main.js"
 directories:
