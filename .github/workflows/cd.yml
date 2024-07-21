@@ -132,15 +132,42 @@ jobs:
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 📤 Upload artifact siyuan_desc_mapping.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: siyuan_desc_mapping.json
+          path: siyuan_desc_mapping.json
+
   build:
     runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.name }}
     needs: create_release
     strategy:
       matrix:
+        # suffix 需要与 electron builder 配置中的 artifactName 匹配
         config:
+          - os: ubuntu-20.04
+            name: ubuntu build linux-x86_64.AppImage
+            kernel_path_upx: "app/kernel-linux/SiYuan-Sillot-Kernel"
+            kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
+            build_args_prefix: "-s -w -X"
+            build_args_suffix: "Mode=prod"
+            electron_args: "dist-linux"
+            goos: "linux"
+            goarch: "amd64"
+            suffix: "linux-x86_64.AppImage"
+          - os: ubuntu-20.04
+            name: ubuntu build linux-x64.tar.gz
+            kernel_path_upx: "app/kernel-linux/SiYuan-Sillot-Kernel"
+            kernel_path: "../app/kernel-linux/SiYuan-Sillot-Kernel"
+            build_args_prefix: "-s -w -X"
+            build_args_suffix: "Mode=prod"
+            electron_args: "dist-linux"
+            goos: "linux"
+            goarch: "amd64"
+            suffix: "linux-x64.tar.gz"
           - os: windows-latest
-            name: windows build win.exe
+            name: windows build win-x64.exe
             kernel_path_upx: "app/kernel/SiYuan-Sillot-Kernel.exe"
             kernel_path: "../app/kernel/SiYuan-Sillot-Kernel.exe"
             build_args_prefix: "-s -w -H=windowsgui -X"
@@ -150,7 +177,7 @@ jobs:
             gobin: "bin"
             mingwsys: "MINGW64"
             goarch: "amd64"
-            suffix: "win.exe"
+            suffix: "win-x64.exe"
           - os: windows-latest
             name: windows build android.apk
             kernel_path_upx: "app/kernel/SiYuan-Sillot-Kernel.exe"
@@ -381,7 +408,7 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             upload_url: ${{ needs.create_release.outputs.upload_url }}
-            asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-beta_arm64.apk
+            asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-android-arm64_v8a.apk
             asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
 
       - name: 📤 Upload logs to artifact if failure

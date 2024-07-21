@@ -3,7 +3,7 @@ appId: "sc.windom.sillot"
 asar: false
 compression: "store"
 copyright: "© 2024 Hi-Windom"
-artifactName: "siyuan-${version}-${os}-arm64.${ext}"
+artifactName: "Sillot-${version}-${os}-${arch}.${ext}"
 extraMetadata:
   main: "electron/main.js"
 directories:
@@ -13,34 +13,24 @@ files:
 extraFiles:
   - from: "../LICENSE"
     to: "LICENSE"
-win:
-  icon: "src/assets/icon.ico"
+
+linux:
+  icon: "src/assets/icon.icns"
+  category: "Utility"
+  executableName: "Sillot"
+  desktop: {
+    "Name": "Sillot",
+    "Comment": "Refactor your thinking",
+    "Type": "Application",
+    "Categories": "Utility;"
+  }
   extraResources:
-    - from: "kernel-arm64"
+    - from: "kernel-linux"
       to: "kernel"
-  requestedExecutionLevel: "asInvoker"
-  # certificateSubjectName: "Yunnan Liandi Technology Co., Ltd."
-  signingHashAlgorithms: [ 'sha256' ]
-  #rfc3161TimeStampServer: "http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-  #rfc3161TimeStampServer: "http://time.certum.pl"
-  rfc3161TimeStampServer: "http://timestamp.entrust.net/TSS/RFC3161sha2TS"
   target:
-    - target: "nsis"
-      arch: "arm64"
-nsis:
-  oneClick: false
-  perMachine: false
-  allowToChangeInstallationDirectory: true
-  allowElevation: true
-  deleteAppDataOnUninstall: true
-  createDesktopShortcut: true
-  createStartMenuShortcut: true
-  shortcutName: "Sillot"
-  license: "../LICENSE"
-  include: "nsis/installer.nsh"
-  warningsAsErrors: false
-  installerSidebar: "nsis/installerSidebar.bmp"
-  uninstallerSidebar: "nsis/uninstallerSidebar.bmp"
+    - target: "tar.gz"
+    - target: "AppImage"
+    - target: "deb"
 electronLanguages: ['zh-CN', 'en-US']
 extraResources:
   - from: "changelogs"
@@ -49,7 +39,7 @@ extraResources:
     to: "stage"
   - from: "guide"
     to: "guide"
-    filter: "!**/{.DS_Store,.git,.gitignore,.idea}"
+    filter: "!**/{.DS_Store,.git,.gitignore,.idea,20211226090932-5lcq56f}"
   - from: "appearance/boot"
     to: "appearance/boot"
     filter: "!**/{.DS_Store}"
@@ -70,9 +60,11 @@ extraResources:
   - from: "appearance/themes/daylight"
     to: "appearance/themes/daylight"
     filter: "!**/{.DS_Store,custom.css}"
-  - from: "appearance/themes/lnco"
-    to: "appearance/themes/lnco"
-    filter: "!**/{.DS_Store,custom.css}"
   - from: "src/assets/fonts"
     to: "appearance/fonts"
     filter: "!**/{.DS_Store}"
+  - from: "appearance/themes/lnco"
+    to: "appearance/themes/lnco"
+    filter: "!**/{.DS_Store,custom.css}"
+  - from: "pandoc/pandoc-linux-amd64.zip"
+    to: "pandoc.zip"

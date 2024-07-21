@@ -35,7 +35,7 @@ HEADER_sillot = '''
 <p>
 <img src="https://img.shields.io/badge/Chromium 114+-black?logo=Google Chrome" title="Chromium" height="29"/>
 <img src="https://img.shields.io/badge/Windows 10+-black?logo=nsis" title="Windows" height="29"/>
-<img src="https://img.shields.io/badge/Linux TODO-black?logo=linux" title="linux" height="29"/>
+<img src="https://img.shields.io/badge/Linux AMD64-black?logo=linux" title="linux" height="29"/>
 <img src="https://img.shields.io/badge/Android 12+-black?logo=android" title="Android" height="29"/>
 <img src="https://img.shields.io/badge/HarmonyOS TODO-black?logo=harmonyos" title="harmonyos" height="29"/>
 </p>

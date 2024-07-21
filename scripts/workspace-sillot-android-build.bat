@@ -3,7 +3,7 @@
 @REM if errorlevel 1 实际上是在检查errorlevel是否大于或等于1，这是检查命令是否失败的标准做法。
 
 echo ===== Building UI =====
-call pnpm --filter ./app install
+call pnpm install
 call pnpm run app:build
 if errorlevel 1 (
     exit /b %errorlevel%
