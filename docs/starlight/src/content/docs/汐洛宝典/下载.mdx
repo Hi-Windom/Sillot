@@ -2,6 +2,9 @@
 title: 下载
 ---
 
+import { Image } from "astro:assets"
+import myImage from "@assets/shots/2024-07-21-002329.png"
+
 ## Github release
 
 https://github.com/Hi-Windom/Sillot/releases
@@ -18,7 +21,7 @@ https://www.alipan.com/s/FuVG2PhBYTD 提取码: g4k1
 
 找到 GitHub 仓库的 [Release 页面](https://github.com/Hi-Windom/Sillot/releases)，并在 Assets 里找到 AppImage 文件。
 
-<img src="/src/assets/shots/2024-07-21-002329.png" />
+<Image src={myImage} alt="找到 AppImage 文件" />
 
 复制 Appimage 的链接，在 WSL 中打开终端，输入 `wget <URL>` 命令下载，然后通过 `chmod +x <FILENAME>` 命令赋予可执行权限，最后通过 `./<FILENAME>` 命令运行。
 
