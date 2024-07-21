@@ -8,17 +8,25 @@ link:./docs/Sillot-android[汐洛安卓]
 
 image::split.png[Split Image]
 
-image:https://img.shields.io/github/license/Hi-Windom/Sillot?style=flat&color=0080ff[license]
-image:https://img.shields.io/github/last-commit/Hi-Windom/Sillot?style=flat&logo=git&logoColor=white&color=0080ff[last-commit]
-image:https://img.shields.io/github/languages/top/Hi-Windom/Sillot?style=flat&color=0080ff[repo-top-language]
-image:https://img.shields.io/github/languages/count/Hi-Windom/Sillot?style=flat&color=0080ff[repo-language-count]
-image:https://img.shields.io/github/repo-size/Hi-Windom/Sillot?style=flat-square[GitHub repo size]
-image:https://img.shields.io/github/languages/code-size/Hi-Windom/Sillot.svg?style=flat-square[GitHub code size]
+image:https://img.shields.io/github/repo-size/Hi-Windom/Sillot?logo=github[GitHub repo size]
+image:https://img.shields.io/github/languages/code-size/Hi-Windom/Sillot.svg?logo=github[GitHub code size]
+image:https://img.shields.io/github/issues-closed/Hi-Windom/Sillot?logo=github[GitHub closed issues]
+image:https://img.shields.io/github/issues-pr-closed/Hi-Windom/Sillot?logo=github[GitHub closed pull requests]
 
-image:https://app.codacy.com/project/badge/Grade/3106acfdbc5041118d800c5b4f2f935d[
-    codacy,
-    link="https://app.codacy.com/gh/Hi-Windom/Sillot/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"
+image:https://hits.b3log.org/Hi-Windom/Sillot.svg[
+    Github Hits,
+    link="https://github.com/Hi-Windom/Sillot"
     ]
+image:https://img.shields.io/github/last-commit/Hi-Windom/Sillot?logo=git[last-commit]
+image:https://img.shields.io/github/commit-activity/m/Hi-Windom/Sillot?logo=git[GitHub commit activity]
+image:https://img.shields.io/github/commit-activity/y/Hi-Windom/Sillot?logo=git[GitHub commit activity]
+
+image:https://img.shields.io/github/languages/count/Hi-Windom/Sillot[repo-language-count]
+// codacy 太拉了，不好用
+// image:https://app.codacy.com/project/badge/Grade/3106acfdbc5041118d800c5b4f2f935d[
+//     codacy,
+//     link="https://app.codacy.com/gh/Hi-Windom/Sillot/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"
+//     ]
 image:https://www.codefactor.io/repository/github/hi-windom/sillot/badge[
     codefactor,
     link="https://www.codefactor.io/repository/github/hi-windom/sillot"
@@ -27,7 +35,7 @@ image:https://codecov.io/gh/Hi-Windom/Sillot/branch/master/graph/badge.svg?token
     codecov,
     link="https://codecov.io/gh/Hi-Windom/Sillot"
     ]
-image:https://img.shields.io/github/downloads/Hi-Windom/Sillot/total.svg?style=flat-square&color=A26738&logo=github[
+image:https://img.shields.io/github/downloads/Hi-Windom/Sillot/total.svg?style=flat-square&logo=github[
     downloads,
     link="https://github.com/Hi-Windom/Sillot/releases"
     ]
@@ -35,17 +43,11 @@ image:https://img.shields.io/docker/pulls/soltus/sillot?color=99CCFF&label=pulls
     docker-pulls,
     link="https://hub.docker.com/r/soltus/sillot"
     ]
-image:https://hits.b3log.org/Hi-Windom/Sillot.svg[
-    Hits,
-    link="https://github.com/Hi-Windom/Sillot"
-    ]
 
 // 注意当前设置 master 为默认分支
 image:https://repobeats.axiom.co/api/embed/708cdf00c747155e49ff28c0c0024e17a28e5705.svg[
     Insights,
     link="https://github.com/Hi-Windom/Sillot/pulse"
 ]
-
-image::../app/stage/icon.png[Sillot Logo]
 
 image::https://capsule-render.vercel.app/api?type=waving&color=timeGradient&height=300&&section=footer&text=Hi-Windom&fontSize=90&fontAlign=50&fontAlignY=70&desc=Power%20by%20&descAlign=50&descSize=30&descAlignY=40&animation=twinkling[Hi-Windom Footer]
