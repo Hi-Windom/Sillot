@@ -1,6 +1,6 @@
 {
   "name": "sillot-gibbet",
-  "version": "0.35.24072117",
+  "version": "0.35.24072421",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://sillot.db.sc.cn",
   "repository": "https://github.com/Hi-Windom/Sillot",
@@ -9,7 +9,7 @@
     "node": ">=20.11.1",
     "pnpm": ">=9.1.0"
   },
-  "packageManager": "pnpm@9.5.0",
+  "packageManager": "pnpm@9.6.0",
   "scripts": {
     "test": "echo 'Test your sister day by day'",
     "sp": "pnpm store prune",

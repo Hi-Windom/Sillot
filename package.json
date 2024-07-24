@@ -1,10 +1,10 @@
 {
   "name": "sillot-workspace",
-  "version": "0.35.24072117",
+  "version": "0.35.24072421",
   "syv": "3.1.2",
   "sypv": "[3.0.16, 3.0.17, 3.1.0, 3.1.1]",
   "description": "汐洛 pnpm 工作区",
-  "packageManager": "pnpm@9.5.0",
+  "packageManager": "pnpm@9.6.0",
   "actionInstallCommand": "pnpm install --no-frozen-lockfile",
   "homepage": "https://sillot.db.sc.cn",
   "repository": "https://github.com/Hi-Windom/Sillot",
@@ -24,15 +24,6 @@
   "keywords": [],
   "author": "",
   "devDependencies": {
-    "@biomejs/biome": "1.8.2",
-    "@types/node": "^20.14.8",
-    "@types/react": "^18.3.0",
-    "@types/react-dom": "^18.3.0",
-    "shelljs": "^0.8.5",
-    "typescript": "^5.5.2",
-    "webpack": "^5.92.1",
-    "webpack-bundle-analyzer": "^4.10.1",
-    "webpack-cli": "^5.1.4"
   },
   "resolutions": {
     "lodash": "4.17.21"
