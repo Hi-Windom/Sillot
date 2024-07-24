@@ -1,10 +1,11 @@
 name: Release Docker Image
 
 on:
+  workflow_call: # TODO
   workflow_dispatch:
     inputs:
       image_tag:
-        description: '镜像标签，留空则使用 package.json 中的版本号。务必注意：请确认选择了正确的分支。完整输入示例：0.31.1000-rc0 '
+        description: '镜像标签，留空则使用 package.json 中的版本号。务必注意：请确认选择了正确的分支。完整输入示例：0.35.24072117-E1 '
         required: true
         default: ''
       channel:
