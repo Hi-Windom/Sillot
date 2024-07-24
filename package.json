@@ -1,8 +1,13 @@
 {
-  "name": "Sillot-workspace",
+  "name": "sillot-workspace",
   "version": "0.35.24072117",
+  "syv": "3.1.2",
+  "sypv": "[3.0.16, 3.0.17, 3.1.0, 3.1.1]",
   "description": "汐洛 pnpm 工作区",
   "packageManager": "pnpm@9.5.0",
+  "actionInstallCommand": "pnpm install --no-frozen-lockfile",
+  "homepage": "https://sillot.db.sc.cn",
+  "repository": "https://github.com/Hi-Windom/Sillot",
   "scripts": {
     "app:build": "pnpm -F ./app run gentpl && pnpm -F ./app run /build:.*/",
     "app:b:lint": "pnpm -F ./app run b:lint",
@@ -28,5 +33,8 @@
     "webpack": "^5.92.1",
     "webpack-bundle-analyzer": "^4.10.1",
     "webpack-cli": "^5.1.4"
+  },
+  "resolutions": {
+    "lodash": "4.17.21"
   }
 }

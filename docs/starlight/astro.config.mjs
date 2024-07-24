@@ -58,6 +58,10 @@ export default defineConfig({
                     autogenerate: { directory: "汐洛宝典" },
                 },
                 {
+                    label: "发行说明",
+                    autogenerate: { directory: "发行说明" },
+                },
+                {
                     label: "依赖更新",
                     autogenerate: { directory: "依赖更新" },
                 },

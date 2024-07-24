@@ -1,8 +1,6 @@
 {
-  "name": "sillot",
+  "name": "sillot-gibbet",
   "version": "0.35.24072117",
-  "syv": "3.1.2",
-  "sypv": "[3.0.16, 3.0.17, 3.1.0, 3.1.1]",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://sillot.db.sc.cn",
   "repository": "https://github.com/Hi-Windom/Sillot",
@@ -12,7 +10,6 @@
     "pnpm": ">=9.1.0"
   },
   "packageManager": "pnpm@9.5.0",
-  "actionInstallCommand": "pnpm install --no-frozen-lockfile",
   "scripts": {
     "test": "echo 'Test your sister day by day'",
     "sp": "pnpm store prune",
@@ -161,8 +158,5 @@
     "electron-store": "^10.0.0",
     "monaco-editor": "^0.50.0",
     "monaco-editor-nls": "^3.1.0"
-  },
-  "resolutions": {
-    "lodash": "4.17.21"
   }
 }

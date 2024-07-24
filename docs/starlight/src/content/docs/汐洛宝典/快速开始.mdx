@@ -1,5 +1,12 @@
 ---
 title: 快速开始
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: 0
+  # 为链接添加徽章
+  badge:
+    text: 必读
+    variant: tip
 ---
 import {
     sillotNoteName_yobeCe,
@@ -26,6 +33,7 @@ import {
     lnco_doCe
 } from '../../../Const'
 import { Steps } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
 ## 🦢 {sillot_yobeCe}缘起
 
@@ -98,3 +106,9 @@ import { Steps } from '@astrojs/starlight/components';
 {sillotMatrixName_yobeCe}没有收费计划，但这不意味着用户可以免费使用{sillotMatrixName_yobeCe}的全部功能，因为有些收费特性来自供应链上游（例如思源笔记）或者授权认证服务。{sillotMatrixName_yobeCe}尊重开源生态与他人劳动成果，不会对集成的开源功能私自收费，也不会破解供应链上游提供的付费功能给用户（但保留开发者内部测试时暂时破解的权利）。
 
 ## 🙋 {sillotMatrixName_yobeCe}的版本划分与更新节奏是？
+
+见发行说明。
+
+<Aside>
+如果您无法证明您的新彖乄用途，我们不会为您的数据安全负责。
+</Aside>
