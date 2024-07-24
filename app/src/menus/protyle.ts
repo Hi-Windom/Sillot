@@ -475,6 +475,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
         let submenu: IMenu[] = [];
         if (element.getAttribute("data-subtype") === "s") {
             submenu.push({
+                iconHTML: "",
                 label: window.siyuan.languages.turnToDynamic,
                 click() {
                     element.setAttribute("data-subtype", "d");
@@ -489,6 +490,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
             });
         } else {
             submenu.push({
+                iconHTML: "",
                 label: window.siyuan.languages.turnToStatic,
                 click() {
                     element.setAttribute("data-subtype", "s");
@@ -500,6 +502,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
             });
         }
         submenu = submenu.concat([{
+            iconHTML: "",
             label: window.siyuan.languages.text,
             click() {
                 nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
@@ -508,6 +511,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
                 oldHTML = nodeElement.outerHTML;
             }
         }, {
+            iconHTML: "",
             label: "*",
             click() {
                 element.setAttribute("data-subtype", "s");
@@ -518,6 +522,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
                 oldHTML = nodeElement.outerHTML;
             }
         }, {
+            iconHTML: "",
             label: window.siyuan.languages.text + " *",
             click() {
                 element.insertAdjacentHTML("beforebegin", element.innerHTML + " ");
@@ -530,7 +535,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
             }
         }, {
             label: window.siyuan.languages.link,
-            icon: "iconLink",
+            iconHTML: "",
             click() {
                 element.outerHTML = `<span data-type="a" data-href="siyuan://blocks/${element.getAttribute("data-id")}">${element.innerHTML}</span><wbr>`;
                 nodeElement.setAttribute("updated", formatDate(new Date(), 'yyyyMMddHHmmss'));
@@ -541,8 +546,8 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
         }]);
         if (element.parentElement.textContent.trim() === element.textContent.trim() && element.parentElement.tagName === "DIV") {
             submenu.push({
+                iconHTML: "",
                 label: window.siyuan.languages.blockEmbed,
-                icon: "iconSQL",
                 click() {
                     const html = `<div data-content="select * from blocks where id='${refBlockId}'" data-node-id="${id}" data-type="NodeBlockQueryEmbed" class="render-node" updated="${formatDate(new Date(), 'yyyyMMddHHmmss')}">${nodeElement.querySelector(".protyle-attr").outerHTML}</div>`;
                     nodeElement.outerHTML = html;
@@ -553,6 +558,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
             });
         }
         submenu.push({
+            iconHTML: "",
             label: window.siyuan.languages.defBlock,
             click() {
                 fetchPost("/api/block/swapBlockRef", {
@@ -563,6 +569,7 @@ export const refMenu = (protyle: IProtyle, element: HTMLElement) => {
             }
         });
         submenu.push({
+            iconHTML: "",
             label: window.siyuan.languages.defBlockChildren,
             click() {
                 fetchPost("/api/block/swapBlockRef", {
