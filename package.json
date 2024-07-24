@@ -10,7 +10,6 @@
   "repository": "https://github.com/Hi-Windom/Sillot",
   "scripts": {
     "app:build": "pnpm -F ./app run gentpl && pnpm -F ./app run /build:.*/",
-    "app:b:lint": "pnpm -F ./app run b:lint",
     "app:gentpl": "pnpm -F ./app run gentpl",
     "app:git:tag": "pnpm -F ./app run git:tag",
     "siyuan:b:lint": "",
@@ -19,7 +18,11 @@
     "docs:build": "pnpm -F ./docs/starlight run build",
     "vsce:sillot": "pnpm -F ./.vscode/extensions/Sillot run vsce:package",
     "git:proxy": "git config --global http.proxy http://127.0.0.1:7897 && git config --global https.proxy http://127.0.0.1:7897 && echo '7897是 Clash Verge 默认端口'",
-    "test": "pnpm -r run test"
+    "test": "pnpm -r run test",
+    "b:lint:gibbet": "biome lint app/src --config-path . --diagnostic-level error --write && echo 'ref https://biomejs.dev/reference/cli/#biome-lint'",
+    "b:check:gibbet": "biome check app/src --config-path . --diagnostic-level error --write && echo 'ref https://biomejs.dev/reference/cli/#biome-check'",
+    "b:lint:vsce:sillot": "biome lint .vscode/extensions/Sillot/src --config-path . --diagnostic-level error --write && echo 'ref https://biomejs.dev/reference/cli/#biome-lint'",
+    "b:check:vsce:sillot": "biome check .vscode/extensions/Sillot/src --config-path . --diagnostic-level error --write && echo 'ref https://biomejs.dev/reference/cli/#biome-check'"
   },
   "keywords": [],
   "author": "",

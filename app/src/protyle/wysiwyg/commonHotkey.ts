@@ -105,7 +105,7 @@ export const upSelect = (options: {
             // 选中上一个节点的处理在 toolbar/index.ts 中 `shift+方向键或三击选中`
             if (innerText.substr(0, startIndex).indexOf("\n") === -1 &&
                 // 当第一行太长自然换行的情况
-                options.range.getBoundingClientRect().top - nodeEditableElement.getBoundingClientRect().top - parseInt(getComputedStyle(nodeEditableElement).paddingTop) < 14) {
+                options.range.getBoundingClientRect().top - nodeEditableElement.getBoundingClientRect().top - Number.parseInt(getComputedStyle(nodeEditableElement).paddingTop) < 14) {
                 setFirstNodeRange(nodeEditableElement, options.range);
                 if (!isMac()) {
                     // windows 中 shift 向上选中三行后，最后的光标会乱跳
@@ -156,7 +156,7 @@ export const downSelect = (options: {
             // 选中下一个节点的处理在 toolbar/index.ts 中 `shift+方向键或三击选中`
             if (!getNextBlock(options.nodeElement) && innerText.trimRight().substr(endIndex).indexOf("\n") === -1 &&
                 // 当最后一行太长自然换行的情况
-                nodeEditableElement.getBoundingClientRect().bottom - options.range.getBoundingClientRect().bottom - parseInt(getComputedStyle(nodeEditableElement).paddingBottom) < 14) {
+                nodeEditableElement.getBoundingClientRect().bottom - options.range.getBoundingClientRect().bottom - Number.parseInt(getComputedStyle(nodeEditableElement).paddingBottom) < 14) {
                 // 当为最后一个块时应选中末尾
                 setLastNodeRange(nodeEditableElement, options.range, false);
                 if (options.nodeElement.classList.contains("code-block") && isExpandDown) {

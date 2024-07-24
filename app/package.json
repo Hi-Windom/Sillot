@@ -28,8 +28,6 @@
     "build:desktop": "webpack --mode production --config webpack.desktop.js",
     "build:export": "webpack --mode production --config webpack.export.js",
     "build-ignore:mobile": "webpack --mode production && pnpm run build:desktop && pnpm run build:export",
-    "b:lint": "biome lint ./src --config-path ../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-lint'",
-    "b:check": "biome check ./src --config-path ../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-check'",
     "j:test": "jest",
     "j:test-c": "jest --coverage",
     "dev": "webpack --mode development",
