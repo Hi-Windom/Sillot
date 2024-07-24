@@ -24,6 +24,7 @@
   "keywords": [],
   "author": "",
   "devDependencies": {
+    "@biomejs/biome": "1.8.3"
   },
   "resolutions": {
     "lodash": "4.17.21"
