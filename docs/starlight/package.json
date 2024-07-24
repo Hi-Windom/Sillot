@@ -1,7 +1,7 @@
 {
   "name": "starlight",
   "type": "module",
-  "version": "0.35.24072117",
+  "version": "0.35.24072421",
   "scripts": {
     "test": "echo 'Test your sister day by day'",
     "dev": "astro dev",
@@ -26,5 +26,5 @@
     "starlight-links-validator": "^0.9.0",
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@9.5.0"
+  "packageManager": "pnpm@9.6.0"
 }

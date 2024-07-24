@@ -1,0 +1,129 @@
+---
+title: 发行渠道
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: 0
+  # 为链接添加徽章
+  badge:
+    text: 必读
+    variant: tip
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import BannerTopPrLock from '@components/BannerTopPrLock.astro';
+
+<BannerTopPrLock />
+
+<Aside>stable rc beta alpha S RC B A 是版本号保留字段，不应在渠道中使用</Aside>
+
+渠道制将是汐洛宝典的默认发行方式，渠道将决定用户可以使用的特性，以及特性更新的周期。docker hub 率先支持， github 将在后续支持（部分渠道工作流将转移至下游）。
+
+<Aside type="tip" title="发行说明">
+
+编写发行说明的渠道有：新彖乄渠道、洛可可渠道、先锋渠道。
+
+</Aside>
+
+## 新彖乄渠道
+
+> 新彖乄渠道是海文东标准的一部分
+
+<Card title="T" icon="seti:happenings">
+【汐洛】全矩阵经过周期观察验证后才会推送新彖乄渠道更新，仅包含已冻结的特性，由洛可可渠道裁剪未冻结的特性后传递，适合新彖乄用户。
+
+在 docker hub ，新彖乄渠道使用 `T` 标签。
+
+版本号更新 0.100.*-T -> 0.200.*-T ，重大修复版本可例外，更新周期很长（6月左右）
+</Card>
+
+## 洛可可渠道
+
+> 洛可可渠道是海文东标准的一部分
+
+  <Card title="Rococo & R" icon="seti:plan">
+    【汐洛·洛可可】洛可可渠道包括已冻结的特性和已稳定的未冻结特性，由先锋渠道禁用实验性特性后传递，适合大多数用户。
+
+    在 docker hub ，洛可可渠道使用 `Rococo` 和 `R` 标签，额外使用 `latest` 这一标签。
+
+    功能版本号更新 0.110.* -> 0.120.* ，重大修复版本可例外，更新周期较长（31天左右）
+  </Card>
+
+
+## 先锋渠道
+
+> 先锋渠道是海文东标准的一部分
+
+  <Card title="Pioneer & P" icon="seti:plan">
+    【汐洛·先锋】先锋渠道，包括实验性特性，由开发者渠道裁剪开发测试套件等后传递，适合喜欢探索尝鲜的用户。
+
+        在 docker hub，先锋渠道使用 `Pioneer` 和 `P` 标签。
+
+    功能版本号更新 0.100.* -> 0.101.* ，重大修复版本可例外，更新周期较短（13天左右）
+  </Card>
+
+## 开发者渠道
+
+> 开发者渠道是海文东标准的一部分
+
+  <Card title="Dev & D" icon="seti:plan">
+    【汐洛·开发者】开发者渠道，包括实验性特性，且包括开发测试套件等，由金丝雀渠道优化后传递，面向所有开发者。
+
+    在 docker hub，开发者渠道使用 `Dev` 和 `D` 标签。
+
+    版本号更新 0.100.* -> 0.100.* ，更新周期较短（5天左右）
+  </Card>
+
+## 金丝雀渠道
+
+> 金丝雀渠道是海文东标准的一部分
+
+  <Card title="Canary & C" icon="seti:plan">
+    【汐洛·金丝雀】金丝雀渠道，包含了垃圾代码，面向内部开发者。
+
+    在 docker hub，金丝雀渠道使用 `Canary` 和 `C` 标签。
+
+    版本号更新 0.100.* -> 0.100.* ，无更新周期。
+  </Card>
+
+## 神罚渠道
+
+> 神罚渠道是海文东标准的一部分
+
+  <Card title="Emo & E" icon="seti:plan">
+    【汐洛·神罚】神罚渠道，通常用于情绪测试，基本上可以确定是有问题的，因此仅面向神，正常人请勿使用。
+
+    在 docker hub ，神罚渠道使用 `Emo` 和 `E` 标签。
+
+    版本号更新 0.100.*-E1 -> 0.100.*-E2 ，无更新周期。
+  </Card>
+
+## 其他渠道
+
+  <Card title="Gibbet & G" icon="seti:plan">
+    【汐洛·绞架】绞架渠道，仅包括汐洛绞架，更新周期很长，适合喜欢小而美的用户。
+
+    版本号更新与可可渠道一致。
+  </Card>
+  <Card title="Salvation & S" icon="seti:plan">
+    【汐洛·救赎】救赎渠道，移除了汐洛绞架，更新周期很长，适合喜欢小而美的用户。
+
+    版本号更新与可可渠道一致。
+  </Card>
+
+
+## 渠道在汐洛的基本实现
+
+> TODO
+
+### 业务拆分
+
+### 特性的冻结
+
+### 实验性特性
+
+### 独立发行说明
+
+### 版本号判断
+
+……

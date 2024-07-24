@@ -2,7 +2,7 @@
   "name": "sillot",
   "displayName": "汐洛 Sillot",
   "description": "汐洛彖夲肜矩阵（Sillot T☳Converbenk Matrix）为智慧新彖务服务。此插件为汐洛官方插件，提供多功能一体化集成。",
-  "version": "0.35.24072117",
+  "version": "0.35.24072421",
   "preview": true,
   "repository": "https://github.com/Hi-Windom/Sillot",
   "publisher": "Hi-Windom",
@@ -430,23 +430,17 @@
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
-    "lint": "eslint src --ext ts --fix",
-    "test": "vscode-test",
-    "b:lint": "biome lint ./src --config-path ../../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-lint'",
-    "b:check": "biome check ./src --config-path ../../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-check'"
+    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/fs-extra": "catalog:",
     "@types/mocha": "^10.0.6",
     "@types/node": "catalog:",
     "@types/vscode": "^1.90.0",
-    "@typescript-eslint/eslint-plugin": "^7.9.0",
-    "@typescript-eslint/parser": "^7.9.0",
     "@vscode/test-cli": "^0.0.8",
     "@vscode/test-electron": "^2.3.10",
     "@vscode/vsce": "^2.29.0",
     "copy-webpack-plugin": "^12.0.2",
-    "eslint": "^8.57.0",
     "jsonc-parser": "^3.2.1",
     "mkdirp": "^3.0.1",
     "rimraf": "^5.0.7",
@@ -462,5 +456,5 @@
     "fs-extra": "catalog:",
     "json5": "^2.2.3"
   },
-  "packageManager": "pnpm@9.5.0"
+  "packageManager": "pnpm@9.6.0"
 }

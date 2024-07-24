@@ -2,6 +2,10 @@
 title: 94to114
 ---
 
+import BannerTopArchived from '@components/BannerTopArchived.astro';
+
+<BannerTopArchived />
+
 Chromium 94 功能冻结于2021年7月29日，已经不满足新彖乄要求。
 2024年7月15日，汐洛彖夲肜矩阵v0.35将要求提升至 114（2023年4月11日功能冻结）。
 
@@ -22,7 +26,7 @@ Chromium 94 功能冻结于2021年7月29日，已经不满足新彖乄要求。
 > 由不支持变更为完全支持（ 104 开始）
 
 语法改进，使使用具有“范围”类型（如宽度或高度）的功能的媒体查询不那么冗长。可以与普通的数学比较运算符一起使用。
-例如： @media (100px <= width <= 1900px) 等价于 @media (min-width: 100px) and (max-width: 1900px)
+例如： @media (100px \<= width \<= 1900px) 等价于 @media (min-width: 100px) and (max-width: 1900px)
 
 ### LCH 和 Lab 颜色值 | LCH and Lab color values
 

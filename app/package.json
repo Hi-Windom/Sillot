@@ -1,8 +1,6 @@
 {
-  "name": "sillot",
-  "version": "0.35.24072117",
-  "syv": "3.1.2",
-  "sypv": "[3.0.16, 3.0.17, 3.1.0, 3.1.1]",
+  "name": "sillot-gibbet",
+  "version": "0.35.24072421",
   "description": "Build Your Eternal Digital Garden",
   "homepage": "https://sillot.db.sc.cn",
   "repository": "https://github.com/Hi-Windom/Sillot",
@@ -11,8 +9,7 @@
     "node": ">=20.11.1",
     "pnpm": ">=9.1.0"
   },
-  "packageManager": "pnpm@9.5.0",
-  "actionInstallCommand": "pnpm install --no-frozen-lockfile",
+  "packageManager": "pnpm@9.6.0",
   "scripts": {
     "test": "echo 'Test your sister day by day'",
     "sp": "pnpm store prune",
@@ -31,8 +28,6 @@
     "build:desktop": "webpack --mode production --config webpack.desktop.js",
     "build:export": "webpack --mode production --config webpack.export.js",
     "build-ignore:mobile": "webpack --mode production && pnpm run build:desktop && pnpm run build:export",
-    "b:lint": "biome lint ./src --config-path ../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-lint'",
-    "b:check": "biome check ./src --config-path ../ --diagnostic-level error --apply && echo 'ref https://biomejs.dev/reference/cli/#biome-check'",
     "j:test": "jest",
     "j:test-c": "jest --coverage",
     "dev": "webpack --mode development",
@@ -161,8 +156,5 @@
     "electron-store": "^10.0.0",
     "monaco-editor": "^0.50.0",
     "monaco-editor-nls": "^3.1.0"
-  },
-  "resolutions": {
-    "lodash": "4.17.21"
   }
 }
