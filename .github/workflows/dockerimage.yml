@@ -19,8 +19,8 @@ on:
         - D & Dev
         - C & Canary
         - E & Emo
-        - G & Gibbet
-        - S & Salvation
+        - R_G & Rococo_Gibbet
+        - R_S & Rococo_Salvation
 
 # ref https://docs.github.com/zh/actions/learn-github-actions/variables
 env:
@@ -43,14 +43,14 @@ jobs:
         run: |
           # 定义映射关系
           declare -A dockerFileMap=(
-            ["T"]="Dockerfile"
-            ["R & Rococo & latest"]="Dockerfile"
-            ["P & Pioneer"]="Dockerfile"
-            ["D & Dev"]="Dockerfile"
-            ["C & Canary"]="Dockerfile"
-            ["E & Emo"]="Dockerfile"
-            ["G & Gibbet"]="Dockerfile"
-            ["S & Salvation"]="Dockerfile"
+            ["T"]="docker/T.Dockerfile"
+            ["R & Rococo & latest"]="docker/R.Dockerfile"
+            ["P & Pioneer"]="docker/P.Dockerfile"
+            ["D & Dev"]="docker/D.Dockerfile"
+            ["C & Canary"]="docker/C.Dockerfile"
+            ["E & Emo"]="docker/E.Dockerfile"
+            ["R_G & Rococo_Gibbet"]="Dockerfile"
+            ["R_S & Rococo_Salvation"]="docker/R_S.Dockerfile"
           )
           channel="${{ github.event.inputs.channel }}"
           docker_file="${dockerFileMap[$channel]}"

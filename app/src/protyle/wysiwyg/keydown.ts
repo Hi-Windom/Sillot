@@ -15,7 +15,7 @@ import {
     hasClosestBlock,
     hasClosestByAttribute,
     hasClosestByMatchTag,
-    hasTopClosestByAttribute
+    hasTopClosestByAttribute, isInEmbedBlock
 } from "../util/hasClosest";
 import {removeBlock, removeImage} from "./remove";
 import {
@@ -1322,8 +1322,7 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             return;
         }
 
-        if (!nodeElement.classList.contains("code-block") && !event.repeat &&
-            !hasClosestByAttribute(nodeElement, "data-type", "NodeBlockQueryEmbed")) {
+        if (!nodeElement.classList.contains("code-block") && !event.repeat && !isInEmbedBlock(nodeElement)) {
             let findToolbar = false;
             protyle.options.toolbar.find((menuItem: IMenuItem) => {
                 if (!menuItem.hotkey) {

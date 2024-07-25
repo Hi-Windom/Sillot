@@ -1,5 +1,3 @@
-ARG NB_USER=jovyan
-ARG NB_UID=1000
 FROM node:20 as NODE_BUILD
 WORKDIR /Hi-Windom/Sillot/
 ADD . /Hi-Windom/Sillot/
@@ -19,48 +17,31 @@ RUN apt-get purge -y jq
 RUN apt-get autoremove -y
 RUN rm -rf /var/lib/apt/lists/*
 
-FROM golang:bullseye as GO_BUILD
+FROM golang:alpine as GO_BUILD
 WORKDIR /Hi-Windom/Sillot/
 COPY --from=NODE_BUILD /Hi-Windom/Sillot/ /Hi-Windom/Sillot/
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential && \
-    cd kernel && go build --tags fts5 -v -ldflags "-s -w" && \
+RUN apk add --no-cache gcc musl-dev && \
+    cd kernel && go build --tags fts5 -v -ldflags "-s -w -X github.com/Hi-Windom/Sillot/kernel/util.Mode=prod" && \
     mkdir /opt/Sillot/ && \
-    rm /Hi-Windom/Sillot/app/appearance/langs/es_ES.json && \
-    rm /Hi-Windom/Sillot/app/appearance/langs/fr_FR.json && \
-    rm /Hi-Windom/Sillot/app/appearance/langs/ja_JP.json && \
-    rm /Hi-Windom/Sillot/app/appearance/langs/zh_CHT.json && \
     mv /Hi-Windom/Sillot/app/appearance/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/stage/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/guide/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/app/changelogs/ /opt/Sillot/ && \
     mv /Hi-Windom/Sillot/kernel/kernel /opt/Sillot/ && \
-    mv /Hi-Windom/Sillot/Docker_entry.sh /opt/Sillot/ && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 
-FROM soltus/jupyter-binder-python:latest
+FROM alpine:latest
+LABEL maintainer="Soltus<694357845@qq.ocm>"
+
 WORKDIR /opt/Sillot/
 COPY --from=GO_BUILD /opt/Sillot/ /opt/Sillot/
-COPY --from=denoland/deno:bin /deno /usr/local/bin/deno
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-
-USER root
-RUN sudo apt-get update && \
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates tzdata && \
-    sudo rm -rf /var/lib/apt/lists/*
-
-RUN sudo chown -R root:root /opt/Sillot/
-RUN sudo chmod +x /opt/Sillot/kernel /usr/local/bin/deno /tini /opt/Sillot/Docker_entry.sh
+RUN addgroup --gid 1000 sillot && adduser --uid 1000 --ingroup sillot --disabled-password sillot && apk add --no-cache ca-certificates tzdata && chown -R sillot:sillot /opt/Sillot/
 
 ENV TZ=Asia/Shanghai
 ENV RUN_IN_CONTAINER=true
 EXPOSE 58131
-LABEL maintainer="Soltus<694357845@qq.com>"
 
-# 默认值，用户应当修改
-ENV SILLOT_ARGS_KERNEL="--accessAuthCode 58131"
-ENV SILLOT_ARGS_JUPYTER="--port=8888 --ip=* --no-browser --allow-root"
-ENTRYPOINT [ "/tini", "--", "/opt/Sillot/Docker_entry.sh" ]
+USER sillot
+ENTRYPOINT [ "/opt/Sillot/kernel" ]
