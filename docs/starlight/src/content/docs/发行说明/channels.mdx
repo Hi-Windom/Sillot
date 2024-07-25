@@ -25,6 +25,13 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 
 </Aside>
 
+<Aside type="tip" title="命名规范">
+
+1. 不得包含 `&`
+2. 使用下划线连接
+
+</Aside>
+
 ## 新彖乄渠道
 
 > 新彖乄渠道是海文东标准的一部分
@@ -41,7 +48,7 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 
 > 洛可可渠道是海文东标准的一部分
 
-  <Card title="Rococo & R" icon="seti:plan">
+  <Card title="Rococo" icon="seti:plan">
     【汐洛·洛可可】洛可可渠道包括已冻结的特性和已稳定的未冻结特性，由先锋渠道禁用实验性特性后传递，适合大多数用户。
 
     在 docker hub ，洛可可渠道使用 `Rococo` 和 `R` 标签，额外使用 `latest` 这一标签。
@@ -54,7 +61,7 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 
 > 先锋渠道是海文东标准的一部分
 
-  <Card title="Pioneer & P" icon="seti:plan">
+  <Card title="Pioneer" icon="seti:plan">
     【汐洛·先锋】先锋渠道，包括实验性特性，由开发者渠道裁剪开发测试套件等后传递，适合喜欢探索尝鲜的用户。
 
         在 docker hub，先锋渠道使用 `Pioneer` 和 `P` 标签。
@@ -66,7 +73,7 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 
 > 开发者渠道是海文东标准的一部分
 
-  <Card title="Dev & D" icon="seti:plan">
+  <Card title="Dev" icon="seti:plan">
     【汐洛·开发者】开发者渠道，包括实验性特性，且包括开发测试套件等，由金丝雀渠道优化后传递，面向所有开发者。
 
     在 docker hub，开发者渠道使用 `Dev` 和 `D` 标签。
@@ -78,7 +85,7 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 
 > 金丝雀渠道是海文东标准的一部分
 
-  <Card title="Canary & C" icon="seti:plan">
+  <Card title="Canary" icon="seti:plan">
     【汐洛·金丝雀】金丝雀渠道，包含了垃圾代码，面向内部开发者。
 
     在 docker hub，金丝雀渠道使用 `Canary` 和 `C` 标签。
@@ -90,25 +97,31 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 
 > 神罚渠道是海文东标准的一部分
 
-  <Card title="Emo & E" icon="seti:plan">
+  <Card title="Emo" icon="seti:plan">
     【汐洛·神罚】神罚渠道，通常用于情绪测试，基本上可以确定是有问题的，因此仅面向神，正常人请勿使用。
 
     在 docker hub ，神罚渠道使用 `Emo` 和 `E` 标签。
 
-    版本号更新 0.100.*-E1 -> 0.100.*-E2 ，无更新周期。
+    版本号更新 `0.100.*-E1` -> `0.100.*-E2` ，无更新周期。
   </Card>
 
 ## 其他渠道
 
-  <Card title="Gibbet & G" icon="seti:plan">
-    【汐洛·绞架】绞架渠道，仅包括汐洛绞架，更新周期很长，适合喜欢小而美的用户。
+> 其他渠道不属于海文东标准，需要基于海文东标准渠道
 
-    版本号更新与可可渠道一致。
+  <Card title="Rococo_Gibbet" icon="seti:plan">
+    【汐洛·绞架】绞架渠道，基于洛可可渠道，仅包括汐洛绞架，更新周期很长，适合喜欢小而美的用户。
+
+    在 docker hub ，绞架渠道使用 `Rococo_Gibbet` 和 `R_G` 标签。
+
+    版本号更新与洛可可渠道一致。
   </Card>
-  <Card title="Salvation & S" icon="seti:plan">
-    【汐洛·救赎】救赎渠道，移除了汐洛绞架，更新周期很长，适合喜欢小而美的用户。
+  <Card title="Rococo_Salvation" icon="seti:plan">
+    【汐洛·救赎】救赎渠道，基于洛可可渠道，移除了汐洛绞架，更新周期很长，适合喜欢小而美的用户。
 
-    版本号更新与可可渠道一致。
+    在 docker hub ，救赎渠道使用 `Rococo_Salvation` 和 `R_S` 标签。
+
+    版本号更新与洛可可渠道一致。
   </Card>
 
 
