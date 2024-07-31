@@ -1,0 +1,114 @@
+---
+title: git tag 和 branch 的区别以及使用场景
+---
+
+tag 对应某次 commit, 是一个点，是不可移动的。
+branch 对应一系列 commit，是很多点连成的一根线，有一个HEAD 指针，是可以依靠 HEAD 指针移动的。
+
+所以，两者的区别决定了使用方式，改动代码用 branch ,不改动只查看用 tag。
+
+tag 和 branch 的相互配合使用，有时候起到非常方便的效果，例如 已经发布了 v1.0 v2.0 v3.0 三个版本，这个时候，我突然想不改现有代码的前提下，在 v2.0 的基础上加个新功能，作为 v4.0 发布。就可以 检出 v2.0 的代码作为一个 branch ，然后作为开发分支。
+
+## tag 的简单使用
+
+### 创建标签
+
+需要说明的是，创建 tag 是基于本地分支的 commit，而且与分支的推送是两回事，就是说分支已经推送到远程了，但是你的 tag 并没有，如果把 tag 推送到远程分支上，需要另外执行 tag 的推送命令。
+
+```bash
+git tag <tagName> # 创建本地tag
+git push origin <tagName> # 推送到远程仓库
+```
+
+若存在很多未推送的本地标签，你想一次全部推送的话，可以使用一下的命令：
+
+```bash
+git push origin --tags
+```
+
+以上是基于本地当前分支的最后的一个 commit 创建的 tag ，但是如果不想以最后一个，只想以某一个特定的提交为 tag ，也是可以的，只要你知道 commit 的 id。
+
+```bash
+git log --pretty=oneline # 查看当前分支的提交历史，里面包含 commit id
+git tag -a <tagName> <commitId>
+```
+
+### 查看标签
+
+查看本地某个 tag 的详细信息：
+
+```bash
+git show <tagName>
+```
+
+查看本地所有 tag ：
+
+> 下面两个命令都可以
+
+```bash
+git tag
+git tag -l
+```
+
+查看远程所有 tag：
+
+```bash
+git ls-remote --tags origin
+```
+
+### 删除标签
+
+本地 tag 的删除：
+
+```bash
+git tag -d <tagName>
+```
+
+远程 tag 的删除：
+
+```bash
+git push origin :<tagName>
+```
+
+### 重命名标签
+
+这个本质上是删除掉旧名字 tag ，然后再新建新名字 tag ,然后实现重命名的作用。
+
+如果 tag 只存在本地，那么只需要删除本地的旧名字 tag ，然后新建新名字 tag：
+
+```bash
+git tag -d <oldTagName>
+git tag <newTagName>
+git push origin <newTagName> # 推送到远程仓库
+```
+
+若已经推送到远程了，那么不仅要删除本地的，还要删除远程的，再重新创建和推送：
+
+```bash
+git tag -d <oldTagName>
+git push origin :<oldTagName>
+git tag <newTagName>
+git push origin <newTagName> # 推送到远程仓库
+```
+
+### 检出标签
+
+命令如下：
+
+```bash
+git checkout -b <branchName> <tagName>
+```
+
+因为 tag 本身指向的就是一个 commit，所以和根据 commit id 检出分支是一个道理。
+但是需要特别说明的是，如果我们想要修改 tag 检出代码分支，那么虽然分支中的代码改变了，但是 tag 标记的 commit 还是同一个，标记的代码是不会变的，这个要格外的注意。
+
+## git分支删除后tag还在吗
+
+当我们在Git中删除一个分支时，该分支上的提交历史将不再可见，但是这并不会影响标签（tag）的存在。标签是指向特定提交的静态引用，可以视为一个不可变的指针。
+
+当我们删除一个分支时，标签仍然指向原始分支上的提交。这意味着标签仍然存在，并可以通过标签名称访问和使用。
+
+参考：
+
+1. https://www.cnblogs.com/konglxblog/p/16384162.html
+2. https://worktile.com/kb/ask/283219.html#

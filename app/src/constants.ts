@@ -4,7 +4,7 @@ import {isMobile} from "./util/functions";
 // declare const NODE_ENV: string;
 // declare const SIYUAN_ORIGIN_VERSION: string;
 import { SConst } from "./SConst";
-import * as pkg from "../package.json" assert { type: "json" };
+import * as pkg from "../../package.json" assert { type: "json" };
 const NODE_ENV = "development";
 const SIYUAN_VERSION = pkg.version;
 const SIYUAN_ORIGIN_VERSION = pkg.syv;
