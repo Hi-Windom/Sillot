@@ -37,7 +37,7 @@ HEADER_sillot = '''
 <img src="https://img.shields.io/badge/Windows 10+-black?logo=nsis" title="Windows" height="29"/>
 <img src="https://img.shields.io/badge/Linux AMD64-black?logo=linux" title="linux" height="29"/>
 <img src="https://img.shields.io/badge/Android 12+-black?logo=android" title="Android" height="29"/>
-<img src="https://img.shields.io/badge/HarmonyOS TODO-black?logo=harmonyos" title="harmonyos" height="29"/>
+<img src="https://img.shields.io/badge/HarmonyOS NEXT-black?logo=harmonyos" title="harmonyos" height="29"/>
 </p>
 
 🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)    📦 [VSCode Extension](https://marketplace.visualstudio.com/items?itemName=Hi-Windom.sillot)    📦 [Chromium Browser Extension（维护中）](https://github.com/K-Sillot/Sillot-Be/releases)
