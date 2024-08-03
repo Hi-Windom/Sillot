@@ -540,7 +540,6 @@ export const initKeyboardToolbar = () => {
         const target = event.target as HTMLElement;
         const slashBtnElement = hasClosestByClassName(event.target as HTMLElement, "keyboard__slash-item");
         if (slashBtnElement && !slashBtnElement.getAttribute("data-type")) {
-            // toolbarElement.querySelector('.keyboard__action[data-type="add"]').classList.remove("protyle-toolbar__item--current");
             activeBlur();
             hideKeyboardToolbarUtil();
             hideKeyboardToolbar();
@@ -560,7 +559,6 @@ export const initKeyboardToolbar = () => {
             return;
         }
         const type = buttonElement.getAttribute("data-type");
-        console.log("test", type)
         // appearance
         if (["clear", "style2", "style4", "color", "backgroundColor", "fontSize", "style1"].includes(type)) {
             const nodeElements = getFontNodeElements(protyle);
