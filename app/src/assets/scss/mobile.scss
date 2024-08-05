@@ -284,7 +284,7 @@
   border-top: 1px solid var(--b3-theme-surface-lighter);
   overflow: hidden;
   flex-direction: column;
-  z-index: 1;
+  z-index: 999;
 
   &__dynamic {
     overflow: auto;

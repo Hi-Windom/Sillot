@@ -144,7 +144,7 @@ export const getEditorRange = (element: Element) => {
             return range;
         }
     }
-    // 代码块过长，在代码块的下一个块前删除，代码块会滚动到顶部，因粗需要 preventScroll
+    // 代码块过长，在代码块的下一个块前删除，代码块会滚动到顶部，因此需要 preventScroll
     (element as HTMLElement).focus({preventScroll: true});
     let targetElement;
     if (element.classList.contains("table")) {

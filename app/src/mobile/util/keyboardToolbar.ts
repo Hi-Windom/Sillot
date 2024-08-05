@@ -533,10 +533,16 @@ export const initKeyboardToolbar = () => {
 </div>
 <div class="keyboard__util"></div>`;
     toolbarElement.addEventListener("click", (event) => {
+        if (window.Sillot?.android?.LockKeyboardToolbar) {
+            window.Sillot.android.LockKeyboardToolbar = false
+        }
         const protyle = getCurrentEditor()?.protyle;
         const target = event.target as HTMLElement;
         const slashBtnElement = hasClosestByClassName(event.target as HTMLElement, "keyboard__slash-item");
         if (slashBtnElement && !slashBtnElement.getAttribute("data-type")) {
+            activeBlur();
+            hideKeyboardToolbarUtil();
+            hideKeyboardToolbar();
             const dataValue = decodeURIComponent(slashBtnElement.getAttribute("data-value"));
             protyle.hint.fill(dataValue, protyle, false);   // 点击后 range 会改变
             if (dataValue !== Constants.ZWSP + 3) {

@@ -25,6 +25,10 @@
         }
     },
     "terminal": {
-        "shellPathList": ["%SystemRoot%\\System32\\cmd.exe", "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"]
+        "shellPathList": [
+            "%SystemRoot%\\System32\\cmd.exe",
+            "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "D:\\X-S01\\Git\\bin\\bash.exe"     // 修改为你的 git bash.exe 路径
+        ]
     }
 }
