@@ -74,7 +74,7 @@
     "security.allowedUNCHosts": [
         "wsl.localhost" // 允许查看，保存是另外的权限
     ],
-    "workbench.experimental.enableNewProfilesUI": true, // since vscode 1.91.0
+    "workbench.experimental.enableNewProfilesUI": true, // since vscode 1.91
     "rust-analyzer.cargo.features": ["__runtime_js_sources"], // https://docs.deno.com/runtime/manual/references/contributing/
     // 非工作区设置，需要在用户设置中修改 ::结束
     "files.associations": {
@@ -90,9 +90,17 @@
       } // 也可以直接设置为 "editor.quickSuggestions": true (忽略警告)
     },
     "workbench.editor.wrapTabs": true,
-    "terminal.integrated.gpuAcceleration": "auto",
-    "scm.workingSets.enabled": true,
-    "scm.workingSets.default": "current",
+    "terminal.integrated.gpuAcceleration": "auto", // since vscode 1.89
+    "terminal.integrated.suggest.enabled": true, // vscode 1.92 improve
+    "terminal.integrated.suggest.runOnEnter": "exactMatchIgnoreExtension", // since vscode 1.92
+    "terminal.integrated.suggest.builtinCompletions": {
+        "pwshCode": true,
+        "pwshGit": true
+    }, // since vscode 1.92
+    "scm.workingSets.enabled": true, // since vscode 1.89
+    "scm.workingSets.default": "current", // since vscode 1.89
+    "scm.showHistoryGraph": true, // since vscode 1.91 // 1.92 experimental -> formal
+    "markdown.editor.updateLinksOnPaste.enabled": true, // since vscode 1.89 // 1.92 experimental -> formal
     "editor.guides.indentation": true,
     "editor.stickyScroll.enabled": true,
     "editor.minimap.side": "left", // 显示在左侧更专注
@@ -110,9 +118,9 @@
       "**/.history": true
     },
     // 实验性设置
-    "scm.experimental.showHistoryGraph": true, // since vscode 1.91.0
-    "notebook.experimental.remoteSave": true,
-    "markdown.experimental.updateLinksOnPaste": true,
+    "notebook.experimental.remoteSave": true, // since vscode 1.89
+    "debugpy.showPythonInlineValues": true, // since vscode 1.92
+    "diffEditor.experimental.useTrueInlineView": true, // since vscode 1.92
     // CodeGeeX 智能编程助手设置
     "Codegeex.Chat.LanguagePreference": "中文",
     "Codegeex.Comment.LanguagePreference": "中文",
