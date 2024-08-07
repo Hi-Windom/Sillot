@@ -1,0 +1,118 @@
+---
+title: VSCode 1.88 (2024 年 3 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -188
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import { Image } from "astro:assets"
+import myImage1 from "@assets/shots/2024-08-07--vscode1.88__minimap-sections.png"
+
+> 主要内容摘抄自 [VSCode 1.88 发行说明](https://code.visualstudio.com/updates/v1_88)，文中“我们”即 VSCode
+
+## [开放编辑器的自定义标签](https://code.visualstudio.com/updates/v1_88#_custom-labels-for-open-editors)
+
+现在，您可以自定义编辑器选项卡和打开编辑器视图的显示标签。此功能可用于区分同名文件的编辑器。
+
+您可以通过在 `workbench.editor.customLabels.patterns` 设置下添加条目来根据自己的喜好定制这些标签。每个条目都应包含一个与文件路径匹配的glob 模式和一个定义编辑器选项卡新名称的模板。此自定义仅在文件路径与指定模式匹配时适用。模式是否匹配取决于它被定义为相对还是绝对文件路径模式。
+
+模板可以包含诸如 `${filename}` 和 `${extname}` 之类的变量，这些变量可以用文件路径中的值动态替换。`${dirname}${dirname(N)}`
+
+要启用或禁用这些自定义标签，请使用 `workbench.editor.customLabels.enabled` 设置。这样您就可以随时切换到原始编辑器名称，而无需删除自定义模式。
+
+## [锁定滚动](https://code.visualstudio.com/updates/v1_88#_locked-scrolling)
+
+现在，您可以使用 **`View: Toggle Locked Scrolling Across Editors`** 命令同步所有可见编辑器的滚动。这意味着，当您在一个编辑器中滚动时，所有其他编辑器都会滚动相同的量，从而保持所有内容对齐。如果您需要并排比较文件，此功能非常有用。
+
+如果您想要更好地控制启用和禁用锁定滚动，您可以选择仅在按住特定键时激活滚动同步。为命令设置键盘快捷键 `workbench.action.holdLockedScrolling` ，您就可以在需要时临时锁定编辑器中的滚动。
+
+## [底部的活动栏](https://code.visualstudio.com/updates/v1_88#_activity-bar-at-the-bottom)
+
+之前，我们引入了将活动栏移至侧边栏顶部的选项。现在，我们还允许您将活动栏移至底部。为此，请将设置更改 `workbench.activityBar.location` 为 `bottom` 。
+
+```josn
+"workbench.activityBar.location": "bottom"
+```
+
+我们还改进了活动栏位于顶部时的外观和感觉，以确保它与界面的其余部分很好地契合。
+
+## [重启扩展](https://code.visualstudio.com/updates/v1_88#_restart-extensions)
+
+当扩展更新时，您现在可以重新启动扩展，而不必重新加载窗口。
+
+## [小地图部分标题](https://code.visualstudio.com/updates/v1_88#_minimap-section-headers)
+
+小地图现在可以识别和呈现由折叠标记定义的部分（例如 `//#region Deletion` 中的部分）, 这让您可以快速扫描和浏览大型文件。
+
+<Image src={myImage1} alt="小地图部分标题" />
+
+## [差异编辑器阶段/恢复选择按钮](https://code.visualstudio.com/updates/v1_88#_diff-editor-stagerevert-selection-buttons)
+
+差异编辑器现在有单独的Stage和Revert控件边框。这些操作可让您暂存或还原已更改的代码块。
+
+如果您对文本进行了某些更改的选择，这些按钮可以让您暂停或恢复所选的更改（选择范围内的所有更改的字符）。
+
+<Aside type="tip" title="不够完善">
+
+截至版本 1.92 ，VSCode 差异编辑器对区块的识别没有 Souretree 那么细致
+
+</Aside>
+
+## [传入更改文件装饰](https://code.visualstudio.com/updates/v1_88#_incoming-changes-file-decorations)
+
+为了避免在从远程合并/重新定基更改时发生潜在冲突，我们现在会显示所有有传入更改且已获取但尚未合并/重新定基的文件的文件修饰。要使用此功能，您应该同时启用 `git.autofetch` 和 `git.decorations.enabled` 设置。
+
+## [在 Markdown 中更智能地插入图像和链接](https://code.visualstudio.com/updates/v1_88#_smarter-inserting-of-images-and-links-in-markdown)
+
+当您将图像或文件拖放或粘贴到 Markdown 文件中时，VS Code 会自动为其插入 Markdown 图像或链接语法。当您插入到不支持 Markdown 语法的代码块和其他上下文中时，我们现在还会智能地禁用此行为.
+
+您随时可以使用拖放/粘贴小部件切换回插入 Markdown 语法。您可以使用 `markdown.editor.drop.enabled` 和 `markdown.editor.filePaste.enabled` 设置来配置此行为。
+
+## [本地工作区扩展](https://code.visualstudio.com/updates/v1_88#_local-workspace-extensions)
+
+我们很高兴推出这项新的预览功能，它允许您直接在工作区中打包扩展。此功能旨在满足您特定的工作区需求并提供更量身定制的开发体验。
+
+要使用此功能，您需要将扩展​​打包到.vscode/extensions工作区内的文件夹中。然后，VS Code 会在扩展​​视图的工作区推荐部分中显示此扩展，用户可以从中安装它。VS Code 仅为该工作区安装此扩展。它还要求用户在安装和运行此扩展之前信任该工作区。
+
+## [终端 shell 集成 API](https://code.visualstudio.com/updates/v1_88#_terminal-shell-integration-api)
+
+现已推出一种新提议的 API，它允许访问由 shell 集成激活的终端提供的一些信息。使用此 API，可以监听终端中正在执行的命令的传入数据和退出代码。它还引入了一种更可靠的方法来执行命令，即在发送命令之前等待提示符可用，这有助于解决各种 shell 设置中可能出现的一些冲突/竞争条件。
+
+以下是使用该Terminal.shellIntegration.executeCommand提案的一个例子：
+```ts
+// Execute a command in a terminal immediately after being created
+const myTerm = window.createTerminal();
+window.onDidActivateTerminalShellIntegration(async ({ terminal, shellIntegration }) => {
+  if (terminal === myTerm) {
+    const command = shellIntegration.executeCommand('echo "Hello world"');
+    const code = await command.exitCode;
+    console.log(`Command exited with code ${code}`);
+  }
+}));
+
+// Fallback to sendText if there is no shell integration within 3 seconds of launching
+setTimeout(() => {
+  if (!myTerm.shellIntegration) {
+    myTerm.sendText('echo "Hello world"');
+    // Without shell integration, we can't know when the command has finished or what the
+    // exit code was.
+  }
+}, 3000);
+```
+
+下面是一个监听命令数据流的例子：
+```ts
+// Create a terminal and log all data via console.log
+const myTerm = window.createTerminal();
+window.onDidStartTerminalShellExecution(execution => {
+  if (execution.terminal === myTerm) {
+    const stream = execution.createDataStream();
+    for await (const data of stream) {
+      console.log(data);
+    }
+  }
+});
+```
+
+[您可以在此处](https://translate.google.com/website?sl=auto&tl=zh-CN&hl=zh-CN&u=https://github.com/microsoft/vscode/blob/main/src/vscode-dts/vscode.proposed.terminalShellIntegration.d.ts)查看新的 API 。

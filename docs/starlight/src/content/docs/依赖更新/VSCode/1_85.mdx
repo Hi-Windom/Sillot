@@ -1,0 +1,87 @@
+---
+title: VSCode 1.85 (2023 年 11 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -185
+---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+import { Image } from "astro:assets"
+import myImage1 from "@assets/shots/2024-08-08--vscode1.85__multi-diff-editor.png"
+
+> 主要内容摘抄自 [VSCode 1.85 发行说明](https://code.visualstudio.com/updates/v1_85)，文中“我们”即 VSCode
+
+## [浮动编辑器窗口](https://code.visualstudio.com/updates/v1_85#_floating-editor-windows)
+
+我们很高兴地宣布，在此版本中，您可以将编辑器从主窗口移动到他们自己的轻量级窗口。在一个窗口中对编辑器所做的更改会立即应用于编辑器打开的所有其他窗口。
+
+创建浮动编辑器窗口的最简单方法是将编辑器拖出当前窗口，然后将其拖放到桌面上的空白区域。
+
+新的 <VSCodeSettingsLink id="workbench.editor.dragToOpenWindow"/> 设置可以禁用此行为。
+
+此外，还有一些新的全局和上下文命令，用于将编辑器和编辑器组移动或复制到其自己的窗口中：
+
+
+- View: Copy Editor into New Window (workbench.action.editor.copyWithSyntaxHighlightingAction)
+- View: Move Editor into New Window (workbench.action.editor.moveEditorToNextWindow)
+- View: Copy Editor Group into New Window (workbench.action.editor.copyGroupToNextWindow)
+- View: Move Editor Group into New Window (workbench.action.editor.moveGroupToNextWindow)
+- View: New Empty Editor Window (workbench.action.newWindow)
+
+浮动窗口中的编辑器区域可以按照您想要的任何[复杂布局](http://code.visualstudio.com/docs/editor/custom-layout)进行排列。而且，由于终端和搜索结果都可以作为编辑器打开，因此您现在也可以在单独的窗口中拥有这些功能！
+
+## [文件资源管理器中的本机粘贴支持](https://code.visualstudio.com/updates/v1_85#_native-paste-support-in-the-file-explorer)
+
+VS Code 现在支持将操作系统资源管理器中的文件本机粘贴到 VS Code 文件资源管理器中。
+
+## [扩展自动更新控制](https://code.visualstudio.com/updates/v1_85#_extension-auto-update-control)
+
+您现在可以选择要自动更新的扩展程序。如果您不想自动更新所有扩展，而是有选择地选择要自动更新的扩展，这将非常有用。您可以选择一个扩展，也可以选择发布者中的所有扩展。如果您选择自动更新发布商的所有扩展程序，则可以取消选择该发布商的单个扩展程序。
+
+您应已禁用自动更新（无）或启用所选扩展程序（所选扩展程序）才能使用此功能。
+
+## [设置编辑器搜索改进和 bug 修复](https://code.visualstudio.com/updates/v1_85#_settings-editor-search-improvements-and-bug-fixes)
+
+“设置”编辑器又回到了首先按匹配类型对搜索结果进行排序，而不仅仅是按目录排序。换言之，标题和关键字匹配项会显示在顶部，因此您无需向下滚动即可找到具有匹配标题的设置。
+
+“设置”编辑器仍按目录对设置进行排序，这意味着在搜索查询（如 `@ext：<extension-id>`）时，将遵循扩展作者的顺序键。
+
+此迭代还修复了许多设置编辑器回归问题，包括由于网络问题导致设置编辑器无法加载，以及在某些搜索查询上挂起。
+
+## [多文档高亮显示](https://code.visualstudio.com/updates/v1_85#_multi-document-highlighting)
+
+多文档高亮显示得到了新提议的 [MultiDocumentHighlightProvider](https://code.visualstudio.com/updates/v1_85#_multi-document-highlighting-api) API 的额外支持。现在，内置了对 TypeScript 语言的语义出现高亮显示的支持，可以通过将 Editor： Occurrences Highlight （editor.occurrencesHighlight） 设置值从 singleFile 更改为 multiFile 来启用。对于除 TypeScript 以外的语言，在实现更多特定于语言的提供程序之前，多文档匹配项将根据文本匹配项而不是语义匹配项突出显示。
+
+## [传入/传出更改](https://code.visualstudio.com/updates/v1_85#_incomingoutgoing-changes)
+
+在这个里程碑中，我们在源代码管理视图中引入了一个新的传入/传出部分，以显示当前分支与其远程分支相比的传入和传出更改。新部分既显示单个更改（更改的资源数量以及插入和删除），还显示汇总所有更改中所有资源的“所有更改”条目。可以使用 <VSCodeSettingsLink id="scm.showIncomingChanges"/> 和 <VSCodeSettingsLink id="scm.showOutgoingChanges"/> 设置来控制新部分的可见性。这两个设置都支持以下值：always、auto（默认）和 never。
+
+## [输入最大行数](https://code.visualstudio.com/updates/v1_85#_input-maximum-lines)
+
+以前，源代码管理输入会自动增长，最多显示 6 行文本，这对于大多数提交消息来说已经足够了。但是，在某些情况下，更多空间会有所帮助，并且有一个新设置 <VSCodeSettingsLink id="scm.inputMaxLines"/> ，用于控制源代码管理输入行的最大数量。
+
+## [终端粘性滚动]()
+
+视口顶部的命令提示符会粘在终端的顶部，类似于 Sticky Scroll 在编辑器中的工作方式。单击 Sticky Scroll 元素将滚动到终端缓冲区的该部分。此功能目前默认处于禁用状态，但可以通过设置 <VSCodeSettingsLink id="terminal.integrated.stickyScroll.enabled"/> 为 `true` 来启用。我们计划在未来默认启用此功能，届时您将能够通过右键单击并关闭它来选择退出。
+
+## [TS首选使用“type”进行自动导入](https://code.visualstudio.com/updates/v1_85#_prefer-using-type-for-auto-imports)
+
+仅类型导入允许您导入类型，同时确保导入在运行时被完全擦除。如果您更喜欢始终默认输入，您现在可以设置<VSCodeSettingsLink id="typescript.preferences.preferTypeOnlyAutoImports"/> 为 `true` ，自动导入将使用仅类型导入。默认情况下，此设置处于关闭状态。
+
+## [树上的粘性滚动](https://code.visualstudio.com/updates/v1_85#_sticky-scroll-in-trees)
+
+在编辑器中 Sticky Scroll 成功的基础上，我们将此功能扩展到所有树视图，使用户能够更轻松地浏览项目树。可以通过设置 <VSCodeSettingsLink id="workbench.tree.enableStickyScroll"/> 为 `true` 来启用树的粘性滚动。为确保 Sticky Scroll 不会占用太多空间，它最多只能占用视图高度的 40%。此外，用户可以通过配置 <VSCodeSettingsLink id="workbench.tree.stickyScrollMaxItemCount"/>（默认设置为 7）来自定义粘性元素的最大数量。
+
+为了改进树导航体验，您可以选择一个粘性元素以直接跳转到树中的它，或者按父元素的 V 形图标以隐藏其所有子元素。此外，启用粘滞滚动后，访问复选框和操作项更容易。
+
+## [多文件差异编辑器](https://code.visualstudio.com/updates/v1_85#_multifile-diff-editor)
+
+此版本提供了多重差异编辑器的预览版。多重差异编辑器允许您在一个可滚动视图中查看多个文件中的更改：
+
+<Image src={myImage1} alt="多文件差异编辑器" />
+
+要启用多重差异编辑器，请设置 `"multiDiffEditor.experimental.enabled": true` 。目前，multi diff 编辑器可用于查看本地更改、暂存更改、传入/传出更改以及拉取请求的更改。请注意，多重差异编辑器的功能尚未完成，可能并非在所有情况下都有效。
+
+## [多文档高亮 API](https://code.visualstudio.com/updates/v1_85#_multi-document-highlighting-api)
+
+如上一版本中介绍的那样，现在支持 VS Code 中的多文档高亮显示。在此迭代中，我们添加了[一个建议的 MultiDocumentHighlightProvider API](https://github.com/microsoft/vscode/blob/main/src/vscode-dts/vscode.proposed.multiDocumentHighlightProvider.d.ts) ，用于注册多文档突出显示提供程序。这增加了为特定编程语言提供语义出现高亮显示的能力。提供程序返回一个新的 MultiDocumentHighlight 结构，其中包含 URI 到 DocumentHighlight 的映射。

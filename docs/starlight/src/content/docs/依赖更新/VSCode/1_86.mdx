@@ -1,0 +1,169 @@
+---
+title: VSCode 1.86 (2024 年 1 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -186
+---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.86 发行说明](https://code.visualstudio.com/updates/v1_86)，文中“我们”即 VSCode
+
+## [配置每个窗口的缩放级别](https://code.visualstudio.com/updates/v1_86#_configure-zoom-levels-per-window)
+
+新设置 <VSCodeSettingsLink id="window.zoomPerWindow"/>（默认启用）允许您配置缩放命令（放大、缩小、缩放重置）以仅应用于活动窗口，而不适用于所有打开的窗口。以前，使用这些命令不仅会将其应用于所有打开的窗口，而且还会更新 <VSCodeSettingsLink id="window.zoomLevel"/> 设置。
+
+我们认为，使用这些命令更像是一种临时手势，例如在进行演示时，因此应该只适用于从中调用它们的窗口。
+
+当窗口的自定义缩放级别与 `window.zoomLevel` 设置值不匹配时，状态栏中会显示缩放级别指示器。选择状态栏指示器以查找用于更改缩放级别、重置缩放级别或快速转到相关设置的控件。
+
+具有自定义缩放级别的窗口在重新启动和工作区更改时保留该缩放级别。
+
+> 注意：将 `window.zoomPerWindow` 配置为 `false` 以恢复之前的缩放级别行为。
+
+## [更强大、更灵活的自动保存选项](https://code.visualstudio.com/updates/v1_86#_more-powerful-and-flexible-auto-save-options)
+
+VS Code 长期以来一直提供自动保存选项。在此版本中，我们使此功能更加强大。
+
+### 配置每种资源或语言的自动保存
+
+现在，所有自动保存设置都可以按文件夹或语言进行配置，这使您可以选择性地仅为特定语言或文件夹启用自动保存。
+
+在下面的示例中，设置配置为：
+```json
+{
+  "[markdown]": {
+    "files.autoSave": "afterDelay"
+  }
+}
+```
+
+### [禁用出错时自动保存](https://code.visualstudio.com/updates/v1_86#_disable-auto-save-when-errors)
+
+通过新的 <VSCodeSettingsLink id="files.autoSaveWhenNoErrors"/> 设置，如果文件中存在错误标记，则可以禁用“自动保存”，而“自动保存”通常会保存编辑器。
+
+当您有外部工具监视文件更改时，这可能很有用，因为在外部工具中，您希望避免这些工具对包含错误的已更改文件执行操作。
+
+### [仅自动保存工作区文件](https://code.visualstudio.com/updates/v1_86#_auto-save-for-workspace-files-only)
+
+最后，新设置 <VSCodeSettingsLink id="files.autoSaveWorkspaceFilesOnly"/> 将“自动保存”限制为仅对工作区内的文件。
+
+## [允许禁用每个扩展程序的通知](https://code.visualstudio.com/updates/v1_86#_allow-disabling-notifications-per-extension)
+
+现在，我们提供更精细的控制功能，用于禁用来自扩展程序的通知。在通知 Toast 中，您可以禁用扩展的通知。
+
+在“通知中心”中，有一个中心位置可用于管理已触发通知的所有扩展的通知启用。
+
+这项新功能补充了我们现有的“勿扰模式”，该模式会全局禁用所有通知。与全局开关一样，错误通知将始终出现，并且无法禁用。
+
+## [允许交换左右差异编辑器](https://code.visualstudio.com/updates/v1_86#_allow-swapping-left-and-right-diff-editors)
+
+当您比较两个文件（例如，从文件资源管理器中）时，会出现一个新操作来交换差异编辑器的左侧和右侧。
+
+> 注意：比较两个可编辑文件允许您在任一侧进行更改。
+
+## [在新窗口中打开“输出”面板](https://code.visualstudio.com/updates/v1_86#_open-output-panel-in-a-new-window)
+
+现在，“输出”面板在面板标题菜单中具有“在新窗口中打开输出”操作，用于在单独的窗口中查看“输出”面板。
+
+## [从 CLI 更新扩展](https://code.visualstudio.com/updates/v1_86#_update-extensions-from-cli)
+
+现在，您可以使用 `--update-extensions` 参数从命令行更新扩展。这会将所有已安装的扩展更新到最新版本。
+
+## [粘贴文本/html 内容](https://code.visualstudio.com/updates/v1_86#_paste-texthtml-content)
+
+“粘贴为...” (`Paste As`) 命令现在允许您在剪贴板中粘贴文本/html 内容。
+
+## [源代码管理提交输入自定义项](https://code.visualstudio.com/updates/v1_86#_commit-input-customizations)
+
+在这个里程碑中，我们添加了一个新设置 <VSCodeSettingsLink id="scm.inputMinLineCount"/> ，可用于控制提交输入字段的初始高度。控制提交输入字段最大大小的设置已从 `scm.inputMaxLines` 重命名为 `scm.inputMaxLineCount` ，以便与类似设置的命名约定匹配。
+
+用户现在可以使用特定于语言的编辑器设置来进一步自定义提交输入字段。特定于语言的编辑器设置可用于定义编辑器规则和禁用自动换行：
+```json
+"[scminput]": {
+    "editor.rulers": [
+      50,
+      72
+    ],
+    "editor.wordWrap": "off"
+  }
+```
+
+## [源代码管理存储库视图改进](https://code.visualstudio.com/updates/v1_86#_source-control-repositories-view-improvements)
+
+为了帮助更好地管理具有大量仓库的工作区，我们在仓库上下文菜单中添加了一个新命令：关闭其他仓库。我们还添加了对“关闭仓库”和“关闭其他仓库”命令的多选支持，因此用户可以一次关闭多个仓库，或者关闭除少数仓库以外的所有仓库。
+
+由于扩展参与的操作，“源代码管理存储库”视图可能会变得拥挤。为了帮助解决这个问题，我们添加了隐藏贡献的操作的功能，方法是右键单击操作并选择隐藏。隐藏的操作将移至“...”菜单中。除 `Checkout` 和 `Sync` 之外的所有操作都可以隐藏。
+
+## [传入/传出更改改进](https://code.visualstudio.com/updates/v1_86#_incomingoutgoing-changes-improvements)
+
+我们将继续完善“源代码管理”视图中的“传入/传出更改”部分。在此里程碑中，我们进行了更改，以便仅当当前分支具有跟踪远程分支时，才会显示“传入更改”节点。
+
+我们已将 Fetch 和 Pull 操作添加到 Incoming changes 节点，并将 Push 操作添加到 Outgoing changes 节点。
+
+我们添加了操作来查看每个单独的提交，以及利用多文件差异编辑器的所有传入/传出更改。
+
+用户现在可以使用新设置 <VSCodeSettingsLink id="scm.showChangesSummary"/> 来隐藏“所有更改”条目
+
+## [能够合并标签](https://code.visualstudio.com/updates/v1_86#_ability-to-merge-tags)
+
+我们通过添加合并标签的功能解决了一个长期存在的功能请求。命令面板中添加了一个新命令 `Git: Merge...` ，该命令替换了 `Git: Merge Branch...` 命令。调用 `Git: Merge...` 命令将显示一个快速选取控件，其中列出了分支和标签。
+
+## [“查看存储”命令](https://code.visualstudio.com/updates/v1_86#_view-stash-command)
+
+我们添加了一个新命令 `Git: View Stash...` ，使用户能够在多文件差异编辑器中查看存储库中的任何存储。查看 git 仓库时，编辑器标题菜单将包含要应用/弹出或删除仓库的操作。
+
+## [Notebook 内置变量视图](https://code.visualstudio.com/updates/v1_86#_builtin-variable-view)
+
+我们在 Run 和 Debug 视图中添加了一个实验变量视图，如果扩展提供这些变量，则该视图可用于查看笔记本内核中的变量。可以使用以下设置启用此功能：
+```json
+"notebook.experimental.variablesView": true
+```
+
+## [Notebook 粘性卷轴](https://code.visualstudio.com/updates/v1_86#_notebook-sticky-scroll)
+
+笔记本编辑器的 Sticky Scroll 功能得到了重大改进，使其样式与工作台的其余部分保持一致，并为每个 markdown 元素添加折叠控件。
+
+## [通过鼠标滚轮缩放终端](https://code.visualstudio.com/updates/v1_86#_zoom-terminal-via-mouse-wheel)
+
+现在，当启用此设置时，可以在按住 Ctrl 的同时使用鼠标滚轮放大和缩小终端：
+```json
+"terminal.integrated.mouseWheelZoom": true
+```
+
+## [终端中的链接改进](https://code.visualstudio.com/updates/v1_86#_link-improvements)
+
+文件协议 URI （`file://`） 现在支持末尾的行号和列号扩展，就像大多数其他链接一样。还支持新的 `#<line>` 格式。
+
+## [任务配置路径分隔符变量的简写](https://code.visualstudio.com/updates/v1_86#_shorthand-for-path-separator-variable)
+
+新的 `${/}` 变量可以用作现有 `${pathSeparator}` 变量的简写。
+
+## [粘贴 URL 以自动创建 Markdown 链接](https://code.visualstudio.com/updates/v1_86#_paste-a-url-to-automatically-create-a-markdown-link)
+
+想要将您复制的链接转换为 Markdown 链接吗？当您将 URL 粘贴到选中文本的 Markdown 文件中时，VS Code 现在会自动插入 Markdown 链接。
+
+此功能由 <VSCodeSettingsLink id="markdown.editor.pasteUrlAsFormattedLink.enabled"/> 设置控制。您可以更改它以自定义此行为：
+
+- smartWithSelection — 默认值。当您选择了文本并且不在特殊元素（如代码块）中时，这将启用该功能。
+- smart — 与 smartWithSelection 相同，但不需要选择。
+- always — 始终将 url 粘贴为 Markdown 链接
+- never — 禁用粘贴为 Markdown 链接。
+
+## [新的 workspace.save 和 workspace.saveAs API](https://code.visualstudio.com/updates/v1_86#_new-workspacesave-and-workspacesaveas-apis)
+
+新的最终确定的 API `workspace.save` 和 `workspace.saveAs` 允许扩展触发保存编辑器的流程，无论是保存到其资源，还是通过要求用户提供资源。
+
+所有保存方法都返回生成的 Uri，如果操作已取消，则返回 undefined。除非已关联路径，否则无标题文件将始终要求用户提供目标。
+
+## [FileSystemProvider API 的只读消息](https://code.visualstudio.com/updates/v1_86#_readonly-message-for-filesystemprovider-api)
+
+使用 registerFileSystemProvider 注册 FileSystemProvider 时，可以设置选项以将整个文件系统标记为只读。现在，如果将 isReadonly 选项设置为 MarkdownString，则当用户尝试在文件系统中编辑文件时，该消息将显示在编辑器中。
+
+## [Electron 27 更新](https://code.visualstudio.com/updates/v1_86#_electron-27-update)
+
+在这个里程碑中，我们将在我们的稳定版本中向用户推广 Electron 27 更新。此更新附带 Chromium 118.0.5993.159 和 Node.js 18.17.1
+
+## [Linux 最低要求更新](https://code.visualstudio.com/updates/v1_86#_linux-minimum-requirements-update)
+
+在这个里程碑中，我们更新了工具链以构建我们的桌面客户端。从此版本开始，VS Code 桌面仅与基于 glibc 2.28 或更高版本以及 glibcxx 3.4.25 或更高版本的 Linux 发行版兼容，例如 Debian 10、RHEL 8 或 Ubuntu 20.04。

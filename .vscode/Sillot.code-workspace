@@ -71,6 +71,7 @@
   ],
   "settings": {
     // 非工作区设置，需要在用户设置中修改 ::开始
+    "window.titleBarStyle": "custom",
     "security.allowedUNCHosts": [
         "wsl.localhost" // 允许查看，保存是另外的权限
     ],
@@ -89,45 +90,66 @@
         "strings": "on"
       } // 也可以直接设置为 "editor.quickSuggestions": true (忽略警告)
     },
+    "window.title": "${dirty} ${activeRepositoryName}:${activeRepositoryBranchName}${separator}${rootName}${separator}${profileName}", // 在设置的UI界面查看具体介绍
     "workbench.editor.wrapTabs": true,
+    "terminal.integrated.mouseWheelZoom": true, // since vscode 1.86
+    "terminal.integrated.stickyScroll.enabled": true, // since vscode 1.85
     "terminal.integrated.gpuAcceleration": "auto", // since vscode 1.89
     "terminal.integrated.suggest.enabled": true, // vscode 1.92 improve
     "terminal.integrated.suggest.runOnEnter": "exactMatchIgnoreExtension", // since vscode 1.92
+    "terminal.integrated.suggest.quickSuggestions": true, // since vscode 1.90
+    "terminal.integrated.suggest.suggestOnTriggerCharacters": true, // since vscode 1.90
     "terminal.integrated.suggest.builtinCompletions": {
         "pwshCode": true,
         "pwshGit": true
     }, // since vscode 1.92
+    "git.autofetch": true, // since vscode 1.88 // 若设置为 true，则自动从当前 Git 仓库的默认远程仓库提取提交。若设置为 all ，则从所有远程仓库进行提取。
     "scm.workingSets.enabled": true, // since vscode 1.89
     "scm.workingSets.default": "current", // since vscode 1.89
+    "scm.inputMinLineCount": 3, // since vscode 1.86
     "scm.showHistoryGraph": true, // since vscode 1.91 // 1.92 experimental -> formal
     "markdown.editor.updateLinksOnPaste.enabled": true, // since vscode 1.89 // 1.92 experimental -> formal
     "editor.guides.indentation": true,
     "editor.stickyScroll.enabled": true,
     "editor.minimap.side": "left", // 显示在左侧更专注
     "editor.minimap.enabled": true,
+    "editor.lightbulb.enabled": "on",
+    "editor.occurrencesHighlight": "multiFile",
+    "window.density.editorTabHeight": "compact", // since vscode 1.83
+    "diffEditor.hideUnchangedRegions.enabled": true, // since vscode 1.81 // 1.82 experimental -> formal
+    "workbench.tree.enableStickyScroll": true, // since vscode 1.85
+    "workbench.tree.stickyScrollMaxItemCount": 6, // since vscode 1.85
+    "workbench.activityBar.location": "default",
     "workbench.editor.titleScrollbarSizing": "large",
     "workbench.editor.openPositioning": "right",
     "workbench.editor.showTabs": "multiple",
+    "workbench.editor.pinnedTabsOnSeparateRow": true, // since vscode 1.83
+    "workbench.editor.doubleClickTabToToggleEditorGroupSizes": "maximize", // `maximize` since vscode 1.84
     "workbench.editor.enablePreview": true, // 启用或禁用预览编辑器
     "workbench.editor.closeEmptyGroups": false, // 关闭编辑器组的最后一个编辑器是否关闭该组本身
-    "workbench.editor.customLabels.enabled": true, // REF https://code.visualstudio.com/docs/getstarted/userinterface#_customize-tab-labels
+    "workbench.editor.customLabels.enabled": true, // since vscode 1.88 // REF https://code.visualstudio.com/docs/getstarted/userinterface#_customize-tab-labels
     "workbench.editor.customLabels.patterns": {
         "**/src/**/index.ts": "${dirname}/${filename} 💕"
-    },
+    }, // since vscode 1.88
     "search.exclude": {
       "**/.history": true
     },
     // 实验性设置
     "notebook.experimental.remoteSave": true, // since vscode 1.89
+    "notebook.experimental.variablesView": true, // since vscode 1.86
     "debugpy.showPythonInlineValues": true, // since vscode 1.92
     "diffEditor.experimental.useTrueInlineView": true, // since vscode 1.92
+    "diffEditor.experimental.showMoves": true, // since vscode 1.82
     // CodeGeeX 智能编程助手设置
     "Codegeex.Chat.LanguagePreference": "中文",
     "Codegeex.Comment.LanguagePreference": "中文",
     "Codegeex.SidebarUI.LanguagePreference": "中文",
     "Codegeex.CandidateNum": "2 (中)",
     "Codegeex.CompletionModel": "CodeGeeX Pro[Beta]",
-    "asciidoc.antora.enableAntoraSupport": false
+    "asciidoc.antora.enableAntoraSupport": false,
+    "typescript.preferences.preferTypeOnlyAutoImports": true, // since vscode 1.85 // require TS 5.3+
+    "files.autoSaveWhenNoErrors": true, // since vscode 1.86
+    "files.autoSaveWorkspaceFilesOnly": true, // since vscode 1.86
   },
   "extensions": {
     "recommendations": [

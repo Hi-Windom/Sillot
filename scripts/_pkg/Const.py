@@ -33,11 +33,12 @@ HEADER_sillot = '''
 # ❄️ [国内用户推荐使用阿里云盘下载](https://sillot.db.sc.cn/汐洛宝典/下载/#阿里云盘)
 
 <p>
-<img src="https://img.shields.io/badge/Chromium 114+-black?logo=Google Chrome" title="Chromium" height="29"/>
-<img src="https://img.shields.io/badge/Windows 10+-black?logo=nsis" title="Windows" height="29"/>
-<img src="https://img.shields.io/badge/Linux AMD64-black?logo=linux" title="linux" height="29"/>
-<img src="https://img.shields.io/badge/Android 12+-black?logo=android" title="Android" height="29"/>
-<img src="https://img.shields.io/badge/HarmonyOS NEXT-black?logo=harmonyos" title="harmonyos" height="29"/>
+<img src="https://img.shields.io/badge/Chromium 114+-black?logo=Google Chrome" title="Chromium" height="25"/>
+<img src="https://img.shields.io/badge/Windows 10+-black?logo=nsis" title="Windows" height="25"/>
+<img src="https://img.shields.io/badge/Linux AMD64-black?logo=linux" title="linux" height="25"/>
+<img src="https://img.shields.io/badge/Android 12+-black?logo=android" title="Android" height="25"/>
+<img src="https://img.shields.io/badge/HarmonyOS NEXT-black?logo=harmonyos" title="harmonyos" height="25"/>
+<img src="https://img.shields.io/badge/VSCode 1.82+-black?logo=IconFinder" title="VSCode" height="25"/>
 </p>
 
 🚢 [Docker image](https://hub.docker.com/r/soltus/sillot/tags?page=1&ordering=last_updated)    📦 [VSCode Extension](https://marketplace.visualstudio.com/items?itemName=Hi-Windom.sillot)    📦 [Chromium Browser Extension（维护中）](https://github.com/K-Sillot/Sillot-Be/releases)
