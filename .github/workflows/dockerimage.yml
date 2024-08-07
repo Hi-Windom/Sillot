@@ -16,11 +16,10 @@ on:
         - T
         - R & Rococo & latest
         - P & Pioneer
-        - D & Dev
         - C & Canary
         - E & Emo
-        - R_G & Rococo_Gibbet
-        - R_S & Rococo_Salvation
+        - S_Gibbet
+        - D_Gibbet
 
 # ref https://docs.github.com/zh/actions/learn-github-actions/variables
 env:
@@ -46,11 +45,10 @@ jobs:
             ["T"]="docker/T.Dockerfile"
             ["R & Rococo & latest"]="docker/R.Dockerfile"
             ["P & Pioneer"]="docker/P.Dockerfile"
-            ["D & Dev"]="docker/D.Dockerfile"
             ["C & Canary"]="docker/C.Dockerfile"
             ["E & Emo"]="docker/E.Dockerfile"
-            ["R_G & Rococo_Gibbet"]="Dockerfile"
-            ["R_S & Rococo_Salvation"]="docker/R_S.Dockerfile"
+            ["S_Gibbet"]="Dockerfile"
+            ["D_Gibbet"]="docker/D_Gibbet.Dockerfile"
           )
           channel="${{ github.event.inputs.channel }}"
           docker_file="${dockerFileMap[$channel]}"
