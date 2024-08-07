@@ -1,0 +1,153 @@
+---
+title: VSCode 1.82 (2023 年 8 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -182
+---
+
+import { Image } from "astro:assets"
+import myImage1 from "@assets/shots/2024-08-07--vscode1.82__diffEditor-movedCodeDetection.gif"
+import myImage2 from "@assets/shots/2024-08-07--vscode1.82__diffEditor-collapsedCodeHeaders.gif"
+
+> 主要内容摘抄自 [VSCode 1.82 发行说明](https://code.visualstudio.com/updates/v1_82)，文中“我们”即 VSCode
+
+## [内置端口转发](https://code.visualstudio.com/updates/v1_82#_builtin-port-forwarding)
+
+VS Code 现在具有内置端口转发系统。此功能允许您通过互联网将本地运行的服务共享给其他人和设备。要使用它，请在面板区域中可用的端口视图中选择转发端口按钮（端口：聚焦端口视图）。
+[请参阅端口转发](https://code-visualstudio-com.translate.goog/docs/editor/port-forwarding?_x_tr_sl=auto&_x_tr_tl=zh-CN&_x_tr_hl=zh-CN)用户指南，了解有关端口转发的更多信息。
+命令中心现在默认开启
+
+## [命令中心现在默认开启](https://code.visualstudio.com/updates/v1_82#_command-center-now-on-by-default)
+
+几个月前，我们引入了命令中心，作为发现和与 VS Code 交互的快捷方式。您可以将其用作启动板，在命令面板中查找命令、运行任务和其他快速体验。我们一直在进行一项实验，在标题栏中显示命令中心，并得到了积极的反馈，因此我们觉得是时候默认启用它了。
+
+## [状态栏的新主题颜色和更新主题颜色](https://code.visualstudio.com/updates/v1_82#_new-and-updated-themable-colors-for-the-status-bar)
+
+状态栏已为其项目提供了许多可主题化的颜色。现在有更多颜色可用于主题化悬停前景色和背景色：
+
+- statusBarItem.errorHoverBackground
+- statusBarItem.errorHoverForeground
+- statusBarItem.warningHoverBackground
+- statusBarItem.warningHoverForeground
+- statusBarItem.remoteHoverBackground
+- statusBarItem.remoteHoverForeground
+- statusBarItem.offlineHoverBackground
+- statusBarItem.offlineHoverForeground
+
+以下两种颜色名称已更新，因为颜色不再适用于整个状态栏，而仅适用于远程指示器：
+
+- statusBar.offlineBackground重命名为statusBarItem.offlineBackground
+- statusBar.offlineForeground重命名为statusBarItem.offlineForeground
+
+## [粘性滚动](https://code.visualstudio.com/updates/v1_82#_sticky-scroll)
+
+此次迭代对 Sticky Scroll UI 进行了几项改进，可以在编辑器顶部找到（视图：切换 Sticky Scroll）。
+
+- 现在，默认情况下，当编辑器水平滚动条滚动时，粘性滚动会横向滚动。可以通过禁用 来关闭此功能 `editor.stickyScroll.scrollWithEditor` 。
+- 按住 键并将鼠标悬停在 Sticky Scroll 行上，即可查看范围的最后一行Shift。按住 键并单击一行可Shift将编辑器光标移动到范围的最后一行。
+- 已将折叠图标添加到 Sticky Scroll 边缘。这些图标的渲染遵循 `editor.showFoldingControls` 控制编辑器边缘中折叠图标渲染的设置。
+
+## [差异编辑器](https://code.visualstudio.com/updates/v1_82#_diff-editor)
+
+在此版本中，我们默认启用了新的 diff 编辑器。我们还改进了一些新的 diff 编辑器功能并修复了许多错误。
+
+## [移动代码检测](https://code.visualstudio.com/updates/v1_82#_moved-code-detection)
+
+本次迭代我们完善了移动代码检测功能。可以使用 `"diffEditor.experimental.showMoves": true` 或在 diff 编辑器上下文菜单中启用此功能。启用后，系统会检测同一文件中从一个位置移动到另一个位置的代码块，并绘制箭头以指示代码块移动到的位置。
+
+代码移动在发生轻微修改时也会被检测到。可以使用比较按钮来比较移动前后的块。
+
+<Image src={myImage1} alt="移动代码检测" />
+
+## [折叠未更改的代码标题](https://code.visualstudio.com/updates/v1_82#_collapsed-unchanged-code-headers)
+
+使用 `"diffEditor.hideUnchangedRegions.enabled": true` 或选择编辑器上下文菜单中的地图图标来折叠未改变的代码块。
+
+在此版本中，现在有折叠代码块的面包屑导航，以指示哪些符号已折叠。单击面包屑导航项会显示所选项：
+
+<Image src={myImage2} alt="折叠未更改的代码标题" />
+
+## [动态布局](https://code.visualstudio.com/updates/v1_82#_dynamic-layout)
+
+如果 diff 编辑器的宽度太小，编辑器会自动切换到内联视图。如果编辑器再次足够宽，则会恢复以前的布局。设置 `"diffEditor.useInlineViewWhenSpaceIsLimited": false` 为禁用此行为。
+
+## [控制终端在启动时如何恢复](https://code.visualstudio.com/updates/v1_82#_control-how-terminals-restore-on-startup)
+
+新设置 `terminal.integrated.hideOnStartup` 控制应用程序启动时是否自动创建终端。有以下选项可用：
+
+- never（默认）：启动时永不隐藏终端视图。
+- whenEmpty：仅当没有恢复持久会话时才隐藏终端。
+- always：始终隐藏终端，即使已恢复持久会话。
+
+## [快速访问文本搜索](https://code.visualstudio.com/updates/v1_82#_quick-access-text-search)
+
+我们正在尝试在快速访问菜单中显示工作区搜索结果。要尝试此操作，请运行搜索：快速文本搜索（实验性）。此命令设置快速打开以接受搜索查询。输入一些文本以查看来自不同工作区文件的匹配项。
+
+## [支持批量范围格式化](https://code.visualstudio.com/updates/v1_82#_support-for-batch-range-formatting)
+
+APIDocumentRangeFormattingEditProvider现在支持批量格式化。这意味着扩展可以选择性地向编辑器发出信号，表示它支持一次调用多个范围。这有助于减少对格式化提供程序的调用次数，从而提高性能。
+
+要选择批量格式化，提供商必须实现一项新的可选功能：[provideDocumentRangesFormattingEdits](https://translate.google.com/website?sl=auto&tl=zh-CN&hl=zh-CN&u=https://github.com/microsoft/vscode/blob/e34a26097d763548bf220da77b74922765c12fa2/src/vscode-dts/vscode.d.ts%23L4172) 。
+
+## [监听终端命令执行](https://code.visualstudio.com/updates/v1_82#_listen-to-terminal-command-execution)
+
+长期以来，人们一直要求扩展监听终端命令执行 API，而现在该扩展的早期提案已可供测试。此 API 是使用shell 集成实现的，并且只会在启用并运行该 API 的终端上触发。
+```ts
+export interface TerminalExecutedCommand {
+  /**
+   * The {@link Terminal} the command was executed in.
+   */
+  terminal: Terminal;
+  /**
+   * The full command line that was executed, including both the command and the arguments.
+   */
+  commandLine: string | undefined;
+  /**
+   * The current working directory that was reported by the shell. This will be a {@link Uri}
+   * if the string reported by the shell can reliably be mapped to the connected machine.
+   */
+  cwd: Uri | string | undefined;
+  /**
+   * The exit code reported by the shell.
+   */
+  exitCode: number | undefined;
+  /**
+   * The output of the command when it has finished executing. This is the plain text shown in
+   * the terminal buffer and does not include raw escape sequences. Depending on the shell
+   * setup, this may include the command line as part of the output.
+   */
+  output: string | undefined;
+}
+
+export namespace window {
+  /**
+   * An event that is emitted when a terminal with shell integration activated has completed
+   * executing a command.
+   *
+   * Note that this event will not fire if the executed command exits the shell, listen to
+   * {@link onDidCloseTerminal} to handle that case.
+   */
+  export const onDidExecuteTerminalCommand: Event<TerminalExecutedCommand>;
+}
+```
+
+该 API 的形式尚未最终确定，但基本思想将保持不变。
+
+这是一个示例用法，它监听任何成功的git push命令并触发扩展中的刷新：
+```ts
+const disposables = [];
+disposables.push(
+  window.onDidExecuteTerminalCommand(command => {
+    if (command.commandLine.startsWith('git push') && command.exitCode === 0) {
+      refreshState();
+    }
+  })
+);
+function refreshState() {
+  /* ... */
+}
+```
+
+## [Electron 25 更新](https://code.visualstudio.com/updates/v1_82#_electron-25-update)
+
+在这个里程碑中，我们正在向稳定用户推广 Electron 25 更新。此更新附带 Chromium114.0.5735.289 和 Node.js 18.15.0

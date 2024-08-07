@@ -1,14 +1,19 @@
 ---
 title: 依赖更新策略
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -999999
 ---
 
 ## VSCode
 
-总是跟进最新正式版
+总是跟进最新正式版。对 VSCode 的兼容性要求主要取决于其 electron 捆绑的 Chromium 版本。
+
+[VSCode版本更新官方说明](https://code.visualstudio.com/updates)
 
 ## electron
 
-从 beta 7 开始跟进，以便尽快体验新版 Chromium 和 node.js
+开发者渠道从 beta 3 开始跟进，以便尽快跟踪新版 Chromium 和 node.js
 
 如果 beta 版本存在问题，则回退到正式版。electron-nightly 需要修改大量配置，因此汐洛不会使用。
 

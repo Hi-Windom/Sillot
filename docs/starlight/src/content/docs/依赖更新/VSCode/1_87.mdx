@@ -1,0 +1,62 @@
+---
+title: VSCode 1.87 (2024 年 2 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -187
+---
+
+> 主要内容摘抄自 [VSCode 1.87 发行说明](https://code.visualstudio.com/updates/v1_87)，文中“我们”即 VSCode
+
+## [编辑器粘性滚动](https://code.visualstudio.com/updates/v1_87#_editor-sticky-scroll)
+
+本次迭代我们默认在编辑器中启用粘性滚动。您可以使用设置进行更改 `editor.stickyScroll.enabled` 。
+
+我们还将编辑器粘性小部件中可显示的最大行数从 10 增加到了 20。您可以使用设置来配置最大行数 `editor.stickyScroll.maxLineCount` 。
+
+## [多个游标的内联补全](https://code.visualstudio.com/updates/v1_87#_inline-completions-for-multiple-cursors)
+
+此次迭代我们添加了对多光标内联补全的支持。现在，内联补全可在主光标位置和辅助光标位置进行预览和应用。
+
+## [在多差异编辑器中重构预览](https://code.visualstudio.com/updates/v1_87#_refactor-preview-in-multi-diff-editor)
+
+借助重构预览，您可以查看代码重构将应用的更改。重构预览更改现在显示在多差异编辑器中，便于一目了然地查看所有更改并将其与之前的版本进行比较。
+
+## [跟踪命令持续时间](https://code.visualstudio.com/updates/v1_87#_command-duration-tracked)
+
+现在可跟踪终端持续时间，并且在启用 shell 集成时，命令悬停中会显示详细信息
+
+## [新的放大、缩小和重置命令](https://code.visualstudio.com/updates/v1_87#_new-commands-to-zoom-in-out-and-reset)
+
+有新的命令可以放大、缩小和重置终端字体大小。默认情况下，这些命令不受约束，但您可以将它们绑定到您喜欢的键绑定。
+
+- 终端：增加字体大小( workbench.action.terminal.fontZoomIn)
+- 程序端：减小字体大小( workbench.action.terminal.fontZoomOut)
+- 终端：重置字体大小( workbench.action.terminal.fontZoomReset)
+
+## [在窗口标题中包含存储库或分支名称](https://code.visualstudio.com/updates/v1_87#_include-repository-or-branch-name-in-the-window-title)
+
+用户可以使用window.title设置自定义窗口标题。 这次迭代，我们添加了两个可与此设置一起使用的新变量：`${activeRepositoryName}` 和 `${activeRepositoryBranchName}` 。 这些变量分别替换为活动存储库和活动分支的名称。
+
+## [关闭所有未修改的编辑器命令](https://code.visualstudio.com/updates/v1_87#_close-all-unmodified-editors-command)
+
+为了帮助管理编辑器，我们在命令面板中添加了 `Close All Unmodified Editors` 命令，该命令将关闭所有包含未修改文件的编辑器。该命令不会关闭包含未保存更改的编辑器。
+
+## [为本地运行的 JUPYTER 服务器提供语言服务器支持](https://code.visualstudio.com/updates/v1_87#_language-server-support-for-locally-running-jupyter-servers)
+
+当连接到本地 Jupyter 服务器时，Jupyter扩展程序以前会将这些 Jupyter 服务器视为远程服务器。因此，Pylance扩展程序无法检测到已安装的软件包。
+
+此次迭代中，Jupyter扩展会检测连接的 Jupyter 服务器是本地的还是远程的。这使得Pylance扩展能够根据安装的软件包（在本地 Python 环境中）提供更丰富的语言功能。
+
+## [FindFiles2 API](https://code.visualstudio.com/updates/v1_87#_findfiles2-api)
+
+我们添加了一个新的建议扩展 API，它是现有workspace.FindFilesAPI 的改进版本。新workspace.FindFiles2API 引入了新选项，允许工作区文件搜索：
+
+- 尊重files.exclude与search.exclude设置
+- 尊重忽略文件
+- 执行模糊搜索
+- 跟踪符号链接
+
+[您可以在此处](https://translate.google.com/website?sl=auto&tl=zh-CN&hl=zh-CN&u=https://github.com/microsoft/vscode/blob/4e2aa982224429f161423cbdded9587e39766782/src/vscode-dts/vscode.proposed.findFiles2.d.ts)查看新的 API 。
+
+请注意，这是一个暂定名称，将来 `FindFiles2` 可能会将此功能作为 `FindFiles` 的替代重载提供。
+

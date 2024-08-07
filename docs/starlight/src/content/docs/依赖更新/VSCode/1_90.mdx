@@ -1,0 +1,33 @@
+---
+title: VSCode 1.90 (2024 年 5 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -190
+---
+
+> 主要内容摘抄自 [VSCode 1.90 发行说明](https://code.visualstudio.com/updates/v1_90)，文中“我们”即 VSCode
+
+## [编辑器选项卡多​​选](https://code.visualstudio.com/updates/v1_90#_editor-tabs-multi-select)
+
+您现在可以同时选择多个选项卡，从而可以一次将操作应用于多个编辑器。此新功能使您可以通过单个操作移动、固定或关闭多个选项卡。要将另一个选项卡添加到您的选择中，请使用Ctrl + Click（Cmd + Click在 macOS 上）。要选择一系列选项卡，请使用Shift + Click。
+
+## [⚠️ 删除画布渲染器](https://code.visualstudio.com/updates/v1_90#_-removal-of-the-canvas-renderer)
+
+画布渲染器在 VS Code 1.89 版本中已弃用，现已完全删除。这意味着在少数不支持 WebGL2 的机器上，终端现在使用基于 DOM 的渲染器。
+
+## [VS Code 原生的 PowerShell IntelliSense](https://code.visualstudio.com/updates/v1_90#_vs-codenative-intellisense-for-powershell)
+
+除了几项可靠性改进之外，我们还对终端中的 PowerShell IntelliSense 进行了以下更改：
+- `terminal.integrated.shellIntegration.suggestEnabled` 已更改为 `terminal.integrated.suggest.enabled`
+- 新的 `terminal.integrated.suggest.quickSuggestions` 控制功能会在您在空格后输入时是否显示建议
+- 新的 `terminal.integrated.suggest.suggestOnTriggerCharacters` 控制是否在您输入时显示建议 `/`，`\` 或`-`
+
+## [使用 esbuild 进行扩展开发](https://code.visualstudio.com/updates/v1_90#_use-esbuild-for-extensions)
+
+TypeScript和Web的yo代码扩充生成器现在可以选择使用esbuild作为捆绑器。当您选择esbuild时，这将创建一个esbuild.js构建脚本并在pack.json中添加脚本条目并在.vscode/task.json中添加构建任务。要在现有扩展中使用esbuild，请查看[捆绑扩展](https://code-visualstudio-com.translate.goog/api/working-with-extensions/bundling-extension?_x_tr_sl=auto&_x_tr_tl=zh-CN&_x_tr_hl=zh-CN)和[Web 扩展](https://code-visualstudio-com.translate.goog/api/extension-guides/web-extensions?_x_tr_sl=auto&_x_tr_tl=zh-CN&_x_tr_hl=zh-CN)指南。
+
+您可以在 [vscode-extension-samples/esbuild-sample](https://translate.google.com/website?sl=auto&tl=zh-CN&hl=zh-CN&u=https://github.com/microsoft/vscode-extension-samples/tree/main/esbuild-sample) 找到示例项目。
+
+## [Electron 29 更新](https://code.visualstudio.com/updates/v1_90#_electron-29-update)
+
+在这个里程碑中，我们在稳定版本上向用户推广 Electron 29 更新。此更新附带 Chromium 122.0.6261.156 和 Node.js 20.9.0

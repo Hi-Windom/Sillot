@@ -1,0 +1,88 @@
+---
+title: VSCode 1.84 (2023 年 10 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -184
+---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.84 发行说明](https://code.visualstudio.com/updates/v1_84)，文中“我们”即 VSCode
+
+## [自定义活动栏位置](https://code.visualstudio.com/updates/v1_84#_customize-activity-bar-position)
+
+您现在可以将活动栏移动到侧栏的顶部。
+
+当“活动”栏位于顶部时，“帐户”和“管理”按钮将移动到标题栏的最右侧。
+
+注意：仅当启用自定义标题栏 （“window.titleBarStyle”： “custom”） 时才支持此功能。
+
+## [隐藏编辑器选项卡](https://code.visualstudio.com/updates/v1_84#_hide-editor-tabs)
+
+用户现在可以通过将 <VSCodeSettingsLink id="workbench.editor.showTabs"/> 设置为 none 来隐藏编辑器选项卡。
+
+## [最大化编辑组](https://code.visualstudio.com/updates/v1_84#_maximize-editor-group)
+
+有一个新命令 `View: Toggle Maximize Editor Group` （Ctrl+K Ctrl+M） 以最大化编辑器组。这将隐藏所有其他组，并在标签栏中添加一个按钮，允许用户恢复以前的布局。如果将设置 <VSCodeSettingsLink id="workbench.editor.doubleClickTabToToggleEditorGroupSizes"/> 设置为 `maximize` ，则用户可以双击编辑器选项卡以最大化和取消最大化编辑器组。
+
+## [在“设置”编辑器中搜索类似设置](https://code.visualstudio.com/updates/v1_84#_similar-settings-search-in-the-settings-editor)
+
+与命令面板一样，“设置”编辑器现在运行类似的设置搜索，以收集给定查询的更相关的结果。
+
+该实现目前处于早期阶段，您可以期待在接下来的几次迭代中进行改进。
+
+## [确认打开协议链接](https://code.visualstudio.com/updates/v1_84#_confirmation-for-opening-protocol-links)
+
+当文件或工作区的协议链接在 VS Code 中打开时，现在将出现一个对话框，要求确认
+
+协议链接可以指向本地文件（例如 vscode://file/path/to/file）或远程文件（例如 vscode://vscode-remote/ssh-remote+[USER@]HOST[:P ORT]/path/to/file）。对于每种情况，都有新的设置来禁用此行为：
+
+- security.promptForLocalFileProtocolHandling - For local protocol links
+- security.promptForLocalFileProtocolHandling - 用于本地协议链接
+- security.promptForRemoteFileProtocolHandling- For remote protocol links
+- security.promptForRemoteFileProtocolHandling- 用于远程协议链接
+
+## [多文档高亮显示](https://code.visualstudio.com/updates/v1_84#_multidocument-highlighting)
+
+通过设置 `editor.multiDocumentOccurrencesHighlight`（ 已<a href="../1_85#多文档高亮显示">变更</a>为 <VSCodeSettingsLink id="editor.occurrencesHighlight"/> ），添加了对跨多个文档的代码高亮显示的初始支持。这种初始实现仅具有文本匹配项的功能，将来将支持语义突出显示。
+
+## [使用 --force-if-includes 强制推送](https://code.visualstudio.com/updates/v1_84#_force-push-using-forceifincludes)
+
+这个里程碑现在支持 --force-if-includes 选项，这是 Git 2.30 中添加的 --force-with-lease 的辅助选项。新选项可确保在检查远程引用尖端的提交后创建强制推送的提交，并减少了在启用自动获取时丢失提交的机会。您可以通过禁用 <VSCodeSettingsLink id="git.useForcePushIfIncludes"/> 设置来禁用 --force-if-includes 的使用。
+
+## [新的主题颜色](https://code.visualstudio.com/updates/v1_84#_new-theme-colors)
+
+- textPreformat.background：预格式化文本段的背景颜色
+
+## [每个名称的根文件夹图标](https://code.visualstudio.com/updates/v1_84#_root-folder-icons-per-name)
+
+文件图标主题作者现在可以使用新属性 `rootFolderNames` 和 `rootFolderNamesExpanded` 为根文件夹定义特定于名称的图标。您可以查看文件图标主题指南以获取更多信息。
+
+## [具有自定义排除规则的文件观察程序](https://code.visualstudio.com/updates/v1_84#_file-watchers-with-custom-exclude-rules)
+
+在这个里程碑中，我们添加了一个建议的 API，用于创建完全控制排除规则的文件系统观察程序：
+```ts
+export interface FileSystemWatcherOptions {
+  /**
+   * An optional set of glob patterns to exclude from watching.
+   * Glob patterns are always matched relative to the watched folder.
+   */
+  readonly excludes?: string[];
+}
+
+export function createFileSystemWatcher(
+  pattern: RelativePattern,
+  options?: FileSystemWatcherOptions
+): FileSystemWatcher;
+```
+
+这个新的 API 使扩展能够完全控制文件观察程序，无论它是递归观察器还是非递归观察程序，也无论它是想在工作区内部还是外部观看。用户或默认配置的文件监视排除规则将不适用，因此您可以确保仅接收您订阅的事件。
+
+## [Windows 32 位支持结束](https://code.visualstudio.com/updates/v1_84#_windows-32bit-support-ends)
+
+不再支持 Windows 32 位 VS Code。如果您仍在使用 VS Code 的 32 位版本，则应更新到 64 位版本。
+
+## [适用于 Java 的 Gradle](https://code.visualstudio.com/updates/v1_84#_gradle-for-java)
+
+借助改进的 [Gradle for Java 扩展](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-gradle) ，VS Code 中的 Java 开发变得更加容易。由于采用了构建服务器协议 （BSP），预发布版本对构建 Gradle 项目有了更好的支持。与 VS Code 中使用的其他协议（例如语言服务器协议 （LSP））类似，BSP 在开发环境和构建工具（如 Gradle）之间提供了一个抽象层。
+

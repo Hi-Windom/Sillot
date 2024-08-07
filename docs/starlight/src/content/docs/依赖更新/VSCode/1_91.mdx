@@ -1,0 +1,64 @@
+---
+title: VSCode 1.91 (2024 年 6 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -191
+---
+
+> 主要内容摘抄自 [VSCode 1.91 发行说明](https://code.visualstudio.com/updates/v1_91)，文中“我们”即 VSCode
+
+## [配置文件编辑器预览](https://code.visualstudio.com/updates/v1_91#_profiles-editor-preview)
+
+在此里程碑中，我们引入了新的配置文件编辑器，使您能够在一个地方管理配置文件。此体验包括创建新配置文件、编辑和删除现有配置文件，以及导入和导出配置文件以与他人共享。在创建新配置文件时，您可以在保存之前预览配置文件并根据需要进行自定义。配置文件编辑器还使您能够使用特定配置文件打开新窗口，或将某个配置文件设置为新窗口的默认配置文件。
+
+配置文件编辑器是此 `workbench.experimental.enableNewProfilesUI` 设置背后的一项实验性功能。启用后，您可以从窗口左下角的“设置”齿轮图标访问配置文件编辑器。
+
+## [带有配置文件菜单项的新窗口](https://code.visualstudio.com/updates/v1_91#_new-window-with-profile-menu-item)
+
+除了配置文件编辑器之外，我们还在文件菜单中添加了操作，以便打开具有特定配置文件的新窗口。使用文件>带有配置文件的新窗口菜单可以打开具有特定配置文件的新窗口。
+
+## [扩展安装选项](https://code.visualstudio.com/updates/v1_91#_extension-install-options)
+
+我们添加了更多选项，让您在安装扩展时有更大的灵活性：
+
+- 安装扩展但不同步它。
+- 安装扩展程序的特定版本。以前，您必须先安装扩展程序的最新版本，然后才能选择特定版本。
+
+这些操作可以在扩展视图中的扩展的右键上下文菜单中找到
+
+## [访问自定义标签中的文件扩展名](https://code.visualstudio.com/updates/v1_91#_access-file-extensions-in-custom-labels)
+
+当您定义[自定义标签](https://code-visualstudio-com.translate.goog/docs/getstarted/userinterface?_x_tr_sl=auto&_x_tr_tl=zh-CN&_x_tr_hl=zh-CN#_customize-tab-labels)时，您现在可以更灵活地使用语法访问单个文件扩展名 `${extname(N)}` 。此外，`${extname(N)}` 还支持负索引以按相反顺序捕获文件扩展名。要获取整个文件扩展名，请使用 `${extname}` 。
+
+例如，对于文件tests/editor.test.ts：
+```
+    ${filename}=>editor
+    ${extname}=>test.ts
+    ${extname(0)}=>ts
+    ${extname(1)}=>test
+    ${extname(-1)}=>test
+    ${extname(-2)}=>ts
+```
+
+## [取消设置主题颜色](https://code.visualstudio.com/updates/v1_91#_unset-a-theme-color)
+
+如果主题设置了您不喜欢的颜色或边框，您现在可以使用default将其设置回原始值：
+```json
+  "workbench.colorCustomizations": {
+      "diffEditor.removedTextBorder": "default"
+  }
+```
+
+## [更改折叠占位符的颜色](https://code.visualstudio.com/updates/v1_91#_change-folding-placeholder-color)
+
+折叠占位符（省略号）现在可以用颜色来设置主题 `editor.foldPlaceholderForeground` 。
+
+## [保存时的代码操作](https://code.visualstudio.com/updates/v1_91#_code-actions-on-save)
+
+通过此 `editor.codeActionsOnSave` 设置，您可以配置一组代码操作，这些操作会在您保存文件时自动应用，例如用于组织导入。我们改进了配置此设置的 IntelliSense，通过根据您的工作区文件和活动扩展提供可用的代码操作列表。
+
+> 注意：尽管true和false目前仍是有效配置，但它们将被弃用，取而代之的是explicit、always和never。有关示例，请参阅[保存文档上的代码操作](https://code-visualstudio-com.translate.goog/docs/typescript/typescript-refactoring?_x_tr_sl=auto&_x_tr_tl=zh-CN&_x_tr_hl=zh-CN#_code-actions-on-save)。
+
+## [传入/传出更改图表预览](https://code.visualstudio.com/updates/v1_91#_incomingoutgoing-changes-graph-preview)
+
+我们一直在探索使用一种替代的方式来可视化传入和传出的更改。此里程碑包含一个实验性功能，它使用图形来可视化传入和传出的更改。该图形包含当前分支、当前分支的上游分支以及可选的基础分支。图形的根是这些分支的共同祖先。 您可以通过使用 `scm.experimental.showHistoryGraph` 设置启用这种新的可视化效果。试用一下并告诉我们您的想法，因为我们将继续改进和扩展此可视化中的可用功能。

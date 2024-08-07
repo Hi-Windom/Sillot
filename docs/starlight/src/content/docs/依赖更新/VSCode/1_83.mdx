@@ -1,0 +1,54 @@
+---
+title: VSCode 1.83 (2023 年 9 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -183
+---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.83 发行说明](https://code.visualstudio.com/updates/v1_83)，文中“我们”即 VSCode
+
+## [命令面板中的类似命令结果](https://code.visualstudio.com/updates/v1_83#_similar-command-results-in-the-command-palette)
+
+找到您正在寻找的命令可能具有挑战性。仅在 VS Code 中就有 2000 多个命令......有了你最喜欢的扩展，这个数字可以飙升得更高。我们想介绍一种方法来帮助您找到所需的内容，同时仍保持 Command Palette 今天提供的速度。为此，我们在命令面板结果中包含了一个称为“类似命令”的新部分。
+
+我们认为这将真正帮助那些难以记住确切命令名称的人......老实说，这几乎是我们所有人在某个时候的情况。
+
+## [配置文件的图标](https://code.visualstudio.com/updates/v1_83#_icons-for-profiles)
+
+您现在可以将图标与配置文件关联。此图标将显示在“活动栏”中，代替“管理”齿轮图标。如果您有多个配置文件，并且想要快速识别当前处于活动状态的配置文件，这将非常有用。
+
+## [编辑器选项卡高度密度](https://code.visualstudio.com/updates/v1_83#_editor-tab-height-density)
+
+<VSCodeSettingsLink id="window.density.editorTabHeight"/> 设置允许用户将选项卡高度减小到更紧凑的大小。
+
+## [固定在单独行上的编辑器选项卡](https://code.visualstudio.com/updates/v1_83#_pinned-editor-tabs-on-separate-row)
+
+添加了新设置 <VSCodeSettingsLink id="workbench.editor.pinnedTabsOnSeparateRow"/>。激活后，固定的选项卡将显示在其他选项卡上方的单独行中。在选项卡行之间拖动时，编辑器选项卡会自动固定或取消固定。如果未将 <VSCodeSettingsLink id="workbench.editor.showTabs"/> 设置为 "multiple" 则无效。
+
+## [改进了编辑器操作的溢出行为](https://code.visualstudio.com/updates/v1_83#_improved-overflow-behavior-for-editor-actions)
+
+当编辑器操作的数量超过可用空间时，操作将溢出到“更多操作”菜单中。此逻辑已得到优化，现在排除了一些重要操作，例如“关闭”或“拆分编辑器”。这意味着即使可用空间有限，它们也将始终可见。
+
+## [颜色主题选取器现在显示主题标识符](https://code.visualstudio.com/updates/v1_83#_color-theme-picker-now-shows-theme-identifier)
+
+“颜色主题”选取器现在会显示颜色主题的本地化名称及其旁边的字符串标识符。这样做是为了帮助使用非英语语言包但只知道主题英文名称的用户。
+
+## [为终端菜单做出贡献](https://code.visualstudio.com/updates/v1_83#_contribute-to-terminal-menus)
+
+有两个新菜单可以贡献给终端/上下文和终端/标题/上下文，它们分别向终端上下文菜单和终端选项卡上下文菜单添加条目。用法示例：
+```json
+{
+  "contributes": {
+    "menus": {
+      "terminal/context": [
+        { "command": "terminalTest.sendText" }
+      ],
+      "terminal/title/context": [
+        { "command": "terminalTest.sendText" }
+      ]
+    }
+    }
+}
+```

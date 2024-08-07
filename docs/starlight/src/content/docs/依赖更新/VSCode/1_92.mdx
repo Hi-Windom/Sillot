@@ -1,0 +1,188 @@
+---
+title: VSCode 1.92 (2024 年 7 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -192
+---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+import { Image } from "astro:assets"
+import myImage1 from "@assets/shots/2024-08-07--vscode1.92__single-line changes.png"
+
+> 主要内容摘抄自 [VSCode 1.92 发行说明](https://code.visualstudio.com/updates/v1_92)，文中“我们”即 VSCode
+
+## [将面板移至顶部](https://code.visualstudio.com/updates/v1_92#_move-panel-to-top)
+
+您现在可以将面板移至工作平台的顶部，在编辑器区域之上。默认情况下，面板位于底部，包括诸如终端、输出面板和调试控制台等视图。此增强功能补充了现有的将面板定位在左侧、右侧和底部的选项。
+
+## [配置文件编辑器预览](https://code.visualstudio.com/updates/v1_92#_profiles-editor-preview)
+
+在这个里程碑中，我们继续改进配置文件编辑器，使其更易于使用，并具有与设置编辑器一致的外观和感觉。配置文件编辑器作为一项实验性功能，可通过 `workbench.experimental.enableNewProfilesUI`设置启用 (since 1.91) 。启用后，您可以从窗口左下角的设置齿轮图标访问配置文件编辑器。
+
+## [覆盖现有配置文件](https://code.visualstudio.com/updates/v1_92#_override-existing-profile)
+
+现在，您可以通过创建具有相同名称的新配置文件来覆盖现有配置文件，包括默认配置文件。
+
+## [改进的扩展更新体验](https://code.visualstudio.com/updates/v1_92#_improved-extension-update-experience)
+
+我们对扩展更新体验进行了几处改进，让您对更新扩展有更多的控制，并更易于管理扩展的自动更新。
+
+> 所有扩展的自动更新
+
+我们在扩展视图标题区域更改了全局扩展自动更新操作，变为“为所有扩展启用自动更新”和“为所有扩展禁用自动更新”操作。通过这些操作，您可以一次性启用或禁用所有扩展的自动更新。
+
+> 单个扩展的自动更新
+
+我们改进了单个扩展的自动更新体验，始终显示启用或禁用扩展自动更新的操作。这使扩展的自动更新管理更加容易。
+
+> 通过 VSIX 安装的扩展禁用自动更新
+
+当您通过 VSIX 安装扩展时，默认情况下该扩展的自动更新被禁用。这使您能够使用已安装的扩展版本，而不会自动更新。
+
+> 对扩展更新的更多控制
+
+当您将一个没有可执行代码的已安装扩展版本更新为具有可执行代码的版本时，现在需要用户同意。这使您能够在应用此类更新之前对其进行审查。
+选择“审查”按钮会在浏览器中打开扩展更改日志或扩展存储库。您可以审查更改，然后决定是否要更新扩展。
+
+## [设置编辑器跳转问题已修复](https://code.visualstudio.com/updates/v1_92#_settings-editor-jump-issue-fixed)
+
+过去，设置编辑器在修改设置后会跳转，并将焦点更改到另一个设置。而且在修改设置之前滚动得越多，这种跳转情况就越糟。我们更改了设置编辑器在修改设置后重新渲染设置的方式，现在设置编辑器在修改设置后不再跳转。
+
+## [设置的 URL 处理](https://code.visualstudio.com/updates/v1_92#_url-handling-for-settings)
+
+VS Code 现在可以处理格式为 vscode://settings/setting.name 的“设置”URL（对于 Insiders 版本是 vscode-insiders://settings/setting.name ，对于 OSS 版本是 code-oss），并将打开设置编辑器到指定的设置。如果没有给出设置，则仍会打开设置编辑器。当在发行说明中使用带有设置 URL 的锚标签，并且在 VS Code 中打开发行说明时，我们会按照之前的代码设置功能进行特殊处理和渲染。
+
+## [配置用于打开链接的浏览器](https://code.visualstudio.com/updates/v1_92#_configure-the-browser-to-open-links)
+
+一个新的设置 `workbench.externalBrowser` 使您能够配置用于打开链接的浏览器。默认情况下，使用操作系统的标准浏览器。您可以在每个工作区级别配置此设置，并且此设置也支持设置同步。
+将浏览器可执行文件的完整路径指定为设置值。或者，为了确保在不同设备上的正确功能，您还可以使用浏览器别名，例如 edge、chrome 或 firefox 。
+
+## [禁用拖放时自动打开文件](https://code.visualstudio.com/updates/v1_92#_disable-auto-file-open-on-drag-and-drop)
+
+以前，将文件拖放到资源管理器中也会自动在编辑器中打开它。在某些情况下，这可能不是期望的行为。一个新的设置 `explorer.autoOpenDroppedFile` 使您能够切换此行为。默认情况下，拖放文件时会继续在编辑器中打开，但设置为 false 时，此行为将被禁用。
+
+## [灯泡控件的改进](https://code.visualstudio.com/updates/v1_92#_lightbulb-control-improvements)
+
+有时，灯泡控件可能会遮挡编辑器中的代码。为了解决这个问题，我们为灯泡控件引入了一种改进的启发式方法，当没有空间时，会在编辑器的侧边栏显示灯泡，而不是遮挡编辑器中的代码。
+您可以使用 <VSCodeSettingsLink id="editor.lightbulb.enabled" /> 设置在编辑器中切换灯泡控件。
+
+## [传入/传出更改图](https://code.visualstudio.com/updates/v1_92#_incomingoutgoing-changes-graph)
+
+在这个里程碑中，我们使用一个图来实现传入和传出更改的可视化。该图包含当前分支、当前分支的上游分支以及一个可选的基础分支。该图的根是这些分支的共同祖先。
+
+我们对历史项悬停进行了几项改进：
+- 启用了多选，以查看属于同一分支的多个历史项的更改。
+- 在“...”菜单中添加了选项，以从远程/基础分支过滤历史项。
+- 添加了获取、拉取和推送历史项的操作。
+
+您可以通过切换 `scm.showHistoryGraph` 设置来禁用传入/传出更改的图形可视化。
+
+## [终端外壳集成](https://code.visualstudio.com/updates/v1_92#_terminal-shell-integration)
+
+每次源控制操作以及针对特定文件/文件夹的文件系统事件之后，源控制视图都会刷新。当在集成终端中执行 git 命令时，命令完成与源控制视图刷新之间可能会有延迟。为了减少这种延迟，从这个里程碑开始，我们使用终端外壳集成 API 来检测在集成终端中执行的各种 git 命令（例如，添加、签出、提交、获取、拉取、推送等）的成功完成，并刷新源控制视图。
+
+## [Notebook 多单元格注释](https://code.visualstudio.com/updates/v1_92#_multicell-commenting)
+
+笔记本编辑器现在支持一次对一个或多个单元格切换注释。通过选择一个或多个单元格容器，然后使用键盘快捷键 Ctrl+/ 来实现。
+
+## [粘贴时更新 Markdown 链接](https://code.visualstudio.com/updates/v1_92#_update-markdown-links-on-paste)
+
+> since 1.89
+
+VS Code 现在可以通过更新任何复制和粘贴文本中的链接，帮助您在 Markdown 文档之间移动文本部分。有了这个功能，VS Code 会修复所有相对路径链接、引用链接以及所有具有相对路径的图像/视频，以便它们在新文档中正常工作。
+每当您在两个 Markdown 文件之间复制和粘贴带有链接的文本时，此功能就会启动。如果有可以更新的链接，粘贴后您将看到粘贴小部件。选择“粘贴并更新粘贴的链接”，VS Code 会为您修复链接。
+您可以通过将 `markdown.editor.updateLinksOnPaste.enabled` 设置为 false 来完全禁用此功能。
+
+## [使用 python-environment-tools 改进 Python 发现](https://code.visualstudio.com/updates/v1_92#_improved-python-discovery-using-pythonenvironmenttools)
+
+在上一版本中，我们宣布了 Python 环境工具，它重新设计了专注于性能的 Python 发现基础设施。这种方法减少了执行 Python 二进制文件以探测信息的需求，从而提高了性能。
+从本版本开始，我们将此增强功能作为实验的一部分推出。如果您有兴趣尝试，可以在用户设置的 settings.json 中将 "python.locator" 设置为 "native" ，然后重新加载 VS Code 窗口。
+
+## [Python 源代码中的内联变量值](https://code.visualstudio.com/updates/v1_92#_inline-variable-values-in-source-code)
+
+Python 调试器扩展引入了内联值功能，以增强您的 Python 调试体验。使用内联值，您可以在调试会话期间在编辑器中内联查看变量的值，就在相应的代码行旁边。这有助于您快速了解程序的状态，而无需将鼠标悬停在变量上或检查“运行和调试”视图中的“变量”部分。
+要启用此功能，请在用户设置中将配置值 `debugpy.showPythonInlineValues` 设置为 true 。
+
+## [真正的内联差异](https://code.visualstudio.com/updates/v1_92#_true-inline-diffs)
+
+在本次迭代中，我们引入了 `diffEditor.experimental.useTrueInlineView` 设置（默认关闭）。当您启用此设置并使用内联视图时，单行更改将以内联方式呈现。
+
+启用此实验标志时内联视图的前后对比：
+
+<Image src={myImage1} alt="启用此实验标志时内联视图的前后对比" />
+
+此功能是实验性的，未来可能会有变化。
+
+## [VS Code 原生的 PowerShell 智能感知](https://code.visualstudio.com/updates/v1_92#_vs-codenative-intellisense-for-powershell)
+
+本次发布中，VS Code 原生的 PowerShell 智能感知实验性功能有了一些显著的改进。要在 Windows 或 macOS 上启用此功能：
+```json
+"terminal.integrated.suggest.enabled": true
+```
+除了该功能更加可靠之外，还进行了许多其他改进，如下所示。
+- 补全不再截断: 补全现在准确显示输入的内容，而不是截断的版本。例如，在搜索目录名称时，现在包括了.\ 并且能正确突出显示。
+- 优化的目录导航补全: 目录名称现在包括尾随的 `\` 或 `/` ，完成时会为新目录刷新补全。
+
+### [配置回车键行为](https://code.visualstudio.com/updates/v1_92#_configure-enter-behavior)
+
+新的 `terminal.integrated.suggest.runOnEnter` 设置使您能够配置回车键的行为，以在满足某些条件时运行命令。以下是可用的值：
+- `always`：总是在按回车键时运行。
+- `exactMatch`：在完整输入建议时按回车键运行。
+- `exactMatchIgnoreExtension`（默认）：在完整输入建议或输入没有扩展名的文件时按回车键运行。
+- `never`（旧行为）：按回车键时从不运行。
+
+此更改对于不经常破坏现有的肌肉记忆非常重要，因为这通常会导致与未启用该功能时相同的按键操作。例如，运行 `cd...` ，在此更改之前，您需要输入 `cd..<enter><enter>` ，但现在只需按一次回车键，这要归功于这个新设置。
+
+### [改进的文件补全](https://code.visualstudio.com/updates/v1_92#_improved-file-completions)
+
+文件补全现在按文件名长度升序、文件名字母顺序以及文件扩展名字母顺序排序。作为命令（而不是参数）运行的文件补全现在也会根据其文件扩展名和当前操作系统得到提升。例如，在 Windows 上运行时，.ps1、.bat 和.cmd 文件会得到提升，从而在列表中显示的优先级更高。
+这些更改不仅提高了顶部项目的相关性，还通过使行为更接近原生 PowerShell 制表符补全来帮助肌肉记忆。例如，在 Windows 上的 VS Code 代码库中经常运行的命令是 `./scripts/code.bat` 。有了这些更改，`./sc<tab>/c<enter>` 可以完成并运行 `./scripts/code.bat` 。
+
+### [全局补全缓存](https://code.visualstudio.com/updates/v1_92#_global-completion-caching)
+
+命令的全局补全在会话之间进行缓存，这显著提高了 shell 启动性能。这还解决了重新连接的终端补全无法正常工作的问题。目前，可以通过运行 `Terminal: Clear Suggest Cache` 命令来清除和刷新这些缓存。在英特尔 i7-12700KF 上测试，这将激活 shell 集成所需的时间从约 600 毫秒减少到约 50 毫秒。
+
+### [PowerShell 中的内置终端补全](https://code.visualstudio.com/updates/v1_92#_builtin-terminal-completions-in-powershell)
+
+我们现在为 git 提供内置补全。这些基于 posh-git 项目，但有一些通用和 VS Code 特定的改进。
+其他一些改进包括：
+- 别名在右侧显示其扩展状态
+- 分支、标签、存储和远程的特定 Git 图标
+- 右侧的子命令描述
+
+我们还为 code 和 code-insiders 提供内置补全，尽管这些非常基础，并将在未来的版本中改进。
+这些补全可能与其他 PowerShell 模块的补全冲突。您可以使用以下设置禁用它们：
+```json
+"terminal.integrated.suggest.builtinCompletions": {
+    "pwshCode": false,
+    "pwshGit": false
+}
+```
+
+## [搜索 API](https://code.visualstudio.com/updates/v1_92#_search-apis)
+
+在过去的几个月里，我们一直在致力于完成三个提议的搜索 API：
+- `FindTextInFiles`：使用 VS Code 的文本搜索在工作区文件中查找文本。
+- `FileSearchProvider`：为无法通过 VS Code 现有的搜索功能正确搜索的自定义文件方案提供文件搜索结果。例如，在虚拟文件系统中的快速打开中搜索时，扩展提供的结果可能会显示出来。
+- `TextSearchProvider`：与 FileSearchProvider 类似，但用于文本搜索结果。例如，在虚拟文件系统中的搜索视图中搜索时，扩展提供的结果可能会显示出来。
+
+此外，我们正在改进 `workspace.findFiles` API，它使用 VS Code 的工作区文件搜索来查找文件。新版本应该允许更多选项，并且应该更清晰地处理排除选项。在引入改进版本时，现有的函数签名应该仍然有效。
+
+## [将 Markdown 语言服务器移至单独的存储库](https://code.visualstudio.com/updates/v1_92#_move-markdown-language-server-to-separate-repository)
+
+我们将为 VS Code 内置 Markdown 智能感知提供支持的语言服务器移到了它自己的存储库中。此前，这个项目是从 VS Code 主存储库的子文件夹发布的。这次更改使得为该项目做贡献变得更容易。
+该项目在 npm 上仍以相同的名称发布：vscode-markdown-languageserver。
+
+## [VS Code 使用 ESM 的进展](https://code.visualstudio.com/updates/v1_92#_progress-on-using-esm-for-vs-code)
+
+在这个里程碑中，我们再次着手为 VS Code 核心采用 ESM 的工作。我们未来的目标是使用 ECMAScript 模块（ESM）加载并完全放弃 AMD。这是一项需要多个里程碑才能完成的工作，将使整体代码加载和捆绑现代化。
+
+## [Electron 30 更新](https://code.visualstudio.com/updates/v1_92#_electron-30-update)
+
+在这个里程碑中，我们向稳定版的用户推出了 Electron 30 更新。此更新包含 Chromium 124.0.6367.243 和 Node.js 20.14.0
+
+关于生成.bat 或.cmd 文件时 API 更改的中断通知：
+
+此 Electron 更新中的 Node 版本包含一个因应对 CVE 而做出的[破坏性更改](https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2#command-injection-via-args-parameter-of-child_processspawn-without-shell-option-enabled-on-windows-cve-2024-27980---high)，如果您在 Windows 上执行.bat 或.cmd 文件，可能会影响到您。您可以在使用 shell 选项生成这些文件时遵循 Node.js 设定的[指南](https://nodejs.org/api/child_process.html#spawning-bat-and-cmd-files-on-windows)。
+
+我们建议扩展作者始终使用我们的 Insiders 版本测试其扩展，以便提前捕获这些更改。
