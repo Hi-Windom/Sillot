@@ -8,3 +8,216 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+import { Image } from "astro:assets"
+import myImage1 from "@assets/shots/2024-08-09--vscode1.66__notification.png"
+import myImage2 from "@assets/shots/2024-08-09--vscode1.66__independentColorPoolPerBracketTypeEnabled.png"
+import myImage3 from "@assets/shots/2024-08-09--vscode1.66__inputboxseverity.png"
+
+> 主要内容摘抄自 [VSCode 1.66 发行说明](https://code.visualstudio.com/updates/v1_66)，文中“我们”即 VSCode
+
+## [当地历史](https://code.visualstudio.com/updates/v1_66#_local-history)
+
+现在，文件的本地历史记录可在时间轴视图中使用。根据配置的设置，每次保存编辑器时，都会向列表中添加一个新条目。
+
+每个本地历史记录条目包含创建条目时文件的全部内容，并且在某些情况下，可以提供更多的语义信息（例如，指示重构）。
+
+从一个条目中，您可以：
+
+- 将更改与本地文件或以前的条目进行比较。
+- 回滚操作。
+- 删除或重命名条目。
+
+有新的全局命令可用于本地历史记录：
+
+- `workbench.action.localHistory.create` - 用自定义名称为活动文件创建一个新的历史记录条目。
+- `workbench.action.localHistory.deleteAll` - 删除所有文件中的所有历史记录条目。
+- `workbench.action.localHistory.restoreViaPicker` - 查找要跨所有文件恢复的历史记录条目。
+
+这些命令没有默认的键绑定，但您可以添加自己的键盘快捷键。
+
+还有一些新的设置可以处理本地历史：
+
+- <VSCodeSettingsLink id="workbench.localHistory.enabled"/> - 启用或禁用本地历史记录（默认值：true）。
+- <VSCodeSettingsLink id="workbench.localHistory.maxFileSize"/> - 创建本地历史记录条目时的文件大小限制（默认值：256 KB）。
+- <VSCodeSettingsLink id="workbench.localHistory.maxFileEntries"/> - 每个文件的本地历史记录条目限制（默认值：50）。
+- <VSCodeSettingsLink id="workbench.localHistory.exclude"/> - 用于从本地历史中排除某些文件的Glob模式。
+- <VSCodeSettingsLink id="workbench.localHistory.mergeWindow"/> - 将进一步更改添加到本地文件历史记录中的最后一个条目的时间间隔（以秒为单位）（默认值为10秒）。
+
+注意：本地历史记录条目存储在不同的位置，具体取决于您对VS Code的使用。当打开本地文件时，这些条目将保存在本地用户数据文件夹中，当打开远程文件时，它们将存储在远程用户数据文件夹中。当没有可用的文件系统时（例如，在某些情况下，当使用VS Code for Web时），条目存储到IndexedDB中。
+
+## [设置编辑器](https://code.visualstudio.com/updates/v1_66#_settings-editor)
+
+### 语言过滤器
+
+用户现在可以在设置编辑器搜索框中键入 `@lang: languageId` ，以查看和编辑可以为ID为`languageId`的语言配置的所有设置。这样，用户可以查看特定于语言的设置，也称为语言覆盖。
+
+请注意，这些覆盖将保持配置状态，直到通过单击齿轮图标并重置设置来明确重置。
+
+### 工作区和文件夹设置保留
+
+设置编辑器中的工作区和文件夹设置现在将保留，直到用户手动重置。此更改有助于用户明确指定等于设置的默认值但不同于用户设置值的工作区设置值的情况。以前，用户必须打开工作区设置JSON文件来设置此值。
+
+在编辑器选项卡下方，在设置编辑器工作区选项卡中设置选项卡大小，并自动添加到工作区的 `settings.json` 文件中。
+
+## [主要通知按钮](https://code.visualstudio.com/updates/v1_66#_primary-notification-buttons)
+
+通知的第一个按钮现在以原色显示，以区别于其他按钮。它遵循与对话框相同的模式。
+
+<Image src={myImage1} alt="主要通知按钮" />
+
+## [默认二进制编辑器](https://code.visualstudio.com/updates/v1_66#_default-binary-editor)
+
+一个新的设置，<VSCodeSettingsLink id="workbench.editor.defaultBinaryEditor"/> ，允许您绕过二进制文件警告，并在检测到二进制文件时自动打开您选择的编辑器类型。您可以从设置编辑器中的一个按钮或通过settings.json中的智能感知来选择默认的二进制编辑器ID。
+
+## [更流畅的身份验证体验](https://code.visualstudio.com/updates/v1_66#_smoother-authentication-experiences)
+
+您可能会注意到GitHub和Microsoft的身份验证流程更加顺畅。
+
+- 对于GitHub身份验证，我们已经删除了初始的继续页面，因此您的登录体验需要少一步。
+- 对于Microsoft身份验证，如果您已经使用Microsoft的设置同步或其他扩展登录，我们会尽量减少您从VS Code中被发送出去登录的次数。
+
+## [从CLI同时安装预发行版和普通扩展](https://code.visualstudio.com/updates/v1_66#_install-prerelease-and-normal-extensions-together-from-cli)
+
+VS Code现在支持从命令行同时安装预发行版和普通扩展。例如，以下命令行指令将安装GitHub.vscode-pull-request-github扩展的预发布版本和GitHub.remotehub扩展的发布版本：
+```bash
+code --install-extension GitHub.vscode-pull-request-github@prerelease --install-extension GitHub.remotehub
+```
+
+## [改进的平台特定扩展更新](https://code.visualstudio.com/updates/v1_66#_improved-platform-specific-extension-updates)
+
+VS Code现在支持将特定于平台的扩展更新为更具体的目标平台版本。例如，如果您使用的是Windows 64位，并且已经安装了Windows 32位的C/C++扩展，并且Marketplace具有与Windows 64位相同版本的扩展，则VS Code将自动将扩展更新为64位版本。
+
+## [音频提示改进](https://code.visualstudio.com/updates/v1_66#_audio-cue-improvements)
+
+新设置 <VSCodeSettingsLink id="audioCues.volume"/>（0-100，默认值为50）可用于控制音频提示的音量。还有一个更新的音频提示折叠区域。
+
+## [侧面板和侧栏的新名称](https://code.visualstudio.com/updates/v1_66#_new-names-for-side-panel-and-side-bar)
+
+两个版本之前，我们引入了[侧面板](https://code.visualstudio.com/updates/v1_64#_new-side-panel)。当时，我们删除了将包含终端的底部面板移到侧面的功能，以支持新的一致命令。在听取用户反馈后，我们确定这一决定破坏了一些重要的工作流程，我们决定恢复这一更改。
+
+这给我们留下了两个面板，面板和侧板，两者都可以放在工作台的侧面。为了解决这个问题并更好地反映新侧面板的方向，我们决定更新侧栏和侧面板的命名。侧边栏现在将被称为主侧边栏在用户界面中，而侧面板现在将被称为辅助侧边栏。
+
+- Side Bar (侧栏) -> Primary Side Bar (主侧栏)
+- Side Panel (侧面板) -> Secondary Side Bar (辅助侧栏)
+
+这些名称将反映在整个编辑器的菜单和命令中;但是，没有更改命令ID以防止破坏现有的键绑定。
+
+## 终端显示所有查找匹配项
+
+当在终端中搜索时，搜索词的所有实例现在都将突出显示。当前选择的匹配也有一个特定的高光，可以单独自定义。
+
+您可以通过以 `terminal.findMatch` 为前缀的颜色自定义来微调突出显示颜色的外观。
+
+## [终端命令导航改进](https://code.visualstudio.com/updates/v1_66#_command-navigation-improvements)
+
+一个鲜为人知的功能，已经存在了一段时间，是能够快速导航之间的命令在终端。最初，这是基于按下Enter键的时间，但现在当shell集成启用时，它将升级为使用shell集成知识来更可靠地识别正确的行。此外，现在在命令之间跳转时会显示UI反馈。
+
+可以通过以下键绑定访问此功能：
+
+- Linux/Windows: Ctrl+Up/Down (new)
+
+按住Shift键可在终端中的命令之间进行选择。
+
+## [终端复制的文本保留HTML样式](https://code.visualstudio.com/updates/v1_66#_copied-text-retains-html-styling)
+
+要从终端复制富文本，请运行 `Terminal: Copy Selection as HTML` 或使用终端上下文菜单项复制为HTML。
+
+## [终端最小对比度默认值已更改](https://code.visualstudio.com/updates/v1_66#_minimum-contrast-ratio-default-changed)
+
+<VSCodeSettingsLink id="terminal.integrated.minimumContrastRatio"/> 设置已经存在了一段时间，它可以根据背景颜色动态更改终端中的前景色。在这个版本中，我们将默认值更改为4.5（WCAG AA），以确保无论主题如何都可以访问终端。如果这最终导致颜色出现问题，您可以通过设置`"terminal.integrated.minimumContrastRatio": 1` 来禁用该功能。
+
+## [用于游标索引的监听变量](https://code.visualstudio.com/updates/v1_66#_snippet-variables-for-cursor-index)
+
+有新的代码段变量：`$CURSOR_INDEX` 和 `$CURSOR_NUMBER` 。它们的计算结果为相应游标的索引。后者从1开始，前者从0开始。这些变量的强大之处在于它与多个游标的组合。
+
+例如，下面的代码片段将为每个光标添加一个有序列表项：
+```json
+"ordered_list": {
+  "scope": "markdown",
+  "prefix": "ol",
+  "body": [
+    "$CURSOR_NUMBER. $0"
+  ],
+  "description": "Add ordered list"
+}
+```
+
+## [双对彩色化](https://code.visualstudio.com/updates/v1_66#_bracket-pair-colorization)
+
+有一个新的设置 <VSCodeSettingsLink id="editor.bracketPairColorization.independentColorPoolPerBracketType"/>。当设置为 `true` 时，每个括号类型将使用自己的颜色池进行着色。因此，不同类型的嵌套括号将具有相同的颜色。
+
+<Image src={myImage2} alt="双对彩色化" />
+
+## [改进的语言检测](https://code.visualstudio.com/updates/v1_66#_improved-language-detection)
+
+在上一次迭代中，我们添加了设置 <VSCodeSettingsLink id="workbench.editor.historyBasedWebageDetection"/> 来配置是否使用新的语言检测策略，该策略考虑到您打开的文件类型。该设置现在默认处于启用状态，并且添加了新的设置 <VSCodeSettingsLink id="workshop.editor.preferHistoryBasedLanguageDetection"/> ，以便为该策略的结果提供更多优先级。
+
+## [CSS格式化程序](https://code.visualstudio.com/updates/v1_66#_css-formatter)
+
+内置的CSS扩展现在附带了一个格式化程序。格式化程序与CSS，LESS和SCSS一起工作。它由[JS Beautify库](https://github.com/beautify-web/js-beautify)实现，并带有以下设置：
+
+- <VSCodeSettingsLink id="css.format.enable"/> - 启用/禁用默认的CSS格式化程序。
+- <VSCodeSettingsLink id="css.format.newlineBetweenRules"/> - 用空行分隔规则集。
+- <VSCodeSettingsLink id="css.format.newlineBetweenSelectors"/> - 用新行分隔选择器。
+- <VSCodeSettingsLink id="css.format.spaceAroundSelectorSeparator"/> - 确保在选择器分隔符 '>', '+', '~' (for example, a > b) 周围使用空格字符。
+
+less和scss也有相同的设置。
+
+## [HTML中的JavaScript语义突出显示](https://code.visualstudio.com/updates/v1_66#_javascript-semantic-highlighting-in-html)
+
+我们已经将HTML文件中JavaScript源代码的语义突出显示与您在普通.js文件中看到的一致。
+
+这不仅使代码颜色更加一致，还增加了一些以前缺少的重要语义信息，例如突出显示只读类型。
+
+## [支持笔记本的文档选择器](https://code.visualstudio.com/updates/v1_66#_notebookaware-document-selectors)
+
+我们已经完成了对 `vscode.DocumentType` 的添加。此类型允许您将语言功能（如Go to Definition）与特定文档相关联，它驱动UI，还决定是否向相应的提供程序请求结果。我们添加了一个新属性，允许扩展缩小笔记本类型。例如，`{ language: 'python', notebookType: 'jupyter-notebook'}` 针对所有嵌入在Python笔记本中的Python文档。
+
+## [具有自定义语言ID的输出通道](https://code.visualstudio.com/updates/v1_66#_output-channel-with-custom-language-id)
+
+在这个里程碑中，我们已经完成了[CodeOutputChannel API](https://github.com/microsoft/vscode/blob/dc2f5d8dd1790ac4fc6054e11b44e36884caa4be/src/vscode-dts/vscode.d.ts#L9415) ，以创建具有自定义语言ID的输出通道。这将允许您通过传递语言ID为您的输出通道贡献令牌或语法着色和CodeLens功能。
+
+## [支持 CompletionItem.detail](https://code.visualstudio.com/updates/v1_66#_support-for-completionitemdetail)
+
+Last month, the Debug Adapter Protocol added a detail property to the CompletionItem object. This property is now supported in VS Code. You will see the detail in the suggest widget in the Debug Console.
+上个月，SNMP适配器协议向CompletionItem对象添加了一个 `detail` 属性。VS Code现在支持此属性。您将在建议小部件中看到详细信息。
+
+## [InputBox 验证消息严重性](https://code.visualstudio.com/updates/v1_66#_inputbox-validation-message-severity)
+
+我们的InputBox API（通过 `window.showInputBox` 和 `window.outputBox`）提供了验证用户输入的机制。在这次迭代中，我们用一个建议的API来扩展它，以显示严重性。
+
+例如，如果你想根据用户的输入向他们显示一条信息消息，你的验证消息可以返回：
+
+```json
+{
+  content: 'this is an info message';
+  severity: InputBoxValidationSeverity.Info;
+}
+```
+
+它看起来像这样：
+
+<Image src={myImage3} alt="验证消息严重性" />
+
+此建议的详细信息可以在 [inputBoxSeverity](https://github.com/microsoft/vscode/blob/68802ccc44e21661aa426bfd211c6e94788aa42b/src/vscode-dts/vscode.proposed.inputBoxSeverity.d.ts) 中找到。
+
+## [内联完成](https://code.visualstudio.com/updates/v1_66#_inline-completions)
+
+我们继续致力于内联完成，为下两个版本的最终完成做准备。内联补全现在可以用于建议片段或文本替换（以前只支持文本插入）
+
+## [拖拽到编辑器](https://code.visualstudio.com/updates/v1_66#_drop-into-editor)
+
+建议的[文本编辑器拖放API](https://github.com/microsoft/vscode/blob/bfc026b97a1c28d8288aa2510c066d03e5bcde54/src/vscode-dts/vscode.proposed.textEditorDrop.d.ts)允许扩展处理到文本编辑器中的拖放。这些拖拽事件可以来自VS Code（例如将文件从VS Code的资源管理器拖到文本编辑器中），也可以通过将文件从操作系统拖拽到VS Code中来生成。
+
+## [Electron 17 update](https://code.visualstudio.com/updates/v1_66#_electron-17-update)
+
+在这个里程碑中，我们很高兴在VS Code中发布Electron v17。这是我们之前采用Electron v13的一个重大更新，并利用了Electron的[流程重用架构](https://github.com/electron/electron/issues/18397)。在过去的一年里，我们一直在重新实现并逐步推出一些核心服务的更改，这些更改涉及与工作台相关的交互和生命周期，为新架构做准备：
+
+- File Watcher 文件监视器
+- Integrated Terminal 集成终端
+- Extension host 扩展主机
+- Search 搜索
+
+像切换磁盘和重新加载磁盘这样的操作现在应该更快了。通过此更新，我们还将Chromium版本提升到98.0.4758.109，Nodejs版本提升到16.13.0

@@ -103,6 +103,7 @@
         "pwshCode": true,
         "pwshGit": true
     }, // since vscode 1.92
+    "git.untrackedChanges": "separate",
     "git.autofetch": true, // since vscode 1.88 // 若设置为 true，则自动从当前 Git 仓库的默认远程仓库提取提交。若设置为 all ，则从所有远程仓库进行提取。
     "scm.workingSets.enabled": true, // since vscode 1.89
     "scm.workingSets.default": "current", // since vscode 1.89
@@ -115,6 +116,7 @@
     "editor.minimap.enabled": true,
     "editor.lightbulb.enabled": "on",
     "editor.occurrencesHighlight": "multiFile",
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true, // since vscode 1.66
     "window.density.editorTabHeight": "compact", // since vscode 1.83
     "diffEditor.hideUnchangedRegions.enabled": true, // since vscode 1.81 // 1.82 experimental -> formal
     "workbench.tree.enableStickyScroll": true, // since vscode 1.85
@@ -150,6 +152,13 @@
     "typescript.preferences.preferTypeOnlyAutoImports": true, // since vscode 1.85 // require TS 5.3+
     "files.autoSaveWhenNoErrors": true, // since vscode 1.86
     "files.autoSaveWorkspaceFilesOnly": true, // since vscode 1.86
+    "explorer.fileNesting.expand": true, // since vscode 1.67
+    "explorer.fileNesting.enabled": true, // since vscode 1.67
+    "explorer.fileNesting.patterns": {
+      "webpack.config.js": "webpack.*.js",
+      "electron-builder.yml": "electron-builder-*.yml",
+      "index.ts": "*.ts"
+    },
   },
   "extensions": {
     "recommendations": [
