@@ -32,18 +32,6 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 
 </Aside>
 
-## 新彖乄渠道
-
-> 新彖乄渠道是海文东标准的一部分
-
-<Card title="T" icon="seti:happenings">
-【汐洛】全矩阵经过周期观察验证后才会推送新彖乄渠道更新，仅包含已冻结的特性，由洛可可渠道裁剪未冻结的特性后传递，适合新彖乄用户。
-
-在 docker hub ，新彖乄渠道使用 `T` 标签。
-
-版本号更新 0.100.*-T -> 0.200.*-T ，重大修复版本可例外，无更新周期。
-</Card>
-
 ## 洛可可渠道
 
 > 洛可可渠道是海文东标准的一部分
@@ -53,7 +41,10 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 
     在 docker hub ，洛可可渠道使用 `Rococo` 和 `R` 标签，额外使用 `latest` 这一标签。
 
-    功能版本号更新 0.110.* -> 0.120.* ，重大修复版本可例外，更新周期较长（3月左右）
+    更新周期较长（2月左右）
+
+    - 发行版本号更新 `0.100.*` -> `0.101.*` -> `0.102.*` ，重大修复版本可例外
+    - 内部版本号更新 `1.36.*.{{ yyMMddHHmmss }}` -> `1.37.*.{{ yyMMddHHmmss }}` -> `1.38.*.{{ yyMMddHHmmss }}`
   </Card>
 
 
@@ -66,7 +57,10 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 
         在 docker hub，先锋渠道使用 `Pioneer` 和 `P` 标签。
 
-    功能版本号更新 0.100.* -> 0.101.* ，重大修复版本可例外，更新周期较短（1月左右）
+    更新周期较短（2周左右）
+
+    - 发行版本号更新 `0.100.*` -> `0.101.0` -> `0.101.1`
+    - 内部版本号更新 `1.36.*.{{ yyMMddHHmmss }}` -> `1.37.1.{{ yyMMddHHmmss }}` -> `1.37.2.{{ yyMMddHHmmss }}`
   </Card>
 
 ## 金丝雀渠道
@@ -78,7 +72,10 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 
     在 docker hub，金丝雀渠道使用 `Canary` 和 `C` 标签。
 
-    版本号更新 0.100.* -> 0.100.* ，无更新周期。
+    无更新周期。
+
+    - 发行版本号不变
+    - 内部版本号更新 `1.36.1.{{ yyMMddHHmmss }}` -> `1.36.1.{{ yyMMddHHmmss }}`
   </Card>
 
 ## 情绪渠道
@@ -86,12 +83,27 @@ import BannerTopPrLock from '@components/BannerTopPrLock.astro';
 > 情绪渠道是海文东标准的一部分
 
   <Card title="Emo" icon="seti:plan">
-    【汐洛·情绪】情绪渠道，通常用于开发者暴力测试，基本上可以确定是有问题的，请勿使用。
+    【汐洛·情绪】情绪渠道，仅在开发者需要暴力测试时启用，擅自使用后果自负。
 
     在 docker hub ，神罚渠道使用 `Emo` 和 `E` 标签。
 
-    版本号更新 `0.100.*-E1` -> `0.100.*-E2` ，无更新周期。
+    无更新周期。
+
+    - 发行版本号不变
+    - 内部版本号更新 `1.36.1.{{ yyMMddHHmmss }}` -> `1.36.1.{{ yyMMddHHmmss }}.E1` -> `1.36.1.{{ yyMMddHHmmss }}.E2`
   </Card>
+
+## 新彖乄渠道
+
+> 新彖乄渠道是海文东标准的一部分
+
+<Card title="T" icon="seti:happenings">
+【汐洛】全矩阵经过周期观察验证后才会推送新彖乄渠道更新，仅包含已冻结的特性，由洛可可渠道裁剪未冻结的特性后传递，适合新彖乄用户。
+
+在 docker hub ，新彖乄渠道使用 `T` 标签。
+
+版本号更新与洛可可渠道一致。
+</Card>
 
 ## 救赎渠道
 

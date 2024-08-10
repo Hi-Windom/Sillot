@@ -2,12 +2,15 @@
 title: 94to114
 ---
 
+import { Aside } from '@astrojs/starlight/components';
 import BannerTopArchived from '@components/BannerTopArchived.astro';
 
 <BannerTopArchived />
 
 Chromium 94 功能冻结于2021年7月29日，已经不满足新彖乄要求。
 2024年7月15日，汐洛彖夲肜矩阵v0.35将要求提升至 114（2023年4月11日功能冻结）。
+
+<Aside>受此影响，VSCode 要求提升至 <a href="/依赖更新/vscode/1_82/">1.82 (2023 年 8 月)</a></Aside>
 
 ## 新增支持
 
@@ -182,3 +185,9 @@ CSS 嵌套提供了将一个样式规则嵌套到另一个样式规则中的能�
 > 该 overlay 值可识别，但行为与“auto”相同。
 
 overflow CSS 属性的 overlay 值是一个非标准值，用于使滚动条显示在内容顶部而不是占用空间。此值已弃用，相关功能将标准化为 scrollbar-gutter 属性。
+
+## 其他
+
+### popover 属性支持
+
+见 https://developer.mozilla.org/zh-CN/docs/Web/HTML/Global_attributes/popover

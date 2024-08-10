@@ -8,3 +8,146 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+import { Image } from "astro:assets"
+import myImage1 from "@assets/shots/2024-08-10--vscode1.73__restrict-search-to-folder.gif"
+import myImage2 from "@assets/shots/2024-08-10--vscode1.73__exclude-folder-from-search.gif"
+
+
+> 主要内容摘抄自 [VSCode 1.73 发行说明](https://code.visualstudio.com/updates/v1_73)，文中“我们”即 VSCode
+
+## [在搜索中包含和排除文件夹](https://code.visualstudio.com/updates/v1_73#_include-and-exclude-folders-from-search)
+
+在“搜索”视图的结果树视图中右键单击文件夹时，上下文菜单中现在有两个新选项。
+
+- 选择“将搜索限制为文件夹”会将选定的文件夹路径添加到要包含的文件文本框中。向此文本框添加路径会将搜索结果限制为符合列出的路径或模式的结果。
+<Image src={myImage1} alt="restrict-search-to-folder" />
+- 选择“从搜索中排除文件夹”会将选定的文件夹路径添加到要排除的文件文本框中。在此处添加路径将排除任何符合列出的路径或模式的搜索结果。
+<Image src={myImage2} alt="exclude-folder-from-search" />
+
+## [默认折叠提供程序](https://code.visualstudio.com/updates/v1_73#_default-folding-provider)
+
+通常，当一种语言有多个折叠提供程序处于活动状态时，VS Core 会尝试合并结果。如果存在冲突的范围，则会丢弃某些范围。此外，并非所有折叠供应商都可以与其他供应商结合使用。
+
+新的 <VSCodeSettingsLink id="editor.defaultFoldingProvider"/> 设置允许您选择要使用的折叠提供程序。提供程序的名称是扩展 ID （ `{publisher}.{extension}` ） 的扩展。
+
+以下示例将（假设的）扩展 aeschli.better-folding 中的折叠提供程序设置为 JavaScript 的默认值。
+
+```json
+    "[javascript]": {
+            "editor.defaultFoldingRangeProvider": "aeschli.better-folding"
+    }
+```
+
+## [合并编辑器改进](https://code.visualstudio.com/updates/v1_73#_merge-editor)
+
+## [Markdown 在文件重命名/移动时自动更新链接](https://code.visualstudio.com/updates/v1_73#_markdown-automatic-link-updates-on-file-rename-move)
+
+厌倦了在移动或重命名文件时意外破坏 Markdown 中的链接或图像？尝试新的 <VSCodeSettingsLink id="markdown.updateLinksOnFileMove.enabled"/> 设置！
+
+您可以使用 <VSCodeSettingsLink id="markdown.updateLinksOnFileMove.include"/> 控制受影响的文件类型。默认情况下，它对所有 Markdown 文件和常见图像文件格式都启用。
+
+## [Markdown 未使用和重复链接定义诊断](https://code.visualstudio.com/updates/v1_73#_markdown-unused-and-duplicate-link-definition-diagnostics)
+
+## [Markdown link occurrence highlighting](https://code.visualstudio.com/updates/v1_73#_markdown-link-occurrence-highlighting)
+
+## [为工作空间编辑提供元数据](https://code.visualstudio.com/updates/v1_73#_provide-metadata-for-workspace-edits)
+
+用于应用工作区编辑的 API 现在允许扩展提供元数据，例如，用于将编辑标记为重构。这些额外的元数据将被编辑器接受，并在重构后自动保存（设置：`files.refactoring.autoSave`）。
+
+## [限制哪些命令可以由 MarkdownString 和 webviews 运行](https://code.visualstudio.com/updates/v1_73#_restrict-which-commands-can-be-run-by-markdownstring-and-in-webviews)
+
+MarkdownString 中的命令链接是在 VS Code 的悬停消息或 IntelliSense 详细信息中创建自定义交互的有用方法。Webviews 还可以使用命令链接直接从 Webview 触发 VS Code 命令。但是，命令链接也可能很危险，因为它们可用于执行任何命令，包括许多在设计时未考虑安全性的命令。因此，默认情况下，命令链接处于禁用状态，并且必须由扩展显式启用。
+
+虽然这种全有或全无的方法行之有效，但我们也发现它给扩展作者带来了太多的安全负担。需要使用命令链接的扩展必须验证它们呈现的内容中仅包含安全命令。这既容易忘记，也很容易出错。
+
+为了改进这一点，我们引入了用于命令链接启用的新 API，允许扩展仅启用受信任的命令子集。
+
+对于 MarkdownString，`isTrusted` 属性现在采用可以执行的命令的允许列表（所有其他命令都将被阻止）：
+
+```ts
+const md = new vscode.MarkdownString(
+  `A command link: [Open setting](command:workbench.action.openSettings)`
+);
+
+// Set trusted commands instead of enabling all commands
+md.isTrusted = { enabledCommands: ['workbench.action.openSettings'] };
+```
+
+对于 Webview，`WebviewOptions.enableCommandUris` 属性现在可以是已启用命令的列表，而不是简单的 true/false：
+
+```ts
+const options: vscode.WebviewOptions = {
+  enableCommandUris: ['workbench.action.openSettings']
+};
+```
+
+我们强烈建议所有使用命令链接的扩展都采用这种新的、限制性更强的 API，以提高安全性。
+
+## [Web 视图和 WebView 视图的一致源](https://code.visualstudio.com/updates/v1_73#_consistent-origin-for-webviews-and-webview-views)
+
+为了缩短 Web 视图的加载时间，我们现在尝试为给定类型的 Web 视图的所有实例保持一致的来源。这有两个主要好处：
+
+- Web视图可以更好地利用缓存。这意味着本地资源的加载速度应该更快。
+- Web视图可以使用本地存储和其他按源分区的 Web API。<br/>
+请记住，webview 的所有实例现在都将在同一源上运行，因此，如果它们使用 API（如本地存储），请确保对每个资源特定于文档的任何数据/状态进行分区。例如，`localStorage.setItem('scrollPosition', 100)` 将在所有 webview 实例中将 `scrollPosition` 设置为 100。如果要设置单个资源的滚动位置，还需要在键中包含资源 ID：`localStorage.setItem(myDocUri, JSON.stringify({scrollPosition: 100 }))` 。<br/>
+您也不应使用 localStorage 或类似的 API 来存储关键数据，例如文档内容。虽然 VS Code 尽最大努力维护 Web 视图的一致源，但我们不能保证源不会更改。<br/>
+在许多情况下，您应该使用 [webview 状态 API](https://code.visualstudio.com/api/extension-guides/webview#getstate-and-setstate) ，因为这些 API 可以为您处理上述两个问题。
+
+源是为每个扩展和 webview 类型随机生成的。在 WebView 的所有实例中使用相同的源。
+
+目前，普通的 Web 视图和 WebView 视图都试图保持一致的来源。我们计划在下一次迭代中将此功能用于自定义编辑器和笔记本 Web视图。
+
+## [日志输出通道](https://code.visualstudio.com/updates/v1_73#_log-output-channel)
+
+在上一个里程碑中，我们引入了 LogOutputChannel API 提案，用于创建仅用于日志记录的输出通道。在此迭代中，我们向其添加了 logLevel 属性和 onDidChangeLogLevel 事件。logLevel 属性表示输出通道的当前日志级别，当输出通道的日志级别发生变化时，将触发 onDidChangeLogLevel 事件。
+
+```ts
+/**
+ * A channel for containing log output.
+ */
+export interface LogOutputChannel extends OutputChannel {
+
+    /**
+     * The current log level of the channel.
+     * Defaults to application {@link env.logLevel application log level}.
+     */
+    readonly logLevel: LogLevel;
+
+    /**
+     * An {@link Event} which fires when the log level of the channel changes.
+     */
+    readonly onDidChangeLogLevel: Event<LogLevel>;
+    ...
+    ...
+}
+```
+
+我们还向 env 命名空间添加了 logLevel 属性和 onDidChangeLogLevel 事件，以表示应用程序的当前日志级别，当应用程序的日志级别发生变化时，将触发该事件。
+
+```ts
+export namespace env {
+  /**
+   * The current log level of the application.
+   */
+  export const logLevel: LogLevel;
+
+  /**
+   * An {@link Event} which fires when the log level of the application changes.
+   */
+  export const onDidChangeLogLevel: Event<LogLevel>;
+}
+```
+
+## [优化输入延迟](https://code.visualstudio.com/updates/v1_73#_optimizing-for-input-latency)
+
+随着 VS Code 的大小不断增大，按下击键时的活动量也在增加。在这次迭代中，我们退后一步，对在编辑器中输入时究竟会发生什么进行了彻底的调查，以及我们可以将什么推迟到击键在屏幕上呈现之后。此次勘探的主要成果是：
+
+- 进行了几项更改，以尽可能地推迟工作，直到编辑器中的击键在屏幕上呈现之后。对此影响的粗略估计是，当 IntelliSense 未显示时，输入延迟会减少 ~15%，而当 IntelliSense 正在重新筛选时，输入延迟的减少甚至更高。
+- 现在，我们拥有更精细的技术，可以手动测量输入延迟，并在这个亚毫秒*级别进行优化。
+- 有一项正在进行的更改将帮助我们跟踪和报告输入延迟的样本。这将为我们提供一些具体的数字来维持和改进。
+
+这只是这项工作的开始，我们还有更多更改应该会在下一个版本发布。
+
+\* _这些数字很大程度上取决于用于测试的硬件。在功能强大的硬件上，0.5 毫秒的改进可能最终在更普通的硬件上变成 2 毫秒。_

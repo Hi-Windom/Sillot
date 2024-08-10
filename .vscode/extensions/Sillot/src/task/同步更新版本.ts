@@ -56,12 +56,29 @@ export function add_task_同步更新版本(context: vscode.ExtensionContext) {
             Promise.all(versionPromises).then(versions => {
                 // 过滤掉null值
                 const validVersions = versions.filter(version => version !== null);
+                async function validateVersionInput(input: string) {
+                    const versionPattern = /^(\d+)\.(\d+)(?:\.(\d+))?$/;
+                    const versionPatternWithNonNumeric = /^[^\d]*(\d+)\.(\d+)(?:\.(\d+))?([^\d]*)$/;
+                    if (!input) {
+                        return { message: '版本号不能为空', severity: vscode.InputBoxValidationSeverity.Error };
+                    }
+                    if (versionPattern.test(input)) {
+                        // 输入是纯数字版本号，格式正确
+                        return { message: '版本号格式正确', severity: vscode.InputBoxValidationSeverity.Info };
+                    } if (versionPatternWithNonNumeric.test(input)) {
+                        // 输入包含非数字字符，视为警告
+                        return { message: '版本号包含非数字字符，可能非本意', severity: vscode.InputBoxValidationSeverity.Warning };
+                    }
+                    // 输入既不是纯数字版本号，也不符合包含非数字字符的版本号格式，视为错误
+                    return { message: '版本号格式不正确，应为 major.minor.patch 或 major.minor', severity: vscode.InputBoxValidationSeverity.Error };
+                }
                 vscode.window
                     .showInputBox({
                         title: "请输入新版本号",
                         value: validVersions[0],
                         placeHolder: "如果是二段版本号会被使用格式化时间填充为三段版本号",
-                        prompt: `旧版本号: ${validVersions.join(", ")})`,
+                        prompt: `旧版本: ${validVersions.join(", ")}`,
+                        validateInput: validateVersionInput
                     })
                     .then(async version => {
                         if (version) {
@@ -73,7 +90,7 @@ export function add_task_同步更新版本(context: vscode.ExtensionContext) {
                                 version = `${version}.${timestamp}`;
                             }
                             // 遍历映射并更新版本号
-                            selectedOptions.forEach(async (value: string, index: number) => {
+                            for (const [index, value] of selectedOptions.entries()) {
                                 Log.d(TAG, value);
                                 if (await fs.exists(value)) {
                                     const pkgContent = fs.readJSONSync(value);
@@ -83,7 +100,7 @@ export function add_task_同步更新版本(context: vscode.ExtensionContext) {
                                 } else {
                                     vscode.window.showWarningMessage(`已跳过无效映射 ${value}`);
                                 }
-                            });
+                            }
                             vscode.window.showInformationMessage("所有 package.json 文件的版本已更新。");
                         }
                     });

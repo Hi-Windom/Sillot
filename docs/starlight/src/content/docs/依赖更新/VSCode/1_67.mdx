@@ -8,3 +8,125 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.67 发行说明](https://code.visualstudio.com/updates/v1_67)，文中“我们”即 VSCode
+
+## [资源管理器文件嵌套](https://code.visualstudio.com/updates/v1_67#_explorer-file-nesting)
+
+资源管理器现在支持根据其名称嵌套相关文件。有几种设置可以控制此行为：
+
+- <VSCodeSettingsLink id="explorer.fileNesting.enabled"/> - 控制是否启用大型文件嵌套。它可以全局设置，也可以针对特定工作区进行设置。
+- <VSCodeSettingsLink id="explorer.fileNesting.expand"/> - 控制默认情况下是否展开嵌套文件。
+- <VSCodeSettingsLink id="explorer.fileNesting.patterns"/> - 控制文件的嵌套方式。默认配置为 TypeScript 和 JavaScript 项目提供嵌套智能，但建议您修改此配置以适应您自己的项目结构。
+
+文件嵌套已通过实验设置进行了多次迭代。现在的行为基本没有变化，但文件操作除外。实验性设置 `explorer.experimental.fileNesting.operateAsGroup` 已被移除，支持在折叠时将嵌套视为一个组，但在其他情况下将嵌套视为单个实体。这意味着，如果您想复制、剪切、拖动或删除整个嵌套文件堆栈，您可以折叠嵌套，然后将其作为单个实体进行操作。当嵌套元素展开时，所选内容将照常运行。
+
+## [重构后保存文件](https://code.visualstudio.com/updates/v1_67#_save-files-after-refactoring)
+
+重构（如重命名）通常会修改多个文件，并留下未保存的更改（脏）。外部开发工具通常需要保存这些文件。为了简化此工作流，有一个新设置 <VSCodeSettingsLink id="files.refactoring.autoSave"/> ，该设置默认为 true，并控制是否应自动保存重构中的文件。
+
+## [在编辑器限制中排除脏编辑器](https://code.visualstudio.com/updates/v1_67#_exclude-dirty-editors-in-editor-limit)
+
+新设置 <VSCodeSettingsLink id="workbench.editor.limit.excludeDirty"/> 控制打开的编辑器的最大数量是否应排除脏编辑器以计入配置的限制。默认情况下，该设置处于禁用状态 （false）。
+
+## [将“未提交的更改”恢复到时间线](https://code.visualstudio.com/updates/v1_67#_bring-back-uncommitted-changes-to-timeline)
+
+> 看不出来变化
+
+当我们上个月引入本地历史记录功能时，我们从 Git 时间线提供程序中删除了未提交的更改条目，因为它感觉有点多余。但是，一些用户在此时间线条目中看到了真正的价值，现在您可以通过相应地配置新的 <VSCodeSettingsLink id="git.timeline.showUncommitted"/> 设置来恢复它。
+
+## [打开失败时的新编辑器占位符](https://code.visualstudio.com/updates/v1_67#_new-editor-placeholder-when-opening-fails)
+
+当编辑器无法打开时，VS Code 将不再显示通知，并显示之前打开的编辑器。取而代之的是，有一个通用占位符，其中包含错误消息，在某些情况下，还有解决错误的操作。
+
+## [显示无效或不兼容的扩展](https://code.visualstudio.com/updates/v1_67#_show-invalid-or-incompatible-extensions)
+
+“扩展”视图现在在“已安装的扩展”列表中显示无效或不兼容的扩展，并显示错误状态。例如，如果你的 VS Code 版本是 1.67.0-insider，并且你已安装需要 VS Code 版本 1.68.0 的扩展，则它将以不兼容的错误状态显示在列表中。
+
+## [退出前确认](https://code.visualstudio.com/updates/v1_67#_confirm-before-quit)
+
+可以将新设置 <VSCodeSettingsLink id="window.confirmBeforeClose"/> 配置为在退出应用程序之前显示确认对话框。
+
+注意：该设置并非全新，在 VS Code for Web 中已提供一段时间。
+
+## [在新窗口中处理 URI](https://code.visualstudio.com/updates/v1_67#_handle-uri-in-new-window)
+
+每当 VS Code URI 包含查询参数 `windowId=_blank` 时，VS Code 将在新窗口中处理它。示例：`vscode://vscode.git/clone?url=https%3A%2F%2Fgithub.com%2FMicrosoft%2Fvscode-vsce.git&windowId=_blank` 。
+
+## [默认情况下启用括号对着色](https://code.visualstudio.com/updates/v1_67#_bracket-pair-colorization-enabled-by-default)
+
+鉴于 1.60 版本中引入的新括号对着色功能的积极反馈，我们默认启用括号对着色。
+
+可以通过将 `editor.bracketPairColorization.enabled` 设置为 `false` 来禁用括号对着色。
+
+也可以仅针对特定语言禁用括号对着色：
+
+```json
+"[typescript]": {
+  "editor.bracketPairColorization.enabled": false,
+},
+```
+
+## [TextMate 语法可以将标记标记为不平衡](https://code.visualstudio.com/updates/v1_67#_textmate-grammars-can-mark-tokens-as-unbalanced)
+
+## [新的括号匹配算法](https://code.visualstudio.com/updates/v1_67#_new-bracket-matching-algorithm)
+
+## [Bracket guide improvements](https://code.visualstudio.com/updates/v1_67#_bracket-guide-improvements)
+
+## [Toggle inlay hints](https://code.visualstudio.com/updates/v1_67#_toggle-inlay-hints)
+
+## [改进了内联建议](https://code.visualstudio.com/updates/v1_67#_improved-inline-suggestions)
+
+## [将文本拖放到编辑器中](https://code.visualstudio.com/updates/v1_67#_drag-and-drop-text-into-editor)
+
+您现在可以将文本从其他应用程序拖放到文本编辑器中。拖动时，虚线光标会显示文本的插入位置。
+
+## [扩展的远程源提供商 API](https://code.visualstudio.com/updates/v1_67#_expanded-remote-source-providers-api)
+
+Git 扩展 API 现在允许注册或显示远程源提供程序的扩展提供有关远程源的更丰富的信息。
+
+远程源提供商现在可以为各个远程源设置描述和图标。此外，提供商可以选择性地指定最新的远程源。它们显示在选取器的顶层，以便于访问，如果提供了时间戳，则按时间戳排序。
+
+## [Markdown：查找对标题的所有引用](https://code.visualstudio.com/updates/v1_67#_markdown-find-all-references-to-reference-links)
+
+VS Code 现在支持在 Markdown 文件中运行标头的“查找所有引用”。这使您可以查看当前工作区中使用给定标题的所有位置，包括从其他 Markdown 文件指向它的链接。
+
+首先，将光标放在标题本身或指向标题的链接的片段部分（例如，在 `[链接文本](#_some-header)` 或 `[链接文本](/path/to/file#some-header)`  中 `#some-header` ），然后运行“查找所有引用”。
+
+这将在“引用”视图中显示所有引用。如果您更喜欢其他视图，还可以使用“查看引用”或“转到引用”命令。
+
+## [Markdown：查找引用链接的所有引用](https://code.visualstudio.com/updates/v1_67#_markdown-find-all-references-to-reference-links)
+
+## [Markdown：查找对文件的所有引用](https://code.visualstudio.com/updates/v1_67#_markdown-find-all-references-to-files)
+
+## [Markdown：查找对 URL 的所有引用](https://code.visualstudio.com/updates/v1_67#_markdown-find-all-references-to-urls)
+
+## [Markdown：重命名标题](https://code.visualstudio.com/updates/v1_67#_markdown-rename-headers)
+
+曾经更改过 Markdown 文件中的标题，却意识到您还不小心破坏了指向它的所有链接吗？这就是我们对 Markdown 的新重命名支持可以提供帮助的地方。
+
+首先，将光标放在标题上，然后按 F2 开始重命名。输入标题的新文本，然后按 Enter 接受。这既会更新当前标头，也会更新当前工作区中指向它的所有已知链接。
+
+## [Markdown：重命名引用链接](https://code.visualstudio.com/updates/v1_67#_markdown-rename-reference-links)
+
+## [Markdown：重命名文件](https://code.visualstudio.com/updates/v1_67#_markdown-rename-files)
+
+## [关闭 JSON 验证](https://code.visualstudio.com/updates/v1_67#_json)
+
+新设置 <VSCodeSettingsLink id="json.validate.enable"/> 允许您关闭 JSON 验证。
+
+## [设置配置文件](https://code.visualstudio.com/updates/v1_67#_settings-profile)
+
+在此里程碑中，我们引入了设置配置文件，它是设置、扩展和 UI 自定义项的集合。如果自定义了 VS Code，现在可以将自定义项导出到设置配置文件 （mysetup.code-profile），并将其保存到计算机并与他人共享。
+
+## [选项卡 API](https://code.visualstudio.com/updates/v1_67#_tab-api)
+
+我们已经完成了选项卡 API 的只读端（也支持关闭选项卡），这标志着我们最受好评的议题之一 [microsoft/vscode#15178](https://github.com/microsoft/vscode/issues/15178) 的完成。这将公开信息，例如有多少组、打开了哪些选项卡、哪些选项卡处于活动状态、选项卡代表什么类型的编辑器等等！有关详细信息，请参阅vscode.d.ts文件，其中 API 的入口点是 window.tabGroups。
+
+## [支持非递归工作区文件观察程序](https://code.visualstudio.com/updates/v1_67#_support-for-nonrecursive-workspace-file-watchers)
+
+在之前的里程碑中，我们宣布 createFileSystemWatcher API 可用于监视磁盘上的任何文件夹，只要该文件夹不在打开的工作区内即可。现在，我们放宽了此限制，并允许非递归文件观察者在任何地方访问，甚至在打开的工作区内也是如此。非递归观察程序的优点是，为排除 （files.watcherExclude） 配置的设置不适用，因此您可以确保文件观察程序仅针对您订阅的路径发出。
+
+我们正在努力为递归观察器提供全面支持，并为扩展提供自定义排除规则，因此请继续关注更多内容！

@@ -8,3 +8,47 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.80 发行说明](https://code.visualstudio.com/updates/v1_80)，文中“我们”即 VSCode
+
+## [控制固定宽度标签的最小宽度]
+
+当 <VSCodeSettingsLink id="workbench.editor.tabSizing"/> 设置为 fixed 时，新设置 <VSCodeSettingsLink id="workbench.editor.tabSizingFixedMinWidth"/> 控制选项卡的最小大小。[1.79 发行说明](https://code.visualstudio.com/updates/v1_79#_new-tab-sizing-option-fixed)中更详细地解释了固定的选项卡宽度。
+
+## [搜索 .gitignore exclude 行为](https://code.visualstudio.com/updates/v1_80#_search-gitignore-exclude-behavior)
+
+当 <VSCodeSettingsLink id="search.useIgnoreFiles"/> 设置为 true 时，无论工作区是否初始化为 Git 存储库，现在都会尊重工作区的 `.gitignore` 。
+
+## [可调整大小的内容悬停](https://code.visualstudio.com/updates/v1_80#_resizable-content-hover)
+
+现在可以调整内容悬停控件的大小。您可以将鼠标悬停在控制边框上，然后拖动窗框以更改悬停的大小。
+
+## [关闭存储库改进](https://code.visualstudio.com/updates/v1_80#_close-repository-improvements)
+
+过去，用户可以在源代码管理视图中使用 `Git: Close Repository` 命令或 Close Repository 操作来关闭存储库，但某些操作（例如，从已关闭的存储库中打开文件）会重新打开已关闭的存储库。在这个里程碑上，我们进行了一些改进，因此现在每个工作区都会保留仓库已关闭的事实。用户可以使用 `Git: Reopen Closed Repositories` 命令重新打开已关闭的仓库。
+
+## [Markdown 格式化粘贴的 URL 作为 Markdown 链接](https://code.visualstudio.com/updates/v1_80#_markdown-format-pasted-urls-as-markdown-links)
+
+新的 <VSCodeSettingsLink id="markdown.editor.pasteUrlAsFormattedLink.enabled"/> 设置（默认为 false）允许您在 Markdown 编辑器中插入自动格式化为 Markdown 链接的链接。如果您选择一些文本以替换为粘贴的链接，则所选文本将自动成为链接的标题。如果未选择任何文本，则将有一个默认的链接标题。此功能适用于外部浏览器链接以及工作区中的文件。
+
+您必须启用设置 <VSCodeSettingsLink id="editor.pasteAs.enabled"/> 才能使此新设置生效。
+
+## [树形复选框 API](https://code.visualstudio.com/updates/v1_80#_tree-checkbox-api)
+
+TreeItem checkboxState API 已完成。默认情况下，具有复选框的树项将由 VS Code 管理其选中状态。可以通过将 TreeViewOptions 属性 manageCheckboxStateManually 设置为 true 来更改此行为。设置 manageCheckboxStateManually 后，扩展负责管理父复选框和子复选框的选中和取消选中。
+
+## [EnvironmentVariableCollection.description](https://code.visualstudio.com/updates/v1_80#_environmentvariablecollectiondescription)
+
+这个新的 API 允许为 EnvironmentVariableCollection 指定描述，在终端选项卡悬停中向用户显示，以解释更改到底在做什么。
+
+```ts
+// Example of what the Git extension could use
+context.environmentVariableCollection.description =
+  'An explanation of what the environment changes do';
+```
+
+## [文件系统提供程序的只读消息](https://code.visualstudio.com/updates/v1_80#_readonly-message-for-file-system-providers)
+
+当您注册FileSystemProvider时，您可以提供只读消息，而不是简单地将文件系统标记为只读。当用户尝试编辑来自该提供商的文件时，以下消息将显示在编辑器中。

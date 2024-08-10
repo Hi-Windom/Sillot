@@ -8,3 +8,158 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import { Aside } from '@astrojs/starlight/components';
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+import { Image } from "astro:assets"
+import myImage1 from "@assets/shots/2024-08-09--vscode1.68__deprecated extensions.png"
+
+> 主要内容摘抄自 [VSCode 1.68 发行说明](https://code.visualstudio.com/updates/v1_68)，文中“我们”即 VSCode
+
+## [“问题”面板表格视图](https://code.visualstudio.com/updates/v1_68#_problems-panel-table-view)
+
+在这个里程碑中，我们为用户添加了一项新功能，可以在树和表之间切换“问题”面板的查看模式。与树状视图相比，该表显示每个问题的源（语言服务或扩展），这使用户可以按其源筛选问题。
+
+## [已弃用的扩展](https://code.visualstudio.com/updates/v1_68#_deprecated-extensions)
+
+在此里程碑中，我们添加了对 VS Code 中已弃用扩展的支持。
+
+<Image src={myImage1} alt="已弃用的扩展" />
+
+注意：已弃用的扩展列表由 VS Code 维护。如果您认为应该弃用某个扩展，请在此[讨论](https://github.com/microsoft/vscode-discussions/discussions/1)中发表评论与我们联系。
+
+## [赞助扩展](https://code.visualstudio.com/updates/v1_68#_sponsoring-extensions)
+
+VS Code 现在允许用户赞助他们最喜欢的扩展。当扩展可以被赞助时，VS Code 将在扩展视图详细信息页面中呈现一个赞助按钮。“赞助者”按钮会将您定向到扩展程序的赞助 URL，您可以在其中提供支持。请参阅[扩展包赞助](https://code.visualstudio.com/updates/v1_68#_extension-sponsorship)，了解如何为扩展选择启用此功能。
+
+## [在资源管理器中基于 .gitignore 隐藏文件](https://code.visualstudio.com/updates/v1_68#_hide-files-in-explorer-based-on-gitignore)
+
+文件资源管理器现在支持解析和隐藏 .gitignore 文件排除的文件。这可以通过 <VSCodeSettingsLink id="explorer.excludeGitIgnore"/> 设置来启用。此设置与 <VSCodeSettingsLink id="files.exclude"/> 一起使用，以在资源管理器中隐藏不需要的文件。
+
+注意：此时，否定的 globs（ 例如 `!package.json` ）是不可解析的。
+
+## [Git：分支前缀](https://code.visualstudio.com/updates/v1_68#_git-branch-prefix)
+
+为了使创建新分支的过程更加顺畅，有一个新设置 <VSCodeSettingsLink id="git.branchPrefix"/> ，它指定在创建新分支时用作前缀的字符串。
+
+<Aside>推荐用于文件夹级而不是工作空间级或者用户级</Aside>
+
+## [Git：分支名称生成](https://code.visualstudio.com/updates/v1_68#_git-branch-name-generation)
+
+新设置 <VSCodeSettingsLink id="git.branchRandomName.enable"/> 将使 VS Code 在创建新分支时建议随机分支名称。随机名称是从字典中生成的，您可以通过 <VSCodeSettingsLink id="git.branchRandomName.dictionary"/> 设置进行控制。支持的词典包括：形容词（默认）、动物（默认）、颜色和数字。
+
+<Aside>不支持自定义感觉没什么用</Aside>
+
+## [Git：分支保护](https://code.visualstudio.com/updates/v1_68#_git-branch-protection)
+
+使用新的 <VSCodeSettingsLink id="git.branchProtection"/> 设置，您可以配置要保护的特定分支。VS Code 将避免直接在受保护的分支上提交，并将为你提供创建新分支以提交到它的机会。您可以使用 <VSCodeSettingsLink id="git.branchProtectionPrompt"/> 设置来微调此行为。
+
+## [GitHub：拉取请求模板支持](https://code.visualstudio.com/updates/v1_68#_github-pull-request-template-support)
+
+GitHub 扩展现在可以理解[拉取请求模板](https://docs.github.com/communities/using-templates-to-encourage-useful-issues-and-pull-requests/creating-a-pull-request-template-for-your-repository)，并在从新分叉的存储库创建 PR 时将它们用作基础。
+
+## [转到源定义](https://code.visualstudio.com/updates/v1_68#_go-to-source-definition)
+
+VS Code 持续时间最长、最受好评的功能请求之一是让 VS Code 导航到来自外部库的函数和符号的 JavaScript 实现。目前，“转到定义”跳转到定义目标函数或符号类型的类型定义文件（.d.ts文件）。如果您需要检查这些符号的类型或文档，但隐藏了代码的实际实现，这将非常有用。当前的行为也使许多 JavaScript 用户感到困惑，他们可能无法理解 .d.ts 的 TypeScript 类型。
+
+虽然将 Go to Definition 更改为导航到符号的 JavaScript 实现听起来很简单，但此功能请求打开这么久是有原因的。JavaScript（尤其是许多库附带的编译 JavaScript）比.d.ts更难分析。尝试分析node_modules下的所有 JavaScript 代码既会很慢，还会大大增加内存使用量。此外，还有许多 JavaScript 模式是 VS Code IntelliSense 引擎无法理解的。
+
+这就是新的“转到源定义”命令的用武之地。当您从编辑器上下文菜单或命令面板运行此命令时，TypeScript 将尝试跟踪符号的 JavaScript 实现并导航到它。这可能需要几秒钟，我们可能并不总是得到正确的结果，但它在许多情况下应该很有用。
+
+我们正在积极改进此功能，因此请在您的代码库中尝试一下并[分享您的反馈](https://github.com/microsoft/TypeScript/issues/49003)。
+
+## [Group aware Organize Imports](https://code.visualstudio.com/updates/v1_68#_group-aware-organize-imports)
+
+## [Markdown 链接验证](https://code.visualstudio.com/updates/v1_68#_markdown-link-validation)
+
+## [合并编辑器](https://code.visualstudio.com/updates/v1_68#_merge-editor)
+
+我们已经开始致力于提供更好的合并体验。现在还处于早期阶段，我们还没有准备好接受反馈，但您可以通过 `git.experimental.mergeEditor` 尝试一下。启用此功能后，具有合并冲突的文件将在新的合并编辑器中打开，从而简化解决冲突的过程。
+
+## [Inline Completions Finalization](https://code.visualstudio.com/updates/v1_68#_inline-completions-finalization)
+
+我们已经完成了 Inline Completions API。这允许扩展提供与建议小部件分离的内联完成。内联完成将呈现为已被接受的格式，但颜色为灰色。用户可以循环浏览建议并使用 Tab 键接受它们。使用 Inline Completions 的示例扩展是 GitHub Copilot。有关详细信息，请参阅vscode.d.ts文件，其中 API 的入口点为 [languages.registerInlineCompletionItemProvider](https://github.com/microsoft/vscode/blob/e3a8e502ad7263836d0bc34cbcefbfc7bd65104f/src/vscode-dts/vscode.d.ts#L12357) 。
+
+## [InputBox 验证消息严重性最终确定](https://code.visualstudio.com/updates/v1_68#_inputbox-validation-message-severity-finalization)
+
+我们的 InputBox API（通过 `window.showInputBox` 和 `window.createInputBox` ）已经完成，用于[提供用户输入验证的严重性](https://github.com/microsoft/vscode/blob/main/src/vscode-dts/vscode.d.ts#L1990-L2002)。
+
+例如，如果要根据用户的输入向用户显示信息消息，则验证消息可以返回：
+
+```js
+{
+  message: 'this is an info message';
+  severity: InputBoxValidationSeverity.Info;
+}
+```
+
+## [基于时间线视图的扩展激活](https://code.visualstudio.com/updates/v1_68#_extension-activation-based-on-timeline-view)
+
+当时间线视图可见时，已添加新的激活事件。此事件 `onView:timeline` 可由任何扩展使用，对于实现建议的 Timeline API 的扩展最有用。
+
+## [扩展赞助](https://code.visualstudio.com/updates/v1_68#_extension-sponsorship)
+
+在这个里程碑中，我们在扩展的package.json中引入了一个赞助者字段，允许扩展选择加入赞助。sponsor 对象有一个 url 字段，用于扩展作者的赞助链接。例如：
+
+```json
+"sponsor": {
+    "url": "https://github.com/sponsors/nvaccess"
+}
+```
+
+## [复制粘贴 API](https://code.visualstudio.com/updates/v1_68#_copy-paste-api)
+
+新的 documentPaste API 提案允许扩展挂接到文本编辑器内的复制和粘贴中。这可用于修改插入到粘贴上的文本。扩展还可以在复制文本时存储元数据，并在粘贴时使用此元数据（例如，在两个代码文件之间粘贴时引入导入）。
+
+[文档粘贴扩展示例](https://github.com/microsoft/vscode-extension-samples/tree/main/document-paste)演示了此 API 的操作：
+
+```ts
+/**
+ * Provider that maintains a count of the number of times it has copied text.
+ */
+class CopyCountPasteEditProvider implements vscode.DocumentPasteEditProvider {
+  private readonly countMimeTypes = 'application/vnd.code.copydemo-copy-count';
+
+  private count = 0;
+
+  prepareDocumentPaste(
+    _document: vscode.TextDocument,
+    _range: vscode.Range,
+    dataTransfer: vscode.DataTransfer,
+    _token: vscode.CancellationToken
+  ): void | Thenable<void> {
+    dataTransfer.set(this.countMimeTypes, new vscode.DataTransferItem(this.count++));
+  }
+
+  async provideDocumentPasteEdits(
+    _document: vscode.TextDocument,
+    range: vscode.Range,
+    dataTransfer: vscode.DataTransfer,
+    token: vscode.CancellationToken
+  ) {
+    const countDataTransferItem = dataTransfer.get(this.countMimeTypes);
+    if (!countDataTransferItem) {
+      return undefined;
+    }
+
+    const textDataTransferItem = dataTransfer.get('text/plain') ?? dataTransfer.get('text');
+    if (!textDataTransferItem) {
+      return undefined;
+    }
+
+    const count = await countDataTransferItem.asString();
+    const text = await textDataTransferItem.asString();
+
+    // Build a snippet to insert
+    const snippet = new vscode.SnippetString();
+    snippet.appendText(`(copy #${count}) ${text}`);
+
+    return new vscode.SnippetTextEdit(range, snippet);
+  }
+}
+
+vscode.languages.registerDocumentPasteEditProvider(
+  { language: 'markdown' },
+  new CopyCountPasteEditProvider()
+);
+```

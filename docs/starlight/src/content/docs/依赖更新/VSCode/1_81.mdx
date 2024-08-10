@@ -8,3 +8,35 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+import { Image } from "astro:assets"
+import myImage1 from "@assets/shots/2024-08-11--vscode1.81__icons-in-quick-pick.png"
+
+> 主要内容摘抄自 [VSCode 1.81 发行说明](https://code.visualstudio.com/updates/v1_81)，文中“我们”即 VSCode
+
+## [Markdown 将 URL 粘贴为格式化链接](https://code.visualstudio.com/updates/v1_81#_markdown-paste-urls-as-formatted-links)
+
+<VSCodeSettingsLink id="markdown.editor.pasteUrlAsFormattedLink"/> 设置现在有一个新的 `smart` 选项。智能粘贴功能可以检测您何时粘贴到您可能不希望自动 Markdown 链接格式化的文本中。智能粘贴忽略的一些情况包括在 Markdown 链接内粘贴、粘贴到另一个 Markdown 链接上以及代码块内粘贴。
+
+默认情况下，pasteUrlAsFormattedLink 功能当前处于关闭状态（ `never` ），但您可以将设置更改为 `smart` 或 `always`（始终创建格式化的 URL 链接）。
+
+## [revealSetting 和 focusSearch 已添加到 IOpenSettingsActionOptions 中](https://code.visualstudio.com/updates/v1_81#_revealsetting-and-focussearch-added-to-iopensettingsactionoptions)
+
+扩展现在可以将 revealSetting 对象和 focusSearch 布尔值传递到接受 IOpenSettingsActionOptions 参数的命令中，例如 `workbench.action.openSettingsJson` 。
+
+例如，以下命令
+
+```ts
+vscode.commands.executeCommand('workbench.action.openSettingsJson', {
+  revealSetting: { key: 'editor.renderWhitespace' }
+});
+```
+
+打开用户设置 JSON 文件，然后显示 `editor.renderWhitespace` 设置（如果存在）。
+
+## [QuickPickItem 中的图标已完成](https://code.visualstudio.com/updates/v1_81#_icons-in-quickpickitem-finalized)
+
+QuickPickItem 中用于图标的 API 已完成。现在，可以使用 iconPath 属性在 QuickPickItem中显示图标。
+
+<Image src={myImage1} alt="QuickPickItem 中的图标已完成" />

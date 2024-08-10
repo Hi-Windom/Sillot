@@ -8,3 +8,23 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> 主要内容摘抄自 [VSCode 1.77 发行说明](https://code.visualstudio.com/updates/v1_77)，文中“我们”即 VSCode
+
+## [从编辑器装订线复制 GitHub 深层链接](https://code.visualstudio.com/updates/v1_77#_copy-github-deep-links-from-editor-gutter)
+
+现在，在 GitHub 仓库中工作时，您可以从编辑器装订线复制编辑器行或范围的深层链接。
+
+在 VS Code Desktop 中，为了能够从编辑器装订线创建 GitHub 永久链接和 HEAD 链接，您需要安装 [GitHub Pull Requests and Issues](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github) 扩展。在 vscode.dev 中，GitHub 仓库的深层链接开箱即用。
+
+<Aside>在非主分支上的永久链接可能404</Aside>
+
+## [按文件内容推荐扩展名](https://code.visualstudio.com/updates/v1_77#_recommend-extensions-by-file-content)
+
+VS Code 现在可以根据文件内容推荐扩展。例如，如果打开具有笔记本单元格语法的 Python 文件，VS Code 建议使用 Jupyter 扩展来适当地呈现和运行这些单元格。
+
+## [改进了终端选项卡悬停](https://code.visualstudio.com/updates/v1_77#_improved-tab-hover)
+
+终端选项卡悬停现在显示 shell 的进程 ID、完整的命令行以及改进的扩展环境变量贡献视图。
