@@ -8,3 +8,60 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.74 发行说明](https://code.visualstudio.com/updates/v1_74)，文中“我们”即 VSCode
+
+## [自定义资源管理器自动显示逻辑](https://code.visualstudio.com/updates/v1_74#_custom-explorer-autoreveal-logic)
+
+## [CJK 字符的新分词选项](https://code.visualstudio.com/updates/v1_74#_new-word-break-option-for-cjk-characters)
+
+现在可以使用名为 <VSCodeSettingsLink id="editor.wordBreak"/> 的设置来避免在 CJK 字符后插入换行点。当配置了 `keepAll` 时，换行算法将尝试将 CJK 字符后面的文本保持在同一行。此设置对其他脚本中的字符没有任何影响。
+
+## [新的缩进大小设置](https://code.visualstudio.com/updates/v1_74#_new-indent-size-setting)
+
+有一个名为 `editor.indentSize` 的新设置，它允许将缩进大小（构成缩进的空格数）与制表符大小（用于呈现制表符的空格数）分离。这在处理使用混合制表符和空格缩进的文件时非常有用，并且只有在使用手动缩进配置时才能执行。
+
+下面是一个示例配置：
+```json
+"editor.detectIndentation": false,
+"editor.insertSpaces": true,
+"editor.tabSize": 8,
+"editor.indentSize": 2
+```
+
+## [乐观的用户界面更新]
+
+执行 Git 操作后，将执行一组 git 命令（例如，git status）以在更新源代码管理视图之前更新数据模型。在某些情况下，运行这些命令可能需要几秒钟才能完成（例如，在处理大型 monorepo 时），从而导致在刷新源代码管理视图之前出现延迟。
+
+在这个里程碑上，我们进行了更改，以便在 git 状态完成之前，针对某些 Git 操作（暂存、取消暂存、放弃更改和提交）乐观地更新源代码管理视图，从而产生更快速的源代码管理视图。
+
+新功能默认处于启用状态，但可以使用 `git.optimisticUpdate: false` 禁用此功能。
+
+## [已声明的扩展贡献的隐式激活事件](https://code.visualstudio.com/updates/v1_74#_implicit-activation-events-for-declared-extension-contributions)
+
+在此里程碑中，我们删除了在扩展在其package.json中声明某些扩展贡献时明确列出激活事件的要求。
+
+以前，如果扩展声明在其package.json文件中贡献了命令 mycommand，则它还需要在 package.json 的 activationEvents 字段中列出相应的 onCommand：mycommand 激活事件，以便成功执行命令。这很繁琐且容易出错，并可能导致大package.json文件。
+
+VS Code 现在将自动填充以下扩展贡献点的激活事件：
+
+| 贡献点  | 推断的激活事件 |
+| ---- | ---- |
+| commands  | onCommand |
+| authentication  | onAuthenticationRequest |
+| languages  | onLanguage |
+| customEditors  | onCustomEditor |
+| views  | onView | 
+
+扩展作者现在可以安全地从扩展中删除这些推断的激活事件。如果这样做，请更新 VS Code 引擎要求，以确保扩展不会被视为与早期版本的 VS Code 兼容：
+```json
+    "engines": {
+        "vscode": "^1.74.0"
+    },
+```
+
+## [将 vsce 重命名为 @vscode/vsce](https://code.visualstudio.com/updates/v1_74#_renaming-of-vsce-to-vscodevsce)
+
+VS Code 的扩展管理器 vsce 工具已重命名为 `@vscode/vsce` 。对于将该工具用作库的任何人来说，这都是一个重大更改。CLI 工具仍称为 vsce，可以通过 `npm install -g @vscode/vsce` 进行安装。

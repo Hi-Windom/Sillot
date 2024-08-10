@@ -6,6 +6,9 @@
   "preview": true,
   "repository": "https://github.com/Hi-Windom/Sillot",
   "publisher": "Hi-Windom",
+  "sponsor": {
+    "url": "https://sillot.db.sc.cn/love"
+  },
   "icon": "media/icon.png",
   "galleryBanner": {
     "color": "#131824",

@@ -8,3 +8,162 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+import { Image } from "astro:assets"
+import myImage1 from "@assets/shots/2024-08-09--vscode1.72__search-tree-view.gif"
+
+> 主要内容摘抄自 [VSCode 1.72 发行说明](https://code.visualstudio.com/updates/v1_72)，文中“我们”即 VSCode
+
+## [选择使用 3 向合并编辑器](https://code.visualstudio.com/updates/v1_72#_opt-in-to-use-the-3way-merge-editor)
+
+在审查了我们收到的所有合并编辑器反馈并考虑了整个体验之后，我们决定在检测到冲突时默认不显示 3 向合并编辑器（git.mergeEditor 设置现在为 false）。此决定的原因可以在 [issue #160806](https://github.com/microsoft/vscode/issues/160806) 中找到。
+
+## [从头开始重新计算的结果文件](https://code.visualstudio.com/updates/v1_72#_opt-in-to-use-the-3way-merge-editor)
+
+在上一次迭代中，我们尝试将合并编辑器设计为有冲突的文件的替代视图。单独的编辑器窗格不显示冲突标记，而是显示冲突的详细信息。这种设计的优点是打开合并编辑器不会修改磁盘上的文件，并且可以保留在打开合并编辑器之前所做的用户更改。不幸的是，这不仅令人困惑，而且并非在所有情况下都有效，因为我们的合并算法和 Git 合并算法没有完全对齐。
+
+在此版本中，如果在合并编辑器中打开带有冲突标记的文件，作为第一步，我们将使用合并算法重新计算结果文件，而不插入任何冲突标记。单方面的冲突将自动解决，正确的冲突将重置为两个版本的共同祖先，并标记为未处理。
+
+## [改进了编辑器自动滚动行为](https://code.visualstudio.com/updates/v1_72#_improved-autoscroll-behavior)
+
+在选择和拖动时，编辑器过去常常以依赖于显示器的每秒帧数 （FPS） 的方式滚动，有时编辑器会在鼠标到达编辑器边缘时快速滚动。现在，编辑器以更易于管理的速度自动滚动，当鼠标靠近边缘时，大约每秒一个视口，当鼠标远离编辑器时，速度更快，与 FPS 无关。
+
+## [改进的悬停](https://code.visualstudio.com/updates/v1_72#_improved-hover)
+
+编辑器悬停过去在隐藏自身方面非常激进，尤其是当鼠标经过编辑器的空白区域时。这使得难以达到悬停中显示的某些动作。现在，只要鼠标向悬停方向移动，悬停就会保持可见。设置 `"editor.hover.sticky": false` 将恢复到之前的行为。
+
+## [最近更新的扩展](https://code.visualstudio.com/updates/v1_72#_recently-updated-extensions)
+
+VS Code 现在在扩展视图的“更新”的“最近更新”部分中显示过去 7 天内更新的扩展。
+
+## [需要注意的扩展](https://code.visualstudio.com/updates/v1_72#_extensions-requiring-attention)
+
+VS Code 现在显示需要注意的扩展，这些扩展被排序到扩展视图的默认已安装部分的顶部。这包括具有挂起更新或已更新或禁用并需要 VS Code 重新加载的扩展。
+
+现在，“活动栏”中“扩展”图标上的标记显示需要注意的扩展数量。
+
+## [忽略扩展的更新](https://code.visualstudio.com/updates/v1_72#_ignore-updates-for-an-extension)
+
+现在，您可以通过单击“更新”下拉菜单中的“忽略更新”按钮来忽略扩展的更新。这将从“需要注意的扩展”列表中删除该扩展。
+
+您可以通过取消选中相同的“忽略更新”按钮来撤消此操作。
+
+请注意，安装扩展的特定版本（通过“安装另一个版本”）也将忽略该扩展的更新。
+
+## [已安装扩展的排序](https://code.visualstudio.com/updates/v1_72#_sorting-of-installed-extensions)
+
+现在，您可以按“安装计数”、“评级”、“名称”、“发布日期”和“更新日期”对已安装的扩展列表进行排序。
+
+## [搜索结果显示为树视图](https://code.visualstudio.com/updates/v1_72#_results-displayed-as-a-tree-view)
+
+您现在可以在树中查看搜索结果！只需单击搜索视图顶角的列表/树图标，即可在列表和树视图之间切换。
+
+<Image src={myImage1} alt="搜索结果显示为树视图" />
+
+## [发现嵌套的 Git 存储库](https://code.visualstudio.com/updates/v1_72#_discover-nested-git-repositories)
+
+为了解决长期存在的功能请求，我们在这个里程碑上对存储库发现进行了更改，以添加对嵌套 Git 存储库的支持。根据嵌套仓库的位置，您可能需要修改 <VSCodeSettingsLink id="git.repositoryScanMaxDepth"/> 设置（默认值为 1 级）。
+
+## [存储库 fetch 改进](https://code.visualstudio.com/updates/v1_72#_repository-fetch-improvements)
+
+对于具有多个远程的 Git 存储库，调用 fetch 命令现在将显示一个 Quick Pick，其中包含所有远程的列表。用户可以选择要获取的特定远程或从所有远程获取。
+
+## [中止合并命令](https://code.visualstudio.com/updates/v1_72#_abort-merge-command)
+
+There is a new command, Git: Abort Merge, to abort a merge operation that is currently in progress.
+有一个新命令 `Git: Abort Merge` ，用于中止当前正在进行的合并操作。
+
+## [GitHub Issue Notebooks 扩展](https://code.visualstudio.com/updates/v1_72#_github-issue-notebooks)
+
+[GitHub Issue Notebooks](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-github-issue-notebooks&ssr=false#overview) 扩展展示了笔记本 API，并且非常方便。本着这种精神，我们采用了工作区编辑 API 的最新改进。有一些新的代码操作：
+
+- 将单元格移动/复制到新笔记本中。
+- 允许您使用 OR 语句拆分单元格。
+- 使用代码段编辑将符合条件的值（如 `label:bug` ）提取到变量中。
+- 基于代码段的值集错误的快速修复。
+
+## [Jupyter 的一些改进](https://code.visualstudio.com/updates/v1_72#_jupyter)
+
+## [在干净的环境中进行扩展调试](https://code.visualstudio.com/updates/v1_72#_extension-debugging-in-a-clean-environment)
+
+在调试扩展时，始终存在一个问题，即扩展在扩展作者的开发环境（用户设置和已安装的扩展）中运行，而不是在更适合扩展目标用户的环境中运行。
+
+借助最近引入的“配置文件”功能，现在可以通过在扩展的调试配置中指定配置文件，在不同的环境中运行正在开发的扩展。
+
+支持两种方案：
+
+- 使用未命名的“空”配置文件在干净的环境中进行调试，该配置文件在扩展调试停止时会自动删除。
+- 使用专为正在开发的扩展创建的命名配置文件在受控环境中进行调试，该配置文件包含特定的用户设置和扩展。
+
+此调试配置显示如何使用 --profile-temp 开关在干净的环境中进行调试：
+
+```json
+{
+  "name": "Extension",
+  "type": "extensionHost",
+  "request": "launch",
+  "args": ["--profile-temp", "--extensionDevelopmentPath=${workspaceFolder}"],
+  "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+  "preLaunchTask": "npm: watch"
+}
+```
+
+下面是一个调试配置，用于在受控环境中进行调试，该环境使用先前创建的名为“extensionContext”的配置文件：
+
+```json
+{
+  "name": "Extension",
+  "type": "extensionHost",
+  "request": "launch",
+  "args": ["--profile=extensionContext", "--extensionDevelopmentPath=${workspaceFolder}"],
+  "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+  "preLaunchTask": "npm: watch"
+}
+```
+
+请注意，在远程位置调试扩展时 （通过远程开发扩展 Dev Containers、SSH 或 WSL） ，使用 --profile-temp 标志将导致以下状态消息。这是意料之中的，因为临时配置文件不包含任何扩展，这意味着远程开发扩展也丢失了。对于远程方案，建议您创建一个空的命名配置文件，向其添加远程开发扩展，然后使用 --profile=.... 命令行选项。
+
+## [树视图 initialSize 贡献已完成](https://code.visualstudio.com/updates/v1_72#_tree-view-initialsize-contribution-finalized)
+
+在 package.json 中提供视图的扩展可以使用 `initialSize` 属性来设置其视图的初始大小。initialSize 的工作方式类似于 CSS flex-grow。
+
+在应用 initialSize 时有一些限制：
+
+- 这只是一个初始大小。一旦呈现了视图，initialSize 将不会再次应用。
+- 仅当扩展同时拥有视图和视图容器时，它才适用。
+
+## [树视图 viewBadge 已完成](https://code.visualstudio.com/updates/v1_72#_tree-viewbadge-finalized)
+
+TreeView 有一个可选的 `viewBadge` 属性，可用于在视图的视图容器上设置数字徽章。
+
+## [树项复选框](https://code.visualstudio.com/updates/v1_72#_tree-item-checkboxes)
+
+建议的 `checkboxState` 允许您向树项添加复选框。
+
+## [日志输出通道](https://code.visualstudio.com/updates/v1_72#_log-output-channel)
+
+vscode.window.createOutputChannel API 现在有一个新的日志布尔选项，可用于创建仅用于日志记录的输出通道。
+
+```ts
+/**
+ * Creates a new {@link LogOutputChannel log output channel} with the given name.
+ *
+ * @param name Human-readable string which will be used to represent the channel in the UI.
+ * @param options Options for the log output channel.
+ */
+export function createOutputChannel(
+  name: string,
+  options: { readonly log: true }
+): LogOutputChannel;
+```
+
+LogOutputChannel 支持以下方法来记录消息
+
+```ts
+trace(message: string, ...args: any[]): void;
+debug(message: string, ...args: any[]): void;
+info(message: string, ...args: any[]): void;
+warn(message: string, ...args: any[]): void;
+error(error: string | Error, ...args: any[]): void;
+```

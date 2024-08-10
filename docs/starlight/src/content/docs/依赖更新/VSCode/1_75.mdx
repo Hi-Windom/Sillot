@@ -8,3 +8,77 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.75 发行说明](https://code.visualstudio.com/updates/v1_75)，文中“我们”即 VSCode
+
+## [配置文件](https://code.visualstudio.com/updates/v1_75#_profiles)
+
+我们很高兴地宣布，配置文件功能现已在 VS Code 中正式发布。配置文件可以包含扩展、设置、键盘快捷键、UI 状态、任务和用户代码段。您可以为不同的开发方案（如数据科学、文档编写）或多种编程语言（如 Python 或 Java）自定义 VS Code。如果您根据工作流（例如“工作”或“演示”）有不同的 VS Code 设置，您也可以将它们另存为不同的配置文件。您可以打开多个工作区（文件夹），同时应用不同的配置文件。
+
+## [打开大文件的新确认](https://code.visualstudio.com/updates/v1_75#_new-confirmation-to-open-large-files)
+
+为了防止意外打开非常大的文件，尤其是在远程环境中，由于网络传输可能会产生实际成本，在打开文件之前会显示确认。可以通过新的 <VSCodeSettingsLink id="workbench.editorLargeFileConfirmation"/> 设置修改该限制，并且根据打开的本地文件和远程文件具有不同的默认值。
+
+## [文件观察器支持 files。watcher排除 glob 模式](https://code.visualstudio.com/updates/v1_75#_file-watcher-supports-fileswatcherexclude-glob-patterns)
+
+`files.watcherExclude` 设置支持 glob 模式，以实现文件观察程序的强大排除规则。但是，用于文件监视的库本身并未支持 glob 模式。在这个里程碑中，我们贡献了对 glob 模式的支持，以实现更高效的资源使用，尤其是在 Linux 上。
+
+## [建议选择模式](https://code.visualstudio.com/updates/v1_75#_suggest-selection-mode)
+
+有一个新设置 （<VSCodeSettingsLink id="editor.suggest.selectionMode"/>），允许您配置是在键入时自动选择建议还是通过触发字符自动选择建议。
+
+默认设置是始终选择最佳建议，以便按 Enter 或 Tab 键插入该建议。如果您不希望选择建议，请将值设置为 never、whenQuickSuggestion 或 whenTriggerCharacter。使用这些设置值时，建议仍会显示，但不会自动选择，您可以使用箭头键选择一个。
+
+请注意，此设置仅适用于自动建议，不适用于通过 Ctrl+空格键明确触发建议时显示的建议。
+
+## [颜色装饰器限制](https://code.visualstudio.com/updates/v1_75#_color-decorators-limit)
+
+编辑器中显示的颜色装饰器数量限制为 500 个。这是为了防止在打开包含大量颜色的文件时出现性能问题。现在可以通过 <VSCodeSettingsLink id="editor.colorDecoratorsLimit"/> 设置来配置此限制。
+
+## [重新设计的内联建议工具栏](https://code.visualstudio.com/updates/v1_75#_redesigned-inline-suggestions-toolbar)
+
+在这个里程碑中，我们重新设计了内联建议工具栏，使其更紧凑、更易于使用。它具有一些按钮，可以快速循环浏览替代建议，并完全或逐字接受建议。
+
+设置 `"editor.inlineSuggest.showToolbar": "always"` 可用于在内联建议可用时始终显示工具栏。
+
+我们还添加了默认键绑定，用于逐字接受/撤消建议（Ctrl+左箭头/右箭头）。
+
+## [源代码管理新命令](https://code.visualstudio.com/updates/v1_75#_new-commands)
+
+Git 2.35 为 git stash 命令引入了新的 --staged 模式。通过这种新模式，您可以轻松地仅存储暂存的更改。如果您的 Git 版本支持此新模式，则可以使用新的 `Git: Stash Staged` 命令来利用它。
+
+VS Code 已经支持使用 `Git: Delete Tag` 命令删除本地标签。在这个里程碑上，我们启用了使用新的 `Git: Delete Remote Tag` 命令删除远程标记的功能。
+
+## [父文件夹中的 Git 存储库](https://code.visualstudio.com/updates/v1_75#_git-repositories-in-parent-folders)
+
+VS Code 使用 git rev-parse --show-toplevel 来确定 Git 仓库的根。在大多数情况下，Git 存储库的根目录位于工作区内部，但在某些情况下，Git 仓库的根目录位于工作区的父文件夹或打开的文件中。虽然在工作区的父文件夹中打开 Git 存储库或打开的文件对于高级用户来说是一个很棒的功能，但它可能会让新用户感到困惑。我们已经看到一些案例，在这些案例中，这种混淆导致丢弃这些 Git 存储库的更改，从而导致数据丢失。
+
+为了避免混淆并降低数据丢失的风险，从此里程碑开始，VS Code 将在源代码管理视图中显示通知和新的欢迎视图，并且不会自动从工作区的父文件夹和打开的文件打开 Git 存储库。
+
+“打开存储库”按钮将打开一个“快速选择”，其中包含在工作区的父文件夹或打开的文件中发现的所有 Git 存储库的列表。从父文件夹打开 Git 存储库的选择会被记住。
+
+用户可以使用 `git.openRepositoryInParentFolders` 设置来控制如何处理父文件夹中的 Git 仓库。想要恢复旧行为的用户可以将 `git.openRepositoryInParentFolders` 设置设置为始终。
+
+## [源代码管理命令禁用](https://code.visualstudio.com/updates/v1_75#_command-disablement)
+
+根据 Git 仓库的大小或是否存在各种 Git 钩子，某些 Git 操作可能需要很长时间才能完成。我们过去已经看到，在前一个命令仍在进行时启动命令可能会导致意外结果（例如，在提交操作进行时丢弃对文件的更改）。
+
+为了防止这种情况，我们将禁用大多数 Git 命令，同时进行以下操作：Checkout、Commit、Push 和 Pull。这意味着，在运行这些操作时，大多数 Git 命令将不会显示在命令面板中，并将在源代码管理视图和状态栏中被禁用。
+
+## [同步固定扩展版本](https://code.visualstudio.com/updates/v1_75#_sync-pinned-extension-versions)
+
+“设置同步”现在将同步固定的扩展版本。这意味着，当您在一台计算机上安装扩展的特定版本时，它将固定到您同步到的所有其他计算机上的该版本。
+
+## [扩展注册设置可声明忽略同步](https://code.visualstudio.com/updates/v1_75#_ignore-a-setting-to-sync)
+
+现在，在注册设置时，默认情况下，您可以使用 `ignoreSync` 属性从“设置同步”中隐藏设置。这对于不打算在计算机之间同步的设置非常有用。
+
+## [GB18030认证](https://code.visualstudio.com/updates/v1_75#_gb18030-certification)
+
+VS Code 现已获得 GB18030 认证 - 这意味着中国政府内部的认证委员会已确认 VS Code 可以正确表示所有中文字符。该测试涵盖了所有内置的使用场景。
+
+## [迁移到 ESM](https://code.visualstudio.com/updates/v1_75#_migrating-to-esm)
+
+我们已经开始了将代码库迁移到 ESM 的旅程。VS Code 项目早于原生模块 （ESM），我们目前一直在使用异步模块系统 （AMD）。AMD为我们提供了很好的服务，但现在是时候继续前进了。我们已经开始将我们的代码库迁移到 ESM，我们正在取得良好的进展，并希望在接下来的几个月内完成这项工作。

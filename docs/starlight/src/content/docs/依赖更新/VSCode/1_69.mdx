@@ -8,3 +8,184 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.69 发行说明](https://code.visualstudio.com/updates/v1_69)，文中“我们”即 VSCode
+
+## [3 路合并编辑器](https://code.visualstudio.com/updates/v1_69#_3-way-merge-editor)
+
+在此版本中，我们继续开发 3 向合并编辑器。可以通过将 <VSCodeSettingsLink id="git.mergeEditor"/> 设置为 true 来启用此功能，并将在未来的版本中默认启用此功能。
+
+合并编辑器允许您快速解决 Git 合并冲突。启用后，可以通过单击“源代码管理”视图中的冲突文件来打开合并编辑器。复选框可用于接受和合并“他们的”或“您的”中的更改。
+
+合并编辑器中提供了所有语言功能（包括诊断、断点和测试），因此您可以立即获得有关合并结果中任何问题的反馈。
+
+合并编辑器支持单词级合并——只要更改不相交，双方都可以应用。如果插入顺序很重要，可以交换。在任何时候，冲突也可以手动解决。
+
+## [小地图上下文菜单](https://code.visualstudio.com/updates/v1_69#_minimap-context-menu)
+
+VS Code 小地图在编辑器一侧显示源代码文件的高级轮廓。您已经能够通过“查看：切换小地图”命令切换小地图的可见性，或使用“编辑器 > 小地图：启用”（`editor.minimap.enabled`） 设置完全禁用小地图。在此版本中，现在有一个上下文菜单，可以轻松显示或隐藏小地图。
+
+您还可以使用大小 （`editor.minimap.size`）、比例 （`editor.minimap.scale`） 和滑块 （`editor.minimap.showSlider`） 设置来调整外观。如果小地图处于隐藏状态，您仍可以通过右键单击侧面装订线来显示上下文菜单。
+
+## [使用编辑器创作提交消息](https://code.visualstudio.com/updates/v1_69#_author-commit-message-using-an-editor)
+
+在这个里程碑上，现在，只要提交输入框中未提供任何消息，您就可以使用全文编辑器来编写提交消息。要使用此新流程，请单击“提交”按钮，而不提供提交消息。
+
+现在，您可以在编辑器中编写提交消息。要接受提交消息并完成提交操作，请关闭编辑器选项卡或在编辑器工具栏中选择“接受提交消息”按钮。要取消提交操作，您可以清除文本编辑器的内容并关闭编辑器选项卡，或者在编辑器工具栏中选择“放弃提交消息”按钮。
+
+您可以通过切换 <VSCodeSettingsLink id="git.useEditorAsCommitInput"/> 设置来禁用此新流程，并回退到使用快速输入控件的上一个体验。更改设置后，必须重新启动 VS Code 才能使更改生效。
+
+要对在集成终端中执行的 `git commit` 命令使用相同的流程，请启用 <VSCodeSettingsLink id="git.terminalGitEditor"/> 设置。启用该设置后，您将必须重新启动终端会话。
+
+## [支持 Markdown 中的尖括号链接](https://code.visualstudio.com/updates/v1_69#_support-for-angle-bracket-links-in-markdown)
+
+Markdown 允许您使用尖括号来编写包含空格或其他特殊字符的链接目标：
+```md
+[Some link](<path to file with spaces.md>)
+```
+
+在此迭代中，我们改进了对尖括号链接的支持，以便它们在编辑器中正确突出显示和单击。
+
+## [HTML 最终新行格式化程序设置更改](https://code.visualstudio.com/updates/v1_69#_html-final-new-line-formatter-setting-change)
+
+设置 `html.format.endWithNewline` 已被删除，取而代之的是 `files.insertFinalNewline` 。
+
+`files.insertFinalNewline` 适用于所有编程语言。如果希望每种语言进行不同的设置，可以使用语言范围：
+
+```json
+{
+  "[html]": {
+    "files.insertFinalNewline": true
+  }
+}
+```
+
+## [可扩展的笔记本渲染器](https://code.visualstudio.com/updates/v1_69#_extensible-notebook-renderers)
+
+笔记本渲染器允许扩展自定义单元格和输出在笔记本中的呈现方式。在此迭代中，我们扩展了笔记本渲染器 API，以允许渲染器增强另一个渲染器，包括 VS Code 中的一些内置渲染器。这允许扩展向笔记本渲染添加新功能，而无需重新实现完整的渲染器。它还提供了更好的用户体验，因为用户不必在新的渲染器之间切换即可查看正确渲染的内容。
+
+[Notebook 扩展 Markdown 呈现器示例](https://github.com/microsoft/vscode-extension-samples/tree/main/notebook-extend-markdown-renderer-sample)演示扩展如何使用表情符号支持扩展 VS Code 的内置 Markdown 呈现器。让我们快速浏览一下关键部分！
+
+可扩展笔记本渲染器的 API 是有意松散定义的。首先，我们的扩展需要贡献一个新的笔记本渲染器。因为我们要扩展现有的渲染器，所以我们在这里使用 entrypoint 字段来指定要扩展的渲染器的 ID（在本例中为 VS Code 的内置 vscode.markdown-it-renderer）以及要加载的渲染器脚本的路径：
+
+```json
+"notebookRenderer": [
+    {
+        "id": "sample.markdown-it.emoji-extension",
+        "displayName": "Markdown it Emoji renderer",
+        "entrypoint": {
+            "extends": "vscode.markdown-it-renderer",
+            "path": "./out/emoji.js"
+        }
+    }
+]
+```
+
+现在，只要激活 vscode.markdown-it-renderer ，此渲染器就会被激活。
+
+现在，为了扩展 vscode.markdown-it-renderer，我们的渲染器可以在基础渲染器上调用一个方法。此方法特定于基本呈现器。在本例中，我们首先使用 getRenderer 获取基础渲染器，然后在其上调用 extendMarkdownIt 以增强它用于渲染的 Markdown-It 实例：
+
+```ts
+import type * as MarkdownIt from 'markdown-it';
+import type { RendererContext } from 'vscode-notebook-renderer';
+
+interface MarkdownItRenderer {
+    extendMarkdownIt(fn: (md: MarkdownIt) => void): void;
+}
+
+export async function activate(ctx: RendererContext<void>) {
+    // Acquire the base renderer
+    const markdownItRenderer = await ctx.getRenderer('vscode.markdown-it-renderer') as MarkdownItRenderer | undefined;
+    if (!markdownItRenderer) {
+        throw new Error(`Could not load 'vscode.markdown-it-renderer'`);
+    }
+
+    // Load our Markdown-It extension
+    const emoji = require('markdown-it-emoji');
+
+    // Call the base renderer's extension method (extendMarkdownIt) to augment
+    // the Markdown-It with emoji support.
+    markdownItRenderer.extendMarkdownIt((md: MarkdownIt) => {
+        return md.use(emoji, {});
+    });
+}
+```
+
+这里要注意的关键部分是 extendMarkdown 它只是基础渲染器返回的一个方法。其他可扩展渲染器可以轻松返回自己的扩展点。
+
+请查看 [Notebook 扩展 Markdown 渲染器示例](https://github.com/microsoft/vscode-extension-samples/tree/main/notebook-extend-markdown-renderer-sample)，获取扩展 VS Code 的内置 Markdown-It 渲染器的完整示例。
+
+## [粘贴编辑提供程序](https://code.visualstudio.com/updates/v1_69#_paste-edit-provider)
+
+我们更新了 documentPaste API 提案，使其更易于正确实现，特别是在使用多个游标时。
+
+提醒一下，此 API 允许扩展挂钩到文本编辑器内的复制和粘贴。扩展可以使用它来修改粘贴时插入的文本。[文档粘贴扩展示例](https://github.com/microsoft/vscode-extension-samples/tree/main/document-paste)显示了运行中的更新的 API：
+
+```ts
+/**
+ * Provider that maintains a count of the number of times it has copied text.
+ */
+class CopyCountPasteEditProvider implements vscode.DocumentPasteEditProvider {
+  private readonly countMimeTypes = 'application/vnd.code.copydemo-copy-count';
+
+  private count = 0;
+
+  prepareDocumentPaste?(
+    _document: vscode.TextDocument,
+    _ranges: readonly vscode.Range[],
+    dataTransfer: vscode.DataTransfer,
+    _token: vscode.CancellationToken
+  ): void | Thenable<void> {
+    dataTransfer.set(this.countMimeTypes, new vscode.DataTransferItem(this.count++));
+    dataTransfer.set('text/plain', new vscode.DataTransferItem(this.count++));
+  }
+
+  async provideDocumentPasteEdits(
+    _document: vscode.TextDocument,
+    _ranges: readonly vscode.Range[],
+    dataTransfer: vscode.DataTransfer,
+    _token: vscode.CancellationToken
+  ): Promise<vscode.DocumentPasteEdit | undefined> {
+    const countDataTransferItem = dataTransfer.get(this.countMimeTypes);
+    if (!countDataTransferItem) {
+      return undefined;
+    }
+
+    const textDataTransferItem = dataTransfer.get('text') ?? dataTransfer.get('text/plain');
+    if (!textDataTransferItem) {
+      return undefined;
+    }
+
+    const count = await countDataTransferItem.asString();
+    const text = await textDataTransferItem.asString();
+
+    // Build a snippet to insert
+    const snippet = new vscode.SnippetString();
+    snippet.appendText(`(copy #${count}) ${text}`);
+
+    return { insertText: snippet };
+  }
+}
+
+export function activate(context: vscode.ExtensionContext) {
+  // Enable our provider in plaintext files
+  const selector: vscode.DocumentSelector = { language: 'plaintext' };
+
+  // Register our provider
+  context.subscriptions.push(
+    vscode.languages.registerDocumentPasteEditProvider(
+      selector,
+      new CopyCountPasteEditProvider(),
+      {
+        pasteMimeTypes: ['text/plain']
+      }
+    )
+  );
+}
+```
+
+## [Electron 18 更新](https://code.visualstudio.com/updates/v1_69#_electron-18-update)
+
+在这个里程碑中，我们完成了将 Electron 18 捆绑到 VS Code 桌面的探索。此更新附带 Chromium 100.0.4896.160 和 Node.js 16.13.2

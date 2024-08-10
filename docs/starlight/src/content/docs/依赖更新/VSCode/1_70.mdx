@@ -8,3 +8,35 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.70 发行说明](https://code.visualstudio.com/updates/v1_70)，文中“我们”即 VSCode
+
+## [树查找控件](https://code.visualstudio.com/updates/v1_70#_tree-find-control)
+
+树视图（如文件资源管理器）现在支持“查找”控件。您可以在树内按 `Ctrl+Alt+F` 以弹出“查找”控件。您可以使用“查找”控件来突出显示匹配的元素，或切换“筛选器”按钮来隐藏与搜索词不匹配的所有元素。
+
+## [编辑器粘性滚动](https://code.visualstudio.com/updates/v1_70#_editor-sticky-scroll)
+
+现在可以显示 UI，显示用户在滚动期间所处的范围。“粘性滚动”UI 将显示编辑器顶部位于哪个类/接口/命名空间/函数/方法/构造函数中，帮助您了解文档中的位置。使用 `editor.experimental.stickyScroll.enabled` 设置启用粘滞滚动。
+
+## [htmlLanguageParticipants贡献点](https://code.visualstudio.com/updates/v1_70#_htmllanguageparticipants-contribution-point)
+
+一个新的贡献点 `htmlLanguageParticipants` 允许类 HTML 语言声明他们想要继承所有 HTML 语言服务器特性，例如代码完成、悬停和大纲。这对于不想实现完整语言服务器的编程语言扩展很有用。
+
+一个例子是内置的 handlebars 扩展，它现在在其package.json中将自身添加到 htmlLanguageParticipants：
+
+```json
+"contributes": {
+  "htmlLanguageParticipants": [
+     {
+       "languageId": "handlebars"
+      }
+    ]
+}
+```
+
+[Quarkus](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-quarkus) 扩展已经采用了贡献点。它通过针对嵌入式 Qute HTML 模板语言的附加建议丰富了 HTML 功能
+
+## [Webview 上下文菜单](https://code.visualstudio.com/updates/v1_70#_webview-context-menus)

@@ -56,7 +56,7 @@ export function add_task_同步更新packageManager(context: vscode.ExtensionCon
                 // 过滤掉null值
                 const validVersions = versions.filter(packageManager => packageManager !== null);
                 // 获取用户输入的版本号
-                const packageManager = await getUserInput_packageManagerx(validVersions);
+                const packageManager = await getUserInput_packageManager(validVersions);
                 if (packageManager) {
                     // 遍历映射并更新版本号
                     selectedOptions.forEach(async (value: string, index: number) => {
@@ -84,33 +84,46 @@ export function add_task_同步更新packageManager(context: vscode.ExtensionCon
     context.subscriptions.push(disposable);
 }
 
-async function getUserInput_packageManagerx(validVersions: any[]) {
+async function getUserInput_packageManager(validVersions: string[]) {
     // 正则表达式模式，用于校验用户输入
     const packagePattern = /^[\w/.-]+@([0-9]+)(?:\.([0-9]+)(?:\.([0-9]+))?)?$/;
     const packagePatternStrict = /^(npm|pnpm|yarn|bun)@[0-9]+\.[0-9]+\.[0-9]+$/;
-    let userInput: string | undefined = undefined;
+    let userInput: string | undefined = validVersions?.[0] ? validVersions[0] : undefined;
+
+    async function validateInput(input: string) {
+        if (input === undefined) {
+            return { message: '输入不能为空', severity: vscode.InputBoxValidationSeverity.Error };
+        }
+        if (packagePatternStrict.test(input)) {
+            return { message: '输入格式正确', severity: vscode.InputBoxValidationSeverity.Info };
+        }
+        if (packagePattern.test(input)) {
+            return {
+                message: `当前启用了严格模式，只接受 ${packagePatternStrict}`,
+                severity: vscode.InputBoxValidationSeverity.Warning
+            };
+        }
+        return { message: `${input} 不符合格式要求 <package manager name>@<version>`, severity: vscode.InputBoxValidationSeverity.Error };
+    }
+
     while (true) {
         userInput = await vscode.window.showInputBox({
             title: "格式为 <package manager name>@<version>",
-            prompt: `当前版本: ${validVersions.join(", ")}`,
+            prompt: `旧版本: ${validVersions.join(", ")}`,
+            placeHolder: "例如：pnpm@9.11.0",
             value: userInput, // 将上一次的用户输入作为新输入框的默认值
+            validateInput: validateInput
         });
 
         // 如果用户取消了输入
         if (userInput === undefined) {
             return null;
         }
+
         // 格式正确，返回
-        if (userInput && packagePatternStrict.test(userInput)) {
+        if (packagePatternStrict.test(userInput)) {
             return userInput;
-        }
-        if (userInput && packagePattern.test(userInput)) {
-            // https://nodejs.cn/api-v20/packages/packagemanager.html
-            vscode.window.showWarningMessage(
-                `当前启用了严格模式，只接受 ${packagePatternStrict}`
-            );
-        } else {
-            vscode.window.showWarningMessage(`${userInput} 不符合格式要求 <package manager name>@<version>`);
         }
     }
 }
+
