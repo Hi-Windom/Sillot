@@ -114,12 +114,15 @@
     "scm.inputMinLineCount": 3, // since vscode 1.86
     "scm.showHistoryGraph": true, // since vscode 1.91 // 1.92 experimental -> formal
     "markdown.editor.updateLinksOnPaste.enabled": true, // since vscode 1.89 // 1.92 experimental -> formal
+    "markdown.editor.pasteUrlAsFormattedLink.enabled": "smart", // since vscode 1.80
     "markdown.updateLinksOnFileMove.enabled": "prompt", // since vscode 1.73
     "markdown.updateLinksOnFileMove.enableForDirectories": true,
     "markdown.occurrencesHighlight.enabled": true, // since vscode 1.73
+    "markdown.suggest.paths.includeWorkspaceHeaderCompletions": "onSingleOrDoubleHash", // since vscode 1.76
     "markdown.validate.enabled": true, // since vscode 1.68
     "mdx.validate.ignoreLinks": [], // TODO
     "editor.guides.indentation": true,
+    "editor.linkedEditing": true,
     "editor.stickyScroll.enabled": true, // 1.71 experimental -> formal
     "editor.minimap.side": "left", // 显示在左侧更专注
     "editor.minimap.enabled": true,
@@ -133,6 +136,7 @@
     "workbench.tree.enableStickyScroll": true, // since vscode 1.85
     "workbench.tree.stickyScrollMaxItemCount": 6, // since vscode 1.85
     "workbench.activityBar.location": "default",
+    "workbench.sideBar.location": "right", // 在右侧减少了对编辑器布局的干扰
     "workbench.editor.titleScrollbarSizing": "large",
     "workbench.editor.openPositioning": "right",
     "workbench.editor.showTabs": "multiple",
@@ -170,6 +174,9 @@
       "webpack.config.js": "webpack.*.js",
       "electron-builder.yml": "electron-builder-*.yml",
       "index.ts": "*.ts"
+    },
+    "files.readonlyInclude": { // since vscode 1.79
+        "**/assets/template/*/*.tpl": true // 通过代码生成的文件
     },
   },
   "extensions": {
@@ -266,6 +273,7 @@
       "AMiner.codegeex", // CodeGeeX 智能编程助手
       "ms-vscode.live-server", // 微软官方起本地HTTP服务预览网页，对工作区支持良好
       "ms-vscode.vscode-github-issue-notebooks", // 微软官方出品
+      "GitHub.vscode-pull-request-github", // vscode 核心扩展
     ],
     "unwantedRecommendations": [
       "oderwat.indent-rainbow", // 花里胡哨影响观感

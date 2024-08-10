@@ -8,3 +8,124 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.79 发行说明](https://code.visualstudio.com/updates/v1_79)，文中“我们”即 VSCode
+
+## [只读模式](https://code.visualstudio.com/updates/v1_79#_readonly-mode)
+
+在某些开发方案中，将工作区的某些文件夹或文件显式标记为只读可能会有所帮助。例如，如果文件夹或文件内容由不同的进程（例如Node.js包管理器管理的node_modules文件夹）进行管理，则将它们标记为只读可以避免无意中的更改。
+
+对于此用例，有一些新设置可以在资源管理器以及文本和笔记本编辑器中将文件路径标记为只读：
+
+- <VSCodeSettingsLink id="files.readonlyInclude"/> - 如果匹配，则将文件设为只读的路径或 glob 模式。
+- <VSCodeSettingsLink id="files.readonlyExclude"/> - 当文件与 files.readonlyInclude 匹配时，用于跳过只读文件的路径或 glob 模式。
+- <VSCodeSettingsLink id="files.readonlyFromPermissions"/> - 磁盘上没有写入权限的文件是否应为只读文件。
+
+根据设置规则，如果路径被视为只读，则无法从资源管理器中修改它（例如，删除它），并且文本或笔记本编辑器是只读的。
+
+对于只读模式的更多临时切换，可以使用新命令仅更改当前会话的模式，从而推翻您的设置配置：
+
+- `Set Active Editor Readonly in Session` - 将活动编辑器标记为只读。
+- `Set Active Editor Writeable in Session` - 将活动编辑器标记为可写。
+- `Toggle Active Editor Readonly in Session` - 在只读和可写之间切换。
+- `Reset Active Editor Readonly in Session` - 重置会话状态。
+
+## [修复了新的选项卡大小调整选项](https://code.visualstudio.com/updates/v1_79#_new-tab-sizing-option-fixed)
+
+<VSCodeSettingsLink id="workbench.editor.tabSizing"/> 设置修复了一个新选项，该选项使每个选项卡的宽度相等。当空间变得有限时，选项卡将同样缩小到最小值。新设置 <VSCodeSettingsLink id="workbench.editor.tabSizingFixedMaxWidth"/> 设置选项卡的初始大小。
+
+在此模式下，当您使用鼠标快速关闭选项卡时，选项卡的宽度将保持稳定，以便通过单击同一点来关闭每个选项卡。然后，当您将鼠标从编辑器选项卡区域离开时，将调整宽度。
+
+## [网络质量指示](https://code.visualstudio.com/updates/v1_79#_network-quality-indication)
+
+连接到远程计算机时，VS Code 远程编辑功能的最佳体验需要良好的网络连接和低延迟。在这个里程碑中，我们更新了状态栏中的远程指示器，以便在延迟非常高或网络连接似乎离线时为您提供一些反馈。
+
+## [默认分支名称](https://code.visualstudio.com/updates/v1_79#_default-branch-name)
+
+从此里程碑开始，使用 VS Code 创建的所有新 Git 存储库都将 main 设置为其默认分支。如果您更喜欢为默认分支使用不同的名称，可以使用 <VSCodeSettingsLink id="git.defaultBranchName"/> 设置进行更改。当设置设置为空时，VS Code 将遵循 Git 中配置的默认分支名称。将文件夹发布到 GitHub 也会遵循在 GitHub 上配置的默认分支名称。
+
+## [JSX 标签的链接编辑](https://code.visualstudio.com/updates/v1_79#_linked-editing-for-jsx-tags)
+
+使用链接编辑时，当您更改开始 JSX 标签时，VS Code 将自动更新相应的结束标签。这可以节省大量时间
+
+默认情况下，该功能处于关闭状态，但可以通过设置来启用：
+```json
+"editor.linkedEditing": true
+```
+
+您还可以使用 `Start Linked Editing` 命令显式启动链接编辑。
+
+## [在拖放或粘贴 Markdown 时将外部媒体文件复制到工作区](https://code.visualstudio.com/updates/v1_79#_copy-external-media-files-into-workspace-on-drop-or-paste-for-markdown)
+
+想要将图像或视频添加到 Markdown 文档中？现在，您无需浪费时间先手动将文件复制到工作区，然后再添加链接，只需将文件拖放或粘贴到 Markdown 中即可。如果文件当前不是工作区的一部分，VS Code 会自动将文件复制到工作区并插入指向它的链接
+
+这也适用于剪贴板中的图像数据。例如，如果在 Windows 上使用截图工具截取屏幕截图，则可以在 Markdown 文件中按“粘贴”，VS Code 将从剪贴板数据创建一个新的图像文件，并将 Markdown 图像链接插入到新文件。如果您在截取屏幕截图以将其复制到剪贴板时按住 Ctrl 键，这也适用于 macOS。
+
+您还可以使用一些设置来自定义此功能的行为：
+
+### markdown.copyFiles.destination
+
+<VSCodeSettingsLink id="markdown.copyFiles.destination"/> 设置控制创建新媒体文件的位置。此设置将在当前 Markdown 文档上匹配的 glob 映射到图像目标。图像目标还可以使用一些简单的变量。有关可用变量的信息，请参阅 `markdown.copyFiles.destination` 设置说明。
+
+例如，如果我们希望工作区中 /docs 下的每个 Markdown 文件都将新的媒体文件放入特定于当前文件的图像目录中，我们可以编写：
+
+```json
+"markdown.copyFiles.destination": {
+  "/docs/**/*": "images/${documentBaseName}/"
+}
+```
+
+现在，当将新文件粘贴到 `/docs/api/readme.md` 中时，将在 `/docs/api/images/readme/image.png` 中创建图像文件。
+
+您甚至可以使用简单的正则表达式以类似于代码段的方式转换变量。例如，在创建媒体文件时，此转换仅使用文档文件名的第一个字母
+
+```json
+"markdown.copyFiles.destination": {
+  "/docs/**/*": "images/${documentBaseName/(.).*/$1/}/"
+}
+```
+
+当将新文件粘贴到 `/docs/api/readme.md` 时，图像现在会在 `/docs/api/images/r/image.png` 下创建。
+
+### markdown.copyFiles.overwriteBehavior
+
+<VSCodeSettingsLink id="markdown.copyFiles.overwriteBehavior"/> 设置控制新创建的媒体文件是否覆盖现有文件。
+
+默认情况下，VS Code 永远不会覆盖现有文件。相反，如果你有一个名为 `image.png` 的文件，并尝试将其粘贴到已存在 `image.png` 的工作区中的 Markdown 文档中，VS Code 将改为创建一个名为 `image-1.png` 的新文件。如果您随后尝试粘贴另一个名为 `image.png` 的文件，它将被创建为 `image-2.png` 。
+
+如果您更喜欢让现有文件被新文件覆盖，请设置 `"markdown.copyFiles.overwriteBehavior": "overwrite"` 。现在，VS Code 将始终使用原始文件名，覆盖该路径的任何现有文件。
+
+### 禁止将文件复制到工作区
+
+VS Code 只会尝试将文件复制到工作区中，前提是它们还不是工作区的一部分。此外，我们目前仅将媒体文件（图像、视频、音频）复制到工作区。
+
+但是，如果您发现这种新行为过于侵入性，您可以通过设置来禁用它以进行拖放和粘贴：
+
+```json
+"markdown.editor.drop.copyIntoWorkspace": "never"
+"markdown.editor.filePaste.copyIntoWorkspace": "never"
+```
+
+## [Markdown 文件中的 HTML 路径的 IntelliSense](https://code.visualstudio.com/updates/v1_79#_intellisense-for-html-paths-in-markdown-files)
+
+许多 Markdown 方言允许在 Markdown 文档中使用原始 HTML 标签。在此更新中，我们已将 VS Code 的大部分 Markdown IntelliSense 功能扩展到这些 HTML 标记中使用的文件路径。这包括对以下各项的支持：
+
+- 路径完成。
+- 查找对链接到文件的所有引用。
+- 重命名或移动文件时自动更新文件路径。
+- 使用 F2 安全地重命名文件。
+- 验证链接到的文件是否存在于工作区中。
+
+## [改进了本地文件的 vscode.fs 性能](https://code.visualstudio.com/updates/v1_79#_improved-vscodefs-performance-for-local-files)
+
+当您使用 `vscode.fs` API 处理文件时（您应该这样做！），现在对扩展主机本地文件的操作将更快地解决。
+
+以前，扩展主机会将这些操作委托给 VS Code 客户端执行，但现在它们直接在扩展主机内部执行，从而节省了往返行程。
+
+## [更严格的状态栏 API](https://code.visualstudio.com/updates/v1_79#_stricter-status-bar-api)
+
+用于创建状态栏项的 API createStatusBarItem 允许扩展传递标识符。此标识符用于控制隐藏和显示状态栏项。标识符对于扩展应该是唯一的，但直到现在还没有强制执行。在此版本中，我们对此进行了更严格的操作，并且由具有相同标识符的同一扩展创建的状态栏项现在将合并为一个。
+
+## [在任务完成时关闭终端的任务呈现选项已经完成](https://code.visualstudio.com/updates/v1_79#_tasks)

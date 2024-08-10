@@ -8,3 +8,49 @@ sidebar:
     text: 支持终止
     variant: caution
 ---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.78 发行说明](https://code.visualstudio.com/updates/v1_78)，文中“我们”即 VSCode
+
+## [新的默认颜色主题](https://code.visualstudio.com/updates/v1_78#_new-default-color-themes)
+
+新的“深色现代”和“浅色现代”主题取代了“深色+”和“浅色+”，成为新的默认深色和浅色主题。
+
+## [从图像预览中复制图像](https://code.visualstudio.com/updates/v1_78#_copy-images-from-the-image-preview)
+
+现在，您可以使用 Ctrl+C 或右键单击预览并选择“复制”，从内置图像预览中复制图像。复制的图像数据可以粘贴回 VS Code 或其他应用程序中。
+
+## [独立颜色选择器](https://code.visualstudio.com/updates/v1_78#_standalone-color-picker)
+
+现在可以启动独立的颜色选择器，以便插入和替换颜色。要打开颜色选取器，请从“命令面板”中选择“显示或聚焦独立颜色选取器”。
+
+当扩展未提供任何颜色或颜色格式时，颜色选取器将回退到 CSS 格式的颜色。现在还可以可视化所有文件类型中 CSS 格式颜色的内联颜色装饰器。要显示这些装饰器，请启用编辑器：默认颜色装饰器 （ <VSCodeSettingsLink id="editor.defaultColorDecorators"/> ） 设置。
+
+## [Diff 算法改进](https://code.visualstudio.com/updates/v1_78#_diff-algorithm-improvements)
+
+我们继续改进 VS Code 中的新 diff 算法，并弃用了旧算法。虽然旧算法仍然是差异编辑器的默认算法，但我们将慢慢将默认值更改为新算法并测量其性能。
+
+您可以通过将 <VSCodeSettingsLink id="diffEditor.diffAlgorithm"/> 设置为 advanced（新的 diff 算法）或 legacy（默认）来覆盖默认值。
+
+在许多情况下，新算法可以产生更好的差异，但对于某些文档来说，速度可能会更慢。
+
+## [改进了扩展建议通知](https://code.visualstudio.com/updates/v1_78#_improved-extension-recommendations-notification)
+
+扩展建议通知现在显示推荐扩展的发布者。这有助于您在安装扩展程序之前做出更明智的决定
+
+## [通知已安装的已弃用扩展](https://code.visualstudio.com/updates/v1_78#_informing-about-installed-deprecated-extensions)
+
+如果您安装了已被弃用的扩展，您现在将收到一条通知，通知您有关它并建议替代方案。对于每个已弃用的扩展，此内容仅显示一次。
+
+## [GitHub 仓库规则集](https://code.visualstudio.com/updates/v1_78#_github-repository-rulesets)
+
+VS Code 已经允许使用 <VSCodeSettingsLink id="git.branchProtection"/> 设置定义分支保护。在这个里程碑中，我们添加了一项新的实验性功能，该功能使用最近发布的 GitHub 存储库规则集来确定分支是否受到保护。如果您使用的是 GitHub 仓库规则集，则可以使用 <VSCodeSettingsLink id="github.branchProtection"/> 设置启用此功能。
+
+## [editor/lineNumber/context 菜单](https://code.visualstudio.com/updates/v1_78#_editorlinenumbercontext-menu)
+
+我们已经完成了 editor/lineNumber/context 菜单。这允许扩展作者向锚定到编辑器行号和字形边距的上下文菜单贡献操作。参与此菜单的操作在命令参数中接收行号，并且可以在其 when 子句中引用 editorLineNumber 上下文键。
+
+## [Electron 22 更新](https://code.visualstudio.com/updates/v1_78#_electron-22-update)
+
+在这个里程碑中，我们已经完成了使用自定义分配器作为扩展主机的实验，并准备将 Electron 22 捆绑到 VS Code Desktop 中。此更新附带 Chromium 108.0.5359.215 和 Node.js 16.17.1

@@ -12,3 +12,79 @@ sidebar:
 import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
 
 > 主要内容摘抄自 [VSCode 1.76 发行说明](https://code.visualstudio.com/updates/v1_76)，文中“我们”即 VSCode
+
+## [个人资料徽章](https://code.visualstudio.com/updates/v1_76#_profile-badge)
+
+VS Code 现在通过在“管理活动”栏图标上将配置文件名称的前两个字母显示为配置文件徽章来指示当前自定义配置文件。
+
+主题可以通过配置两种新的主题颜色来自定义个人资料徽章、背景和前景色：
+
+- profileBadge.background
+- profileBadge.foreground
+
+## [Moveable Explorer 视图](https://code.visualstudio.com/updates/v1_76#_moveable-explorer-view)
+
+VS Code 中的大多数视图和视图容器都是可移动的，但少数内置容器除外。在此版本中，资源管理器视图容器 （Ctrl+Shift+E） 现在是可移动的，并且可以放置在辅助侧边栏或底部面板中，以允许进一步的工作台自定义。
+
+如果要将所有视图重置回默认布局，可以从命令面板运行 `Views: Reset View Locations` 。
+
+## [在扩展编辑器中验证的发布者域](https://code.visualstudio.com/updates/v1_76#_verified-publisher-domain-in-extension-editor)
+
+扩展编辑器现在会在已验证指示器旁边显示已验证的发布者域。
+
+## [JSONC文档排序](https://code.visualstudio.com/updates/v1_76#_jsonc-document-sorting)
+
+现在可以按键对 JSONC（带有注释的 JSON 文档）文件进行排序。要使用此功能，请从命令面板中选择 `JSON: Sort Document` 。
+
+## [Git 提交语法高亮显示](https://code.visualstudio.com/updates/v1_76#_git-commit-syntax-highlighting)
+
+VS Code 采用了新的 Git 语法，为 Git 提交消息文件提供语法高亮显示。新语法对英语以外的语言有更好的支持。
+
+## [Markdown 工作区标题链接完成](https://code.visualstudio.com/updates/v1_76#_markdown-workspace-header-link-completions)
+
+需要链接到另一个 Markdown 文档中的标题，但不记得或想输入完整的文件路径？尝试使用工作区标题完成！
+
+您可以使用 Markdown > 建议 > 路径： 包括工作区标题完成设置 （ <VSCodeSettingsLink id="markdown.suggest.paths.includeWorkspaceHeaderCompletions"/> ） 来配置是否/何时显示工作区标题完成。
+
+有效的设置值为：
+- onDoubleHash（默认值）- 仅在键入 ## 后显示工作区标头完成情况。
+- onSingleOrDoubleHash - 在键入 # 或 ## 后显示工作区标头完成情况。
+- never - 从不显示工作区标头完成。
+
+请记住，在当前工作区中查找所有标头的成本可能很高，因此首次请求它们时可能会有轻微的延迟，尤其是对于具有大量 Markdown 文件的工作区。
+
+## [配置 Markdown 链接的首选文件扩展名样式](https://code.visualstudio.com/updates/v1_76#_configure-preferred-file-extension-style-for-markdown-links)
+
+如果 VS Code 更喜欢使用文件扩展名来链接到 Markdown 文件，则会配置新的 markdown.preferredMdPathExtensionStyle 设置。此首选项用于语言工具，例如路径完成和链接重命名。
+
+有效的设置值为：
+
+- auto - 尝试保留文件扩展名的现有样式。
+- includeExtension - 在链接中包含尾随的 .md。
+- removeExtension - 从链接中删除尾随的 .md。
+
+## [InputBox 提示和验证消息中的链接支持](https://code.visualstudio.com/updates/v1_76#_link-support-in-inputbox-prompts-and-validation-messages)
+
+在此迭代中，我们引入了对 InputBox 提示和验证消息中链接的支持。在这些字符串中，您现在可以使用以下语法来创建链接：
+
+```md
+[link text](link target)
+```
+
+链接目标可以是 URL 或命令 ID。当用户单击链接时，链接目标将分别在浏览器中打开或作为命令执行。
+
+Example:
+```ts
+const result = await vscode.window.showInputBox({
+  prompt:
+    'Please enter a valid email address [more info](https://aka.ms/vscode-email-validation)',
+  validateInput: text => {
+    if (text.indexOf('@') === -1) {
+      return 'Please enter a valid email address, [more info](https://aka.ms/vscode-email-validation)';
+    }
+    return undefined;
+  }
+});
+```
+
+此行为适用于 showInputBox 和 createInputBox API。
