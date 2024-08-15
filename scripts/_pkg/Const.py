@@ -30,7 +30,7 @@ HEADER_sillot = '''
 
 # 🚧 汐洛仅用于开发者测试，不要用来存储重要数据！
 
-> 如果 Github 下载困难，可以右键复制 assets 的 apk 文件链接到 [Github 文件加速](https://tool.mintimate.cn/gh/) 下载
+> 如果 Github 下载困难，可以右键复制 assets 文件链接到 [Github 文件加速](https://tool.mintimate.cn/gh/) 下载
 
 <p>
 <img src="https://img.shields.io/badge/Chromium 114+-black?logo=Google Chrome" title="Chromium" height="25"/>
