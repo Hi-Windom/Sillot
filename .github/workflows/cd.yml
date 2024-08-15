@@ -99,12 +99,10 @@ jobs:
           echo "release_version=v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}" >> $GITHUB_OUTPUT
           changelog1=$(python scripts/parse-changelog-HEAD.py -t ${{ github.ref }} -b ${{ steps.thisLatestRelease.outputs.release }} -e ${{ steps.electronVersion.outputs.result }} ${{ env.repo_owner }}/${{ env.repo_name }})
           changelog2=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ env.repo_name }})
-          changelog3=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ env.repo_name_android }})
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "release_body_sillot<<$EOF" >> $GITHUB_ENV
           echo "$changelog1" >> $GITHUB_ENV
           echo "$changelog2" >> $GITHUB_ENV
-          echo "$changelog3" >> $GITHUB_ENV
           echo "$EOF" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
