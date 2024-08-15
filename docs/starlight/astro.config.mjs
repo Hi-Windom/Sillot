@@ -42,50 +42,47 @@ export default defineConfig({
                 },
                 // 英文文档在 `src/content/docs/en/` 中。
                 en: { label: "English", lang: "en" },
-                // ja: { label: "日本語", lang: "ja" },
-                // es: { label: "Español", lang: "es" },
-                // ru: { label: "Русский", lang: "ru" },
             },
             sidebar: [
                 // REF https://starlight.astro.build/zh-cn/guides/sidebar/
                 {
                     label: "APIs",
-                    collapsed: true, // 默认折叠分组
+                    collapsed: true,
                     autogenerate: { directory: "-api" },
                 },
                 {
                     label: "汐洛宝典",
-                    collapsed: true, // 默认折叠分组
+                    collapsed: true,
                     autogenerate: { directory: "--" },
                 },
                 {
                     label: "发行说明",
-                    collapsed: true, // 默认折叠分组
+                    collapsed: true,
                     autogenerate: { directory: "-release" },
                 },
                 {
                     label: "依赖更新",
-                    collapsed: true, // 默认折叠分组
+                    collapsed: true,
                     autogenerate: { directory: "-dep" },
                 },
                 {
                     label: "汐洛绞架用户指南",
-                    collapsed: true, // 默认折叠分组
+                    collapsed: true,
                     autogenerate: { directory: "-guide/汐洛绞架" },
                 },
                 {
                     label: "思源笔记用户指南",
-                    collapsed: true, // 默认折叠分组
+                    collapsed: true,
                     autogenerate: { directory: "-guide/siyuan" },
                 },
                 {
                     label: "风颂用户指南",
-                    collapsed: true, // 默认折叠分组
+                    collapsed: true,
                     autogenerate: { directory: "-guide/风颂" },
                 },
                 {
                     label: "汐洛扩展用户指南",
-                    collapsed: true, // 默认折叠分组
+                    collapsed: true,
                     autogenerate: { directory: "-guide/汐洛扩展" },
                 },
             ],
