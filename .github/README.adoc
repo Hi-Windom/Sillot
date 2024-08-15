@@ -2,9 +2,11 @@
 
 link:./docs/Sillot-android[汐洛安卓]
 | link:./docs/Sillot-Gibbet[汐洛绞架]
-| link:./docs/compatibility[兼容性]
-| link:./docs/document[文档]
-| link:./docs/roadmap[路线图]
+| link:./docs/compatibility[汐洛兼容性]
+| link:./docs/document[汐洛文档]
+| link:./docs/roadmap[汐洛路线图]
+| link:https://github.com/MC-Sillot[汐洛多渠道融合]
+| link:https://github.com/K-Sillot[汐洛套件]
 
 image::split.png[Split Image]
 
@@ -13,15 +15,11 @@ image:https://img.shields.io/github/languages/code-size/Hi-Windom/Sillot.svg?log
 image:https://img.shields.io/github/issues-closed/Hi-Windom/Sillot?logo=github[GitHub closed issues]
 image:https://img.shields.io/github/issues-pr-closed/Hi-Windom/Sillot?logo=github[GitHub closed pull requests]
 
-image:https://hits.b3log.org/Hi-Windom/Sillot.svg[
-    Github Hits,
-    link="https://github.com/Hi-Windom/Sillot"
-    ]
-image:https://img.shields.io/github/last-commit/Hi-Windom/Sillot?logo=git[last-commit]
+image:https://hits.b3log.org/Hi-Windom/Sillot.svg[Github Hits]
+image:https://img.shields.io/github/languages/count/Hi-Windom/Sillot[repo-language-count]
 image:https://img.shields.io/github/commit-activity/m/Hi-Windom/Sillot?logo=git[GitHub commit activity]
 image:https://img.shields.io/github/commit-activity/y/Hi-Windom/Sillot?logo=git[GitHub commit activity]
 
-image:https://img.shields.io/github/languages/count/Hi-Windom/Sillot[repo-language-count]
 // codacy 太拉了，不好用
 // image:https://app.codacy.com/project/badge/Grade/3106acfdbc5041118d800c5b4f2f935d[
 //     codacy,
