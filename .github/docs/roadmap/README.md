@@ -3,8 +3,7 @@
 </p>
 
 <p align="center">
-<a href="../Sillot-android">汐洛安卓</a> | <a href="../Sillot-Gibbet">汐洛绞架</a> | <a href="../compatibility">兼容性</a>
-| <a href="../document">文档</a> | 路线图
+<a href="../Sillot-android">汐洛安卓</a> | <a href="../Sillot-Gibbet">汐洛绞架</a> | <a href="../document">汐洛文档</a> | 汐洛路线图
 </p>
 
 <p align="center">
