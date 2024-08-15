@@ -1,0 +1,115 @@
+---
+title: 快速开始
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: 0
+  # 为链接添加徽章
+  badge:
+    text: 必读
+    variant: tip
+---
+import {
+    sillotNoteName_yobeCe,
+    sillotNoteName_doCe,
+    syNoteName_CN,
+    syNoteName_EN,
+    sillotMatrixName_yobeCe,
+    sillotMatrixName_doCe,
+    sillot_yobeCe,
+    sillot_doCe,
+    siow_yobeCe,
+    siow_doCe,
+    hellise_yobeCe,
+    hellise_doCe,
+    potter_yobeCe,
+    potter_doCe,
+    sofill_yobeCe,
+    sofill_doCe,
+    sili_yobeCe,
+    sili_doCe,
+    winsay_yobeCe,
+    winsay_doCo,
+    lnco_yobeCe,
+    lnco_doCe
+} from '../../../Const'
+import { Steps } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🦢 {sillot_yobeCe}缘起
+
+{sillot_yobeCe}孵化自{syNoteName_CN}。{sillot_yobeCe}的诞生颇具传奇色彩，最开始是 Sofill-（内部代号 {winsay_doCo}）主题团队抱怨{syNoteName_CN}UI变化频繁且难以预测，同时多空间引入的随机端口让原本的主题设置持久化面临两难选择。时壬海文东首席司空夜华了解情况后，决定依托{syNoteName_CN}现有基础，构建一个新彖务客户端，命名为{sillot_yobeCe}（{sillot_doCe}）。后来，司空夜华进一步提出海文东互联的概念，{sillot_yobeCe}作为新彖务客户端具有举足轻重的战略地位。
+
+雪千凝进一步完善了{sillotMatrixName_yobeCe}。
+
+<p align="center">
+<a href="https://github.com/Hi-Windom/Sillot/pulse"><img alt="Insights（注意当前设置 master 为默认分支）" src="https://repobeats.axiom.co/api/embed/708cdf00c747155e49ff28c0c0024e17a28e5705.svg" /></a>
+</p>
+
+## 🕋 {sillotMatrixName_yobeCe}（{sillotMatrixName_doCe}）
+
+{/*
+
+> 司司（SiSi）是海文东面向新彖乄的作用域与命名空间，主要提供感知驱动能力，即新彖乄AI
+
+> 奕奕（ViVi）是海文东面向内部效率集成的作用域与命名空间，主要提供生态集成，即海文东互联
+
+*/}
+
+### 🤍 {sillotNoteName_doCe} {siow_doCe}
+
+{sillotNoteName_yobeCe}（{sillotNoteName_doCe}）基于自{syNoteName_CN}（{syNoteName_EN}），前身是{syNoteName_CN}{sillot_yobeCe}版（更早是{syNoteName_CN}{sillot_yobeCe}分支），是智慧新录乄终端（多端融合，移动端优先）。{siow_yobeCe}（{siow_doCe}）是智慧新彖乄事务驱动中心，混合云原生（kotlin/java + Python + JS/TS + Golang + Rust）设计，主要配合{sillotNoteName_yobeCe}。{sillotNoteName_yobeCe}{siow_yobeCe}组成了智慧新彖乄的安全可控托管。
+
+### 🤍 {hellise_doCe} {potter_doCe}
+
+{hellise_yobeCe}（{hellise_doCe}）的前身是绛亽束彖园络管理系统，采用C#语言WPF框架开发，使用MSSQL数据库存储数据，由于种种原因被停滞许久。2024年，面对新的形势，我们重新规划了{hellise_yobeCe}的开发计划，真正打造出好用的彖级数字资产管理终端。{potter_yobeCe}（{potter_doCe}）是绛亽数据驱动中心，混合云原生设计（kotlin/java + Python + JS/TS + Golang + Rust），可配合{hellise_yobeCe}。{hellise_yobeCe}{potter_yobeCe}组成了彖级数字资产的统一管理平台。
+
+### 🤍 {sofill_doCe} {sili_doCe}
+
+{sofill_yobeCe}（{sofill_doCe}）包含多个仓库（TS(JS)、kotlin(java)、Go、C#、Python），为{sillot_yobeCe}生态提供基于现代技术的全链路一体化敏捷开发支持，提供npm、nuget（计划）、JitPack（计划）、PyPi（计划）包，在VSCode插件、Obsdian 插件、{sillotNoteName_yobeCe}插件、{sillotNoteName_yobeCe}主题等多路复用。{sili_yobeCe}（{sili_doCe}）在{sofill_yobeCe}的基础上为{sillot_yobeCe}{siow_yobeCe}与{hellise_yobeCe}{potter_yobeCe}提供桥接支持，并承担试验场功能。简单来说，{sofill_yobeCe}是独立的仓库，{sili_yobeCe}则随{sillot_yobeCe}或{hellise_yobeCe}分发。
+
+### 🤍 {winsay_doCo} Lnco
+
+{winsay_yobeCe}（{winsay_doCo}）的前身是{syNoteName_CN}Sofill-主题，提供统一的界面美化，涵盖{sillotNoteName_yobeCe}、{hellise_yobeCe}等应用。{lnco_yobeCe}（{lnco_doCe}）的前身是{syNoteName_CN}Sofill+主题（仅立项），专注于侵入式扩展实现。简单来说，{winsay_yobeCe}是独立的仓库，不与应用捆绑，{lnco_yobeCe}则随{sillot_yobeCe}或赫礼斯分发。
+
+## ❓ 常见问题
+
+### 🙋 {sillotNoteName_yobeCe}适合{syNoteName_CN}用户吗？
+
+不适合。{sillot_yobeCe}从立项之初就没有考虑过{syNoteName_CN}用户。以 v0.11 版本为标志，{sillot_yobeCe}彻底移除“社区分支”定位，不再对{syNoteName_CN}社区负责，即不再考虑思源社区开发者。
+
+{sillotNoteName_yobeCe}与{syNoteName_CN}存在较大差异，用户感知较明显的如下：
+
+* 只照顾简中用户。意码包括了简中、繁中、英文字母、藏文字符和通用符号，因此在意码体系中如果要支持英文需要扩展意码系统的自实现。除了简中和英文外，其他语言的支持则连讨论的必要都没有（这只是因为无法实现，不存在任何歧视性彖策）。
+* 调试优先而不是性能优先
+* 非绞架渠道占用大
+* 为了减轻维护的心智压力，仅考虑非常有限的向下兼容。
+
+不过，得益于{sillot_yobeCe}优异的顶层设计，在这片实验的田野上总是能迸发出蓬勃向上的生机。{sillotNoteName_yobeCe}已经成为{syNoteName_CN}实际上最大的试验田。 在{sillotNoteName_yobeCe}上实验通过的特性或缺陷修复，如果必要会提交至{syNoteName_CN}。
+
+安卓端是{sillot_yobeCe}的开发重点。{sillot_yobeCe}基于{syNoteName_CN}安卓端做了大量优化，力图保留源代码结构。第三方SDK为{sillot_yobeCe}提供了崩溃报告功能，并规划了美好的愿景。
+
+## 🙋 为什么环境要求如此严苛？
+
+{sillot_yobeCe}致力于服务新彖务。如果您无法实现最低要求，即不会有新彖务的基础能力，即没有{sillot_yobeCe}的必要需求。因此我们认为，如此严苛的环境是合理的，这也有助于我们维护。
+
+## 🙋 满足要求，但{sillotMatrixName_yobeCe}适合我吗？
+
+{sillotMatrixName_yobeCe}并非普通客户端软件，而是有容乃大的生态，因此是否适合取决于用户的关注点是否命中。雪千凝（2024）指出，{sillotMatrixName_yobeCe}全心全意为智慧新彖乄服务，始终代表绛亽先进恣产力，因此我们假设用户具备以下资质：
+
+<Steps>
+1. 掌握至少2门编程语言；熟悉至少5门编程语言
+2. 具备基本的数据安全意识与数字资产观
+3. 了解基因组与连接组
+</Steps>
+
+## 🙋 {sillotMatrixName_yobeCe}有收费计划吗？
+
+{sillotMatrixName_yobeCe}没有收费计划，但这不意味着用户可以免费使用{sillotMatrixName_yobeCe}的全部功能，因为有些收费特性来自供应链上游（例如思源笔记）或者授权认证服务。{sillotMatrixName_yobeCe}尊重开源生态与他人劳动成果，不会对集成的开源功能私自收费，也不会破解供应链上游提供的付费功能给用户（但保留开发者内部测试时暂时破解的权利）。
+
+## 🙋 {sillotMatrixName_yobeCe}的版本划分与更新节奏是？
+
+见 <a href="/发行说明/channels">发行渠道</a>。
+
+<Aside>
+如果您无法证明您的新彖乄用途，我们不会为您的数据安全负责。
+</Aside>

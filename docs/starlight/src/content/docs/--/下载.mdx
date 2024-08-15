@@ -1,0 +1,68 @@
+---
+title: 下载
+---
+
+import { Image } from "astro:assets"
+import myImage from "@assets/shots/2024-07-21-002329.png"
+
+## Github release
+
+https://github.com/Hi-Windom/Sillot/releases
+
+## 阿里云盘
+
+https://www.alipan.com/s/FuVG2PhBYTD 提取码: g4k1
+
+## 在 WSL 上运行
+
+这里以安装了 `kali-linux-default` 的 kali 系统为例（约占用 3GB 空间）。用户可以在 [微软商店获取 kali ](https://apps.microsoft.com/detail/9pkr34tncv07?hl=zh-cn&gl=CN)，然通过官方文档 [了解如何安装 kali-linux-default](https://www.kali.org/docs/general-use/metapackages/) 。
+
+如果未安装 `wget`，可以通过 `apt install wget` 命令安装。
+
+找到 GitHub 仓库的 [Release 页面](https://github.com/Hi-Windom/Sillot/releases)，并在 Assets 里找到 AppImage 文件。
+
+<Image src={myImage} alt="找到 AppImage 文件" />
+
+复制 Appimage 的链接，在 WSL 中打开终端，输入 `wget <URL>` 命令下载，然后通过 `chmod +x <FILENAME>` 命令赋予可执行权限，最后通过 `./<FILENAME>` 命令运行。
+
+### 在其他挂载盘里运行
+
+在其他挂载盘里运行有两个好处，一个是节省 C 盘空间（ WSL 的默认挂载盘是 C 盘），另一个方便通过 Windows 文件资源管理器管理。
+
+通过命令 `ls /mnt/` 可以查看 WSL 挂载的盘符。
+
+假设我们想将 AppImage 文件放到 D 盘已存在的文件夹 D:\\wsl\\kali\\ ，可以参考以下操作：
+
+```bash
+cd /mnt/d/wsl/kali
+wget <URL>
+chmod +x <FILENAME>.AppImage
+./<FILENAME>.AppImage
+```
+
+### 手动提取后运行
+
+直接运行 Appimage 有个问题：无法写入日志文件，用户可以在控制台看到类似下面的信息：
+
+```log
+Unable to write to log file: [Error: EROFS: read-only file system, open '/tmp/.mount_sillotEOT29t/resources/electron-main.log'] {
+  errno: -30,
+  code: 'EROFS',
+  syscall: 'open',
+  path: '/tmp/.mount_sillotEOT29t/resources/electron-main.log'
+}
+```
+
+而通过 --appimage-extract-and-run 指令可以写入日志文件，但是其仍然在 /tmp 路径。
+
+要解决这个问题，可以手动提取 AppImage 的内容，然后运行其中的可执行文件。首先，提取 AppImage：
+
+```bash
+./<FILENAME>.AppImage --appimage-extract
+```
+
+然后，运行提取出来的可执行文件：
+
+```bash
+./squashfs-root/AppRun
+```
