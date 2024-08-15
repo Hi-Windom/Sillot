@@ -1,0 +1,196 @@
+---
+title: 94to114
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -114000
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import BannerTopArchived from '@components/BannerTopArchived.astro';
+
+<BannerTopArchived />
+
+Chromium 94 功能冻结于2021年7月29日，已经不满足新彖乄要求。
+2024年7月15日，汐洛彖夲肜矩阵v0.35将要求提升至 114（2023年4月11日功能冻结）。
+
+<Aside>受此影响，VSCode 要求提升至 <a href="/依赖更新/vscode/1_82/">1.82 (2023 年 8 月)</a></Aside>
+
+## 新增支持
+
+### CSS 首字母 | CSS Initial Letter
+
+> 由不支持变更为部分支持（ 110 开始）
+
+部分支持是指仅支持 initial-letter 属性（不是 initial-letter-align 或 initial-letter-wrap ）
+
+### 小型、大型和动态视口单元 | Small, Large, and Dynamic viewport units
+
+> 由不支持变更为完全支持（ 108 开始）
+
+### 媒体查询：范围语法 | Media Queries: Range Syntax
+
+> 由不支持变更为完全支持（ 104 开始）
+
+语法改进，使使用具有“范围”类型（如宽度或高度）的功能的媒体查询不那么冗长。可以与普通的数学比较运算符一起使用。
+例如： @media (100px \<= width \<= 1900px) 等价于 @media (min-width: 100px) and (max-width: 1900px)
+
+### LCH 和 Lab 颜色值 | LCH and Lab color values
+
+> 由不支持变更为完全支持（ 111 开始）
+
+lch() 和 lab() 颜色函数基于CIE LAB色彩空间，以与人类感知非常接近的方式表示颜色，并提供比通常的RGB色彩空间更广泛的颜色范围。
+
+### :has() CSS 关系伪类 | :has() CSS relational pseudo-class
+
+> 由不支持变更为完全支持（ 105 开始）
+
+> 非常实用的特性，不过使用时注意尽可能缩小范围以提升性能。
+
+选择包含特定内容的元素。例如， a:has(img) 选择包含 `<img>` 子元素的所有 `<a>` 元素。
+
+### CSS 字体调色板 + COLR/CPAL（v1）字体格式  | CSS font-palette + COLR/CPAL(v1) Font Formats
+
+> 由不支持变更为完全支持（ COLR/CPAL（v1）字体格式从 98 开始；CSS 字体调色板从 101 开始）
+
+参考：https://www.zhangxinxu.com/wordpress/2022/07/css-font-palette/
+
+### CSS 容器查询单元 | CSS Container Query Units
+
+> 由不支持变更为完全支持（ 105 开始）
+
+容器查询单元指定相对于查询容器维度的长度。单位包括：cqw, cqh, cqi, cqb, cqmin, cqmax.
+
+### CSS 容器查询（大小） | CSS Container Queries (Size)
+
+> 由不支持变更为完全支持（ 106 开始）
+
+105 在多列布局中组合大小容器查询和表布局不起作用
+
+### CSS 容器样式查询 | CSS Container Style Queries
+
+> 由不支持变更为部分支持（ 111 开始）
+
+部分支持是指仅在 style() 查询中使用 CSS 自定义属性值
+
+### CSS color 函数 | CSS color() function
+
+> 由不支持变更为完全支持（ 111 开始）
+
+CSS color() 函数允许浏览器显示任何颜色空间中的颜色，例如 P3 颜色空间，它可以显示默认 sRGB 颜色空间之外的颜色。
+
+### CSS 级联层 | CSS Cascade Layers
+
+> 由不支持变更为完全支持（ 99 开始）
+
+`@layer`
+
+### 通行密钥 | Passkeys
+
+> 由不支持变更为完全支持（ 108 开始）
+
+通行密钥，也称为多设备 FIDO 凭据，为用户提供了更易于使用且更安全的密码替代方案。FIDO 是商业认证，对汐洛来说没有用处。
+
+### MathML
+
+> 由不支持变更为完全支持（ 109 开始）
+
+允许在网页上编写数学公式和符号的特殊标签。基于 Chromium 的浏览器特别支持 [MathML Core](https://www.w3.org/TR/mathml-core/)。虽然与其他 MathML 实现有很大的支持重叠，但也存在一些差异（[详见](https://groups.google.com/a/chromium.org/g/blink-dev/c/n4zf_3FWmAA/m/oait3tsMAQAJ)）。
+
+### CSS 嵌套 | CSS Nesting
+
+> 由不支持变更为部分支持（ 112 开始）
+
+> 112-119 不允许嵌套类型（元素）选择器而不以符号开头，如 & 嵌套选择器。
+
+CSS 嵌套提供了将一个样式规则嵌套到另一个样式规则中的能力，子规则的选择器相对于父规则的选择器。类似的行为以前需要 CSS 预处理器。
+
+### View Transitions API（单文档） | View Transitions API (single-document)
+
+> 由不支持变更为完全支持（ 111 开始）
+
+参考：https://juejin.cn/post/7255675484938256441
+
+### WebTransport
+
+> 由不支持变更为完全支持（ 97 开始）
+
+> 已知问题：（1） Chromium 浏览器存在 WebTransport 连接过度限制的问题，无法通过代码缓解。
+> （2） Chromium 浏览器存在一个问题，即关闭流的写入器端将关闭，而不会确保实际发送所有先前发送的数据。
+
+使用 HTTP3 从服务器发送和接收数据的协议框架。类似于 WebSockets，但支持多流、单向流、无序交付以及可靠和不可靠的传输。
+
+### WebGPU
+
+> 由不支持变更为完全支持（ 113 开始）
+
+> 默认情况下，在 Linux 上未启用。
+
+使用硬件加速进行复杂渲染和计算的 API。用例包括要求苛刻的 3D 游戏和加速科学计算。旨在取代 WebGL。
+
+### CSS 文本换行：平衡 | CSS text-wrap: balance
+
+> 由不支持变更为部分支持（ 114 开始）
+
+允许多行文本以每行大致相同的宽度中断行，通常用于使标题更具可读性和视觉吸引力。部分支持是指仅支持 text-wrap： balance，不支持 text-wrap-style： balance。
+
+### HEVC/H.265 视频格式 | HEVC/H.265 video format
+
+> 由不支持变更为部分支持（ 107 开始）
+
+浏览器很难普遍支持 HEVC，因为它既复杂又昂贵。HEVC 与 AV1 竞争，AV1 具有相似的压缩质量并提供免费许可证。
+支持 Android （>= 5.0） 上的所有设备，支持在 Windows 上支持硬件的设备 （>= Windows 8），以及在 Linux 和 ChromeOS 上支持由 VAAPI 提供支持的硬件设备。
+如果 Edge >= 107，则支持 Android （>= 5.0） 上的所有设备，适用于在 Windows （>= Windows 10 1709） 上支持硬件的设备，当安装了 Microsoft Store 中的 HEVC 视频扩展时。
+
+
+
+## 修改支持
+
+### 文本强调样式 | text-emphasis styling
+
+> 由部分支持变更为完全支持（ 99 开始）
+
+> 已知问题：Android 版 Chrome 偶尔会出现正确渲染强调字形的问题。
+
+部分支持是指对 -webkit-text-emphasis-position 的错误支持。这些浏览器支持 and under 作为值，但不支持 over 规范要求的 added left 和 right values。
+
+### CSS 图像集 | CSS image-set
+
+> 由部分支持变更为完全支持（ 114 开始）
+
+112 版本前支持非常有限。仅 url() 被接受为图像，并且仅 x 被接受为分辨率。
+
+113 版本不支持 calc() 用于分辨率。
+
+### 声明式影子 DOM | Declarative Shadow DOM
+
+> 由部分支持变更为完全支持（ 111 开始）
+
+部分支持是指使用较旧的非标准属性，而不是标准化属性 shadowroot shadowrootmode
+
+### CSS 分页符属性 | CSS page-break properties
+
+> 由部分支持变更为完全支持（ 108 开始）
+
+> 并非所有移动浏览器都提供打印支持，即列出的支持基于浏览器引擎功能。
+
+> 支持 CSS 2.1 规范中的 page-break-* 别名，但不支持最新规范中的 break-* 属性。
+
+部分支持是由于不支持 avoid page-break-before & page-break-after （仅 page-break-inside ）。
+
+
+
+## 移除支持
+
+### CSS overflow: overlay
+
+> 已弃用（ 114 开始）
+
+> 该 overlay 值可识别，但行为与“auto”相同。
+
+overflow CSS 属性的 overlay 值是一个非标准值，用于使滚动条显示在内容顶部而不是占用空间。此值已弃用，相关功能将标准化为 scrollbar-gutter 属性。
+
+## 其他
+
+### popover 属性支持
+
+见 https://developer.mozilla.org/zh-CN/docs/Web/HTML/Global_attributes/popover

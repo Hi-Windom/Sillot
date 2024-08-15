@@ -49,41 +49,44 @@ export default defineConfig({
             sidebar: [
                 // REF https://starlight.astro.build/zh-cn/guides/sidebar/
                 {
-                    label: "Reference",
+                    label: "APIs",
                     collapsed: true, // 默认折叠分组
-                    autogenerate: { directory: "reference" },
+                    autogenerate: { directory: "-api" },
                 },
                 {
                     label: "汐洛宝典",
-                    autogenerate: { directory: "汐洛宝典" },
+                    collapsed: true, // 默认折叠分组
+                    autogenerate: { directory: "--" },
                 },
                 {
                     label: "发行说明",
-                    autogenerate: { directory: "发行说明" },
+                    collapsed: true, // 默认折叠分组
+                    autogenerate: { directory: "-release" },
                 },
                 {
                     label: "依赖更新",
-                    autogenerate: { directory: "依赖更新" },
+                    collapsed: true, // 默认折叠分组
+                    autogenerate: { directory: "-dep" },
                 },
                 {
                     label: "汐洛绞架用户指南",
                     collapsed: true, // 默认折叠分组
-                    autogenerate: { directory: "guides/汐洛绞架" },
+                    autogenerate: { directory: "-guide/汐洛绞架" },
                 },
                 {
                     label: "思源笔记用户指南",
                     collapsed: true, // 默认折叠分组
-                    autogenerate: { directory: "guides/siyuan" },
+                    autogenerate: { directory: "-guide/siyuan" },
                 },
                 {
                     label: "风颂用户指南",
                     collapsed: true, // 默认折叠分组
-                    autogenerate: { directory: "guides/风颂" },
+                    autogenerate: { directory: "-guide/风颂" },
                 },
                 {
                     label: "汐洛扩展用户指南",
                     collapsed: true, // 默认折叠分组
-                    autogenerate: { directory: "guides/汐洛扩展" },
+                    autogenerate: { directory: "-guide/汐洛扩展" },
                 },
             ],
             components: {

@@ -27,7 +27,7 @@
       },
     {
       "path": "../docs/starlight", // 列出子文件夹，在父文件夹的 setting.json 添加隐藏（排除）
-      "name": "汐洛宝典🤍/docs/starlight 🗂️",
+      "name": "汐洛文档🤍/docs/starlight 🗂️",
       "url": "https://github.com/Hi-Windom/Sillot/docs/starlight"
     },
     {
