@@ -9,23 +9,44 @@ packages:
 
 # Default catalogs
 catalog:
-  "@types/node": ^20.14.8
+  "@types/node": ^22.4.0
   "@types/react": ^18.3.1
   "@types/react-dom": ^18.3.0
   "@types/fs-extra": ^11.0.4
-  "@mui/icons-material": ^5.15.20
-  "@mui/material": ^5.15.20
-  "@mui/joy": 5.0.0-beta.36
-  typescript: ^5.5.2
+  "@mui/icons-material": ^5.16.7
+  "@mui/material": ^5.16.7
+  "@mui/joy": 5.0.0-beta.48
+  "@vscode/webview-ui-toolkit": ^1.4.0
+  "@vscode/vsce": ^3.0.0
+  "@types/vscode": ^1.92.0
+  "@babel/core": ^7.25.2
+  "@babel/runtime": 7.25.0
+  "@babel/preset-env": 7.25.0
+  "@babel/preset-react": 7.24.7
+  "@babel/preset-typescript": 7.24.7
+  "@babel/plugin-transform-runtime": 7.24.7
+  typescript: ^5.5.4
+  ts-loader: ^9.5.1
+  tslib: ^2.6.3
   react: 18.3.1
   react-dom: 18.3.1
-  electron: 31.3.1 # 在 cd.yml 工作流中需要读取，因此不要用任何版本前缀
+  electron: 31.4.0 # 在 cd.yml 工作流中需要读取，因此不要用任何版本前缀
   electron-builder: 24.13.3
   date-fns: ^3.6.0
   sofill: ^1.1.10
-  webpack: ^5.92.1
+  webpack: ^5.93.0
   webpack-cli: ^5.1.4
-  rollup: ^4.18.0
+  rollup: ^4.20.0
+  rollup-plugin-import-css: ^3.5.1
+  rollup-plugin-postcss: ^4.0.2
   fs-extra: ^11.2.0
-  astro: ^4.11.0
-  sass: ^1.77.6
+  astro: ^4.14.2
+  sass: ^1.77.8
+  sass-loader: ^16.0.0
+  jsonc-parser: ^3.3.1
+  json5: ^2.2.3
+  vconsole: ^3.15.1
+  sweetalert2: ^11.12.4
+  esbuild: ^0.23.0
+  esbuild-loader: ^4.2.2
+  postcss: ^8.4.41

@@ -439,25 +439,25 @@
     "@types/fs-extra": "catalog:",
     "@types/mocha": "^10.0.6",
     "@types/node": "catalog:",
-    "@types/vscode": "^1.90.0",
+    "@types/vscode": "catalog:",
     "@vscode/test-cli": "^0.0.8",
     "@vscode/test-electron": "^2.3.10",
-    "@vscode/vsce": "^2.29.0",
+    "@vscode/vsce": "catalog:",
     "copy-webpack-plugin": "^12.0.2",
-    "jsonc-parser": "^3.2.1",
+    "jsonc-parser": "catalog:",
     "mkdirp": "^3.0.1",
-    "rimraf": "^5.0.7",
+    "rimraf": "^6.0.1",
     "sofill": "catalog:",
-    "ts-loader": "^9.5.1",
+    "ts-loader": "catalog:",
     "typescript": "catalog:",
     "webpack": "catalog:",
     "webpack-cli": "catalog:"
   },
   "dependencies": {
     "@octokit/rest": "^20.1.1",
-    "@vscode/webview-ui-toolkit": "^1.4.0",
+    "@vscode/webview-ui-toolkit": "catalog:",
     "fs-extra": "catalog:",
-    "json5": "^2.2.3"
+    "json5": "catalog:"
   },
   "packageManager": "pnpm@9.6.0"
 }
