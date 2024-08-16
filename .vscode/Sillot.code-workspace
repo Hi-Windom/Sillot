@@ -113,7 +113,7 @@
     "scm.workingSets.enabled": true, // since vscode 1.89
     "scm.workingSets.default": "current", // since vscode 1.89
     "scm.inputMinLineCount": 3, // since vscode 1.86
-    "scm.showHistoryGraph": true, // since vscode 1.91 // 1.92 experimental -> formal
+    "scm.showHistoryGraph": false, // 2024-08-16看起来还存在问题，暂不启用 // since vscode 1.91 // 1.92 experimental -> formal
     "markdown.editor.updateLinksOnPaste.enabled": true, // since vscode 1.89 // 1.92 experimental -> formal
     "markdown.editor.pasteUrlAsFormattedLink.enabled": "smart", // since vscode 1.80
     "markdown.updateLinksOnFileMove.enabled": "prompt", // since vscode 1.73
