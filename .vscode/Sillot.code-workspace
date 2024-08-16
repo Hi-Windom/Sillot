@@ -105,8 +105,9 @@
         "pwshGit": true
     }, // since vscode 1.92
     "git.mergeEditor": true, // 默认使用 3 向合并编辑器
-    "git.repositoryScanMaxDepth": 6, // since vscode 1.72
+    "git.repositoryScanMaxDepth": 3, // since vscode 1.72
     "git.untrackedChanges": "separate",
+    "git.autoStash": true,
     "git.autofetch": true, // since vscode 1.88 // 若设置为 true，则自动从当前 Git 仓库的默认远程仓库提取提交。若设置为 all ，则从所有远程仓库进行提取。
     "git.optimisticUpdate": true, // since vscode 1.74
     "scm.workingSets.enabled": true, // since vscode 1.89
