@@ -99,12 +99,10 @@ jobs:
           echo "release_version=v${{ steps.version.outputs.value }}_$(TZ=Asia/Shanghai date +'%Y%m%d')_syv${{ steps.syv.outputs.value }}" >> $GITHUB_OUTPUT
           changelog1=$(python scripts/parse-changelog-HEAD.py -t ${{ github.ref }} -b ${{ steps.thisLatestRelease.outputs.release }} -e ${{ steps.electronVersion.outputs.result }} ${{ env.repo_owner }}/${{ env.repo_name }})
           changelog2=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ env.repo_name }})
-          changelog3=$(python scripts/parse-changelog-sillot.py -t ${{ github.ref }} ${{ env.repo_owner }}/${{ env.repo_name_android }})
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "release_body_sillot<<$EOF" >> $GITHUB_ENV
           echo "$changelog1" >> $GITHUB_ENV
           echo "$changelog2" >> $GITHUB_ENV
-          echo "$changelog3" >> $GITHUB_ENV
           echo "$EOF" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -401,15 +399,23 @@ jobs:
           # override default build-tools version -- optional
           BUILD_TOOLS_VERSION: "34.0.0"
 
-      - name: 📤 Upload APK to release assets
+        # 需要改进  https://github.com/noriban/sign-android-release/issues/116
+      - name: 📤 Upload APK0 to release assets
         if: contains( matrix.config.suffix, 'apk')
         uses: shogo82148/actions-upload-release-asset@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             upload_url: ${{ needs.create_release.outputs.upload_url }}
-            asset_name: ${{ env.repo_name }}-${{ needs.create_release.outputs.release_version }}-android-arm64_v8a.apk
-            asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
+            asset_path: ${{ steps.sign_app.outputs.signedReleaseFile0 }}
+      - name: 📤 Upload APK1 to release assets
+        if: contains( matrix.config.suffix, 'apk')
+        uses: shogo82148/actions-upload-release-asset@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            upload_url: ${{ needs.create_release.outputs.upload_url }}
+            asset_path: ${{ steps.sign_app.outputs.signedReleaseFile1 }}
 
       - name: 📤 Upload logs to artifact if failure
         if: failure()

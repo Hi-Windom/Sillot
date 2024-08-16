@@ -105,14 +105,15 @@
         "pwshGit": true
     }, // since vscode 1.92
     "git.mergeEditor": true, // 默认使用 3 向合并编辑器
-    "git.repositoryScanMaxDepth": 6, // since vscode 1.72
+    "git.repositoryScanMaxDepth": 3, // since vscode 1.72
     "git.untrackedChanges": "separate",
+    "git.autoStash": true,
     "git.autofetch": true, // since vscode 1.88 // 若设置为 true，则自动从当前 Git 仓库的默认远程仓库提取提交。若设置为 all ，则从所有远程仓库进行提取。
     "git.optimisticUpdate": true, // since vscode 1.74
     "scm.workingSets.enabled": true, // since vscode 1.89
     "scm.workingSets.default": "current", // since vscode 1.89
     "scm.inputMinLineCount": 3, // since vscode 1.86
-    "scm.showHistoryGraph": true, // since vscode 1.91 // 1.92 experimental -> formal
+    "scm.showHistoryGraph": false, // 2024-08-16看起来还存在问题，暂不启用 // since vscode 1.91 // 1.92 experimental -> formal
     "markdown.editor.updateLinksOnPaste.enabled": true, // since vscode 1.89 // 1.92 experimental -> formal
     "markdown.editor.pasteUrlAsFormattedLink.enabled": "smart", // since vscode 1.80
     "markdown.updateLinksOnFileMove.enabled": "prompt", // since vscode 1.73
@@ -156,7 +157,7 @@
     "notebook.experimental.remoteSave": true, // since vscode 1.89
     "notebook.experimental.variablesView": true, // since vscode 1.86
     "debugpy.showPythonInlineValues": true, // since vscode 1.92
-    "diffEditor.experimental.useTrueInlineView": true, // since vscode 1.92
+    "diffEditor.experimental.useTrueInlineView": true, // 还需要在 diffEditor 界面右上角更多选项中启用 // since vscode 1.92
     "diffEditor.experimental.showMoves": true, // since vscode 1.82
     // CodeGeeX 智能编程助手设置
     "Codegeex.Chat.LanguagePreference": "中文",

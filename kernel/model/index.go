@@ -84,7 +84,7 @@ func listSyFiles(dir string) (ret []string) {
 	dirPath := filepath.Join(util.DataDir, dir)
 	err := filelock.Walk(dirPath, func(path string, d fs.FileInfo, err error) error {
 		if nil != err {
-			logging.LogWarnf("walk dir [%s] failed: %s", dirPath, err)
+			logging.LogWarnf("(model) listSyFiles() walk dir [%s] failed: %s", dirPath, err)
 			return err
 		}
 
@@ -99,7 +99,7 @@ func listSyFiles(dir string) (ret []string) {
 		return nil
 	})
 	if nil != err {
-		logging.LogWarnf("walk dir [%s] failed: %s", dirPath, err)
+		logging.LogWarnf("(model) listSyFiles() walk dir [%s] failed: %s", dirPath, err)
 	}
 	return
 }

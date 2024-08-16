@@ -14,9 +14,9 @@ docmap_sillot = {
 docmap_siyuan = {
     "Feature": "引入特性 | Feature",
     # "Enhancement": "改进功能 | Enhancement",
-    "Bug": "修复错误 | Bugfix",
+    # "Bug": "修复错误 | Bugfix",
     # "Document": "文档相关 | Document",
-    "Refactor": "开发重构 | Refactor",
+    # "Refactor": "开发重构 | Refactor",
     "Abolishment": "移除废止 | Abolishment",
     "Development": "开发者相关 | Development",
 }
@@ -30,7 +30,7 @@ HEADER_sillot = '''
 
 # 🚧 汐洛仅用于开发者测试，不要用来存储重要数据！
 
-> 如果 Github 下载困难，可以右键复制 assets 的 apk 文件链接到 [Github 文件加速](https://tool.mintimate.cn/gh/) 下载
+> 如果 Github 下载困难，可以右键复制 assets 文件链接到 [Github 文件加速](https://tool.mintimate.cn/gh/) 下载
 
 <p>
 <img src="https://img.shields.io/badge/Chromium 114+-black?logo=Google Chrome" title="Chromium" height="25"/>
