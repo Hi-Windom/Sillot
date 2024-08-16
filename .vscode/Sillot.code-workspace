@@ -180,7 +180,9 @@
       "README.md": "README*.md",
     },
     "files.readonlyInclude": { // since vscode 1.79
-        "**/assets/template/*/*.tpl": true // 通过代码生成的文件
+        "**/assets/template/*/*.tpl": true, // 通过代码生成的文件
+        "**/pnpm-lock.yaml": true,
+        "*.sum": true, // golang 自动生成
     },
   },
   "extensions": {
