@@ -386,7 +386,7 @@ func (searcher *AssetsSearcher) FullIndex() {
 	var results []*AssetParseResult
 	filelock.Walk(assetsDir, func(absPath string, info fs.FileInfo, err error) error {
 		if nil != err {
-			logging.LogErrorf("walk dir [%s] failed: %s", absPath, err)
+			logging.LogErrorf("(model) FullIndex() walk dir [%s] failed: %s", absPath, err)
 			return err
 		}
 
