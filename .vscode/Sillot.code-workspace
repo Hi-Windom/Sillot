@@ -157,7 +157,7 @@
     "notebook.experimental.remoteSave": true, // since vscode 1.89
     "notebook.experimental.variablesView": true, // since vscode 1.86
     "debugpy.showPythonInlineValues": true, // since vscode 1.92
-    "diffEditor.experimental.useTrueInlineView": true, // since vscode 1.92
+    "diffEditor.experimental.useTrueInlineView": true, // 还需要在 diffEditor 界面右上角更多选项中启用 // since vscode 1.92
     "diffEditor.experimental.showMoves": true, // since vscode 1.82
     // CodeGeeX 智能编程助手设置
     "Codegeex.Chat.LanguagePreference": "中文",
