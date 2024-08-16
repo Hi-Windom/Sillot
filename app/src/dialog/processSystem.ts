@@ -203,6 +203,7 @@ export const exitSiYuan = () => {
     window.sout.tracker("invoked");
     const overlay = document.querySelector('#SillotOverlay') as HTMLElement;
     overlay.style.display = "block";
+    overlay.style.zIndex = (++window.siyuan.zIndex).toString();
     exportIDB().then(() => {
     hideAllElements(["util"]);
     /// #if MOBILE
