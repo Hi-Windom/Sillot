@@ -174,7 +174,10 @@
     "explorer.fileNesting.patterns": {
       "webpack.config.js": "webpack.*.js",
       "electron-builder.yml": "electron-builder-*.yml",
-      "index.ts": "*.ts"
+      "index.ts": "*.ts",
+      "pnpm-workspace.yaml": "package.json, .npmrc",
+      "Sillot-workspace.yaml": "pnpm-workspace.yaml, biome.jsonc, .editorconfig",
+      "README.md": "README*.md",
     },
     "files.readonlyInclude": { // since vscode 1.79
         "**/assets/template/*/*.tpl": true // 通过代码生成的文件
