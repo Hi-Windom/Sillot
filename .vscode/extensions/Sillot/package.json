@@ -20,7 +20,7 @@
   "extensionDependencies": [],
   "markdown": "github",
   "engines": {
-    "vscode": "^1.90.0"
+    "vscode": "^1.92.0"
   },
   "categories": [
     "Programming Languages",
@@ -439,7 +439,7 @@
     "@types/fs-extra": "catalog:",
     "@types/mocha": "^10.0.6",
     "@types/node": "catalog:",
-    "@types/vscode": "catalog:",
+    "@types/vscode": "^1.92.0",
     "@vscode/test-cli": "^0.0.8",
     "@vscode/test-electron": "^2.3.10",
     "@vscode/vsce": "catalog:",
