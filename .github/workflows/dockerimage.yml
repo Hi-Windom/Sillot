@@ -6,7 +6,7 @@ on:
     inputs:
       image_tag:
         description: '镜像标签，留空则使用 package.json 中的版本号。务必注意：请确认选择了正确的分支。完整输入示例：0.35.24072117-E1 '
-        required: true
+        required: false
         default: ''
       channel:
         description: "发行渠道"
@@ -104,7 +104,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PWD }}
 
       - name: 🔥 Build the Docker image use Workflow Dispatch inputs' version
-        if: ${{ github.event_name == 'workflow_dispatch' && !github.event.inputs.image_tag == '' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.image_tag != '' && github.event.inputs.image_tag != null }}
         run: |
           # Check if the channel input contains '&', if not, it's a single tag
           if [[ "${{ github.event.inputs.channel }}" == *" & "* ]]; then
@@ -126,7 +126,7 @@ jobs:
           "${TAG_ARGS[@]}" \
           .
       - name: 🔥 Build the Docker image use package_json version
-        if: ${{ github.event_name == 'push' || github.event.inputs.image_tag == '' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.image_tag == '' || github.event.inputs.image_tag == null) }}
         run: |
           # Check if the channel input contains '&', if not, it's a single tag
           if [[ "${{ github.event.inputs.channel }}" == *" & "* ]]; then
