@@ -47,7 +47,7 @@ jobs:
             ["P & Pioneer"]="docker/P.Dockerfile"
             ["C & Canary"]="docker/C.Dockerfile"
             ["E & Emo"]="docker/E.Dockerfile"
-            ["S_Gibbet"]="Dockerfile"
+            ["S_Gibbet"]="docker/S_Gibbet.Dockerfile"
             ["D_Gibbet"]="docker/D_Gibbet.Dockerfile"
           )
           channel="${{ github.event.inputs.channel }}"
