@@ -1,9 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
 
-/**
- * TODO: 支持选择终端路径（.sillot.jsonc 没有定义则忽略）
- */
 export function add_task_运行工作区脚本文件(context: vscode.ExtensionContext) {
     const disposable = vscode.commands.registerCommand("sillot.运行工作区脚本文件", async () => {
         let batFiles: vscode.Uri[] | undefined = undefined;
@@ -79,14 +76,11 @@ export function add_task_运行工作区脚本文件(context: vscode.ExtensionCo
 }
 
 class TerminalHandler {
-    private terminal: vscode.Terminal | undefined;
     private quickPick: vscode.QuickPick<vscode.QuickPickItem> | undefined;
 
     cancel() {
         this.quickPick?.dispose();
         this.quickPick = undefined;
-        this.terminal?.dispose();
-        this.terminal = undefined;
     }
 
     async execute(batFiles: vscode.Uri[], fileNameStartWith: string, limiter: number) {
@@ -119,12 +113,12 @@ class TerminalHandler {
                 } else {
                     resolve(undefined);
                 }
-                this.quickPick?.dispose();
+                this.cancel();
             });
 
             this.quickPick?.onDidHide(() => {
                 resolve(undefined);
-                this.quickPick?.dispose();
+                this.cancel();
             });
 
             this.quickPick?.show();
@@ -132,60 +126,53 @@ class TerminalHandler {
         if (!selectedBatFile) {
             return; // 用户取消了选择
         }
-
         const selectedBatFileUri = batFilesSafe[batFileChoices.indexOf(selectedBatFile)].fsPath;
-
-        vscode.window.withProgress(
-            {
-                location: vscode.ProgressLocation.Notification,
-                title: `💥 Run ${selectedBatFile} ... 点击取消关闭终端`,
-                cancellable: true,
-            },
-            async (progress, token) => {
-                return new Promise(async (resolve, reject) => {
-                    // 读取 脚本文件的内容
-                    const batFileData = await vscode.workspace.fs.readFile(vscode.Uri.file(selectedBatFileUri));
-                    const batFileContent = batFileData.toString();
-                    let cmd = "";
-                    let comment: RegExpMatchArray | null = null;
-
-                    // 查找第一行 @REM 注释，并提取其值作为工作目录
-                    const commentLine = batFileContent.split("\n")[0];
-                    if (selectedBatFile.endsWith(".bat")) {
-                        cmd = selectedBatFileUri;
-                        comment = commentLine.match(/@REM\s+(.+)/);
-                    } else if (selectedBatFile.endsWith(".py")) {
-                        cmd = `python ${selectedBatFileUri}`;
-                        comment = commentLine.match(/#\s+(.+)/);
-                    } else if (selectedBatFile.endsWith(".js")) {
-                        cmd = `node ${selectedBatFileUri}`;
-                        comment = commentLine.match(/\/\/\s+(.+)/);
-                    } else {
-                        cmd = selectedBatFileUri;
-                    }
-                    let workingDirectory = path.resolve(path.dirname(selectedBatFileUri)); // 将 workingDirectory 解析为绝对路径
-                    if (comment) {
-                        workingDirectory = path.resolve(path.join(workingDirectory, comment[1]));
-                    } else {
-                        vscode.window.showWarningMessage("脚本文件第一行没有定义相对工作路径，使用默认值");
-                    }
-
-                    this.terminal = vscode.window.createTerminal({
-                        name: selectedBatFile,
-                        cwd: workingDirectory, // 使用提取的工作目录
-                        hideFromUser: false,
-                    });
-
-                    token.onCancellationRequested(() => {
-                        this.cancel();
-                    });
-
-                    // 运行脚本文件
-                    this.terminal.sendText(cmd);
-                    this.terminal.show();
-                });
-            }
-        );
+        await this.runScript(selectedBatFile, selectedBatFileUri);
     }
 
+    /**
+     * 运行脚本文件，不支持并发
+     */
+    async runScript(selectedBatFile: string, selectedBatFileUri: string) {
+        // 读取 脚本文件的内容
+        const batFileData = await vscode.workspace.fs.readFile(vscode.Uri.file(selectedBatFileUri));
+        const batFileContent = batFileData.toString();
+        let cmd = "";
+        let comment: RegExpMatchArray | null = null;
+
+        // 查找第一行注释，并提取其值作为工作目录
+        const commentLine = batFileContent.split("\n")[0];
+        if (selectedBatFile.endsWith(".bat")) {
+            cmd = selectedBatFileUri;
+            comment = commentLine.match(/@REM\s+(.+)/);
+        } else if (selectedBatFile.endsWith(".py")) {
+            cmd = `python ${selectedBatFileUri}`;
+            comment = commentLine.match(/#\s+(.+)/);
+        } else if (selectedBatFile.endsWith(".js")) {
+            cmd = `node ${selectedBatFileUri}`;
+            comment = commentLine.match(/\/\/\s+(.+)/);
+        } else {
+            cmd = selectedBatFileUri;
+        }
+        let workingDirectory = path.resolve(path.dirname(selectedBatFileUri));
+        if (comment) {
+            // 将 workingDirectory 解析为绝对路径
+            workingDirectory = path.resolve(path.join(workingDirectory, comment[1]));
+        } else {
+            vscode.window.showWarningMessage("脚本文件第一行没有定义相对工作路径，使用默认值");
+        }
+
+        // 创建并运行任务
+        const task = new vscode.Task(
+            { type: "custom", task: "runScript" },
+            vscode.TaskScope.Workspace,
+            "Run Script",
+            "custom",
+            new vscode.ShellExecution(cmd, { cwd: workingDirectory }),
+            "$msCompile"
+        );
+
+        // 运行任务
+        vscode.tasks.executeTask(task);
+    }
 }
