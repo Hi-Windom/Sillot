@@ -118,7 +118,9 @@ jobs:
           TAG_ARGS=()
           for TAG in "${TAGS[@]}"; do
             TAG_ARGS+=("-t" "${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }}:$TAG")
-            TAG_ARGS+=("-t" "${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }}:$TAG-${{ github.event.inputs.image_tag }}")
+            if [ "$TAG" != "latest" ]; then
+                TAG_ARGS+=("-t" "${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }}:$TAG-${{ github.event.inputs.image_tag }}")
+            fi
           done
           # Run the docker buildx command once with all the -t options
           docker buildx build --push --platform linux/amd64 \
@@ -140,7 +142,9 @@ jobs:
           TAG_ARGS=()
           for TAG in "${TAGS[@]}"; do
             TAG_ARGS+=("-t" "${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }}:$TAG")
-            TAG_ARGS+=("-t" "${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }}:$TAG-${{ steps.version.outputs.value }}")
+            if [ "$TAG" != "latest" ]; then
+                TAG_ARGS+=("-t" "${{ env.docker_hub_owner }}/${{ env.docker_hub_repo }}:$TAG-${{ steps.version.outputs.value }}")
+            fi
           done
           # Run the docker buildx command once with all the -t options
           docker buildx build --push --platform linux/amd64 \
