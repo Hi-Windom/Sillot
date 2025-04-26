@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "astro-feelback": "^0.3.4",
-    "sharp": "^0.33.3"
+    "sharp": "^0.34.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.7.0",
