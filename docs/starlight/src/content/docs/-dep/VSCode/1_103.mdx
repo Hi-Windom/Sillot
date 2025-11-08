@@ -1,0 +1,29 @@
+---
+title: VSCode 1.103 (2025 年 7 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -1103
+---
+
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+
+> 主要内容摘抄自 [VSCode 1.103 发行说明](https://vscode.js.cn/updates/v1_103)，文中“我们”即 VSCode
+
+## [在用 uv 创建的虚拟环境中安装依赖项](https://vscode.js.cn/updates/v1_103#_install-dependencies-in-virtual-environments-created-with-uv)
+
+现在，当您针对使用 uv 创建的虚拟环境运行 Jupyter Notebook 时，我们支持安装所需的依赖项。
+
+## [仓库视图](https://vscode.js.cn/updates/v1_103#_repositories-view)
+
+在此里程碑中，我们更新了视图的渲染，以便在视觉上区分仓库、子模块和工作区。我们还显示了仓库、子模块和工作区之间的父子关系。
+
+## [终端激活事件](https://vscode.js.cn/updates/v1_103#_terminal-activation-events)
+
+有两个新的激活事件可用于扩展：
+
+    onTerminal：当任何终端打开时触发。
+    onTerminalShellIntegration：当终端的富 Shell 集成激活时触发。
+
+您可以指定 shellType 来定位特定的 shell。例如，当 Bash 终端启用 Shell 集成时，onTerminalShellIntegration:bash 会激活。

@@ -1,0 +1,20 @@
+---
+title: VSCode 1.100 (2025 年 4 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -1100
+---
+
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+
+> 主要内容摘抄自 [VSCode 1.100 发行说明](https://vscode.js.cn/updates/v1_100)，文中“我们”即 VSCode
+
+## [.*.env 文件的默认语法高亮](https://vscode.js.cn/updates/v1_100#_default-syntax-highlighting-for-env-files)
+
+名称格式为 `.*.env` 的文件现在会像 `.ini` 文件一样进行语法高亮显示。
+
+## [扩展的 ESM 支持](https://vscode.js.cn/updates/v1_100#_esm-support-for-extensions)
+
+NodeJS 扩展主机现在支持使用 JavaScript 模块 (ESM) 的扩展。它所需要的只是您的扩展的 package.json 文件中的 `"type": "module"` 条目。有了它，JavaScript 代码可以使用 import 和 export 语句，包括特殊模块 `import('vscode')` 。在此处找到一个示例：https://github.com/jrieken/vscode-esm-sample-extension。

@@ -1,0 +1,40 @@
+---
+title: VSCode 1.94 (2024 年 9 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -194
+---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.94 发行说明](https://vscode.js.cn/updates/v1_94)，文中“我们”即 VSCode
+
+## [查看与配置文件关联的文件夹和工作区](https://vscode.js.cn/updates/v1_94#_view-folders-and-workspaces-associated-with-a-profile)
+
+在此里程碑中，我们在配置文件编辑器中引入了文件夹和工作区部分。此部分集中列出了与特定配置文件关联的所有文件夹和工作区。在此部分中，您可以添加或修改文件夹，或在新窗口中打开文件夹或工作区。
+
+## [更新所有配置文件中的扩展程序](https://vscode.js.cn/updates/v1_94#_update-extensions-across-all-profiles)
+
+在此里程碑中，我们引入了更新所有配置文件中扩展程序的功能。如果您有多个配置文件并且希望保持扩展程序版本同步，这很有用。以前，您必须切换到每个配置文件并更新该配置文件的扩展程序
+
+## [在资源管理器中查找](https://vscode.js.cn/updates/v1_94#_find-in-explorer)
+
+我们改进了资源管理器视图中的查找功能，使其更容易在大型项目中搜索文件。您可以使用键盘快捷键 `Ctrl+Alt+F` 在文件资源管理器中打开查找控件。在搜索时，您可以在模糊匹配和连续匹配之间切换以获得更灵活的结果。
+
+请注意，某些上下文菜单操作在搜索期间暂时禁用。请继续关注即将推出的更多改进！
+
+## [内联提示改进](https://vscode.js.cn/updates/v1_94#_inlay-hint-improvements)
+
+我们添加了  <VSCodeSettingsLink id="editor.inlayHints.maximumLength" /> 设置，该设置控制内联提示在多少个字符后被截断。
+
+我们还修改了内联提示的更新策略，现在，在键入时，它们应该会更快地更新，但不会导致光标的任何水平移动。
+实验性
+
+## [源代码管理图设置](https://vscode.js.cn/updates/v1_94#_source-control-graph-settings)
+
+在此里程碑中，我们添加了一组新设置，以便您可以自定义图表
+
+- <VSCodeSettingsLink id="scm.graph.badges" /> 控制在源代码管理图视图中显示哪些徽章
+- <VSCodeSettingsLink id="scm.graph.pageOnScroll" /> 控制当您滚动到列表末尾时，源代码管理图视图是否加载下一页项目
+- <VSCodeSettingsLink id="scm.graph.pageSize" /> 在源代码管理图视图中显示和加载更多项目的默认项目数
+

@@ -1,0 +1,28 @@
+---
+title: VSCode 1.97 (2025 年 1 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -197
+---
+
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+
+> 主要内容摘抄自 [VSCode 1.97 发行说明](https://vscode.js.cn/updates/v1_97)，文中“我们”即 VSCode
+
+## [复合日志](https://vscode.js.cn/updates/v1_97#_compound-logs)
+
+有时，您会发现信息分散在多个日志中，需要将它们一起查看才能获得完整的情况。现在，您可以在一个复合日志视图中查看多个日志。结合新的筛选功能，分析日志变得更好了！
+
+要创建自定义复合日志，请使用“输出”面板溢出菜单中的“创建复合日志...”操作。
+
+## [扩展筛选器增强](https://vscode.js.cn/updates/v1_97#_extension-filter-enhancements)
+
+为了帮助您跟踪有可用更新的扩展以及查找最近更新的扩展，您现在在“扩展”视图中有了两个新的筛选选项：`@outdated` 和 `@recentlyUpdated` 。
+
+## [单元格执行时的内联值](https://vscode.js.cn/updates/v1_97#_inline-values-upon-cell-execution)
+
+现在，Notebook 编辑器支持在单元格执行后通过设置 <VSCodeSettingsLink id="notebook.inlineValues" /> 显示内联值。启用后，在成功执行单元格后，将根据已注册的 InlineValueProvider 的结果显示内联值。
+
+如果没有提供者，则回退方法通过简单的正则表达式匹配将内核中找到的值与单元格文档进行匹配。建议使用语言扩展提供的提供者以确保更准确的结果。

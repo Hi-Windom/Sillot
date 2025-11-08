@@ -1,0 +1,26 @@
+---
+title: VSCode 1.95 (2024 年 10 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -195
+---
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.95 发行说明](https://vscode.js.cn/updates/v1_95)，文中“我们”即 VSCode
+
+## [多个 GitHub 账户](https://vscode.js.cn/updates/v1_95#_multiple-github-accounts)
+
+上个月的功能已升级为默认行为，现在可以在 VS Code 中同时登录多个 GitHub 账户。
+
+## [设置编辑器中实验性和预览设置的指示器](https://vscode.js.cn/updates/v1_95#_settings-editor-indicator-for-experimental-and-preview-settings)
+
+以前，在查看设置编辑器时，并不总是清楚哪些设置是实验性或预览性设置。为了突出实验性和即将推出的功能，设置编辑器现在在实验性和预览设置旁边显示指示器。您可以在设置编辑器搜索框中键入 `@tag:experimental` 或 `@tag:preview` 以相应地筛选设置。
+
+扩展作者可以为其设置添加“实验性”或“预览”标签，以在设置编辑器中显示相应的指示器。
+
+## [面板中的视图图标](https://vscode.js.cn/updates/v1_95#_view-icons-in-panel)
+
+在工作台面板区域，视图通常以标签形式显示在标题栏中（例如，*终端* 或 *输出*）。然而，在较小的屏幕上，这些标签可能会超出可用空间，导致某些视图溢出到下拉菜单中。
+
+为了解决这个问题，我们添加了一个新设置：<VSCodeSettingsLink id="workbench.panel.showLabels" /> 。禁用后，视图将显示为图标而不是标签，从而节省水平空间并减少溢出。

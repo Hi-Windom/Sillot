@@ -1,0 +1,29 @@
+---
+title: VSCode 1.96 (2024 年 11 月)
+sidebar:
+# 为链接设置自定义顺序，数字越小显示在上方（全局的，这将影响父层级排序）
+  order: -196
+---
+
+
+import VSCodeSettingsLink from "@components/VSCodeSettingsLink.astro"
+
+> 主要内容摘抄自 [VSCode 1.96 发行说明](https://vscode.js.cn/updates/v1_96)，文中“我们”即 VSCode
+
+## [改进的扩展搜索结果](https://vscode.js.cn/updates/v1_96#_improved-extension-search-results)
+
+当您在“扩展”视图中使用自由格式文本搜索扩展时，已安装的扩展现在会显示在搜索结果的顶部。这使得在搜索 Marketplace 时更容易查找和管理已安装的扩展。
+
+## [扩展磁盘空间](https://vscode.js.cn/updates/v1_96#_extension-disk-space)
+
+您现在可以在“扩展”编辑器中查看扩展在磁盘上的内存使用情况。这可以帮助您了解扩展正在使用多少磁盘空间。
+
+## [配置允许的扩展](https://vscode.js.cn/updates/v1_96#_configure-allowed-extensions)
+
+您现在可以使用 <VSCodeSettingsLink id="extensions.allowed" /> 设置控制哪些扩展可以在 VS Code 中安装。此设置允许您按发布者、特定扩展和版本指定允许或阻止的扩展。如果扩展或版本被阻止，则如果已安装，它将被禁用。您可以指定以下类型的扩展选择器：
+- 允许或阻止来自发布者的所有扩展
+- 允许或阻止特定扩展
+- 允许特定扩展版本
+- 允许特定扩展版本和平台
+- 只允许扩展的稳定版本
+- 只允许发布者的稳定扩展版本
