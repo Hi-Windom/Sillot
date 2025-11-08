@@ -10,6 +10,8 @@ link:./docs/Sillot-android[汐洛安卓]
 
 image::split.png[Split Image]
 
+== 海纳百川，有容乃大
+
 image:https://img.shields.io/github/repo-size/Hi-Windom/Sillot?logo=github[GitHub repo size]
 image:https://img.shields.io/github/languages/code-size/Hi-Windom/Sillot.svg?logo=github[GitHub code size]
 image:https://img.shields.io/github/issues-closed/Hi-Windom/Sillot?logo=github[GitHub closed issues]
@@ -48,4 +50,4 @@ image:https://repobeats.axiom.co/api/embed/708cdf00c747155e49ff28c0c0024e17a28e5
     link="https://github.com/Hi-Windom/Sillot/pulse"
 ]
 
-image::https://capsule-render.vercel.app/api?type=waving&color=timeGradient&height=300&&section=footer&text=Hi-Windom&fontSize=90&fontAlign=50&fontAlignY=70&desc=Power%20by%20&descAlign=50&descSize=30&descAlignY=40&animation=twinkling[Hi-Windom Footer]
+image:https://capsule-render.vercel.app/api?type=waving&color=timeGradient&height=300&&section=footer&text=Hi-Windom&fontSize=90&fontAlign=50&fontAlignY=70&desc=Power%20by%20&descAlign=50&descSize=30&descAlignY=40&animation=twinkling[Hi-Windom, link="https://github.com/Hi-Windom"]

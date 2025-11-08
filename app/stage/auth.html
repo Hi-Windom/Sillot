@@ -106,7 +106,7 @@
             }
         }
         /* 手机横屏模式下的样式 */
-        @media screen and (orientation: landscape) {
+        @media screen and (max-height: 700px) {
             body.body--mobile { /* body--mobile 由 java 注入 */
                 .ft__on-surface {
                     margin: 13px 0 0;
@@ -114,7 +114,7 @@
                 .b3-button {
                     margin: 13px 0 0;
                 }
-                #Biometric, #BiometricTip, h1 {
+                #Biometric {
                     display: none;
                 }
             }

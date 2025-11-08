@@ -35,3 +35,5 @@ title: callout
 
 > [!CAUTION]
 > Negative potential consequences of an action.
+
+<!-- 方法 -->

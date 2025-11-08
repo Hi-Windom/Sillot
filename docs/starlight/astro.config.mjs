@@ -66,6 +66,11 @@ export default defineConfig({
                     autogenerate: { directory: "-dep" },
                 },
                 {
+                    label: "统计数据",
+                    collapsed: true,
+                    autogenerate: { directory: "-statistics" },
+                },
+                {
                     label: "汐洛绞架用户指南",
                     collapsed: true,
                     autogenerate: { directory: "-guide/汐洛绞架" },
