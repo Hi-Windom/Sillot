@@ -32,7 +32,7 @@ RUN apk add --no-cache gcc musl-dev && \
     mv /Hi-Windom/Sillot/kernel/kernel /opt/Sillot/ && \
     find /opt/Sillot/ -name .git | xargs rm -rf
 
-FROM alpine:latest
+FROM alpine:3.23.3
 LABEL maintainer="Soltus<694357845@qq.ocm>"
 
 WORKDIR /opt/Sillot/
